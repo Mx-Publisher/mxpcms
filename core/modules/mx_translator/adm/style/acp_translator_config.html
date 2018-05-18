@@ -1,0 +1,37 @@
+{% INCLUDE 'overall_header.html' %}
+    <h1>{{ lang('ACP_TRANSLATOR_CONFIG') }}</h1>
+
+    <p>{{ lang('ACP_TRANSLATOR_CONFIG_EXPLAIN') }}</p>
+
+    <form id="acp_translator_config" method="post" action="{{ U_ACTION }}">
+
+    <fieldset>
+    <legend>{{ lang('ACP_TRANSLATOR_CONFIG_SET') }}</legend>
+	<dl>
+		<dt>
+			<label for="translator_default_lang">{{ lang('TRANSLATOR_DEFAULT_LANG') }}{{ lang('COLON') }}</label><br /><span>{{ lang('TRANSLATOR_DEFAULT_LANG_EXPLAIN') }}</span>
+		</dt>
+        <dd>
+            <input name="translator_default_lang" type="text" id="translator_default_lang" value="{{ TRANSLATOR_DEFAULT_LANG }}" maxlength="255" />
+        </dd>
+    </dl>
+    <dl>
+        <dt>
+            <label for="translator_choice_lang">{{ lang('TRANSLATOR_CHOICE_LANG') }}{{ lang('COLON') }}</label><br /><span>{{ lang('TRANSLATOR_CHOICE_LANG_EXPLAIN') }}</span>
+        </dt>
+        <dd>
+            <input name="translator_choice_lang" type="text" id="translator_choice_lang" value="{{ TRANSLATOR_CHOICE_LANG }}" maxlength="255" />
+        </dd>
+    </dl>
+
+
+    <p class="submit-buttons">
+        <input type="hidden" name="action" value="save" />
+        <input class="button1" type="submit" id="submit" name="submit" value="{{ lang('SUBMIT') }}" />&nbsp;
+        <input class="button2" type="reset" id="reset" name="reset" value="{{ lang('RESET') }}" />
+        {{ S_FORM_TOKEN }}
+
+    </fieldset>
+    </form>
+
+{% INCLUDE 'overall_footer.html' %}

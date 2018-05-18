@@ -1,0 +1,190 @@
+<!-- BEGIN ajax_select -->
+<select name="{ajax_select.NAME}" id="{ajax_select.ID}" style="{ajax_select.STYLE}">
+	{ajax_select.OPTIONS}
+</select>
+<!-- END ajax_select -->
+<!-- BEGIN file_to_translate_select -->
+<script type="text/javascript">
+    <!--
+	/**
+	 * get Object
+	 */
+	function getObj(obj)
+	{
+		return ( document.getElementById ? document.getElementById(obj) : ( document.all ? document.all[obj] : null ) );
+	}
+	/**
+	 * Create xmlHTTP Object
+	 */
+	function getHTMLObject()
+	{
+        var xmlHttp;
+        try { // Firefox, Opera 8.0+, Safari
+            xmlHttp = new XMLHttpRequest();
+        } 
+        catch (e) { // Internet Explorer
+            try {
+                xmlHttp = new ActiveXObject("Msxml2.XMLHTTP");
+            } 
+            catch (e) {
+                try {
+                    xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+                } 
+                catch (e) {
+                    alert("Your browser does not support AJAX!");
+                    return false;
+                }
+            }
+        }
+		return xmlHttp;
+	}
+	
+	var regExp_Lang = /(\<select[^>]*\>).*?(\<\/select\>)/mi;
+    function ajaxLangFunction( selL){
+		var xmlHttp;
+		xmlHttp = getHTMLObject();
+        xmlHttp.onreadystatechange = function()
+		{
+            if (xmlHttp.readyState == 4) 
+			{	
+                into_obj = getObj('f_lang_into');
+				responseTEXT = xmlHttp.responseText;
+				into_obj.innerHTML = responseTEXT;
+            }
+        }
+		send_string = 'language[from]=' + selL + '&language[into]=' + getObj('lang_into').value + '&into=language';
+
+        xmlHttp.open("POST", "{S_ACTION_AJAX}", true);
+        xmlHttp.setRequestHeader("Content-Type","application/x-www-form-urlencoded; charset=UTF-8");
+		xmlHttp.send(send_string);
+    }
+    
+	function ajaxModuleLangList(selL)
+	{
+		var xmlHttp;
+		xmlHttp = getHTMLObject();
+        xmlHttp.onreadystatechange = function()
+		{
+            if (xmlHttp.readyState == 4) {
+				
+                into_obj = getObj('f_select_file');
+                //into_obj = getObj('main');
+				responseTEXT = xmlHttp.responseText;
+				into_obj.innerHTML = responseTEXT.replace( /^\s*|\s*$/g, '');
+                getObj('translate_file').innerHTML = '';
+            }
+        }
+		
+		send_string='translate[module]=' + selL + '&into=files';
+        xmlHttp.open("POST", "{S_ACTION_AJAX}", true);
+        xmlHttp.setRequestHeader("Content-Type","application/x-www-form-urlencoded; charset=UTF-8");
+		xmlHttp.send(send_string);
+	}
+	
+	function ajaxDirLangList(selL)
+	{
+		var xmlHttp;
+		xmlHttp = getHTMLObject();
+        xmlHttp.onreadystatechange = function()
+		{
+            if (xmlHttp.readyState == 4) {
+				
+                into_obj = getObj('f_select_dir');
+                //into_obj = getObj('main');
+				responseTEXT = xmlHttp.responseText;
+				into_obj.innerHTML = responseTEXT.replace( /^\s*|\s*$/g, '');
+                getObj('translate_file').innerHTML = '';
+            }
+        }
+		
+		send_string='translate[dir]=' + selL + '&into=files';
+        xmlHttp.open("POST", "{S_ACTION_AJAX}", true);
+        xmlHttp.setRequestHeader("Content-Type","application/x-www-form-urlencoded; charset=UTF-8");
+		xmlHttp.send(send_string);
+	}
+	
+	function getSelectedText(el) 
+	{
+	    if (typeof el.selectionStart == "number") 
+		{
+	        return el.value.slice(el.selectionStart, el.selectionEnd);
+	    } 
+		else if (typeof document.selection != "undefined") 
+		{
+	        var range = document.selection.createRange();
+	        if (range.parentElement() == el) 
+			{
+	            return range.text;
+	        }
+	    }
+	    return "";
+	}
+
+	function copySelected() 
+	{
+	    var srcTextarea = document.getElementById("trans_input");
+	    var destTextarea = document.getElementById("trans_google");
+	    destTextarea.value = getSelectedText(srcTextarea);
+	}	
+    // -->    
+</script>
+<h2 style="margin-bottom:0px;padding-bottom:0px;">{L_WHAT_TRANSLATE}</h2>
+<form id="acp_translate" action="{S_ACTION}" method="post" style="margin:0px;padding:0px;">
+    <table border="0" cellspacing="1" cellpadding="4" width="100%" class="forumline" style="border-collapse:collapse">
+        <thead>
+            <tr>
+                <th class="thCornerL">
+                    {L_LANGUAGE_INTO}
+                </th>
+                <!-- BEGIN modules -->
+                <th class="thCornerR" width="30%">
+                    {L_MX_MODULES}
+                </th>
+                <!-- END modules -->
+                <!-- BEGIN dirs -->
+                <th class="thCornerR" width="30%">
+                    {L_DIR_SELECT}
+                </th>
+                <!-- END dirs -->				
+                <th class="thCornerR">
+                    {L_FILE_SELECT}
+                </th>
+                <th class="thCornerR">
+                    &laquo;
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="row1" width="17%" align="center" id="f_lang_into">
+                    <select name="language[into]" id="lang_into" style="width:100%"onchange="getObj('translate_file').innerHTML='';">
+                    	{S_LANGUAGE_INTO}
+                    </select>
+                </td>
+				<!-- BEGIN modules -->
+                <td class="row1" width="19%">
+                    <select name="translate[module]" style="width:100%" onchange="ajaxModuleLangList(this.value)"{MODULE_DISABLED}>
+                        {S_MODULE_LIST}
+                    </select>
+                </td>
+				<!-- END modules -->
+				<!-- BEGIN dirs -->
+                <td class="row1" width="5%" id="f_select_dir">
+                    <select name="translate[dir]" id="dir" style="width:100%" onchange="getObj('translate_file').innerHTML='';"{MODULE_DISABLED}>
+                        {S_DIR_LIST}
+                    </select>
+                </td>
+				<!-- END dirs -->				
+                <td class="row1" width="25%" align="center" id="f_select_file">
+                    <select name="translate[file]" id="file" style="width:100%" onchange="getObj('translate_file').innerHTML='';"{MODULE_DISABLED}>
+                        {S_FILE_LIST}
+                    </select>
+                </td>
+                <td class="row1" width="5%">
+                    <input type="submit" name="set_file" value="{L_SUBMIT}"{MODULE_DISABLED}>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</form>
+<!-- END file_to_translate_select -->

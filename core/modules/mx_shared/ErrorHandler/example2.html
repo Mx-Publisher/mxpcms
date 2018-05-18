@@ -1,0 +1,22 @@
+<table cellspacing="0" cellpadding="0"><tr><td style="vertical-align: top;"><code style="background-color: #FFFFCC; color: #666666;"><a name="60"></a>&nbsp;60&nbsp;<br /><a name="61"></a>&nbsp;61&nbsp;<br /><a name="62"></a>&nbsp;62&nbsp;<br /><a name="63"></a>&nbsp;63&nbsp;<br /><a name="64"></a>&nbsp;64&nbsp;<br /><a name="65"></a>&nbsp;65&nbsp;<br /><a name="66"></a>&nbsp;66&nbsp;<br /><a name="67"></a>&nbsp;67&nbsp;<br /><a name="68"></a>&nbsp;68&nbsp;<br /><a name="69"></a>&nbsp;69&nbsp;<br /><a name="70"></a><font style="background-color: red; color: white;">&nbsp;70&nbsp;</font><br /><a name="71"></a>&nbsp;71&nbsp;<br /><a name="72"></a>&nbsp;72&nbsp;<br /><a name="73"></a>&nbsp;73&nbsp;<br /><a name="74"></a>&nbsp;74&nbsp;<br /><a name="75"></a>&nbsp;75&nbsp;<br /><a name="76"></a>&nbsp;76&nbsp;<br /><a name="77"></a>&nbsp;77&nbsp;<br /><a name="78"></a>&nbsp;78&nbsp;<br /><a name="79"></a>&nbsp;79&nbsp;<br /><a name="80"></a>&nbsp;80&nbsp;<br /></code></td><td style="vertical-align: top;"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#007700">function </font><font color="#0000BB">_disconnect</font><font color="#007700">() {
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return @</font><font color="#0000BB">mysql_close</font><font color="#007700">(</font><font color="#0000BB">$this</font><font color="#007700">-&gt;</font><font color="#0000BB">connectId</font><font color="#007700">);
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+<br />&nbsp;
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#FF8000">/**
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* @param string $query
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* @return resource|true|false Example: resource on SELECT, true on DELETE, false on error
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* @access protected
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*/
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#007700">function </font><font color="#0000BB">_query</font><font color="#007700">(&amp;</font><font color="#0000BB">$query</font><font color="#007700">) {
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;echo </font><font color="#0000BB">$show_error</font><font color="#007700">;
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return @</font><font color="#0000BB">mysql_query</font><font color="#007700">(</font><font color="#0000BB">$query</font><font color="#007700">, </font><font color="#0000BB">$this</font><font color="#007700">-&gt;</font><font color="#0000BB">connectId</font><font color="#007700">);
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+<br />&nbsp;
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#FF8000">/**
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* Modify limit query
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* @param string $query
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* @param int $offset
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* @param int $limit
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* @return string
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* @access public
+<br /></code></td></tr></table><br><a style="font-family: tahoma; font-size: 12px;" href="/dev/showSource.php?file=d%3A%5Cpublic_html%5Cmygosudoc%5Cwww%5Cincludes%5CDb%5CMysql%5CMysql.php&line=70&prev=10000&next=10000#55">View Full Source</a>

@@ -1,0 +1,176 @@
+<h1>{L_CONFIGURATION_TITLE}</h1>
+
+<p>{L_CONFIGURATION_EXPLAIN}</p>
+
+
+<form action="{S_CONFIG_ACTION}" method="post">
+<div id="tabs">
+			<ul id="admintabs">
+				
+				<li id="gen_sett_tab"><a href="javascript:selectPart('gen_sett')">{L_GENERAL_SETTINGS}</a></li>
+				<li id="style_sett_tab"><a href="javascript:selectPart('style_sett')">{L_STYLE_SETTINGS}</a></li>
+				<li id="config_info_tab"><a href="javascript:selectPart('config_info')">INFO</a></li>
+				
+			</ul>
+</div>
+<div class="acp">
+<div class="panel">
+	<span class="corners-top"><span></span></span>
+	<div class="content" style="padding-left:5px;padding-right:5px;">
+<fieldset id="gen_sett">
+	<dl>
+		<dt><label for="portal_name">{L_PORTAL_NAME}</label></dt>
+		<dd><input type="text" maxlength="150" size="50" name="portal_name" id="portal_name" value="{PORTAL_NAME}" /></dd>
+	</dl>
+
+	<dl>
+		<dt><label for="portal_status_1">{L_PORTAL_STATUS}</label><br /><span class="explain">{L_PORTAL_STATUS_EXPLAIN}</span></dt>
+		<dd><input type="radio" name="portal_status" id="portal_status_1" value="1" class="radio" {S_PORTAL_STATUS_YES} /> <label for="portal_status_1">{L_YES}</label>&nbsp;
+		<input type="radio" name="portal_status" id="portal_status_0" value="0" class="radio" {S_PORTAL_STATUS_NO} /> <label for="portal_status_0">{L_NO}</label></dd>
+	</dl>
+	<dl>
+		<dt><label for="disabled_message">{L_DISABLED_MESSAGE}</label></dt>
+		<dd><textarea rows="5" cols="50" wrap="virtual" name="disabled_message" id="disabled_message">{DISABLED_MESSAGE}</textarea></dd>
+	</dl>
+	<dl>
+		<dt>{L_PORTAL_URL}</dt>
+		<dt><input type="text" maxlength="150" size="50" name="portal_url" value="{PORTAL_URL}" /></dt>
+	</dl>
+	<dl>
+		<dt>{L_PORTAL_PHPBB_URL}</dt>
+		<dt><input type="text" maxlength="150" size="50" name="portal_phpbb_url" value="{PORTAL_PHPBB_URL}" /></dt>
+	</dl>		
+	<dl>
+		<dt><label for="board_timezone">{L_SYSTEM_TIMEZONE}</label></dt>
+		<dd>{TIMEZONE_SELECT}</dd>
+	</dl>
+	<dl>
+		<dt><label for="mx_use_cache_1">{L_MX_USE_CACHE}</label><br /><span class="explain">{L_MX_USE_CACHE_EXPLAIN}</span></dt>
+		<dd><input type="radio" name="mx_use_cache" id="mx_use_cache_1" value="1" class="radio" {S_MX_USE_CACHE_YES} /> <label for="mx_use_cache_1">{L_YES}</label>&nbsp;
+		<input type="radio" name="mx_use_cache" id="mx_use_cache_0" value="0" class="radio" {S_MX_USE_CACHE_NO} /> <label for="mx_use_cache_0">{L_NO}</label></dd>
+	</dl>
+	<dl>
+		<dt><label for="mod_rewrite_1">{L_MX_MOD_REWRITE}</label><br /><span class="explain">{L_MX_MOD_REWRITE_EXPLAIN}</span></dt>
+		<dd><input type="radio" name="mod_rewrite" id="mod_rewrite_1" value="1" class="radio" {S_MX_MOD_REWRITE_YES} /> <label for="mod_rewrite_1">{L_YES}</label>&nbsp;
+		<input type="radio" name="mod_rewrite" id="mod_rewrite_0" value="0" class="radio" {S_MX_MOD_REWRITE_NO} /> <label for="mod_rewrite_0">{L_NO}</label></dd>
+	</dl>
+</fieldset>
+<fieldset id="portal_back"></fieldset>
+<fieldset id="cookie_sett"></fieldset>
+<fieldset id="style_sett">
+	<dl>
+		<dt><label for="default_lang">{L_DEFAULT_LANG}</label></dt>
+		<dd>{LANG_SELECT}</dd>
+	</dl>
+	<dl>
+		<dt><label for="default_style">{L_DEFAULT_STYLE}</label></dt>
+		<dd>{STYLE_SELECT}</dd>
+	</dl>
+	<dl>
+		<dt><label for="mx_override_user_style_0">{L_OVERRIDE_STYLE}</label><br /><span class="explain">{L_OVERRIDE_STYLE_EXPLAIN}</span></dt>
+		<dd><input type="radio" name="mx_override_user_style" id="mx_override_user_style_1" value="1" class="radio" {OVERRIDE_STYLE_YES} /> <label for="mx_override_user_style_1">{L_YES}</label>&nbsp;
+		<input type="radio" name="mx_override_user_style" id="mx_override_user_style_0" value="0" class="radio" {OVERRIDE_STYLE_NO} /> <label for="mx_override_user_style_0">{L_NO}</label></dd>
+	</dl>
+	<dl>
+		<dt><label for="admin_style_select">{L_DEFAULT_ADMIN_STYLE}</label></dt>
+		<dd>{ADMIN_STYLE_SELECT}</dd>
+	</dl>
+	<dl>
+		<dt><label for="overall_header">{L_OVERALL_HEADER}</label><!-- IF L_OVERALL_HEADER_EXPLAIN neq '' --><br /><span class="explain">{L_OVERALL_HEADER_EXPLAIN}</span><!-- ENDIF --></dt>
+		<dd><input type="text" maxlength="150" size="50" name="overall_header" id="overall_header" value="{OVERALL_HEADER}" /></dd>
+	</dl>
+	<dl>
+		<dt><label for="overall_footer">{L_OVERALL_FOOTER}</label><!-- IF L_OVERALL_FOOTER_EXPLAIN neq '' --><br /><span class="explain">{L_OVERALL_FOOTER_EXPLAIN}</span><!-- ENDIF --></dt>
+		<dd><input type="text" maxlength="150" size="50" name="overall_footer" id="overall_footer" value="{OVERALL_FOOTER}" /></dd>
+	</dl>
+	<dl>
+		<dt><label for="main_layout">{L_MAIN_LAYOUT}</label><!-- IF L_MAIN_LAYOUT_EXPLAIN neq '' --><br /><span class="explain">{L_MAIN_LAYOUT_EXPLAIN}</span><!-- ENDIF --></dt>
+		<dd><input type="text" maxlength="150" size="50" name="main_layout" id="main_layout" value="{MAIN_LAYOUT}" /></dd>
+	</dl>
+	<dl>
+		<dt><label for="navigation_block">{L_NAVIGATION_BLOCK}</label><!-- IF L_NAVIGATION_BLOCK_EXPLAIN neq '' --><br /><span class="explain">{L_NAVIGATION_BLOCK_EXPLAIN}</span><!-- ENDIF --></dt>
+		<dd>{NAVIGATION_BLOCK}</dd>
+	</dl>
+	<dl>
+		<dt><label for="top_phpbb_links_1">{L_TOP_PHPBB_LINKS}</label></dt>
+		<dd><input type="radio" name="top_phpbb_links" id="top_phpbb_links_1" value="1" class="radio" {S_TOP_PHPBB_LINKS_YES} /> <label for="top_phpbb_links_1">{L_YES}</label>&nbsp;
+		<input type="radio" name="top_phpbb_links" id="top_phpbb_links_0" value="0" class="radio" {S_TOP_PHPBB_LINKS_NO} /> <label for="top_phpbb_links_0">{L_NO}</label></dd>
+	</dl>
+</fieldset>
+<fieldset id="email_sett"></fieldset>
+<div id="config_info">
+<fieldset>
+	<legend>{L_GENERAL_CONFIG_INFO}</legend>
+	<!-- IF PHPBB_BACKEND -->
+	<dl>
+		<dt><label>{L_PHPBB_RELATIVE_PATH}</label></dt>
+		<dd>{PHPBB_RELATIVE_PATH}</dd>
+	</dl>
+	<!-- ENDIF -->
+	<dl>
+		<dt><label>{L_PORTAL_VERSION}</label></dt>
+		<dd>{PORTAL_VERSION}</dd>
+	</dl>
+</fieldset>
+<!-- IF PHPBB_BACKEND -->
+<fieldset>
+	<legend>{L_PHPBB_INFO}</legend>
+	<dl>
+		<dt><label>{L_PHPBB_VERSION}</label></dt>
+		<dd>{PHPBB_VERSION}</dd>
+	</dl>
+	<dl>
+		<dt><label>{L_PHPBB_SERVER_NAME}</label></dt>
+		<dd>{PHPBB_SERVER_NAME}</dd>
+	</dl>
+	<dl>
+		<dt><label>{L_PHPBB_SCRIPT_PATH}</label></dt>
+		<dd>{PHPBB_SCRIPT_PATH}</dd>
+	</dl>
+</fieldset>
+<!-- ENDIF -->
+</div>
+	<p align="right">
+		{S_HIDDEN_FIELDS}
+		<input type="submit" name="submit" value="{L_SUBMIT}" class="button1" />&nbsp;
+		<input type="reset" value="{L_RESET}" class="button2" />
+	</p>
+
+</form>
+</div>
+	<span class="corners-bottom"><span></span></span>
+</div>
+</div>
+<br clear="all" />
+<script type="text/javascript">
+<!--
+function admingetObj(obj)
+{
+	return ( document.getElementById ? document.getElementById(obj) : ( document.all ? document.all[obj] : null ) );
+}
+function adminsetNone(part)
+{
+	admingetObj(part + '_tab').className = '';
+	admingetObj(part).style.display = 'none';
+
+}
+function adminsetBlock(part)
+{
+	admingetObj(part + '_tab').className = 'activetab';
+	admingetObj(part).style.display = 'block';
+
+}
+function selectPart(part)
+{
+	adminsetNone('gen_sett');
+	adminsetNone('style_sett');
+	adminsetNone('config_info');
+
+
+	adminsetBlock(part);
+}
+
+selectPart('gen_sett');
+
+// -->
+</script>

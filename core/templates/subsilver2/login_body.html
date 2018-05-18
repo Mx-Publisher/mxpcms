@@ -1,0 +1,58 @@
+<table border="0" cellspacing="10" cellpadding="0" width="100%" class="mx_body_table">
+	<tr valign="top">
+		<td>
+
+			<form action="{S_LOGIN_ACTION}" method="post" target="_top">
+
+			<table width="100%" cellpadding="4" cellspacing="1" border="0" class="forumline" align="center">
+			  <tr>
+				<th height="25" class="thHead" nowrap="nowrap">{L_ENTER_PASSWORD}</th>
+			  </tr>
+			  <tr>
+				<td class="row1"><table border="0" cellpadding="3" cellspacing="1" width="100%">
+						<tr>
+							<td colspan="2" align="center">&nbsp;</td>
+						</tr>
+						<tr>
+							<td width="45%" align="right" <!-- IF S_ADMIN_AUTH -->style="width: 50%; text-align: {S_CONTENT_FLOW_END};"<!-- ENDIF -->><b class="gensmall">{L_USERNAME}:</b></td>
+							<td><input class="post" type="text" name="{USERNAME_CREDENTIAL}" size="25" value="{USERNAME}" tabindex="1" />
+								<!-- IF not S_ADMIN_AUTH and S_REGISTER_ENABLED -->
+									<br /><a class="gensmall" href="{U_REGISTER}">{L_REGISTER}</a>
+								<!-- ENDIF -->
+							</td>
+						</tr>
+						<tr>
+							<td width="45%" align="right" <!-- IF S_ADMIN_AUTH -->style="width: 50%; text-align: {S_CONTENT_FLOW_END};"<!-- ENDIF -->><b class="gensmall">{L_PASSWORD}:</b></td>
+							<td>
+								<input class="post" type="password" name="{PASSWORD_CREDENTIAL}" size="25" tabindex="2" />
+								<!-- IF U_SEND_PASSWORD --><br /><a class="gensmall" href="{U_SEND_PASSWORD}">{L_FORGOT_PASS}</a><!-- ENDIF -->
+								<!-- IF U_RESEND_ACTIVATION and not S_ADMIN_AUTH --><br /><a class="gensmall" href="{U_RESEND_ACTIVATION}">{L_RESEND_ACTIVATION}</a><!-- ENDIF -->
+							</td>
+						</tr>
+						<!-- IF S_DISPLAY_FULL_LOGIN -->
+							<!-- IF S_AUTOLOGIN_ENABLED -->
+							<tr>
+								<td>&nbsp;</td>
+								<td><input type="checkbox" class="radio" name="autologin" tabindex="3" /> <span class="gensmall">{L_AUTO_LOGIN}</span></td>
+							</tr>
+							<!-- ENDIF -->
+							<tr>
+								<td>&nbsp;</td>
+								<td><input type="checkbox" class="radio" name="viewonline" tabindex="4" /> <span class="gensmall">{L_HIDE_ME}</span></td>
+							</tr>
+						<!-- ENDIF -->
+					  <tr align="center">
+						<td colspan="2">
+							{S_HIDDEN_FIELDS}
+							<input type="submit" name="login" class="mainoption" value="{L_LOGIN}" />
+						</td>
+					  </tr>
+					</table></td>
+			  </tr>
+			</table>
+
+			</form>
+
+		</td>
+	</tr>
+</table>

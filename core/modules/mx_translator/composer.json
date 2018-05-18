@@ -1,0 +1,31 @@
+{
+    "name": "orynider/mx_translator",
+    "type": "phpbb-extension",
+    "description": "Translator extension for phpBB based on module by culprit_cz. Adds Translator to the Forum Header.",
+    "homepage": "",
+    "version": "1.0.0",
+    "license": "GPL-2.0",
+    "authors": [
+        {
+            "name": "FlorinCB",
+            "email": "orynider@gmail.com",
+            "homepage": "http://pubory.uv.ro",
+            "role": "Extension Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "phpbb/phpbb": ">=3.1.0"
+    },
+    "extra": {
+        "display-name": "Translator",
+        "soft-require": {
+            "phpbb/phpbb": ">=3.1.0"
+        },
+        "version-check": {
+            "host": "www.phpbb.com",
+            "directory": "/customise/db/extension/mx_translator",
+            "filename": "version_check"
+        }
+    }
+}

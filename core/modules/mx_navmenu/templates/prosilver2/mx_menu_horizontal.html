@@ -1,0 +1,26 @@
+<link href="{U_PORTAL_ROOT_PATH}modules/mx_navmenu/templates/prosilver/prosilver.css" rel="stylesheet" type="text/css" media="screen" />
+<div class="forabg block">
+<ul class="inner topiclist forums">
+	<li style="padding-right:5px;">
+		<dl>
+			<!-- BEGIN catrow -->
+			<dd class="posts_portal">
+			<span style="cursor:pointer;" onClick="mx_toggle(this, 'mxNavCat_{catrow.BLOCK_ID}{catrow.CAT_ID}', '{catrow.U_CAT_NAV_EXPAND}', '{catrow.U_CAT_NAV_CONTRACT}');"><img src="{catrow.U_CAT_NAV_DYNAMIC}" border="0" /></span>
+			<strong>{catrow.CATEGORY}</strong><br />
+			<!-- BEGIN switch_cat_desc -->
+			{catrow.switch_cat_desc.CAT_DESC}<br />
+			<!-- END switch_cat_desc -->
+			<span id="mxNavCat_{catrow.BLOCK_ID}{catrow.CAT_ID}" style="display: {catrow.CAT_SHOW};">
+			<!-- BEGIN menurow -->
+			<span class="mnu-nm{catrow.menurow.CURRENT}" style="background-image: url('{catrow.menurow.MENU_ICON}');">
+			<a class="nav" href="{catrow.menurow.U_MENU_URL}">{catrow.menurow.MENU_NAME}</a><br />
+			</span>
+			<!-- END menurow -->
+			</span>
+			</dd>
+			<!-- END catrow -->
+		</dl>
+	</li>
+</ul>
+<span class="corners-bottom"><span></span></span>
+</div>

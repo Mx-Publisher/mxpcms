@@ -1,0 +1,15 @@
+var HelpIndex = [
+["About", "chapters/introduction/overview.htm"],
+["Administration", "chapters/administration/introduction.htm"],
+["Backup Data", "chapters/uninstalling/backup_data.htm"],
+["Changed files", "chapters/upgrading/changed_files.htm"],
+["Code Changes", "chapters/upgrading/code_changes.htm"],
+["Confirmations", "chapters/installing/confirmation.htm"],
+["Download", "chapters/installing/download_packages.htm"],
+["Full", "chapters/upgrading/full.htm"],
+["Requirements", "chapters/installing/requirements.htm"],
+["Uninstalling", "chapters/uninstalling/uninstalling.htm"],
+["Uploading", "chapters/installing/uploading.htm"],
+["Why", "chapters/introduction/why_mxbb.htm"],
+["Why not", "chapters/introduction/why_not_mxbb.htm"],
+["Wizard", "chapters/installing/the_installation_wizard.htm"]];
