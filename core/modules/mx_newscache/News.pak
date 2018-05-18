@@ -1,0 +1,27 @@
+module=+:52=+:News Read=+:modules/mx_newscache/=+:News Read Module=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:52=+:53=+:News RSS=+:News Modules Support RSS standard=+:mx_news_rss.php=+:
+parameter=+:53=+:94=+:rss_nbr_display=+:Number=+:5=+:=+:0=+:0
+parameter=+:53=+:95=+:rss_title=+:Text=+:=+:=+:0=+:0
+parameter=+:53=+:96=+:rss_source=+:Text=+:=+:=+:0=+:0
+parameter=+:53=+:97=+:News_Folder=+:Text=+:cache/=+:=+:0=+:0
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:News RSS=+:News Modules Support RSS standard=+:53=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:52=+:54=+:Israel=+:Israel News=+:mx_news.php=+:
+parameter=+:54=+:98=+:News_Xml_File=+:Text=+:https://www.huffingtonpost.com/topic/israel/feed?o=xml=+:=+:0=+:0
+parameter=+:54=+:99=+:News_Folder=+:Text=+:cache/=+:=+:0=+:0
+parameter=+:54=+:100=+:New_Cache_Time=+:Number=+:1800=+:=+:0=+:0
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Israel News=+:Israel News block=+:54=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+block=+:=+:Movie business news=+:Demo block=+:54=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+block=+:=+:Arts and culture news=+:Demo block=+:54=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+function=+:52=+:55=+:WORLD=+:WORLD News=+:mx_news.php=+:
+parameter=+:55=+:101=+:News_Xml_File=+:Text=+:https://news.google.com/news/rss/headlines/section/topic/WORLD?ned=us&hl=en&gl=US=+:=+:0=+:0
+parameter=+:55=+:102=+:News_Folder=+:Text=+:cache/=+:=+:0=+:0
+parameter=+:55=+:103=+:New_Cache_Time=+:Number=+:1800=+:=+:0=+:0
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Israel News=+:Israel News block=+:55=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+block=+:=+:Movie business news=+:Demo block=+:55=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+block=+:=+:Arts and culture news=+:Demo block=+:55=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+function=+:0=+:0=+:0=+:endoflist=+:0=+:0

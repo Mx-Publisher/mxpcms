@@ -1,0 +1,186 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1250">
+	<TITLE>Mx Portal installation - readme</TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.0  (Win32)">
+	<META NAME="CREATED" CONTENT="0;0">
+	<META NAME="CHANGED" CONTENT="20101010;15361400">
+	<!-- link rel="stylesheet" href="templates/subSilver/subSilver.css" type="text/css" -->
+	<SCRIPT LANGUAGE="Javascript">
+<!--
+	if ( 0 )
+	{
+		window.open('privmsg.php?mode=newpm', '_phpbbprivmsg', 'HEIGHT=225,resizable=yes,WIDTH=400');;
+	}
+//-->
+</SCRIPT>
+	<STYLE TYPE="text/css">
+	<!--
+		TD P { color: #000000; font-family: "Verdana", "Arial", "Helvetica", sans-serif }
+		P { color: #000000; font-family: "Verdana", "Arial", "Helvetica", sans-serif }
+		A:link { color: #006699 }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="ro-RO" TEXT="#000000" LINK="#006699" BGCOLOR="#e5e5e5" DIR="LTR">
+<TABLE BORDER=1 CELLPADDING=2 CELLSPACING=2 FRAME=VOID STYLE="page-break-before: always">
+	<TR>
+		<TD COLSPAN=2>
+			<P><B><FONT SIZE=5>MXP</FONT> <FONT SIZE=5>Module - ErrorDocs
+			Handler<BR></FONT><FONT SIZE=2>v. 1.0.2</FONT></B></P>
+			<P><FONT SIZE=3><B>Module</B></FONT> <BR>- for MXP Core 2.8.x and
+			3.0.x (with some notes, see below)</P>
+			<P><STRONG>Author [Credits]</STRONG><BR><A HREF="mailto:jon.ohlsson@mx-publisher.com">Jon
+			Ohlsson</A> [Markus, Jon Ohlsson]<BR>Original MX-Publisher
+			Errordocs module by <A HREF="http://www.phpmix.com/">Markus</A>
+			<BR><BR><B>Description</B> <BR>The MXP Module is an addon product
+			for the MX-Publisher Core.</P>
+			<P><STRONG>Features</STRONG> <BR>The ErrorDocs Handler Module
+			allows you to easilly integrate web server HTTP Error Documents
+			(ie. 404 Not Found, etc.) with your portal pages.</P>
+			<P><STRONG>Reference</STRONG></P>
+			<UL>
+				<LI><P STYLE="margin-bottom: 0cm">More Information on HTTP Error
+				Codes: <BR><A HREF="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10">RFC2616
+				- Hypertext Transfer Protocol -- HTTP/1.1 -- Status Code
+				Definitions</A> 
+				</P>
+				<LI><P>http://httpd.apache.org/docs/mod/core.html#errordocument 
+				</P>
+			</UL>
+			<P><A NAME="install"></A>I. <A HREF="#install">Installation/Upgrade
+			instructions</A> <BR><BR>II. <A HREF="#themes">Additional styles</A>
+			<BR><BR>III. <A HREF="#languages">Additional languages</A><BR><BR><A HREF="http://www.mx-publisher.com/no_valid_page" TARGET="_blank">DEMO
+			</A><BR><BR><A HREF="http://www.mx-publisher.com/download" TARGET="_blank">DOWNLOAD
+			</A><BR><BR><BR><B>I. Installation Instructions</B> <BR>To install
+			this module, follow these instructions.</P>
+			<P>If you encounter any problems during install, or if you need
+			further assistance, visit the MXP<A HREF="http://www.mx-publisher.com/forum/" TARGET="_blank">
+			support forum</A> or <A HREF="http://www.mx-publisher.com/docs" TARGET="_blank">Online
+			Docs</A>, author support forum:
+			<A HREF="http://forums.phpmix.org/viewtopic.php?t=53">http://forums.phpmix.org/viewtopic.php?t=53</A></P>
+			<P><BR><BR>
+			</P>
+			<DIV ID="page" DIR="LTR">
+				<DIV ID="ie-minwidth" DIR="LTR">
+					<DIV ID="ie-layout" DIR="LTR">
+						<DIV ID="ie-container" DIR="LTR">
+							<DIV ID="wrapper1" DIR="LTR">
+								<DIV ID="wrapper2" DIR="LTR">
+									<UL>
+										<LI><P>Remove possible old installation: <BR>In the
+										Administration Panel -&gt; Module Administration, delete
+										previous instance of this module. <BR>Delete all module
+										files within /modules/<B>mx_errordocs</B>. 
+										</P>
+										<LI><P>Copy and upload new files: <BR>Unzip the distributed
+										files into your portal modules directory:
+										/modules/<B>mx_errordocs</B>. 
+										</P>
+										<LI><P>Import the module definition file: <BR>In the
+										Administration Panel -&gt; Module Administration, import
+										Module Pack for this module. 
+										</P>
+										<LI><P>Configure Module Settings: <BR>In the Administration
+										Panel, select the new module options. 
+										</P>
+										<LI><P>Add module block <B>ErrorDocs</B> to any Portal page
+										<FONT COLOR="#8b0000">(*)</FONT>: <BR>In the Administration
+										Panel -&gt; Block Administration (or Page Administration).
+										<BR><BR><FONT COLOR="#8b0000">(*)</FONT> Note: This step is
+										optional since you may run this module standalone. <BR>As
+										Block : <A HREF="http://www.example.com/index.php?page=15&amp;errno=404" TARGET="_blank">http://www.example.com/index.php?page=15&amp;errno=404</A>
+										<BR>Standalone:
+										<A HREF="http://www.example.com/modules/mx_errordocs/errordocs.php?errno=404">http://www.example.com/modules/mx_errordocs/errordocs.php?errno=404</A></P>
+									</UL>
+									<DIV ID="Section1" DIR="LTR">
+										<DIV ID="Section2" DIR="LTR">
+											<DIV ID="Section3" DIR="LTR">
+												<DIV ID="Section4" DIR="LTR">
+													<DIV ID="Section5" DIR="LTR">
+														<DIV ID="Section6" DIR="LTR">
+															<P><A NAME="wrapper2"></A><FONT FACE="Times New Roman, serif"><U><B>APACHE
+															COMMANDS SAMPLES:</B></U> </FONT>
+															</P>
+															<UL>
+																<LI><P>Running mx_errordocs as a block (where # is
+																your page identifier):  
+																</P>
+															</UL>
+															<UL>
+																<P>ErrorDocument 400
+																/index.php?page=#&amp;errno=400&amp;errlog=yes
+																<BR>ErrorDocument 403
+																/index.php?page=#&amp;errno=403&amp;errlog=yes
+																<BR>ErrorDocument 404
+																/index.php?page=#&amp;errno=404&amp;errlog=yes
+																<BR>ErrorDocument 500
+																/index.php?page=#&amp;errno=500&amp;errlog=yes 
+																</P>
+																<P></P>
+																<LI><P><A NAME="SXBB4996x"></A>Running mx_errordocs
+																standalone: <B>Code:</B> &nbsp;&lsaquo;&nbsp;<A HREF="javascript:void(0)" ONCLICK="SXBB['SXBB4996'].select('Select');"><SPAN STYLE="text-decoration: none"><B>Select</B></SPAN></A>&nbsp;&rsaquo;&nbsp;&lsaquo;&nbsp;<A HREF="javascript:void(0)" ONCLICK="SXBB['SXBB4996'].resize('Expand');"><SPAN STYLE="text-decoration: none"><B>Expand</B></SPAN></A>&nbsp;&rsaquo;
+																																</P>
+																<P>ErrorDocument 400
+																/modules/mx_errordocs/errordocs.php?errno=400&amp;errlog=yes
+																<BR>ErrorDocument 403
+																/modules/mx_errordocs/errordocs.php?errno=403&amp;errlog=yes
+																<BR>ErrorDocument 404
+																/modules/mx_errordocs/errordocs.php?errno=404&amp;errlog=yes
+																<BR>ErrorDocument 500
+																/modules/mx_errordocs/errordocs.php?errno=500&amp;errlog=yes
+																																</P>
+																<P></P>
+																<P>Please, visit Apache site for more information:
+																<BR><A HREF="http://httpd.apache.org/docs" TARGET="_blank">http://httpd.apache.org/docs</A>
+																<BR><A HREF="http://httpd.apache.org/docs/mod/core.html#errordocument" TARGET="_blank">http://httpd.apache.org/docs/mod/core.html#errordocument</A></P>
+															</UL>
+															<P><BR><BR>
+															</P>
+														</DIV>
+													</DIV>
+												</DIV>
+											</DIV>
+										</DIV>
+									</DIV>
+									<P>&lt; <A HREF="#top">Back to Top</A> &gt;</P>
+								</DIV>
+							</DIV>
+						</DIV>
+					</DIV>
+				</DIV>
+			</DIV>
+			<P><I>To summarize:</I></P>
+			<UL>
+				<LI><P STYLE="margin-bottom: 0cm">If installing from scratch, use
+				the &quot;install module&quot; option in the AdminCP - Modules 
+				</P>
+				<LI><P STYLE="margin-bottom: 0cm">If upgrading, use the &quot;upgrade
+				module&quot; option in the AdminCP - Modules 
+				</P>
+				<LI><P>If uninstalling, use the &quot;delete module&quot; feature
+				in the AdminCP - Modules 
+				</P>
+			</UL>
+			<P><I>Note:</I> If upgrading, do NOT delete/uninstall the module
+			prior to upgrading, or else you'll lose all module data!</P>
+			<P><A NAME="themes"></A><A NAME="languages"></A><A HREF="#top">Back
+			to Top</A> <BR><BR><BR><B>II. Additional Styles</B> <BR>This
+			module is compatible with any theme/style. <BR><BR><A HREF="#top">Back
+			to Top</A> <BR><BR><BR><B>III. Additional Languages</B> <BR>First
+			check to see if your language is already translated. Available
+			translations are hosted at www.mx-publisher.com<BR><BR>If exists,
+			download and install in the modules/mx_modulename/language folder.
+			If not, duplicate (copy and paste) any included language file,
+			rename to match your language, translate using any texteditor,
+			save and upload. <BR><BR><A HREF="#top">Back to Top</A> 
+			</P>
+			<P>/MXP Team</P>
+		</TD>
+	</TR>
+</TABLE>
+<P><BR><BR>
+</P>
+</BODY>
+</HTML>

@@ -1,0 +1,49 @@
+<?php
+/** ------------------------------------------------------------------------
+ * 
+ *    $Id: config.php.contrib,v 1.1 2010/10/09 22:15:39 orynider Exp $
+ * This file must be put into the MX-Publisher Modular System directory, not into the phpBB directory.
+ **/
+
+//
+// MySql Information ( CHANGE HERE )
+//
+$dbms = 'mysql4';
+
+
+$dbhost = 'localhost';
+$dbname = 'test';
+$dbuser = 'root';
+$dbpasswd = '';
+
+//
+// Portal prefix table
+//
+$mx_table_prefix = 'mx_';
+
+//
+// phpBB Prefix table
+//
+$table_prefix = 'phpbb_';
+
+//
+// phpBB acm type for db api
+//
+$acm_type = 'file';
+
+//
+// Where is PHPBB
+//
+$phpbb_root_path = $mx_root_path . 'phpBB2/';
+
+//
+// Portal is Installed
+//
+define('MX_INSTALLED', true);
+
+//
+// phpBB Is Intalled
+//
+define('PHPBB_INSTALLED', true);
+
+?>

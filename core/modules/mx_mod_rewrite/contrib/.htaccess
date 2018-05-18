@@ -1,0 +1,76 @@
+DirectoryIndex index.php index.cgi index.pl index.shtml index.html
+#
+# Limit
+#
+<Limit GET HEAD POST> 
+# 
+#   Allow access to everyone, but... 
+# 
+   order allow,deny 
+   allow from all 
+# 
+#   Banned: Who, Reason, Reference Link (topic), etc. ???... 
+# 
+	# MX
+	# deny from 212.138.47.0/24 
+	# deny from 212.138.64.0/22 
+</Limit>
+
+# deny most common except .php 
+<FilesMatch "\.(inc|tpl|h|ihtml|sql|ini|conf|class|bin|spd|theme|module|exe)$"> 
+deny from all 
+</FilesMatch> 
+
+#Disable .htaccess viewing from browser 
+<Files ~ "^\.ht"> 
+    Order allow,deny 
+    Deny from all 
+    Satisfy All 
+</Files> 
+
+<Files ~ "\config.php$"> 
+deny from all 
+</Files> 
+
+
+<IfModule mod_rewrite.c> 
+	RewriteEngine on 
+
+	#
+	# Custom Defs (examples)
+	# Note: You need the additional catlink version for every rule to support the navigation menu additional vars (main category links only)
+	
+	#RewriteRule ^home/catlink([0-9]*)(.*)$ index.php?page=1&cat_link=$1 [L]
+	#RewriteRule ^home(.*)$ index.php?page=1 [L]
+
+	#RewriteRule ^forum/catlink([0-9]*)(.*)$ index.php?page=2&cat_link=$1 [L]
+	#RewriteRule ^forum(.*)$ index.php?page=2 [L]
+	
+	#RewriteRule ^something/catlink([0-9]*)(.*)$ index.php?page=3&cat_link=$1 [L]
+	#RewriteRule ^something(.*)$ index.php?page=3 [L]
+	
+	#RewriteRule ^something_more/catlink([0-9]*)(.*)$ index.php?page=4&cat_link=$1 [L]
+	#RewriteRule ^something_more(.*)$ index.php?page=4 [L]	
+	
+	# NOTE: The parent rule must be located last in line, since they are executed in order
+	#RewriteRule ^info/p1(.*)$ index.php?page=5&dynamic_block=1 [L]
+	#RewriteRule ^info/p2(.*)$ index.php?page=5&dynamic_block=2 [L]
+	#RewriteRule ^info/p3(.*)$ index.php?page=5&dynamic_block=3 [L]	
+	#RewriteRule ^info(.*)$ index.php?page=5 [L]
+
+	#
+	# General 
+	#
+	RewriteCond %{REQUEST_URI} ^(.*)/catlink([0-9]*)(.*)$
+	RewriteRule ^page([0-9]*)/catlink([0-9]*)(.*)$ index.php?page=$1&cat_link=$2 [L]
+		
+	RewriteCond %{REQUEST_URI} ^(.*)/sub([0-9]*)(.*)$
+	RewriteRule ^page([0-9]*)/sub([0-9]*)(.*)$ index.php?page=$1&dynamic_block=$2 [L]
+		
+	RewriteCond %{REQUEST_URI} ^/page([0-9]*)(.*)$
+	RewriteRule ^page([0-9]*)(.*)$ index.php?page=$1$2 [L]
+	
+	RewriteCond %{REQUEST_URI} ^/block([0-9]*)(.*)$
+	RewriteRule ^block([0-9]*)(.*)$ index.php?block=$1$2 [L]	
+	
+</IfModule>

@@ -1,0 +1,10 @@
+module=+:55=+:ErrorDocs=+:modules/mx_errordocs/=+:Errordocs handling=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:55=+:98=+:ErrorDocss=+:=+:errordocs.php=+:
+parameter=+:98=+:319=+:ErrorDocs_Enable_Log=+:Boolean=+:TRUE=+:=+:0=+:0
+parameter=+:98=+:320=+:ErrorDocs_Include_Codes=+:Text=+:=+:=+:0=+:0
+parameter=+:98=+:321=+:ErrorDocs_Exclude_Extensions=+:Text=+:ico=+:=+:0=+:0
+parameter=+:98=+:322=+:ErrorDocs_Max_Records=+:Number=+:100=+:=+:0=+:0
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Demo - ErrorDocss=+:Demo block=+:98=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+function=+:0=+:0=+:0=+:endoflist=+:0=+:0

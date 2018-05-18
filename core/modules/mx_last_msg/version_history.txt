@@ -1,0 +1,30 @@
+#################################################################
+##
+## Mx Portal 2.7 - Last Message Module v. 1.04
+##
+v. 1.04
+- Redeclare auth() fix
+- Some files updated. No db updates. Reinstalling (importing) is not needed!
+
+v. 1.03
+- Bugfixes: numerous
+- New/changed file(s):
+	mx_last_msg.php
+	LastMessage.pak
+	mx_install_readme.htm
+- Delete old file(s):
+	Last Message.pak
+	mx_install - readme.htm
+
+v. 1.02 
+ - Bugfix: show author/poster 
+ - Changed files: mx_last_msg.tpl 
+
+ v. 1.01 
+ - New *.pak file, for automatic Block generation during install 
+
+ v. 1.0 - Numerous bugfixes 
+
+## /Mx Team
+##
+#################################################################

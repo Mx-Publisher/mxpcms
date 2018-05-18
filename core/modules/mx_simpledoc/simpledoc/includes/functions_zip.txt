@@ -1,0 +1,148 @@
+
+********************************************************
+
+  ZIP creation class
+  ==================
+
+   This class allows you to create ZIP archives on the
+  fly with local files or dynamical contents.
+
+   ZLIB extensions are not necessary, so this script is
+  compatible with most of the hosting services !
+
+********************************************************
+
+  Important notes
+  ===============
+
+   Always think to the CHMOD under Linux, it's really
+  paining to answer those questions !
+
+   This class can be used without ZLIB extensions, but of
+  course archives can't be compressed, only grouped (that's
+  not so bad, whatever)
+
+   To create ZIP archives that can be read without ZLIB,
+  you must chose the lowest compressing level ("Stock"
+  with WinRAR) when creating the archive.
+
+   A good idea would be to try the sample script given
+  with the class (exemple.php).
+  In french (YOU translate, I always have to do)
+
+*********************************************************
+
+  Class functions
+  ===============
+
+  Here is the list of functions and arguments :
+
+   Zip->get_List( [Archive ZIP])
+   -----------------------------
+
+    Returns an array of arrays :
+
+     + [filename] => Extracted filename
+     + [stored_filename] => Archived filename
+     + [size] => Extracted file size
+     + [compressed_size] => Compressed file size
+     + [crc] => CRC32 of the file (HEX)
+     + [mtime] => Date (Unix time)
+     + [comment] => Comment, if present
+     + [folder] => 0 for a file, 1 for a folder
+     + [index] => Index of the file (see extract)
+     + [status] => ok if the file isn't corrupted
+
+   ### EXEMPLE :
+    > <?
+    >  // Displays the contents of folder/archive.zip
+    >  include("zip.lib.php");
+    >  $zip = new Zip;
+    >  print_r( $zip->get_List("folder/archive.zip") );
+    > ?>
+
+   Zip->Add( [ARR{ ARR{ $(folder/)(Name)$, $Contents$}, ... }] , [Compression] )
+   ----------------------------------------------------------------------------
+
+    Add files/folders to an archive.
+
+    The first argument is an array.
+
+    Each element of this array is an array itself, the first element is
+    the (folder/)name of the extracted file and the second the contents
+    of this file.
+
+    If the first element is a folder name only and if there isn't contents,
+    the folder will be created, but empty.
+
+    Subfolders are automatically created if they don't exist in the file
+    name.
+
+    The second argument of the function can enable or disable the file 
+    compression. (1=enable, 0=disable)
+    This must be set to 0 if the ZLIB extensiosn are disabled.
+
+    Returns an array, indexes are file names and values are add status
+    (1 or 0)
+
+    To use archived files, you must use get_file()
+
+   ### EXEMPLE :
+    > <?
+    >  // Creates archive test.zip no compressed with <t.txt> and <folder/>
+    >  include("zip.lib.php");
+    >  $zip = new Zip;
+    >  $zip->Add(Array(Array("t.txt","Text"),Array("folder/")),0);
+    >  fputs(fopen("test.zip","wb"), $zip->get_file() ); // see get_file()
+    > ?>
+
+   Zip->get_file()
+   ---------------
+
+    Very easy : returns a string of compressed files and folders that you
+    can use in files or send to the client with header("Content-Type...");
+
+    See exemple above.
+
+   Zip->extract( [ZIP Archive], [Target folder], { Index } )
+   ---------------------------------------------------------
+
+    Extract all or part of an archive.
+
+    [ZIP Archive] is the (folder/)name of the archive you want
+    extract.
+
+    [Target folder] is the folder where files will be extracted.
+    Beware ! Permissions must be accessible for PHP !
+
+    { Index } is an array of file indexes you want to
+    extract. Indexes are descripted in get_list().
+    If one of thoses index is -1 or if {index} is absent,
+    the whole archive is extracted
+
+    Subfolders are created automatically.
+
+   ### EXEMPLE :
+    > <?
+    >  // Extract files with index 1 & 3 to /files
+    >  // and the whole archive to /archive
+    >  include("zip.lib.php");
+    >  $zip = new Zip;
+    >  $zip->Extract("test.zip","files",Array(1,3));
+    >  $zip->Extract("test.zip","archive",Array(-1));
+    > ?>
+
+*********************************************************
+
+  Help and support
+  ================
+
+   You don't understand one of theses functions
+  or you have any question ?
+
+  Go to the forum of maxg.info :
+  http://forum.maxg.info
+
+
+********************************************************
+       Created by bouchon, http://maxg.info

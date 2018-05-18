@@ -1,0 +1,29 @@
+#################################################################
+##
+## Mx Portal 2.7 - Statistics Module v. 1.04
+##
+v. 1.04
+- Redeclare auth() fix
+- Some files updated. No db updates. Reinstalling (importing) is not needed! 
+
+v. 1.03
+- Bugfixes: BM13
+- New/Updated file(s):
+	mx_statistics.php
+	mx_install_readme.htm
+- Delete old file(s):
+	mx_install - readme.htm
+	
+v. 1.02
+- Various bugfixes
+- Changed files: *.pak file and mx_statistics.php
+
+v. 1.01
+- New *.pak file, for automatic Block generation during install
+
+v. 1.0 - Numerous bugfixes 
+
+##
+## /Mx Team
+##
+#################################################################

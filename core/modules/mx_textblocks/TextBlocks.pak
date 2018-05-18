@@ -1,0 +1,29 @@
+module=+:20=+:Text Blocks=+:modules/mx_textblocks/=+:Textblocks module=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:20=+:20=+:TextBlock (phpBB)=+:BBcodes, html and smilies usage defined by phpBB config=+:mx_textblock_bbcode.php=+:
+parameter=+:20=+:15=+:Text=+:phpBBTextBlock=+:Insert your text here=+:=+:0
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Demo - TextBlock (phpBB)=+:Demo block=+:20=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:20=+:80=+:TextBlock_Blog=+:UserBlog Textblock=+:mx_textblock_blog.php=+:
+parameter=+:80=+:163=+:Blog=+:BBText=+:Add your text here...=+:=+:0
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Demo - TextBlock_Blog=+:Demo block=+:80=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:20=+:21=+:TextBlock (Html/wysiwyg)=+:Plain html textblock, or featuring wysiwyg =+:mx_textblock_html.php=+:
+parameter=+:21=+:16=+:Html=+:WysiwygTextBlock=+:Entre your Html code here=+:=+:0
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Demo - TextBlock (Html/wysiwyg)=+:Demo block=+:21=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:20=+:22=+:TextBlock (Customized)=+:Textblock, featuring block defined settings=+:mx_textblock_multi.php=+:
+parameter=+:22=+:330=+:allow_bbcode=+:Boolean=+:TRUE=+:=+:1
+parameter=+:22=+:331=+:allow_html=+:Boolean=+:TRUE=+:=+:1
+parameter=+:22=+:332=+:allow_smilies=+:Boolean=+:TRUE=+:=+:1
+parameter=+:22=+:52=+:block_style=+:Boolean=+:TRUE=+:=+:0
+parameter=+:22=+:333=+:html_tags=+:Text=+:b,i,u=+:=+:1
+parameter=+:22=+:50=+:Text=+:CustomizedTextBlock=+:Enter your block text here=+:=+:0
+parameter=+:22=+:51=+:text_style=+:Text=+:none=+:=+:0
+parameter=+:22=+:53=+:title_style=+:Boolean=+:TRUE=+:=+:0
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Demo - TextBlock (Customized)=+:Demo block=+:22=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+function=+:0=+:0=+:0=+:endoflist=+:0=+:0

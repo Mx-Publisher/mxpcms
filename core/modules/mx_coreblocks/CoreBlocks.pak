@@ -1,0 +1,77 @@
+module=+:10=+:Core Blocks=+:modules/mx_coreblocks/=+:Core blocks=+:
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:10=+:17=+:Announcements=+:Announcements=+:mx_announce.php=+:
+parameter=+:17=+:3=+:announce_display=+:Boolean=+:TRUE=+:=+:0
+parameter=+:17=+:6=+:announce_display_global=+:Boolean=+:TRUE=+:=+:0
+parameter=+:17=+:5=+:announce_display_normal=+:Boolean=+:FALSE=+:=+:0
+parameter=+:17=+:4=+:announce_display_sticky=+:Boolean=+:TRUE=+:=+:0
+parameter=+:17=+:11=+:announce_forum=+:Function=+:=+:get_list_multiple("{parameter_id}[]", FORUMS_TABLE, 'forum_id', 'forum_name', "{parameter_value}", TRUE)=+:0
+parameter=+:17=+:7=+:announce_img=+:Text=+:thumb_globe.gif=+:=+:0
+parameter=+:17=+:10=+:announce_img_global=+:Text=+:thumb_globe.gif=+:=+:0
+parameter=+:17=+:9=+:announce_img_normal=+:Text=+:thumb_globe.gif=+:=+:0
+parameter=+:17=+:8=+:announce_img_sticky=+:Text=+:thumb_globe.gif=+:=+:0
+parameter=+:17=+:2=+:announce_nbr_days=+:Number=+:14=+:=+:0
+parameter=+:17=+:1=+:announce_nbr_display=+:Number=+:1=+:=+:0
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Demo - Announcements=+:Demo block=+:17=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:10=+:53=+:DynamicBlock=+:Dynamic block defined by its block_id=+:mx_dynamic.php=+:
+parameter=+:53=+:136=+:default_block_id=+:Function=+:0=+:get_list_formatted("block_list","{parameter_value}","{parameter_id}[]")=+:0
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Demo - DynamicBlock=+:Demo block=+:53=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:10=+:10=+:Forum phpBB=+:Forum phpBB=+:mx_forum.php=+:
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Demo - Forum phpBB=+:Demo block=+:10=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:10=+:16=+:Google=+:Google=+:mx_google.php=+:
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Demo - Google=+:Demo block=+:16=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:10=+:48=+:IncludeX=+:Include site or file=+:mx_includex.php=+:
+parameter=+:48=+:133=+:x_1=+:Text=+:=+:=+:0
+parameter=+:48=+:134=+:x_2=+:Text=+:=+:=+:0
+parameter=+:48=+:161=+:x_3=+:Text=+:http://www.mx-publisher.com=+:=+:0
+parameter=+:48=+:131=+:x_mode=+:Menu_single_select=+:x_iframe=+:a:6:{i:0;s:8:"x_listen";i:1;s:8:"x_iframe";i:2;s:10:"x_textfile";i:3;s:12:"x_multimedia";i:4;s:5:"x_pic";i:5;s:8:"x_format";}=+:0
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Demo - IncludeX=+:Demo block=+:48=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:10=+:13=+:Language Select=+:Language Select=+:mx_language.php=+:
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Demo - Language Select=+:Demo block=+:13=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:10=+:14=+:Login=+:Login=+:mx_login.php=+:
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Demo - Login=+:Demo block=+:14=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:10=+:19=+:Multiple Horizontal Blocks=+:Block that can arrange other blocks in a horizontal line.=+:mx_multiple_blocks.php=+:
+parameter=+:19=+:60=+:block_ids=+:Function=+:1,2,3=+:get_list_multiple( "{parameter_id}[]", BLOCK_TABLE, 'block_id', 'block_title', "{parameter_value}", TRUE, 'block_desc')=+:0
+parameter=+:19=+:61=+:block_sizes=+:Text=+:20%,30%,*=+:=+:0
+parameter=+:19=+:62=+:space_between=+:Number=+:4=+:=+:0
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Demo - Multiple Horizontal Blocks=+:Demo block=+:19=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:10=+:18=+:Who is Online=+:Who is Online=+:mx_online.php=+:
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Demo - Who is Online=+:Demo block=+:18=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:10=+:12=+:Polls=+:Polls=+:mx_poll.php=+:
+parameter=+:12=+:13=+:Poll_Display=+:Function=+:0=+:poll_select( {parameter_value}, "{parameter_id}" )=+:0
+parameter=+:12=+:36=+:poll_forum=+:Function=+:=+:get_list_multiple("{parameter_id}[]", FORUMS_TABLE, 'forum_id', 'forum_name', "{parameter_value}", TRUE)=+:0
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Demo - Polls=+:Demo block=+:12=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:10=+:104=+:Search=+:Site Search=+:mx_search.php=+:
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Demo - Search=+:Demo block=+:104=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:10=+:97=+:Site Log=+:Site change monitor=+:mx_site_log.php=+:
+parameter=+:97=+:317=+:log_filter_date=+:Menu_single_select=+:1 month=+:a:12:{i:0;s:8:"no limit";i:1;s:5:"1 day";i:2;s:6:"2 days";i:3;s:6:"3 days";i:4;s:6:"1 week";i:5;s:7:"2 weeks";i:6;s:7:"3 weeks";i:7;s:7:"1 month";i:8;s:8:"2 months";i:9;s:8:"3 months";i:10;s:8:"6 months";i:11;s:6:"1 year";}=+:0
+parameter=+:97=+:315=+:numOfEvents=+:Number=+:5=+:=+:0
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Demo - Site Log=+:Demo block=+:97=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:10=+:15=+:Theme Select=+:Theme Select=+:mx_theme.php=+:
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Demo - Theme Select=+:Demo block=+:15=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+function=+:0=+:0=+:0=+:endoflist=+:0=+:0

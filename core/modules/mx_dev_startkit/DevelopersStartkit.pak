@@ -1,0 +1,9 @@
+module=+:60=+:Developers Startkit Module=+:modules/mx_dev_startkit/=+:Developers resource, demonstrating how to develope a MXP module, by giving examples=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:60=+:104=+:DevelopersStartkitFunction=+:Startkit Function=+:mx_dev_startkit.php=+:
+parameter=+:104=+:347=+:startkit_test_custom=+:startkit_module_select=+:=+:
+parameter=+:104=+:348=+:startkit_test_number=+:Number=+:0=+:
+parameter=+:104=+:349=+:startkit_test_string=+:Text=+:enter a string=+:
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Demo - DevelopersStartkitFunction=+:Demo block=+:104=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+function=+:0=+:0=+:0=+:endoflist=+:0=+:0

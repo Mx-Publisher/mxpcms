@@ -1,0 +1,8 @@
+module=+:58=+:SimpleDoc=+:modules/mx_simpledoc/=+:A small docs management module=+:
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:58=+:74=+:manageDoc=+:Manage Docs=+:mx_simpledoc.php=+:
+parameter=+:74=+:174=+:project_folder=+:Text=+:=+:=+:0=+:0
+parameter=+:74=+:175=+:project_name=+:Text=+:=+:=+:0=+:0
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Demo - manageDoc=+:Demo block=+:74=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+function=+:0=+:0=+:0=+:endoflist=+:0=+:0

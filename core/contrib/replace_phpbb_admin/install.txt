@@ -1,0 +1,7 @@
+If you want to direct all calls from the phpBB AdminCP to the mxBB AdminCP (the latter integrates the phpBB AdminCP within its own), do this:
+
+Go to your /phpbbroot/admin/ directory.
+Rename index.php to index_old.php
+Copy the index.php in the phpbb/admin directory.
+
+Edit index.php and replace "www.yourdomain.com" with your portal address.

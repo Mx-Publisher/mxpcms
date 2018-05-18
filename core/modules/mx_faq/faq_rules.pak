@@ -1,0 +1,10 @@
+module=+:52=+:Mx Faq and Rules=+:modules/mx_faq/=+:Faq and Rules Manager=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:52=+:54=+:MX Faq=+:Faq page=+:faq.php=+:
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Demo - MX Faq=+:Demo block=+:54=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:52=+:55=+:Mx Rules=+:Rules page=+:rules.php=+:
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Demo - Mx Rules=+:Demo block=+:55=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+function=+:0=+:0=+:0=+:endoflist=+:0=+:0

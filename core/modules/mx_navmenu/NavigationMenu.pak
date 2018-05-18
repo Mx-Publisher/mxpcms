@@ -1,0 +1,20 @@
+module=+:50=+:Navigation Menu=+:modules/mx_navmenu/=+:MX-Portal Site Navigation=+:
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:50=+:51=+:User Navigation Menu=+:Site Navigation=+:mx_menu_nav.php=+:
+parameter=+:51=+:66=+:Nav menu=+:nav_menu=+:=+:=+:0=+:10
+parameter=+:51=+:93=+:menu_display_style=+:Radio_single_select=+:Classic=+:a:5:{i:0;s:7:"Classic";i:1;s:8:"Advanced";i:2;s:15:"Simple_CSS_menu";i:3;s:17:"Advanced_CSS_menu";i:4;s:18:"Overall_navigation";}=+:0=+:20
+parameter=+:51=+:63=+:menu_display_mode=+:Radio_single_select=+:Vertical=+:a:2:{i:0;s:8:"Vertical";i:1;s:10:"Horizontal";}=+:0=+:30
+parameter=+:51=+:64=+:menu_page_sync=+:Boolean=+:0=+:=+:0=+:40
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Demo - User Navigation Menu=+:Demo block=+:51=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:50=+:52=+:Page Navigation Menu=+:Site Navigation=+:mx_site_nav.php=+:
+parameter=+:52=+:155=+:menu_page_parent=+:Function=+:0=+:generate_page_jumpbox("{parameter_id}[]",0,0,"{parameter_value}")=+:0=+:10
+parameter=+:52=+:100=+:Site menu=+:site_menu=+:=+:=+:0=+:20
+parameter=+:52=+:101=+:menu_display_style=+:Radio_single_select=+:Overall_navigation=+:a:5:{i:0;s:7:"Classic";i:1;s:8:"Advanced";i:2;s:15:"Simple_CSS_menu";i:3;s:17:"Advanced_CSS_menu";i:4;s:18:"Overall_navigation";}=+:0=+:30
+parameter=+:52=+:102=+:menu_display_mode=+:Radio_single_select=+:Horizontal=+:a:2:{i:0;s:8:"Vertical";i:1;s:10:"Horizontal";}=+:0=+:40
+parameter=+:52=+:103=+:menu_page_sync=+:Boolean=+:1=+:=+:0=+:50
+parameter=+:52=+:156=+:menu_custom_tpl=+:Text=+:=+:=+:1=+:60
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Demo - Page Navigation Menu=+:Demo block=+:52=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+function=+:0=+:0=+:0=+:endoflist=+:0=+:0

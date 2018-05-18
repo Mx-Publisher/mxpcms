@@ -1,0 +1,80 @@
+# $Id: how\040to.txt,v 1.2 2010/10/14 01:52:27 orynider Exp $
+
+HOW TO:
+
+Synchronize the phpBB and mxBB overall_header.tpl files (i.e. the header look and feel)
+
+-------------------------------------------------------------------------------
+
+1) Upload this overall_header.tpl, overwriting the existing overall_header.tpl file in /phpbbroot/templates/templatename/
+
+2) In /phpbbroot/includes/page_header.php, you will have to add some mxBB definitions. For more information on adding your custom portal links, take a look here: http://www.mx-publisher.com/index.php?page=108&mode=article&k=35 .
+
+#
+#-----[ OPEN ]----------------------
+#
+phpbbroot/includes/page_header.php
+
+#
+#-----[ FIND ]----------------------
+#
+$template->assign_vars(array(
+	'SITENAME' => $board_config['sitename'],
+
+#
+#-----[ BEFORE, ADD ]----------------------
+#
+// Define the relative path to mx, eg ../mx/ or ../ or whatever
+$path_to_mx = '../';
+
+#
+#-----[ FIND ]----------------------
+#
+	'U_INDEX' => append_sid('index.'.$phpEx),
+
+#
+#-----[ REPLACE WITH ]----------------------
+#
+//
+// mxBB Definitions for the synchronized header
+//
+	'MX_ROOT_PATH' => $path_to_mx,
+	'TEMPLATE_ROOT_PATH' => 'templates/'.$theme['template_name'],
+	'L_FORUM' => $lang['Forum'], 
+	//
+	// Use either 'sitename' or manual definfition in lang_main for the home link text!
+	// Note: if using $lang['Portal_home'], you have to add the entry in lang_main youself
+	// for example:
+	// $lang['Portal_home'] = 'Portal Home';
+	// before // That's all, Folks!
+	//
+//	'L_HOME'  => $board_config['sitename'], 
+	'L_HOME'  => $lang['Portal_home'], 
+	'U_INDEX'    => append_sid( $path_to_mx . 'index.'.$phpEx . '?page=2'),
+	'U_INDEX_PORTAL' => append_sid( $path_to_mx . 'index.'.$phpEx),
+	// Additional header links are defined accordinly
+//
+// END MX
+//
+
+
+
+3) If using you're using a user-defined L_HOME entry, you will have to add the language definition to lang_main.php; this is optional.
+
+#
+#-----[ OPEN ]----------------------
+#
+phpbbroot/language/lang_english/lang_main.php
+
+#
+#-----[ FIND ]----------------------
+#
+//
+// That's all, Folks!
+
+#
+#-----[ BEFORE, ADD ]----------------------
+#
+// mxBB Definitions for the synchronized header
+$lang['Portal_home'] = 'Portal Home';
+

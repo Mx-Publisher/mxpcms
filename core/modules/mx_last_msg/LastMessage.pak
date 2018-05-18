@@ -1,0 +1,17 @@
+module=+:30=+:Post Last Message=+:modules/mx_last_msg/=+:Last Message Module=+:0
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:30=+:30=+:Post Last Message=+:Post Last Message=+:mx_last_msg.php=+:
+parameter=+:30=+:21=+:Last_Msg_Align=+:Values=+:left=+:=+:0
+parameter=+:30=+:39=+:Last_Msg_Display_Author=+:Boolean=+:FALSE=+:=+:0
+parameter=+:30=+:18=+:Last_Msg_Display_Date=+:Boolean=+:TRUE=+:=+:0
+parameter=+:30=+:22=+:Last_Msg_Display_Forum=+:Boolean=+:TRUE=+:=+:0
+parameter=+:30=+:40=+:Last_Msg_Display_Icon_View=+:Boolean=+:TRUE=+:=+:0
+parameter=+:30=+:38=+:Last_Msg_Display_Last_Author=+:Boolean=+:TRUE=+:=+:0
+parameter=+:30=+:37=+:Last_Msg_forum=+:Function=+:=+:get_list_multiple("{parameter_id}[]", FORUMS_TABLE, 'forum_id', 'forum_name', "{parameter_value}", TRUE)=+:0
+parameter=+:30=+:17=+:Last_Msg_Number_Title=+:Number=+:15=+:=+:0
+parameter=+:30=+:20=+:Last_Msg_Target=+:Values=+:_blank=+:=+:0
+parameter=+:30=+:19=+:Last_Msg_Title_Length=+:Number=+:30=+:=+:0
+parameter=+:30=+:318=+:msg_filter_date=+:Function=+:5=+:get_list_static("{parameter_id}[]",array("no limit", "1 day", "2 days", "3 days", "1 week", "2 weeks", "3 weeks", "1 month", "2 months", "3 months", "6 months", "1 year"),"{parameter_value}")=+:0
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Demo - Post Last Message=+:Demo block=+:30=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+function=+:0=+:0=+:0=+:endoflist=+:0=+:0

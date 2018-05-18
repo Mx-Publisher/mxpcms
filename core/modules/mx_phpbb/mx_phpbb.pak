@@ -1,0 +1,7 @@
+module=+:53=+:phpBB2 Integration=+:modules/mx_phpbb/=+:Vanilla phpBB2 Forum Integration=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:53=+:52=+:phpBB=+:MXP Forum Integration=+:mx_phpbb.php=+:
+parameter=+:52=+:96=+:Source_phpBB_Forums=+:phpbb_type_select=+:=+:=+:0=+:0
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Demo - phpBB=+:Demo block=+:52=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+function=+:0=+:0=+:0=+:endoflist=+:0=+:0
