@@ -1,7 +1,8 @@
 <table border="0" cellspacing="5" cellpadding="0" width="100%" id="main_table">
 <tr>
 	<!-- BEGIN layout_column -->
-	<td style="width: <!-- IF layout_column.BLOCK_SIZE neq '100%' -->{layout_column.BLOCK_SIZE}px<!-- ENDIF -->; " valign="top">
+	<td style="width: <!-- IF layout_column.BLOCK_SIZE neq '100%' -->{layout_column.BLOCK_SIZE}px<!-- ENDIF -->; " valign="top" >
+	<div class="tabulated">	
 		<!-- BEGIN blocks -->
 		<!-- BEGIN sub_start -->
 		<table border="0" cellspacing="0" cellpadding="0" width="<!-- IF layout_column.BLOCK_SIZE neq '100%' -->{layout_column.BLOCK_SIZE}px<!-- ENDIF -->">
@@ -15,7 +16,7 @@
 					<!-- BEGIN show_title -->
 					<div class="forabg" style="margin-bottom:0px;padding-bottom:0px;">
 						<div class="inner">
-							<span class="corners-top"><span></span></span>
+							
 					<!-- END show_title -->
 		  						<!-- BEGIN block_header -->
 								<ul class="topiclist">
@@ -23,7 +24,7 @@
 
 									<!-- BEGIN edit -->
 										<li style="float:right">
-										<form action="{layout_column.blocks.edit.EDIT_ACTION}" method="post" class="mx_editform">
+										<form method="post" id="edit-form" action="{layout_column.blocks.edit.EDIT_ACTION}" method="post" class="edit-icon">
 										{layout_column.blocks.edit.EDIT_IMG}
 										{layout_column.blocks.edit.S_HIDDEN_FORM_FIELDS}
 										</form>
@@ -35,8 +36,13 @@
 
 									<!-- BEGIN show_title -->
 										<li class="header">
-										<dl class="icon"><dt class="header">{layout_column.blocks.show_title.L_TITLE}</dt></dl>
-										</li>
+										
+										<dt class="icon header">
+										{layout_column.blocks.show_title.L_TITLE}
+										</dt>
+										</li>{layout_column.blocks.BLOCK}
+										<span class="content"></span>
+										
 									<!-- END show_title -->
 
 								<!-- BEGIN block_header -->
@@ -46,10 +52,12 @@
 						</div>
 					</div>
 					<!-- END show_title -->
-					{layout_column.blocks.BLOCK}
+					
 
 					<!-- BEGIN block_stats -->
-					<div align="right"><span class="copyright">{layout_column.blocks.block_stats.L_BLOCK_UPDATED}{layout_column.blocks.block_stats.EDITOR_NAME} ({layout_column.blocks.block_stats.EDIT_TIME})</span></div>
+					<div align="right">
+					<span class="copyright">{layout_column.blocks.block_stats.L_BLOCK_UPDATED}{layout_column.blocks.block_stats.EDITOR_NAME} ({layout_column.blocks.block_stats.EDIT_TIME})</span>
+					</div>
 					<br clear="all" />
 					<!-- END block_stats -->
 
@@ -62,7 +70,7 @@
 		</table>
 		<!-- END sub_start -->
 		<!-- END blocks -->
-	</td>
+	</div></td>
 	<!-- END layout_column -->
 </tr>
 </table>

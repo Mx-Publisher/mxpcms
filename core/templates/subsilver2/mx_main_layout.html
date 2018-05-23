@@ -1,105 +1,76 @@
-<table border="0" cellspacing="2" cellpadding="0" width="100%" class="mx_body_table">
+<table border="0" cellspacing="5" cellpadding="0" width="100%" id="main_table">
+<tr>
+	<!-- BEGIN layout_column -->
+	<td style="width: <!-- IF layout_column.BLOCK_SIZE neq '100%' -->{layout_column.BLOCK_SIZE}px<!-- ENDIF -->; " valign="top" >
+	<div class="tabulated">	
+		<!-- BEGIN blocks -->
+		<!-- BEGIN sub_start -->
+		<table border="0" cellspacing="0" cellpadding="0" width="<!-- IF layout_column.BLOCK_SIZE neq '100%' -->{layout_column.BLOCK_SIZE}px<!-- ENDIF -->">
+			<tr>
+		<!-- END sub_start -->
 
-	<tr valign="top">
-		<!-- BEGIN layout_column -->
-		<td class="{layout_column.COL_CLASS}" width="{layout_column.BLOCK_SIZE}">
+			<!-- BEGIN sub_col -->
+				{layout_column.blocks.sub_col.INNER_SPACE}
+				<td class="{layout_column.blocks.sub_col.COL_CLASS}" width="<!-- IF layout_column.blocks.sub_col.BLOCK_SIZE neq '100%' -->{layout_column.blocks.sub_col.BLOCK_SIZE}<!-- ELSE -->100%<!-- ENDIF -->">
+			<!-- END sub_col -->
+					<!-- BEGIN show_title -->
+					<div class="forabg" style="margin-bottom:0px;padding-bottom:0px;">
+						<div class="inner">
+							
+					<!-- END show_title -->
+		  						<!-- BEGIN block_header -->
+								<ul class="topiclist">
+		  						<!-- END block_header -->
 
-			<!-- BEGIN blocks -->
+									<!-- BEGIN edit -->
+										<li style="float:right">
+										<form method="post" id="edit-form" action="{layout_column.blocks.edit.EDIT_ACTION}" method="post" class="edit-icon">
+										{layout_column.blocks.edit.EDIT_IMG}
+										{layout_column.blocks.edit.S_HIDDEN_FORM_FIELDS}
+										</form>
+										</li>
+										<!-- BEGIN hidden_block -->
+										<li style="float:right">HB {layout_column.blocks.edit.hidden_block.HIDDEN_BLOCK}</li>
+										<!-- END hidden_block -->
+									<!-- END edit -->
 
-			<!-- BEGIN sub_start -->
-			<table border="0" cellpadding="0" cellspacing="0" width="{layout_column.BLOCK_SIZE}">
-				<tr valign="top">
-			<!-- END sub_start -->
+									<!-- BEGIN show_title -->
+										<li class="header">
+										
+										<dt class="icon header">
+										{layout_column.blocks.show_title.L_TITLE}
+										</dt>
+										</li>{layout_column.blocks.BLOCK}
+										<span class="content"></span>
+										
+									<!-- END show_title -->
 
-					<!-- BEGIN sub_col -->
-					{layout_column.blocks.sub_col.INNER_SPACE}
-					<td class="{layout_column.blocks.sub_col.COL_CLASS}" width="{layout_column.blocks.sub_col.BLOCK_SIZE}">
-					<!-- END sub_col -->
+								<!-- BEGIN block_header -->
+								</ul>
+								<!-- END block_header -->
+					<!-- BEGIN show_title -->
+						</div>
+					</div>
+					<!-- END show_title -->
+					
 
-						 <table width="{layout_column.BLOCK_SIZE}" cellpadding="0" cellspacing="0" border="0" class="mx_graphborder">
-							  <tr>
-								   <td>
+					<!-- BEGIN block_stats -->
+					<div align="right">
+					<span class="copyright">{layout_column.blocks.block_stats.L_BLOCK_UPDATED}{layout_column.blocks.block_stats.EDITOR_NAME} ({layout_column.blocks.block_stats.EDIT_TIME})</span>
+					</div>
+					<br clear="all" />
+					<!-- END block_stats -->
 
-							  						<table width="100%" cellpadding="0" cellspacing="0" border="0" class="forumline" style="border-bottom: 0; padding:0px 0px 0px 0px;">
-							  						<!-- BEGIN block_header -->
-							  							<tr>
-							  								<td>
-										  						<table width="100%" cellpadding="0" cellspacing="0" style="border:none; padding:0px 0px 0px 0px;">
-										  							<tr>
-																	<!-- END block_header -->
+			<!-- BEGIN sub_col -->
+				</td>
+			<!-- END sub_col -->
 
-											 							<!-- BEGIN show_title -->
-																		<th align="left" style="background-color: #75507b; overflow: auto; width: 80%; height: 20px;">
-																			&nbsp;{layout_column.blocks.show_title.L_TITLE}&nbsp;
-																		</th>
-																		<!-- END show_title -->
-
-																		<!-- BEGIN edit -->
-
-																		<th align="right" class="editCP_switch" style="display: {layout_column.blocks.edit.EDITCP_SHOW};">
-																			<form action="{layout_column.blocks.edit.EDIT_ACTION}" method="post" class="mx_editform">
-																				<div>
-
-													  									<dl>
-																							<dt  align="right">
-														  									<!-- BEGIN hidden_block -->
-																								<i>{layout_column.blocks.edit.hidden_block.HIDDEN_BLOCK}</i>
-																							<!-- END hidden_block -->																							
-														  										{layout_column.blocks.edit.EDIT_IMG}
-																								{layout_column.blocks.edit.S_HIDDEN_FORM_FIELDS}																							
-																							</dt>
-													  									</dl>
-
-																				</div>
-																			</form>
-																		</th>
-
-																		<!-- END edit -->
-
-											 							<!-- BEGIN show_title -->
-																		<th align="right" style="overflow: auto; width: 1%; height: 20px;"></th>
-																		<!-- END show_title -->
-
-													<!-- BEGIN block_header -->
-																	</tr>
-																</table>
-															</td>
-														</tr>
-													</table>
-													<!-- END block_header -->
-
-													<div id="block_{layout_column.blocks.BLOCK_ID}" style="width: 100%; border:none; padding:0px 0px 0px 0px;">
-														<dl>
-															<dt>
-																{layout_column.blocks.BLOCK}
-															</dt>
-														</dl>
-													</div>
-								    </td>
-							   </tr>
-						  </table>
-
-						<!-- BEGIN block_stats -->
-						<div align="right"><span class="copyright">{layout_column.blocks.block_stats.L_BLOCK_UPDATED}{layout_column.blocks.block_stats.EDITOR_NAME} ({layout_column.blocks.block_stats.EDIT_TIME})</span></div>
-						<br clear="all" />
-						<!-- END block_stats -->
-
-						<!-- BEGIN no_stats -->
-						<br clear="all" />
-						<!-- END no_stats -->
-
-					<!-- BEGIN sub_col -->
-					</td>
-					<!-- END sub_col -->
-
-			<!-- BEGIN sub_end -->
-				</tr>
-			</table>
-			<!-- END sub_end -->
-
-			<!-- END blocks -->
-
-		</td>
-		<!-- END layout_column -->
-	</tr>
+		<!-- BEGIN sub_start -->
+			</tr>
+		</table>
+		<!-- END sub_start -->
+		<!-- END blocks -->
+	</div></td>
+	<!-- END layout_column -->
+</tr>
 </table>

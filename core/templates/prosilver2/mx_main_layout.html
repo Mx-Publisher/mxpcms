@@ -1,16 +1,16 @@
-<table border="0" cellspacing="5" cellpadding="0" width="100%" id="main_table">
+<table border="0" cellspacing="5" cellpadding="0" width="100%" id="main_table" onload="go_trough( this)">
 <tr>
 	<!-- BEGIN layout_column -->
-	<td style="width: <!-- IF layout_column.BLOCK_SIZE neq '100%' -->{layout_column.BLOCK_SIZE}px<!-- ENDIF -->; " valign="top">
+	<td width="{layout_column.BLOCK_SIZE}" valign="top">
 		<!-- BEGIN blocks -->
 		<!-- BEGIN sub_start -->
-		<table border="0" cellspacing="0" cellpadding="0" width="<!-- IF layout_column.BLOCK_SIZE neq '100%' -->{layout_column.BLOCK_SIZE}px<!-- ENDIF -->">
+		<table border="0" cellspacing="0" cellpadding="0" width="{layout_column.BLOCK_SIZE}" onload="go_trough( this)">
 			<tr>
 		<!-- END sub_start -->
 
 			<!-- BEGIN sub_col -->
 				{layout_column.blocks.sub_col.INNER_SPACE}
-				<td class="{layout_column.blocks.sub_col.COL_CLASS}" width="<!-- IF layout_column.blocks.sub_col.BLOCK_SIZE neq '100%' -->{layout_column.blocks.sub_col.BLOCK_SIZE}<!-- ELSE -->100%<!-- ENDIF -->">
+				<td class="{layout_column.blocks.sub_col.COL_CLASS}" width="{layout_column.blocks.sub_col.BLOCK_SIZE}">
 			<!-- END sub_col -->
 					<!-- BEGIN show_title -->
 					<div class="forabg" style="margin-bottom:0px;padding-bottom:0px;">
@@ -66,3 +66,24 @@
 	<!-- END layout_column -->
 </tr>
 </table>
+<script type="text/javascript">
+<!--
+function getObj(obj)
+{
+	return ( document.getElementById ? document.getElementById(obj) : ( document.all ? document.all[obj] : null ) );
+}
+function go_trough( obj)
+{
+	obj1 = obj.rows[0].childNodes;
+	for( i = 0; i < obj1.length; i++)
+	{
+		if ( obj1[i].nodeName == 'TD' && obj1[i].width == '100%')
+		{
+			obj1[i].width='';
+		}
+	}
+}
+
+go_trough( getObj('main_table'));
+-->
+</script>

@@ -1,3 +1,36 @@
+/*  	
+--------------------------------------------------------------
+Colours and backgrounds
+-------------------------------------------------------------- */
+
+/* Big button images */
+
+a.print {
+	background-image: url("images/icon_print.gif");
+}
+
+a.sendemail {
+	background-image: url("images/icon_sendemail.gif");
+}
+
+a.fontsize {
+	background-image: url("images/icon_fontsize.gif");
+}
+
+
+a.fontsize {
+	background-position: 0 -1px;
+}
+
+a.fontsize:hover {
+	background-position: 0 -20px;
+}
+
+ul.linklist li {
+    list-style-type: none;
+
+}
+
 #mx-wrap {
 	padding: 0 20px;
 	min-width: 650px;
@@ -215,54 +248,39 @@ H1.blockcp {
 \***********/
 .sitebar {
 	clear: both;
-	margin-top: 2px;
-	background: #12A3EB url("./images/sitebar_bg.gif") repeat-x;
+
 }
 .sitebar .corners-bottom {
-	top: -5px;
-	margin-top:0px;
 	position:relative;
 
 }
 
 .sitebar UL {
 	margin-left: 0px;
-	padding-bottom: 1px;
-	font-weight: bold;
 }
 
 .sitebar UL LI {
-	float:left;
 	display:block;
 }
-.sitebar .button A.nav, .sitebar .button-current A.nav {
-	text-decoration:none;
-	background: #cadceb url("./images/sitebar_bg.gif") repeat-x;
+.sitebar .button-current  {
+	background: #12A3EB repeat-x;
 }
 
 .sitebar .button A.nav , .sitebar .button-current A.nav {
-	font-size: 1.3em;
-	padding: 3px 5px 3px 5px;
-	color: #FFFFFF;
 	display:block;
-	text-decoration: none;
 }
 .sitebar .button-current A.nav {
 	background-position: 0 -44px;
-	color: #0a90d3;
 }
 
 .sitebar UL LI.button A.nav:active, .sitebar UL LI.button-current A.nav:active {
-	background-color: #CCCCCC;
 	background-image: url("./images/bg_active.gif");
 	background-position: -1px 0px;
 	color: Red;
 }
 
 .sitebar UL LI.button A.nav:hover, .sitebar UL LI.button-current A.nav:hover {
-	background-color: #CCCCCC;
 	background-position: 0 -22px;
-	color: #000000;
 }
 
 .linklist .icon {

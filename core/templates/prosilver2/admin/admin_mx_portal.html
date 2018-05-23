@@ -5,13 +5,11 @@
 
 <form action="{S_CONFIG_ACTION}" method="post">
 <div id="tabs">
-			<ul id="admintabs">
-				
-				<li id="gen_sett_tab"><a href="javascript:selectPart('gen_sett')">{L_GENERAL_SETTINGS}</a></li>
-				<li id="style_sett_tab"><a href="javascript:selectPart('style_sett')">{L_STYLE_SETTINGS}</a></li>
-				<li id="config_info_tab"><a href="javascript:selectPart('config_info')">INFO</a></li>
-				
-			</ul>
+	<ul>
+	<li id="gen_sett_tab"><a href="javascript:selectPart('gen_sett')"><span>{L_GENERAL_SETTINGS}</span></a></li>
+	<li id="style_sett_tab"><a href="javascript:selectPart('style_sett')"><span>{L_STYLE_SETTINGS}</span></a></li>
+	<li id="config_info_tab"><a href="javascript:selectPart('config_info')"><span>INFO</span></a></li>
+	</ul>
 </div>
 <div class="acp">
 <div class="panel">
@@ -33,17 +31,23 @@
 		<dd><textarea rows="5" cols="50" wrap="virtual" name="disabled_message" id="disabled_message">{DISABLED_MESSAGE}</textarea></dd>
 	</dl>
 	<dl>
-		<dt>{L_PORTAL_URL}</dt>
-		<dt><input type="text" maxlength="150" size="50" name="portal_url" value="{PORTAL_URL}" /></dt>
+		<dt><label for="portal_url">{L_PORTAL_URL}</label></dt>
+		<dd><input type="text" maxlength="150" size="50" name="portal_url" value="{PORTAL_URL}" /></dd>
 	</dl>
 	<dl>
 		<dt>{L_PORTAL_PHPBB_URL}</dt>
-		<dt><input type="text" maxlength="150" size="50" name="portal_phpbb_url" value="{PORTAL_PHPBB_URL}" /></dt>
-	</dl>		
+		<dd><input type="text" maxlength="150" size="50" name="portal_phpbb_url" value="{PORTAL_PHPBB_URL}" /></dd>
+	</dl>	
+	<dl>
+		<dt><label for="server_name">{L_SERVER_NAME}</label></dt>
+		<dd><input type="text" maxlength="255" size="40" name="server_name" id="server_name" value="{SERVER_NAME}" /></dd>
+	</dl>
+
 	<dl>
 		<dt><label for="board_timezone">{L_SYSTEM_TIMEZONE}</label></dt>
 		<dd>{TIMEZONE_SELECT}</dd>
 	</dl>
+
 	<dl>
 		<dt><label for="mx_use_cache_1">{L_MX_USE_CACHE}</label><br /><span class="explain">{L_MX_USE_CACHE_EXPLAIN}</span></dt>
 		<dd><input type="radio" name="mx_use_cache" id="mx_use_cache_1" value="1" class="radio" {S_MX_USE_CACHE_YES} /> <label for="mx_use_cache_1">{L_YES}</label>&nbsp;
@@ -55,8 +59,7 @@
 		<input type="radio" name="mod_rewrite" id="mod_rewrite_0" value="0" class="radio" {S_MX_MOD_REWRITE_NO} /> <label for="mod_rewrite_0">{L_NO}</label></dd>
 	</dl>
 </fieldset>
-<fieldset id="portal_back"></fieldset>
-<fieldset id="cookie_sett"></fieldset>
+
 <fieldset id="style_sett">
 	<dl>
 		<dt><label for="default_lang">{L_DEFAULT_LANG}</label></dt>
@@ -96,8 +99,8 @@
 		<dd><input type="radio" name="top_phpbb_links" id="top_phpbb_links_1" value="1" class="radio" {S_TOP_PHPBB_LINKS_YES} /> <label for="top_phpbb_links_1">{L_YES}</label>&nbsp;
 		<input type="radio" name="top_phpbb_links" id="top_phpbb_links_0" value="0" class="radio" {S_TOP_PHPBB_LINKS_NO} /> <label for="top_phpbb_links_0">{L_NO}</label></dd>
 	</dl>
+
 </fieldset>
-<fieldset id="email_sett"></fieldset>
 <div id="config_info">
 <fieldset>
 	<legend>{L_GENERAL_CONFIG_INFO}</legend>
@@ -141,36 +144,31 @@
 	<span class="corners-bottom"><span></span></span>
 </div>
 </div>
-<br clear="all" />
 <script type="text/javascript">
+
 <!--
-function admingetObj(obj)
+function getObj(obj)
 {
 	return ( document.getElementById ? document.getElementById(obj) : ( document.all ? document.all[obj] : null ) );
 }
-function adminsetNone(part)
+
+function setNone( part)
 {
-	admingetObj(part + '_tab').className = '';
-	admingetObj(part).style.display = 'none';
+	getObj( part+'_tab').className='';
+	getObj( part).style.display='none';
 
 }
-function adminsetBlock(part)
+
+function selectPart( part)
 {
-	admingetObj(part + '_tab').className = 'activetab';
-	admingetObj(part).style.display = 'block';
-
+	setNone( 'gen_sett');
+	setNone( 'style_sett');
+	setNone( 'config_info');
+	getObj( part+'_tab').className='activetab';
+	getObj( part).style.display='block';
 }
-function selectPart(part)
-{
-	adminsetNone('gen_sett');
-	adminsetNone('style_sett');
-	adminsetNone('config_info');
-
-
-	adminsetBlock(part);
-}
-
-selectPart('gen_sett');
-
+selectPart( 'gen_sett');
 // -->
 </script>
+
+<br clear="all" />
