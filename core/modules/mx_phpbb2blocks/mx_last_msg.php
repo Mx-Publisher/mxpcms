@@ -206,7 +206,7 @@ for( $row_count = 0; $row_count < count($postrow); $row_count++ )
 		$topic_type = $lang['Topic_Moved'] . ' ';
 		$topic_id = $postrow[$row_count]['topic_moved_id'];
 
-		$folder_image = $images['last_msg_folder'];
+		$folder_image = $mx_user->images['last_msg_folder'];
 		$folder_alt = $lang['Topics_Moved'];
 		$newest_post_img = '';
 	}
@@ -214,18 +214,18 @@ for( $row_count = 0; $row_count < count($postrow); $row_count++ )
 	{
 		if ( $postrow[$row_count]['topic_type'] == POST_ANNOUNCE )
 		{
-			$folder = $images['last_msg_folder_announce'];
-			$folder_new = $images['last_msg_folder_announce_new'];
+			$folder = $mx_user->images['last_msg_folder_announce'];
+			$folder_new = $mx_user->images['last_msg_folder_announce_new'];
 		}
 		else if ( $postrow[$row_count]['topic_type'] == POST_STICKY )
 		{
-			$folder = $images['last_msg_folder_sticky'];
-			$folder_new = $images['last_msg_folder_sticky_new'];
+			$folder = $mx_user->images['last_msg_folder_sticky'];
+			$folder_new = $mx_user->images['last_msg_folder_sticky_new'];
 		}
 		else if ( $postrow[$row_count]['topic_status'] == TOPIC_LOCKED )
 		{
-			$folder = $images['last_msg_folder_locked'];
-			$folder_new = $images['last_msg_folder_locked_new'];
+			$folder = $mx_user->images['last_msg_folder_locked'];
+			$folder_new = $mx_user->images['last_msg_folder_locked_new'];
 		}
 		else
 		{
@@ -233,18 +233,18 @@ for( $row_count = 0; $row_count < count($postrow); $row_count++ )
 			
 			if ( $replies >= $board_config['hot_threshold'] )
 			{
-				$folder = $images['last_msg_folder_hot'];
-				$folder_new = $images['last_msg_folder_hot_new'];
+				$folder = $mx_user->images['last_msg_folder_hot'];
+				$folder_new = $mx_user->images['last_msg_folder_hot_new'];
 			}
 			else
 			{
-				$folder = $images['last_msg_folder'];
-				$folder_new = $images['last_msg_folder_new'];
+				$folder = $mx_user->images['last_msg_folder'];
+				$folder_new = $mx_user->images['last_msg_folder_new'];
 			}
 		}
 
 		$newest_post_img = '';
-		if ( $userdata['session_logged_in'] )
+		if ( $mx_user->data['session_logged_in'] )
 		{
 			$tracking_topics = ( isset( $_COOKIE[$board_config['cookie_name'] . '_t'] ) ) ? unserialize( $_COOKIE[$board_config['cookie_name'] . "_t"] ) : array();
 			$tracking_forums = ( isset( $_COOKIE[$board_config['cookie_name'] . '_f'] ) ) ? unserialize( $_COOKIE[$board_config['cookie_name'] . "_f"] ) : array();
@@ -284,7 +284,7 @@ for( $row_count = 0; $row_count < count($postrow); $row_count++ )
 						$folder_image = $folder_new;
 						$folder_alt = $lang['New_posts'];
 
-						$newest_post_img = '<a href="' . mx_append_sid(PHPBB_URL . "viewtopic.$phpEx?" . POST_TOPIC_URL . "=$topic_id&amp;view=newest") . '"><img src="' . $images['last_msg_icon_newest_reply'] . '" alt="' . $lang['View_newest_post'] . '" title="' . $lang['View_newest_post'] . '" border="0" /></a> ';
+						$newest_post_img = '<a href="' . mx_append_sid(PHPBB_URL . "viewtopic.$phpEx?" . POST_TOPIC_URL . "=$topic_id&amp;view=newest") . '"><img src="' . $mx_user->images['last_msg_icon_newest_reply'] . '" alt="' . $lang['View_newest_post'] . '" title="' . $lang['View_newest_post'] . '" border="0" /></a> ';
 					}
 					else
 					{
@@ -299,7 +299,7 @@ for( $row_count = 0; $row_count < count($postrow); $row_count++ )
 					$folder_image = $folder_new;
 					$folder_alt = ( $postrow[$row_count]['topic_status'] == TOPIC_LOCKED ) ? $lang['Topic_locked'] : $lang['New_posts'];
 
-					$newest_post_img = '<a href="' . mx_append_sid(PHPBB_URL . "viewtopic.$phpEx?" . POST_TOPIC_URL . "=$topic_id&amp;view=newest") . '"><img src="' . $images['last_msg_icon_newest_reply'] . '" alt="' . $lang['View_newest_post'] . '" title="' . $lang['View_newest_post'] . '" border="0" /></a> ';
+					$newest_post_img = '<a href="' . mx_append_sid(PHPBB_URL . "viewtopic.$phpEx?" . POST_TOPIC_URL . "=$topic_id&amp;view=newest") . '"><img src="' . $mx_user->images['last_msg_icon_newest_reply'] . '" alt="' . $lang['View_newest_post'] . '" title="' . $lang['View_newest_post'] . '" border="0" /></a> ';
 				}
 			}
 			else
@@ -384,7 +384,7 @@ for( $row_count = 0; $row_count < count($postrow); $row_count++ )
 
 	if ( $display_icon_view == "TRUE" )
 	{
-		$last_post_url = '<a href="' . mx_append_sid(PHPBB_URL . "viewtopic.$phpEx?". "lmsg_start=" . $msg_start . "&" . POST_POST_URL . '=' . $postrow[$row_count]['topic_last_post_id']) . '#' . $postrow[$row_count]['topic_last_post_id'] . '"><img src="' . $images['last_msg_icon_latest_reply'] . '" alt="' . $lang['View_latest_post'] . '" title="' . $lang['View_latest_post'] . '" border="0" /></a>';
+		$last_post_url = '<a href="' . mx_append_sid(PHPBB_URL . "viewtopic.$phpEx?". "lmsg_start=" . $msg_start . "&" . POST_POST_URL . '=' . $postrow[$row_count]['topic_last_post_id']) . '#' . $postrow[$row_count]['topic_last_post_id'] . '"><img src="' . $mx_user->images['last_msg_icon_latest_reply'] . '" alt="' . $lang['View_latest_post'] . '" title="' . $lang['View_latest_post'] . '" border="0" /></a>';
 	}
 	else
 	{

@@ -475,7 +475,11 @@ class mx_bbcode extends bbcode_base
 			{
 				if (!@file_exists($this->template_filename2))
 				{				
-					trigger_error('The file ' . $this->template_filename . ', The file ' . $this->template_filename2 . ' is missing.', E_USER_ERROR);
+					global $template; 					
+					
+					$this->template_filename = $template->make_filename('bbcode.tpl', false);
+					$this->template_filename2 = $template->make_filename('bbcode.html', false);					
+					//trigger_error('The file "' . $this->template_filename . '", and The file "' . $this->template_filename2 . '" are missing.', E_USER_ERROR);
 				}
 				else
 				{

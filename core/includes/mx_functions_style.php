@@ -1948,22 +1948,11 @@ class mx_user extends mx_session
 			$parsed_array = array();
 		}	
 		
-		if( @file_exists(@phpbb_realpath($phpbb_root_path . $this->current_template_path . '/style.cfg')) )
-		{
-			//parse phpBB3 style cfg file
-			$cfg_file_name = 'style.cfg';			
-			$cfg_file = $phpbb_root_path . $this->current_template_path . '/style.cfg';
-					
-			if (!isset($parsed_array['filetime']) || (@filemtime($cfg_file) > $parsed_array['filetime']))
-			{
-				// Re-parse cfg file
-				$parsed_array = parse_cfg_file($cfg_file);		
-				$parsed_array['filetime'] = @filemtime($cfg_file);				
-				$this->cache->put('_cfg_' . $this->template_path, $parsed_array);
-			}							
-		}
-		else
-		{	
+		//
+		// Try phpBB2 then phpBB3 style configuration file
+		//		
+		if(@file_exists(@phpbb_realpath($phpbb_root_path . $current_template_path . '/' . $template_name . '.cfg')) )
+		{		
 			//parse phpBB2 style cfg file	
 			$cfg_file_name = $this->template_name . '.cfg';
 			$cfg_file = $phpbb_root_path . $this->current_template_path . '/' . $cfg_file_name;
@@ -1978,7 +1967,20 @@ class mx_user extends mx_session
 				}
 			}		
 		}
-		
+		elseif( @file_exists(@phpbb_realpath($phpbb_root_path . $this->current_template_path . '/style.cfg')) )
+		{
+			//parse phpBB3 style cfg file
+			$cfg_file_name = 'style.cfg';			
+			$cfg_file = $phpbb_root_path . $this->current_template_path . '/style.cfg';
+					
+			if (!isset($parsed_array['filetime']) || (@filemtime($cfg_file) > $parsed_array['filetime']))
+			{
+				// Re-parse cfg file
+				$parsed_array = parse_cfg_file($cfg_file);		
+				$parsed_array['filetime'] = @filemtime($cfg_file);				
+				$this->cache->put('_cfg_' . $this->template_path, $parsed_array);
+			}							
+		}		
 		$check_for = array(
 			'pagination_sep'    => (string) ', '
 		);
@@ -2089,7 +2091,7 @@ class mx_user extends mx_session
 		// phpBB2 image sets main images
 		//				
 		$img_lang = ( file_exists($phpbb_root_path . $this->current_template_path . $this->img_lang_dir) ) ? $this->img_lang : $this->default_language_name;
-
+		
 		//
 		// Import phpBB Graphics, prefix with PHPBB_URL, and apply LANG info
 		//
@@ -2099,17 +2101,41 @@ class mx_user extends mx_session
 			{
 				foreach( $value as $key2 => $val2 )
 				{
-					$images[$key][$key2] = PHPBB_URL . $val2;
+					$this->images[$key][$key2] = $images[$key][$key2] = PHPBB_URL . $val2;
 				}
 			}
 			else
 			{
-				$images[$key] = str_replace('{LANG}', 'lang_' . $img_lang, $value);
-				$images[$key] = PHPBB_URL . $images[$key];
+				$this->images[$key] = $images[$key] = str_replace('{LANG}', 'lang_' . $img_lang, $value);
+				$this->images[$key] = $images[$key] = PHPBB_URL . $images[$key];
 			}
+			
+			if(empty($images['forum']))
+			{
+				//print_r('Your style configuration file has a typo! ');
+				//print_r($images);
+				$images['forum'] = 'folder.gif';
+			}			
+			
+			/* Here we overwrite phpBB images from the template db or configuration file  */		
+			$rows = $this->image_rows($images);		
+			
+			foreach ($rows as $row)
+			{
+				$row['image_filename'] = rawurlencode($row['image_filename']);
+				
+				if(empty($row['image_name']))
+				{
+					//print_r('Your style configuration file has a typo! ');
+					//print_r($row);
+					$row['image_name'] = 'spacer.gif';
+				}
+							
+				$this->img_array[$row['image_name']] = $row;				
+			}			
 		}
 		
-		//		
+		//print_r($images);		
 		// Import phpBB Olympus image sets main images
 		//		
 		if (@file_exists("{$phpbb_root_path}{$this->template_path}{$this->template_name}{$this->imageset_path}/imageset.cfg"))

@@ -716,7 +716,7 @@ function mx_session_start()
  */
 function get_page_id($search_item, $use_function_file = false, $get_page_data_array = false)
 {
-	global $db, $userdata, $mx_cache;
+	global $db, $mx_user, $mx_cache;
 
 	//
 	// Try to reuse results.
@@ -724,13 +724,13 @@ function get_page_id($search_item, $use_function_file = false, $get_page_data_ar
 	$cache_key = '_pagemap_block' . $search_item;
 
 	$page_id_array = array();
-	if ( $mx_cache->_exists( $cache_key ) )
+	if ($mx_cache->_exists($cache_key))
 	{
-		$page_id_array = unserialize( $mx_cache->get( $cache_key ) );
+		$page_id_array = unserialize($mx_cache->get($cache_key));
 	}
 	else
 	{
-		if( $use_function_file )
+		if($use_function_file !== false)
 		{
 			$sql = "SELECT * FROM " . FUNCTION_TABLE . " WHERE function_file = '$search_item' LIMIT 1";
 			if( !($result = $db->sql_query($sql)) )
@@ -747,20 +747,20 @@ function get_page_id($search_item, $use_function_file = false, $get_page_data_ar
 			}
 			$row = $db->sql_fetchrow($result);
 			$db->sql_freeresult($result);
-			$search_item = $row['block_id'];
+			$search_item = isset($row['block_id']) ? intval($row['block_id']) : 0;
 		}
-
+		
 		//
 		// First, see if we can get the page_id from ordinary blocks
 		//
-		$sql = "SELECT bct.*, pag.page_id, pag.page_name, pag.page_desc
+		$sql = "SELECT pag.page_id, pag.page_name, pag.page_desc
 			FROM " . COLUMN_BLOCK_TABLE . " bct,
-		       	" . PAGE_TABLE . " pag,
+				" . PAGE_TABLE . " pag,
 				" . COLUMN_TABLE . " col
 			WHERE pag.page_id = col.page_id
 				AND bct.column_id = col.column_id
 				AND bct.block_id = '" . $search_item . "'
-	   		ORDER BY pag.page_id
+			ORDER BY pag.page_id
 			LIMIT 1";
 
 		if( !($p_result = $db->sql_query($sql)) )
@@ -770,7 +770,7 @@ function get_page_id($search_item, $use_function_file = false, $get_page_data_ar
 		$p_row = $db->sql_fetchrow($p_result);
 		$db->sql_freeresult($result);
 
-		if( empty($p_row['page_id']) )
+		if( empty($p_row['page_id']) || (($use_function_file !== false) && ($search_item > 0)) )
 		{
 			//
 			// Find all dynamic block Page_ids, if not present as ordinary block
@@ -794,34 +794,35 @@ function get_page_id($search_item, $use_function_file = false, $get_page_data_ar
 			$db->sql_freeresult($result);
 			$p_row = $db->sql_fetchrow($p_result);
 		}
-
-		if( empty($p_row['page_id']) )
+		
+		if( empty($p_row['page_id'])  || (($use_function_file !== false) && ($search_item > 0)) )
 		{
-			//
 			// Find all subblock page_ids
-			//
 			$sql = "SELECT pag.page_id, pag.page_name, pag.page_desc, sys.parameter_value
 				FROM " . COLUMN_BLOCK_TABLE . " bct,
-			       	" . PAGE_TABLE . " pag,
+					" . PAGE_TABLE . " pag,
 					" . COLUMN_TABLE . " col,
 					" . BLOCK_SYSTEM_PARAMETER_TABLE . " sys,
-					" . PARAMETER_TABLE . " par
+					" . PARAMETER_TABLE . " par,
+					" . FUNCTION_TABLE . " fcn
 				WHERE pag.page_id = col.page_id
 					AND bct.column_id = col.column_id
 					AND bct.block_id = sys.block_id
 					AND sys.parameter_id = par.parameter_id
 					AND par.parameter_name = 'block_ids'
-		   		ORDER BY sys.block_id";
-
+					AND par.function_id = fcn.function_id
+					AND fcn.function_file = 'mx_multiple_blocks.php'
+					ORDER BY sys.block_id";
+					
 			if( !($p_result = $db->sql_query($sql)) )
 			{
 				mx_message_die(GENERAL_ERROR, "Could not query column list", '', __LINE__, __FILE__, $sql);
 			}
-
+			
 			while( $temp_row = $db->sql_fetchrow($p_result) )
 			{
 				$block_ids_array = explode(',' , $temp_row['parameter_value']);
-
+				
 				foreach($block_ids_array as $key => $block_id)
 				{
 					if ($block_id == $search_item)
@@ -830,7 +831,7 @@ function get_page_id($search_item, $use_function_file = false, $get_page_data_ar
 						continue;
 					}
 				}
-
+				
 				if (!empty($p_row['page_id']))
 				{
 					continue;
@@ -839,33 +840,34 @@ function get_page_id($search_item, $use_function_file = false, $get_page_data_ar
 			$db->sql_freeresult($result);
 		}
 
-		if( empty($p_row['page_id']) )
+		if( empty($p_row['page_id'])  || (($use_function_file !== false) && ($search_item > 0)) )
 		{
-			//
 			// Find if block is a default dynamic block (desperate try)
-			//
 			$sql = "SELECT pag.page_id, pag.page_name, pag.page_desc, sys.parameter_value
 				FROM " . COLUMN_BLOCK_TABLE . " bct,
 			       	" . PAGE_TABLE . " pag,
 					" . COLUMN_TABLE . " col,
 					" . BLOCK_SYSTEM_PARAMETER_TABLE . " sys,
-					" . PARAMETER_TABLE . " par
+					" . PARAMETER_TABLE . " par,
+					" . FUNCTION_TABLE . " fcn
 				WHERE pag.page_id = col.page_id
 					AND bct.column_id = col.column_id
 					AND bct.block_id = sys.block_id
 					AND sys.parameter_id = par.parameter_id
 					AND par.parameter_name = 'default_block_id'
+					AND par.function_id = fcn.function_id
+					AND fcn.function_file = 'mx_dynamic.php'
 		   		ORDER BY sys.block_id";
-
+				
 			if( !($p_result = $db->sql_query($sql)) )
 			{
 				mx_message_die(GENERAL_ERROR, "Could not query column list", '', __LINE__, __FILE__, $sql);
 			}
-
+			
 			while( $temp_row = $db->sql_fetchrow($p_result) )
 			{
 				$block_ids_array = explode(',' , $temp_row['parameter_value']);
-
+				
 				foreach($block_ids_array as $key => $block_id)
 				{
 					if ($block_id == $search_item)
@@ -874,7 +876,7 @@ function get_page_id($search_item, $use_function_file = false, $get_page_data_ar
 						continue;
 					}
 				}
-
+				
 				if (!empty($p_row['page_id']))
 				{
 					continue;
@@ -882,27 +884,95 @@ function get_page_id($search_item, $use_function_file = false, $get_page_data_ar
 			}
 			$db->sql_freeresult($result);
 		}
-
+		
 		$page_id_array = array();
 		if (!empty($p_row['page_id']))
-		{
-			$page_id_array['page_id'] = $p_row['page_id'];
-			$page_id_array['page_name'] = $p_row['page_name'];
-			$page_id_array['page_desc'] = $p_row['page_desc'];
-			$page_id_array['block_id'] = $p_row['block_id'];
+		{		
+			if(isset($p_row['page_id']))
+			{
+				$page_id_array['page_id'] = isset($p_row['page_id']) ? $p_row['page_id'] : $page_id;
+			}	
+			
+			if(isset($p_row['page_name']))
+			{
+				$page_id_array['page_name'] = $p_row['page_name'];
+			}			
+			
+			if(isset($p_row['page_desc']))
+			{
+				$page_id_array['page_desc'] = $p_row['page_desc'];
+			}		
+			
+			if(isset($p_row['block_id']))
+			{
+				$page_id_array['block_id'] = isset($p_row['block_id']) ? $p_row['block_id'] : 0;
+			}			
+			
 		}
 		unset($p_row);
-		$mx_cache->put( $cache_key, serialize($page_id_array) );
+		$mx_cache->put($cache_key, serialize($page_id_array));
 	}
-
+	
 	if ( $get_page_data_array && !empty($page_id_array['page_id']) )
 	{
 		return $page_id_array;
 	}
-	else if(!empty($page_id_array['page_id']))
+	else if(isset($page_id_array['page_id']))
 	{
 		return $page_id_array['page_id'];
 	}
+	else if( (isset($page_id_array) && isset($search_item) && ($search_item > 0))  || (($use_function_file !== false) && ($search_item > 0)) )
+	{
+		global $mx_request_vars;
+		
+		//
+		// Page selector
+		//
+		$page_id = $mx_request_vars->request('page', MX_TYPE_INT, 1);
+
+		//
+		// Find all dynamic block Page_ids, if not present as ordinary block
+		//
+		$sql = "SELECT pag.page_id, pag.page_name, pag.page_desc, nav.block_id
+			FROM " . PAGE_TABLE . " pag,
+				" . BLOCK_TABLE . " blk,
+				" . MENU_NAV_TABLE . " nav,
+				" . MENU_CAT_TABLE . " nac
+			WHERE pag.page_id > 0
+				AND nac.cat_id = nav.cat_id
+				AND nav.block_id = blk.block_id
+				AND nav.block_id = '" . $search_item . "'
+			ORDER BY blk.block_id";
+				
+		if( !($p_result = $db->sql_query($sql)) )
+		{
+			mx_message_die(GENERAL_ERROR, "Could not query column list", '', __LINE__, __FILE__, $sql);
+		}		
+		$p_row = $db->sql_fetchrow($p_result);		
+		$db->sql_freeresult($p_result);
+		
+		if(isset($p_row['page_id']))
+		{
+			$page_id_array['page_id'] = isset($p_row['page_id']) ? $p_row['page_id'] : $page_id;
+		}	
+		
+		if(isset($p_row['page_name']))
+		{
+			$page_id_array['page_name'] = $p_row['page_name'];
+		}			
+		
+		if(isset($p_row['page_desc']))
+		{
+			$page_id_array['page_desc'] = $p_row['page_desc'];
+		}		
+		
+		if(isset($p_row['block_id']))
+		{
+			$page_id_array['block_id'] = isset($p_row['block_id']) ? $p_row['block_id'] : $search_item;
+		}		
+					
+		return $page_id_array;
+	}	
 	else
 	{
 		return '';

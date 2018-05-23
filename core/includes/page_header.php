@@ -677,15 +677,17 @@ else
 }
 
 // Search box
-$search_page_id_pafiledb = get_page_id('dload.' . $phpEx, true);
-$search_page_id_kb = get_page_id('kb.' . $phpEx, true);
 $search_page_id_site = get_page_id('mx_search.' . $phpEx, true);
-
 $option_search_site = !empty($search_page_id_site) ? '<option value="site">' . $lang['Mx_search_site'] . '</option>' : '';
+
 $option_search_forum = '<option value="forum">' . $lang['Mx_search_forum'] . '</option>';
-$option_search_kb = !empty($search_page_id_kb) ? '<option value="kb">' . $lang['Mx_search_kb'] . '</option>' : '';
-$option_search_pafiledb = !empty($search_page_id_pafiledb) ? '<option value="pafiledb">' . $lang['Mx_search_pafiledb'] . '</option>' : '';
 $option_search_google = '<option value="google">' . $lang['Mx_search_google'] . '</option>';
+
+$search_page_id_kb = get_page_id('kb.' . $phpEx, true);
+$option_search_kb = !empty($search_page_id_kb) ? '<option value="kb">' . $lang['Mx_search_kb'] . '</option>' : '';
+
+$search_page_id_pafiledb = get_page_id('dload.' . $phpEx, true);
+$option_search_pafiledb = !empty($search_page_id_pafiledb) ? '<option value="pafiledb">' . $lang['Mx_search_pafiledb'] . '</option>' : '';
 
 //
 // Generate list of additional css files to include (defined by modules)
@@ -799,6 +801,9 @@ $layouttemplate->assign_vars(array(
 	'S_NOTIFICATIONS_DISPLAY'		=> $mx_user->data['user_active'],		
 	
 	'loops'							=> '', // To get loops
+	
+	// 'L_CHANGE_FONT_SIZE'				=> '', 
+	'FONT_SIZE_CHANGE'				=> '- -- -', 	
 	
 	'S_PLUPLOAD'					=> false,
 	'S_IN_SEARCH'					=> false,	
@@ -919,14 +924,6 @@ $layouttemplate->assign_vars(array(
 
 	'S_LOGIN_ACTION' 		=> mx_append_sid('login.'.$phpEx),
 	'S_LOGIN_REDIRECT'		=> build_url(),
-
-	'S_ENABLE_FEEDS'			=> false,
-	'S_ENABLE_FEEDS_OVERALL'	=> false,
-	'S_ENABLE_FEEDS_FORUMS'		=> false,
-	'S_ENABLE_FEEDS_TOPICS'		=> false,
-	'S_ENABLE_FEEDS_TOPICS_ACTIVE'	=> false,
-	'S_ENABLE_FEEDS_NEWS'		=> false,
-	
 	
 	//Login page or box constants
 	'S_USER_LOGGED_IN' 		=> ($mx_user->data['user_id'] != ANONYMOUS) ? true : false,
@@ -953,7 +950,11 @@ $layouttemplate->assign_vars(array(
 	'S_TOPIC_ID	'			=> $topic_id,		
 
 	'S_SIMPLE_MESSAGE'		=> false,
-
+	
+	'U_PORTAL_ROOT_PATH' => PORTAL_URL,
+	'U_PHPBB_ROOT_PATH' => PHPBB_URL,
+	'TEMPLATE_ROOT_PATH' => TEMPLATE_ROOT_PATH,	
+	
 	'SID'				=> !empty($SID) ? $SID : $mx_user->session_id,
 	'_SID'				=> !empty($_GET['sid']) ? $_GET['sid'] : $mx_user->session_id,
 	'SESSION_ID'		=> !empty($mx_user->data['session_id']) ? $mx_user->data['session_id'] : (isset($_COOKIE[$board_config['cookie_name'] . '_sid'] ) ? $_COOKIE[$board_config['cookie_name'] . '_sid'] : ''),
@@ -982,10 +983,11 @@ $layouttemplate->assign_vars(array(
 	'T_STYLESHEET_LINK'		=> "{$web_path}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme/stylesheet.css',
 	'T_STYLESHEET_LANG_LINK'=> "{$web_path}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme/images/lang_' . $default_lang . '/stylesheet.css',
 	'T_FONT_AWESOME_LINK'	=> "{$web_path}assets/css/font-awesome.min.css",
-	
+		
 	'T_JQUERY_LINK'			=> !empty($board_config['allow_cdn']) && !empty($board_config['load_jquery_url']) ? $board_config['load_jquery_url'] : "{$web_path}assets/javascript/jquery.min.js?assets_version=" . $phpbb_major,
 	'S_ALLOW_CDN'			=> !empty($board_config['allow_cdn']),		
 	
+
 	'T_THEME_NAME'			=> rawurlencode($theme['template_name']),
 	'T_THEME_LANG_NAME'		=> $mx_user->data['user_lang'],
 	'T_TEMPLATE_NAME'		=> $theme['template_name'],
@@ -1050,11 +1052,6 @@ $layouttemplate->assign_vars(array(
 	'T_SPAN_CLASS2' => isset($mx_user->theme['span_class2']) ? $mx_user->theme['span_class2'] : '',
 	'T_SPAN_CLASS3' => isset($mx_user->theme['span_class3']) ? $mx_user->theme['span_class3'] : '',
 
-	//+ mxBB
-	'U_PORTAL_ROOT_PATH' => PORTAL_URL,
-	'U_PHPBB_ROOT_PATH' => PHPBB_URL,
-	'TEMPLATE_ROOT_PATH' => TEMPLATE_ROOT_PATH,
-
 	'L_HOME' => $lang['MX_home'],
 	//'L_HOME' => $lang['Home Page'],
 	//'L_FORUM' => $lang['Forum'],
@@ -1063,6 +1060,7 @@ $layouttemplate->assign_vars(array(
 	'U_INDEX_FORUM' => mx_append_sid(PORTAL_URL . 'index.' . $phpEx . '?page=2'),
 	'U_INDEX' => mx_append_sid(PORTAL_URL . 'index.' . $phpEx),
 	'U_SEARCH_SITE' => mx_append_sid(PORTAL_URL . 'index.' . $phpEx . '?page=' . $search_page_id_site . '&mode=results&search_terms=all'),
+	
 	'U_SEARCH_KB' => mx_append_sid(PORTAL_URL . 'index.' . $phpEx . '?page=' . $search_page_id_kb . '&mode=search&search_terms=all'),
 	'U_SEARCH_PAFILEDB' => mx_append_sid(PORTAL_URL . 'index.' . $phpEx . '?page=' . $search_page_id_pafiledb . '&action=search&search_terms=all'),
 
@@ -1074,15 +1072,27 @@ $layouttemplate->assign_vars(array(
 	'L_SEARCH_GOOGLE' => $option_search_google,
 
 	'T_PHPBB_STYLESHEET' => (isset($mx_user->theme['head_stylesheet']) ? $mx_user->theme['head_stylesheet'] : $mx_user->template_name . ".css"),
-	'T_STYLESHEET_LINK'	=> (!file_exists($phpbb_root_path . "templates/" . $mx_user->template_name . "/theme/stylesheet.css") ? "{$phpbb_root_path}templates/" . $mx_user->template_name . '/'.$mx_user->template_name.'.css' : "{$phpbb_root_path}templates/" . $mx_user->template_name . '/theme/stylesheet.css'), //: "{$phpbb_root_path}style.$phpEx?sid=$mx_user->session_id&amp;id=" . $mx_user->theme['style_id'] . '&amp;lang=' . $mx_user->encode_lang($board_config['default_lang']),
+	'T_STYLESHEET_LINK'	=> (!file_exists($mx_root_path . "templates/" . $mx_user->template_name . "/theme/stylesheet.css") ? "{$web_path}templates/" . $mx_user->template_name . '/'.$mx_user->template_name.'.css' : "{$web_path}templates/" . $mx_user->template_name . '/theme/stylesheet.css'), //: "{$phpbb_root_path}style.$phpEx?sid=$mx_user->session_id&amp;id=" . $mx_user->theme['style_id'] . '&amp;lang=' . $mx_user->encode_lang($board_config['default_lang']),
 	'T_MXBB_STYLESHEET' => isset($mx_user->theme['head_stylesheet']) ? (strpos($mx_user->theme['head_stylesheet'], '.') ? $mx_user->theme['head_stylesheet'] : $mx_user->theme['head_stylesheet'].'.css') : $mx_user->template_name.'.css',
 	'T_GECKO_STYLESHEET' => 'gecko.css',
+	
+	//+ MX-Publisher	
 	'MX_ADDITIONAL_CSS_FILES' => $mx_addional_css_files,
 	'MX_ADDITIONAL_JS_FILES' => $mx_addional_js_files,
 	'MX_ADDITIONAL_HEADER_TEXT' => $mx_addional_header_text,
 	'MX_ICON_CSS' => isset($images['mx_graphics']['icon_style']) ? $images['mx_graphics']['icon_style'] : '',
 	//- MX-Publisher
+	
+	'U_MX_SHARED_FILES_PATH' => "{$web_path}modules/mx_shared/",
+	
+	'T_STYLESWITCHER_JS' => (!file_exists($mx_root_path . "modules/mx_shared/phpbb/styleswitcher.js") ? "{$web_path}templates/" . $mx_user->template_name . '/styleswitcher.js' : "{$web_path}modules/mx_shared/phpbb/styleswitcher.js"),
+	'T_FORUM_FN_JS'	=> (!file_exists($mx_root_path . "modules/mx_shared/phpbb/forum_fn.js") ? "{$web_path}templates/" . $mx_user->template_name . '/forum_fn.js' : "{$web_path}modules/mx_shared/phpbb/forum_fn.js"), 
+	'T_EDITOR_JS' => (!file_exists($mx_root_path . "modules/mx_shared/phpbb/editor.js") ? "{$web_path}templates/" . $mx_user->template_name . '/editor.js' : "{$web_path}modules/mx_shared/phpbb/editor.js"), 
+	'T_AJAX_JS'	=> (!file_exists($mx_root_path . "modules/mx_shared/phpbb/ajax.js") ? "{$web_path}templates/" . $mx_user->template_name . '/ajax.js' : "{$web_path}modules/mx_shared/phpbb/ajax.js"),
+	'T_TIMEZONE_JS'	=> (!file_exists($mx_root_path . "modules/mx_shared/phpbb/timezone.js") ? "{$web_path}templates/" . $mx_user->template_name . '/timezone.js' : "{$web_path}modules/mx_shared/phpbb/timezone.js"), 	
+	
 
+	
 	'NAV_LINKS' => $nav_links_html,
 
 	// swithes for logged in users?
@@ -1104,10 +1114,19 @@ $layouttemplate->assign_vars(array(
 	// Additional css for gecko browsers
 	'GECKO' => strstr($useragent, 'Gecko'),
 	
+	'S_ENABLE_FEEDS'			=> false,
+	'S_ENABLE_FEEDS_OVERALL'	=> false,
+	'S_ENABLE_FEEDS_FORUMS'		=> false,
+	'S_ENABLE_FEEDS_TOPICS'		=> false,
+	'S_ENABLE_FEEDS_TOPICS_ACTIVE'	=> false,
+	'S_ENABLE_FEEDS_NEWS'		=> false,		
+	
+		
+	
 	'L_ACP' => $lang['Admin_panel'],
 	'U_ACP' => ($mx_user->data['user_level'] == ADMIN) ? "{$phpbb_root_path}admin/index.$phpEx?sid=" . $mx_user->session_id : $admin_link
 ));
-
+//print_r($layouttemplate);
 // Definitions of main navigation links
 $mx_backend->page_header('generate_nav_links');
 
@@ -1195,5 +1214,6 @@ $meta_str .= '<meta name="robots"      content="' . $index  . ',' . $follow .'" 
 $meta_str .= $header . "\n";
 
 $layouttemplate->assign_vars(array( 'META' => $meta_str) );
+//print_r($layouttemplate);
 $layouttemplate->pparse('overall_header');
 ?>

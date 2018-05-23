@@ -2478,6 +2478,7 @@ class Template
 	*/	
 	function compile_code($filename, $code, $use_isset = false)
 	{
+		global $mx_user;
 		//	$filename - file to load code from. used if $code is empty
 		//	$code - tpl code
 		//	$use_isset - if false then compiled code looks more beautiful and easier
@@ -2551,6 +2552,12 @@ class Template
 		/** content may be removed ... however designers should use entities
 		/** if they wish to display < and > ** /
 		$this->remove_php_tags($code);
+		
+		/** Replace some unitialised  page_header() tags **/
+		$code = str_replace('{TEMPLATE_ROOT_PATH}', TEMPLATE_ROOT_PATH, $code);			
+		$code = str_replace('{U_PORTAL_ROOT_PATH}', PORTAL_URL, $code);		
+		$code = str_replace('{U_PHPBB_ROOT_PATH}', PHPBB_URL, $code);
+		$code = str_replace('{T_MXBB_STYLESHEET}', $mx_user->theme['head_stylesheet'], $code);	
 		
 		/** Replace phpBB 2.2 <!-- (END)PHP --> tags **/
 		preg_match_all('#<!-- PHP -->(.*?)<!-- ENDPHP -->#s', $code, $matches);

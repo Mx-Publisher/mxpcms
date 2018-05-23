@@ -1,30 +1,36 @@
 <div class="forabg block">
 	<div class="inner bg1 post" style="margin-bottom:0px">
 		<span class="corners-top"><span></span></span>
-		<div class="box">
-			<div class="whos_online">
-				<a href="{U_VIEWONLINE}"><img src="{ONLINE_IMG}" alt="{L_WHO_IS_ONLINE}" border="0" /></a>
-	<!-- BEGIN switch_phpbb -->
-	<div class="inner bg1 post" style="margin-bottom:0px">
-	{TOTAL_POSTS}<br />{TOTAL_USERS}<br />{NEWEST_USER}
-	</div>
-	<!-- END switch_phpbb -->
-			</div>
+		<div class="bg2 content" style="margin-top:0x;">	
+			<div class="box">
+				<div class="whos_online">
+					<a href="{U_VIEWONLINE}"><img src="{ONLINE_IMG}" alt="{L_WHO_IS_ONLINE}" border="0" /></a>
+					<!-- BEGIN switch_phpbb -->
+					<div class="bg3" style="margin-bottom:0px">
+					{TOTAL_POSTS}
+					<br />
+					{TOTAL_USERS}
+					<br />
+					{NEWEST_USER}
+					</div>
+					<!-- END switch_phpbb -->
+				</div>
+				
+				<div class="top_poster">
+					<span class="bg3" style="position: relative; float:left; text-align:center; width:100%; padding-bottom:3px; font-size: 9px;">
+						{last_online.ONLINE_TIME}
+					</span>
+				<br clear="both" /><br />
+				</div>	
+				{TOTAL_USERS_ONLINE} &nbsp; 
+				<br />
+				{RECORD_USERS}
+				<br />
+				{LOGGED_IN_USER_LIST}
+				<br />
+				<em>{L_ONLINE_LEGEND}: {ONLINE_LEGEND}</em>
+			</div>			
 		</div>
-		
-		<span class="corners-bottom"><span></span></span>
-	</div>
-	<div class="inner bg2 post" style="margin-top:0x;">
-	<div class="top_poster">
-		<span class="bg3" style="position: relative; float:left; text-align:center; width:100%; padding-bottom:3px; font-size: 9px;">
-			{last_online.ONLINE_TIME}
-		</span>
-		<br clear="both" />
-	<br />
-	</div>	
-	{TOTAL_USERS_ONLINE} &nbsp; <br />{RECORD_USERS}<br />{LOGGED_IN_USER_LIST}<br />
-	<em>{L_ONLINE_LEGEND}: {ONLINE_LEGEND}</em>
-	</div>
 <span class="corners-bottom"><span></span></span>
 </div>
 <!-- IF DEBUG_QUERIES --><div class="block_data">{LAST_ONLINE_DEBUG}</div><!-- ENDIF -->

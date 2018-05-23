@@ -47,7 +47,7 @@ else
 //
 if( $mark_read == 'forums' )
 {
-	if( $userdata['session_logged_in'] )
+	if( $mx_user->data['session_logged_in'] )
 	{
 		setcookie($board_config['cookie_name'] . '_f_all', time(), 0, $board_config['cookie_path'], $board_config['cookie_domain'], $board_config['cookie_secure']);
 	}
@@ -284,9 +284,9 @@ if( ( $total_categories = count($category_rows) ) )
 		//'TOTAL_USERS' => sprintf($l_total_user_s, $total_users),
 		//'NEWEST_USER' => sprintf($lang['Newest_user'], '<a href="' . mx_append_sid(PHPBB_URL . "profile.$phpEx?mode=viewprofile&amp;" . POST_USERS_URL . "=$newest_uid") . '">', $newest_user, '</a>'),
 
-		'FORUM_IMG' => $images['mx_forum'],
-		'FORUM_NEW_IMG' => $images['mx_forum_new'],
-		'FORUM_LOCKED_IMG' => $images['mx_forum_locked'],
+		'FORUM_IMG' => $mx_user->images['forum'],
+		'FORUM_NEW_IMG' => $mx_user->images['forum_new'],
+		'FORUM_LOCKED_IMG' => $mx_user->images['forum_locked'],
 
 		'L_FORUM' => $lang['Forum'],
 		'L_TOPICS' => $lang['Topics'],
@@ -354,13 +354,13 @@ if( ( $total_categories = count($category_rows) ) )
 						{
 							if ( $forum_data[$j]['forum_status'] == FORUM_LOCKED )
 							{
-								$folder_image = $images['mx_forum_locked'];
+								$folder_image = $mx_user->images['forum_locked'];
 								$folder_alt = $lang['Forum_locked'];
 							}
 							else
 							{
 								$unread_topics = false;
-								if ( $userdata['session_logged_in'] )
+								if ( $mx_user->data['session_logged_in'] )
 								{
 									if ( !empty($new_topic_data[$forum_id]) )
 									{
@@ -403,7 +403,7 @@ if( ( $total_categories = count($category_rows) ) )
 									}
 								}
 
-								$folder_image = ( $unread_topics ) ? $images['mx_forum_new'] : $images['mx_forum'];
+								$folder_image = ( $unread_topics ) ? $mx_user->images['forum_new'] : $mx_user->images['forum'];
 								$folder_alt = ( $unread_topics ) ? $lang['New_posts'] : $lang['No_new_posts'];
 							}
 
