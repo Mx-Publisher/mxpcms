@@ -796,14 +796,14 @@ class mx_cache extends cache
 				"page_auth_moderator_group" => $row['pag_auth_moderator_group'],
 				"ip_filter" => $row['ip_filter'],
 				"phpbb_stats" => $row['phpbb_stats']
-				);
+			);
 
 			$column_row = array(
 				"column_id" => $row['column_id'],
 				"column_title" => $row['column_title'],
 				"column_order" => $row['column_order'],
 				"column_size" => $row['column_size']
-				);
+			);
 
 			$block_row = array(
 				"block_id" => $row['block_id'],
@@ -811,7 +811,7 @@ class mx_cache extends cache
 				//"module_path" => $row['module_path'],
 				//"function_file" => $row['function_file'],
 				//"function_admin" => $row['function_admin']
-				);
+			);
 
 			if ( $next_page )
 			{
@@ -2954,8 +2954,9 @@ class mx_page
 	var $page_ov_header = '';
 	var $page_ov_footer = '';
 	var $page_main_layout = '';
-	var $page_navigation_block = '0';
-
+	var $page_navigation_block = 31;
+	var $vertical_navigation_block = 8;
+	
 	var $mxbb_copyright_addup = array();
 	var $mxbb_css_addup = array();
 
@@ -3177,6 +3178,7 @@ class mx_page
 		//echo($this->page_ov_header);
 		$this->phpbb_stats = $this->info['phpbb_stats'] == -1 ? ($portal_config['top_phpbb_links'] == 1 ? true : false ) : ( $this->info['phpbb_stats'] == 1 ? true : false );
 		$this->page_navigation_block = $this->info['page_navigation_block'] == 0 ? $portal_config['navigation_block'] : $this->info['page_navigation_block'];
+		//$this->vertical_navigation_block = $this->info['page_navigation_block'] == 0 ? $portal_config['navigation_block'] : $this->info['page_navigation_block'];		
 		
 		//
 		// Set the public view auth

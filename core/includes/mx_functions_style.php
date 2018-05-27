@@ -835,6 +835,9 @@ class mx_user extends mx_session
 	var $default_template_name = 'subSilver';
 	var $default_current_template_path = '';
 
+	var $imageset_backend = PORTAL_BACKEND;
+	var $ext_imageset_backend = PORTAL_BACKEND;	
+	
 	var $imageset_path = '/theme/images/';	
 	var $img_array = array();
 	var $images;
@@ -2065,16 +2068,17 @@ class mx_user extends mx_session
 		}
 		elseif (@is_dir("{$phpbb_root_path}{$this->template_path}{$this->template_name}/theme/images/"))
 		{
-			$this->imageset_path = '/theme/images/';  //phpBB3 Images
-			if ((@is_dir("{$phpbb_root_path}{$this->template_path}{$this->template_name}/theme/images/lang_{$this->user_language_name}")) || (@is_dir("{$phpbb_root_path}{$this->template_path}{$this->template_name}/theme/images/lang_{$this->default_language_name}")))
+			if ((@is_dir("{$phpbb_root_path}{$this->template_path}{$this->template_name}/theme/lang_{$this->user_language_name}")) || (@is_dir("{$phpbb_root_path}{$this->template_path}{$this->template_name}/theme/lang_{$this->default_language_name}")))
 			{
-				$this->img_lang = (file_exists($phpbb_root_path . $this->template_path . $this->template_name . $this->imageset_path . 'lang_' . $this->user_language_name)) ? $this->user_language_name : $this->default_language_name;
+				$this->imageset_path = '/theme/images/';  //phpBB3 Images				
+				$this->img_lang = (file_exists($phpbb_root_path . $this->template_path . $this->template_name . '/theme/' . 'lang_' . $this->user_language_name)) ? $this->user_language_name : $this->default_language_name;
 				$this->img_lang_dir = 'lang_' . $this->img_lang;
 				$this->imageset_backend = 'phpbb2';	
 			}
-			if ((@is_dir("{$phpbb_root_path}{$this->template_path}{$this->template_name}/theme/images/{$this->user_language}")) || (@is_dir("{$phpbb_root_path}{$this->template_path}{$this->template_name}/theme/images/{$this->default_language}")))
+			if ((@is_dir("{$phpbb_root_path}{$this->template_path}{$this->template_name}/theme/{$this->user_language}")) || (@is_dir("{$phpbb_root_path}{$this->template_path}{$this->template_name}/theme/{$this->default_language}")))
 			{
-				$this->img_lang = (file_exists($phpbb_root_path . $this->template_path . $this->template_name . $this->imageset_path . $this->user_language_name)) ? $this->user_language : $this->default_language;
+				$this->imageset_path = '/theme/images/';  //phpBB3 Images				
+				$this->img_lang = (file_exists($phpbb_root_path . $this->template_path . $this->template_name . '/theme/' . $this->user_language_name)) ? $this->user_language : $this->default_language;
 				$this->img_lang_dir = $this->img_lang;
 				$this->imageset_backend = 'phpbb3';	
 			}			
@@ -2115,7 +2119,7 @@ class mx_user extends mx_session
 				//print_r('Your style configuration file has a typo! ');
 				//print_r($images);
 				$images['forum'] = 'folder.gif';
-			}			
+			}						
 			
 			/* Here we overwrite phpBB images from the template db or configuration file  */		
 			$rows = $this->image_rows($images);		
@@ -2335,30 +2339,118 @@ class mx_user extends mx_session
 		{
 			mx_message_die(CRITICAL_ERROR, "Could not open " . $mx_root_path . $module_root_path . $this->default_current_template_path . " style config file", '', __LINE__, __FILE__);
 		}
-
-		$img_lang = ( file_exists($mx_root_path . $current_template_path . '/images/lang_' . $board_config['default_lang']) ) ? $board_config['default_lang'] : 'english';
-
+		
+		//		
+		// Set MXP image sets main images and backend
+		// english
+		// romanian
+		$mx_img_lang = ( file_exists($mx_root_path . $current_template_path . '/theme/images/lang_' . $board_config['default_lang']) ) ? $board_config['default_lang'] : 'english';
+		
+		if (@is_dir("{$mx_root_path}{$this->template_path}{$this->template_name}/theme/images/"))
+		{
+			$this->imageset_path = '/theme/images/';  //phpBB3 Images
+			if ((@is_dir("{$mx_root_path}{$this->template_path}{$this->template_name}/theme/images/lang_{$this->user_language_name}")) || (@is_dir("{$mx_root_path}{$this->template_path}{$this->template_name}/theme/images/lang_{$this->default_language_name}")))
+			{
+				$this->img_lang = (file_exists($mx_root_path . $this->template_path . $this->template_name . $this->imageset_path . 'lang_' . $this->user_language_name)) ? $this->user_language_name : $this->default_language_name;
+				$this->img_lang_dir = 'lang_' . $this->img_lang;
+				$this->ext_imageset_backend = 'phpbb2';	
+			}
+			if ((@is_dir("{$mx_root_path}{$this->template_path}{$this->template_name}/theme/images/{$this->user_language}")) || (@is_dir("{$mx_root_path}{$this->template_path}{$this->template_name}/theme/images/{$this->default_language}")))
+			{
+				$this->img_lang = (file_exists($mx_root_path . $this->template_path . $this->template_name . $this->imageset_path . $this->user_language_name)) ? $this->user_language : $this->default_language;
+				$this->img_lang_dir = $this->img_lang;
+				$this->ext_imageset_backend = 'phpbb3';	
+			}			
+		}		
+		
+		$mx_img_lang = $this->img_lang;
+		
+		//		
+		// Set phpBB2 or phpbb3 image sets main images and backend
+		//english
+		//		
+		$phpbb_img_lang = ( file_exists($phpbb_root_path . $this->current_template_path . $this->img_lang_dir) ) ? $this->img_lang : $this->default_language_name;
+		
+		if (@is_dir("{$phpbb_root_path}{$this->template_path}{$this->template_name}/imageset/"))
+		{
+			$this->imageset_path = '/imageset/'; //Olympus ImageSet
+			$this->img_lang = (file_exists($phpbb_root_path . $this->template_path . $this->template_name . $this->imageset_path . $this->lang_iso)) ? $this->lang_iso : $this->default_language;
+			$this->img_lang_dir = $this->img_lang;
+			$this->ext_imageset_backend = 'olympus';		
+		}
+		elseif (@is_dir("{$phpbb_root_path}{$this->template_path}{$this->template_name}/theme/images/"))
+		{
+			if ((@is_dir("{$phpbb_root_path}{$this->template_path}{$this->template_name}/theme/lang_{$this->user_language_name}")) || (@is_dir("{$phpbb_root_path}{$this->template_path}{$this->template_name}/theme/lang_{$this->default_language_name}")))
+			{
+				$this->imageset_path = '/theme/images/';  //phpBB3 Images				
+				$this->img_lang = (file_exists($phpbb_root_path . $this->template_path . $this->template_name . '/theme/' . 'lang_' . $this->user_language_name)) ? $this->user_language_name : $this->default_language_name;
+				$this->img_lang_dir = 'lang_' . $this->img_lang;
+				$this->ext_imageset_backend = 'phpbb2';	
+			}
+			if ((@is_dir("{$phpbb_root_path}{$this->template_path}{$this->template_name}/theme/{$this->user_language}")) || (@is_dir("{$phpbb_root_path}{$this->template_path}{$this->template_name}/theme/{$this->default_language}")))
+			{
+				$this->imageset_path = '/theme/images/';  //phpBB3 Images				
+				$this->img_lang = (file_exists($phpbb_root_path . $this->template_path . $this->template_name . '/theme/' . $this->user_language_name)) ? $this->user_language : $this->default_language;
+				$this->img_lang_dir = $this->img_lang;
+				$this->ext_imageset_backend = 'phpbb3';				
+			}			
+		}		
+		elseif (@is_dir("{$phpbb_root_path}{$this->template_path}{$this->template_name}/images/"))
+		{
+			$this->imageset_path = '/images/';  //phpBB2 Images
+			$this->img_lang = (file_exists($phpbb_root_path . $this->template_path . $this->template_name . $this->imageset_path . '/images/lang_' . $this->user_language_name)) ? $this->user_language_name : $this->default_language_name;
+			$this->img_lang_dir = 'lang_' . $this->img_lang;
+			$this->ext_imageset_backend = 'phpbb2';	
+		}		
+		
+		$phpbb_img_lang = $this->img_lang;		
+		
 		while( list($key, $value) = @each($mx_images) )
 		{
 			if (is_array($value))
 			{
-				foreach( $value as $key2 => $val2 )
+				foreach($value as $key2 => $val2)
 				{
-					$images[$key][$key2] = $val2;
+					$this->images[$key][$key2] = $images[$key][$key2] = $val2;
 				}
 			}
 			else
-			{
-				$images[$key] = str_replace('{LANG}', 'lang_' . $img_lang, $value);
+			{				
+				/*
+				* Load MXP lang keys
+				* Load vanilla phpBB2 lang files if is possible
+				*/
+				switch ($this->ext_imageset_backend)
+				{
+					case 'internal':
+					case 'smf2':
+					case 'mybb':
+						$img_lang = $mx_img_lang;
+					break;			
+					case 'phpbb3':
+					case 'olympus':
+					case 'ascraeus':
+					case 'rhea':
+					case 'proteus':			
+						$img_lang = $this->img_lang;
+						//$template_path = 'styles/';
+					break;
+						
+					case 'phpbb2':	
+						$img_lang = $this->img_lang;
+					break;
+				}				
+								
+				$this->images[$key] = $images[$key] = str_replace('{LANG}', 'lang_' . $img_lang, $value);
 			}
 		}
 
 		//
 		// What template is the module using?
 		//
-		$module_key = !empty($module_root_path) ? $module_root_path : 'subSilver';
+		$module_key = !empty($module_root_path) ? $module_root_path : 'prosilver';
 		$this->template_names[$module_key] = $template_name;
-
+		
 		unset($mx_images);
 	}
 

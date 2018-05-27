@@ -38,7 +38,9 @@
 		s.parentNode.insertBefore(wf, s);
 	})(document);
 </script>
+
 <!-- ENDIF -->
+<!-- This should not be included direct from phpBB but later from MXP template folder wich means can be ported to internal backend with no change in this file -->
 <link href="{T_STYLESHEET_LINK}" rel="stylesheet">
 <link href="{T_STYLESHEET_LANG_LINK}" rel="stylesheet">
 
@@ -62,6 +64,10 @@
 <!-- IF S_PLUPLOAD -->
 	<link href="{T_THEME_PATH}/plupload.css?assets_version={T_ASSETS_VERSION}" rel="stylesheet">
 <!-- ENDIF -->
+
+<!-- link href="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}{T_MXBB_STYLESHEET}" rel="stylesheet" type="text/css" media="screen, projection" /-->
+
+<link href="{T_THEME_PATH}/responsive.css?assets_version={T_ASSETS_VERSION}" rel="stylesheet" media="all and (max-width: 700px)">
 
 <!--[if lte IE 9]>
 	<link href="{T_THEME_PATH}/tweaks.css?assets_version={T_ASSETS_VERSION}" rel="stylesheet">
@@ -168,13 +174,14 @@ function checkSearch()
 			</div>			
 	<div class="navbar sitebar" style="clear:both;">			
 		{OVERALL_NAVIGATION}
-	</div>			
+	</div>
+			<span class="corners-bottom" style="height:0px;margin:0px;padding:0px;"><span></span></span>
 			<!-- ENDIF -->
 			<!-- EVENT overall_header_searchbox_after -->
-
-			</div>
-			<!-- EVENT overall_header_headerbar_after -->
 		</div>
+		<!-- EVENT overall_header_headerbar_after -->
+	</div>
+		<span><span></span></span>		
 		<!-- EVENT overall_header_navbar_before -->
 		<!-- INCLUDE navbar_header.html -->
 			

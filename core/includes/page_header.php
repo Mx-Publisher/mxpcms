@@ -1176,6 +1176,10 @@ if ($mx_page->auth_view || $mx_page->auth_mod)
 		//}
 		$module_root_path = $mx_module_path;
 	}
+	
+	//$block_id = $mx_page->vertical_navigation_block;
+
+		
 }
 
 // Add no-cache control for cookies if they are set

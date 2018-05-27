@@ -1,21 +1,25 @@
 <link href="{U_PORTAL_ROOT_PATH}modules/mx_navmenu/templates/prosilver/prosilver.css" rel="stylesheet" type="text/css" media="screen" />
+<div class="navbar" role="navigation" style="clear:left;float:left">
+	<div class="inner">
 
-<div style="clear:left;float:left">
 	<ul id="nav-main" class="linklist bulletin" role="menubar">
+	<!-- EVENT navbar_header_quick_links_before -->									
 		<!-- BEGIN catrow -->
-		<li id="quick-links" class="small-icon responsive-menu dropdown-container button{catrow.CURRENT}" id="c_{catrow.CAT_ID}" onmouseover="showMenuRows('{catrow.CAT_ID}');" onmouseout="hideMenuRows('{catrow.CAT_ID}')">
-			{catrow.CATEGORY}
+		<li class="button{catrow.CURRENT}" id="c_{catrow.CAT_ID}" onmouseover="showMenuRows('{catrow.CAT_ID}');" onmouseout="hideMenuRows('{catrow.CAT_ID}')">
+			<span>{catrow.CATEGORY}</span>
 
 			<ul id="cat_{catrow.CAT_ID}" onmouseover="showMenuRows('{catrow.CAT_ID}');" style="display:none;position:absolute;background-color:#FFFFFF;margin:0px;padding:0px;position:absolute;z-index:160;"><!-- BEGIN menurow -->
-				<li class="separator mnu-ov{catrow.menurow.CURRENT}">
-					<a href="responsive-menu-link dropdown-trigger {catrow.menurow.U_MENU_URL}" style="background-image: url({catrow.menurow.MENU_ICON})">
-						{catrow.menurow.MENU_NAME}
+				<li class="mnu-ov{catrow.menurow.CURRENT}">
+					<a href="{catrow.menurow.U_MENU_URL}" style="background-image: url({catrow.menurow.MENU_ICON})">
+						<i class="icon mnu-nm{catrow.menurow.CURRENT}"></i>						
+						<span>{catrow.menurow.MENU_NAME}</span>
 					</a>
 				</li>
 <!-- END menurow --></ul>
 		 </li>
-	<!-- END catrow -->
+	<!-- END catrow -->		
 	</ul>
+	</div>
 </div>
 <script type="text/javascript">
 function getObj(obj)

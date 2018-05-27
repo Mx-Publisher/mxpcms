@@ -38,14 +38,14 @@
 		s.parentNode.insertBefore(wf, s);
 	})(document);
 </script>
-<!-- ENDIF -->
 
+<!-- ENDIF -->
 <!-- This should not be included direct from phpBB but later from MXP template folder wich means can be ported to internal backend with no change in this file -->
 <link href="{T_STYLESHEET_LINK}" rel="stylesheet">
 <link href="{T_STYLESHEET_LANG_LINK}" rel="stylesheet">
+
 <!-- link href="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}{T_MXBB_STYLESHEET}" rel="stylesheet" type="text/css" media="screen, projection" /-->
 <!-- link rel="stylesheet" href="{U_PHPBB_ROOT_PATH}styles/prosilver/theme/stylesheet.css" type="text/css" / -->
-
 
 
 <link href="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}theme/print.css" rel="stylesheet" type="text/css" media="print" title="printonly" />
@@ -54,12 +54,6 @@
 <link href="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}theme/normal.css" rel="stylesheet" type="text/css" title="A" />
 <link href="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}theme/medium.css" rel="alternate stylesheet" type="text/css" title="A+" />
 <link href="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}theme/large.css" rel="alternate stylesheet" type="text/css" title="A++" />
-
-<!-- IF S_CONTENT_DIRECTION eq 'rtl' -->
-	<link href="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}theme/bidi.css" rel="stylesheet" type="text/css" media="screen, projection" />
-<!-- ENDIF -->
-
-<!-- link href="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}{T_MXBB_STYLESHEET}" rel="stylesheet" type="text/css" media="screen, projection" /-->
 
 <link href="{T_THEME_PATH}/responsive.css?assets_version={T_ASSETS_VERSION}" rel="stylesheet" media="all and (max-width: 700px)">
 
@@ -70,6 +64,10 @@
 <!-- IF S_PLUPLOAD -->
 	<link href="{T_THEME_PATH}/plupload.css?assets_version={T_ASSETS_VERSION}" rel="stylesheet">
 <!-- ENDIF -->
+
+<!-- link href="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}{T_MXBB_STYLESHEET}" rel="stylesheet" type="text/css" media="screen, projection" /-->
+
+<link href="{T_THEME_PATH}/responsive.css?assets_version={T_ASSETS_VERSION}" rel="stylesheet" media="all and (max-width: 700px)">
 
 <!--[if lte IE 9]>
 	<link href="{T_THEME_PATH}/tweaks.css?assets_version={T_ASSETS_VERSION}" rel="stylesheet">
@@ -173,44 +171,133 @@ function checkSearch()
 					{S_SEARCH_HIDDEN_FIELDS}
 				</fieldset>
 				</form>
-			</div>			
-	<div class="navbar sitebar" style="clear:both;">			
-		{OVERALL_NAVIGATION}
-	</div>			
-			<span class="corners-bottom" style="height:0px;margin:0px;padding:0px;"><span></span></span>
+			</div>
 			<!-- ENDIF -->
-			<!-- EVENT overall_header_searchbox_after -->		
+			<!-- EVENT overall_header_searchbox_after -->			
+	<div class="navbar nav-menu" style="clear:both;">			
+		{OVERALL_NAVIGATION}
+	</div>	
+			<span class="corners-bottom" style="height:0px;margin:0px;padding:0px;"><span></span></span>
+		
 		</div>
+		<!-- EVENT overall_header_headerbar_after -->
 	</div>
 		<span><span></span></span>
+	<!-- EVENT overall_header_navbar_before -->
 	<div style="position:relative;height:5px;margin-top:-5px;background-color:White;"></div>
-	<div class="navbar" style="clear:both;">
-		<div class="inner">
-			<span class="corners-top"><span></span></span>
-				<ul class="linklist navlinks" style="font-weight:normal;margin-top:0px;padding-top:0px;">
-						<li class="icon-home"><a href="{U_INDEX}" title="{L_INDEX}"><strong>{L_INDEX}</strong></a></li>
-						<li class="icon-help">&raquo; {PAGE_TITLE}</li>
-						<li class="rightside"><a href="#" onclick="fontsizeup(); return false;" class="fontsize" title="{L_CHANGE_FONT_SIZE}">{FONT_SIZE_CHANGE}</a></li>
+	<div class="navbar" role="navigation" style="clear:both;">
+	<div class="inner">
+	<span class="corners-top"><span></span></span>
+	<ul id="nav-main" class="nav-main linklist navlinks" role="menubar" style="font-weight:normal;margin-top:0px;padding-top:0px;">
+		
+		<li id="quick-links" class="small-icon responsive-menu dropdown-container<!-- IF not S_DISPLAY_QUICK_LINKS and not S_DISPLAY_SEARCH --> hidden<!-- ENDIF -->" data-skip-responsive="true">
+			<a href="#" class="responsive-menu-link dropdown-trigger">{L_QUICK_LINKS}</a>
+			<div class="dropdown topiclist forums nav-menu hidden">
+				<div class="pointer"><div class="pointer-inner"></div></div>
+				<ul class="dropdown-contents topiclist forums nav-menu" role="menu">
+					<!-- EVENT navbar_header_quick_links_before -->
+	<div class="post bg2 online sitebar" style="clear:both;">			
+		{OVERALL_NAVIGATION}
+	</div>	
+						<li class="separator"></li>
+						<!-- IF S_DISPLAY_MEMBERLIST --><li class="small-icon icon-members"><a href="{U_MEMBERLIST}" role="menuitem">{L_MEMBERLIST}</a></li><!-- ENDIF -->
+						<!-- IF U_TEAM --><li class="small-icon icon-team"><a href="{U_TEAM}" role="menuitem">{L_THE_TEAM}</a></li><!-- ENDIF -->
+					
+					<li class="separator"></li>
+
+					<!-- EVENT navbar_header_quick_links_after -->
 				</ul>
-				<ul class="linklist rightside">
-						<!--li class="icon" style="background-image:url('{NAV_IMAGES_FAQ}');"><a href="">{L_FAQ}</a></li-->
-						<!-- IF USER_LOGGED_IN -->
-						<!--li class="icon" style="background-image:url('{NAV_IMAGES_MEMBERS}');"><a href="">{L_MEMBERLIST}</a></li-->
-						<!-- ENDIF -->
-						<!-- IF USER_LOGGED_OUT -->
-						<li class="icon-register"><a href="{U_REGISTER}" class="mainmenu">{L_REGISTER}</a></li>
-						<!-- ENDIF -->
-						<li class="icon-logout"><a href="{U_LOGIN_LOGOUT}">{L_LOGIN_LOGOUT}</a></li>
-				</ul>
-				<!-- IF USER_LOGGED_IN -->
-				<ul class="linklist leftside">
-						<!--li class="icon" style="background-image:url('{NAV_IMAGES_PROFILE}');"><a href="{U_MEMBERLIST}">{L_PROFILE}</a></li-->
-						<!--li class="icon" style="background-image:url('{NAV_IMAGES_PRIVMSG}');"><a href="{U_PRIVATEMSGS}">{L_PRIVATEMSGS}</a></li-->
-				</ul>
+			</div>
+		</li>		
+		
+		<!-- EVENT overall_header_navigation_prepend -->
+		<li class="small-icon icon-faq" <!-- IF not S_USER_LOGGED_IN -->data-skip-responsive="true"<!-- ELSE -->data-last-responsive="true"<!-- ENDIF -->><a href="{U_FAQ}" rel="help" title="{L_FAQ_EXPLAIN}" role="menuitem">{L_FAQ}</a></li>
+		<!-- EVENT overall_header_navigation_append -->
+		<!-- IF U_ACP --><li class="small-icon icon-acp" data-last-responsive="true"><a href="{U_ACP}" title="{L_ACP}" role="menuitem">{L_ACP_SHORT}</a></li><!-- ENDIF -->
+		<!-- IF U_MCP --><li class="small-icon icon-mcp" data-last-responsive="true"><a href="{U_MCP}" title="{L_MCP}" role="menuitem">{L_MCP_SHORT}</a></li><!-- ENDIF -->
+
+	<!-- IF S_REGISTERED_USER -->
+		<!-- EVENT navbar_header_user_profile_prepend -->
+		<li id="username_logged_in" class="rightside <!-- IF CURRENT_USER_AVATAR --> no-bulletin<!-- ENDIF -->" data-skip-responsive="true">
+			<!-- EVENT navbar_header_username_prepend -->
+			<div class="header-profile dropdown-container">
+				<a href="{U_PROFILE}" class="header-avatar dropdown-trigger"><!-- IF CURRENT_USER_AVATAR -->{CURRENT_USER_AVATAR} <!-- ENDIF -->{CURRENT_USERNAME_SIMPLE}</a>
+				<div class="dropdown hidden">
+					<div class="pointer"><div class="pointer-inner"></div></div>
+					<ul class="dropdown-contents" role="menu">
+						<!-- IF U_RESTORE_PERMISSIONS --><li class="small-icon icon-restore-permissions"><a href="{U_RESTORE_PERMISSIONS}">{L_RESTORE_PERMISSIONS}</a></li><!-- ENDIF -->
+
+						<!-- EVENT navbar_header_profile_list_before -->
+
+						<li class="small-icon icon-ucp"><a href="{U_PROFILE}" title="{L_PROFILE}" role="menuitem">{L_PROFILE}</a></li>
+						<li class="small-icon icon-profile"><a href="{U_USER_PROFILE}" title="{L_READ_PROFILE}" role="menuitem">{L_READ_PROFILE}</a></li>
+
+						<!-- EVENT navbar_header_profile_list_after -->
+
+						<li class="separator"></li>
+						<li class="small-icon icon-logout"><a href="{U_LOGIN_LOGOUT}" title="{L_LOGIN_LOGOUT}" accesskey="x" role="menuitem">{L_LOGIN_LOGOUT}</a></li>
+					</ul>
+				</div>
+			</div>
+			<!-- EVENT navbar_header_username_append -->
+		</li>
+		<!-- IF S_DISPLAY_PM -->
+			<li class="small-icon icon-pm rightside" data-skip-responsive="true">
+				<a href="{U_PRIVATEMSGS}" role="menuitem"><span>{L_PRIVATE_MESSAGES} </span><strong class="badge<!-- IF not PRIVATE_MESSAGE_COUNT --> hidden<!-- ENDIF -->">{PRIVATE_MESSAGE_COUNT}</strong></a>
+			</li>
+		<!-- ENDIF -->
+		<!-- IF S_NOTIFICATIONS_DISPLAY -->
+			<li class="small-icon icon-notification dropdown-container dropdown-{S_CONTENT_FLOW_END} rightside" data-skip-responsive="true">
+				<a href="{U_VIEW_ALL_NOTIFICATIONS}" id="notification_list_button" class="dropdown-trigger"><span>{L_NOTIFICATIONS} </span><strong class="badge<!-- IF not NOTIFICATIONS_COUNT --> hidden<!-- ENDIF -->">{NOTIFICATIONS_COUNT}</strong></a>
+				<!-- INCLUDE notification_dropdown.html -->
+			</li>
+		<!-- ENDIF -->
+		<!-- EVENT navbar_header_user_profile_append -->
+	<!-- ELSE -->
+		<li class="small-icon icon-logout rightside"  data-skip-responsive="true"><a href="{U_LOGIN_LOGOUT}" title="{L_LOGIN_LOGOUT}" accesskey="x" role="menuitem">{L_LOGIN_LOGOUT}</a></li>
+		<!-- IF S_REGISTER_ENABLED and not (S_SHOW_COPPA or S_REGISTRATION) -->
+			<li class="small-icon icon-register rightside" data-skip-responsive="true"><a href="{U_REGISTER}" role="menuitem">{L_REGISTER}</a></li>
+		<!-- ENDIF -->
+		<!-- EVENT navbar_header_logged_out_content -->
+	<!-- ENDIF -->		
+		
+		<li class="rightside"><a href="#" onclick="fontsizeup(); return false;" class="fontsize" title="{L_CHANGE_FONT_SIZE}">{FONT_SIZE_CHANGE}</a></li>
+	</ul>
+
+	<ul id="nav-breadcrumbs" class="linklist navlinks" role="menubar">
+		<!-- DEFINE $MICRODATA = ' itemtype="http://data-vocabulary.org/Breadcrumb" itemscope=""' -->
+		<!-- EVENT overall_header_breadcrumbs_before -->
+		<li class="small-icon icon-home breadcrumbs">
+			<!-- IF U_SITE_HOME -->
+			
+			<!-- ENDIF -->
+			<!-- EVENT overall_header_breadcrumb_prepend -->
+			<span class="crumb"{$MICRODATA}>
+				<a href="{U_INDEX}" title="{L_SITE_HOME}" accesskey="h" data-navbar-reference="index" itemprop="url">
+				&nbsp;&nbsp;<span itemprop="title">{L_INDEX}</span>
+				</a>
+			</span>		
+			<!-- EVENT overall_header_navlink_prepend -->
+			<span class="crumb"{$MICRODATA}<!-- IF navlinks.MICRODATA --> {navlinks.MICRODATA}<!-- ENDIF -->>
+				<a href="{U_INDEX}" title="{L_INDEX}" itemprop="url">
+				&nbsp;&nbsp;<strong>{L_INDEX}</strong>
+				</a>
+				<li class="icon-help">&raquo;<span itemprop="title">{PAGE_TITLE}</span></li>
+			</span>
+			<!-- EVENT overall_header_navlink_append -->
+			
+			<!-- EVENT overall_header_breadcrumb_append -->
+		</li>
+		<!-- EVENT overall_header_breadcrumbs_after -->
+
+		<!-- IF S_DISPLAY_SEARCH and not S_IN_SEARCH -->
+			<li class="rightside responsive-search" style="display: none;"><a href="{U_SEARCH}" title="{L_SEARCH_ADV_EXPLAIN}" role="menuitem">{L_SEARCH}</a></li>
+		<!-- ENDIF -->
+	</ul>
 				<!-- ENDIF -->
 				<span class="corners-bottom"><span></span></span>
 			</div>
-		</div>
+			
 			<!-- IF PHPBB_STATS -->
 				<ul class="linklist">
 				<!-- IF USER_LOGGED_IN -->
@@ -227,7 +314,9 @@ function checkSearch()
 					</li>
 					<!--<li class="rightside"><a href="{U_MARK_FORUMS}" accesskey="m">{L_MARK_FORUMS_READ}</a></li> -->
 				</ul>
-			<!-- ENDIF -->		
+			<!-- ENDIF -->
+
+	<!-- EVENT overall_header_navbar_after -->		
 	</div>
 
 	<!-- EVENT overall_header_page_body_before -->

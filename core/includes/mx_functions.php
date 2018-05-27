@@ -980,6 +980,307 @@ function get_page_id($search_item, $use_function_file = false, $get_page_data_ar
 }
 
 /**
+ * Get block_id ,function_file, etc., for block or function.
+ *
+ * This function returns the page_id for the page on which a block (or a function block) is located.
+ * First instance found is returned. Results are cached for later reuse. Examples:
+ * - get_block_id('dload.php', true) - to find a pafileDB block
+ * - get_block_id($block_id) - to find a pafileDB function_file, module_root_path
+ *
+ * @access public
+ * @param string $search_item block_id (or function_file)
+ * @param boolean $use_function_file $search_item is a function_file
+ * @param boolean $get_page_data_array return page data results (not only id)
+ * @return integer (array)
+ */
+function get_block_id($search_item, $use_function_file = false, $get_function_file = false, $get_block_id = false)
+{
+	global $db, $mx_user, $mx_cache;
+
+	//
+	// Try to reuse results.
+	//
+	$cache_key = '_pagemap_block' . $search_item;
+
+	$page_id_array = array();
+	if($use_function_file !== false)
+	{
+		$function_file = $search_item;
+		$sql = "SELECT * FROM " . FUNCTION_TABLE . " WHERE function_file = '$search_item' LIMIT 1";
+		if( !($result = $db->sql_query($sql)) )
+		{
+			mx_message_die(GENERAL_ERROR, "Could not query Activity Mod module information", '', __LINE__, __FILE__, $sql);
+		}
+		$row = $db->sql_fetchrow($result);
+		$function_id = $row['function_id'];
+
+		$sql = "SELECT * FROM " . BLOCK_TABLE . " WHERE function_id = '$function_id' LIMIT 1";
+		if( !($result = $db->sql_query($sql)) )
+		{
+			mx_message_die(GENERAL_ERROR, "Could not query " . $search_item . " module information", '', __LINE__, __FILE__, $sql);
+		}
+		$row = $db->sql_fetchrow($result);
+		$db->sql_freeresult($result);
+		$search_item = isset($row['block_id']) ? intval($row['block_id']) : 0;
+	}
+		
+	if($get_function_file !== false)
+	{
+		$block_id = $search_item;		
+		$sql = "SELECT * FROM " . BLOCK_TABLE . " WHERE block_id = '$block_id' LIMIT 1";
+		if( !($result = $db->sql_query($sql)) )
+		{
+			mx_message_die(GENERAL_ERROR, "Could not query " . $search_item . " module information", '', __LINE__, __FILE__, $sql);
+		}
+		$row = $db->sql_fetchrow($result);
+		$function_id = $row['function_id'];
+		$db->sql_freeresult($result);			
+		
+		$sql = "SELECT * FROM " . FUNCTION_TABLE . " WHERE function_id = '$function_id' LIMIT 1";
+		if( !($result = $db->sql_query($sql)) )
+		{
+			mx_message_die(GENERAL_ERROR, "Could not query Activity Mod module information", '', __LINE__, __FILE__, $sql);
+		}
+		$row = $db->sql_fetchrow($result);			
+		$db->sql_freeresult($result);
+		$function_file = isset($row['function_file']) ? $row['function_file'] : '';
+		
+		return $function_file;
+	}		
+		
+	//
+	// First, see if we can get the page_id from ordinary blocks
+	//
+	$sql = "SELECT pag.page_id, pag.page_name, pag.page_desc
+		FROM " . COLUMN_BLOCK_TABLE . " bct,
+			" . PAGE_TABLE . " pag,
+			" . COLUMN_TABLE . " col
+		WHERE pag.page_id = col.page_id
+			AND bct.column_id = col.column_id
+			AND bct.block_id = '" . $search_item . "'
+		ORDER BY pag.page_id
+		LIMIT 1";
+
+	if( !($p_result = $db->sql_query($sql)) )
+	{
+		mx_message_die(GENERAL_ERROR, "Could not query column list", '', __LINE__, __FILE__, $sql);
+	}
+	$p_row = $db->sql_fetchrow($p_result);
+	$db->sql_freeresult($result);
+
+	if( empty($p_row['page_id']) || (($use_function_file !== false) && ($search_item > 0)) )
+	{
+		//
+		// Find all dynamic block Page_ids, if not present as ordinary block
+		//
+		$sql = "SELECT pag.page_id, pag.page_name, pag.page_desc, nav.block_id
+			FROM " . PAGE_TABLE . " pag,
+					" . BLOCK_TABLE . " blk,
+					" . MENU_NAV_TABLE . " nav,
+					" . MENU_CAT_TABLE . " nac
+			WHERE pag.page_id = nav.page_id AND nav.page_id > 0
+				AND nac.cat_id = nav.cat_id
+				AND nav.block_id = blk.block_id
+				AND nav.block_id = '" . $search_item . "'
+			ORDER BY blk.block_id
+			LIMIT 1";
+
+		if( !($p_result = $db->sql_query($sql)) )
+		{
+			mx_message_die(GENERAL_ERROR, "Could not query column list", '', __LINE__, __FILE__, $sql);
+		}
+		$db->sql_freeresult($result);
+		$p_row = $db->sql_fetchrow($p_result);
+	}
+		
+	if( empty($p_row['page_id'])  || (($use_function_file !== false) && ($search_item > 0)) )
+	{
+		// Find all subblock page_ids
+		$sql = "SELECT pag.page_id, pag.page_name, pag.page_desc, sys.parameter_value
+			FROM " . COLUMN_BLOCK_TABLE . " bct,
+				" . PAGE_TABLE . " pag,
+				" . COLUMN_TABLE . " col,
+				" . BLOCK_SYSTEM_PARAMETER_TABLE . " sys,
+				" . PARAMETER_TABLE . " par,
+				" . FUNCTION_TABLE . " fcn
+			WHERE pag.page_id = col.page_id
+				AND bct.column_id = col.column_id
+				AND bct.block_id = sys.block_id
+				AND sys.parameter_id = par.parameter_id
+				AND par.parameter_name = 'block_ids'
+				AND par.function_id = fcn.function_id
+				AND fcn.function_file = 'mx_multiple_blocks.php'
+				ORDER BY sys.block_id";
+					
+		if( !($p_result = $db->sql_query($sql)) )
+		{
+			mx_message_die(GENERAL_ERROR, "Could not query column list", '', __LINE__, __FILE__, $sql);
+		}
+			
+		while( $temp_row = $db->sql_fetchrow($p_result) )
+		{
+			$block_ids_array = explode(',' , $temp_row['parameter_value']);
+				
+			foreach($block_ids_array as $key => $block_id)
+			{
+				if ($block_id == $search_item)
+				{
+					$p_row = $temp_row;
+					continue;
+				}
+			}
+				
+			if (!empty($p_row['page_id']))
+			{
+				continue;
+			}
+		}
+		$db->sql_freeresult($result);
+	}
+
+	if( empty($p_row['page_id'])  || (($use_function_file !== false) && ($search_item > 0)) )
+	{
+		// Find if block is a default dynamic block (desperate try)
+		$sql = "SELECT pag.page_id, pag.page_name, pag.page_desc, sys.parameter_value
+			FROM " . COLUMN_BLOCK_TABLE . " bct,
+			    " . PAGE_TABLE . " pag,
+				" . COLUMN_TABLE . " col,
+				" . BLOCK_SYSTEM_PARAMETER_TABLE . " sys,
+				" . PARAMETER_TABLE . " par,
+				" . FUNCTION_TABLE . " fcn
+			WHERE pag.page_id = col.page_id
+				AND bct.column_id = col.column_id
+				AND bct.block_id = sys.block_id
+				AND sys.parameter_id = par.parameter_id
+				AND par.parameter_name = 'default_block_id'
+				AND par.function_id = fcn.function_id
+				AND fcn.function_file = 'mx_dynamic.php'
+		   	ORDER BY sys.block_id";
+				
+		if( !($p_result = $db->sql_query($sql)) )
+		{
+			mx_message_die(GENERAL_ERROR, "Could not query column list", '', __LINE__, __FILE__, $sql);
+		}
+			
+		while( $temp_row = $db->sql_fetchrow($p_result) )
+		{
+			$block_ids_array = explode(',' , $temp_row['parameter_value']);
+				
+			foreach($block_ids_array as $key => $block_id)
+			{
+				if ($block_id == $search_item)
+				{
+					$p_row = $temp_row;
+					continue;
+				}
+			}
+				
+			if (!empty($p_row['page_id']))
+			{
+				continue;
+			}
+		}
+		$db->sql_freeresult($result);
+	}
+		
+	$page_id_array = array();
+	if (!empty($p_row['page_id']))
+	{		
+		if(isset($p_row['page_id']))
+		{
+			$page_id_array['page_id'] = isset($p_row['page_id']) ? $p_row['page_id'] : $page_id;
+		}	
+			
+		if(isset($p_row['page_name']))
+		{
+			$page_id_array['page_name'] = $p_row['page_name'];
+		}			
+			
+		if(isset($p_row['page_desc']))
+		{
+			$page_id_array['page_desc'] = $p_row['page_desc'];
+		}		
+			
+		if(isset($p_row['block_id']))
+		{
+			$page_id_array['block_id'] = isset($p_row['block_id']) ? $p_row['block_id'] : 0;
+		}			
+			
+	}
+	unset($p_row);
+
+	if($get_block_id !== false)
+	{
+		return isset($page_id_array['block_id']) ? $page_id_array['block_id'] : $block_id;
+	}	
+	
+	if ( $get_page_data_array && !empty($page_id_array['page_id']) )
+	{
+		return $page_id_array;
+	}
+	else if(isset($page_id_array['page_id']))
+	{
+		return $page_id_array['page_id'];
+	}
+	else if( (isset($page_id_array) && isset($search_item) && ($search_item > 0))  || (($use_function_file !== false) && ($search_item > 0)) )
+	{
+		global $mx_request_vars;
+		
+		//
+		// Page selector
+		//
+		$page_id = $mx_request_vars->request('page', MX_TYPE_INT, 1);
+
+		//
+		// Find all dynamic block Page_ids, if not present as ordinary block
+		//
+		$sql = "SELECT pag.page_id, pag.page_name, pag.page_desc, nav.block_id
+			FROM " . PAGE_TABLE . " pag,
+				" . BLOCK_TABLE . " blk,
+				" . MENU_NAV_TABLE . " nav,
+				" . MENU_CAT_TABLE . " nac
+			WHERE pag.page_id > 0
+				AND nac.cat_id = nav.cat_id
+				AND nav.block_id = blk.block_id
+				AND nav.block_id = '" . $search_item . "'
+			ORDER BY blk.block_id";
+				
+		if( !($p_result = $db->sql_query($sql)) )
+		{
+			mx_message_die(GENERAL_ERROR, "Could not query column list", '', __LINE__, __FILE__, $sql);
+		}		
+		$p_row = $db->sql_fetchrow($p_result);		
+		$db->sql_freeresult($p_result);
+		
+		if(isset($p_row['page_id']))
+		{
+			$page_id_array['page_id'] = isset($p_row['page_id']) ? $p_row['page_id'] : $page_id;
+		}	
+		
+		if(isset($p_row['page_name']))
+		{
+			$page_id_array['page_name'] = $p_row['page_name'];
+		}			
+		
+		if(isset($p_row['page_desc']))
+		{
+			$page_id_array['page_desc'] = $p_row['page_desc'];
+		}		
+		
+		if(isset($p_row['block_id']))
+		{
+			$page_id_array['block_id'] = isset($p_row['block_id']) ? $p_row['block_id'] : $search_item;
+		}		
+					
+		return $page_id_array;
+	}	
+	else
+	{
+		return '';
+	}
+}
+
+/**
  * Generate icon select list.
  *
  * Handy function to generate icon select lists.
