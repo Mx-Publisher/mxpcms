@@ -1169,7 +1169,7 @@ class mx_user extends mx_session
 			case 'internal':
 			case 'smf2':
 			case 'mybb':
-				$shared_lang_path = $phpbb_root_path . 'includes/shared/phpbb2/language/';
+				$shared_lang_path = $mx_root_path . 'includes/shared/phpbb2/language/';
 				//$template_path = 'styles/';
 			break;			
 			case 'phpbb3':

@@ -31,8 +31,7 @@ $mx_starttime = $mx_starttime[1] + $mx_starttime[0];
 @define('DEBUG', 1);  // [Admin Option] Show Footer debug stats - Actually set in phpBB/includes/constants.php
 @define('DEBUG_EXTRA', 1);  // [Admin Option] Show memory usage. Show link to full SQL debug report in footer. Beware, this makes the page slow to load. For debugging only.
 //
-//
-error_reporting(E_ALL & ~E_NOTICE); //Default error reporting in PHP 5.2+
+//error_reporting(E_ALL & ~E_NOTICE); //Default error reporting in PHP 5.2+
 //error_reporting  (E_ERROR | E_WARNING | E_PARSE); // This will NOT report uninitialized variables
 //include($mx_root_path . 'modules/mx_shared/ErrorHandler/prepend.php'); // For nice error output
 
