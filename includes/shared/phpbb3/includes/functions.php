@@ -1115,7 +1115,7 @@ if (!function_exists('realpath'))
 		return phpbb_own_realpath($path);
 	}
 }
-else
+elseif (!function_exists('phpbb_realpath'))
 {
 	/**
 	* A wrapper for realpath
@@ -5167,57 +5167,40 @@ class bitfield
 	}
 }
 
-
-/**
-* Little helper for the build_hidden_fields function
-*/
-function _build_hidden_fields($key, $value, $specialchar, $stripslashes)
+//
+//This file is sometime included for build_hidden_fields() function 
+//and so we keep it here with this check for new for phpBB2 Tablet-PC and SmartPhone Edition Backend
+//
+if (!function_exists('_build_hidden_fields'))
 {
-	$hidden_fields = '';
-
-	if (!is_array($value))
+	/**
+	* Little helper for the build_hidden_fields function
+	*/
+	function _build_hidden_fields3($key, $value, $specialchar, $stripslashes)
 	{
-		$value = ($stripslashes) ? stripslashes($value) : $value;
-		$value = ($specialchar) ? htmlspecialchars($value, ENT_COMPAT, 'UTF-8') : $value;
+		$hidden_fields = '';
 
-		$hidden_fields .= '<input type="hidden" name="' . $key . '" value="' . $value . '" />' . "\n";
-	}
-	else
-	{
-		foreach ($value as $_key => $_value)
+		if (!is_array($value))
 		{
-			$_key = ($stripslashes) ? stripslashes($_key) : $_key;
-			$_key = ($specialchar) ? htmlspecialchars($_key, ENT_COMPAT, 'UTF-8') : $_key;
+			$value = ($stripslashes) ? stripslashes($value) : $value;
+			$value = ($specialchar) ? htmlspecialchars($value, ENT_COMPAT, 'UTF-8') : $value;
 
-			$hidden_fields .= _build_hidden_fields($key . '[' . $_key . ']', $_value, $specialchar, $stripslashes);
+			$hidden_fields .= '<input type="hidden" name="' . $key . '" value="' . $value . '" />' . "\n";
 		}
+		else
+		{
+			foreach ($value as $_key => $_value)
+			{
+				$_key = ($stripslashes) ? stripslashes($_key) : $_key;
+				$_key = ($specialchar) ? htmlspecialchars($_key, ENT_COMPAT, 'UTF-8') : $_key;
+
+				$hidden_fields .= _build_hidden_fields($key . '[' . $_key . ']', $_value, $specialchar, $stripslashes);
+			}
+		}
+
+		return $hidden_fields;
 	}
 
-	return $hidden_fields;
-}
-
-/**
-* Build simple hidden fields from array
-*
-* @param array $field_ary an array of values to build the hidden field from
-* @param bool $specialchar if true, keys and values get specialchared
-* @param bool $stripslashes if true, keys and values get stripslashed
-*
-* @return string the hidden fields
-*/
-function build_hidden_fields($field_ary, $specialchar = false, $stripslashes = false)
-{
-	$s_hidden_fields = '';
-
-	foreach ($field_ary as $name => $vars)
-	{
-		$name = ($stripslashes) ? stripslashes($name) : $name;
-		$name = ($specialchar) ? htmlspecialchars($name, ENT_COMPAT, 'UTF-8') : $name;
-
-		$s_hidden_fields .= _build_hidden_fields($name, $vars, $specialchar, $stripslashes);
-	}
-
-	return $s_hidden_fields;
 }
 
 ?>

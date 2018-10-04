@@ -84,6 +84,11 @@ error_reporting(E_ALL ^ E_NOTICE);
 // ================================================================================
 // The following code is based on common.php from phpBB
 // ================================================================================
+//Temp fix for timezone by orynider
+if (@function_exists('date_default_timezone_set') && @function_exists('date_default_timezone_get'))
+{
+	@date_default_timezone_set(@date_default_timezone_get());
+}
 /*
 * Remove variables created by register_globals from the global scope
 * Thanks to Matt Kavanagh
@@ -847,30 +852,31 @@ if($confirm)
 					$tplEx = 'tpl';
 					$backendtype = 'mxbb';					
 					$config_settings = 'config';
-					break;					
-				case 'phpbb2':
-					$tplEx = 'tpl';
-					$backendtype = 'phpbb';					
-					$config_settings = 'config';
-					break;
-				case 'phpbb3':
-				case 'olympus':		
-				case 'ascraeus':
-				case 'rhea':
-					$tplEx = 'html';
-					$backendtype = 'phpbb';						
-					$config_settings = 'config';					
-					break;				
+				break;
 				case 'smf2':
 					$tplEx = 'php';
 					$backendtype = 'smf';						
 					$config_settings = 'Settings';					
-					break;
+				break;
 				case 'mybb':
 					$tplEx = 'php';
 					$backendtype = 'mybb';						
 					$config_settings = 'inc/config';					
-					break;					
+				break;					
+				case 'phpbb2':
+					$tplEx = 'tpl';
+					$backendtype = 'phpbb';					
+					$config_settings = 'config';
+				break;
+				case 'phpbb3':
+				case 'olympus':		
+				case 'ascraeus':
+				case 'rhea':
+				case 'proteus':				
+					$tplEx = 'html';
+					$backendtype = 'phpbb';						
+					$config_settings = 'config';					
+				break;									
 			}
 			
 			if ($mx_request_vars->is_post('backend'))
@@ -883,16 +889,16 @@ if($confirm)
 				{
 					case 'mxbb':
 						$backend_info = get_mxbb_info($mx_root_path . $backend_path . "$config_settings.$phpEx");
-						break;					
+					break;					
 					case 'phpbb':
 						$backend_info = get_phpbb_info($mx_root_path . $backend_path . "config.$phpEx");
-						break;
+					break;
 					case 'smf2':
 						$backend_info = get_smf_info($mx_root_path . $backend_path . "Settings.$phpEx");					
-						break;
+					break;
 					case 'mybb':
 						$backend_info = array_merge(get_mybb_info($mx_root_path . $backend_path . "inc/config.$phpEx"), get_mybb_settings($mx_root_path . $backend_path . "inc/settings.$phpEx"));
-						break;						
+					break;						
 				}				
 								
 				if( !isset($backend_info['dbms']) || $backend_info['dbms'] != $dbms || $backend_info['dbhost'] != $dbhost || $backend_info['dbname'] != $dbname || $backend_info['dbuser'] != $dbuser || $backend_info['dbpasswd'] != $dbpasswd || $backend_info['table_prefix'] != $table_prefix )
@@ -1164,7 +1170,8 @@ if($confirm)
 				case 'phpbb3':
 				case 'olympus':
 				case 'ascraeus':
-				case 'rhea':				
+				case 'rhea':
+				case 'proteus':				
 					$sql = array();
 					
 					$sql[] = "INSERT INTO " . $mx_table_prefix . "block VALUES('6', 'Poll', 'This is a Demo Block', '14', '0', '5', '0', '0', '0', '0', '0', '1', '1', '0', '1125841942', '2')";
@@ -1446,13 +1453,15 @@ if($confirm)
 				
 				case 'phpbb3':
 				case 'olympus':
-				case 'ascraeus':		
+				case 'ascraeus':
+				case 'rhea':
+				case 'proteus':				
 					$sql[] = "INSERT INTO " . $mx_table_prefix . "module VALUES('30', 'phpBB3 Blocks', 'modules/mx_phpbb3blocks/', 'MXP Portal phpBB3 blocks', '', 'MX-Publisher Core Module', 'Original MXP <i>phpBB3 Blocks</i> module by <a href=\"http://mxpcms.sourceforge.net\" target=\"_blank\">The MXP Development Team</a>')";
 					$message .= mx_install_cmd_sql($sql) . '<br />';
 				break;
 				
-				case 'rhea':		
-					$sql[] = "INSERT INTO " . $mx_table_prefix . "module VALUES('30', 'phpBB3 Blocks', 'modules/mx_phpbb4blocks/', 'MXP Portal phpBB4 blocks', '', 'MX-Publisher Core Module', 'Original MXP <i>phpBB4 Blocks</i> module by <a href=\"http://mxpcms.sourceforge.net\" target=\"_blank\">The MXP Development Team</a>')";
+				case 'phpbb4':				
+					$sql[] = "INSERT INTO " . $mx_table_prefix . "module VALUES('30', 'phpBB4 Blocks', 'modules/mx_phpbb4blocks/', 'MXP Portal phpBB4 blocks', '', 'MX-Publisher Core Module', 'Original MXP <i>phpBB4 Blocks</i> module by <a href=\"http://mxpcms.sourceforge.net\" target=\"_blank\">The MXP Development Team</a>')";
 					$message .= mx_install_cmd_sql($sql) . '<br />';
 				break;				
 				
@@ -1462,7 +1471,7 @@ if($confirm)
 				break;
 				
 				case 'mybb':		
-					$sql[] = "INSERT INTO " . $mx_table_prefix . "module VALUES('30', 'MyBB Blocks', 'modules/mx_smf2blocks/', 'MXP Portal MyBB blocks', '', 'MX-Publisher Core Module', 'Original MXP <i>MyBB Blocks</i> module by <a href=\"http://mxpcms.sourceforge.net\" target=\"_blank\"> The MXP Development Team</a>')";
+					$sql[] = "INSERT INTO " . $mx_table_prefix . "module VALUES('30', 'MyBB Blocks', 'modules/mx_mybbblocks/', 'MXP Portal MyBB blocks', '', 'MX-Publisher Core Module', 'Original MXP <i>MyBB Blocks</i> module by <a href=\"http://mxpcms.sourceforge.net\" target=\"_blank\"> The MXP Development Team</a>')";
 					$message .= mx_install_cmd_sql($sql) . '<br />';
 				break;				
 			}			
@@ -1803,16 +1812,18 @@ for($i = 0; $i < $offset1; $i++)
 	// Get the version related information if this forum is phpBB
 	if (file_exists($phpbb_root_path . "modcp.$phpEx")) // phpBB2
 	{
-		$phpbbversion = $portal_backend = 'phpbb2';
+		$portal_backend = 'phpbb2';
+		$phpbbversion = '2.0.24';
 	}
 	elseif (file_exists($phpbb_root_path . "style.$phpEx")) // phpBB3 Olympus
 	{
-			$phpbbversion = $portal_backend = 'phpbb3';
-			//$phpbbversion = $portal_backend = 'olympus';
+			$portal_backend = 'olympus'; //'phpbb3'
+			$phpbbversion = '3.0.14';
 	}
 	elseif (file_exists($phpbb_root_path . "report.$phpEx")) // phpBB3 Ascraeus
 	{
-		$phpbbversion = $portal_backend = 'ascraeus';
+		$portal_backend = 'ascraeus';
+		$phpbbversion = '3.1.12';
 	}
 	/*
 	elseif (file_exists($phpbb_root_path . "index.$phpEx")) // phpBB4 Rhea
@@ -1823,15 +1834,28 @@ for($i = 0; $i < $offset1; $i++)
 	if (!file_exists($phpbb_root_path . "config.$phpEx") && !file_exists($phpbb_root_path . "Settings.$phpEx"))			
 	{	
 		echo("phpBB File: " . $phpbb_root_path . "config.$phpEx" . " not found.");
-		$phpbbversion = 'phpbb'; 
+		$phpbbversion = $mx_portal_version; 
 		$portal_backend = 'internal';		
 	}
 	// Get the DB related information if this forum is phpBB
 	if (file_exists($phpbb_root_path . "config.$phpEx"))
 	{
-		$phpbb_info = $backend_info = get_phpbb_info($phpbb_root_path . "config.$phpEx", $phpbbversion);	
+		$phpbb_info = $backend_info = get_phpbb_info($phpbb_root_path, $portal_backend, $phpbbversion);
+		if (file_exists($phpbb_root_path . "report.$phpEx")) // phpBB3.1+
+		{
+			$portal_backend = !empty($phpbb_info['backend']) ? $phpbb_info['backend'] : $portal_backend;
+			$phpbbversion = !empty($phpbb_info['version']) ? $phpbb_info['version'] : $phpbbversion;
+		}		
 	}
-	
+	//Not phpBB
+	if (file_exists($phpbb_root_path . "Settings.$phpEx"))			
+	{	
+		echo("File: " . $phpbb_root_path . "Settings.$phpEx" . " found.");
+		//Redenifing phpBb compatible variables
+		//$phpbb_info = $backend_info = get_phpbb_info($phpbb_root_path, $phpbbversion);
+		//$phpbbversion = 'phpbb'; 
+		//$portal_backend = 'internal';		
+	}	
 	// Save forums information for debuging purposes
 	$debuginfo[] = array('phpBB Info'.($phpbb_files_cnt > 1 ? " #$i" : ''),
 		'base:'.$phpbb_base_path.
@@ -1869,7 +1893,7 @@ for($i = 0; $i < $offset1; $i++)
 		'BACKEND_PATH'	=> $phpbb_relative,
 		'PORTAL_URL'	=> $portal_url,
 		'BACKEND_URL'	=> $phpbb_url,
-		'PORTAL_BACKEND' => $phpbbversion,
+		'PORTAL_BACKEND' => $portal_backend,
 		'DBMS'			=> $default_dbms,
 		'DB_HOST'		=> $phpbb_info['dbhost'] ? $phpbb_info['dbhost'] : 'localhost',
 		'DB_NAME'		=> $phpbb_info['dbname'],
@@ -1993,10 +2017,10 @@ for($i = $offset2; $i < $files_cnt; $i++)
 	$mybb_found = true;
 }
 /* */
-//$select_database_type .= dbms_select($default_dbms);
 $select_backend_path .= '<option value="-1">'.'internal'.'</option>';
 $select_backend_path .= '</select><br />';
 $select_database_type .= '<option value="-1">'.'re-select'.'</option>';
+$select_database_type .= dbms_select($default_dbms);
 $select_database_type .= '</select><br />';
 /*--------------------
 * DEBUG ONLY ;-)

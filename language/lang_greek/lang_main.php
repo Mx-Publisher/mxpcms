@@ -50,6 +50,7 @@ $lang['Hidden_block_explain'] = 'Αυτό το block είναι \'κρυμμέν
 //
 $lang['MX_home'] = 'Αρχική Σελίδα';
 $lang['MX_forum'] = 'Δημόσια Συζήτηση';
+$lang['MX_navigation'] = 'Pages navigation, eg. forum navigation, like pafiledb navigation.';	
 
 //
 // Core Blocks - Language
@@ -103,6 +104,7 @@ $lang['Block_Title'] = 'Τίτλος';
 $lang['Block_Info'] = 'Πληροφορίες';
 
 $lang['Block_Config_updated'] = 'Η διαμόρφωση του Block ενημερώθηκε επιτυχώς.';
+$lang['Edit'] = 'ΕΠΕΞΕΡΓΑ';
 $lang['Block_Edit'] = 'Επεξεργασία Block';
 $lang['Block_Edit_dyn'] = 'Επεξεργασία μητρικού dynamic block';
 $lang['Block_Edit_sub'] = 'Επεξεργασία μητρικού χωρισμένου block';

@@ -38,6 +38,7 @@
 // varies ... give it your best guess!
 //
 
+$lang['USER_LANG'] = 'ro';
 $lang['ENCODING'] = 'UTF-8';
 $lang['DIRECTION'] = 'ltr';
 $lang['LEFT'] = 'left';
@@ -50,6 +51,7 @@ $lang['DATE_FORMAT'] =  'd/M/Y'; // This should be changed to the default date f
 // please add it here.
 
 $lang['TRANSLATION_INFO'] = 'Varianta în limba română: <a href="http://www.phpbb.ro" target="_blank">Romanian phpBB online community</a>';
+
 
 //
 // Common, these terms are used
@@ -94,6 +96,30 @@ $lang['No'] = 'Nu';
 $lang['Enabled'] = 'Activat';
 $lang['Disabled'] = 'Dezactivat';
 $lang['Error'] = 'Eroare';
+
+// -------------------------------------------------
+$lang['Goto_page'] = 'Goto page';
+
+$lang['Post_by_author'] = 'by';
+$lang['Posted_on_date'] = 'on';
+$lang['In'] = 'in';
+
+$lang['Statistics'] = 'Statistics';
+$lang['Legend'] = 'Legend: ';
+$lang['Posted_articles_zero_total'] = 'No post'; // Number of posts
+$lang['Posted_articles_total'] = 'Total posts <strong>%d</strong>'; // Number of posts
+$lang['Posted_article_total'] = 'Total posts <strong>%d</strong>'; // Number of posts
+$lang['Registered_users_zero_total'] = 'No member'; // # registered users
+$lang['Registered_users_total'] = 'Total members <strong>%d</strong>'; // # registered users
+$lang['Registered_user_total'] = 'Total members <strong>%d</strong>'; // # registered users
+$lang['Newest_user'] = 'Our newest member <strong>%s%s%s</strong>'; // a href, username, /a  
+
+$lang['Rules_moderate'] = '%sModerate this forum%s'; // %s replaced by a href links, do not remove!
+
+$lang['Quick_mod'] = 'Quick-mod tools:';
+
+$lang['Search_forums'] = 'Search within';
+// -------------------------------------------------
 
 $lang['Next'] = 'Următoare';
 $lang['Previous'] = 'Anterioară';
@@ -1054,6 +1080,7 @@ $lang['youtube_link'] = 'Link';
 // Begin Simple Subforums MOD
 $lang['Subforums'] = 'Subforumuri';
 // End Simple Subforums MOD
+
 
 //
 // That's all Folks!

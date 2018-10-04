@@ -1,0 +1,29 @@
+<div class="forabg block">
+	<div class="inner">
+		<div class="postbody bg1" style="width:100%">
+			<ul class="topiclist forums nav-menu">
+			<!-- BEGIN catrow -->
+				<li style="padding-left: 10px;">
+					<span style="cursor:pointer;padding-right:5px"
+						onclick="mx_toggle(this, 'mxNavCat_{catrow.BLOCK_ID}{catrow.CAT_ID}', '{catrow.U_CAT_NAV_EXPAND}', '{catrow.U_CAT_NAV_CONTRACT}');"><img
+							src="{catrow.U_CAT_NAV_DYNAMIC}" alt=""/></span><strong>{catrow.CATEGORY}</strong>
+					<ul id="mxNavCat_{catrow.BLOCK_ID}{catrow.CAT_ID}" style="display: {catrow.CAT_SHOW};padding-left:10px;">
+					<!-- BEGIN menurow -->
+
+						<li class="mnu-nm{catrow.menurow.CURRENT}">						
+						<div class="row1" onmouseout="this.className='row1';" onmouseover="this.className='row2';" style="background-image: url('{catrow.menurow.MENU_ICON}');">&nbsp;</div>
+						<span class="{catrow.menurow.MENU_STYLE}">						
+							<a class="nav" href="{catrow.menurow.U_MENU_URL}" {catrow.menurow.U_MENU_URL_TARGET} title="{catrow.menurow.MENU_DESC}">{catrow.menurow.MENU_NAME}</a>
+						</span>						
+							<br />
+						</li>
+						
+					<!-- END menurow -->
+					</ul>
+				</li>
+			<!-- END catrow -->
+			</ul>
+		</div>
+	</div>
+	<span class="corners-bottom"><span></span></span>
+</div>

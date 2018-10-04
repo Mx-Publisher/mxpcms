@@ -18,6 +18,13 @@
 //
 // setlocale(LC_ALL, 'en');
 
+$lang['USER_LANG'] = 'en';
+$lang['ENCODING'] = 'UTF-8';
+$lang['DIRECTION'] = 'ltr';
+$lang['LEFT'] = 'left';
+$lang['RIGHT'] = 'right';
+$lang['DATE_FORMAT'] =  'd/M/Y'; // This should be changed to the default date format for your language, php date() format
+
 //
 // General
 //
@@ -45,6 +52,7 @@ $lang['Hidden_block_explain'] = 'This block is \'hidden\', but visible to you si
 //
 $lang['MX_home'] = 'Home';
 $lang['MX_forum'] = 'Forum';
+$lang['MX_navigation'] = 'Pages navigation, eg. forum navigation, like pafiledb navigation.';	
 
 //
 // Core Blocks - Language
@@ -98,6 +106,7 @@ $lang['Block_Title'] = 'Title';
 $lang['Block_Info'] = 'Information';
 
 $lang['Block_Config_updated'] = 'Block configuration updated successfully.';
+$lang['Edit'] = 'EDIT';
 $lang['Block_Edit'] = 'Edit Block';
 $lang['Block_Edit_dyn'] = 'Edit parent dynamic block';
 $lang['Block_Edit_sub'] = 'Edit parent split block';
@@ -127,7 +136,7 @@ $lang['mx_copy_translation_title'] = 'About the translation';
 // This is optional, if you would like a _SHORT_ message output
 // along with our copyright message indicating you are the translator
 // please add it here.
-//$lang['TRANSLATION_INFO_MXBB'] = 'English Language by <a href="http://mxpcms.sourceforge.net/" target="_blank">MX-Publisher Development Team</a>';
+$lang['TRANSLATION_INFO_MXBB'] = 'English Language by <a href="http://mxpcms.sourceforge.net/" target="_blank">MX-Publisher Development Team</a>';
 
 //
 // Installation

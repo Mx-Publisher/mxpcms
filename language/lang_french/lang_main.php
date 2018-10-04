@@ -21,8 +21,8 @@ setlocale(LC_ALL, 'fr');
 $lang['USER_LANG'] = 'fr';
 $lang['ENCODING'] = 'UTF-8';
 $lang['DIRECTION'] = 'ltr';
-$lang['LEFT'] = 'left';
-$lang['RIGHT'] = 'right';
+$lang['LEFT'] = 'gauche';
+$lang['RIGHT'] = 'droit';
 $lang['DATE_FORMAT'] =  'd/M/Y'; // This should be changed to the default date format for your language, php date() format
 
 
@@ -59,7 +59,7 @@ $lang['Hidden_block_explain'] = 'Ce bloc est \'masqué\', mais visible tant que 
 // 
 $lang['MX_home'] = 'Accueil'; 
 $lang['MX_forum'] = 'Forum'; 
-
+$lang['MX_navigation'] = 'Pages navigation, eg. forum navigation, like pafiledb navigation.';
 // 
 // Core Blocks - Language 
 // 
@@ -112,6 +112,7 @@ $lang['Block_Title'] = 'Titre';
 $lang['Block_Info'] = 'Information'; 
 
 $lang['Block_Config_updated'] = 'Configuration de Bloc mise à jour.'; 
+$lang['Edit'] = 'EDITER';
 $lang['Block_Edit'] = 'Editer le Bloc'; 
 $lang['Block_Edit_dyn'] = 'Editer le bloc dynamique parent'; 
 $lang['Block_Edit_sub'] = 'Editer le bloc subdivisé parent'; 

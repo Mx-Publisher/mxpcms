@@ -657,7 +657,29 @@ $lang['MXP_Version_outdated'] = 'Se pare ca instalarea ta MXP <b>nu</b> este la 
 $lang['MXP_Latest_version_info'] = 'Ultima veriune disponibilă este <b>MXP %s</b>. ';
 $lang['MXP_Current_version_info'] = 'Tu ai <b>MXP %s</b>.';
 $lang['MXP_Mailing_list_subscribe_reminder'] = 'Pentru ultimile informaţii de ştiri şi actualizări pentru MXP, de ce nu <a href="http://lists.sourceforge.net/lists/listinfo/mxpcms-news" target="_new">înscriete la lista de mailuri</a>.';
-
+/* lang_admin_gd_info.php - BEGIN */
+$lang['GD_Title'] = 'GD Info';
+$lang['NO_GD'] = 'No GD';
+$lang['GD_Description'] = 'Retrieve information about the currently installed GD library';
+$lang['GD_Freetype_Support'] = 'Freetype Fonts Support:';
+$lang['GD_Freetype_Linkage'] = 'Freetype Link Type:';
+$lang['GD_T1lib_Support'] = 'T1lib Support:';
+$lang['GD_Gif_Read_Support'] = 'Gif Read Support:';
+$lang['GD_Gif_Create_Support'] = 'Gif Create Support:';
+$lang['GD_Jpg_Support'] = 'Jpg/Jpeg Support:';
+$lang['GD_Png_Support'] = 'Png Support:';
+$lang['GD_Wbmp_Support'] = 'WBMP Support:';
+$lang['GD_XBM_Support'] = 'XBM Support:';
+$lang['GD_WebP_Support'] = 'WebP Support:';
+$lang['GD_Jis_Mapped_Support'] = 'Japanese Font Support:';
+$lang['GD_True'] = 'Yes';
+$lang['GD_False'] = 'No';
+$lang['GD_VERSION'] = 'GD Version:';
+$lang['GD_0'] = 'No GD';
+$lang['GD_1'] = 'GD1';
+$lang['GD_2'] = 'GD2';
+$lang['GD_show_img_no_gd'] = 'Show GIF thumbnails without using GD libraries (full images are loaded and then just shown resized).';
+/* lang_admin_gd_info.php - END */
 $lang['Trans_title']				= 'Translate to your Language';
 $lang['Trans_description']			= 'Use Translate Control Panel to translate portal to your language';
 $lang['Trans_which_core']			= 'Which Part';

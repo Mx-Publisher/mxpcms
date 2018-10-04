@@ -68,6 +68,9 @@ class mx_backend
 		str_replace("//", "/", $phpbb_root_path);		
 		str_replace("//", "/", $smf_root_path);
 		
+		// Define backend template extension
+		//$tplEx = 'php';
+		$tplEx = 'html';		
 		// SMF Is Intalled
 		$portal_backend_valid_file = @file_exists($smf_root_path . "Settings.$phpEx");
 		
@@ -111,11 +114,7 @@ class mx_backend
 				
 			'character_set'		=> $db_character_set,					
 		);			
-		
-		// Define backend template extension
-		//$tplEx = 'php';
-		$tplEx = 'html';
-		
+			
 		// Most database systems have not set UTF-8 as their default input charset.
 		if (!empty($db_character_set))
 		{		
@@ -167,6 +166,11 @@ class mx_backend
 		
 		define('PHPBB_URL', $server_url_phpbb);
 		define('BOARD_URL', $server_url_smf);
+		
+		// Define backend template extension
+		//$tplEx = 'php';
+		$tplEx = 'html';
+		if (!defined('TPL_EXT')) define('TPL_EXT', $tplEx);			
 		
 		// Now sync Configs - In SMF mode, we rely on native configs, thus we need to sync mxp and smf settings	
 		$this->sync_board_config_keys();

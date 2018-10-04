@@ -40,16 +40,17 @@ for( $i = 0; $i < count($config_name); $i++ )
 //
 // Define some parameters
 //
-/*
-$menu_display_style = 'Overall_navigation';
-$menu_display_mode == 'Horizontal';
-$menu_page_sync = true;
-*/
+
 $menu_custom_tpl = $mx_menu_config['menu_custom_tpl'];
 $menu_display_style = $mx_menu_config['menu_display_style'];
 $menu_display_mode = $mx_menu_config['menu_display_mode'];
 $menu_page_sync = ( $mx_menu_config['menu_page_sync'] != 'No' );
-
+/*	* /
+$menu_custom_tpl = '';
+$menu_display_style = 'Overall_navigation';
+$menu_display_mode = 'Horizontal';
+$menu_page_sync = true;
+/*	*/
 $page_parent = !empty($mx_menu_config['menu_page_parent']) ? $mx_menu_config['menu_page_parent'] : 0;
 
 //
@@ -88,49 +89,67 @@ else
 	{
 		case 'Classic':
 			$template_tmp = $menu_display_mode == 'Horizontal' ? array('body' => 'mx_menu_classic_hor.tpl') : array('body' => 'mx_menu_classic_ver.tpl');
-			break;
+		break;
 		case 'Advanced':
 			$template_tmp = $menu_display_mode == 'Horizontal' ? array('body' => 'mx_menu_advanced_hor.tpl') : array('body' => 'mx_menu_advanced_ver.tpl');
 			$kick_js = $menu_display_mode == 'Horizontal' ? 'adv_hor.js' : 'adv_ver.js';
 			$mx_page->add_footer_text( 'includes/js/' . $kick_js, true );
-			break;
+		break;
 		case 'Simple_CSS_menu':
 			$template_tmp = $menu_display_mode == 'Horizontal' ? array('body' => 'mx_menu_simple_CSS_hor.tpl') : array('body' => 'mx_menu_simple_CSS_ver.tpl');
 			$kick_js = $menu_display_mode == 'Horizontal' ? 'simple_CSS_hor.js' : 'simple_CSS_ver.js';
 			$mx_page->add_footer_text( 'includes/js/' . $kick_js, true );
-			break;
+		break;
 		case 'Advanced_CSS_menu':
 			$template_tmp = $menu_display_mode == 'Horizontal' ? array('body' => 'mx_menu_advanced_CSS_hor.tpl') : array('body' => 'mx_menu_advanced_CSS_ver.tpl');
 			$kick_js = $menu_display_mode == 'Horizontal' ? 'adv_CSS_hor.js' : 'adv_CSS_ver.js';
 			$mx_page->add_footer_text( 'includes/js/' . $kick_js, true );
-			break;
+		break;
 		case 'Simple_x':
 			$template_tmp = $menu_display_mode == 'Horizontal' ? array('body' => 'mx_menu_simple_x_hor.tpl') : array('body' => 'mx_menu_simple_x_ver.tpl');
-			break;			
+		break;			
 		case 'Overall_navigation':
 			$template_tmp = array('body' => 'mx_menu_overall_standard.tpl');
-			break;			
+		break;			
 		default:
 			$template_tmp = $menu_display_mode == 'Horizontal' ? array('body' => 'mx_menu_classic_hor.tpl') : array('body' => 'mx_menu_classic_ver.tpl');
-			break;
+		break;
 	}
 	
 	switch( $menu_display_mode )
 	{
 		case 'Overall_navigation':
 			$template_tmp = array('body' => "mx_menu_overall_standard.$tplEx");
-			break;
+		break;
 		default:
 			$template_tmp = $template_tmp;
-			break;
+		break;
 	}	
 }
 
 $template->set_filenames($template_tmp);
 
 generate_site_menu($page_parent);
+/*
+* Get menu data
+**/
+if ( $mx_cache->_exists($nav_def_key) )
+{
+	$mx_nav_data = $mx_cache->get($nav_def_key);
+}
+else
+{
+	$mx_nav_data = mx_get_nav_menu($block_id);
+	$mx_cache->put($nav_def_key, $mx_nav_data);
+}
+$navCategory = $mx_nav_data['navcategory'];
+$pageMapping = $mx_nav_data['pagemapping'];
 
-$cat_width = $num_of_cats > 0 ? ceil(100 / $num_of_cats) . '%' : '100%';
+$num_of_cats = count($navCategory);
+/*
+* Get menu data
+**/
+$cat_width = ($num_of_cats > 0) ? ceil(100 / $num_of_cats) . '%' : '100%';
 
 $template->assign_vars(array(
 	'BLOCK_SIZE'			=> ( !empty($block_size) ? $block_size : '100%' ),
@@ -144,19 +163,24 @@ $template->assign_vars(array(
 	'U_PORTAL_ROOT_PATH' 	=> PORTAL_URL,
 	'U_PHPBB_ROOT_PATH' 	=> PHPBB_URL,
 	'TEMPLATE_ROOT_PATH'	=> TEMPLATE_ROOT_PATH,
-	
+
+	//SEARCH
+	'U_SEARCH' 				=> mx_append_sid(PHPBB_URL .'search.'.$phpEx),
+	'U_SEARCH_UNANSWERED'	=> mx_append_sid(PHPBB_URL . 'search.'.$phpEx.'?search_id=unanswered'),
+	'U_SEARCH_SELF'			=> mx_append_sid(PHPBB_URL .'search.'.$phpEx.'?search_id=egosearch'),
+	'U_SEARCH_NEW'			=> mx_append_sid(PHPBB_URL .'search.'.$phpEx.'?search_id=newposts'),
 
 	//
 	// mygosmenu
 	//
 	'MX_ROOT_PATH'			=> $mx_root_path,
-	'T_TR_COLOR1' 			=> '#'.$theme['tr_color1'],
-	'T_TR_COLOR2' 			=> '#'.$theme['tr_color2'],
-	'T_TR_COLOR3' 			=> '#'.$theme['tr_color3'],
-	'T_BODY_LINK' 			=> '#'.$theme['body_link'],
-	'T_BODY_VLINK' 			=> '#'.$theme['body_vlink'],
-	'T_TH_COLOR1' 			=> '#'.$theme['th_color1'],
-	'T_FONTFACE1' 			=> $theme['fontface1'],
+	'T_TR_COLOR1' 			=> '#'.$mx_user->theme['tr_color1'],
+	'T_TR_COLOR2' 			=> '#'.$mx_user->theme['tr_color2'],
+	'T_TR_COLOR3' 			=> '#'.$mx_user->theme['tr_color3'],
+	'T_BODY_LINK' 			=> '#'.$mx_user->theme['body_link'],
+	'T_BODY_VLINK' 			=> '#'.$mx_user->theme['body_vlink'],
+	'T_TH_COLOR1' 			=> '#'.$mx_user->theme['th_color1'],
+	'T_FONTFACE1' 			=> $mx_user->theme['fontface1'],
 	'IMG_CONTRACT' 			=> $images['mx_contract'],
 	'IMG_EXPAND' 			=> $images['mx_expand'],
 	'MENU_MODE'				=> $menu_display_mode,

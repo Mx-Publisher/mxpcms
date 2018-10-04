@@ -1,0 +1,30 @@
+<link href="{U_PORTAL_ROOT_PATH}modules/mx_navmenu/templates/prosilver/prosilver.css" rel="stylesheet" type="text/css" media="screen" />
+
+<div class="forabg block">
+	<div class="inner bg1 post">
+		<span class="corners-top"><span></span></span>
+		<div class="postbody" style="width:100%">
+			<ul class="topiclist forums nav-menu" style="margin-bottom:0px">
+			<!-- BEGIN catrow -->
+				<li class="icon fa-pencil" style="padding-left: 10px;">
+					<span style="cursor:pointer;padding-right:5px" onclick="mx_toggle(this, 'mxNavCat_{catrow.BLOCK_ID}{catrow.CAT_ID}', '{catrow.U_CAT_NAV_EXPAND}', '{catrow.U_CAT_NAV_CONTRACT}');">
+						<img src="{catrow.U_CAT_NAV_DYNAMIC}" alt=""/>
+					</span>
+					<strong>{catrow.CATEGORY}</strong>
+					<ul id="mxNavCat_{catrow.BLOCK_ID}{catrow.CAT_ID}" style="display: {catrow.CAT_SHOW};padding-left:10px;">
+					<!-- BEGIN menurow -->
+						<li class="icon mnu-nm{catrow.menurow.CURRENT}" style="padding-left: 20px; background: transparent url('{catrow.menurow.MENU_ICON}') 0% -2% no-repeat;">
+							<a class="nav" href="{catrow.menurow.U_MENU_URL}" {catrow.menurow.U_MENU_URL_TARGET} title="{catrow.menurow.MENU_DESC}">
+							{catrow.menurow.MENU_NAME}
+							</a>
+							<br />
+						</li>
+					<!-- END menurow -->
+					</ul>
+				</li>
+			<!-- END catrow -->
+			</ul>
+		</div>
+	</div>
+	<span class="corners-bottom"><span></span></span>
+</div>

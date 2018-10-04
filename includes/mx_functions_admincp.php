@@ -2842,31 +2842,7 @@ class mx_admin
 
 					$sql_delete = "DELETE FROM " . PARAMETER_TABLE . " WHERE function_id = " . $module_data[1] . " AND parameter_id = " . $module_data[2];
 					break;
-				//	
-				// 0: option, 1: option_id, 2: parameter_id, 3: option_code,
-				// 4: option_desc
-				//	
-				case 'option':
-					// Parameter Option
-					$sql = "SELECT * FROM " . PARAMETER_OPTION_TABLE . " WHERE parameter_id = ".intval($module_data[2])."  ORDER BY option_id";
-					if(($result = $db->sql_query($sql)))
-					{
-						$table = PARAMETER_OPTION_TABLE;
-						$fldkey = 'option_id';
-						$key = $module_data[1];
-		
-						$sql_add = "INSERT INTO " . PARAMETER_OPTION_TABLE . " (option_id, parameter_id, option_code, option_desc)
-							VALUES ('$module_data[1]', '$module_data[2]', '$module_data[3]', '$module_data[4]' )";
-		
-						$sql_update = "UPDATE " . PARAMETER_OPTION_TABLE . "
-							SET parameter_id = '$module_data[2]',
-								option_code  = '$module_data[3]',
-								option_desc  = '$module_data[4]'
-							WHERE option_id = '$module_data[1]'";
-		
-						$sql_delete = "DELETE FROM " . PARAMETER_OPTION_TABLE . " WHERE option_id = " . $module_data[1] . " AND parameter_id = " . $module_data[2];					
-					}				
-					break;	
+
 				//
 				// 0: block, 1: block_id, 2: block_title, 3: block_desc,
 				// 4: function_id, 5: auth_view, 6: auth_edit, 7: auth_delete
@@ -3165,28 +3141,6 @@ class mx_admin
 					$module_pak .= $resultset_param[$p]['parameter_order'] . "\n";
 
 					$paramater_id = $resultset_param[$p]['parameter_id'];
-					
-					// Parameter Option
-					$sql = "SELECT * FROM " . PARAMETER_OPTION_TABLE . " WHERE parameter_id = $paramater_id ORDER BY option_id";
-					if(($result = $db->sql_query($sql)))
-					{
-						$resultset_opt = $db->sql_fetchrowset($result);
-		
-						// 0: option, 1: option_id, 2: parameter_id, 3: option_code,
-						// 4: option_desc
-						for( $o = 0; $o < count($resultset_opt); $o++ )
-						{
-							$module_pak .= 'option' . $delimeter . $resultset_opt[$o]['option_id'] . $delimeter;
-							$module_pak .= $resultset_opt[$o]['parameter_id'] . $delimeter;
-							$module_pak .= $resultset_opt[$o]['option_code'] . $delimeter;
-							$module_pak .= $resultset_opt[$o]['option_desc'] . "\n";
-						}
-		
-						$module_pak .= 'option' . $delimeter. '0' . $delimeter;
-						$module_pak .= '0' . $delimeter;
-						$module_pak .= '0' . $delimeter;
-						$module_pak .= 'endoflist' . $delimeter . "\n";					
-					}									
 				}
 
 				$module_pak .= 'parameter' . $delimeter . '0' . $delimeter;

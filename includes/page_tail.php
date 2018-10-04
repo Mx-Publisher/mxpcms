@@ -40,6 +40,11 @@ if ($mx_page->editcp_exists)
 	));
 }
 
+if( !is_object($phpBB2))
+{
+	$phpBB2 = new phpBB2();
+}
+
 //
 // Page last updated (by)
 //
@@ -47,11 +52,11 @@ if (!empty($mx_page->last_updated))
 {
 	$editor_name_tmp = mx_get_userdata($mx_page->last_updated_by);
 	$editor_name = $editor_name_tmp['username'];
-	$edit_time = phpBB2::create_date( $board_config['default_dateformat'], $mx_page->last_updated, $board_config['board_timezone'] );
+	$edit_time = $phpBB2->create_date( $board_config['default_dateformat'], $mx_page->last_updated, $board_config['board_timezone'] );
 
 	$template->assign_block_vars('page_last_updated', array(
 		'L_PAGE_UPDATED'	=> isset($lang['Page_updated_date']) ? $lang['Page_updated_date'] : 'Page Updated',
-		'NAME' 		=> $userdata['user_level'] == ADMIN ? $lang['Page_updated_by'] . $editor_name : '',
+		'NAME' 		=> $mx_user->data['user_level'] == ADMIN ? $lang['Page_updated_by'] . ' ' . $editor_name : '',
 		'TIME' 		=> $edit_time,
 	));
 }
@@ -102,10 +107,16 @@ if (isset($mx_page->mxbb_footer_addup) && (count($mx_page->mxbb_footer_addup) > 
 	}
 }
 
+if( !is_object($mx_backend))
+{
+	$mx_backend = new mx_backend();
+}
+
 $mx_backend->page_tail('generate_backend_version');
 
 $template->assign_vars(array(
 	'U_PORTAL_ROOT_PATH' 		=> PORTAL_URL,
+	'U_PHPBB_ROOT_PATH' 		=> PHPBB_URL,
 	'TEMPLATE_ROOT_PATH' 		=> TEMPLATE_ROOT_PATH,
 	'MXBB_EXTRA' 				=> $mxbb_footer_text,
 	'MXBB_EXTRA_URL' 			=> $mxbb_footer_text_url,
@@ -115,6 +126,12 @@ $template->assign_vars(array(
 	'ADMIN_LINK' 				=> ($userdata['user_level'] == ADMIN && $userdata['user_id'] != ANONYMOUS) ? '<a href="' . $u_acp . '?sid=' . $userdata['session_id'] . '">' . $l_acp . '</a><br />' : '',
 	'L_ACP' 					=> ($userdata['user_level'] == ADMIN && $userdata['user_id'] != ANONYMOUS) ? $l_acp : '',
 	'U_ACP' 					=> ($userdata['user_level'] == ADMIN && $userdata['user_id'] != ANONYMOUS) ? $u_acp : '',
+	'U_CONTACT_US'			=> ($mx_user->data['user_last_privmsg']) ? mx_append_sid("{$phpbb_root_path}memberlist.$phpEx?mode=contactadmin") : '',
+	
+	'U_TEAM'				=> ($mx_user->data['user_id'] != ANONYMOUS && (PORTAL_BACKEND !== 'internal') && $phpbb_auth->acl_get('u_viewprofile')) ?  mx_append_sid("{$phpbb_root_path}memberlist.$phpEx?mode=team") : '',
+	'U_TERMS_USE'			=> mx_append_sid("{$phpbb_root_path}profile.$phpEx?mode=terms"),
+	'U_PRIVACY'				=> mx_append_sid("{$phpbb_root_path}profile.$phpEx?mode=privacy"),
+		
 	'MX_ADDITIONAL_FOOTER_TEXT' => $mx_addional_footer_text,
 	'EXECUTION_STATS'			=> (defined('DEBUG')) ? $debug_output : ''
 ));

@@ -1,0 +1,26 @@
+<div class="forabg block">
+	<div class="inner">
+	<!-- BEGIN no_row -->
+		<div class="blockbody bg2">{no_row.L_NO_ITEMS}</div>
+	<!-- END no_row -->
+	<!-- BEGIN msg_row -->
+		<div class="blockbody bg2" style="display:block;">
+			<div>
+				<div style="float:left">
+					<img src="{msg_row.FOLDER_IMG}" width="19" height="18" alt="{msg_row.L_TOPIC_FOLDER_ALT}" title="{msg_row.L_TOPIC_FOLDER_ALT}" />
+				</div>
+				<div>
+					<b><a href="{msg_row.U_LAST_MSG}" target="{U_TARGET}" title="{msg_row.LAST_MSG_ALT}" class="genmed">{msg_row.LAST_MSG}</a></b><br />
+					<a href="{msg_row.U_FORUM}" target="{U_TARGET}" title="{msg_row.FORUM_NAME_ALT}" class="gensmall">{msg_row.FORUM_NAME}</a>
+				</div>
+				<div style="text-align:right">
+					<span style="white-space:nowrap">{msg_row.LAST_MSG_DATE}</span>
+					<span style="white-space:nowrap">{msg_row.TOPIC_AUTHOR} {msg_row.LAST_POST_AUTHOR}{msg_row.LAST_POST_IMG}</span>
+				</div>
+			</div>
+		</div>
+	<!-- END msg_row -->
+	<div class="bg1">{PAGINATION}</div>
+	</div>
+	<span class="corners-bottom"><span></span></span>
+</div>

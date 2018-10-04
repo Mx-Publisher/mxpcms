@@ -373,19 +373,19 @@ elseif ($mx_request_vars->get('pane', MX_TYPE_NO_TAGS) == 'right' )
 						case PAGE_INDEX:
 							$location = $lang['Forum_index'];
 							$location_url = "index.$phpEx?pane=right";
-							break;
+						break;
 						case PAGE_POSTING:
 							$location = $lang['Posting_message'];
 							$location_url = "index.$phpEx?pane=right";
-							break;
+						break;
 						case PAGE_LOGIN:
 							$location = $lang['Logging_on'];
 							$location_url = "index.$phpEx?pane=right";
-							break;
+						break;
 						case PAGE_SEARCH:
 							$location = $lang['Searching_forums'];
 							$location_url = "index.$phpEx?pane=right";
-							break;
+						break;
 						default:
 							$mx_viewonline_info = mx_get_viewonline_info($onlinerow_reg[$i]['user_session_page']);
 							if( $mx_viewonline_info !== false )
@@ -414,8 +414,8 @@ elseif ($mx_request_vars->get('pane', MX_TYPE_NO_TAGS) == 'right' )
 					"ROW_COLOR" => "#" . $row_color,
 					"ROW_CLASS" => $row_class,
 					"USERNAME" => $username,
-					"STARTED" => phpBB2::create_date($board_config['default_dateformat'], $onlinerow_reg[$i]['session_start'], $board_config['board_timezone']),
-					"LASTUPDATE" => phpBB2::create_date($board_config['default_dateformat'], $onlinerow_reg[$i]['user_session_time'], $board_config['board_timezone']),
+					"STARTED" => $phpBB2->create_date($board_config['default_dateformat'], $onlinerow_reg[$i]['session_start'], $board_config['board_timezone']),
+					"LASTUPDATE" => $phpBB2->create_date($board_config['default_dateformat'], $onlinerow_reg[$i]['user_session_time'], $board_config['board_timezone']),
 					"FORUM_LOCATION" => $location,
 					"IP_ADDRESS" => $reg_ip,
 
@@ -452,19 +452,19 @@ elseif ($mx_request_vars->get('pane', MX_TYPE_NO_TAGS) == 'right' )
 					case PAGE_INDEX:
 						$location = $lang['Forum_index'];
 						$location_url = "index.$phpEx?pane=right";
-						break;
+					break;
 					case PAGE_POSTING:
 						$location = $lang['Posting_message'];
 						$location_url = "index.$phpEx?pane=right";
-						break;
+					break;
 					case PAGE_LOGIN:
 						$location = $lang['Logging_on'];
 						$location_url = "index.$phpEx?pane=right";
-						break;
+					break;
 					case PAGE_SEARCH:
 						$location = $lang['Searching_forums'];
 						$location_url = "index.$phpEx?pane=right";
-						break;
+					break;
 					default:
 						$mx_viewonline_info = mx_get_viewonline_info($onlinerow_guest[$i]['session_page']);
 						if( $mx_viewonline_info !== false )
@@ -485,8 +485,8 @@ elseif ($mx_request_vars->get('pane', MX_TYPE_NO_TAGS) == 'right' )
 				"ROW_COLOR" => "#" . $row_color,
 				"ROW_CLASS" => $row_class,
 				"USERNAME" => $lang['Guest'],
-				"STARTED" => phpBB2::create_date($board_config['default_dateformat'], $onlinerow_guest[$i]['session_start'], $board_config['board_timezone']),
-				"LASTUPDATE" => phpBB2::create_date($board_config['default_dateformat'], $onlinerow_guest[$i]['session_time'], $board_config['board_timezone']),
+				"STARTED" => $phpBB2->create_date($board_config['default_dateformat'], $onlinerow_guest[$i]['session_start'], $board_config['board_timezone']),
+				"LASTUPDATE" => $phpBB2->create_date($board_config['default_dateformat'], $onlinerow_guest[$i]['session_time'], $board_config['board_timezone']),
 				"FORUM_LOCATION" => $location,
 				"IP_ADDRESS" => $guest_ip,
 
@@ -506,8 +506,8 @@ elseif ($mx_request_vars->get('pane', MX_TYPE_NO_TAGS) == 'right' )
 	$phpbb_version_info = $mx_backend->phpbb_version_check();
 
 	/* Begin MX-Publisher version check code block */
-	$current_MXP_version = explode('.', $portal_config['portal_version']);
-	$minor_mx_revision = (int) $current_MXP_version[2];
+	$current_mxp_version = explode('.', $portal_config['portal_version']);
+	$minor_mx_revision = (int) $current_mxp_version[2];
 
 	$errno = 0;
 	$errstr = $mx_version_info = '';
@@ -599,7 +599,7 @@ else
 	);
 
 	$template->assign_vars(array(
-		'ADMIN_TITLE' => $lang['Mx-Publisher_adminCP'],
+		'L_ADMIN_TITLE' => isset($lang['mxBB_adminCP']) ? $lang['mxBB_adminCP'] : $lang['Mx-Publisher_adminCP'],
 		"S_FRAME_NAV" => mx_append_sid("index.$phpEx?pane=left"),
 		"S_FRAME_MAIN" => mx_append_sid("index.$phpEx?pane=right"))
 	);

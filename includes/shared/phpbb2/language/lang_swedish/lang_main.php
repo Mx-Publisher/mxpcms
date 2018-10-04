@@ -120,6 +120,30 @@ $lang['Enabled'] = 'Aktiverad';
 $lang['Disabled'] = 'Inaktiverad';
 $lang['Error'] = 'Fel';
 
+// -------------------------------------------------
+$lang['Goto_page'] = 'Goto page';
+
+$lang['Post_by_author'] = 'by';
+$lang['Posted_on_date'] = 'on';
+$lang['In'] = 'in';
+
+$lang['Statistics'] = 'Statistics';
+$lang['Legend'] = 'Legend: ';
+$lang['Posted_articles_zero_total'] = 'No post'; // Number of posts
+$lang['Posted_articles_total'] = 'Total posts <strong>%d</strong>'; // Number of posts
+$lang['Posted_article_total'] = 'Total posts <strong>%d</strong>'; // Number of posts
+$lang['Registered_users_zero_total'] = 'No member'; // # registered users
+$lang['Registered_users_total'] = 'Total members <strong>%d</strong>'; // # registered users
+$lang['Registered_user_total'] = 'Total members <strong>%d</strong>'; // # registered users
+$lang['Newest_user'] = 'Our newest member <strong>%s%s%s</strong>'; // a href, username, /a  
+
+$lang['Rules_moderate'] = '%sModerate this forum%s'; // %s replaced by a href links, do not remove!
+
+$lang['Quick_mod'] = 'Quick-mod tools:';
+
+$lang['Search_forums'] = 'Search within';
+// -------------------------------------------------
+
 $lang['Next'] = 'Nästa';
 $lang['Previous'] = 'Föregående';
 $lang['Goto_page'] = 'Gå till sida';

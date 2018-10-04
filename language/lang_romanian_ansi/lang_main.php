@@ -51,6 +51,7 @@ $lang['Hidden_block_explain'] 		= 'Acest bloc este \'ascuns\', dar visibil deoar
 //
 $lang['MX_home'] 					= 'Acasã';
 $lang['MX_forum'] 					= 'Forum';
+$lang['MX_navigation'] = 'Pages navigation, eg. forum navigation, like pafiledb navigation.';	
 
 //
 // Core Blocks - Language
@@ -87,6 +88,7 @@ $lang['Block_Title']            	= 'Titlu';
 $lang['Block_Info']            		= 'Informaþii';
 
 $lang['Block_Config_updated']   	= 'Configuraþia blocului actualizatã cu succes';
+$lang['Edit'] = 'EDITARE';
 $lang['Block_Edit']             	= 'Editeazã Bloc';
 $lang['Block_Edit_dyn']         	= 'Editeazã Blocul pãrinte dinamic';
 $lang['Block_Edit_sub']         	= 'Editeazã Blocul pãrinte împãrþit';

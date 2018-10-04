@@ -1,0 +1,23 @@
+services:
+    orynider.mx_translator.admin.controller:
+        class: orynider\mx_translator\controller\mxp_translator
+        arguments:
+            - '@cache.driver'
+            - '@config'
+            - '@service_container'
+            - '@controller.helper'
+            - '@dbal.conn'
+            - '@language'
+            - '@log'
+            - '@request'
+            - '@template'
+            - '@user'
+            - '%core.root_path%'
+            - '%core.php_ext%'
+    orynider.mx_translator.listener:
+        class: orynider\mx_translator\event\listener
+        arguments:
+            - '@template'
+            - '@config'
+        tags:
+            - { name: event.listener }

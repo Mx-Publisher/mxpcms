@@ -5,6 +5,9 @@
 <!-- BEGIN olist_open --><ol style="list-style-type: {LIST_TYPE}"><!-- END olist_open -->
 <!-- BEGIN olist_close --></ol><!-- END olist_close -->
 
+<!-- BEGIN mlist_open --><ml style="list-style-type: {LIST_TYPE}"><!-- END olist_open -->
+<!-- BEGIN mlist_close --></ml><!-- END olist_close -->
+
 <!-- BEGIN listitem --><li><!-- END listitem -->
 <!-- BEGIN listitem_close --></li><!-- END listitem_close -->
 
@@ -14,6 +17,9 @@
 
 <!-- BEGIN code_open --><dl class="codebox"><dt>{L_CODE}: <a href="#" onclick="selectCode(this); return false;">{L_SELECT_ALL_CODE}</a></dt><dd><code><!-- END code_open -->
 <!-- BEGIN code_close --></code></dd></dl><!-- END code_close -->
+
+<!-- BEGIN html_open --><dl class="codebox"><dt><a href="#" onclick="selectCode(this); return false;"></a></dt><dd><i><!-- END html_open -->
+<!-- BEGIN html_close --></i></dd></dl><!-- END html_close -->
 
 <!-- BEGIN inline_attachment_open --><div class="inline-attachment"><!-- END inline_attachment_open -->
 <!-- BEGIN inline_attachment_close --></div><!-- END inline_attachment_close -->
@@ -43,6 +49,69 @@
 
 <!-- BEGIN email --><a href="mailto:{EMAIL}">{DESCRIPTION}</a><!-- END email -->
 
+<!-- BEGIN fa_open --><i aria-hidden="true"><div class="icon fa-<!-- END fa_open -->
+<!-- BEGIN fa_close --> fa-fw"></div></i><!-- END fa_close -->
+
+<!-- BEGIN fa_logo_open --><i class="icon fa-<!-- END fa_logo_open -->
+<!-- BEGIN fa_logo_close --> fa-fw" aria-hidden="true" style="font-size: 60px;"></i><!-- END fa_logo_close -->
+
+<!-- BEGIN table_open -->
+<dl class="table1">
+<dt></dt>
+<dd>
+<table class="table1" onclick="selectCode(this); return false;">
+<!-- END table_open -->
+<!-- BEGIN table_close -->
+</table>
+</dd>
+</dl>
+<!-- END table_close -->
+
+<!-- BEGIN tr_open -->
+<dl class="table1">
+<dt></dt>
+<dd>
+<tr class="table1 {IDENTIFIER}" onclick="selectCode(this); return false;">
+<!-- END tr_open -->
+<!-- BEGIN tr_close -->
+</tr>
+</dd>
+</dl>
+<!-- END tr_close -->
+
+<!-- BEGIN th_open --><tr class="{IDENTIFIER}"><!-- END th_open -->
+<!-- BEGIN th_close --></tr><!-- END th_close -->	
+
+<!-- BEGIN td_open --><td class="{IDENTIFIER}"><!-- END td_open -->
+<!-- BEGIN td_close --></td><!-- END td_close -->	
+
+<!-- BEGIN cell_open --><td style="{CELL}"><!-- END cell_open -->
+<!-- BEGIN cell_close --></td><!-- END cell_close -->
+
+<!-- BEGIN thead_open --><thead class="{IDENTIFIER}"><!-- END thead_open -->
+<!-- BEGIN thead_close --></thead><!-- END thead_close -->	
+
+<!-- BEGIN tbody_open --><tbody class="{IDENTIFIER}"><!-- END tbody_open -->
+<!-- BEGIN tbody_close --></tbody><!-- END tbody_close -->
+	
+<!-- BEGIN center --><div style="width: 100%;text-align: center">{TEXT}</div><!-- END center -->
+
+<!-- BEGIN center_open --><div style="width: 100%;text-align: center"><!-- END center_open  -->
+<!-- BEGIN center_close --></div><!-- END center_close  -->
+	
+<!-- BEGIN align --><span style="text-align:{IDENTIFIER}; display:block;">{TEXT}</span><!-- END align -->
+<!-- BEGIN align_open --><div style="text-align:{ALIGN}"><!-- END align_open -->
+<!-- BEGIN align_close --></div><!-- END align_close -->
+<!-- BEGIN marq_open --><marquee direction="{MARQ}" scrolldelay="120"><!-- END marq_open -->
+<!-- BEGIN marq_close --></marquee><!-- END marq_close -->	
+<!-- BEGIN float --><span style="float:{IDENTIFIER}">{TEXT}</span><!-- END float -->
+<!-- BEGIN float_open --><span style="float:{IDENTIFIER}"><!-- END float_open -->
+<!-- BEGIN float_close --></span><!-- END float_close -->
+<!-- BEGIN font_open --><span style="font-family:{FONT}"><!-- END font_open --> 
+<!-- BEGIN font_close --></span><!-- END font_close --> 
+<!-- BEGIN fa --><i class="icon fa-{TEXT} fa-fw" aria-hidden="true" style="color: #FF0000; font-size 20px;"></i><!-- END fa -->
+<!-- BEGIN poet_open --><div tag='{POET}' style='display:none'><!-- END poet_open -->
+<!-- BEGIN poet_close --></div><script>doPoetry()</script><!-- END poet_close -->
 <!-- BEGIN flash --><!-- URL's used in the movie-->
 <!-- text used in the movie--> 
 <!-- --> 
@@ -68,6 +137,11 @@
 <a href="http://video.google.com/googleplayer.swf?docId={GVIDEOID}" target="_blank">http://video.google.com/videoplay?docid={GVIDEOID}</a><br />
 </div>
 <!-- END GVideo -->
+
+<!-- BEGIN ram -->
+<embed src="{song_detail.SONG_URL}" align="center" width="{song_detail.WIDTH}" height="{song_detail.HEIGHT}" type="audio/x-pn-realaudio-plugin" console="cons" controls="ControlPanel" autostart="false">
+</embed>
+<!-- END ram -->
 
 <!-- BEGIN youtube -->
 <div style="text-align:center;">
@@ -134,6 +208,14 @@ function iPaper(docId, access_key, height, width) {
 </div><br />
 <!-- END ipaper -->
 
+<!-- BEGIN ipaper_open -->
+<div style="text-align:center;">
+</div>
+<!-- END ipaper_open -->
+<!-- BEGIN ipaper_close -->
+<br />
+<!-- END ipaper_close -->
+
 <!-- BEGIN stream -->
 <div style="text-align:center;">
 <object id="wmp" width=300 height=70 classid="CLSID:22d6f312-b0f6-11d0-94ab-0080c74c7e95"
@@ -158,6 +240,8 @@ src="{URL}" name=MediaPlayer2 showcontrols=1 showdisplay=0 showstatusbar=1 autos
 <div align="left"><embed src="{URL}" autoplay="false" width={WIDTH} height={HEIGHT}></embed></div>
 </div>
 <!-- END video -->
+
+<!-- BEGIN web --><iframe width="100%" height="350" src="{URL}"></iframe><!-- END web -->
 
 <!-- BEGIN hr --><hr noshade color='#000000' size='1'><!-- END hr -->
 

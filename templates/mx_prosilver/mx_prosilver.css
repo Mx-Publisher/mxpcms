@@ -1,0 +1,368 @@
+/*  mxBB 3.0 Style Sheet
+    --------------------------------------------------------------
+	Style name:		proSilver
+	Based on style:	proSilver (this is the default phpBB 3 style)
+	Original author:	subBlue ( http://www.subBlue.com/ )
+	Modified by:	mxBB Project Team		
+	
+	Copyright 2006 phpBB Group ( http://www.phpbb.com/ )
+    --------------------------------------------------------------
+*/
+
+@import url("./theme/common.css");
+@import url("./theme/links.css");
+@import url("./theme/content.css");
+@import url("./theme/buttons.css");
+@import url("./theme/cp.css");
+@import url("./theme/forms.css");
+@import url("./theme/tweaks.css");
+@import url("./theme/colours.css");
+
+.block {
+	background-position: 0px -20px;
+}
+
+.blockbody {
+	padding: 3px;
+	margin-bottom: 4px;
+	background-repeat: no-repeat;
+	background-position: 100% 0;
+} 
+.textbody {
+	padding: 0;
+	line-height: 1.48em;
+	color: #333333;
+	clear: both;
+}
+
+.textbody .ignore {
+	font-size: 1.1em;
+}
+
+.textbody .content {
+	font-size: 1.2em;
+}
+.textbody h3.first {
+	/* The first post on the page uses this */
+	font-size: 1.5em;
+}
+
+.textbody h3 {
+	/* Postbody requires a different h3 format - so change it here */
+	font-size: 1.4em;
+	padding: 2px 0 0 0;
+	margin: 0 0 0.3em 0 !important;
+	text-transform: none;
+	border: none;
+	font-family: "Trebuchet MS", Verdana, Helvetica, Arial, sans-serif;
+	line-height: 125%;
+}
+
+.textbody h3 img {
+	/* Also see tweaks.css */
+	vertical-align: bottom;
+}
+
+.blockcp {
+	width: 100%;
+	border: 1px solid #CCCFD3;
+	background-color: #FFFFFF;
+	padding: 1px;
+}
+
+.blockcp th {
+	padding: 3px 4px;
+	color: #FFFFFF;
+	background: #70AED3 url("./theme/images/gradient2b.gif") bottom left repeat-x;
+	border-top: 1px solid #6DACD2;
+	border-bottom: 1px solid #327AA5;
+	text-align: left;
+	text-transform: uppercase;
+}
+.blockcp .row1 { background-color: #F9F9F9; }
+.blockcp .row2 { background-color: #DCEBFE; }
+
+.blockcp .explain { font-style:italic;font-weight:normal;}
+
+.blockcp fieldset {
+	margin: 10px 10px 15px 10px;
+	padding: 10px;
+	border-top: 1px solid #D7D7D7;
+	border-right: 1px solid #CCCCCC;
+	border-bottom: 1px solid #CCCCCC;
+	border-left: 1px solid #D7D7D7;
+	background-color: #FFFFFF;
+	position: relative;
+}
+.blockcp .delete {
+	color: Red;
+}
+.blockcp fieldset.menurows {
+	padding:1px;
+}
+
+.blockcp .row {
+	padding: 3px 5px 3px 5px;
+}
+.blockcp .row:hover {
+	background-color: #F6F4D0;
+}
+
+.blockcp legend {
+	padding: 1px 0;
+	font-family: Tahoma,arial,Verdana,Sans-serif;
+	font-size: 1.0em;
+	font-weight: bold;
+	color: #115098;
+	margin-top: -.3em;
+	position: relative;
+	text-transform: none;
+	line-height: 1.2em;
+	top: 0;
+	vertical-align: middle;
+}
+
+/* Hide from macIE \*/
+.blockcp legend { top: -1.2em; }
+/* end */
+
+.blockcp fieldset dl:hover dt label {
+	color: #000000;
+}
+
+.blockcp fieldset.fields2 dl:hover dt label {
+	color: inherit;
+}
+
+/* Quick-login on index page */
+.blockcp fieldset.quick-login input {
+	background-color: #F2F3F3;
+}
+
+.blockcp fieldset dl {
+	margin-bottom: 10px;
+	
+	font-size: 0.85em;
+	
+}
+
+.blockcp fieldset dt {
+	width: 45%;
+	text-align: left;
+	border: none;
+	border-right: 1px solid #CCCCCC;
+	padding-top: 3px;
+	padding-right: 5px;
+	margin-right:5px;
+	font-weight: normal;
+	text-transform: none;
+	text-align: right;
+}
+.blockcp dt .explain { font-style: italic;}
+
+.blockcp dd { color: #666666; margin-left:5px; padding-left:5px;}
+.blockcp dd + dd { padding-top: 5px;}
+.blockcp dt span { padding: 0 5px 0 0;}
+
+.blockcp dd input {
+	font-size: 1.00em;
+	max-width: 100%;
+}
+
+.blockcp dd select {
+	font-size: 100%;
+	width: auto;
+	max-width: 100%;
+}
+
+.blockcp dd textarea {
+	font-size: 0.90em;
+	width: 90%;
+}
+
+.blockcp dd select {
+	width: auto;
+	font-size: 1.00em;
+}
+
+.blockcp .dividers {
+	border-top:solid 1px #CCCCCC;
+
+}
+.blockcp .dividers span{
+	top: -1.2em;
+}
+
+H1.blockcp {
+	font-weight: normal;
+	color: #28313F;
+	border-bottom: 1px solid #CCCCCC;
+	font-size: 1.6em;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+	padding-bottom: 0.5em;
+	
+}
+
+/***********\
+|* SiteBar *|
+\***********/
+.sitebar {
+	clear: both;
+	margin-top: 2px;
+	background: #12A3EB url("./theme/images/sitebar_bg.gif") repeat-x;
+}
+.sitebar .corners-bottom {
+	top: -5px;
+	margin-top:0px;
+	position:relative;
+
+}
+
+.sitebar UL {
+	margin-left: 0px;
+	padding-bottom: 1px;
+	font-weight: bold;
+}
+
+.sitebar UL LI {
+	float:left;
+	display:block;
+}
+.sitebar .button A.nav, .sitebar .button-current A.nav {
+	text-decoration:none;
+	background: #cadceb url("./theme/images/sitebar_bg.gif") repeat-x;
+}
+
+.sitebar .button A.nav , .sitebar .button-current A.nav {
+	font-size: 1.3em;
+	padding: 3px 5px 3px 5px;
+	color: #FFFFFF;
+	display:block;
+	text-decoration: none;
+}
+.sitebar .button-current A.nav {
+	background-position: 0 -44px;
+	color: #0a90d3;
+}
+
+.sitebar UL LI.button A.nav:active, .sitebar UL LI.button-current A.nav:active {
+	background-color: #CCCCCC;
+	background-image: url("./theme/images/bg_active.gif");
+	background-position: -1px 0px;
+	color: Red;
+}
+
+.sitebar UL LI.button A.nav:hover, .sitebar UL LI.button-current A.nav:hover {
+	background-color: #CCCCCC;
+	background-position: 0 -22px;
+	color: #000000;
+}
+
+.linklist .icon {
+	background-position: 0 50%;
+	background-repeat: no-repeat;
+	background-image: none;
+	padding: 1px 0 0 17px;
+}
+
+UL.rightside {
+	float: right;
+}
+.rtl ul.linklist li.rightside, .rtl p.rightside {
+	float: right;
+	margin-right: 0;
+	margin-left: 5px;
+	text-align: right;
+}
+
+/* Search box
+--------------------------------------------- */
+#nav-search {
+	color: #FFFFFF;
+	position: relative;
+	margin-top: 1px;
+	margin-right: 5px;
+	margin-bottom: 1px;
+	display: block; 
+	float: right;
+	text-align: right;
+	white-space: nowrap; /* For Opera */
+}
+
+.rtl #nav-search {
+	float: left;
+	text-align: left;
+	margin-right: 0;
+	margin-left: 5px;
+}
+
+#nav-search #keywords {
+	width: 95px;
+	background-color: #FFF;
+}
+
+#nav-search input {
+	border: 1px solid #b0b0b0;
+}
+
+/* .button1 style defined later, just a few tweaks for the search button version */
+#nav-search input.button1 {
+	padding: 1px 5px;
+}
+
+#nav-search li {
+	text-align: right;
+	margin-top: 4px;
+}
+
+#nav-search img {
+	vertical-align: middle;
+	margin-right: 3px;
+}
+
+#tabs a span{
+	float: left;
+	display: block;
+	background: url("./theme/images/bg_tabs2.gif") no-repeat 100% -35px;
+	padding: 7px 10px 4px 4px;
+	color: #767676;
+	white-space: nowrap;
+	font-family: Arial, Helvetica, sans-serif;
+	text-transform: uppercase;
+	font-weight: bold;
+}
+#tabs .activetab a span {
+	background-position: 100% 0;
+	padding-bottom: 5px;
+	color: #23649F;
+}
+
+#tabs a:hover {
+	background-position: 0 -69px;
+}
+
+#tabs a:hover span {
+	background-position: 100% -69px;
+}
+
+#tabs .activetab a:hover span {
+	color: #115098;
+}
+
+.fieldset1, .fieldset1 FIELDSET {
+	border: solid 1px #CCCCCC;
+	background-color: #FFFFFF;
+	padding:10px;
+}
+
+.fieldset1 FORM * {
+	font-size: 1.0em;
+}
+
+.row1	{ background-color: #ECF3F7; } /* .bg1 */
+.row2	{ background-color: #e1ebf2; } /* .bg2 */
+.row2	{ background-color: #cadceb; } /* .bg3 */
+.row4	{ background-color: #EFEFEF; }
+.row5	{ background-color: #DEE3E7; }
+.row6	{ background-color: #D1D7DC; }

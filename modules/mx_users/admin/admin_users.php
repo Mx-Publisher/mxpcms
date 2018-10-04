@@ -97,21 +97,20 @@ if ( $mode == 'edit' || $mode == 'add' || $mode == 'save' && $mx_request_vars->i
 						WHERE ug.user_id = $user_id
 							AND g.group_id = ug.group_id
 							AND g.group_single_user = 1";
-					break;
+				break;
 				case 'phpbb3':
+				default:
 					$sql = "SELECT g.group_id
 						FROM " . USER_GROUP_TABLE . " ug, " . GROUPS_TABLE . " g
 						WHERE ug.user_id = $user_id
 							AND g.group_id = ug.group_id
 							AND g.group_name IN ('BOTS', 'GUESTS')";
-					break;
+				break;
 			}
-
 			if( !($result = $db->sql_query($sql)) )
 			{
 				mx_message_die(GENERAL_ERROR, 'Could not obtain group information for this user', '', __LINE__, __FILE__, $sql);
 			}
-
 			$row = $db->sql_fetchrow($result);
 
 			if (PORTAL_BACKEND != 'internal')

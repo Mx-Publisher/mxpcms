@@ -2,8 +2,8 @@
 /**
 *
 * @package MX-Publisher Module - mx_navmenu
-* @version $Id: mx_site_nav2.php,v 1.3 2014/05/18 06:24:56 orynider Exp $
-* @copyright (c) 2002-2008 [Jon Ohlsson] MX-Publisher Project Team
+* @version $Id: mx_site_nav.php,v 1.13 2014/05/18 06:24:56 orynider Exp $
+* @copyright (c) 2002-2006 [Jon Ohlsson] MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net
 *
@@ -29,7 +29,7 @@ include_once( $module_root_path . 'includes/navmenu_functions.' . $phpEx );
 //
 // Setup config parameters
 //
-$config_name = array('menu_custom_tpl', 'menu_display_mode', 'menu_page_parent');
+$config_name = array('menu_display_style', 'menu_display_mode', 'menu_page_sync', 'menu_page_parent', 'menu_custom_tpl');
 
 for( $i = 0; $i < count($config_name); $i++ )
 {
@@ -40,8 +40,16 @@ for( $i = 0; $i < count($config_name); $i++ )
 //
 // Define some parameters
 //
+/*
+$menu_display_style = 'Overall_navigation';
+$menu_display_mode == 'Horizontal';
+$menu_page_sync = true;
+*/
 $menu_custom_tpl = $mx_menu_config['menu_custom_tpl'];
+$menu_display_style = $mx_menu_config['menu_display_style'];
 $menu_display_mode = $mx_menu_config['menu_display_mode'];
+$menu_page_sync = ( $mx_menu_config['menu_page_sync'] != 'No' );
+
 $page_parent = !empty($mx_menu_config['menu_page_parent']) ? $mx_menu_config['menu_page_parent'] : 0;
 
 //
@@ -49,6 +57,7 @@ $page_parent = !empty($mx_menu_config['menu_page_parent']) ? $mx_menu_config['me
 // Define this menu block has been used on this page - either as a block or in the header. To avoid it being used several times
 //
 $nav_def_key = 'MX_SITE_MENU_' . $block_id;
+
 if ( defined($nav_def_key) )
 {
 	$mx_block->show_title = false;
@@ -63,30 +72,61 @@ define($nav_def_key, true);
 $page_id = $mx_request_vars->request('page', MX_TYPE_INT, 1);
 $virtual_id = $mx_request_vars->request('virtual', MX_TYPE_INT, '');
 
-if (!empty($menu_custom_tpl) && !in_array($menu_custom_tpl, array('Classic','Advanced','Simple_CSS_menu','Advanced_CSS_menu','Overall_navigation')))
+if (!empty($menu_custom_tpl))
 {
-	$template_tmp = $menu_custom_tpl;
+	$template_tmp = array('body' => $menu_custom_tpl);
+	$template_tmp_path = str_replace(strrchr($template_tmp, '/'), '', $template_tmp) . '/';
+	$kick_js = @file_exists($mx_root_path . $module_root_path . 'templates/' .$mx_user->template_names[$module_root_path] . $template_tmp_path) ? ($menu_display_mode == 'Horizontal' ? 'horizontal' : 'vertical') : '';
+	if (!empty($kick_js))
+	{
+		$mx_page->add_footer_text( 'templates/' . $mx_user->template_names[$module_root_path] . $template_tmp_path . $kick_js . '.js', true );
+	}
 }
 else
 {
-	switch( $menu_display_mode )
+	switch( $menu_display_style )
 	{
-		case 'Horizontal':
-			$template_tmp = 'mx_menu_horizontal.tpl';
+		case 'Classic':
+			$template_tmp = $menu_display_mode == 'Horizontal' ? array('body' => 'mx_menu_classic_hor.tpl') : array('body' => 'mx_menu_classic_ver.tpl');
 			break;
-		case 'Vertical':
-			$template_tmp = 'mx_menu_vertical.tpl';
+		case 'Advanced':
+			$template_tmp = $menu_display_mode == 'Horizontal' ? array('body' => 'mx_menu_advanced_hor.tpl') : array('body' => 'mx_menu_advanced_ver.tpl');
+			$kick_js = $menu_display_mode == 'Horizontal' ? 'adv_hor.js' : 'adv_ver.js';
+			$mx_page->add_footer_text( 'includes/js/' . $kick_js, true );
 			break;
+		case 'Simple_CSS_menu':
+			$template_tmp = $menu_display_mode == 'Horizontal' ? array('body' => 'mx_menu_simple_CSS_hor.tpl') : array('body' => 'mx_menu_simple_CSS_ver.tpl');
+			$kick_js = $menu_display_mode == 'Horizontal' ? 'simple_CSS_hor.js' : 'simple_CSS_ver.js';
+			$mx_page->add_footer_text( 'includes/js/' . $kick_js, true );
+			break;
+		case 'Advanced_CSS_menu':
+			$template_tmp = $menu_display_mode == 'Horizontal' ? array('body' => 'mx_menu_advanced_CSS_hor.tpl') : array('body' => 'mx_menu_advanced_CSS_ver.tpl');
+			$kick_js = $menu_display_mode == 'Horizontal' ? 'adv_CSS_hor.js' : 'adv_CSS_ver.js';
+			$mx_page->add_footer_text( 'includes/js/' . $kick_js, true );
+			break;
+		case 'Simple_x':
+			$template_tmp = $menu_display_mode == 'Horizontal' ? array('body' => 'mx_menu_simple_x_hor.tpl') : array('body' => 'mx_menu_simple_x_ver.tpl');
+			break;			
 		case 'Overall_navigation':
-			$template_tmp = 'mx_menu_overall_navigation.tpl';
-			break;
+			$template_tmp = array('body' => 'mx_menu_overall_standard.tpl');
+			break;			
 		default:
-			$template_tmp = 'mx_menu_vertical.tpl';
+			$template_tmp = $menu_display_mode == 'Horizontal' ? array('body' => 'mx_menu_classic_hor.tpl') : array('body' => 'mx_menu_classic_ver.tpl');
 			break;
 	}
+	
+	switch( $menu_display_mode )
+	{
+		case 'Overall_navigation':
+			$template_tmp = array('body' => "mx_menu_overall_standard.$tplEx");
+			break;
+		default:
+			$template_tmp = $template_tmp;
+			break;
+	}	
 }
 
-$template->set_filenames(array('body' => $template_tmp));
+$template->set_filenames($template_tmp);
 
 generate_site_menu($page_parent);
 
@@ -104,15 +144,10 @@ $template->assign_vars(array(
 	'U_PORTAL_ROOT_PATH' 	=> PORTAL_URL,
 	'U_PHPBB_ROOT_PATH' 	=> PHPBB_URL,
 	'TEMPLATE_ROOT_PATH'	=> TEMPLATE_ROOT_PATH,
-
-	//phpBB
-	'U_SEARCH' 				=> mx_append_sid(PHPBB_URL .'search.'.$phpEx),
-	'U_SEARCH_UNANSWERED'	=> mx_append_sid(PHPBB_URL . 'search.'.$phpEx.'?search_id=unanswered'),
-	'U_SEARCH_SELF'			=> mx_append_sid(PHPBB_URL .'search.'.$phpEx.'?search_id=egosearch'),
-	'U_SEARCH_NEW'			=> mx_append_sid(PHPBB_URL .'search.'.$phpEx.'?search_id=newposts'),
+	
 
 	//
-	// css
+	// mygosmenu
 	//
 	'MX_ROOT_PATH'			=> $mx_root_path,
 	'T_TR_COLOR1' 			=> '#'.$theme['tr_color1'],

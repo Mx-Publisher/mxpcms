@@ -87,6 +87,30 @@ $lang['Sort_Descending'] = 'D&eacute;croisant';
 $lang['Sub_to_forum'] = 'Surveiller ce Forum';
 $lang['Sub_to_thread'] = 'Surveiller ce Sujet';
 
+// -------------------------------------------------
+$lang['Goto_page'] = 'Goto page';
+
+$lang['Post_by_author'] = 'by';
+$lang['Posted_on_date'] = 'on';
+$lang['In'] = 'in';
+
+$lang['Statistics'] = 'Statistics';
+$lang['Legend'] = 'Legend: ';
+$lang['Posted_articles_zero_total'] = 'No post'; // Number of posts
+$lang['Posted_articles_total'] = 'Total posts <strong>%d</strong>'; // Number of posts
+$lang['Posted_article_total'] = 'Total posts <strong>%d</strong>'; // Number of posts
+$lang['Registered_users_zero_total'] = 'No member'; // # registered users
+$lang['Registered_users_total'] = 'Total members <strong>%d</strong>'; // # registered users
+$lang['Registered_user_total'] = 'Total members <strong>%d</strong>'; // # registered users
+$lang['Newest_user'] = 'Our newest member <strong>%s%s%s</strong>'; // a href, username, /a  
+
+$lang['Rules_moderate'] = '%sModerate this forum%s'; // %s replaced by a href links, do not remove!
+
+$lang['Quick_mod'] = 'Quick-mod tools:';
+
+$lang['Search_forums'] = 'Search within';
+// -------------------------------------------------
+
 $lang['Next'] = 'Suivant';
 $lang['Previous'] = 'Pr&eacute;c&eacute;dent';
 $lang['Goto_page'] = 'Allez &agrave; la page';
@@ -96,7 +120,7 @@ $lang['IP_Address'] = 'Adresse IP';
 $lang['Select_forum'] = 'S&eacute;lectionnez un Forum';
 $lang['View_latest_post'] = 'Voir derniers messages';
 $lang['View_newest_post'] = 'Voir messages r&eacute;cents';
-$lang['Online_explain'] = 'Ces donn&eacute;es sont bas&eacute;es sur les Membres actifs des derni&egrave;res ' . $board_config['whosonline_time'] . ' minutes';
+$lang['Online_explain'] = 'Ces donn&eacute;es sont bas&eacute;es sur les Membres actifs des derni&egrave;res 5 minutes';
 $lang['Page_of'] = 'Page <b>%d</b> sur <b>%d</b>'; // Replaces with: Page 1 of 2 for example
 
 $lang['ICQ'] = 'ICQ';

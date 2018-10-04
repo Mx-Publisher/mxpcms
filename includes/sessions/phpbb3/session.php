@@ -1170,15 +1170,39 @@ class session
 
 		return ($banned) ? true : false;
 	}
+	
+	/**
+	 * Check the current session for bans
+	 *
+	 * @return true if session user is banned.
+	 */
+	protected function check_ban_for_current_session($config)
+	{
+		if (!defined('SKIP_CHECK_BAN') && $this->data['user_type'] != USER_FOUNDER)
+		{
+			if (!$config['forwarded_for_check'])
+			{
+				$this->check_ban($this->data['user_id'], $this->ip);
+			}
+			else
+			{
+				$ips = explode(' ', $this->forwarded_for);
+				$ips[] = $this->ip;
+				$this->check_ban($this->data['user_id'], $ips);
+			}
+		}
+	}
 
 	/**
 	* Check if ip is blacklisted
-	* This should be called only where absolutly necessary
+	* This should be called only where absolutely necessary
 	*
 	* Only IPv4 (rbldns does not support AAAA records/IPv6 lookups)
 	*
 	* @author satmd (from the php manual)
-	* @param string $mode register/post - spamcop for example is ommitted for posting
+	* @param string 		$mode	register/post - spamcop for example is omitted for posting
+	* @param string|false	$ip		the IPv4 address to check
+	*
 	* @return false if ip is not blacklisted, else an array([checked server], [lookup])
 	*/
 	function check_dnsbl($mode, $ip = false)
@@ -1188,9 +1212,14 @@ class session
 			$ip = $this->ip;
 		}
 
+		// Neither Spamhaus nor Spamcop supports IPv6 addresses.
+		if (strpos($ip, ':') !== false)
+		{
+			return false;
+		}
+
 		$dnsbl_check = array(
-			'list.dsbl.org'			=> 'http://dsbl.org/listing?',
-			'sbl-xbl.spamhaus.org'	=> 'http://www.spamhaus.org/query/bl?ip=',
+			'sbl.spamhaus.org'	=> 'http://www.spamhaus.org/query/bl?ip=',
 		);
 
 		if ($mode == 'register')
@@ -1227,7 +1256,7 @@ class session
 
 		return false;
 	}
-
+	
 	/**
 	* Check if URI is blacklisted
 	* This should be called only where absolutly necessary, for example on the submitted website field

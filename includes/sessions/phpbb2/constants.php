@@ -32,6 +32,11 @@ if ( !defined('IN_PHPBB') )
 @define('ADMIN', 1);
 @define('MOD', 2);
 
+@define('USER_NORMAL', 0);
+@define('USER_INACTIVE', 1);
+@define('USER_IGNORE', 2);
+@define('USER_FOUNDER', 3);
+
 // User related
 @define('USER_ACTIVATION_NONE', 0);
 @define('USER_ACTIVATION_SELF', 1);

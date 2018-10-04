@@ -194,7 +194,8 @@ class mx_backend
 		global $table_prefix, $phpEx, $tplEx;
 		
 		$table_prefix = false;
-		
+		// Define backend template extension
+		$tplEx = 'html';		
 		// Define relative path to phpBB, and validate
 		$phpbb_root_path = $mx_root_path . $portal_config['portal_backend_path'];
 		str_replace("//", "/", $phpbb_root_path);
@@ -205,9 +206,6 @@ class mx_backend
 		{
 			die('Configuration file (config) ' . $phpbb_root_path . "config.$phpEx" . ' couldn\'t be opened.');
 		}
-		
-		// Define backend template extension
-		$tplEx = 'html';
 		
 		// Validate db connection for backend
 		$_result = $db->sql_query("SELECT config_value from " . $table_prefix . "config WHERE config_name = 'cookie_domain'");
@@ -246,7 +244,9 @@ class mx_backend
 
 		$server_url_phpbb = $server_protocol . $server_name . $server_port . $script_name_phpbb;
 		define('PHPBB_URL', $server_url_phpbb);
-
+		// Define backend template extension
+		$tplEx = 'html';
+		if (!defined('TPL_EXT')) define('TPL_EXT', $tplEx);
 		//
 		// Now sync Configs
 		// In phpBB mode, we rely on native phpBB configs, thus we need to sync mxp and phpbb settings
@@ -708,33 +708,30 @@ class mx_backend
 	}
 
 	/**
-	 * Enter description here...
+	 * obtain_phpbb_config
 	 *
 	 * @access public
 	 * @param boolean $use_cache
 	 * @return unknown
 	 */
-	function obtain_phpbb_config($use_cache = true)
+	public function obtain_forum_config()
 	{
-		global $db, $phpbb_root_path, $table_prefix, $mx_cache, $phpEx;
-
-		if (($config = $mx_cache->get('phpbb_config')) && ($use_cache) )
+		global $db, $mx_cache, $phpEx;		
+		
+		if (!defined('CONFIG_TABLE'))
 		{
-			return $config;
-		}
-		else
-		{		
-			if (!defined('CONFIG_TABLE'))
-			{
-				global $table_prefix, $mx_root_path;
+			global $table_prefix, $mx_root_path;
 				
-				require $mx_root_path. "includes/sessions/phpbb3/constants.$phpEx";
-			}
-
-			$sql = "SELECT *
-				FROM " . CONFIG_TABLE;
-
-			if ( !( $result = $db->sql_query( $sql ) ) )
+			require $mx_root_path. "includes/sessions/phpbb2/constants.$phpEx";
+		}		
+		
+		if (($mx_cache->get('phpbb_config')) === false)
+		{
+			$config = $cached_config = array();
+								
+			$sql = 'SELECT config_name, config_value, is_dynamic
+				FROM ' . CONFIG_TABLE;
+			if (!($result = $db->sql_query($sql)))
 			{
 				if (!function_exists('mx_message_die'))
 				{
@@ -745,26 +742,250 @@ class mx_backend
 					mx_message_die( GENERAL_ERROR, 'Couldnt query config information', '', __LINE__, __FILE__, $sql );
 				}
 			}
-
-			while ( $row = $db->sql_fetchrow($result) )
+			
+			while ($row = $db->sql_fetchrow($result))
 			{
+				if (!$row['is_dynamic'])
+				{
+					$cached_config[$row['config_name']] = $row['config_value'];
+				}				
+
 				$config[$row['config_name']] = $row['config_value'];
 			}
 			$db->sql_freeresult($result);
 
-			if ($use_cache)
-			{
-				$mx_cache->put('phpbb_config', $config);
-			}
+			$mx_cache->put('phpbb_config', $cached_config);
+		}
+		else
+		{
+			$sql = 'SELECT config_name, config_value
+				FROM ' . CONFIG_TABLE . '
+				WHERE is_dynamic = 1';
+			$result = $db->sql_query($sql);
 
-			return ( $config );
+			while ($row = $db->sql_fetchrow($result))
+			{
+				$config[$row['config_name']] = $row['config_value'];
+			}
+			$db->sql_freeresult($result);
+		}		
+		
+		return $config;
+	}
+	
+	/**
+	* Set phpbb config values
+	 *
+	 * @param unknown_type $config_name
+	 * @param unknown_type $config_value
+	 */
+	public function set_forum_config($key, $new_value, $use_cache = false)
+	{
+		global $db, $mx_cache, $phpEx;		
+		
+		if (!defined('CONFIG_TABLE'))
+		{
+			global $table_prefix, $mx_root_path;
+				
+			require $mx_root_path. "includes/sessions/phpbb2/constants.$phpEx";
+		}		
+		
+		// Read out config values
+		$config = $this->obtain_phpbb_config();
+		$old_value = !isset($config[$key]) ? $config[$key] : false;		
+		$use_cache = (($key == 'comments_pagination') || ($key == 'pagination')) ? true : false;
+			
+		$sql = 'UPDATE ' . CONFIG_TABLE . "
+			SET config_value = '" . $db->sql_escape($new_value) . "'
+			WHERE config_name = '" . $db->sql_escape($key) . "'";
+
+		if ($old_value !== false)
+		{
+			$sql .= " AND config_value = '" . $db->sql_escape($old_value) . "'";
+		}
+
+		$db->sql_query($sql);
+
+		if (!$db->sql_affectedrows() && isset($config[$key]))
+		{
+			return false;
+		}
+
+		if (!isset($config[$key]))
+		{
+			$sql = 'INSERT INTO ' . CONFIG_TABLE . ' ' . $db->sql_build_array('INSERT', array(
+				'config_name'	=> $key,
+				'config_value'	=> $new_value)),
+				'is_dynamic'	=> ($use_cache) ? 0 : 1));
+			$db->sql_query($sql);
+		}
+		
+		$config[$key] = $new_value;
+
+		
+		if ($use_cache)
+		{
+			$mx_cache->destroy('config');
+			$mx_cache->put('config', $config);			
+		}
+		
+		return true;		
+	}	
+	
+	/**
+	 * Get MX-Publisher config data
+	 *
+	 * @access public
+	 * @return unknown
+	 */
+	public function obtain_portal_config($use_cache = true)
+	{
+		global $db, $mx_cache;
+
+		if ( ($portal_config = $mx_cache->get('mx_config')) && ($use_cache) )
+		{
+			return $portal_config;
+		}
+		else
+		{
+			$sql = "SELECT *
+				FROM " . PORTAL_TABLE . "
+				WHERE portal_id = '1'";
+
+			if ( !($result = $db->sql_query($sql)) )
+			{
+				if (!function_exists('mx_message_die'))
+				{
+					die("Couldnt query portal configuration, Allso this hosting or server is using a cache optimizer not compatible with MX-Publisher or just lost connection to database wile query.");
+				}
+				else
+				{
+					mx_message_die( GENERAL_ERROR, 'Couldnt query portal configuration', '', __LINE__, __FILE__, $sql );
+				}
+			}
+			$row = $db->sql_fetchrow($result);
+			foreach ($row as $config_name => $config_value)
+			{
+				$portal_config[$config_name] = trim($config_value);
+			}
+			$db->sql_freeresult($result);
+			$mx_cache->put('mx_config', $portal_config);
+
+			return ($portal_config);
 		}
 	}
+	
+	/**
+	* Set config value. Creates missing config entry.
+	*
+	*/
+	function set_portal_config($key, $new_value)
+	{
+		global $db, $mx_cache, $portal_config;
+		
+		// Read out config values
+		$portal_config = $this->obtain_portal_config();		
+		
+		$new[$key] = $new_value;
 
+		$sql = "UPDATE  " . PORTAL_TABLE . " SET " . $db->sql_build_array('UPDATE', utf8_normalize_nfc($new));
+		
+		if( !($db->sql_query($sql)) )
+		{
+			mx_message_die(GENERAL_ERROR, "Failed to update portal configuration ", "", __LINE__, __FILE__, $sql);
+		}
+		
+		if (!$db->sql_affectedrows() && !isset($portal_config[$key]))
+		{
+			$sql = 'INSERT INTO ' . PORTAL_TABLE . ' ' . $db->sql_build_array('INSERT', array(
+				$db->sql_escape($key) => $db->sql_escape($new_value)));
+			$db->sql_query($sql);
+		}
+
+		$portal_config[$key] = $new_value;
+
+		$mx_cache->destroy('mx_config');
+	}	
+	
+	/**
+	 * Get userdata
+	 *
+	 * Get Userdata, $mx_user can be username or user_id. If force_str is true, the username will be forced.
+	 * Cached sql, since this function is used for every block.
+	 *
+	 * @param unknown_type $mx_user id or name
+	 * @param boolean $force_str force clean_username
+	 * @return array
+	 */
+	function get_userdata($mxuser, $force_str = false)
+	{
+		global $db, $phpBB2;
+
+		if (!is_numeric($mxuser) || $force_str)
+		{
+			$mx_user = $phpBB2->phpbb_clean_username($mxuser);
+		}
+		else
+		{
+			$mx_user = intval($mxuser);
+		}
+
+		$sql = "SELECT *
+			FROM " . USERS_TABLE . "
+			WHERE ";
+		$sql .= ((is_integer($mxuser)) ? "user_id = $mxuser" : "username = '" .  str_replace("\'", "''", $mxuser) . "'" ) . " AND user_id <> " . ANONYMOUS;
+		if (!($result = $db->sql_query($sql, 120)))
+		{
+			if (!function_exists('mx_message_die'))
+			{
+				die("Tried obtaining data for a non-existent user. Function mx_backend->get_userdata()");
+			}
+			else
+			{
+				mx_message_die(GENERAL_ERROR, 'Tried obtaining data for a non-existent user', '', __LINE__, __FILE__, $sql);
+			}
+		}
+		$return = ($row = $db->sql_fetchrow($result)) ? $row : false;
+		/*
+		foreach ($row as $user_key => $user_value)
+		{
+			$userdata[$user_key] = trim($user_value);
+		}
+		*/
+		$db->sql_freeresult($result);
+		//return ($userdata);			
+		return $return;
+	}	
+	
+	/**
+	* Set user data value. 
+	*
+	*/
+	function set_userdata($key, $new_value)
+	{
+		global $db, $mx_user;
+						
+		$new[$key] = $new_value;
+
+		$sql = "UPDATE " . USERS_TABLE . "
+		SET " . $db->sql_build_array('UPDATE', utf8_normalize_nfc($new)) . "
+		WHERE user_id = '" . $mx_user->data['user_id'] . "'";		
+		if (!($db->sql_query($sql)))
+		{
+			mx_message_die(GENERAL_ERROR, "Failed to update portal configuration ", "", __LINE__, __FILE__, $sql);
+		}
+		
+		if (!$db->sql_affectedrows() && !isset($mx_user->data[$key]))
+		{
+			mx_message_die(GENERAL_ERROR, "Wrong Backend? Adding missing entry key to update MXP configuration  is not supported ATM.", "", __LINE__, __FILE__, $sql);	
+		}
+		$mx_user->data[$key] = $new_value;
+	}	
+	
 	/**
 	* Obtain ranks
 	*/
-	function obtain_ranks()
+	public function obtain_ranks()
 	{
 		global $mx_cache;
 
@@ -1300,7 +1521,7 @@ class mx_backend
 	 */
 	function load_forum_stats()
 	{
-		global $db, $template, $board_config, $portal_config, $phpbb_root_path, $mx_root_path, $lang, $theme, $mx_user, $userdata;
+		global $db, $dbname, $table_prefix, $mx_table_prefix, $phpBB2, $template, $board_config, $portal_config, $phpbb_root_path, $mx_root_path, $lang, $theme, $mx_user, $userdata;
 		
 		$template->assign_block_vars("forum_stats", array());
 		//
@@ -1376,75 +1597,175 @@ class mx_backend
 		// This code is heavily influenced by a similar routine
 		// in phpMyAdmin 2.2.0
 		//
-		if( preg_match("/^mysql/", SQL_LAYER) )
+		switch ($db->get_sql_layer())
 		{
-			$sql = "SELECT VERSION() AS mysql_version";
-			if($result = $db->sql_query($sql))
-			{
-				$row = $db->sql_fetchrow($result);
-				$version = $row['mysql_version'];
-
-				if( preg_match("/^(3\.23|4\.|5\.)/", $version) )
+			case 'mysql':
+			case 'mysql4':
+			case 'mysqli':
+				$sql = "SELECT version() AS version";
+				if($result = $db->sql_query($sql))
 				{
-					static $dbname, $dbsize;
-					$db_name = ( preg_match("/^(3\.23\.[6-9])|(3\.23\.[1-9][1-9])|(4\.)|(5\.)/", $version) ) ? "`$dbname`" : $dbname;
+					$row = $db->sql_fetchrow($result);
+					$version = $row['version'];
 
-					$sql = "SHOW TABLE STATUS
-						FROM " . $db_name;
-					if($result = $db->sql_query($sql))
+					if( preg_match("/^(3\.23|4\.|5\.)/", $version) )
 					{
-						$tabledata_ary = $db->sql_fetchrowset($result);
+						$db_name = ( preg_match("/^(3\.23\.[6-9])|(3\.23\.[1-9][1-9])|(4\.)|(5\.)/", $version) ) ? "`$dbname`" : $dbname;
 
-						$dbsize = 0;
-						for($i = 0; $i < count($tabledata_ary); $i++)
+						$sql = "SHOW TABLE STATUS
+							FROM " . $db_name;						
+						if($result = $db->sql_query($sql))
 						{
-							if( $tabledata_ary[$i]['Type'] != "MRG_MyISAM" )
+							$tabledata_ary = $db->sql_fetchrowset($result);
+							
+							$dbsize = 0;
+							for ($i = 0; $i < count($tabledata_ary); $i++)
 							{
-								if( $table_prefix != "" )
+								if( isset($tabledata_ary[$i]['Engine']))
 								{
-									if( strstr($tabledata_ary[$i]['Name'], $table_prefix) )
+									if( $table_prefix != "" )
+									{
+										if( strstr($tabledata_ary[$i]['Name'], $table_prefix) )
+										{
+											$dbsize += $tabledata_ary[$i]['Data_length'] + $tabledata_ary[$i]['Index_length'];											
+											$phpb_dbsize += $tabledata_ary[$i]['Data_length'] + $tabledata_ary[$i]['Index_length'];
+										}
+									}
+									else
+									{
+										$dbsize += $tabledata_ary[$i]['Data_length'] + $tabledata_ary[$i]['Index_length'];
+									}									
+									
+									if( $mx_table_prefix != "" )
+									{
+										if( strstr($tabledata_ary[$i]['Name'], $mx_table_prefix) )
+										{
+											$dbsize += $tabledata_ary[$i]['Data_length'] + $tabledata_ary[$i]['Index_length'];											
+											$mx_dbsize += $tabledata_ary[$i]['Data_length'] + $tabledata_ary[$i]['Index_length'];
+										}
+									}
+									else
 									{
 										$dbsize += $tabledata_ary[$i]['Data_length'] + $tabledata_ary[$i]['Index_length'];
 									}
 								}
-								else
-								{
-									$dbsize += $tabledata_ary[$i]['Data_length'] + $tabledata_ary[$i]['Index_length'];
-								}
 							}
-						}
-					} // Else we couldn't get the table status.
+						} // Else we couldn't get the table status.
+						$sql = "SELECT table_schema 'database',
+						concat( round( sum( data_length + index_length ) / ( 1024 *1024 ) , 2 ) , 'M' ) size
+						FROM information_schema.TABLES
+						WHERE ENGINE=('MyISAM' || 'InnoDB' )
+						GROUP BY table_schema";						
+						if($result = $db->sql_query($sql))
+						{
+							$tabledata_ary = $db->sql_fetchrowset($result);						
+							$dbsize = isset($dbsize) ? $dbsize : 0;					
+							for ($i = 0; $i < count($tabledata_ary); $i++)
+							{
+								if(isset($tabledata_ary[$i]['database']))
+								{
+									if( strstr($tabledata_ary[$i]['database'], $dbname) )
+									{
+										$dbsize = $tabledata_ary[$i]['size'];
+									}
+																	
+								}							
+							}
+						} // Else we couldn't get the table status.					
+					}
+					else
+					{
+						$dbsize = $lang['Not_available'];
+					}
 				}
 				else
 				{
 					$dbsize = $lang['Not_available'];
 				}
-			}
-			else
-			{
-				$dbsize = $lang['Not_available'];
-			}
-			$db->sql_freeresult($result);
-		}
-		else if( preg_match("/^mssql/", SQL_LAYER) )
-		{
-			$sql = "SELECT ((SUM(size) * 8.0) * 1024.0) as dbsize
-				FROM sysfiles";
-			if( $result = $db->sql_query($sql) )
-			{
-				$dbsize = ( $row = $db->sql_fetchrow($result) ) ? intval($row['dbsize']) : $lang['Not_available'];
-			}
-			else
-			{
-				$dbsize = $lang['Not_available'];
-			}
-			$db->sql_freeresult($result);
-		}
-		else
-		{
-			$dbsize = $lang['Not_available'];
-		}
+				$db->sql_freeresult($result);
 
+			break;
+
+			case 'sqlite3':
+				global $dbhost;
+
+				if (file_exists($dbhost))
+				{
+					$dbsize = filesize($dbhost);
+				}
+
+			break;
+
+			case 'mssql_odbc':
+			case 'mssqlnative':
+				$sql = 'SELECT @@VERSION AS mssql_version';
+				$result = $db->sql_query($sql);
+				$row = $db->sql_fetchrow($result);
+				$db->sql_freeresult($result);
+
+				$sql = 'SELECT ((SUM(size) * 8.0) * 1024.0) as dbsize
+					FROM sysfiles';
+
+				if ($row)
+				{
+					// Azure stats are stored elsewhere
+					if (strpos($row['mssql_version'], 'SQL Azure') !== false)
+					{
+						$sql = 'SELECT ((SUM(reserved_page_count) * 8.0) * 1024.0) as dbsize
+						FROM sys.dm_db_partition_stats';
+					}
+				}
+
+				$result = $db->sql_query($sql, 7200);
+				$dbsize = ($row = $db->sql_fetchrow($result)) ? $row['dbsize'] : false;
+				$db->sql_freeresult($result);
+			break;
+
+			case 'postgres':
+				$sql = "SELECT proname
+					FROM pg_proc
+					WHERE proname = 'pg_database_size'";
+				$result = $db->sql_query($sql);
+				$row = $db->sql_fetchrow($result);
+				$db->sql_freeresult($result);
+
+				if ($row['proname'] == 'pg_database_size')
+				{
+					$database = $db->get_db_name();
+					if (strpos($database, '.') !== false)
+					{
+						list($database, ) = explode('.', $database);
+					}
+
+					$sql = "SELECT oid
+						FROM pg_database
+						WHERE datname = '$database'";
+					$result = $db->sql_query($sql);
+					$row = $db->sql_fetchrow($result);
+					$db->sql_freeresult($result);
+
+					$oid = $row['oid'];
+
+					$sql = 'SELECT pg_database_size(' . $oid . ') as size';
+					$result = $db->sql_query($sql);
+					$row = $db->sql_fetchrow($result);
+					$db->sql_freeresult($result);
+
+					$dbsize = $row['size'];
+				}
+			break;
+
+			case 'oracle':
+				$sql = 'SELECT SUM(bytes) as dbsize
+					FROM user_segments';
+				$result = $db->sql_query($sql, 7200);
+				$dbsize = ($row = $db->sql_fetchrow($result)) ? $row['dbsize'] : false;
+				$db->sql_freeresult($result);
+			break;
+		}
+		
+		$dbsize = ($dbsize !== 0) ? $dbsize : $lang['Not_available'];	
+		
 		if ( is_integer($dbsize) )
 		{
 			if( $dbsize >= 1048576 )

@@ -55,6 +55,7 @@ $lang['Hidden_block_explain'] 		= 'Detta block är \'dolt\', men visas eftersom 
 //
 $lang['MX_home'] 					= 'Hem';
 $lang['MX_forum'] 					= 'Diskussionsforum';
+$lang['MX_navigation'] 				= 'Pages navigation, eg. forum navigation, like pafiledb navigation.';	
 
 //
 // Core Blocks - Language
@@ -108,6 +109,7 @@ $lang['Block_Title']            	= 'Titel';
 $lang['Block_Info']            	 	= 'Information';
 
 $lang['Block_Config_updated']   	= 'Blockkonfigurationen uppdaterades...';
+$lang['Edit'] 						= 'ANDRA';
 $lang['Block_Edit']             	= 'Ändra block';
 $lang['Block_Edit_dyn']         	= 'Ändra dynamiskt block';
 $lang['Block_Edit_sub']         	= 'Ändra uppdelat block';

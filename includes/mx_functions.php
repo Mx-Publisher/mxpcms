@@ -59,7 +59,6 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 	//
 	//This will check whaever we are installing
 	//
-
 	if(defined('HAS_DIED'))
 	{
 		//
@@ -74,7 +73,7 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 		else
 		{
 			$custom_error_message = sprintf($custom_error_message, '', '');
-		}
+		}		
 		echo "<html>\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n<body>\n<b>Critical Error!</b><br />\nmx_message_die() was called multiple times.<br />&nbsp;<hr />";
 		for( $i = 0; $i < count($msg_history); $i++ )
 		{
@@ -94,6 +93,10 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 			}
 			echo "&nbsp;<hr />\n";
 		}
+		if (version_compare(PHP_VERSION, '5.4') < 0)
+		{
+			echo('You are running an unsupported PHP version: ' . PHP_VERSION . '. Please upgrade to PHP 5.6.4 or higher before trying to install phpBB3 or install / upgrate MX-Publisher 3<br />');
+		}		
 		echo $custom_error_message . '<hr /><br clear="all" />';
 		die("</body>\n</html>");
 	}
@@ -189,7 +192,7 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 	if ( empty($default_lang) )
 	{
 		// - populate $default_lang
-		$default_lang= 'english';
+		$default_lang = 'english';
 	}
 
 	$lang_path = $mx_root_path . 'includes/shared/phpbb2/language/';
@@ -230,11 +233,11 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 		//
 		if ( !defined('IN_ADMIN') )
 		{
-			include($mx_root_path . 'includes/page_header.'.$phpEx);
+			include_once($mx_root_path . 'includes/page_header.'.$phpEx);
 		}
 		else
 		{
-			include($mx_root_path . 'admin/page_header_admin.'.$phpEx);
+			include_once($mx_root_path . 'admin/page_header_admin.'.$phpEx);
 		}
 	}
 
@@ -245,14 +248,14 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 			{
 				$msg_title = $lang['Information'];
 			}
-			break;
+		break;
 
 		case CRITICAL_MESSAGE:
 			if ( $msg_title == '' )
 			{
 				$msg_title = $lang['Critical_Information'];
 			}
-			break;
+		break;
 
 		case GENERAL_ERROR:
 			if ( $msg_text == '' )
@@ -264,7 +267,7 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 			{
 				$msg_title = $lang['General_Error'];
 			}
-			break;
+		break;
 
 		case CRITICAL_ERROR:
 			//
@@ -304,7 +307,7 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 			{
 				$msg_title = 'MX-Publisher : <b>' . $lang['Critical_Error'] . '</b>';
 			}
-			break;
+		break;
 	}
 
 
@@ -348,6 +351,7 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 		{
 			$template->set_filenames(array('message_body' => 'admin/admin_message_body.tpl'));
 		}
+		
 		//
 		// Fix for correcting possible "bad" links to phpBB
 		//
@@ -662,6 +666,116 @@ function mx_redirect($url, $redirect_msg = '', $redirect_link = '')
 	exit;
 }
 
+//
+// Encode the IP from decimals into hexademicals
+//
+function mx_encode_ip($dotquad_ip)
+{
+	$ip_sep = explode('.', $dotquad_ip);
+	return sprintf('%02x%02x%02x%02x', $ip_sep[0], $ip_sep[1], $ip_sep[2], $ip_sep[3]);
+}
+
+//
+// Decode the IP from hexademicals to decimals
+//
+function mx_decode_ip($int_ip)
+{
+	$hexipbang = explode('.', chunk_split($int_ip, 2, '.'));
+	return hexdec($hexipbang[0]). '.' . hexdec($hexipbang[1]) . '.' . hexdec($hexipbang[2]) . '.' . hexdec($hexipbang[3]);
+}
+
+//
+// Create date/time from format and timezone
+//
+function mx_create_date($format, $gmepoch, $tz)
+{
+	global $mx_user, $board_config, $lang;
+		
+	static $translate;
+	static $midnight;
+	static $date_cache;
+
+	$format = (!$format) ? $mx_user->date_format : $format;
+	$now = time();
+	$delta = $now - $gmepoch;
+
+	if (!isset($date_cache[$format]))
+	{
+		// Is the user requesting a friendly date format (i.e. 'Today 12:42')?
+		$date_cache[$format] = array(
+			'is_short'		=> strpos($format, '|'),
+			'format_short'	=> substr($format, 0, strpos($format, '|')) . '||' . substr(strrchr($format, '|'), 1),
+			'format_long'	=> str_replace('|', '', $format),
+			// Filter out values that are not strings (e.g. arrays) for strtr().
+			'lang'			=> array_filter($mx_user->lang['datetime'], 'is_string'),
+		);
+
+		// Short representation of month in format? Some languages use different terms for the long and short format of May
+		if ((strpos($format, '\M') === false && strpos($format, 'M') !== false) || (strpos($format, '\r') === false && strpos($format, 'r') !== false))
+		{
+			$date_cache[$format]['lang']['May'] = $mx_user->lang['datetime']['May_short'];
+		}
+	}
+	
+	// Zone offset
+	$zone_offset = $mx_user->timezone + $mx_user->dst;
+		
+	// Show date <= 1 hour ago as 'xx min ago' but not greater than 60 seconds in the future
+	// A small tolerence is given for times in the future but in the same minute are displayed as '< than a minute ago'
+	if ($delta <= 3600 && $delta > -60 && ($delta >= -5 || (($now / 60) % 60) == (($gmepoch / 60) % 60)) && $date_cache[$format]['is_short'] !== false && !$forcedate && isset($this->lang['datetime']['AGO']))
+	{
+		return $this->lang(array('datetime', 'AGO'), max(0, (int) floor($delta / 60)));
+	}
+
+	if (!$midnight)
+	{
+		list($d, $m, $y) = explode(' ', gmdate('j n Y', time() + $zone_offset));
+		$midnight = gmmktime(0, 0, 0, $m, $d, $y) - $zone_offset;
+	}
+
+	if ($date_cache[$format]['is_short'] !== false && !$forcedate && !($gmepoch < $midnight - 86400 || $gmepoch > $midnight + 172800))
+	{
+		$day = false;
+
+		if ($gmepoch > $midnight + 86400)
+		{
+			$day = 'TOMORROW';
+		}
+		else if ($gmepoch > $midnight)
+		{
+			$day = 'TODAY';
+		}
+		else if ($gmepoch > $midnight - 86400)
+		{
+			$day = 'YESTERDAY';
+		}
+
+		if ($day !== false)
+		{
+			return str_replace('||', $mx_user->lang['datetime'][$day], strtr(@gmdate($date_cache[$format]['format_short'], $gmepoch + $zone_offset), $date_cache[$format]['lang']));
+		}
+	}	
+		
+	if (empty($translate) && $board_config['default_lang'] != 'english')
+	{
+		@reset($lang['datetime']);
+		while (list($match, $replace) = @each($lang['datetime']))
+		{
+			$translate[$match] = $replace;
+		}
+	}
+	
+	if (empty($translate))
+	{
+		@reset($lang['datetime']);
+		while (list($match, $replace) = @each($lang['datetime']))
+		{
+			$translate[$match] = $replace;
+		}
+	}
+	return (!is_array($translate)) ? strtr(@gmdate($format, $gmepoch + (3600 * $tz)), $translate) : strtr(@gmdate($format, $gmepoch + (3600 * $tz)), $date_cache[$format]['lang']);
+}
+
 /**
 * Global function for chmodding directories and files for internal use
 *
@@ -685,7 +799,7 @@ function mx_redirect($url, $redirect_msg = '', $redirect_link = '')
 * @return bool	true on success, otherwise false
 * @author faw, phpBB Group
 */
-function mx_chmod($filename, $perms = CHMOD_READ)
+function mx3_chmod($filename, $perms = CHMOD_READ)
 {
 	static $_chmod_info;
 
@@ -892,7 +1006,7 @@ function mx_is_writable($file)
 }
 
 /**
-* Generate portal url (example: http://www.example.com/phpBB)
+* Generate portal url (example: http://www.example.com/)
 * @param bool $without_script_path if set to true the script path gets not appended (example: http://www.example.com)
 */
 function generate_portal_url($without_script_path = false)
@@ -928,7 +1042,7 @@ function generate_portal_url($without_script_path = false)
 
 	if ($server_port && (($cookie_secure && $server_port <> 443) || (!$cookie_secure && $server_port <> 80)))
 	{
-		// HTTP HOST can carry a port number (we fetch $user->host, but for old versions this may be true)
+		// HTTP HOST can carry a port number (we fetch $mx_user->host, but for old versions this may be true)
 		if (strpos($server_name, ':') === false)
 		{
 			$url .= ':' . $server_port;
@@ -947,6 +1061,101 @@ function generate_portal_url($without_script_path = false)
 	}
 
 	return $url;
+}
+//Form validation
+
+
+/**
+* Add a secret hash   for use in links/GET requests
+* @param string  $link_name The name of the link; has to match the name used in check_link_hash, otherwise no restrictions apply
+* @return string the hash
+unique_id()
+*/
+function mx_generate_link_hash($link_name)
+{
+	global $mx_user;
+
+	if (!isset($mx_user->data["hash_$link_name"]))
+	{
+		$mx_user->data["hash_$link_name"] = substr(sha1($mx_user->data['user_form_salt'] . $link_name), 0, 8);
+	}
+
+	return $mx_user->data["hash_$link_name"];
+}
+
+
+/**
+* checks a link hash - for GET requests
+* @param string $token the submitted token
+* @param string $link_name The name of the link
+* @return boolean true if all is fine
+*/
+function mx_check_link_hash($token, $link_name)
+{
+	return $token === mx_generate_link_hash($link_name);
+}
+
+/**
+* Add a secret token to the form (requires the S_FORM_TOKEN template variable)
+* @param string  $form_name The name of the form; has to match the name used in check_form_key, otherwise no restrictions apply
+* @param string  $template_variable_suffix A string that is appended to the name of the template variable to which the form elements are assigned
+*/
+function mx_add_form_key($form_name, $template_variable_suffix = '')
+{
+	global $board_config, $template, $mx_user;
+
+	$now = time();
+	$token_sid = ($mx_user->data['user_id'] == ANONYMOUS) ? $mx_user->session_id : '';
+	$token = sha1($now . $mx_user->data['user_form_salt'] . $form_name . $token_sid);
+
+	$s_fields = build_hidden_fields(array(
+		'creation_time' => $now,
+		'form_token'	=> $token,
+	));
+
+	$template->assign_var('S_FORM_TOKEN' . $template_variable_suffix, $s_fields);
+}
+
+/**
+ * Check the form key. Required for all altering actions not secured by confirm_box
+ *
+ * @param	string	$form_name	The name of the form; has to match the name used
+ *								in add_form_key, otherwise no restrictions apply
+ * @param	int		$timespan	The maximum acceptable age for a submitted form
+ *								in seconds. Defaults to the config setting.
+ * @return	bool	True, if the form key was valid, false otherwise
+ */
+function mx_check_form_key($form_name, $timespan = false)
+{
+	global $board_config, $mx_request_vars, $mx_user;
+
+	if ($timespan === false)
+	{
+		// we enforce a minimum value of half a minute here.
+		$timespan = ($board_config['form_token_lifetime'] == -1) ? -1 : max(30, $board_config['form_token_lifetime']);
+	}
+
+	if ($mx_request_vars->is_set_post('creation_time') && $mx_request_vars->is_set_post('form_token'))
+	{
+		$creation_time	= abs($mx_request_vars->request('creation_time', 0));
+		$token = $mx_request_vars->variable('form_token', '');
+
+		$diff = time() - $creation_time;
+
+		// If creation_time and the time() now is zero we can assume it was not a human doing this (the check for if ($diff)...
+		if (defined('DEBUG_TEST') || $diff && ($diff <= $timespan || $timespan === -1))
+		{
+			$token_sid = ($mx_user->data['user_id'] == ANONYMOUS && !empty($board_config['form_token_sid_guests'])) ? $mx_user->session_id : '';
+			$key = sha1($creation_time . $mx_user->data['user_form_salt'] . $form_name . $token_sid);
+
+			if ($key === $token)
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
 }
 
 /**
@@ -1067,31 +1276,31 @@ function mx_generate_pagination($base_url, $num_items, $per_page, $start_item, $
 /**
  * Get userdata
  *
- * Get Userdata, $user can be username or user_id. If force_str is true, the username will be forced.
+ * Get Userdata, $mx_user can be username or user_id. If force_str is true, the username will be forced.
  * Cached sql, since this function is used for every block.
  *
- * @param unknown_type $user id or name
+ * @param unknown_type $mx_user id or name
  * @param boolean $force_str force clean_username
  * @return array
  */
-function mx_get_userdata($user, $force_str = false)
+function mx_get_userdata($mxuser, $force_str = false)
 {
-	global $db;
+	global $db, $phpBB2;
 
-	if (!is_numeric($user) || $force_str)
+	if (!is_numeric($mxuser) || $force_str)
 	{
-		$user = phpBB2::phpbb_clean_username($user);
+		$mxuser = $phpBB2->phpbb_clean_username($mxuser);
 	}
 	else
 	{
-		$user = intval($user);
+		$mxuser = intval($mxuser);
 	}
 
 	$sql = "SELECT *
 		FROM " . USERS_TABLE . "
 		WHERE ";
-	$sql .= ((is_integer($user)) ? "user_id = $user" : "username = '" .  str_replace("\'", "''", $user) . "'" ) . " AND user_id <> " . ANONYMOUS;
-	if (!($result = $db->sql_query($sql, 120)))
+	$sql .= ((is_integer($mxuser)) ? "user_id = $mxuser" : "username = '" .  str_replace("\'", "''", $mxuser) . "'" ) . " AND user_id <> " . ANONYMOUS;
+	if (!($result = $db->sql_query($sql)))
 	{
 		mx_message_die(GENERAL_ERROR, 'Tried obtaining data for a non-existent user', '', __LINE__, __FILE__, $sql);
 	}
@@ -1099,6 +1308,205 @@ function mx_get_userdata($user, $force_str = false)
 	$return = ($row = $db->sql_fetchrow($result)) ? $row : false;
 	$db->sql_freeresult($result);
 	return $return;
+}
+
+/**
+* Get user avatar
+*
+* @param array $user_row Row from the users table
+* @param string $alt Optional language string for alt tag within image, can be a language key or text
+* @param bool $ignore_config Ignores the config-setting, to be still able to view the avatar in the UCP
+* @param bool $lazy If true, will be lazy loaded (requires JS)
+*
+* @return string Avatar html
+*/
+function mx_get_user_avatar($user_row, $alt = 'USER_AVATAR', $ignore_config = false, $lazy = false)
+{
+	return mx_get_avatar($user_row, $alt, $ignore_config, $lazy);
+}
+
+/**
+* Get group avatar
+*
+* @param array $group_row Row from the groups table
+* @param string $alt Optional language string for alt tag within image, can be a language key or text
+* @param bool $ignore_config Ignores the config-setting, to be still able to view the avatar in the UCP
+* @param bool $lazy If true, will be lazy loaded (requires JS)
+*
+* @return string Avatar html
+*/
+function mx_get_group_avatar($user_row, $alt = 'GROUP_AVATAR', $ignore_config = false, $lazy = false)
+{
+	return mx_get_avatar($user_row, $alt, $ignore_config, $lazy);
+}
+
+/**
+* Build gravatar URL for output on page
+*
+* @param array $row User data or group data that has been cleaned with
+*        \phpbb\avatar\manager::clean_row
+* @return string Gravatar URL
+*/
+function mx_get_gravatar_url($row)
+{
+	$url = '//secure.gravatar.com/avatar/';
+	
+	$url .=  md5(strtolower(trim($row['avatar'])));
+
+	if ($row['avatar_width'] || $row['avatar_height'])
+	{
+		$url .= '?s=' . max($row['avatar_width'], $row['avatar_height']);
+	}
+	
+	return $url;
+}
+
+/**
+* Get avatar
+*
+* @param array $row Row cleaned by \phpbb\avatar\manager::clean_row
+* @param string $alt Optional language string for alt tag within image, can be a language key or text
+* @param bool $ignore_config Ignores the config-setting, to be still able to view the avatar in the UCP
+* @param bool $lazy If true, will be lazy loaded (requires JS)
+*
+* @return string Avatar html
+*/
+function mx_get_avatar($row, $alt, $ignore_config = false, $lazy = false)
+{
+	global $mx_user, $board_config, $mx_cache, $phpbb_root_path, $phpEx;
+
+	if (!$mx_user->optionget('viewavatars') && !$ignore_config)
+	{
+		return '';
+	}
+	
+	$row = array(
+		'avatar' 		=> isset($row['avatar']) ? $row['avatar'] : $row['user_avatar'],
+		'avatar_type' 	=> isset($row['avatar_type']) ? $row['avatar_type'] : $row['user_avatar_type'],
+		'avatar_width' 	=> isset($row['avatar_width']) ? $row['avatar_width'] : (isset($row['user_avatar_width']) ? $row['user_avatar_width'] : '120'),
+		'avatar_height' => isset($row['avatar_height']) ? $row['avatar_height'] : (isset($row['user_avatar_height']) ? $row['user_avatar_height'] : '120'),
+	);
+	
+	$avatar_data = array(
+		'src' => $row['avatar'],
+		'width' => $row['avatar_width'],
+		'height' => $row['avatar_height'],
+	);
+
+	
+	$driver = $row['avatar_type'];
+	$html = '';
+
+	if ($driver)
+	{
+		$html = '<img src="' . mx_get_gravatar_url($row) . '" ' .
+			($row['avatar_width'] ? ('width="' . $row['avatar_width'] . '" ') : '') .
+			($row['avatar_height'] ? ('height="' . $row['avatar_height'] . '" ') : '') .
+			'alt="' . ((!empty($lang[$alt])) ? $lang[$alt] : $alt) . '" />';
+			
+		if (!empty($html))
+		{
+			return $html;
+		}
+
+		$root_path = generate_portal_url();
+
+		$avatar_data = array(
+			'src' => $root_path . $board_config['avatar_gallery_path'] . '/' . $row['avatar'],
+			'width' => $row['avatar_width'],
+			'height' => $row['avatar_height'],
+		);
+	}
+	else
+	{
+		$avatar_data['src'] = '';
+	}
+
+	if (!empty($avatar_data['src']))
+	{
+		if ($lazy)
+		{
+			// Determine board url - we may need it later
+			$board_url = generate_portal_url() . '/';
+			// This path is sent with the base template paths in the assign_vars()
+			// call below. We need to correct it in case we are accessing from a
+			// controller because the web paths will be incorrect otherwise.
+
+			$web_path = $board_url;
+
+			if (is_dir($phpbb_root_path . $mx_user->template_path . $mx_user->template_name . '/theme/images/'))
+			{			
+				$theme_images = "{$web_path}{$mx_user->template_path}" . rawurlencode($mx_user->template_name) . '/theme/images';
+			}
+			elseif (is_dir($phpbb_root_path . $mx_user->template_path . $mx_user->template_name . '/images/'))
+			{			
+				$theme_images = "{$web_path}{$mx_user->template_path}" . rawurlencode($mx_user->template_name . '/images');
+			}			
+			$src = 'src="' . $theme_images . '/no_avatar.gif" data-src="' . $avatar_data['src'] . '"';
+		}
+		else
+		{
+			$src = 'src="' . $avatar_data['src'] . '"';
+		}
+
+		$html = '<img class="avatar" ' . $src . ' ' .
+			($avatar_data['width'] ? ('width="' . $avatar_data['width'] . '" ') : '') .
+			($avatar_data['height'] ? ('height="' . $avatar_data['height'] . '" ') : '') .
+			'alt="' . ((!empty($mx_user->lang[$alt])) ? $mx_user->lang[$alt] : $alt) . '" />';
+	}
+	return $html;
+}
+
+/**
+* Get user rank title and image
+*
+* @param array $userdata the current stored users data
+* @param int $user_posts the users number of posts
+*
+* @return array An associative array containing the rank title (title), the rank image as full img tag (img) and the rank image source (img_src)
+*
+* Note: since we do not want to break backwards-compatibility, this function will only properly assign ranks to guests if you call it for them with user_posts == false
+*/
+function mx_get_user_rank($userdata, $user_posts, &$rank_title = null, &$rank_img = null, &$rank_img_src = null)
+{
+	global $ranks, $board_config, $phpbb_root_path;
+
+	$user_rank_data = array(
+		'title'		=> $rank_title ? $rank_title : null,
+		'img'		=> $rank_img ? $rank_img : null,
+		'img_src'	=> $rank_img_src ? $rank_img_src : null,
+	);	
+	
+	if (empty($ranks))
+	{
+		global $mx_cache;
+		$ranks = $mx_cache->obtain_ranks();
+	}
+
+	if (!empty($userdata))
+	{
+		$user_rank_data['title'] = (isset($ranks['special'][$userdata['user_rank']]['rank_title'])) ? $ranks['special'][$userdata['user_rank']]['rank_title'] : '';
+		$user_rank_data['img'] = (!empty($ranks['special'][$userdata['user_rank']]['rank_image'])) ? '<img src="' . $user_rank_data['img_src'] . '" alt="' . $ranks['special'][$userdata['user_rank']]['rank_title'] . '" title="' . $ranks['special'][$userdata['user_rank']]['rank_title'] . '" />' : '';
+		$user_rank_data['img_src'] = (!empty($ranks['special'][$userdata['user_rank']]['rank_image'])) ? $phpbb_root_path . $board_config['ranks_path'] . '/' . $ranks['special'][$userdata['user_rank']]['rank_image'] : '';	
+	}
+	else if ($user_posts !== false)
+	{
+		if (!empty($ranks['normal']))
+		{
+			foreach ($ranks['normal'] as $rank)
+			{
+				if ($user_posts >= $rank['rank_min'])
+				{
+					$user_rank_data['title'] = $rank['rank_title'];
+					$user_rank_data['img'] = (!empty($rank['rank_image'])) ? '<img src="' . $phpbb_root_path . $board_config['ranks_path'] . '/' . $rank['rank_image'] . '" alt="' . $rank['rank_title'] . '" title="' . $rank['rank_title'] . '" />' : '';
+					$user_rank_data['img_src'] = (!empty($rank['rank_image'])) ? $phpbb_root_path . $board_config['ranks_path'] . '/' . $rank['rank_image'] : '';
+					break;
+				}
+			}
+		}
+	}
+	
+	return $user_rank_data;		
 }
 
 /**
@@ -1182,7 +1590,7 @@ function mx_style_select($default_style, $select_name = "style", $dirname = "tem
 	{
 		$style_select .= '<option value="-1"' . $selected1 . '>' . $lang['Select_page_style'] . '</option>';
 	}			
-	
+	/*
 	while (!($row = $db->sql_fetchrow($result)))
 	{
 		$sql = "SELECT themes_id, style_name
@@ -1193,7 +1601,8 @@ function mx_style_select($default_style, $select_name = "style", $dirname = "tem
 		{
 			mx_message_die(GENERAL_ERROR, "Couldn't query themes table", "", __LINE__, __FILE__, $sql);
 		}
-	}	
+	}
+	*/
 	while ($row = $db->sql_fetchrow($result))
 	{
 		$id = $row['themes_id'];
@@ -2070,7 +2479,7 @@ function mx_this_url($args = '', $force_standalone_mode = false, $file = '')
  */
 function mx_session_start()
 {
-	global $board_config, $do_gzip_compress;
+	global $board_config, $do_gzip_compress, $mx_user, $mx_request_vars, $sid;
 
 	//
 	// Prevent from doing the job more than once.
@@ -2096,9 +2505,9 @@ function mx_session_start()
 	{
 		$phpver = phpversion();
 
-		$useragent = (isset($_SERVER['HTTP_USER_AGENT'])) ? $_SERVER['HTTP_USER_AGENT'] : getenv('HTTP_USER_AGENT');
+		$mx_useragent = (isset($_SERVER['HTTP_USER_AGENT'])) ? $_SERVER['HTTP_USER_AGENT'] : getenv('HTTP_USER_AGENT');
 
-		if ($phpver >= '4.0.4pl1' && (strstr($useragent,'compatible') || strstr($useragent,'Gecko')))
+		if ($phpver >= '4.0.4pl1' && (strstr($mx_useragent,'compatible') || strstr($mx_useragent,'Gecko')))
 		{
 			if (extension_loaded('zlib'))
 			{
@@ -2126,8 +2535,24 @@ function mx_session_start()
 	// Initialize PHP session
 	//
 	//phpinfo();
-	session_start();
-	//
+	//Security check
+	if(is_object($mx_request_vars) || !empty($mx_user->session_id))
+	{
+		// session id check
+		if (!$mx_request_vars->is_empty_request('sid'))
+		{
+			$sid = $mx_request_vars->request('sid', MX_TYPE_NO_TAGS, $mx_user->session_id);
+		}
+		session_id(strip_tags($sid));
+	}
+	// ok to try and start the session
+	if (!empty($sid))
+	{	
+		if (!session_start())
+		{
+			mx_message_die(GENERAL_ERROR, "Failed to start the session", '', __LINE__, __FILE__, $sid);
+		}
+	}	
 }
 
 /**
@@ -2151,12 +2576,12 @@ function get_page_id($search_item, $use_function_file = false, $get_page_data_ar
 	//
 	// Try to reuse results.
 	//
-	$cache_key = '_pagemap_block' . $search_item;
+	$mx_cache_key = '_pagemap_block' . $search_item;
 
 	$page_id_array = array();
-	if ( $mx_cache->_exists( $cache_key ) )
+	if ( $mx_cache->_exists( $mx_cache_key ) )
 	{
-		$page_id_array = unserialize( $mx_cache->get( $cache_key ) );
+		$page_id_array = unserialize( $mx_cache->get( $mx_cache_key ) );
 	}
 	else
 	{
@@ -2324,7 +2749,7 @@ function get_page_id($search_item, $use_function_file = false, $get_page_data_ar
 			$page_id_array['block_id'] = isset($p_row['block_id']) ? $p_row['block_id'] : 0;
 		}
 		unset($p_row);
-		$mx_cache->put( $cache_key, serialize($page_id_array) );
+		$mx_cache->put( $mx_cache_key, serialize($page_id_array) );
 	}
 	
 	if ( $get_page_data_array && !empty($page_id_array['page_id']) )
@@ -2464,6 +2889,30 @@ function mx_parent_data($block_id, $key = '')
 }
 
 /**
+ * Get MX-Publisher modules
+ *
+ * @return modules array
+ */
+function obtain_portal_modules()
+{
+	global $db;
+
+	$modules = array();
+
+	$sql = "SELECT * FROM " . MODULE_TABLE . " ORDER BY module_name";
+	if( !($result = $db->sql_query($sql)) )
+	{
+		mx_message_die(GENERAL_ERROR, "Couldn't obtain modules from database", '', __LINE__, __FILE__, $sql);
+	}
+	while ($row = $db->sql_fetchrow($result))
+	{
+		$modules[] = $row;
+	}
+	$db->sql_freeresult($result);
+	return $modules;
+}
+
+/**
  * Compose MX-Publisher copyrights and credits page.
  * @access public
  */
@@ -2484,7 +2933,7 @@ function compose_mx_copy()
 	$mx_module_copy = '<h1>' . $lang['mx_copy_title'] . '</h1><hr /><br />';
 	$mx_module_copy .= '<br />' . '<span class="maintitle">' . $lang['mx_copy_modules_title'] . '</span>';
 
-	for( $i = 0; $i < count($module); $i++ )
+	for( $i = 0; $i < $count = count($module); $i++ )
 	{
 		if( !empty($module[$i]['module_copy']) )
 		{
@@ -2714,28 +3163,28 @@ if( !function_exists('get_backtrace') )
 	 *
 	 * Creates missing config entry if needed.
 	 *
-	 * @param unknown_type $config_name
-	 * @param unknown_type $config_value
+	 * @param unknown_type $board_config_name
+	 * @param unknown_type $board_config_value
 	 * @param unknown_type $is_dynamic
 	 */
-	function mx_set_config($config_name, $config_value)
+	function mx_set_config($board_config_name, $board_config_value)
 	{
 		global $db, $mx_cache, $portal_config;
 
 		$sql = 'UPDATE ' . PORTAL_TABLE . "
-			SET config_value = '" . $db->sql_escape($config_value) . "'
-			WHERE config_name = '" . $db->sql_escape($config_name) . "'";
+			SET config_value = '" . $db->sql_escape($board_config_value) . "'
+			WHERE config_name = '" . $db->sql_escape($board_config_name) . "'";
 		$db->sql_query($sql);
 
-		if (!$db->sql_affectedrows() && !isset($portal_config[$config_name]))
+		if (!$db->sql_affectedrows() && !isset($portal_config[$board_config_name]))
 		{
 			$sql = 'INSERT INTO ' . PORTAL_TABLE . ' ' . $db->sql_build_array('INSERT', array(
-				'config_name'	=> $config_name,
-				'config_value'	=> $config_value));
+				'config_name'	=> $board_config_name,
+				'config_value'	=> $board_config_value));
 			$db->sql_query($sql);
 		}
 
-		$portal_config[$config_name] = $config_value;
+		$portal_config[$board_config_name] = $board_config_value;
 		$mx_cache->put( 'mxbb_config', $portal_config );
 	}
 }
@@ -3005,7 +3454,7 @@ function update_portal_backend($new_backend = PORTAL_BACKEND)
 	$dbcharacter_set = "uft8";
 
 	/*
-	$config = array(
+	$board_config = array(
 		'dbms'		=> $dbms,
 		'dbhost'		=> $dbhost,
 		'dbname'		=> $dbname,
@@ -3043,18 +3492,18 @@ function update_portal_backend($new_backend = PORTAL_BACKEND)
 
 	$process_msgs[] = 'Writing config ...<br />';
 
-	$config_data = "<"."?php\n\n";
-	$config_data .= "// $mx_portal_name auto-generated config file\n// Do not change anything in this file!\n\n";
-	$config_data .= "// This file must be put into the $mx_portal_name directory, not into the phpBB directory.\n\n";
-	$config_data .= '$'."dbms = '$dbms';\n\n";
-	$config_data .= '$'."dbhost = '$dbhost';\n";
-	$config_data .= '$'."dbname = '$dbname';\n";
-	$config_data .= '$'."dbuser = '$dbuser';\n";
-	$config_data .= '$'."dbpasswd = '$dbpasswd';\n\n";
-	$config_data .= '$'."mx_table_prefix = '$mx_table_prefix';\n\n";
-	$config_data .= "define('DBCHARACTER_SET', '$dbcharacter_set');\n\n";
-	$config_data .= "define('MX_INSTALLED', true);\n\n";
-	$config_data .= '?' . '>';	// Done this to prevent highlighting editors getting confused!
+	$board_config_data = "<"."?php\n\n";
+	$board_config_data .= "// $mx_portal_name auto-generated config file\n// Do not change anything in this file!\n\n";
+	$board_config_data .= "// This file must be put into the $mx_portal_name directory, not into the phpBB directory.\n\n";
+	$board_config_data .= '$'."dbms = '$dbms';\n\n";
+	$board_config_data .= '$'."dbhost = '$dbhost';\n";
+	$board_config_data .= '$'."dbname = '$dbname';\n";
+	$board_config_data .= '$'."dbuser = '$dbuser';\n";
+	$board_config_data .= '$'."dbpasswd = '$dbpasswd';\n\n";
+	$board_config_data .= '$'."mx_table_prefix = '$mx_table_prefix';\n\n";
+	$board_config_data .= "define('DBCHARACTER_SET', '$dbcharacter_set');\n\n";
+	$board_config_data .= "define('MX_INSTALLED', true);\n\n";
+	$board_config_data .= '?' . '>';	// Done this to prevent highlighting editors getting confused!
 
 	@umask(0111);
 	@chmod($mx_root_path . "config.$phpEx", 0644);
@@ -3063,10 +3512,10 @@ function update_portal_backend($new_backend = PORTAL_BACKEND)
 	{
 		$process_msgs[] = "Unable to write config file " . $mx_root_path . "config.$phpEx" . "<br />\n";
 	}
-	$result = @fputs($fp, $config_data, strlen($config_data));
+	$result = @fputs($fp, $board_config_data, strlen($board_config_data));
 	@fclose($fp);
 
-	$process_msgs[] = '<span style="color:pink;">'.str_replace("\n", "<br />\n", htmlspecialchars($config_data)).'</span>';
+	$process_msgs[] = '<span style="color:pink;">'.str_replace("\n", "<br />\n", htmlspecialchars($board_config_data)).'</span>';
 
 	$message = '<hr />';
 	for( $i=0; $i < count($process_msgs); $i++ )
@@ -3119,11 +3568,13 @@ function t($string, array $args = array(), array $options = array())
 {
 	global $lang, $mx_cache, $mx_user, $board_config;
 	static $lang_string;
+	
 	// Merge in default.
 	if (empty($options['langcode']))
 	{
 		$options['langcode'] = isset($lang['USER_LANG']) ? $lang['USER_LANG'] : $mx_user->encode_lang($board_config['default_lang']);
 	}
+	
 	if (!empty($lang[$string]))
 	{
 		$lang_string = $lang[$string];
@@ -3132,6 +3583,7 @@ function t($string, array $args = array(), array $options = array())
 	{
 		$lang_string = $string;
 	}
+	
 	if (empty($args))
 	{
 		return $lang_string;

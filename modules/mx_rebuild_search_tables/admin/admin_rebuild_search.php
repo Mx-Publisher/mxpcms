@@ -34,8 +34,7 @@ require_once($mx_root_path . 'admin/pagestart.' . $phpEx);
 
 switch (PORTAL_BACKEND)
 {
-	case 'internal':
-	case 'phpbb3':
+	default:
 		mx_message_die(GENERAL_MESSAGE, 'This feature is designed for MX-Publisher with phpBB2 backend, thus not compatible with current setup.');
 	
 	break;

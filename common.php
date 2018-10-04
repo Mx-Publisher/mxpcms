@@ -33,8 +33,9 @@ define('INCLUDES', 'includes/'); //Main Includes folder
 @ini_set('display_errors', '1');
 //@error_reporting(E_ERROR | E_WARNING | E_PARSE); // This will NOT report uninitialized variables
 //@error_reporting(E_ALL & ~E_NOTICE); //Default error reporting in PHP 5.2+
-//@session_cache_expire (1440);
-//@set_time_limit (0);
+error_reporting(E_ALL | E_NOTICE | E_STRICT);
+@session_cache_expire (1440);
+@set_time_limit (1500);
 //include($mx_root_path . 'modules/mx_shared/ErrorHandler/prepend.' . $phpEx); // For nice error output
 
 // ================================================================================
@@ -112,6 +113,11 @@ function deregister_globals()
 
 	unset($input);
 }
+/**
+* Minimum Requirement: PHP 7.3.0
+* const PHP_VERSION (PHP 4 >= 4.1.0, PHP 5, PHP 7)
+*/
+@define('PHP_VERSION_MX', PHP_VERSION); 
 
 // If we are on PHP >= 6.0.0 we do not need some code
 if (version_compare(PHP_VERSION, '5.3.0', '>='))
@@ -167,11 +173,123 @@ if (isset($HTTP_SESSION_VARS) && !is_array($HTTP_SESSION_VARS))
 	die("Hacking attempt");
 }
 
-/*
-* Define some basic configuration arrays this also prevents
-* malicious rewriting of language and otherarray values via
-* URI params
-*/
+if (@ini_get('register_globals') == '1' || strtolower(@ini_get('register_globals')) == 'on')
+{
+	// PHP4+ path
+	$not_unset = array('_GET', '_POST', '_COOKIE', '_SERVER', '_SESSION', '_ENV', '_POST', 'phpEx', 'phpbb_root_path', 'mx_root_path');
+
+	// Not only will array_merge give a warning if a parameter
+	// is not an array, it will actually fail. So we check if
+	// _SESSION has been initialised.
+	if (!isset($_SESSION) || !is_array($_SESSION))
+	{
+		$_SESSION = array();
+	}
+
+	// Merge all into one extremely huge array; unset
+	// this later
+	//
+	// Note! Since array_merge() destroys numerical keys - if the array is numerically indexed, the keys get reindexed in a continuous way - we use the + operator instead
+	//
+	//$input = array_merge($_GET, $_POST, $_COOKIE, $_SERVER, $_SESSION, $_ENV, $_POST);
+	$input = $_GET + $_POST + $_COOKIE + $_SERVER + $_SESSION + $_ENV + $_POST;
+
+	unset($input['input']);
+	unset($input['not_unset']);
+
+	while (list($var,) = @each($input))
+	{
+		if (in_array($var, $not_unset))
+		{
+			die('Hacking attempt!');
+		}
+		unset($$var);
+	}
+	unset($input);
+}
+
+//
+// addslashes to vars if magic_quotes_gpc is off
+// this is a security precaution to prevent someone
+// trying to break out of a SQL statement.
+//
+// If we are on PHP >= 6.0.0 we do not need some code
+if ( (@phpversion() < '5.3.0') or ( @function_exists('get_magic_quotes_gpc') && !@get_magic_quotes_gpc() ) )
+{
+	if( is_array($_GET) )
+	{
+		while( list($k, $v) = each($_GET) )
+		{
+			if( is_array($_GET[$k]) )
+			{
+				while( list($k2, $v2) = each($_GET[$k]) )
+				{
+					$_GET[$k][$k2] = addslashes($v2);
+				}
+				@reset($_GET[$k]);
+			}
+			else
+			{
+				$_GET[$k] = addslashes($v);
+			}
+		}
+		@reset($_GET);
+	}
+
+	if( is_array($_POST) )
+	{
+		while( list($k, $v) = each($_POST) )
+		{
+			if( is_array($_POST[$k]) )
+			{
+				while( list($k2, $v2) = each($_POST[$k]) )
+				{
+					$_POST[$k][$k2] = addslashes($v2);
+				}
+				@reset($_POST[$k]);
+			}
+			else
+			{
+				$_POST[$k] = addslashes($v);
+			}
+		}
+		@reset($_POST);
+	}
+
+	if( is_array($_COOKIE) )
+	{
+		while( list($k, $v) = each($_COOKIE) )
+		{
+			if( is_array($_COOKIE[$k]) )
+			{
+				while( list($k2, $v2) = each($_COOKIE[$k]) )
+				{
+					$_COOKIE[$k][$k2] = addslashes($v2);
+				}
+				@reset($_COOKIE[$k]);
+			}
+			else
+			{
+				$_COOKIE[$k] = addslashes($v);
+			}
+		}
+		@reset($_COOKIE);
+	}
+}
+
+//
+// Temp fix for timezone
+//
+if (@function_exists('date_default_timezone_set') && @function_exists('date_default_timezone_get'))
+{
+	@date_default_timezone_set(@date_default_timezone_get());
+}
+
+//
+// Define some basic configuration arrays this also prevents
+// malicious rewriting of language and otherarray values via
+// URI params
+//
 $board_config = array();
 $portal_config = array();
 $userdata = array();
@@ -205,6 +323,8 @@ require($mx_root_path . INCLUDES . 'db/' . $dbms . '.' . $phpEx); // Load dbal a
 require($mx_root_path . INCLUDES . 'utf/utf_tools.' . $phpEx); //Load UTF-8 Tools
 require($mx_root_path . INCLUDES . 'mx_functions_core.' . $phpEx); // CORE class
 
+require($mx_root_path . 'vendor/paragonie/random_compat/lib/random.' . $phpEx);
+
 // Setup class loader first
 if (@phpversion() >= '5.1.2')
 {
@@ -225,7 +345,6 @@ $mx_request_vars = new mx_request_vars();
 */
 $mx_cache = new mx_cache();
 
-
 /*
 * Define Users/Group/Sessions backend, and validate
 * Set $portal_config, $phpbb_root_path, $tplEx, $table_prefix & PORTAL_BACKEND
@@ -238,6 +357,26 @@ if (@function_exists('date_default_timezone_set') && @function_exists('date_defa
 {
 	@date_default_timezone_set(@date_default_timezone_get());
 }
+
+//
+// instatiate the mx_backend class
+//
+$mx_backend = new mx_backend();
+
+//
+// Define some general backend definitions
+// PORTAL_URL, PHPBB_URL, PORTAL_VERSION & $board_config
+//
+$mx_backend->setup_backend();
+
+//
+// Instantiate Dummy phpBB Classes
+//
+if( class_exists('phpBB2'))
+{
+	$phpBB2 = new phpBB2();
+}
+$phpBB3 = new phpBB3();
 
 //
 // MX-Publisher Includes - doing the rest
@@ -258,6 +397,12 @@ $mx_cache->init_mod_rewrite();
 //
 $mx_user = new mx_user();
 
+/**
+* Instantiate the mx_language class
+* $language->_load_lang($mx_root_path, 'lang_main');
+*/
+$language = new mx_language();
+
 //
 // Instantiate the mx_page (CORE) class
 //
@@ -271,14 +416,8 @@ $mx_block = new mx_block();
 //
 // Obtain and encode users IP
 //
-$client_ip = ( !empty($_SERVER['REMOTE_ADDR']) ) ? $_SERVER['REMOTE_ADDR'] : ( ( !empty($_ENV['REMOTE_ADDR']) ) ? $_ENV['REMOTE_ADDR'] : getenv('REMOTE_ADDR') );
-$user_ip = phpBB2::encode_ip($client_ip);
-
-//
-// Define some general backend definitions
-// PORTAL_URL, PHPBB_URL, PORTAL_VERSION & $board_config
-//
-$mx_backend->setup_backend();
+$client_ip = (!empty($_SERVER['REMOTE_ADDR'])) ? $_SERVER['REMOTE_ADDR'] : ((!empty($_ENV['REMOTE_ADDR'])) ? $_ENV['REMOTE_ADDR'] : getenv('REMOTE_ADDR'));
+$user_ip = $phpBB2->encode_ip($client_ip);
 
 //
 // Instantiate the mx_bbcode class
@@ -320,4 +459,5 @@ if(!empty($portal_config['board_disable']) && !defined("IN_ADMIN") && !defined("
 $do_gzip_compress = FALSE;
 
 mx_session_start();			// Note: this needs $board_config populated
+
 ?>

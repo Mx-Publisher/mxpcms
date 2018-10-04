@@ -574,7 +574,8 @@ for($page_count = -1; $page_count < $total_pages; $page_count++)
 	$page_header = !$new_page ? $page_rows[$page_count]['page_header'] : 'overall_header_navigation.html';
 	$page_footer = !$new_page ? $page_rows[$page_count]['page_footer'] : 'overall_footer.html';
 	$page_main_layout = !$new_page ? $page_rows[$page_count]['page_main_layout'] : 'mx_main_layout.html';
-	$navigation_block_list = get_list_formatted('block_list', $page_main_layout, 'navigation_block', 'mx_menu_nav.' . $phpEx);
+	//$navigation_block_list = get_list_formatted('block_list', $page_main_layout, 'navigation_block', 'mx_menu_nav.' . $phpEx);
+	$navigation_block_list = get_list_formatted('block_list', $portal_config['navigation_block'], 'navigation_block', 'mx_menu_nav.' . $phpEx, false, 'mx_site_nav.' . $phpEx);	
 	$default_style = !$new_page ? $page_rows[$page_count]['default_style'] : '_core';
 	$style_select = mx_style_select($default_style, 'mx_default_style', 'templates', true);
 

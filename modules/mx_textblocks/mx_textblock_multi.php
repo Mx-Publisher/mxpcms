@@ -33,9 +33,18 @@ if ($mx_page->is_virtual)
 //
 // Read Block Settings
 //
+$show_title = $mx_block->block_info['show_title'];
 $title = $mx_block->block_info['block_title'];
-$message = $mx_block->get_parameters( 'Text' );
+$desc = $mx_block->block_info['block_desc'];
 
+$block_style = $mx_block->block_parameters['block_style'];
+$text_style = $mx_block->block_parameters['text_style'];
+$title_style = $mx_block->block_parameters['title_style'];
+
+/** Debug Block Configuration in MXP 2.7 **/
+$message = $mx_block->get_parameters('Text');
+/** **/
+print_r($message);
 $block_style = $mx_block->get_parameters( 'block_style' );
 $text_style = $mx_block->get_parameters( 'text_style' );
 $title_style = $mx_block->get_parameters( 'title_style' );
@@ -55,7 +64,7 @@ if (is_object($mx_page))
 	// - LANG: MX_LANG_MAIN (default), MX_LANG_ADMIN, MX_LANG_ALL, MX_LANG_NONE
 	// - IMAGES: MX_IMAGES (default), MX_IMAGES_NONE
 	// -------------------------------------------------------------------------
-	$mx_user->extend(MX_LANG_MAIN, MX_IMAGES_NONE);
+	//$mx_user->extend(MX_LANG_MAIN, MX_IMAGES_NONE);
 	$mx_page->add_copyright( 'MX-Publisher Knowledge Base Module' );
 }
 
@@ -79,7 +88,7 @@ $mx_text->init($allow_html, $allow_bbcode, $allow_smilies); // Note: allowed_htm
 // Decode for display
 //
 $title = $mx_text->display_simple($title);
-$message = $mx_text->display($message, $mx_block->get_parameters( 'Text', MX_GET_PAR_OPTIONS ));
+//$message = $mx_text->display($message, $mx_block->get_parameters( 'Text', MX_GET_PAR_OPTIONS ));
 
 //
 // Start output of page
@@ -102,6 +111,9 @@ if( $show_title == 'TRUE' )
 
 $block_style = ( ( $block_style == '' ) || ( $block_style == 'FALSE' ) ) ? '' : 'forumline';
 $text_style = ( ( $text_style == '' ) || ( $text_style == 'none' ) ) ? 'genmed' : $text_style;
+
+$s_hidden_fields = '<input type="hidden" name="sid" value="' . $userdata['session_id'] . '" />';
+$s_hidden_fields .= '<input type="hidden" name="block_id" value="' . $block_id . '" />';
 
 $template->assign_vars(array(
 	'BLOCK_SIZE' => ( !empty($block_size) ? $block_size : '100%' ),

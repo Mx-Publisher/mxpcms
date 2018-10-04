@@ -421,7 +421,7 @@ class mx_blockcp extends mx_block
 			/*
 			* PRIVATE auth
 			*/
-			
+			$groupdata = array();
 			// Get the list of phpBB usergroups
 			$sql = $mx_backend->generate_group_select_sql();
 			if( !($result = $db->sql_query($sql)) )
@@ -441,7 +441,7 @@ class mx_blockcp extends mx_block
 			$moderator_groups = @explode(',', $this->block_info['auth_moderator_group']);
 			
 			$row_private = '';
-			for( $i = 0; $i < count($groupdata); $i++ )
+			for( $i = 0; $i < $count = count($groupdata); $i++ )
 			{
 				$row_color = ( !( $i % 2 ) ) ? 'row1' : 'row2';
 				$row_private .= '<tr>';

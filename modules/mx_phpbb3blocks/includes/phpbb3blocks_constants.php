@@ -25,7 +25,7 @@ switch (PORTAL_BACKEND)
 	case 'phpbb3':
 	case 'olympus':
 	case 'ascraeus':
-	
+	default:	
 	break;
 }
 

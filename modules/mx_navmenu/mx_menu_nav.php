@@ -214,7 +214,7 @@ foreach($navCategory as $cat_id => $catData)
 			case 'phpbb3':
 			case 'olympus':
 			case 'ascraeus':
-			case 'rhea':
+			default:
 				$mx_bbcode = new mx_bbcode(base64_encode($bbcode_bitfield));
 			break;				
 		}		

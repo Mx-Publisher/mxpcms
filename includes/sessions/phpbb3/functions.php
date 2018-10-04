@@ -228,6 +228,7 @@ function mx_get_username_string($mode, $user_id, $username, $username_colour = '
 
 	switch ($mode)
 	{
+		case 'profile_url':		
 		case 'profile':
 			return $profile_url;
 		break;

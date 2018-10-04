@@ -4,6 +4,9 @@
 <!-- BEGIN olist_open --><ol type="{LIST_TYPE}"><!-- END olist_open -->
 <!-- BEGIN olist_close --></ol><!-- END olist_close -->
 
+<!-- BEGIN mlist_open --><ml style="list-style-type: {LIST_TYPE}"><!-- END olist_open -->
+<!-- BEGIN mlist_close --></ml><!-- END olist_close -->
+
 <!-- BEGIN listitem --><li><!-- END listitem -->
 
 <!-- BEGIN quote_username_open --></span>
@@ -37,13 +40,6 @@
 </table>
 <span class="postbody"><!-- END code_close -->
 
-<!-- BEGIN inline_attachment_open -->
-<div class="attachtitle">{L_ATTACHMENT}:</div><div class="attachcontent">
-<!-- END inline_attachment_open -->
-
-<!-- BEGIN inline_attachment_close -->
-</div>
-<!-- END inline_attachment_close -->
 
 <!-- BEGIN b_open --><span style="font-weight: bold"><!-- END b_open -->
 <!-- BEGIN b_close --></span><!-- END b_close -->
@@ -66,6 +62,48 @@
 
 <!-- BEGIN email --><a href="mailto:{EMAIL}">{EMAIL}</a><!-- END email -->
 
+<!-- BEGIN table --><div class="forumbg forumbg-table tables1 {IDENTIFIER}" style="width: {NUMBER}%"><div class="inner"><table class="table1">{TEXT}</table></div></div><!-- END table -->	
+<!-- BEGIN table_open -->
+<dl class="table1">
+<dt></dt>
+<dd>
+<table class="table1" onclick="selectCode(this); return false;">
+<!-- END table_open -->
+<!-- BEGIN table_close -->
+</table>
+</dd>
+</dl>
+<!-- END table_close -->
+<!-- BEGIN tr --><tr class="{IDENTIFIER}">{TEXT}</tr><!-- END tr -->	
+<!-- BEGIN th --><th class="{IDENTIFIER}" style="width: {NUMBER}%">{TEXT}</th><!-- END th -->	
+<!-- BEGIN td --><td class="{IDENTIFIER}" colspan="{NUMBER}">{TEXT}</td><!-- END td -->	
+<!-- BEGIN td_open --><td class="{IDENTIFIER}"><!-- END td_open -->
+<!-- BEGIN td_close --></td><!-- END td_close -->	
+<!-- BEGIN cell_open --><td style="{CELL}"><!-- END cell_open -->
+<!-- BEGIN cell_close --></td><!-- END cell_close -->
+<!-- BEGIN thead --><thead>{TEXT}</thead><!-- END thead -->
+<!-- BEGIN thead_open --><thead class="{IDENTIFIER}"><!-- END thead_open -->
+<!-- BEGIN thead_close --></thead><!-- END thead_close -->	
+<!-- BEGIN tbody --><tbody>{TEXT}</tbody><!-- END tbody -->
+<!-- BEGIN tbody_open --><tbody class="{IDENTIFIER}"><!-- END tbody_open -->
+<!-- BEGIN tbody_close --></tbody><!-- END tbody_close -->	
+<!-- BEGIN center --><div style="width: 100%;text-align: center">{TEXT}</div><!-- END center -->
+<!-- BEGIN center_open --><div style="width: 100%;text-align: center"><!-- END center_open  -->
+<!-- BEGIN center_close --></div><!-- END center_close  -->
+<!-- BEGIN align --><span style="text-align:{IDENTIFIER}; display:block;">{TEXT}</span><!-- END align -->
+<!-- BEGIN marq_open --><marquee direction="{MARQ}" scrolldelay="120"><!-- END marq_open -->
+<!-- BEGIN marq_close --></marquee><!-- END marq_close -->
+<!-- BEGIN font_open --><span style="font-family:{FONT}"><!-- END font_open --> 
+<!-- BEGIN font_close --></span><!-- END font_close --> 	
+<!-- BEGIN float --><span style="float:{IDENTIFIER}">{TEXT}</span><!-- END float -->
+<!-- BEGIN float_open --><span style="float:{IDENTIFIER}"><!-- END float_open -->
+<!-- BEGIN float_close --></span><!-- END float_close -->				
+<!-- BEGIN fa_open --><i aria-hidden="true"><div class="icon fa-<!-- END fa_open -->
+<!-- BEGIN fa_close --> fa-fw"></div></i><!-- END fa_close -->
+<!-- BEGIN fa_logo_open --><i class="icon fa-<!-- END fa_logo_open -->
+<!-- BEGIN fa_logo_close --> fa-fw" aria-hidden="true" style="font-size: 60px;"></i><!-- END fa_logo_close -->
+<!-- BEGIN poet_open --><div tag='{POET}' style='display:none'><!-- END poet_open -->
+<!-- BEGIN poet_close --></div><script>doPoetry()</script><!-- END poet_close -->
 <!-- BEGIN flash --><!-- URL's used in the movie-->
 <!-- text used in the movie--> 
 <!-- --> 
@@ -91,6 +129,11 @@
 <a href="http://video.google.com/googleplayer.swf?docId={GVIDEOID}" target="_blank">http://video.google.com/videoplay?docid={GVIDEOID}</a><br />
 </div>
 <!-- END GVideo -->
+
+<!-- BEGIN ram -->
+<embed src="{song_detail.SONG_URL}" align="center" width="{song_detail.WIDTH}" height="{song_detail.HEIGHT}" type="audio/x-pn-realaudio-plugin" console="cons" controls="ControlPanel" autostart="false">
+</embed>
+<!-- END ram -->
 
 <!-- BEGIN youtube -->
 <div style="text-align:center;">
@@ -154,8 +197,16 @@ function iPaper(docId, access_key, height, width) {
 //-->
 </script>		
 <a title="View Article / Book" href="{URL}" style="margin: 12px auto 6px auto; font-family: Helvetica,Arial,Sans-serif; font-style: normal; font-variant: normal; font-weight: normal; font-size: 14px; line-height: normal; font-size-adjust: none; font-stretch: normal; -x-system-font: none; display: block; text-decoration: underline;">View Article / Book</a> 
-</div><br />
+</div>
 <!-- END ipaper -->
+
+<!-- BEGIN ipaper_open -->
+<div style="text-align:center;">
+</div>
+<!-- END ipaper_open -->
+<!-- BEGIN ipaper_close -->
+<br />
+<!-- END ipaper_close -->
 
 <!-- BEGIN stream -->
 <div style="text-align:center;">

@@ -605,11 +605,11 @@ window.onload = doOnLoadFunctions;
 
 									<table width="100%" cellpadding="0" cellspacing="0" border="0" align="center">
 										<!-- BEGIN is_page -->
-										
+										<!--
 										<tr>
 										  	<td class="cat" colspan="2" align="left" style="cursor:pointer;cursor:hand;" onclick="onMenuCatClick('{pages.PAGE_ID}','adminPageEdit_');">&nbsp;&nbsp;<img name="adminPageEdit_image_{pages.PAGE_ID}" src="{pages.IMG_URL_EDIT}" border="0" align="absmiddle">&nbsp;<span class="topictitle">{pages.L_TITLE_EDIT}</span></td>
 										</tr>
-										
+										-->
 										<!-- END is_page -->
 
 										<tr>
@@ -634,12 +634,8 @@ window.onload = doOnLoadFunctions;
 																  	<td><input type="text" size="45" name="page_desc" value="{pages.E_PAGE_DESC}" class="post" /></td>
 																</tr>
 																<tr>
-																  	<td width="50%" align="right" ><label for="page_parent">{L_PAGE_PARENT}</label></td>																	
-																  	<td>
-																	<dd>
-																		<select name="page_parent" id="page_parent" class="forminput post" value="{pages.E_PAGE_PARENT}"></select>																		
-																	</dd>
-																	</td>
+																  	<td width="50%" align="right" >{L_PAGE_PARENT}</td>
+																  	<td><select name="page_parent" class="forminput">{pages.E_PAGE_PARENT}" class="post" /></select></td>
 																</tr>
 																<tr>
 																  	<td width="50%" align="right" >{L_PAGE_HEADER}</td>

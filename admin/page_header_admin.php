@@ -57,6 +57,15 @@ if ( $board_config['gzip_compress'] )
 }
 **********/
 
+// Instantiate Dummy phpBB Classes
+if( class_exists('phpBB2'))
+{
+	$phpBB2 = new phpBB2();
+}
+if ( !isset($lang) )
+{
+	$lang = array();
+}
 $template->set_filenames(array('header' => 'admin/page_header.tpl'));
 
 // Format Timezone. We are unable to use array_pop here, because of PHP3 compatibility
@@ -77,7 +86,7 @@ $template->assign_vars(array(
 	'S_TIMEZONE' => sprintf($lang['All_times'], $l_timezone),
 	'S_LOGIN_ACTION' => mx_append_sid('../login.'.$phpEx),
 	'S_JUMPBOX_ACTION' => mx_append_sid('../viewforum.'.$phpEx),
-	'S_CURRENT_TIME' => sprintf($lang['Current_time'], phpBB2::create_date($board_config['default_dateformat'], time(), $board_config['board_timezone'])),
+	'S_CURRENT_TIME' => sprintf($lang['Current_time'], $phpBB2->create_date($board_config['default_dateformat'], time(), $board_config['board_timezone'])),
 	'S_CONTENT_DIRECTION' => $lang['DIRECTION'],
 	'S_CONTENT_ENCODING' => $lang['ENCODING'],
 	'S_CONTENT_DIR_LEFT' => $lang['LEFT'],
@@ -140,7 +149,6 @@ $template->assign_vars(array(
 
 	// Backend
 	'PHPBB' => !(PORTAL_BACKEND === 'internal'),
-
 	// Additional css for gecko browsers
 	'GECKO' => strstr($useragent, 'Gecko'),
 ));

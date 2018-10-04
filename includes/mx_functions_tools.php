@@ -2,7 +2,7 @@
 /**
 *
 * @package Tools
-* @version $Id: mx_functions_tools.php,v 1.69 2014/09/24 05:51:47 orynider Exp $
+* @version $Id: mx_functions_tools.php,v 1.67 2014/05/09 07:51:42 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
@@ -1080,26 +1080,26 @@ class mx_form
 				case "text": // text form
 					$item_label = $item[1];
 					$item_field = '<input type="text" name="' . $this->arrayname . '[' . $item[2] . ']" size="' . $item[3] . '" value="' . $item[4] . '" class="post">';
-					break;
+				break;
 				case "textarea": // textarea
 					$item_label = $item[1];
 					$item_field = '<textarea name="' . $this->arrayname . '[' . $item[2] . ']" class="post" wrap="on" cols="' . $item[3] . '" rows="' . $item[4] . '">' . $item[5] . '</textarea>';
-					break;
+				break;
 				case "password": // password
 					$item_label = $item[1];
 					$item_field = '<input type="password" name="' . $this->arrayname . '[' . $item[2] . ']" size="' . $item[3] . '" value="' . $item[4] . '" class="post">';
-					break;
+				break;
 				case "checkbox": // checkbox button
 					$item_label = $item[1];
 					if ( isset( $item[3] ) )
 						$item_field = '<input type="checkbox" name="' . $this->arrayname . '[' . $item[2] . ']" value="1" checked>';
 					else
 						$item_field = '<input type="checkbox" name="' . $this->arrayname . '[' . $item[2] . ']" value="1"';
-					break;
+				break;
 				case "select":
 					$item_label = $item[1];
 					$item_field = $item[2];
-					break;
+				break;
 				case "file": // file upload field
 					$item_label = $item[1];
 					$item_field = '<input type="file" name="' . $item[2] . '" size="' . $item[3] . '" class="post">';
@@ -1109,7 +1109,7 @@ class mx_form
 				case "hidden": // hidden fields
 					$item_label = '';
 					$item_field = '<input type="hidden" name="' . $this->arrayname . '[' . $item[1] . ']" value="' . $item[2] . '">';
-					break;
+				break;
 				case "submit": // defining the label for submit button
 					$submit = $item[1];
 					$submitname = $item[2];
@@ -1117,14 +1117,14 @@ class mx_form
 				case "delete": // delete button
 					$item_label = $item[1];
 					$item_field = $item[2];
-					break;
+				break;
 			}
 
 			if ( ! empty( $item_field ) )
 			{
 				$template->assign_block_vars( "rows", array( 'LABEL' => $item_label,
 						'FIELD' => $item_field,
-						));
+				));
 			}
 		}
 		$template->pparse( "body" );
@@ -1711,7 +1711,7 @@ define('MX_DELETED_NOTIFICATION'			, 14);
 
 /*
 * Includes
-*/
+/*
 if(!function_exists('prepare_message'))
 {
 	//include_once($mx_root_path . 'includes/shared/phpbb2/includes/functions_post.' . $phpEx);
@@ -1723,7 +1723,7 @@ if( !function_exists('add_search_words') )
 	//include_once($mx_root_path . 'includes/shared/phpbb2/includes/functions_search.' . $phpEx);
 	mx_cache::load_file('functions_search', 'phpbb2');
 }
-/*/
+*/
 
 /**
  * Class: mx_notification.
@@ -1946,20 +1946,17 @@ class mx_notification
 			$error_msg .= ( ( !empty($error_msg) ) ? '<br />' : '' ) . $lang['Empty_subject'];
 		}
 
-		if (!empty($this->message))
+		if ( !empty($this->message) )
 		{
-			if (!$error)
+			if ( !$error )
 			{
-				if ($this->bbcode_on)
+				if ( $this->bbcode_on )
 				{
 					$bbcode_uid = $mx_bbcode->make_bbcode_uid();
 				}
-				
-				if (method_exists($this, 'lookup'))
-				{
-					$privmsg_message = $this->prepare_message(addslashes($this->message), $this->html_on, $this->bbcode_on, $this->smilies_on, $bbcode_uid);
-					$privmsg_message = str_replace('\\\n', '\n', $privmsg_message);
-				}				
+
+				$privmsg_message = $this->prepare_message(addslashes($this->message), $this->html_on, $this->bbcode_on, $this->smilies_on, $bbcode_uid);
+				$privmsg_message = str_replace('\\\n', '\n', $privmsg_message);
 			}
 		}
 		else
@@ -3344,22 +3341,22 @@ class mx_custom_field
 				{
 					case INPUT:
 						$this->display_edit_input( $file_id, $field_id, $field_data );
-						break;
+					break;
 					case TEXTAREA:
 						$this->display_edit_textarea( $file_id, $field_id, $field_data );
-						break;
+					break;
 					case RADIO:
 						$this->display_edit_radio( $file_id, $field_id, $field_data );
-						break;
+					break;
 					case SELECT:
 						$this->display_edit_select( $file_id, $field_id, $field_data );
-						break;
+					break;
 					case SELECT_MULTIPLE:
 						$this->display_edit_select_multiple( $file_id, $field_id, $field_data );
-						break;
+					break;
 					case CHECKBOX:
 						$this->display_edit_checkbox( $file_id, $field_id, $field_data );
-						break;
+					break;
 				}
 
 				$return = true;
@@ -5757,13 +5754,13 @@ class mx_comments extends phpbb_posts
 				{
 					case USER_AVATAR_UPLOAD:
 						$poster_avatar = ( $board_config['allow_avatar_upload'] ) ? '<img src="' . $phpbb_root_path . $board_config['avatar_path'] . '/' . $this->comments_row['user_avatar'] . '" alt="" border="0" />' : '';
-						break;
+					break;
 					case USER_AVATAR_REMOTE:
 						$poster_avatar = ( $board_config['allow_avatar_remote'] ) ? '<img src="' . $this->comments_row['user_avatar'] . '" alt="" border="0" />' : '';
-						break;
+					break;
 					case USER_AVATAR_GALLERY:
 						$poster_avatar = ( $board_config['allow_avatar_local'] ) ? '<img src="' . $phpbb_root_path . $board_config['avatar_gallery_path'] . '/' . $this->comments_row['user_avatar'] . '" alt="" border="0" />' : '';
-						break;
+					break;
 				}
 			}
 
@@ -6026,13 +6023,13 @@ class mx_comments extends phpbb_posts
 				{
 					case USER_AVATAR_UPLOAD:
 						$poster_avatar = ( $board_config['allow_avatar_upload'] ) ? '<img src="' . $phpbb_root_path . $board_config['avatar_path'] . '/' . $this->comments_row['user_avatar'] . '" alt="" border="0" />' : '';
-						break;
+					break;
 					case USER_AVATAR_REMOTE:
 						$poster_avatar = ( $board_config['allow_avatar_remote'] ) ? '<img src="' . $this->comments_row['user_avatar'] . '" alt="" border="0" />' : '';
-						break;
+					break;
 					case USER_AVATAR_GALLERY:
 						$poster_avatar = ( $board_config['allow_avatar_local'] ) ? '<img src="' . $phpbb_root_path . $board_config['avatar_gallery_path'] . '/' . $this->comments_row['user_avatar'] . '" alt="" border="0" />' : '';
-						break;
+					break;
 				}
 			}
 

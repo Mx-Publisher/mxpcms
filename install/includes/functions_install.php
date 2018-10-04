@@ -1050,12 +1050,40 @@ function get_backend_info($config)
 	);
 }
 
-function get_phpbb_info($config, $backend = 'phpbb3')
+function get_phpbb_info($root_path, $backend = 'phpbb3', $phpbbversion = '3.0.14')
 {
+	$phpEx = substr(strrchr(__FILE__, '.'), 1);
+	$config = $root_path . "config.$phpEx";
+	//
 	if ((@include $config) === false)
 	{
 		install_die(GENERAL_ERROR, 'Configuration file ' . $config . ' couldn\'t be opened.');
 	}
+	//
+	if ((@include $root_path . "language/en/install.$phpEx") !== false)
+	{
+		$left_piece1 = explode('. You', $lang['CONVERT_COMPLETE_EXPLAIN']);	
+		$left_piece2 = explode('phpBB', $left_piece1[0]);
+		$phpbbversion = strrchr($left_piece2[1], ' ');
+		switch (true)
+		{
+			case (preg_match('/3.0/i', $phpbbversion)):
+				$backend = 'olympus';
+			break;
+			case (preg_match('/3.1/i', $phpbbversion)):
+				$backend = 'ascraeus';
+			break;
+			case (preg_match('/3.2/i', $phpbbversion)):
+				$backend = 'rhea';
+			break;			
+			case (preg_match('/3.3/i', $phpbbversion)):
+				$backend = 'proteus';
+			break;
+			case (preg_match('/4./i', $phpbbversion)):
+				$backend = 'phpbb4';
+			break;
+		}
+	}	
 	// Check the prefix length to ensure that index names are not too long and does not contain invalid characters
 	switch ($backend)
 	{
@@ -1071,7 +1099,8 @@ function get_phpbb_info($config, $backend = 'phpbb3')
 		break;
 		
 		case 'ascraeus':
-		case 'rhea':		
+		case 'rhea':
+		case 'proteus':		
 			$phpbb_adm_relative_path = (isset($phpbb_adm_relative_path)) ? $phpbb_adm_relative_path : 'adm/';
 			$dbms = get_keys_sufix($dbms);
 			$acm_type = get_keys_sufix($acm_type);
@@ -1089,31 +1118,29 @@ function get_phpbb_info($config, $backend = 'phpbb3')
 		'dbuser'		=> $dbuser,
 		'dbpasswd'		=> $dbpasswd,
 		'table_prefix'	=> $table_prefix,
-		'acm_type'		=> $acm_type ? $acm_type : '',		
+		'backend'		=> $backend,		
+		'version'		=> $phpbbversion,
+		'acm_type'		=> $acm_type ? $acm_type : '',
 		'status'		=> defined('PHPBB_INSTALLED') ? true : false,		
 	);
 }
 
 function get_smf_info($settings)
 {
-
 	if ((@include $settings) === false)
 	{
 		install_die(GENERAL_ERROR, 'Configuration file ' . $settings . ' couldn\'t be opened.');
-	}
-	
+	}	
 	// If we are on PHP < 5.0.0 we need to force include or we get a blank page
 	if (version_compare(PHP_VERSION, '5.0.0', '<')) 
 	{		
 		$db_type = str_replace('mysqli', 'mysql4', $db_type); //this version of php does not have mysqli extension and my crash the installer if finds a forum using this		
 	}
-
 	// If the UTF-8 setting was enabled, add it to the table definitions.
 	if ($db_character_set == 'utf8') 
 	{		
 		$db_type = str_replace('mysql', 'mysql4', $db_type);		
 	}	
-
 	return array(
 		'dbms'				=> $db_type, // 'mysql'
 		'dbhost'			=> $db_server, // 'localhost';
@@ -1202,14 +1229,14 @@ function get_phpbb_url($table_prefix, $portal_backend = 'internal')
 	$sql = 'SELECT config_name, config_value
 		FROM ' . $table_prefix . 'config'
 		. $were_sql;
-	if ( !($result = $db->sql_query($sql)) )
+	if (!($result = $db->sql_query($sql)))
 	{
 		if (!function_exists('mx_message_die'))
 		{
 			global $db;
-
+			
 			$sql = "SELECT * FROM ".$table_prefix."config";
-			if( !($result = $db->sql_query($sql)) )
+			if(!($result = $db->sql_query($sql)))
 			{
 				print("Couldnt query config information, Allso this hosting or server is using a cache optimizer not compatible with MX-Publisher or just lost connection to database wile query.");
 				return false;
@@ -1220,8 +1247,7 @@ function get_phpbb_url($table_prefix, $portal_backend = 'internal')
 			mx_message_die( GENERAL_ERROR, 'Couldnt query config information', '', __LINE__, __FILE__, $sql );
 		}
 	}
-
-	while ( $row = $db->sql_fetchrow($result) )
+	while ($row = $db->sql_fetchrow($result))
 	{
 		$board_config[$row['config_name']] = $row['config_value'];
 	}

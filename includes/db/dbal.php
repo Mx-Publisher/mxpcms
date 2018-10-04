@@ -8,12 +8,10 @@
 * @license http://opensource.org/licenses/gpl-license.php GNU Public License
 * @link http://mxpcms.sourceforge.net/
 *
+*
 */
 
-if ( !defined('IN_PORTAL') )
-{
-	die("Hacking attempt");
-}
+if (!defined('IN_PORTAL')) { die("Hacking attempt"); }
 
 /**
 * @package DBal
@@ -61,7 +59,97 @@ class dbal
 		$this->any_char = chr(0) . '%';
 		$this->one_char = chr(0) . '_';
 	}
+	
+	/**
+	* Gets the name of the sql layer.
+	*
+	* @return string
+	*/
+	public function get_sql_layer()
+	{
+		return $this->sql_layer;
+	}
 
+	/**
+	* Gets the name of the database.
+	*
+	* @return string
+	*/
+	public function get_db_name()
+	{
+		return $this->dbname;
+	}
+
+	/**
+	* Wildcards for matching any (%) character within LIKE expressions
+	*
+	* @return string
+	*/
+	public function get_any_char()
+	{
+		return $this->any_char;
+	}
+
+	/**
+	* Wildcards for matching exactly one (_) character within LIKE expressions
+	*
+	* @return string
+	*/
+	public function get_one_char()
+	{
+		return $this->one_char;
+	}
+
+	/**
+	* {@inheritdoc}
+	*/
+	public function get_db_connect_id()
+	{
+		return $this->db_connect_id;
+	}
+
+	/**
+	* {@inheritdoc}
+	*/
+	public function get_sql_error_triggered()
+	{
+		return $this->sql_error_triggered;
+	}
+
+	/**
+	* {@inheritdoc}
+	*/
+	public function get_sql_error_sql()
+	{
+		return $this->sql_error_sql;
+	}
+
+	/**
+	* {@inheritdoc}
+	*/
+	public function get_transaction()
+	{
+		return $this->transaction;
+	}
+
+	/**
+	* Gets the time spent into the queries
+	*
+	* @return int
+	*/
+	public function get_sql_time()
+	{
+		return $this->sql_time;
+	}
+
+	/**
+	* {@inheritdoc}
+	*/
+	public function get_sql_error_returned()
+	{
+		return $this->sql_error_returned;
+	}
+	
 	/**
 	* return on error or display error message
 	*/

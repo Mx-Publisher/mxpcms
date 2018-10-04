@@ -2,10 +2,10 @@
 /**
 *
 * @package utf
-* @version $Id: utf_tools.php,v 1.5 2013/06/28 15:33:27 orynider Exp $
+* @version $Id: utf_tools.php,v 1.2 2009/01/24 16:47:52 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team & (C) 2005 The phpBB Group
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://mxpcms.sourceforge.net/
+* @link http://mxpcms.sourceforge.net
 *
 */
 
@@ -911,7 +911,7 @@ function utf8_recode($string, $encoding)
 		return gb2312($string);
 	}
 
-	// Trigger an error?! Fow now just give bad data :-(
+	// Trigger an error?! Fow now just gives bad data :-(
 	trigger_error('Unknown encoding: ' . $encoding, E_USER_ERROR);
 	//return $string; // use utf_normalizer::cleanup() ?
 }
@@ -1662,9 +1662,14 @@ function utf8_case_fold_nfkc($text, $option = 'full')
 		global $mx_root_path, $phpEx;
 		include($mx_root_path . 'includes/utf/utf_normalizer.' . $phpEx);
 	}
-
+	
+	if( !is_object($utf_normalizer))
+	{
+		$utf_normalizer = new utf_normalizer();
+	}
+	
 	// convert to NFKC
-	utf_normalizer::nfkc($text);
+	$utf_normalizer->nfkc($text);
 
 	// FC_NFKC_Closure, http://www.unicode.org/Public/5.0.0/ucd/DerivedNormalizationProps.txt
 	$text = strtr($text, $fc_nfkc_closure);
@@ -1779,10 +1784,15 @@ function utf8_normalize_nfc($strings)
 		global $mx_root_path, $phpEx;
 		include($mx_root_path . 'includes/utf/utf_normalizer.' . $phpEx);
 	}
-
+	
+	if( !isset($utf_normalizer))
+	{
+		$utf_normalizer = new utf_normalizer();
+	}
+	
 	if (!is_array($strings))
 	{
-		utf_normalizer::nfc($strings);
+		$utf_normalizer->nfc($strings);
 	}
 	else if (is_array($strings))
 	{
@@ -1792,12 +1802,12 @@ function utf8_normalize_nfc($strings)
 			{
 				foreach ($string as $_key => $_string)
 				{
-					utf_normalizer::nfc($strings[$key][$_key]);
+					$utf_normalizer->nfc($strings[$key][$_key]);
 				}
 			}
 			else
 			{
-				utf_normalizer::nfc($strings[$key]);
+				$utf_normalizer->nfc($strings[$key]);
 			}
 		}
 	}

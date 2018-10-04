@@ -1,0 +1,221 @@
+/*  MX-Publisher and phpBB3 Style Sheet
+    --------------------------------------------------------------
+	Style name:		SwiftBlue
+	Based on style:	SwiftBlue Theme for phpBB2 by BitByBit, 	http://www.bitbybit.f2s.com
+	Original author:	OryNider, using subsilver2 Theme as a base
+	
+	 This is an alternative subsilver2 style with purple-blue colors.
+	
+	Copyright 2006 phpBB Group ( http://www.phpbb.com/ )
+    --------------------------------------------------------------
+*/
+
+@import url("./theme/stylesheet.css");
+
+
+/* General markup styles
+---------------------------------------- */
+* {
+	font-size: 100%;
+}
+
+body, div, p, th, td, li, dd {
+	voice-family: "\"}\"";
+	voice-family: inherit;
+}
+
+table {
+	text-align: justify;
+}
+
+html {
+	/* Always show a scrollbar for short pages - stops the jump when the scrollbar appears. non-ie browsers */
+	height: 100%;
+	margin-bottom: 1px;
+}
+
+body {
+	/* Text-Sizing with ems: http://www.clagnut.com/blog/348/ */
+	font-family: Helvetica, Lucida Grande, Verdana, Arial, sans-serif; 
+	margin:6px 10px;
+	padding:0;
+}
+
+/* General font families for common tags */
+font,th,td,p { font-family: Trebuchet MS, Lucida Grande, Verdana, Helvetica, Arial, sans-serif; }
+
+img {
+	border: 0;
+}
+
+h1 {
+	font-family: Trebuchet MS, Helvetica, sans-serif;
+	font-size: 1.70em;
+	font-weight: normal;
+}
+
+h2, caption {
+	font-family: Trebuchet MS, Helvetica, sans-serif;
+	font-size: 1.40em;
+	font-weight: normal;
+	text-align: left;
+	margin-top: 25px;
+}
+
+.rtl h2, .rtl caption {
+	text-align: right;
+}
+
+h3, h4 {
+	font-family: Trebuchet MS, Helvetica, sans-serif;
+	font-size: 1.20em;
+	text-decoration: none;
+	line-height: 1.20em;
+	margin-top: 25px;
+}
+
+p {
+	margin-bottom: 0.7em;
+	line-height: 1.40em;
+	font-size: 1em;
+}
+
+ul {
+	list-style: disc;
+	margin: 0 0 1em 2em;
+}
+
+.rtl ul {
+	margin: 0 2em 1em 0;
+}
+
+hr {
+	border: 0 none;
+	border-top: 1px dashed #999999;
+	margin-bottom: 5px;
+	padding-bottom: 5px;
+	height: 1px;
+}
+
+.small {
+	font-size: 0.9em;
+}
+
+/* This is the main table round all portal contents, use with .bodyline */
+.mx_main_table	{
+	align:center;
+}
+
+/* This is the outline table round the overall page header */
+.mx_header_table	{
+	border: 0.1em #006699 solid;
+}
+
+/* This is the outline table round the columns/blocks, that is the table below the header */
+.mx_body_table	{
+}
+
+/* This is the outer outline table round the blocks */
+.mx_graphborder	{
+}
+
+/* These are the main mx column styles */
+td.leftcol {
+}
+
+td.middlecol {
+}
+
+td.rightcol	{
+}
+
+/* This is the style used for the top page title. */
+.pagetitle	{
+	font-weight: bold;
+	font-size: 30px;
+	font-family: "Comic Sans MS", Verdana, Arial, Helvetica, sans-serif;
+	text-decoration: none;
+	line-height : 120%;
+	color : #000066;
+	font-variant: small-caps;
+	text-transform: capitalize;
+	letter-spacing: 5px;
+	vertical-align: 20%;
+}
+
+/* This is the style used for the top site title. */
+.sitetitle	{
+	font-family: Arial;
+	font-variant: small-caps;
+	font-weight: bolder;
+	font-size: 12pt;
+	color: #000066;
+}
+
+/* This is the style used for the top site description. */
+.sitetitle_desc	{
+	color: #006699;
+	font-size: 9px;
+}
+
+/* Customized hr below site title */
+hr.hrtop	{
+	height: 3px;
+	border: solid #000066 1px;
+	border-top-width: 1px;
+}
+
+/* For all contract/expand rollup buttons  */
+.mx_rollup_button	{
+	font-size: 11px;
+	margin: 0px;
+	padding: 0px;
+    cursor: pointer;
+    cursor: hand;
+}
+
+/* Form elements */
+form	{
+	margin-bottom: 0px;
+}
+
+/* Form elements */
+form.mx_editform	{
+	margin-bottom: 0px;
+	margin-top: 0px;
+}
+
+/* This is the border around numbers in pagination */
+.mx_pagination, .mx_pagination_sele, .mx_pagination_over	{
+	padding-left: 2px;
+	padding-right: 2px;
+	border-top: 1px solid #B0B0B0;
+	border-right: 1px solid #B0B0B0;
+	border-bottom: 1px solid #B0B0B0;
+	border-left: 1px solid #B0B0B0;
+	text-decoration: none;
+}
+
+.mx_pagination_sele	{
+	background-color: #E0E0E0;
+}
+.mx_pagination_over	{
+	background-color: #F0F0F0;
+}
+
+.shadow	{
+	color: #00AA00;
+	filter: DropShadow(Color=#660000, OffX=5, OffY=5, Positive=1);
+}
+img.shadow	{
+	color: #00AA00;
+	filter:progid:DXImageTransform.Microsoft.dropshadow(OffX=5, OffY=5, Color='gray', Positive='true');
+}
+
+/* TinyMCE specific rules */
+body.mceContentBody {
+	text-align: left;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	color: #000;
+   	background: #FFF;
+}

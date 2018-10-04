@@ -11,14 +11,14 @@
 
 if( !defined('IN_PORTAL') )
 {
-	die("Hacking attempt");
+	die('Hacking attempt @ line: ' . __LINE__ .' & file: '. basename(__FILE__));
 }
 
-define('IN_ADMIN', true);
+@define('IN_ADMIN', true);
 
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
 
-include_once($mx_root_path . 'common.' . $phpEx);
+include($mx_root_path . 'common.' . $phpEx);
 include_once($mx_root_path . 'includes/mx_functions_admincp.' . $phpEx);
 include_once($mx_root_path . 'includes/mx_functions_blockcp.' . $phpEx);
 

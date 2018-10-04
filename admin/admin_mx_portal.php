@@ -93,15 +93,30 @@ if( !empty($mode) )
 	$new['smtp_username'] 			= $mx_request_vars->post('smtp_username', MX_TYPE_NO_TAGS, '0');
 	$new['smtp_password'] 			= $mx_request_vars->post('smtp_password', MX_TYPE_NO_TAGS, '0');
 
-
-	$sql = "UPDATE  " . PORTAL_TABLE . " SET " . $db->sql_build_array('UPDATE', $new);
+	$sql = "UPDATE  " . PORTAL_TABLE . " SET " . $db->sql_build_array('UPDATE', utf8_normalize_nfc($new));
+	
 	if( !($db->sql_query($sql)) )
 	{
 		mx_message_die(GENERAL_ERROR, "Failed to update portal configuration ", "", __LINE__, __FILE__, $sql);
 	}
-
+	//print_r("Portal configuration update " . "<br />" . $sql);
 	$message = update_portal_backend($new['portal_backend']) ? "The CMS configuration file was upgraded ...<br /><br />" : update_portal_backend($new['portal_backend']);
 	
+	//
+	// Update MX-Publisher page/block cache
+	//
+	$mx_cache->trash(); // Empty cache folder
+	$mx_cache->update(); // Regenerate all page_ and block_ files
+
+	//
+	// Update config/custom cache
+	//
+	$mx_cache->tidy(); // Not really needed
+	$mx_cache->destroy('phpbb_config'); // Not really needed
+	$mx_cache->destroy('mxbb_config'); // Not really needed
+	$mx_cache->unload(); // Regenerate data_global.php
+
+	$message .= $lang['Cache_generate'] . "<br /><br />";
 	$mx_cache->put('mxbb_config', $new);
 	
 	$message .= $lang['Portal_Config_updated'] . "<br /><br />" . sprintf($lang['Click_return_portal_config'], "<a href=\"" . mx_append_sid("admin_mx_portal.$phpEx") . "\">", "</a>") . "<br /><br />" . sprintf($lang['Click_return_admin_index'], "<a href=\"" . mx_append_sid("index.$phpEx?pane=right") . "\">", "</a>");
@@ -111,19 +126,69 @@ if( !empty($mode) )
 
 $template->set_filenames(array( 'admin_portal' => 'admin/admin_mx_portal.'.$tplEx) );
 
+$top_phpbb_links_yes = ( $portal_config['top_phpbb_links'] == 1 ) ? 'checked="checked"' : '';
+$top_phpbb_links_no = ( $portal_config['top_phpbb_links'] == 0 ) ? 'checked="checked"' : '';
+
+$mx_use_cache_yes = ( $portal_config['mx_use_cache'] == 1 ) ? 'checked="checked"' : '';
+$mx_use_cache_no = ( $portal_config['mx_use_cache'] == 0 ) ? 'checked="checked"' : '';
+
+$mx_mod_rewrite_yes = ( $portal_config['mod_rewrite'] == 1 ) ? 'checked="checked"' : '';
+$mx_mod_rewrite_no = ( $portal_config['mod_rewrite'] == 0 ) ? 'checked="checked"' : '';
+
+$mx_portal_status_yes = ( $portal_config['portal_status'] == 1 ) ? 'checked="checked"' : '';
+$mx_portal_status_no = ( $portal_config['portal_status'] == 0 ) ? 'checked="checked"' : '';
+
+$disabled_message = $portal_config['disabled_message'];
+
+$phpbb_rel_path = substr( "$phpbb_root_path", 3 );
+
 $navigation_block_list = get_list_formatted('block_list', $portal_config['navigation_block'], 'navigation_block', 'mx_menu_nav.' . $phpEx, false, 'mx_site_nav.' . $phpEx);
 
-$portal_config['default_lang'] = $portal_config['default_lang'] == -1 ? $board_config['default_lang'] : $portal_config['default_lang'];
+$portal_version = $portal_config['portal_version'];
+$phpbb_version = isset($board_config['version']) ? '2' . $board_config['version'] : '0.0.0';
+
+$script_path = isset($portal_config['script_path']) ? $portal_config['script_path'] : $board_config['script_path'];
+$server_name = isset($portal_config['server_name']) ? $portal_config['server_name'] : $board_config['server_name'];
+
+$phpbb_script_path = $board_config['script_path'];
+$phpbb_server_name = $board_config['server_name'];
+
+
+$portal_config['default_lang'] = ($portal_config['default_lang'] == -1) ? $board_config['default_lang'] : $portal_config['default_lang'];
+
+// Default to phpBB default
 $portal_config['default_admin_style'] = $portal_config['default_admin_style'] == -1 ? $board_config['default_style'] : $portal_config['default_admin_style'];
 $portal_config['default_style'] = $portal_config['default_style'] == -1 ? $board_config['default_style'] : $portal_config['default_style'];
 $portal_config['override_user_style'] = $portal_config['override_user_style'] == -1 ? $board_config['override_user_style'] : $portal_config['override_user_style'];
 
-$portal_backend_select = get_list_static('portal_backend', array('internal' => 'Internal', 'phpbb2' => 'phpBB2', 'phpbb3' => 'phpBB3', 'olympus' => 'Olympus', 'ascraeus' => 'Ascraeus', 'smf2' => 'SMF2', 'mybb' => 'myBB'), $portal_config['portal_backend']);
+$portal_backend_select = get_list_static('portal_backend', 
+													array('internal' => 'Internal', 
+																'smf2' => 'SMF2', 
+																'mybb' => 'myBB', 
+																'phpbb2' => 'phpBB2', 
+																'phpbb3' => 'phpBB3', 
+																'olympus' => 'Olympus', 
+																'ascraeus' => 'Ascraeus',
+																'rhea' => 'Rhea',
+																'proteus' => 'Proteus',
+																'phpbb4' => 'phpBB4'
+																), 
+																$portal_config['portal_backend']);
 
 $style_select = mx_style_select($portal_config['default_style'], 'mx_default_style');
 $style_admin_select = mx_style_select($portal_config['default_admin_style'], 'mx_default_admin_style');
 
+if ( isset($mx_user->data['user_timezone']) )
+{
+	$portal_config['board_timezone'] = $board_config['board_timezone'] = $mx_user->data['user_timezone'];
+}
+else
+{
+	$portal_config['board_timezone'] = $board_config['board_timezone'];
+}
+
 $lang_select = mx_language_select($portal_config['default_lang'], 'default_lang', "language");
+
 $timezone_select = mx_tz_select($portal_config['board_timezone'], 'board_timezone');
 
 $current_phpbb_version = $mx_backend->get_phpbb_version(); // Empty if mxp is used standalone
@@ -164,36 +229,66 @@ $template->assign_vars(array(
 	"L_PORTAL_DESC" => $lang['Portal_Desc'], // Will override phpBB 'site_desc'
 	"PORTAL_DESC" => str_replace('"', '&quot;', $portal_config['portal_desc']),
 
-	"L_PORTAL_STATUS" => $lang['Portal_status'], // Will  override phpBB 'board_disable'
-	"L_PORTAL_STATUS_EXPLAIN" => $lang['Portal_status_explain'],
-	"S_PORTAL_STATUS_YES" => ( $portal_config['portal_status'] == 1 ) ? 'checked="checked"' : '',
-	"S_PORTAL_STATUS_NO" => ( $portal_config['portal_status'] == 0 ) ? 'checked="checked"' : '',
+	//"L_PORTAL_STATUS" => $lang['Portal_status'], // Will  override phpBB 'board_disable'
+	//"L_PORTAL_STATUS_EXPLAIN" => $lang['Portal_status_explain'],
+	//"S_PORTAL_STATUS_YES" => ( $portal_config['portal_status'] == 1 ) ? 'checked="checked"' : '',
+	//"S_PORTAL_STATUS_NO" => ( $portal_config['portal_status'] == 0 ) ? 'checked="checked"' : '',
 
-	"L_DISABLED_MESSAGE" => $lang['Disabled_message'], // Will  override phpBB3 'board_disable_msg'
-	"DISABLED_MESSAGE" => $portal_config['disabled_message'],
+	//"L_DISABLED_MESSAGE" => $lang['Disabled_message'], // Will  override phpBB3 'board_disable_msg'
+	//"DISABLED_MESSAGE" => $portal_config['disabled_message'],
 
 	"L_SERVER_NAME" => $lang['Server_name'],
 	"L_SERVER_NAME_EXPLAIN" => $lang['Server_name_explain'],
-	"SERVER_NAME" => $portal_config['server_name'],
+	"SERVER_NAME" => $server_name,
 
 	"L_SERVER_PORT" => $lang['Server_port'],
 	"L_SERVER_PORT_EXPLAIN" => $lang['Server_port_explain'],
-	"SCRIPT_PATH" => $portal_config['script_path'],
+	"SCRIPT_PATH" => $script_path,
 
 	"L_SCRIPT_PATH" => $lang['Script_path'],
 	"L_SCRIPT_PATH_EXPLAIN" => $lang['Script_path_explain'],
 	"SERVER_PORT" => $portal_config['server_port'],
 
-	"L_DATE_FORMAT" => $lang['Date_format'],
+	"L_DATE_FORMAT" => 'MXP' . $lang['Date_format'],
 	"L_DATE_FORMAT_EXPLAIN" => $lang['Date_format_explain'],
 	"DEFAULT_DATEFORMAT" => $portal_config['default_dateformat'],
 
-	"L_SYSTEM_TIMEZONE" => $lang['System_timezone'],
+	"L_SYSTEM_TIMEZONE" => 'MXP ' . $lang['System_timezone'],
 	"TIMEZONE_SELECT" => $timezone_select, // board_timezone
 
-	"L_ENABLE_GZIP" => $lang['Enable_gzip'],
+	"L_ENABLE_GZIP" => 'MXP ' . $lang['Enable_gzip'],
 	"GZIP_YES" => ( $portal_config['gzip_compress'] ) ? "checked=\"checked\"" : "",
 	"GZIP_NO" => ( !$portal_config['gzip_compress'] ) ? "checked=\"checked\"" : "",
+
+	"PORTAL_PHPBB_URL" => $portal_config['portal_phpbb_url'],
+	"OVERALL_HEADER" => $portal_config['overall_header'],
+	
+	"OVERALL_FOOTER" => $portal_config['overall_footer'],
+	"MAIN_LAYOUT" => $portal_config['main_layout'],
+	"NAVIGATION_BLOCK" => $navigation_block_list,
+
+	//"L_PHPBB_RELATIVE_PATH" => $lang['Phpbb_path'],
+	//"L_PHPBB_RELATIVE_PATH_EXPLAIN" => $lang['Phpbb_path_explain'],
+	//"PHPBB_RELATIVE_PATH" => $phpbb_rel_path,
+	
+	//"L_PORTAL_VERSION" => $lang['Portal_version'],
+	//"PORTAL_VERSION" => $portal_version,
+
+	"L_PHPBB_INFO" => $lang['PHPBB_info'],
+
+	//"L_PHPBB_SERVER_NAME" => $lang['PHPBB_server_name'],
+	//"PHPBB_SERVER_NAME" => $phpbb_server_name,
+	
+	//"L_PHPBB_SCRIPT_PATH" => $lang['PHPBB_script_path'],
+	//"PHPBB_SCRIPT_PATH" => $phpbb_script_path,
+	
+	//"L_PHPBB_VERSION" => $lang['PHPBB_version'],
+	//"PHPBB_VERSION" => $phpbb_version,
+
+	"L_TOP_PHPBB_LINKS" => $lang['Top_phpbb_links'] . "<br />" . $lang['Top_phpbb_links_explain'],
+	"S_TOP_PHPBB_LINKS_YES" => $top_phpbb_links_yes,
+	"S_TOP_PHPBB_LINKS_NO" => $top_phpbb_links_no,
+	"TOP_PHPBB_LINKS" => $portal_config['top_phpbb_links'],
 
 	"L_MX_USE_CACHE" => $lang['Mx_use_cache'],
 	"L_MX_USE_CACHE_EXPLAIN" => $lang['Mx_use_cache_explain'],
@@ -260,19 +355,30 @@ $template->assign_vars(array(
 	//
 	// User & Styling
 	//
+	"L_DEFAULT_LANG" => $lang['Default_language'] . ' (' . $mx_user->lang_name . '/' . $portal_config['default_lang'] . ') ',
 	"L_DEFAULT_LANGUAGE" => $lang['Default_language'],
 	"LANG_SELECT" => $lang_select,
 
-	"L_DEFAULT_STYLE" => $lang['Default_style'],
-	"STYLE_SELECT" => $style_select,
+	"L_DEFAULT_STYLE" => $lang['Default_style'] . ' (' . $portal_config['default_style'] . ') ',
 
-	"L_DEFAULT_ADMIN_STYLE" => $lang['Default_admin_style'],
-	"ADMIN_STYLE_SELECT" => $style_admin_select,
-
+	"L_DEFAULT_ADMIN_STYLE" => $lang['Default_admin_style'] . ' (' . $portal_config['default_admin_style'] . ') ',
+	
 	"L_OVERRIDE_STYLE" => $lang['Override_style'],
 	"L_OVERRIDE_STYLE_EXPLAIN" => $lang['Override_style_explain'],
+	
+	"STYLE_SELECT" => $style_select,	
+	"ADMIN_STYLE_SELECT" => $style_admin_select,
+
 	"OVERRIDE_STYLE_YES" => ( $portal_config['override_user_style'] ) ? "checked=\"checked\"" : "",
 	"OVERRIDE_STYLE_NO" => ( !$portal_config['override_user_style'] ) ? "checked=\"checked\"" : "",
+
+	"L_MX_MOD_REWRITE" => $lang['Mx_mod_rewrite'],
+	"L_MX_MOD_REWRITE_EXPLAIN" => $lang['Mx_mod_rewrite_explain'],
+	"S_MX_MOD_REWRITE_YES" => $mx_mod_rewrite_yes,
+	"S_MX_MOD_REWRITE_NO" => $mx_mod_rewrite_no,
+	"MX_MOD_REWRITE" => $portal_config['mod_rewrite'],
+	
+	
 
 	"L_OVERALL_HEADER" => $lang['Portal_Overall_header'] . "<br />" . $lang['Portal_Overall_header_explain'],
 	"OVERALL_HEADER" => $portal_config['overall_header'],
@@ -346,6 +452,14 @@ $template->assign_vars(array(
 	"L_PHPBB_RELATIVE_PATH" => $lang['Phpbb_path'],
 	"L_PHPBB_RELATIVE_PATH_EXPLAIN" => $lang['Phpbb_path_explain'],
 	"PHPBB_RELATIVE_PATH" => substr( "$phpbb_root_path", 3 ),
+
+	"L_PORTAL_STATUS" => $lang['Portal_status'],
+	"L_PORTAL_STATUS_EXPLAIN" => $lang['Portal_status_explain'],
+	"S_PORTAL_STATUS_YES" => $mx_portal_status_yes,
+	"S_PORTAL_STATUS_NO" => $mx_portal_status_no,
+
+	"L_DISABLED_MESSAGE" => $lang['Disabled_message'],
+	"DISABLED_MESSAGE" => $disabled_message,
 
 	"L_PHPBB_SERVER_NAME" => $lang['PHPBB_server_name'],
 	"PHPBB_SERVER_NAME" => $board_config['server_name'],

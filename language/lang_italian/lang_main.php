@@ -64,6 +64,13 @@ $lang['Submit'] = 'Invia';
 $lang['Reset'] = 'Azzera';
 $lang['Cancel'] = 'Cancella';
 $lang['Preview'] = 'Anteprima';
+
+$lang['MX_home'] = 'Caza';
+$lang['MX_forum'] = 'Forum';
+$lang['MX_navigation'] = 'Pages navigation, eg. forum navigation, like pafiledb navigation.';	
+
+
+
 //
 // Timezones ... for display on each page
 //
@@ -224,6 +231,7 @@ $lang['Block_Title'] = 'Titolo';
 $lang['Block_Info'] = 'Informazione';
 
 $lang['Block_Config_updated'] = 'Configurazione blocco aggiornata correttamente.';
+$lang['Edit'] = 'EDITA';
 $lang['Block_Edit'] = 'Edita Blocco';
 $lang['Block_Edit_dyn'] = 'Edita blocco dinamico contenitore';
 $lang['Block_Edit_sub'] = 'Edita blocco affiancato contenitore';

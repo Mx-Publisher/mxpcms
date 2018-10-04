@@ -96,9 +96,9 @@ switch( $mode )
 			{
 				while( $sub_dir = @readdir($dir) )
 				{
-					if( !is_file(phpBB2::phpbb_realpath($mx_root_path . 'templates/' .$sub_dir)) && !is_link(phpBB2::phpbb_realpath($mx_root_path . 'templates/' .$sub_dir)) && $sub_dir != "." && $sub_dir != ".." && $sub_dir != "CVS" )
+					if( !is_file($phpBB2->phpbb_realpath($mx_root_path . 'templates/' .$sub_dir)) && !is_link($phpBB2->phpbb_realpath($mx_root_path . 'templates/' .$sub_dir)) && $sub_dir != "." && $sub_dir != ".." && $sub_dir != "CVS" )
 					{
-						if( @file_exists(@phpBB2::phpbb_realpath($mx_root_path. "templates/" . $sub_dir . "/$sub_dir.cfg")) )
+						if( @file_exists($phpBB2->phpbb_realpath($mx_root_path. "templates/" . $sub_dir . "/$sub_dir.cfg")) )
 						{
 							@include($mx_root_path. "templates/" . $sub_dir . "/$sub_dir.cfg");
 
@@ -132,7 +132,7 @@ switch( $mode )
 					"L_STYLES_TITLE" => $lang['Styles_admin'],
 					"L_STYLES_ADD_TEXT" => $lang['Styles_addnew_explain'],
 					"L_STYLE" => $lang['Style'],
-					//"L_TEMPLATE" => $lang['Template'],
+					"L_TEMPLATE" => $lang['Template'],
 					"L_INSTALL" => $lang['Install'],
 					"L_ACTION" => $lang['Action'])
 				);
@@ -146,7 +146,7 @@ switch( $mode )
 						"ROW_CLASS" => $row_class,
 						"ROW_COLOR" => "#" . $row_color,
 						"STYLE_NAME" => $installable_themes[$i]['style_name'],
-						//"TEMPLATE_NAME" => $installable_themes[$i]['template_name'],
+						"TEMPLATE_NAME" => $installable_themes[$i]['template_name'],
 
 						"U_STYLES_INSTALL" => mx_append_sid("admin_mx_styles.$phpEx?mode=addnew&amp;style=" . urlencode($installable_themes[$i]['style_name']) . "&amp;install_to=" . urlencode($installable_themes[$i]['template_name'])))
 					);
@@ -204,13 +204,15 @@ switch( $mode )
 			{
 				mx_message_die(GENERAL_ERROR, "Could not remove style data!", "", __LINE__, __FILE__, $sql);
 			}
-
-			$sql = "UPDATE " . USERS_TABLE . "
-				SET user_style = " . $board_config['default_style'] . "
-				WHERE user_style = $style_id";
-			if(!$result = $db->sql_query($sql, END_TRANSACTION))
+			if (PORTAL_BACKEND !== 'internal')
 			{
-				mx_message_die(GENERAL_ERROR, "Could not update user style information", "", __LINE__, __FILE__, $sql);
+				$sql = "UPDATE " . USERS_TABLE . "
+					SET user_style = " . $board_config['default_style'] . "
+					WHERE user_style = $style_id";
+				if (!$result = $db->sql_query($sql, END_TRANSACTION))
+				{
+					mx_message_die(GENERAL_ERROR, "Could not update user style information", "", __LINE__, __FILE__, $sql);
+				}
 			}
 
 			$message = $lang['Style_removed'] . "<br /><br />" . sprintf($lang['Click_return_styleadmin'], "<a href=\"" . mx_append_sid("admin_mx_styles.$phpEx") . "\">", "</a>") . "<br /><br />" . sprintf($lang['Click_return_admin_index'], "<a href=\"" . mx_append_sid("index.$phpEx?pane=right") . "\">", "</a>");

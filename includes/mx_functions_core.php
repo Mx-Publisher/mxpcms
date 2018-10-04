@@ -74,19 +74,19 @@ class mx_cache extends cache
 	*/
 	public function __construct()
 	{
-		global $mx_root_path, $phpbb_root_path, $phpEx;
+		global $mx_root_path, $phpbb_root_path;
 		global $db, $portal_config;
 		global $mx_table_prefix, $table_prefix, $phpEx, $tplEx;
 		global $mx_backend, $phpbb_auth, $mx_bbcode;		
 		
-		$this->path = $mx_root_path;
+		$this->path = ($mx_root_path) ? $mx_root_path : './';
+		$this->php_ext = $phpEx;
+		$this->cache_dir = $mx_root_path . 'cache/';
 		$this->backend = $mx_backend;		
 		$this->backend_path = $phpbb_root_path;		
 		$this->db = $db;
 		$this->config = $portal_config; 		
-		$this->php_ex =	$phpEx; 
-		$this->tpl_ex =	$tplEx;		
-		$this->cache_dir = $mx_root_path . 'cache/';
+		$this->tpl_ext = $tplEx;		
 		$this->prefix = $mx_table_prefix;  			
 	}
 	
@@ -118,14 +118,16 @@ class mx_cache extends cache
 		
 		// Overwrite Backend
 		$this->portal_config = $portal_config;
-		
+		if (($portal_config['portal_backend']) && @file_exists($portal_config['portal_backend_path'] . "index.$phpEx"))
+		{
+			$this->backend_path = (!$portal_config['portal_backend_path']) ? $this->backend_path : $portal_config['portal_backend_path'];
+		}		
 		if ($this->backend)
 		{
 			$portal_config['portal_backend'] = $this->backend;
 		}
-		
-		// No backend defined ? Portal not updated to v. 3 ?
-		if ((!$portal_config['portal_backend']) && @file_exists($this->phpbb_path . "profile.$phpEx"))
+		// No backend defined ? MXP-CMS not updated to v. 3 ?
+		if ((!$portal_config['portal_backend']) && @file_exists($this->backend_path . "profile.$phpEx"))
 		{
 			$portal_config['portal_backend'] = 'phpbb2';
 			$portal_config['portal_backend_path'] = $this->backend_path;			
@@ -139,10 +141,8 @@ class mx_cache extends cache
 		}
 		// Load backend
 		$mx_root_path = $this->path;
-		$phpbb_root_path = $this->backend_path; 
-		$phpEx = $this->php_ex;
-		$tplEx = $this->tpl_ex;			
-		require($this->path . 'includes/sessions/'.$portal_config['portal_backend'].'/core.'. $this->php_ex); 
+		$phpbb_root_path = $this->backend_path; 			
+		require($this->path . 'includes/sessions/'.$portal_config['portal_backend'].'/core.'. $this->php_ext); 
 		
 		//Redirect to upgrade or redefine portal backend path
 		if (!$portal_config['portal_backend_path'])
@@ -186,6 +186,46 @@ class mx_cache extends cache
 		require($mx_root_path  . 'includes/sessions/'.PORTAL_BACKEND.'/constants.' . $phpEx);
 	}
 
+	/**
+	 * Enter description here...
+	 *
+	 * @access public
+	 * @param boolean $use_cache
+	 * @return unknown
+	 */
+	function obtain_phpbb_config($use_cache = true)
+	{
+		global $db;
+
+		if (($config = $this->get('phpbb_config')) && $use_cache)
+		{
+			return $config;
+		}
+		else
+		{
+			$sql = "SELECT *
+				FROM " . CONFIG_TABLE;
+
+			if ( !( $result = $db->sql_query( $sql ) ) )
+			{
+				mx_message_die( GENERAL_ERROR, 'Couldnt query config information', '', __LINE__, __FILE__, $sql );
+			}
+
+			while ( $row = $db->sql_fetchrow($result) )
+			{
+				$config[$row['config_name']] = $row['config_value'];
+			}
+			$db->sql_freeresult($result);
+
+			if ($use_cache)
+			{
+				$this->put('phpbb_config', $config);
+			}
+
+			return ( $config );
+		}
+	}
+	
 	/**
 	 * Get MX-Publisher config data
 	 *
@@ -250,7 +290,6 @@ class mx_cache extends cache
 	public function load_file($file = '', $force_shared = false)
 	{
 		global $mx_root_path, $phpbb_root_path, $phpEx, $mx_page, $mx_backend;
-
 		/*
 		* Remember loaded files
 		*/
@@ -258,11 +297,11 @@ class mx_cache extends cache
 		{
 			return;
 		}
-
+		
 		$mx_page->loaded_files[] = $file . (is_string($force_shared) ? $force_shared : '');
-
+		
 		$path = $mx_backend->load_file($force_shared);
-
+		
 		if (file_exists($path . $file.'.'.$phpEx))
 		{
 			@include_once($path . $file.'.'.$phpEx);
@@ -276,13 +315,13 @@ class mx_cache extends cache
 	public function init_mod_rewrite()
 	{
 		global $portal_config, $mx_root_path, $phpEx, $mx_mod_rewrite;
-
+		
 		if ($portal_config['mod_rewrite'])
 		{
 			if ( file_exists( $mx_root_path . 'modules/mx_mod_rewrite/includes/rewrite_functions.' . $phpEx ) )
 			{
 				include_once( $mx_root_path . 'modules/mx_mod_rewrite/includes/rewrite_functions.' . $phpEx );
-
+				
 				if (class_exists('mx_mod_rewrite'))
 				{
 					$mx_mod_rewrite = new mx_mod_rewrite();
@@ -306,7 +345,7 @@ class mx_cache extends cache
 	public function _read_config($id = 1, $sub_id = 0, $type, $force_query = false)
 	{
 		global $portal_config, $mx_root_path;
-
+		
 		switch ($type)
 		{
 			case MX_CACHE_BLOCK_TYPE:
@@ -502,7 +541,169 @@ class mx_cache extends cache
 		unset($row);
 		$db->sql_freeresult($result);
 	}
+	// -------------------------------------------------------------------GET DATA	
+	// Read the variable block configuration
+	function block_config($id = '', $sub_id = 0, $config = '')
+	{
+		global $db;
 
+		$this->block_config = array();
+
+		// If this block doesn't have any parameters, we need this additional query :(
+		$sql_block =  !empty($id) ? " AND block_id = " . $id : '';
+
+		// Generate block parameter data
+		$sql = "SELECT 	blk.*,
+						mdl.module_path, mdl.module_name,
+						fnc.function_file, fnc.function_id, fnc.function_admin
+			FROM " . BLOCK_TABLE . " blk,
+					" . FUNCTION_TABLE . " fnc,
+			        " . MODULE_TABLE . " mdl
+			WHERE   blk.function_id = fnc.function_id
+					AND fnc.module_id   = mdl.module_id";
+
+		$sql .= $sql_block;
+		$sql .= " ORDER BY block_id";
+		
+		if ( !( $result = $db->sql_query( $sql ) ) )
+		{
+			mx_message_die( GENERAL_ERROR, 'Could not obtain block data information', '', __LINE__, __FILE__, $sql );
+		}
+		
+		while ($row = $db->sql_fetchrow($result))
+		{
+			$block_id = $row['block_id'];
+			
+			$block_row = array(
+				"block_id" => $row['block_id'],
+				"block_title" => $row['block_title'],
+				"block_desc" => $row['block_desc'],
+				"auth_view" => $row['auth_view'],
+				"auth_view_group" => $row['auth_view_group'],
+				"auth_edit" => $row['auth_edit'],
+				"auth_edit_group" => $row['auth_edit_group'],
+				"auth_moderator_group" => $row['auth_moderator_group'],
+				"show_block" => $row['show_block'],
+				"show_title" => $row['show_title'],
+				"show_stats" => $row['show_stats'],
+				"block_time" => $row['block_time'],
+				"block_editor_id" => $row['block_editor_id'],
+				"module_root_path" => $row['module_path'],
+				"module_name" => $row['module_name'],				
+				"block_file" => $row['function_file'],
+				"block_edit_file" => $row['function_admin'],
+				"function_id" => $row['function_id']
+			);
+			
+			$this->block_config[$block_id]['block_info'] = $block_row;
+		}
+		
+		$db->sql_freeresult($result);
+		$sql_block =  !empty( $id ) ? ' AND sys.block_id = ' . $id : '';
+		$sql_sub =  !empty( $sub_id ) ? ' AND sys.sub_id = ' . $sub_id : ' AND sys.sub_id = 0';
+
+		// Generate block parameter data
+		$sql = "SELECT 	blk.*,
+						sys.parameter_id, sys.parameter_value, sys.parameter_opt,
+						par.*,
+						mdl.module_path, mdl.module_name,
+						bct.column_id,
+						fnc.function_file, fnc.function_id, fnc.function_admin
+			FROM " . BLOCK_SYSTEM_PARAMETER_TABLE . " sys,
+				" . PARAMETER_TABLE . " par,
+				" . BLOCK_TABLE . " blk,
+				" . FUNCTION_TABLE . " fnc,
+				" . MODULE_TABLE . " mdl,
+				" . COLUMN_BLOCK_TABLE . " bct				
+			WHERE sys.parameter_id = par.parameter_id			
+				AND sys.block_id 	= blk.block_id
+				AND blk.function_id = fnc.function_id
+				AND fnc.module_id   = mdl.module_id";
+				
+		$sql .= $sql_block;
+		$sql .= $sql_sub;
+		$sql .= " ORDER BY sys.block_id, par.parameter_order";
+
+		if (!($result = $db->sql_query($sql)))
+		{
+			mx_message_die( GENERAL_ERROR, 'Could not obtain block data information', '', __LINE__, __FILE__, $sql );
+		}
+		
+		$block_id = 0;
+		while ( $row = $db->sql_fetchrow( $result ) )
+		{
+			$next_block = ( $block_id != $row['block_id'] ) ? true : false;
+			$block_id = $row['block_id'];
+			
+			$block_row = array(
+				"block_id" => $row['block_id'],
+				"block_title" => $row['block_title'],
+				"block_desc" => $row['block_desc'],
+				"column_id" => $row['column_id'],
+				"auth_view" => $row['auth_view'],
+				"auth_view_group" => $row['auth_view_group'],
+				"auth_edit" => $row['auth_edit'],
+				"auth_edit_group" => $row['auth_edit_group'],
+				"auth_moderator_group" => $row['auth_moderator_group'],
+				"show_block" => $row['show_block'],
+				"show_title" => $row['show_title'],
+				"show_stats" => $row['show_stats'],
+				"block_time" => $row['block_time'],
+				"block_editor_id" => $row['block_editor_id'],
+				"module_root_path" => $row['module_path'],
+				"module_name" => $row['module_name'],				
+				"block_file" => $row['function_file'],
+				"block_edit_file" => $row['function_admin'],
+				"function_id" => $row['function_id']
+			);
+			
+			$param_row = array(
+				"parameter_id" => $row['parameter_id'],
+				"function_id" => $row['function_id'],
+				"parameter_name" => $row['parameter_name'],
+				"parameter_type" => $row['parameter_type'],
+				"parameter_auth" => $row['parameter_auth'],
+				"parameter_value" => $row['parameter_value'],
+				"parameter_default" => $row['parameter_default'],
+				"parameter_function" => $row['parameter_function'],
+				"parameter_opt" => $row['parameter_opt'],
+				"parameter_order" => $row['parameter_order']				
+			);
+			
+			if ( $next_block )
+			{
+				$temp_row = array();
+				$temp_row = array( 'block_info' => $block_row );
+			}
+			
+			$temp_row['block_parameters'][$param_row['parameter_name']] = $param_row;
+			//
+			// Compose the pages config array
+			//
+			$this->block_config[$block_id] = $temp_row;
+		}
+		unset($row);
+		$db->sql_freeresult($result);
+		
+		switch($config)
+		{
+			case 'block_info':
+				return $block_row;				
+			break;
+			
+			case 'block_parameters':
+				return $param_row;			
+			break;
+			
+			case 'block_config':			
+				return $this->block_config;
+			break;
+						
+			default:
+				return $this->block_config;
+			break;			
+		}
+	}
 	/**
 	 * Query page data
 	 *
@@ -1040,13 +1241,16 @@ class mx_cache extends cache
 
 			fclose($handle);
 
-			if (!function_exists('mx_chmod'))
+			if (!function_exists('mx3_chmod'))
 			{
-				global $mx_root_path;
-				include($mx_root_path . 'includes/mx_functions.' . $phpEx);
+				//global $mx_root_path;
+				//include($mx_root_path . 'includes/mx_functions.' . $phpEx);
+				mx_chmod($file, CHMOD_READ | CHMOD_WRITE);
 			}
-
-			mx_chmod($file, CHMOD_READ | CHMOD_WRITE);
+			else
+			{
+				mx3_chmod($file, CHMOD_READ | CHMOD_WRITE);
+			}
 
 			$return_value = true;
 		}
@@ -1140,10 +1344,10 @@ class cache
 	*/
 	public function __construct()
 	{
-		global $mx_root_path, $phpEx;
+		global $mx_root_path;
 		
-		$this->path = $mx_root_path;
-		$this->php_ext = $phpEx;		
+		$this->path = ($mx_root_path) ? $mx_root_path : './';
+		$this->php_ext = substr(strrchr(__FILE__, '.'));
 		$this->cache_dir = $mx_root_path . 'cache/';
 	}	
 
@@ -1389,12 +1593,12 @@ class cache
 	public function sql2_save($query, &$query_result, $ttl)
 	{
 		global $db, $phpEx;
-
+		
 		// Remove extra spaces and tabs
 		$query = preg_replace('/[\n\r\s\t]+/', ' ', $query);
 		$hash = md5($query);
 
-		if ($fp = @fopen($this->cache_dir . 'sql_' . md5($query) . '.' . $phpEx, 'wb'))
+		if ($fp = @fopen($this->cache_dir . 'sql_' . md5($query) . '.' . $this->php_ext, 'wb'))
 		{
 			@flock($fp, LOCK_EX);
 
@@ -1459,8 +1663,8 @@ class cache
 	{
 		if ($var_name{0} == '_')
 		{
-			global $phpEx;
-			return file_exists($this->cache_dir . 'data' . $var_name . ".$phpEx");
+			$phpEx = substr(strrchr(__FILE__, '.'), 1);
+			return file_exists($this->cache_dir . 'data' . $var_name . "." . $phpEx);
 		}
 		else
 		{
@@ -1586,8 +1790,7 @@ class cache
 	{
 		if ($var_name{0} == '_')
 		{
-			global $phpEx;
-
+			$phpEx = substr(strrchr(__FILE__, '.'), 1);
 			if ($fp = @fopen($this->cache_dir . 'data' . $var_name . ".$phpEx", 'wb'))
 			{
 				@flock($fp, LOCK_EX);
@@ -1617,8 +1820,7 @@ class cache
 	 */
 	public function destroy($var_name, $table = '')
 	{
-		global $phpEx;
-
+		$phpEx = substr(strrchr(__FILE__, '.'), 1);
 		if ($var_name == 'sql' && !empty($table))
 		{
 			$regex = '(' . ((is_array($table)) ? implode('|', $table) : $table) . ')';
@@ -1652,7 +1854,7 @@ class cache
 
 		if ($var_name{0} == '_')
 		{
-			@unlink($this->cache_dir . 'data' . $var_name . ".$phpEx");
+			@unlink($this->cache_dir . 'data' . $var_name . "." . $phpEx);
 		}
 		else if (isset($this->vars[$var_name]))
 		{
@@ -1816,8 +2018,8 @@ class mx_block extends mx_block_parameter
 	 * @access public
 	 * @var string
 	 */
-	var $function_id = '';
-	var $block_id = '';
+	var $function_id = 0;
+	var $block_id = 0;
 	var $block_title = '';
 	var $block_desc = '';
 	/**#@-*/
@@ -1841,8 +2043,9 @@ class mx_block extends mx_block_parameter
 	 * @access public
 	 * @var string
 	 */
-	var $module_root_path = '';
-	var $block_file = '';
+	var $module_root_path = 'modules/mx_coreblocks/';
+	var $php_ext = 'php7';
+	var $block_file = 'app.php5';
 	var $block_edit_file = '';
 	/**#@-*/
 
@@ -1851,7 +2054,7 @@ class mx_block extends mx_block_parameter
 	 *
 	 * @access public
 	 */
-	var $virtual_id = '';
+	var $virtual_id = 0;
 	var $block_virtual_parameters = array();
 	/**#@-*/
 
@@ -1860,7 +2063,7 @@ class mx_block extends mx_block_parameter
 	 *
 	 * @access public
 	 */
-	var $dynamic_block_id = '';
+	var $dynamic_block_id = 0;
 	var $is_dynamic = false;
 	/**#@-*/
 
@@ -1869,7 +2072,7 @@ class mx_block extends mx_block_parameter
 	 *
 	 * @access public
 	 */
-	var $total_subs = '';
+	var $total_subs = 0;
 	var $sub_block_ids = '';
 	var $sub_block_sizes = '';
 	var $sub_inner_space = '';
@@ -1904,9 +2107,9 @@ class mx_block extends mx_block_parameter
 	 */
 	public function _set_all()
 	{
-		global $userdata, $lang;
+		global $mx_user, $userdata, $lang;
 		
-		$is_admin = ($userdata['user_level'] == ADMIN && $userdata['session_logged_in']) ? true : 0;
+		$is_admin = ($mx_user->data['user_level'] == ADMIN && $mx_user->data['session_logged_in']) ? true : 0;
 		
 		// Weird rewrite for php5 - anyone explaining why wins a medal ;)
 		$temp_row = isset($this->block_config[$this->block_id]) ? $this->block_config[$this->block_id] : false;
@@ -2000,7 +2203,7 @@ class mx_block extends mx_block_parameter
 	{
 		global $mx_request_vars, $phpEx;
 
-		$is_dynamic = ( ( $this->block_file == 'mx_dynamic.' . $phpEx ) ? true : false );
+		$is_dynamic = ( ( $this->block_file == 'mx_dynamic.' . $this->php_ext ) ? true : false );
 
 		if ( $is_dynamic )
 		{
@@ -2019,7 +2222,8 @@ class mx_block extends mx_block_parameter
 	public function _is_sub()
 	{
 		global $phpEx;
-		$is_sub = ( ( $this->block_file == 'mx_multiple_blocks.' . $phpEx ) ? true : false );
+		
+		$is_sub = ( ( $this->block_file == 'mx_multiple_blocks.' . $this->php_ext ) ? true : false );
 
 		if ( $is_sub )
 		{
@@ -2153,10 +2357,7 @@ class mx_block extends mx_block_parameter
 				}
 				$db->sql_freeresult($result);
 			}
-
-
 		}
-
 		$mx_cache->_read_config($this->block_id, $virtual_id, MX_CACHE_BLOCK_TYPE);
 	}
 
@@ -2184,7 +2385,6 @@ class mx_block extends mx_block_parameter
 			}
 			$db->sql_freeresult($result);
 		}
-
 		$mx_cache->update(MX_CACHE_BLOCK_TYPE, $this->block_id, $virtual_id);
 	}
 
@@ -2280,7 +2480,7 @@ class mx_block extends mx_block_parameter
 	{
 		global $layouttemplate, $mx_page;
 
-		mx_message_die(GENERAL_MESSAGE,$this->block_contents);
+		mx_message_die(GENERAL_MESSAGE, $this->block_contents);
 	}
 
 	/**
@@ -2289,18 +2489,18 @@ class mx_block extends mx_block_parameter
 	 */
 	public function output_stats()
 	{
-		global $layouttemplate, $board_config, $lang, $userdata;
+		global $layouttemplate, $board_config, $lang, $mx_user, $phpBB2, $userdata;
 
 		if ( $this->show_stats && !empty($this->block_time) && !empty($this->editor_id) )
 		{
-			$is_admin = ( $userdata['user_level'] == ADMIN && $userdata['session_logged_in'] ) ? TRUE : 0;
+			$is_admin = ($mx_user->data['user_level'] == ADMIN && $mx_user->data['session_logged_in'] ) ? TRUE : 0;
 			$editor_name_tmp = mx_get_userdata($this->editor_id);
 			$editor_name = $editor_name_tmp['username'];
-			$edit_time = phpBB2::create_date( $board_config['default_dateformat'], $this->block_time, $board_config['board_timezone'] );
+			$edit_time = $phpBB2->create_date( $board_config['default_dateformat'], $this->block_time, $board_config['board_timezone'] );
 
 			$layouttemplate->assign_block_vars('layout_column.blocks.block_stats', array(
 				'L_BLOCK_UPDATED'	=> $lang['Block_updated_date'],
-				'EDITOR_NAME'		=> $is_admin ? $lang['Block_updated_by'] . $editor_name : '',
+				'EDITOR_NAME'		=> $is_admin ? $lang['Block_updated_by'] . ' ' . $editor_name : '',
 				'EDIT_TIME'			=> $edit_time
 			));
 		}
@@ -2344,7 +2544,7 @@ class mx_block extends mx_block_parameter
 	 */
 	public function output_cp_button($overall_header = false)
 	{
-		global $layouttemplate, $userdata, $mx_root_path, $mx_page, $lang, $block_size, $images, $phpEx;
+		global $layouttemplate, $mx_user, $userdata, $mx_root_path, $mx_page, $lang, $block_size, $images, $phpEx;
 
 		//
 		// Define some hidden Edit Block parameters
@@ -2376,7 +2576,7 @@ class mx_block extends mx_block_parameter
 		// Compose buttons and info
 		//
 		$block_desc = !empty( $this->block_desc ) ? ' (' . $this->block_desc . ')' : '';
-		$edit_url = mx_append_sid( $mx_root_path . $edit_file . "?sid=" . $userdata['session_id'] );
+		$edit_url = mx_append_sid($mx_root_path . $edit_file . "?sid=" . $mx_user->data['session_id']);
 		$edit_img = '<input type="image" src="' . $block_edit_img . '" alt="' . $block_edit_alt . ' :: ' . $this->block_title . $block_desc . '" title="' . $block_edit_alt . ' :: ' . $this->block_title . $block_desc . '">';
 
 		$this->virtual_id = isset($this->virtual_id) ? $this->virtual_id : ''; //Virtual Id is Not Set ?		
@@ -2389,9 +2589,13 @@ class mx_block extends mx_block_parameter
 		// Output
 		//
 		$temp_array = array(
-			'BLOCK_SIZE'			=> ( !empty( $block_size ) ? $block_size : '100%' ),
+			'BLOCK_SIZE'			=> (!empty($block_size) ? $block_size : '100%'),
 			'EDIT_ACTION'			=> $edit_url,
 			'EDIT_IMG'				=> $edit_img,
+			'EDIT_BLOCK_ALT'		=> $block_edit_alt, 
+			'EDIT_BLOCK_TITLE'		=> $this->block_title, 
+			'EDIT_BLOCK_DESC'		=> $block_desc,			
+			'EDIT_IMG_SRC'			=> $block_edit_img,			
 			'EDITCP_SHOW' 			=> $mx_page->editcp_show ? '' : 'none',
 			'S_HIDDEN_FORM_FIELDS'	=> $s_hidden_fields
 		);
@@ -2436,7 +2640,7 @@ class mx_block extends mx_block_parameter
 		global $mx_request_vars;
 
 		$block_config_temp = '';
-
+		
 		if ($key == MX_GET_ALL_PARS)
 		{
 			return array_merge($this->block_info, $this->block_parameters);
@@ -2446,7 +2650,32 @@ class mx_block extends mx_block_parameter
 		{
 			return $this->block_parameters[$key]['parameter_opt'];
 		}
-
+		/** **/
+		if (!isset($this->block_parameters[$key]['parameter_value']))
+		{
+			$keys = (array) $key;		
+			
+			foreach ($keys as $key)
+			{
+				$level = 0;
+				if (is_array($key))
+				{
+					$pars_key = $key[0];
+					$param_key = $key[1];
+					if (count($key) > 2)
+					{
+						$level = $key[2];
+					}
+				}
+				else
+				{
+					$pars_key = $key;
+					$param_key = $keys[0];
+				}
+				$key = trim($pars_key);		
+			}
+		}				
+		/** **/
 		return !empty($this->virtual_id) ? $this->block_virtual_parameters[$key]['parameter_value'] : $this->block_parameters[$key]['parameter_value'];
 	}
 
@@ -2466,20 +2695,20 @@ class mx_block extends mx_block_parameter
 			case AUTH_ALL:
 				$auth_fields = array('auth_view', 'auth_edit');
 				$auth_fields_groups = array('auth_view_group', 'auth_edit_group');
-				break;
+			break;
 
 			case AUTH_VIEW:
 				$auth_fields = array('auth_view');
 				$auth_fields_groups = array('auth_view_group');
-				break;
+			break;
 
 			case AUTH_EDIT:
 				$auth_fields = array('auth_edit');
 				$auth_fields_groups = array('auth_edit_group');
-				break;
+			break;
 
 			default:
-				break;
+			break;
 		}
 
 		$auth_user = array();
@@ -2522,27 +2751,27 @@ class mx_block extends mx_block_parameter
 				case AUTH_ALL:
 					$auth_user[$auth_fields[$i]] = TRUE;
 					$auth_user[$auth_fields[$i] . '_type'] = $lang['Auth_Anonymous_Users'];
-					break;
+				break;
 
 				case AUTH_REG:
 					$auth_user[$auth_fields[$i]] = ( $userdata['session_logged_in'] ) ? TRUE : 0;
 					$auth_user[$auth_fields[$i] . '_type'] = $lang['Auth_Registered_Users'];
-					break;
+				break;
 
 				case AUTH_ANONYMOUS:
 					$auth_user[$auth_fields[$i]] = ( ! $userdata['session_logged_in'] ) ? TRUE : 0;
 					$auth_user[$auth_fields[$i] . '_type'] = $lang['Auth_Anonymous_Users'];
-					break;
+				break;
 
 				case AUTH_ACL: // PRIVATE
 					$auth_user[$auth_fields[$i]] = ( $userdata['session_logged_in'] ) ? mx_is_group_member($this->block_info[$auth_fields_groups[$i]]) || $is_admin : 0;
 					$auth_user[$auth_fields[$i] . '_type'] = $lang['Auth_Users_granted_access'];
-					break;
+				break;
 
 				case AUTH_MOD:
 					$auth_user[$auth_fields[$i]] = ( $userdata['session_logged_in'] ) ? mx_is_group_member($this->block_info['auth_moderator_group']) || $is_admin : 0;
 					$auth_user[$auth_fields[$i] . '_type'] = $lang['Auth_Moderators'];
-					break;
+				break;
 
 				case AUTH_ADMIN:
 					$auth_user[$auth_fields[$i]] = $is_admin;
@@ -2551,7 +2780,7 @@ class mx_block extends mx_block_parameter
 
 				default:
 					$auth_user[$auth_fields[$i]] = 0;
-					break;
+				break;
 			}
 		}
 
@@ -2562,6 +2791,133 @@ class mx_block extends mx_block_parameter
 
 		return $auth_user;
 	}
+	
+	/**
+	 * Block authb extend
+	 *
+	 * @access private
+	 * @param integer $type all, view or edit
+	 * @return array
+	 */	
+	function block_auth($type, $module_id, $userdata, $f_access = '', $f_access_group = '')
+	{
+		global $db, $lang;
+
+		switch( $type )
+		{
+	//		case AUTH_ALL:
+	//			$a_sql = 'a.auth_view, a.auth_edit, a.auth_delete';
+	//			$a_sql_groups = 'a.auth_view_group, a.auth_edit_group, a.auth_delete_group';
+	//			$auth_fields = array('auth_view', 'auth_edit', 'auth_delete');
+	//			$auth_fields_groups = array('auth_view_group', 'auth_edit_group', 'auth_delete_group');
+	//		break;
+
+			case AUTH_VIEW:
+				$a_sql = 'a.auth_view';
+				$a_sql_groups = 'a.auth_view_group';
+				$auth_fields = array('auth_view');
+				$auth_fields_groups = array('auth_view_group');
+			break;
+
+			case AUTH_EDIT:
+				$a_sql = 'a.auth_edit';
+				$a_sql_groups = 'a.auth_edit_group';
+				$auth_fields = array('auth_edit');
+				$auth_fields_groups = array('auth_edit_group');
+			break;
+
+			case AUTH_DELETE:
+				$a_sql = 'a.auth_delete';
+				$a_sql_groups = 'a.auth_delete_group';
+				$auth_fields = array('auth_delete');
+				$auth_fields_groups = array('auth_delete_group');
+			break;
+
+			default:
+			break;
+		}
+
+		if( $module_id == 0 )
+		{
+			if( $userdata['user_level'] == ADMIN && $userdata['session_logged_in'] )
+			{
+				$auth_user[$auth_fields[0]] = 1;
+				$auth_user[$auth_fields[0] . '_type'] = $lang['Auth_Moderators'];
+			}
+			else
+			{
+				$auth_user[$auth_fields[0]] = 0;
+				$auth_user[$auth_fields[0] . '_type'] = $lang['Auth_Moderators'];
+			}
+			return $auth_user;
+		}
+
+		$is_admin = ( $userdata['user_level'] == ADMIN && $userdata['session_logged_in'] ) ? TRUE : 0;
+
+		$auth_user = array();
+		for( $i = 0; $i < count($auth_fields); $i++ )
+		{
+			$key = $auth_fields[$i]; 
+			$key_groups = $auth_fields_groups[$i];
+			//
+			// If the user is logged on and the module type is either ALL or REG then the user has access
+			//
+			// If the type if ACL, MOD or ADMIN then we need to see if the user has specific permissions
+			// to do whatever it is they want to do ... to do this we pull relevant information for the
+			// user (and any groups they belong to)
+			//
+			// Now we compare the users access level against the modules. We assume here that a moderator
+			// and admin automatically have access to an ACL module, similarly we assume admins meet an
+			// auth requirement of MOD
+			//
+			$value = $f_access[$key];
+			// $value_groups = $f_access_group[$key_groups];
+			$value_groups = $f_access_group;
+
+			switch($value)
+			{
+				case AUTH_ALL:
+					$auth_user[$key] = TRUE;
+					$auth_user[$key . '_type'] = $lang['Auth_Anonymous_Users'];
+				break;
+
+				case AUTH_REG:
+					$auth_user[$key] = ( $userdata['session_logged_in'] ) ? TRUE : 0;
+					$auth_user[$key . '_type'] = $lang['Auth_Registered_Users'];
+				break;
+
+				case AUTH_ANONYMOUS:
+					$auth_user[$key] = ( ! $userdata['session_logged_in'] ) ? TRUE : 0;
+					$auth_user[$key . '_type'] = $lang['Auth_Anonymous_Users'];
+				break;
+
+				case AUTH_ACL: // PRIVATE
+					$auth_user[$key] = ( $userdata['session_logged_in'] ) ? mx_is_group_member($value_groups) || $is_admin : 0;
+					$auth_user[$key . '_type'] = $lang['Auth_Users_granted_access'];
+				break;
+
+				case AUTH_MOD:
+					$auth_user[$key] = ( $userdata['session_logged_in'] ) ? mx_is_group_member($f_access_group['auth_moderator_group']) || $is_admin : 0;
+					$auth_user[$key . '_type'] = $lang['Auth_Moderators'];
+				break;
+
+				case AUTH_ADMIN:
+					$auth_user[$key] = $is_admin;
+					$auth_user[$key . '_type'] = $lang['Auth_Administrators'];
+				break;
+
+				default:
+					$auth_user[$key] = 0;
+				break;
+			}
+		} 
+
+		//
+		// Is user a moderator?
+		 $auth_user['auth_mod'] = ( $userdata['session_logged_in'] ) ? mx_is_group_member($f_access_group['auth_moderator_group']) || $is_admin : 0;
+
+		return $auth_user;
+	}	
 }	// class mx_block
 
 /**
@@ -2723,36 +3079,36 @@ class mx_block_parameter
 						case 'Text':
 						case 'TextArea':
 							$parameter_value = htmlspecialchars( trim( $parameter_value ) );
-							break;
+						break;
 						case 'BBText':
 							$bbcode_uid = $parameter_opt = $mx_bbcode->make_bbcode_uid();
 							$parameter_value = $mx_bbcode->prepare_message($parameter_value, true, true, true, $bbcode_uid);
-							break;
+						break;
 						case 'Html':
 							$parameter_value = $mx_bbcode->prepare_message($parameter_value, true, false, false);
-							break;
+						break;
 						case 'Number':
 							$parameter_value = intval($parameter_value);
-							break;
+						break;
 						case 'Function':
 							if( is_array($parameter_value) )
 							{
 								//$parameter_value = implode(',' , htmlspecialchars($parameter_value));
 								$parameter_value = implode(',' , $parameter_value);
 							}
-							break;
+						break;
 
 						// Custom Fields
 						case 'Radio_single_select':
 						case 'Menu_single_select':
 							$parameter_value = htmlspecialchars( trim( $parameter_value ) );
-							break;
+						break;
 						case 'Menu_multiple_select':
 						case 'Checkbox_multiple_select':
 							$parameter_value = addslashes( serialize( $parameter_value ) );
-							break;
+						break;
 						case 'Separator':
-							break;
+						break;
 
 						default:
 							$parameter_custom = $this->_submit_custom_module_parameters($parameter_data, $block_id);
@@ -2816,8 +3172,6 @@ class mx_block_parameter
 			//
 			$mx_cache->update(MX_CACHE_BLOCK_TYPE, $block_id, $sub_id); // Maybe ambitious, but why not ;)
 			$message .= $lang['AdminCP_action'] . ": " . $lang['Block'] . ' ' . $lang['was_updated'];
-
-
 		}
 		return $message;
 	}
@@ -2853,42 +3207,42 @@ class mx_block_parameter
 					{
 						case 'Separator':
 							$this->display_edit_Separator( $block_id, $parameter_data['parameter_id'], $parameter_data );
-							break;
+						break;
 							case 'Text':
 							$this->display_edit_PlainTextField( $block_id, $parameter_data['parameter_id'], $parameter_data );
-							break;
+						break;
 						case 'TextArea':
 							$this->display_edit_PlainTextAreaField( $block_id, $parameter_data['parameter_id'], $parameter_data );
-							break;
+						break;
 						case 'BBText':
 							$this->display_edit_BBText( $block_id, $parameter_data['parameter_id'], $parameter_data );
-							break;
+						break;
 						case 'Html':
 							$this->display_edit_Html( $block_id, $parameter_data['parameter_id'], $parameter_data );
-							break;
+						break;
 						case 'Boolean':
 							$this->display_edit_Boolean( $block_id, $parameter_data['parameter_id'], $parameter_data );
-							break;
+						break;
 						case 'Number':
 							$this->display_edit_Number( $block_id, $parameter_data['parameter_id'], $parameter_data );
 							break;
 						case 'Function':
 							$this->display_edit_Function( $block_id, $parameter_data['parameter_id'], $parameter_data );
-							break;
+						break;
 
 						// Custom Fields
 						case 'Radio_single_select':
 							$this->display_edit_Radio_single_select( $block_id, $parameter_data['parameter_id'], $parameter_data );
-							break;
+						break;
 						case 'Menu_single_select':
 							$this->display_edit_Menu_single_select( $block_id, $parameter_data['parameter_id'], $parameter_data );
-							break;
+						break;
 						case 'Menu_multiple_select':
 							$this->display_edit_Menu_multiple_select( $block_id, $parameter_data['parameter_id'], $parameter_data );
-							break;
+						break;
 						case 'Checkbox_multiple_select':
 							$this->display_edit_Checkbox_multiple_select( $block_id, $parameter_data['parameter_id'], $parameter_data );
-							break;
+						break;
 						default:
 							$module_root_path = $mx_root_path . $this->module_root_path;
 							$this->is_panel = $this->_get_custom_module_parameters($parameter_data, $block_id);
@@ -2948,7 +3302,6 @@ class mx_block_parameter
 			'PARAMETER_TYPE' 			=> ( !empty($lang["ParType_".$parameter_data['parameter_type']]) ) ? $lang["ParType_".$parameter_data['parameter_type']] : '',
 			'PARAMETER_TYPE_INFO' 		=> ( !empty($lang["ParType_".$parameter_data['parameter_type'] . "_info"]) ) ? ' :: ' . $lang["ParType_".$parameter_data['parameter_type'] . "_info"] : ''
 		));
-
 		$template->pparse('parameter');
 	}
 
@@ -2977,7 +3330,6 @@ class mx_block_parameter
 			'PARAMETER_TYPE_INFO' 		=> ( !empty($lang["ParType_".$parameter_data['parameter_type'] . "_info"]) ) ? ' :: ' . $lang["ParType_".$parameter_data['parameter_type'] . "_info"] : '',
 			'PARAMETER_FIELD' 			=> $parameter_field
 		));
-
 		$template->pparse('parameter');
 	}
 
@@ -3006,7 +3358,6 @@ class mx_block_parameter
 			'PARAMETER_TYPE_INFO' 		=> ( !empty($lang["ParType_".$parameter_data['parameter_type'] . "_info"]) ) ? ' :: ' . $lang["ParType_".$parameter_data['parameter_type'] . "_info"] : '',
 			'PARAMETER_FIELD' 			=> $parameter_field
 		));
-
 		$template->pparse('parameter');
 	}
 
@@ -3039,7 +3390,6 @@ class mx_block_parameter
 			'PARAMETER_TYPE_INFO' 		=> ( !empty($lang["ParType_".$parameter_data['parameter_type'] . "_info"]) ) ? ' :: ' . $lang["ParType_".$parameter_data['parameter_type'] . "_info"] : '',
 			'PARAMETER_FIELD' 			=> $parameter_field
 		));
-
 		$template->pparse('parameter');
 	}
 
@@ -3068,7 +3418,6 @@ class mx_block_parameter
 			'PARAMETER_TYPE_INFO' 		=> ( !empty($lang["ParType_".$parameter_data['parameter_type'] . "_info"]) ) ? ' :: ' . $lang["ParType_".$parameter_data['parameter_type'] . "_info"] : '',
 			'PARAMETER_FIELD' 			=> $parameter_field
 		));
-
 		$template->pparse('parameter');
 	}
 
@@ -3097,7 +3446,6 @@ class mx_block_parameter
 			'PARAMETER_TYPE_INFO' 		=> ( !empty($lang["ParType_".$parameter_data['parameter_type'] . "_info"]) ) ? ' :: ' . $lang["ParType_".$parameter_data['parameter_type'] . "_info"] : '',
 			'PARAMETER_FIELD' 			=> $parameter_field
 		));
-
 		$template->pparse('parameter');
 	}
 
@@ -3136,7 +3484,6 @@ class mx_block_parameter
 			'PARAMETER_TYPE_INFO' 		=> ( !empty($lang["ParType_".$parameter_data['parameter_type'] . "_info"]) ) ? ' :: ' . $lang["ParType_".$parameter_data['parameter_type'] . "_info"] : '',
 			'PARAMETER_FIELD' 			=> $parameter_field
 		));
-
 		$template->pparse('parameter');
 	}
 
@@ -3167,7 +3514,6 @@ class mx_block_parameter
 			'PARAMETER_TYPE_INFO' 		=> ( !empty($lang["ParType_".$parameter_data['parameter_type'] . "_info"]) ) ? ' :: ' . $lang["ParType_".$parameter_data['parameter_type'] . "_info"] : '',
 			'PARAMETER_FIELD' 			=> $parameter_field
 		));
-
 		$template->pparse('parameter');
 	}
 
@@ -3190,14 +3536,14 @@ class mx_block_parameter
 			'parameter' => 'admin/mx_core_parameters.tpl')
 		);
 
-		$template->assign_block_vars( 'radio', array(
+		$template->assign_block_vars('radio', array(
 			'PARAMETER_TITLE' 			=> ( !empty($lang[$parameter_data['parameter_name']]) ) ? $lang[$parameter_data['parameter_name']] : $parameter_data['parameter_name'],
 			'PARAMETER_TITLE_EXPLAIN' 	=> ( !empty($lang[$parameter_data['parameter_name']. "_explain"]) ) ? '<br />' . $lang[$parameter_data['parameter_name']. "_explain"] : '',
 
 				'FIELD_NAME' 			=> ( !empty($lang[$parameter_data['parameter_name']]) ) ? $lang[$parameter_data['parameter_name']] : $parameter_data['parameter_name'],
 				'FIELD_ID' 				=> $parameter_data['parameter_id'],
 				'FIELD_DESCRIPTION' 	=> ( !empty($lang["ParType_".$parameter_data['parameter_type']]) ) ? $lang["ParType_".$parameter_data['parameter_type']] : ''
-			));
+		));
 
 		if ( !empty( $parameter_datas ) )
 		{
@@ -3208,7 +3554,6 @@ class mx_block_parameter
 					);
 			}
 		}
-
 		$template->pparse('parameter');
 	}
 
@@ -3230,16 +3575,14 @@ class mx_block_parameter
 		$template->set_filenames(array(
 			'parameter' => 'admin/mx_core_parameters.tpl')
 		);
-
-		$template->assign_block_vars( 'select', array(
+		$template->assign_block_vars('select', array(
 			'PARAMETER_TITLE' 			=> ( !empty($lang[$parameter_data['parameter_name']]) ) ? $lang[$parameter_data['parameter_name']] : $parameter_data['parameter_name'],
 			'PARAMETER_TITLE_EXPLAIN' 	=> ( !empty($lang[$parameter_data['parameter_name']. "_explain"]) ) ? '<br />' . $lang[$parameter_data['parameter_name']. "_explain"] : '',
 
 				'FIELD_NAME' 			=> ( !empty($lang[$parameter_data['parameter_name']]) ) ? $lang[$parameter_data['parameter_name']] : $parameter_data['parameter_name'],
 				'FIELD_ID' 				=> $parameter_data['parameter_id'],
 				'FIELD_DESCRIPTION' 	=> ( !empty($lang["ParType_".$parameter_data['parameter_type']]) ) ? $lang["ParType_".$parameter_data['parameter_type']] : ''
-			));
-
+		));
 		if ( !empty( $parameter_datas ) )
 		{
 			foreach( $parameter_datas as $key => $value )
@@ -3249,7 +3592,6 @@ class mx_block_parameter
 					);
 			}
 		}
-
 		$template->pparse('parameter');
 	}
 
@@ -3271,13 +3613,11 @@ class mx_block_parameter
 		$template->set_filenames(array(
 			'parameter' => 'admin/mx_core_parameters.tpl')
 		);
-
 		$template->assign_block_vars( 'select_multiple', array(
 				'FIELD_NAME' 			=> ( !empty($lang[$parameter_data['parameter_name']]) ) ? $lang[$parameter_data['parameter_name']] : $parameter_data['parameter_name'],
 				'FIELD_ID' 				=> $parameter_data['parameter_id'],
 				'FIELD_DESCRIPTION' 	=> ( !empty($lang["ParType_".$parameter_data['parameter_type']]) ) ? $lang["ParType_".$parameter_data['parameter_type']] : ''
-			));
-
+		));
 		if ( !empty( $parameter_datas ) )
 		{
 			foreach( $parameter_datas as $key => $value )
@@ -3299,7 +3639,6 @@ class mx_block_parameter
 					);
 			}
 		}
-
 		$template->pparse('parameter');
 	}
 
@@ -3352,7 +3691,6 @@ class mx_block_parameter
 					);
 			}
 		}
-
 		$template->pparse('parameter');
 	}
 
@@ -3590,18 +3928,56 @@ class mx_page
 	 */
 	public function _set_all()
 	{
-		global $userdata, $mx_root_path, $mx_request_vars, $portal_config, $theme, $lang;
+		global $mx_user, $db, $userdata, $board_config, $mx_root_path, $_COOKIE, $portal_config, $theme, $lang, $mx_request_vars;
 		global $mx_block, $tplEx, $_GET;
 
 		$this->info = &$this->page_config[$this->page_id]['page_info'];	
 		
-		$is_admin = ($userdata['user_level'] == ADMIN && $userdata['session_logged_in']) ? true : 0;
+		$is_admin = ($mx_user->data['user_level'] == ADMIN && $mx_user->data['session_logged_in']) ? true : 0;
 	
 		/*
 		* IP filter
 		*/
 		$mx_ip = new mx_ip;
-
+		
+		/*		
+		/* We are trying to setup a style which does not exist in the database
+		/* Try to fallback to the board default (if the user had a custom style)
+		/* and then any users using this style to the default if it succeeds
+		* /		
+		if (($mx_user->data['user_style'] == $board_config['default_style']) || ($mx_user->data['user_id'] == ANONYMOUS))
+		{					
+			$sql = 'SELECT template_name
+					FROM ' . THEMES_TABLE . '
+					WHERE themes_id = ' . (int) $board_config['default_style'];		
+			if ($theme = $db->sql_fetchrow($result = $db->sql_query($sql)))
+			{
+				$db->sql_freeresult($result);
+			}		
+		}
+		else
+		{					
+			$sql = 'SELECT template_name
+					FROM ' . THEMES_TABLE . '
+					WHERE themes_id = ' . (int) $mx_user->data['user_style'];		
+			if ($theme = $db->sql_fetchrow($result = $db->sql_query($sql)))
+			{
+				$db->sql_freeresult($result);
+			}		
+		}
+		
+		if (file_exists($mx_root_path . 'templates/'. $theme['template_name'] . '/template/'))
+		{		
+			$overall_header_tpl = (($this->page_id != 2) && file_exists($mx_root_path . 'templates/'. $theme['template_name'] . '/template/overall_header_navigation.'.$tplEx)) ? 'overall_header_navigation.'.$tplEx : $portal_config['overall_header'];
+			$overall_header_tpl = (($this->page_id == 2) && file_exists($mx_root_path . 'templates/'. $theme['template_name'] . '/template/overall_header_navigation_phpbb.'.$tplEx)) ? 'overall_header_navigation_phpbb.'.$tplEx : $overall_header_tpl;
+		}		
+		else
+		{		
+			$overall_header_tpl = (($this->page_id != 2) && file_exists($mx_root_path . 'templates/'. $theme['template_name'] . '/overall_header_navigation.'.$tplEx)) ? 'overall_header_navigation.'.$tplEx : $portal_config['overall_header'];
+			$overall_header_tpl = (($this->page_id == 2) && file_exists($mx_root_path . 'templates/'. $theme['template_name'] . '/overall_header_navigation_phpbb.'.$tplEx)) ? 'overall_header_navigation_phpbb.'.$tplEx : $overall_header_tpl;
+		}		
+		/* */		
+		
 		//
 		// General
 		//
@@ -3611,17 +3987,20 @@ class mx_page
 
 		$this->default_style = $this->info['default_style'] == -1 ? ($portal_config['default_style']) : ( $this->info['default_style'] );
 		$this->override_user_style = $this->info['override_user_style'] == -1 ? ($portal_config['override_user_style'] == 1 ? 1 : 0 ) : ( $this->info['override_user_style'] == 1 ? 1 : 0 );
+		
 		//
 		// Setup demo style
 		//
-		if (isset($_GET['strip']) && ($_GET['strip'] == true))
+		if (isset($_GET['strip']) && ($mx_request_vars->is_get('strip') == true))
 		{
 			$this->page_ov_header = 'overall_header_print.'.$tplEx;
 		}
 		else		
 		{
 			$this->page_ov_header = !empty($this->info['page_header']) ? $this->info['page_header'] : $portal_config['overall_header'];
+			//$this->page_ov_header = !empty($this->info['page_header']) ? $this->info['page_header'] : $overall_header_tpl;		
 		}
+		
 		$this->page_ov_footer = !empty($this->info['page_footer']) ? $this->info['page_footer'] : $portal_config['overall_footer'];
 		$this->page_main_layout = !empty($this->info['page_main_layout']) ? $this->info['page_main_layout'] : $portal_config['main_layout'];
 		$this->phpbb_stats = $this->info['phpbb_stats'] == -1 ? ($portal_config['top_phpbb_links'] == 1 ? true : false ) : ( $this->info['phpbb_stats'] == 1 ? true : false );
@@ -3642,7 +4021,7 @@ class mx_page
 
 		$this->block_border_graphics = isset($theme['border_graphics']) ? $theme['border_graphics'] : false;
 
-		$s_hidden_fields = '<input type="hidden" name="sid" value="' . $userdata['session_id'] . '" />';
+		$s_hidden_fields = '<input type="hidden" name="sid" value="' . $mx_user->data['session_id'] . '" />';
 		$s_hidden_fields .= '<input type="hidden" name="portalpage" value="' . $this->page_id . '" />';
 		$s_hidden_fields .= '<input type="hidden" name="mode" value="setting" />';
 		$s_hidden_fields .= $mx_request_vars->is_get('f') ? '<input type="hidden" name="f" value="' . $mx_request_vars->get('f', MX_TYPE_INT) . '" />' : '';
@@ -3653,7 +4032,7 @@ class mx_page
 		//
 		// Generate the fold/unfold menu navigation switches (cookie based)
 		//
-		$this->editcp_show = ( $userdata['user_level'] == ADMIN && isset($_COOKIE['editCP_switch']) ) ? $_COOKIE['editCP_switch'] == 1 : true;
+		$this->editcp_show = ($mx_user->data['user_level'] == ADMIN && isset($_COOKIE['editCP_switch'])) ? $_COOKIE['editCP_switch'] == 1 : true;
 
 		$this->is_virtual = isset($this->page_config[$this->page_id]['virtual']) ? $this->page_config[$this->page_id]['virtual'] : false;
 	}
@@ -3665,25 +4044,25 @@ class mx_page
 	 * @param unknown_type $column
 	 * @return unknown
 	 */
-	public function _get_colclass( $column )
+	public function _get_colclass($column)
 	{
-		if ( $this->total_column == 1 )
+		if ($this->total_column == 1)
 		{
 			$colclass = 'middlecol';
 		}
 		else
 		{
-			switch( $column )
+			switch($column)
 			{
 				case 0:
 					$colclass = 'leftcol';
-					break;
+				break;
 				case 1:
 					$colclass = 'middlecol';
-					break;
+				break;
 				case 2:
 					$colclass = 'rightcol';
-					break;
+				break;
 			}
 		}
 
@@ -4020,17 +4399,17 @@ class mx_page
 				case AUTH_ALL:
 					$auth_user[$auth_label[$i]] = TRUE;
 					$auth_user[$auth_label[$i] . '_type'] = $lang['Auth_Anonymous_Users'];
-					break;
+				break;
 
 				case AUTH_REG:
 					$auth_user[$auth_label[$i]] = ($userdata['session_logged_in']) ? TRUE : 0;
 					$auth_user[$auth_label[$i] . '_type'] = $lang['Auth_Registered_Users'];
-					break;
+				break;
 
 				case AUTH_ANONYMOUS:
 					$auth_user[$auth_label[$i]] = (!$userdata['session_logged_in']) ? TRUE : 0;
 					$auth_user[$auth_label[$i] . '_type'] = $lang['Auth_Anonymous_Users'];
-					break;
+				break;
 
 				case AUTH_ACL: // PRIVATE
 					$auth_user[$auth_label[$i]] = ($userdata['session_logged_in']) ? mx_is_group_member($group_data) || $is_admin : 0;
@@ -4040,16 +4419,16 @@ class mx_page
 				case AUTH_MOD:
 					$auth_user[$auth_label[$i]] = ($userdata['session_logged_in']) ? mx_is_group_member($moderator_data) || $is_admin : 0;
 					$auth_user[$auth_label[$i] . '_type'] = $lang['Auth_Moderators'];
-					break;
+				break;
 
 				case AUTH_ADMIN:
 					$auth_user[$auth_label[$i]] = $is_admin;
 					$auth_user[$auth_label[$i] . '_type'] = $lang['Auth_Administrators'];
-					break;
+				break;
 
 				default:
 					$auth_user[$auth_label[$i]] = 0;
-					break;
+				break;
 			}
 		}
 		// Is user a moderator?
@@ -4057,7 +4436,80 @@ class mx_page
 
 		return $auth_user;
 	}
+	/**
+	 * Page auth extend.
+	 *
+	 * @access private
+	 * @param unknown_type $auth_data
+	 * @param unknown_type $group_data
+	 * @param unknown_type $moderator_data
+	 * @return array
+	 */
+	public function page_auth($type, $userdata, $f_access = '', $f_access_group = '')
+	{
+		global $db, $lang, $mx_user;
 
+		$a_sql = 'a.auth_view';
+		$a_sql_groups = 'a.auth_view_group';
+		$auth_fields = array('auth_view');
+		$auth_fields_groups = array('auth_view_group');
+
+		$is_admin = ( $mx_user->data['user_level'] == ADMIN && $userdata['session_logged_in'] ) ? TRUE : 0;
+
+		$auth_user = array();
+		for( $i = 0; $i < count($auth_fields); $i++ )
+		{
+			$key = $auth_fields[$i];
+			$key_groups = $auth_fields_groups[$i];
+
+			$value = $f_access[$key];
+			// $value_groups = $f_access_group[$key_groups];
+			$value_groups = $f_access_group;
+
+			switch( $value )
+			{
+				case AUTH_ALL:
+					$auth_user[$key] = TRUE;
+					$auth_user[$key . '_type'] = $lang['Auth_Anonymous_Users'];
+				break;
+
+				case AUTH_REG:
+					$auth_user[$key] = ( $userdata['session_logged_in'] ) ? TRUE : 0;
+					$auth_user[$key . '_type'] = $lang['Auth_Registered_Users'];
+				break;
+
+				case AUTH_ANONYMOUS:
+					$auth_user[$key] = ( ! $userdata['session_logged_in'] ) ? TRUE : 0;
+					$auth_user[$key . '_type'] = $lang['Auth_Anonymous_Users'];
+				break;
+
+				case AUTH_ACL: // PRIVATE
+					$auth_user[$key] = ( $userdata['session_logged_in'] ) ? mx_is_group_member($value_groups) || $is_admin : 0;
+					$auth_user[$key . '_type'] = $lang['Auth_Users_granted_access'];
+				break;
+
+				case AUTH_MOD:
+					$auth_user[$key] = ( $userdata['session_logged_in'] ) ? mx_is_group_member($f_access_group['auth_moderator_group']) || $is_admin : 0;
+					$auth_user[$key . '_type'] = $lang['Auth_Moderators'];
+				break;
+
+				case AUTH_ADMIN:
+					$auth_user[$key] = $is_admin;
+					$auth_user[$key . '_type'] = $lang['Auth_Administrators'];
+				break;
+
+				default:
+					$auth_user[$key] = 0;
+				break;
+			}
+		} 
+
+		//
+		// Is user a moderator?
+		$auth_user['auth_mod'] = ( $userdata['session_logged_in'] ) ? mx_is_group_member($f_access_group['auth_moderator_group']) || $is_admin : 0;
+
+		return $auth_user;
+	}	
 }	// class mx_page
 
 /**
@@ -4195,19 +4647,172 @@ define('MX_NOT_EMPTY'		, true);	//
  */
 class mx_request_vars
 {
+	/**#@+
+	* Constant identifying the super global with the same name.
+	*/
+	const POST = 0;
+	const GET = 1;
+	const REQUEST = 2;
+	const COOKIE = 3;
+	const SERVER = 4;
+	const FILES = 5;
+	/**#@-*/		
+	
 	//
 	// Implementation Conventions:
 	// Properties and methods prefixed with underscore are intented to be private. ;-)
 	//
+	
+	/**
+	* @var	array	The names of super global variables that this class should protect if super globals are disabled.
+	*/
+	protected $super_globals = array(
+		self::POST 		=> '_POST',
+		self::GET 		=> '_GET',
+		self::REQUEST 	=> '_REQUEST',
+		self::COOKIE 	=> '_COOKIE',
+		self::SERVER 	=> '_SERVER',
+		self::FILES 	=> '_FILES',
+	);
+	
+	/**
+	* @var	array	Stores original contents of $_REQUEST array.
+	*/
+	protected $original_request = null;
 
+	/**
+	* @var
+	*/
+	protected $super_globals_disabled = false;
+
+	/**
+	* @var	array	An associative array that has the value of super global constants as keys and holds their data as values.
+	*/
+	protected $input;
+
+	/**
+	* @var	\phpbb\request\type_cast_helper_interface	An instance of a type cast helper providing convenience methods for type conversions.
+	*/
+	protected $type_cast_helper;	
+	
 	// ------------------------------
 	// Properties
 	//
 
-	// ------------------------------
-	// Constructor
-	//
+	/* ------------------------------
+	* Constructor
+	* Initialises the request class, that means it stores all input data in {@link $input input}
+	* and then calls {@link deactivated_super_global deactivated_super_global}
+	*/
+	public function __construct($disable_super_globals = false)
+	{
+		foreach ($this->super_globals as $const => $super_global)
+		{
+			$this->input[$const] = isset($GLOBALS[$super_global]) ? $GLOBALS[$super_global] : array();
+		}
 
+		// simulate request_order = GP
+		$this->original_request = $this->input[self::REQUEST];
+		$this->input[self::REQUEST] = $this->input[self::POST] + $this->input[self::GET];
+
+		if ($disable_super_globals)
+		{
+			$this->disable_super_globals();
+		}
+	}
+
+	/**
+	* Getter for $super_globals_disabled
+	*
+	* @return	bool	Whether super globals are disabled or not.
+	*/
+	public function super_globals_disabled()
+	{
+		return $this->super_globals_disabled;
+	}
+
+	/**
+	* Disables access of super globals specified in $super_globals.
+	* This is achieved by overwriting the super globals with instances of {@link \phpbb\request\deactivated_super_global \phpbb\request\deactivated_super_global}
+	*/
+	public function disable_super_globals()
+	{
+		if (!$this->super_globals_disabled)
+		{
+			foreach ($this->super_globals as $const => $super_global)
+			{
+				unset($GLOBALS[$super_global]);
+				$GLOBALS[$super_global] = new deactivated_super_global($this, $super_global, $const);
+			}
+
+			$this->super_globals_disabled = true;
+		}
+	}
+
+	/**
+	* Enables access of super globals specified in $super_globals if they were disabled by {@link disable_super_globals disable_super_globals}.
+	* This is achieved by making the super globals point to the data stored within this class in {@link $input input}.
+	*/
+	public function enable_super_globals()
+	{
+		if ($this->super_globals_disabled)
+		{
+			foreach ($this->super_globals as $const => $super_global)
+			{
+				$GLOBALS[$super_global] = $this->input[$const];
+			}
+
+			$GLOBALS['_REQUEST'] = $this->original_request;
+
+			$this->super_globals_disabled = false;
+		}
+	}
+	
+	// ------------------------------
+	// Public Methods
+	//
+	
+	/**
+	* This function allows overwriting or setting a value in one of the super global arrays.
+	*
+	* Changes which are performed on the super globals directly will not have any effect on the results of
+	* other methods this class provides. Using this function should be avoided if possible! It will
+	* consume twice the the amount of memory of the value
+	*
+	* @param	string	$var_name	The name of the variable that shall be overwritten
+	* @param	mixed	$value		The value which the variable shall contain.
+	* 								If this is null the variable will be unset.
+	* @param	mx_request_vars::POST|GET|REQUEST|COOKIE	$super_global
+	* 								Specifies which super global shall be changed
+	*/
+	public function overwrite($var_name, $value, $super_global = self::REQUEST)
+	{
+		if (!isset($this->super_globals[$super_global]))
+		{
+			return;
+		}
+
+		$this->type_cast_helper->add_magic_quotes($value);
+
+		// setting to null means unsetting
+		if ($value === null)
+		{
+			unset($this->input[$super_global][$var_name]);
+			if (!$this->super_globals_disabled())
+			{
+				unset($GLOBALS[$this->super_globals[$super_global]][$var_name]);
+			}
+		}
+		else
+		{
+			$this->input[$super_global][$var_name] = $value;
+			if (!$this->super_globals_disabled())
+			{
+				$GLOBALS[$this->super_globals[$super_global]][$var_name] = $value;
+			}
+		}
+	}
+	
 	// ------------------------------
 	// Private Methods
 	//
@@ -4321,6 +4926,152 @@ class mx_request_vars
 	//
 
 	/**
+	* Central type safe input handling function.
+	* All variables in GET or POST requests should be retrieved through this function to maximise security.
+	*
+	* @param	string|array	$var_name	The form variable's name from which data shall be retrieved.
+	* 										If the value is an array this may be an array of indizes which will give
+	* 										direct access to a value at any depth. E.g. if the value of "var" is array(1 => "a")
+	* 										then specifying array("var", 1) as the name will return "a".
+	* @param	mixed			$default	A default value that is returned if the variable was not set.
+	* 										This function will always return a value of the same type as the default.
+	* @param	bool			$multibyte	If $default is a string this parameter has to be true if the variable may contain any UTF-8 characters
+	*										Default is false, causing all bytes outside the ASCII range (0-127) to be replaced with question marks
+	* @param	mx_request_vars::POST|GET|REQUEST|COOKIE	$super_global
+	* 										Specifies which super global should be used
+	*
+	* @return	mixed	The value of $_REQUEST[$var_name] run through {@link set_var set_var} to ensure that the type is the
+	*					the same as that of $default. If the variable is not set $default is returned.
+	*/
+	public function variable($var_name, $default, $multibyte = false, $super_global = self::REQUEST)
+	{
+		return $this->_variable($var_name, $default, $multibyte, $super_global, true);
+	}
+
+	/**
+	* Get a variable, but without trimming strings.
+	* Same functionality as variable(), except does not run trim() on strings.
+	* This method should be used when handling passwords.
+	*
+	* @param	string|array	$var_name	The form variable's name from which data shall be retrieved.
+	* 										If the value is an array this may be an array of indizes which will give
+	* 										direct access to a value at any depth. E.g. if the value of "var" is array(1 => "a")
+	* 										then specifying array("var", 1) as the name will return "a".
+	* @param	mixed			$default	A default value that is returned if the variable was not set.
+	* 										This function will always return a value of the same type as the default.
+	* @param	bool			$multibyte	If $default is a string this parameter has to be true if the variable may contain any UTF-8 characters
+	*										Default is false, causing all bytes outside the ASCII range (0-127) to be replaced with question marks
+	* @param	mx_request_vars::POST|GET|REQUEST|COOKIE	$super_global
+	* 										Specifies which super global should be used
+	*
+	* @return	mixed	The value of $_REQUEST[$var_name] run through {@link set_var set_var} to ensure that the type is the
+	*					the same as that of $default. If the variable is not set $default is returned.
+	*/
+	public function untrimmed_variable($var_name, $default, $multibyte = false, $super_global = self::REQUEST)
+	{
+		return $this->_variable($var_name, $default, $multibyte, $super_global, false);
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function raw_variable($var_name, $default, $super_global = self::REQUEST)
+	{
+		$path = false;
+
+		// deep direct access to multi dimensional arrays
+		if (is_array($var_name))
+		{
+			$path = $var_name;
+			// make sure at least the variable name is specified
+			if (empty($path))
+			{
+				return (is_array($default)) ? array() : $default;
+			}
+			// the variable name is the first element on the path
+			$var_name = array_shift($path);
+		}
+
+		if (!isset($this->input[$super_global][$var_name]))
+		{
+			return (is_array($default)) ? array() : $default;
+		}
+		$var = $this->input[$super_global][$var_name];
+
+		if ($path)
+		{
+			// walk through the array structure and find the element we are looking for
+			foreach ($path as $key)
+			{
+				if (is_array($var) && isset($var[$key]))
+				{
+					$var = $var[$key];
+				}
+				else
+				{
+					return (is_array($default)) ? array() : $default;
+				}
+			}
+		}
+
+		return $var;
+	}
+
+	/**
+	* Shortcut method to retrieve SERVER variables.
+	*
+	* Also fall back to getenv(), some CGI setups may need it (probably not, but
+	* whatever).
+	*
+	* @param	string|array	$var_name		See \phpbb\request\request_interface::variable
+	* @param	mixed			$Default		See \phpbb\request\request_interface::variable
+	*
+	* @return	mixed	The server variable value.
+	*/
+	public function server($var_name, $default = '')
+	{
+		$multibyte = true;
+
+		if ($this->is_set($var_name, self::SERVER))
+		{
+			return $this->variable($var_name, $default, $multibyte, self::SERVER);
+		}
+		else
+		{
+			$var = getenv($var_name);
+			//$this->type_cast_helper->recursive_set_var($var, $default, $multibyte);
+			return $var;
+		}
+	}
+
+	/**
+	* Shortcut method to retrieve the value of client HTTP headers.
+	*
+	* @param	string|array	$header_name	The name of the header to retrieve.
+	* @param	mixed			$default		See \phpbb\request\request_interface::variable
+	*
+	* @return	mixed	The header value.
+	*/
+	public function header($header_name, $default = '')
+	{
+		$var_name = 'HTTP_' . str_replace('-', '_', strtoupper($header_name));
+		return $this->server($var_name, $default);
+	}
+
+	/**
+	* Shortcut method to retrieve $_FILES variables
+	*
+	* @param string $form_name The name of the file input form element
+	*
+	* @return array The uploaded file's information or an empty array if the
+	* variable does not exist in _FILES.
+	*/
+	public function file($form_name)
+	{
+		return $this->variable($form_name, array('name' => 'none'), true, self::FILES);
+	}
+	
+	/**
 	 * Request POST variable.
 	 *
 	 * _read() wrappers to retrieve POST, GET or any REQUEST (both) variable.
@@ -4333,9 +5084,27 @@ class mx_request_vars
 	 */
 	public function post($var, $type = MX_TYPE_ANY, $dflt = '', $not_null = false)
 	{
-		return $this->_read($var, ($type | MX_TYPE_POST_VARS), $dflt, $not_null);
+		if (!$this->super_globals_disabled())
+		{
+			return $this->_read($var, ($type | MX_TYPE_POST_VARS), $dflt, $not_null);
+		}
+		else	
+		{
+			$super_global = self::POST;
+			$multibyte = false; //UTF-8 ?
+			$default = $dflt;
+			return $this->_variable($var_name, $default, $multibyte, $super_global, true);
+		}			
+		
 	}
-
+	
+	/** ** /	
+	public function post($var_name, $default, $multibyte = false, $super_global = self::POST)
+	{
+		return $this->_variable($var_name, $default, $multibyte, $super_global, true);
+	}
+	/** **/	
+	
 	/**
 	 * Request GET variable.
 	 *
@@ -4349,9 +5118,27 @@ class mx_request_vars
 	 */
 	public function get($var, $type = MX_TYPE_ANY, $dflt = '', $not_null = false)
 	{
-		return $this->_read($var, ($type | MX_TYPE_GET_VARS), $dflt, $not_null);
-	}
+		if (!$this->super_globals_disabled())
+		{
+			return $this->_read($var, ($type | MX_TYPE_GET_VARS), $dflt, $not_null);
+		}
+		else	
+		{
+			$super_global = self::GET;
+			$multibyte = false; //UTF-8 ?
+			$default = $dflt;
+			return $this->_variable($var_name, $default, $multibyte, $super_global, true);
+		}		
 
+	}
+	
+	/** ** /
+	public function get($var_name, $default, $multibyte = false, $super_global = self::GET)
+	{
+		return $this->_variable($var_name, $default, $multibyte, $super_global, true);
+	}
+	/** **/
+	
 	/**
 	 * Request GET or POST variable.
 	 *
@@ -4365,7 +5152,17 @@ class mx_request_vars
 	 */
 	public function request($var, $type = MX_TYPE_ANY, $dflt = '', $not_null = false)
 	{
-		return $this->_read($var, ($type | MX_TYPE_POST_VARS | MX_TYPE_GET_VARS), $dflt, $not_null);
+		if (!$this->super_globals_disabled())
+		{
+			return $this->_read($var, ($type | MX_TYPE_POST_VARS | MX_TYPE_GET_VARS), $dflt, $not_null);	
+		}
+		else	
+		{
+			$super_global = self::REQUEST;
+			$multibyte = false; //UTF-8 ?
+			$default = $dflt;
+			return $this->_variable($var_name, $default, $multibyte, $super_global, true);
+		}	
 	}
 
 	/**
@@ -4379,8 +5176,8 @@ class mx_request_vars
 	 */
 	public function is_post($var)
 	{
-		// Note: _x and _y are used by (at least IE) to return the mouse position at onclick of INPUT TYPE="img" elements.
-		return (isset($_POST[$var]) || ( isset($_POST[$var.'_x']) && isset($_POST[$var.'_y']))) ? 1 : 0;
+		// Note: _x and _y are used by (at least IE) to return the mouse position at onclick of INPUT TYPE="img" elements.	
+		return ($this->is_set_post($var) || $this->is_set_post($var.'_x') && $this->is_set_post($var.'_y')) ? 1 : 0;		
 	}
 
 	/**
@@ -4394,7 +5191,8 @@ class mx_request_vars
 	 */
 	public function is_get($var)
 	{
-		return isset($_GET[$var]) ? 1 : 0 ;
+		//return isset($_GET[$var]) ? 1 : 0 ;
+		return $this->is_set($var, self::GET);		
 	}
 
 	/**
@@ -4409,7 +5207,9 @@ class mx_request_vars
 	public function is_request($var)
 	{
 		return ($this->is_get($var) || $this->is_post($var)) ? 1 : 0;
-	}
+		//return $this->is_set($var, self::REQUEST);
+	}	
+	
 	/**
 	 * Is POST var empty?
 	 *
@@ -4422,8 +5222,10 @@ class mx_request_vars
 	 */
 	public function is_empty_post($var)
 	{
-		return (empty($_POST[$var]) && ( empty($_POST[$var.'_x']) || empty($_POST[$var.'_y']))) ? 1 : 0 ;
+		//return (empty($_POST[$var]) && ( empty($_POST[$var.'_x']) || empty($_POST[$var.'_y']))) ? 1 : 0 ;
+		return ($this->is_empty($var, self::POST) && ($this->is_empty($var.'_x', self::POST) || $this->is_empty($var.'_y', self::POST))) ? 1 : 0;		
 	}
+	
 	/**
 	 * Is GET var empty?
 	 *
@@ -4436,7 +5238,8 @@ class mx_request_vars
 	 */
 	public function is_empty_get($var)
 	{
-		return empty($_GET[$var]) ? 1 : 0 ;
+		//return empty($_GET[$var]) ? 1 : 0;
+		return $this->is_empty($var, self::GET);		
 	}
 
 	/**
@@ -4452,6 +5255,276 @@ class mx_request_vars
 	{
 		return ($this->is_empty_get($var) && $this->is_empty_post($var)) ? 1 : 0;
 	}
+	
+	/**
+	* Checks whether a certain variable was sent via POST.
+	* To make sure that a request was sent using POST you should call this function
+	* on at least one variable.
+	*
+	* @param	string	$name	The name of the form variable which should have a
+	*							_p suffix to indicate the check in the code that creates the form too.
+	*
+	* @return	bool			True if the variable was set in a POST request, false otherwise.
+	*/
+	public function is_set_post($name)
+	{
+		return $this->is_set($name, self::POST);
+	}
+
+	
+	/**
+	* Checks whether a certain variable was sent via GET.
+	* To make sure that a request was sent using GET you should call this function
+	* on at least one variable.
+	*
+	* @param	string	$name	The name of the form variable which should have a
+	*							_p suffix to indicate the check in the code that creates the form too.
+	*
+	* @return	bool			True if the variable was set in a GET request, false otherwise.
+	*/
+	public function is_set_get($name)
+	{
+		return $this->is_set($name, self::GET);
+	}	
+	
+	/**
+	* Checks whether a certain variable is empty in one of the super global
+	* arrays.
+	*
+	* @param	string	$var	Name of the variable
+	* @param	mx_request_vars::POST|GET|REQUEST|COOKIE	$super_global
+	*							Specifies the super global which shall be checked
+	*
+	* @return	bool			True if the variable was sent as input
+	*/
+	public function is_empty($var, $super_global = self::REQUEST)
+	{
+		return empty($this->input[$super_global][$var]);
+	}	
+	
+	/**
+	* Checks whether a certain variable is set in one of the super global
+	* arrays.
+	*
+	* @param	string	$var	Name of the variable
+	* @param	mx_request_vars::POST|GET|REQUEST|COOKIE	$super_global
+	*							Specifies the super global which shall be checked
+	*
+	* @return	bool			True if the variable was sent as input
+	*/
+	public function is_set($var, $super_global = self::REQUEST)
+	{
+		return isset($this->input[$super_global][$var]);
+	}
+	
+	/**
+	* Checks whether the current request is an AJAX request (XMLHttpRequest)
+	*
+	* @return	bool			True if the current request is an ajax request
+	*/
+	public function is_ajax()
+	{
+		return $this->header('X-Requested-With') == 'XMLHttpRequest';
+	}
+
+	/**
+	* Checks if the current request is happening over HTTPS.
+	*
+	* @return	bool			True if the request is secure.
+	*/
+	public function is_secure()
+	{
+		$https = $this->server('HTTPS');
+		$https = $this->server('HTTP_X_FORWARDED_PROTO') === 'https' ? 'on' : $https;
+		return !empty($https) && $https !== 'off';
+	}
+
+	/**
+	* Returns all variable names for a given super global
+	*
+	* @param	mx_request_vars::POST|GET|REQUEST|COOKIE	$super_global
+	*					The super global from which names shall be taken
+	*
+	* @return	array	All variable names that are set for the super global.
+	*					Pay attention when using these, they are unsanitised!
+	*/
+	public function variable_names($super_global = self::REQUEST)
+	{
+		if (!isset($this->input[$super_global]))
+		{
+			return array();
+		}
+
+		return array_keys($this->input[$super_global]);
+	}
+
+	/**
+	* Helper function used by variable() and untrimmed_variable().
+	*
+	* @param	string|array	$var_name	The form variable's name from which data shall be retrieved.
+	* 										If the value is an array this may be an array of indizes which will give
+	* 										direct access to a value at any depth. E.g. if the value of "var" is array(1 => "a")
+	* 										then specifying array("var", 1) as the name will return "a".
+	* @param	mixed			$default	A default value that is returned if the variable was not set.
+	* 										This function will always return a value of the same type as the default.
+	* @param	bool			$multibyte	If $default is a string this parameter has to be true if the variable may contain any UTF-8 characters
+	*										Default is false, causing all bytes outside the ASCII range (0-127) to be replaced with question marks
+	* @param	mx_request_vars::POST|GET|REQUEST|COOKIE	$super_global
+	* 										Specifies which super global should be used
+	* @param	bool			$trim		Indicates whether trim() should be applied to string values.
+	*
+	* @return	mixed	The value of $_REQUEST[$var_name] run through {@link set_var set_var} to ensure that the type is the
+	*					the same as that of $default. If the variable is not set $default is returned.
+	*/
+	protected function _variable($var_name, $default, $multibyte = false, $super_global = self::REQUEST, $trim = true)
+	{
+		$var = $this->raw_variable($var_name, $default, $super_global);
+
+		// Return prematurely if raw variable is empty array or the same as
+		// the default. Using strict comparison to ensure that one can't
+		// prevent proper type checking on any input variable
+		if ($var === array() || $var === $default)
+		{
+			return $var;
+		}
+
+		//$this->type_cast_helper->recursive_set_var($var, $default, $multibyte, $trim);
+
+		return $var;
+	}
+
+	/**
+	* {@inheritdoc}
+	*/
+	public function get_super_global($super_global = self::REQUEST)
+	{
+		return $this->input[$super_global];
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function escape($var, $multibyte)
+	{
+		if (is_array($var))
+		{
+			$result = array();
+			foreach ($var as $key => $value)
+			{
+				//$this->type_cast_helper->set_var($key, $key, gettype($key), $multibyte);
+				$result[$key] = $this->escape($value, $multibyte);
+			}
+			$var = $result;
+		}
+		else
+		{
+			//$this->type_cast_helper->set_var($var, $var, 'string', $multibyte);
+		}
+
+		return $var;
+	}	
 
 }	// class mx_request_vars
+
+/**
+* Replacement for a superglobal (like $_GET or $_POST) which calls
+* trigger_error on all operations but isset, overloads the [] operator with SPL.
+*/
+class deactivated_super_global implements \ArrayAccess, \Countable, \IteratorAggregate
+{
+	/**
+	* @var	string	Holds the name of the superglobal this is replacing.
+	*/
+	private $name;
+
+	/**
+	* @var	\phpbb\request\request_interface::POST|GET|REQUEST|COOKIE	Super global constant.
+	*/
+	private $super_global;
+
+	/**
+	* @var	mx_request_vars	The request class instance holding the actual request data.
+	*/
+	private $request;
+
+	/**
+	* Constructor generates an error message fitting the super global to be used within the other functions.
+	*
+	* @param	mx_request_vars	$request	A request class instance holding the real super global data.
+	* @param	string					$name		Name of the super global this is a replacement for - e.g. '_GET'.
+	* @param	mx_request_vars::POST|GET|REQUEST|COOKIE	$super_global	The variable's super global constant.
+	*/
+	public function __construct(mx_request_vars $request, $name, $super_global)
+	{
+		$this->request = $request;
+		$this->name = $name;
+		$this->super_global = $super_global;
+	}
+
+	/**
+	* Calls trigger_error with the file and line number the super global was used in.
+	*/
+	private function error()
+	{
+		$file = '';
+		$line = 0;
+
+		$message = 'Illegal use of $' . $this->name . '. You must use the request class to access input data. Found in %s on line %d. This error message was generated by deactivated_super_global.';
+
+		$backtrace = debug_backtrace();
+		if (isset($backtrace[1]))
+		{
+			$file = $backtrace[1]['file'];
+			$line = $backtrace[1]['line'];
+		}
+		trigger_error(sprintf($message, $file, $line), E_USER_ERROR);
+	}
+
+	/**
+	* Redirects isset to the correct request class call.
+	*
+	* @param	string	$offset	The key of the super global being accessed.
+	*
+	* @return	bool	Whether the key on the super global exists.
+	*/
+	public function offsetExists($offset)
+	{
+		return $this->request->is_set($offset, $this->super_global);
+	}
+
+	/**#@+
+	* Part of the \ArrayAccess implementation, will always result in a FATAL error.
+	*/
+	public function offsetGet($offset)
+	{
+		$this->error();
+	}
+
+	public function offsetSet($offset, $value)
+	{
+		$this->error();
+	}
+
+	public function offsetUnset($offset)
+	{
+		$this->error();
+	}
+	/**#@-*/
+
+	/**
+	* Part of the \Countable implementation, will always result in a FATAL error
+	*/
+	public function count()
+	{
+		$this->error();
+	}
+
+	/**
+	* Part of the Traversable/IteratorAggregate implementation, will always result in a FATAL error
+	*/
+	public function getIterator()
+	{
+		$this->error();
+	}
+}	// class deactivated_super_global
 ?>

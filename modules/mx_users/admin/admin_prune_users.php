@@ -53,14 +53,15 @@ else
 							WHERE ug.user_id = $user_id
 								AND g.group_id = ug.group_id
 								AND g.group_single_user = 1";
-					break;
+				break;
 				case 'phpbb3':
+				default:
 					$sql = "SELECT g.group_id
 							FROM " . USER_GROUP_TABLE . " ug, " . GROUPS_TABLE . " g
 							WHERE ug.user_id = $user_id
 								AND g.group_id = ug.group_id
 								AND g.group_name IN ('BOTS', 'GUESTS')";
-					break;
+				break;
 			}
 
 				if( !($result = $db->sql_query($sql)) )
