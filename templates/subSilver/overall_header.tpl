@@ -121,16 +121,7 @@ function checkSearch()
 
 						</table>
 					</td>
-				</tr>					
-						
-				<!-- BEGIN switch_view -->
-				<tr>
-					<td align="left" valign="bottom" colspan="3" ><span class="gensmall">{CURRENT_TIME}</span></td>
 				</tr>
-				<tr>
-					<td align="left" valign="bottom" colspan="3" ><span class="nav"><a href="{U_INDEX}" class="nav">{L_INDEX}</a></span></td>
-				</tr>
-				<!-- END switch_view -->
 
 			</table>
 

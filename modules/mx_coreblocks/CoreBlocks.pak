@@ -3,11 +3,11 @@ New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
 function=+:10=+:3=+:DynamicBlock=+:SubBlocks on the same page=+:mx_dynamic.php=+:
 parameter=+:3=+:80=+:default_block_id=+:Function=+:0=+:get_list_formatted("block_list","{parameter_value}","{parameter_id}[]")=+:1=+:0
 parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
-block=+:=+:Demo - DynamicBlock=+:Demo block=+:3=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+block=+:=+:DynamicBlock=+:Demo block=+:3=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
 New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
 function=+:10=+:4=+:Google Search=+:Simple Google Search Block=+:mx_google.php=+:
 parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
-block=+:=+:Demo - Google Search=+:Demo block=+:4=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+block=+:=+:Google Search=+:Demo block=+:4=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
 New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
 function=+:10=+:5=+:IncludeX=+:Include Whatever=+:mx_includex.php=+:
 parameter=+:5=+:70=+:x_mode=+:Menu_single_select=+:x_iframe=+:a:6:{i:0;s:8:"x_listen";i:1;s:8:"x_iframe";i:2;s:10:"x_textfile";i:3;s:12:"x_multimedia";i:4;s:5:"x_pic";i:5;s:8:"x_format";}=+:0=+:0
@@ -15,38 +15,38 @@ parameter=+:5=+:71=+:x_1=+:Text=+:/docs=+:=+:0=+:0
 parameter=+:5=+:72=+:x_2=+:Text=+:325=+:=+:0=+:0
 parameter=+:5=+:73=+:x_3=+:Text=+:=+:=+:0=+:0
 parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
-block=+:=+:Demo - IncludeX=+:Demo block=+:5=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+block=+:=+:IncludeX=+:Demo block=+:5=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
 New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
 function=+:10=+:6=+:Language Select=+:Quick Language Select Block=+:mx_language.php=+:
 parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
-block=+:=+:Demo - Language Select=+:Demo block=+:6=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+block=+:=+:Language Select=+:Demo block=+:6=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
 New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
 function=+:10=+:7=+:Login=+:Login Block=+:mx_login.php=+:
 parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
-block=+:=+:Demo - Login=+:Demo block=+:7=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+block=+:=+:Login=+:Demo block=+:7=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
 New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
 function=+:10=+:11=+:Split Block=+:Split columns, put blocks side by side=+:mx_multiple_blocks.php=+:
 parameter=+:11=+:60=+:block_ids=+:Function=+:1,2,3=+:get_list_multiple( "{parameter_id}[]", BLOCK_TABLE, 'block_id', 'block_title', "{parameter_value}", TRUE, 'block_desc')=+:0=+:0
 parameter=+:11=+:61=+:block_sizes=+:Text=+:20%,30%,*=+:=+:1=+:0
 parameter=+:11=+:62=+:space_between=+:Number=+:4=+:=+:1=+:0
 parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
-block=+:=+:Demo - Split Block=+:Demo block=+:11=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+block=+:=+:Split Block=+:Demo block=+:11=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
 New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
 function=+:10=+:13=+:Who is Online=+:Who is Online Block=+:mx_online.php=+:
 parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
-block=+:=+:Demo - Who is Online=+:Demo block=+:13=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+block=+:=+:Who is Online=+:Demo block=+:13=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
 New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
 function=+:10=+:15=+:Site Search=+:Textblock Search Block=+:mx_search.php=+:
 parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
-block=+:=+:Demo - Site Search=+:Demo block=+:15=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+block=+:=+:Site Search=+:Demo block=+:15=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
 New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
 function=+:10=+:10=+:Site Log=+:Admin Site Log monitor=+:mx_site_log.php=+:
 parameter=+:10=+:91=+:log_filter_date=+:Menu_single_select=+:1 month=+:a:12:{i:0;s:8:"no limit";i:1;s:5:"1 day";i:2;s:6:"2 days";i:3;s:6:"3 days";i:4;s:6:"1 week";i:5;s:7:"2 weeks";i:6;s:7:"3 weeks";i:7;s:7:"1 month";i:8;s:8:"2 months";i:9;s:8:"3 months";i:10;s:8:"6 months";i:11;s:6:"1 year";}=+:1=+:0
 parameter=+:10=+:92=+:numOfEvents=+:Number=+:5=+:=+:1=+:0
 parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
-block=+:=+:Demo - Site Log=+:Demo block=+:10=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+block=+:=+:Site Log=+:Demo block=+:10=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
 New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
 function=+:10=+:12=+:Style Select=+:Quick Style Select Block=+:mx_theme.php=+:
 parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
-block=+:=+:Demo - Style Select=+:Demo block=+:12=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+block=+:=+:Style Select=+:Demo block=+:12=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
 function=+:0=+:0=+:0=+:endoflist=+:0=+:0

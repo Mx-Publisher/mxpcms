@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: common.php,v 1.107 2008/10/04 07:04:24 orynider Exp $
+* @version $Id: common.php,v 1.121 2014/05/09 07:51:42 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -14,28 +14,28 @@ if ( !defined('IN_PORTAL') )
 	die("Hacking attempt");
 }
 
-//
-// To be able to include phpBB functions/methods
-//
-define('IN_PHPBB', 1);
-define('PHPBB_INSTALLED', true);
+/*
+* To be able to include phpBB functions/methods
+*/
+@define('IN_PHPBB', 1);
+@define('PHPBB_INSTALLED', true);
 
-
-//
 // Reset stats
-//
 $mx_starttime = explode(' ', microtime());
 $mx_starttime = $mx_starttime[1] + $mx_starttime[0];
 
-//
-// DEBUG AND ERROR HANDLING
-//
+/*
+* DEBUG AND ERROR HANDLING
+*/
 define('DEBUG', true); // [Admin Option] Show Footer debug stats - Actually set in phpBB/includes/constants.php
 define('DEBUG_EXTRA', true); // [Admin Option] Show memory usage. Show link to full SQL debug report in footer. Beware, this makes the page slow to load. For debugging only.
-@ini_set( 'display_errors', '1' );
-error_reporting  (E_ERROR | E_WARNING | E_PARSE); // This will NOT report uninitialized variables
-//error_reporting(E_ALL & ~E_NOTICE); //Default error reporting in PHP 5.2+
-include($mx_root_path . 'modules/mx_shared/ErrorHandler/prepend.' . $phpEx); // For nice error output
+define('INCLUDES', 'includes/'); //Main Includes folder
+@ini_set('display_errors', '1');
+//@error_reporting(E_ERROR | E_WARNING | E_PARSE); // This will NOT report uninitialized variables
+//@error_reporting(E_ALL & ~E_NOTICE); //Default error reporting in PHP 5.2+
+//@session_cache_expire (1440);
+//@set_time_limit (0);
+//include($mx_root_path . 'modules/mx_shared/ErrorHandler/prepend.' . $phpEx); // For nice error output
 
 // ================================================================================
 // The following code is based on common.php from phpBB
@@ -114,7 +114,7 @@ function deregister_globals()
 }
 
 // If we are on PHP >= 6.0.0 we do not need some code
-if (version_compare(PHP_VERSION, '6.0.0-dev', '>='))
+if (version_compare(PHP_VERSION, '5.3.0', '>='))
 {
 	/**
 	* @ignore
@@ -123,7 +123,7 @@ if (version_compare(PHP_VERSION, '6.0.0-dev', '>='))
 }
 else
 {
-	set_magic_quotes_runtime(0);
+	@set_magic_quotes_runtime(0);
 
 	// Be paranoid with passed vars
 	if (@ini_get('register_globals') == '1' || strtolower(@ini_get('register_globals')) == 'on' || !function_exists('ini_get'))
@@ -131,7 +131,7 @@ else
 		@deregister_globals();
 	}
 
-	define('STRIP', (get_magic_quotes_gpc()) ? true : false);
+	define('STRIP', (@get_magic_quotes_gpc()) ? true : false);
 }
 
 // The following code (unsetting globals)
@@ -167,11 +167,11 @@ if (isset($HTTP_SESSION_VARS) && !is_array($HTTP_SESSION_VARS))
 	die("Hacking attempt");
 }
 
-//
-// Define some basic configuration arrays this also prevents
-// malicious rewriting of language and otherarray values via
-// URI params
-//
+/*
+* Define some basic configuration arrays this also prevents
+* malicious rewriting of language and otherarray values via
+* URI params
+*/
 $board_config = array();
 $portal_config = array();
 $userdata = array();
@@ -182,51 +182,56 @@ $nav_links = array();
 $dss_seeded = false;
 $gen_simple_header = FALSE;
 
-//
-// Read main config file
-//
+/*
+* Read main config file
+*/
 @include_once($mx_root_path . 'config.' . $phpEx);
 
-//
-// Redirect for fresh MX-Publisher install
-//
+/*
+* Redirect for fresh MX-Publisher install
+*/
 if( !defined('MX_INSTALLED') || (MX_INSTALLED === false) )
 {
 	header('Location: ' . $mx_root_path . 'install/mx_install.' . $phpEx);
 	exit;
 }
 
-include_once($mx_root_path . 'includes/shared/phpbb2/includes/functions.' . $phpEx);
-include_once($mx_root_path . 'includes/shared/phpbb3/includes/functions.' . $phpEx);
+/*
+* MX-Publisher CORE Includes
+*/
+require($mx_root_path . INCLUDES . 'mx_class_loader.' . $phpEx);
+require($mx_root_path . INCLUDES . 'mx_constants.' . $phpEx); // Also includes phpBB constants
+require($mx_root_path . INCLUDES . 'db/' . $dbms . '.' . $phpEx); // Load dbal and initiate class
+require($mx_root_path . INCLUDES . 'utf/utf_tools.' . $phpEx); //Load UTF-8 Tools
+require($mx_root_path . INCLUDES . 'mx_functions_core.' . $phpEx); // CORE class
 
-//
-// Instantiate Dummy phpBB Classes
-//
-$phpBB2 = new phpBB2();
-$phpBB3 = new phpBB3();
+// Setup class loader first
+if (@phpversion() >= '5.1.2')
+{
+	$mx_class_loader = new mx_class_loader('mx_', "{$mx_root_path}includes/", $phpEx);
+	$mx_class_loader->register();
+	$mx_class_loader_ext = new mx_class_loader('mx_ext_', "{$mx_root_path}ext/", $phpEx);
+	$mx_class_loader_ext->register();
+}
 
-//
-// MX-Publisher CORE Includes
-//
-include_once($mx_root_path . 'includes/mx_constants.' . $phpEx); // Also includes phpBB constants
-include_once($mx_root_path . 'includes/db/' . $dbms . '.' . $phpEx); // Load dbal and initiate class
-include_once($mx_root_path . 'includes/mx_functions_core.' . $phpEx); // CORE class
-
-//
-// Instantiate the mx_request_vars class
-// make sure to do before it's ever used
+/*
+* Instantiate the mx_request_vars class
+* make sure to do before it's ever used
+*/
 $mx_request_vars = new mx_request_vars();
 
-//
-// Instantiate the mx_cache class
-//
+/*
+* Instantiate the mx_cache class
+*/
 $mx_cache = new mx_cache();
 
-//
-// Define Users/Group/Sessions backend, and validate
-// Set $portal_config, $phpbb_root_path, $tplEx, $table_prefix & PORTAL_BACKEND
-//
+
+/*
+* Define Users/Group/Sessions backend, and validate
+* Set $portal_config, $phpbb_root_path, $tplEx, $table_prefix & PORTAL_BACKEND
+*/
 $mx_cache->load_backend();
+
 
 //Temp fix for timezone
 if (@function_exists('date_default_timezone_set') && @function_exists('date_default_timezone_get'))
@@ -237,8 +242,8 @@ if (@function_exists('date_default_timezone_set') && @function_exists('date_defa
 //
 // MX-Publisher Includes - doing the rest
 //
-include_once($mx_root_path . 'includes/mx_functions.' . $phpEx); // CORE Functions
-include_once($mx_root_path . 'includes/mx_functions_style.' . $phpEx); // Styling and sessions
+include_once($mx_root_path . INCLUDES . 'mx_functions.' . $phpEx); // CORE Functions
+include_once($mx_root_path . INCLUDES . 'mx_functions_style.' . $phpEx); // Styling and sessions
 
 // We do not need this any longer, unset for safety purposes
 unset($dbpasswd);
@@ -267,7 +272,7 @@ $mx_block = new mx_block();
 // Obtain and encode users IP
 //
 $client_ip = ( !empty($_SERVER['REMOTE_ADDR']) ) ? $_SERVER['REMOTE_ADDR'] : ( ( !empty($_ENV['REMOTE_ADDR']) ) ? $_ENV['REMOTE_ADDR'] : getenv('REMOTE_ADDR') );
-$user_ip = $phpBB2->encode_ip($client_ip);
+$user_ip = phpBB2::encode_ip($client_ip);
 
 //
 // Define some general backend definitions
@@ -279,7 +284,6 @@ $mx_backend->setup_backend();
 // Instantiate the mx_bbcode class
 //
 $mx_bbcode = new mx_bbcode();
-
 
 //
 // Remove install and contrib folders
@@ -304,7 +308,7 @@ if (defined('DEBUG_EXTRA'))
 //
 // Show 'Board is disabled' message if needed.
 //
-if( $board_config['board_disable'] && !defined("IN_ADMIN") && !defined("IN_LOGIN") )
+if(!empty($portal_config['board_disable']) && !defined("IN_ADMIN") && !defined("IN_LOGIN"))
 {
 	mx_message_die(GENERAL_MESSAGE, 'Board_disable', 'Information');
 }
@@ -314,5 +318,6 @@ if( $board_config['board_disable'] && !defined("IN_ADMIN") && !defined("IN_LOGIN
 // Note! This is a tweak, modding the standard page_header.php file
 //
 $do_gzip_compress = FALSE;
+
 mx_session_start();			// Note: this needs $board_config populated
 ?>

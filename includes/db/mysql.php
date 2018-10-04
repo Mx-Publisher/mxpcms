@@ -2,11 +2,11 @@
 /**
 *
 * @package DBal
-* @version $Id: mysql.php,v 1.22 2008/10/04 17:30:23 orynider Exp $
+* @version $Id: mysql.php,v 1.27 2014/05/16 18:02:05 orynider Exp $
 * @copyright (c) 2005 phpBB Group
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU Public License
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -36,7 +36,7 @@ class dbal_mysql extends dbal
 {
 	var $mysql_version;
 	var $multi_insert = true;
-	
+
 	/**
 	* Connect to server
 	* @access public
@@ -47,9 +47,7 @@ class dbal_mysql extends dbal
 		$this->user = $sqluser;
 		$this->server = $sqlserver . (($port) ? ':' . $port : '');
 		$this->dbname = $database;
-
-		$this->sql_layer = 'mysql4';
-
+		
 		$this->db_connect_id = ($this->persistency) ? @mysql_pconnect($this->server, $this->user, $sqlpassword, $new_link) : @mysql_connect($this->server, $this->user, $sqlpassword, $new_link);
 		
 		if ($this->db_connect_id && $this->dbname != '')
@@ -61,18 +59,21 @@ class dbal_mysql extends dbal
 				
 				if (version_compare($this->mysql_version, '4.1.3', '>='))
 				{
-					if (UTF_STATUS === 'phpbb3')
-					{				
+					$this->sql_layer = 'mysql4';
+					
+					if (DBCHARACTER_SET === 'uft8')
+					{
 						@mysql_query("SET NAMES 'utf8'", $this->db_connect_id);
 						// enforce strict mode on databases that support it
 					}
+					
 					if (version_compare($this->mysql_version, '5.0.2', '>='))
 					{
 						$result = @mysql_query('SELECT @@session.sql_mode AS sql_mode', $this->db_connect_id);
 						$row = @mysql_fetch_assoc($result);
 						@mysql_free_result($result);
 						$modes = array_map('trim', explode(',', $row['sql_mode']));
-
+						
 						// TRADITIONAL includes STRICT_ALL_TABLES and STRICT_TRANS_TABLES
 						if (!in_array('TRADITIONAL', $modes))
 						{
@@ -80,26 +81,29 @@ class dbal_mysql extends dbal
 							{
 								$modes[] = 'STRICT_ALL_TABLES';
 							}
-
+							
 							if (!in_array('STRICT_TRANS_TABLES', $modes))
 							{
 								$modes[] = 'STRICT_TRANS_TABLES';
 							}
 						}
-
+						
 						$mode = implode(',', $modes);
 						@mysql_query("SET SESSION sql_mode='{$mode}'", $this->db_connect_id);
 					}
 				}
-				else if (version_compare($this->mysql_version, '4.0.0', '<'))
+				else if (version_compare($this->mysql_version, '4.0.0', '>='))
+				{
+					$this->sql_layer = 'mysql4';
+				}
+				else
 				{
 					$this->sql_layer = 'mysql';
 				}
-
 				return $this->db_connect_id;
 			}
 		}
-		return $this->sql_error();
+		return $this->sql_error('');
 	}
 
 
@@ -211,7 +215,8 @@ class dbal_mysql extends dbal
 			// if $total is set to 0 we do not want to limit the number of rows
 			if ($total == 0)
 			{
-				$total = -1;
+				// Because MySQL 4.1+ no longer supports -1 in LIMIT queries we set it to the maximum value
+				$total = '18446744073709551615';
 			}
 
 			$query .= "\n LIMIT " . ((!empty($offset)) ? $offset . ', ' . $total : $total);
@@ -299,10 +304,19 @@ class dbal_mysql extends dbal
 	*/
 	function sql_rowseek($rownum, $query_id = false)
 	{
+		global $mx_cache;
+
 		if (!$query_id)
 		{
 			$query_id = $this->query_result;
 		}
+
+		/* Backported from Olympus, not compatible with MXP, yet
+		if (isset($mx_cache->sql_rowset[$query_id]))
+		{
+			return $mx_cache->sql_rowseek($rownum, $query_id);
+		}
+		*/
 
 		return ($query_id) ? @mysql_data_seek($query_id, $rownum) : false;
 	}
@@ -320,10 +334,19 @@ class dbal_mysql extends dbal
 	*/
 	function sql_freeresult($query_id = false)
 	{
+		global $mx_cache;
+
 		if (!$query_id)
 		{
 			$query_id = $this->query_result;
 		}
+
+		/* Backported from Olympus, not compatible with MXP, yet
+		if (isset($mx_cache->sql_rowset[$query_id]))
+		{
+			return $mx_cache->sql_freeresult($query_id);
+		}
+		*/
 
 		if (isset($this->open_queries[(int) $query_id]))
 		{
@@ -345,26 +368,6 @@ class dbal_mysql extends dbal
 		}
 
 		return @mysql_real_escape_string($msg, $this->db_connect_id);
-	}
-
-	/**
-	* return sql error array
-	* @private
-	*/
-	function _sql_error()
-	{
-		if (!$this->db_connect_id)
-		{
-			return array(
-				'message'	=> @mysql_error(),
-				'code'		=> @mysql_errno()
-			);
-		}
-
-		return array(
-			'message'	=> @mysql_error($this->db_connect_id),
-			'code'		=> @mysql_errno($this->db_connect_id)
-		);
 	}
 
 	/**
@@ -390,6 +393,26 @@ class dbal_mysql extends dbal
 		}
 
 		return $data;
+	}
+
+	/**
+	* return sql error array
+	* @private
+	*/
+	function _sql_error()
+	{
+		if (!$this->db_connect_id)
+		{
+			return array(
+				'message'	=> @mysql_error(),
+				'code'		=> @mysql_errno()
+			);
+		}
+
+		return array(
+			'message'	=> @mysql_error($this->db_connect_id),
+			'code'		=> @mysql_errno($this->db_connect_id)
+		);
 	}
 
 	/**

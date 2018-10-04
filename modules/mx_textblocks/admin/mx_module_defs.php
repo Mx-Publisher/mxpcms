@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Module - mx_textblocks
-* @version $Id: mx_module_defs.php,v 1.31 2008/07/18 00:49:54 orynider Exp $
+* @version $Id: mx_module_defs.php,v 1.33 2013/07/02 02:24:04 orynider Exp $
 * @copyright (c) 2002-2008 [Jon Ohlsson] MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -50,7 +50,7 @@ class mx_module_defs
 	function submit_module_parameters( $parameter_data, $block_id )
 	{
 		global $mx_request_vars, $db, $board_config, $mx_cache, $mx_blockcp, $mx_root_path, $phpbb_root_path, $phpEx;
-		global $html_entities_match, $html_entities_replace;
+		global $html_entities_match, $html_entities_replace, $mx_admin;
 
 		$parameter_value = $mx_request_vars->post($parameter_data['parameter_name']);
 		$parameter_opt = '';
@@ -96,13 +96,13 @@ class mx_module_defs
 		//
 		// Add search words
 		//
-		mx_admin::mx_remove_search_post($block_id);
+		$mx_admin->mx_remove_search_post($block_id);
 
 		$block_config_temp = $mx_cache->read( $block_id, MX_CACHE_BLOCK_TYPE );
 		$block_info_temp = $block_config_temp[$block_id]['block_info'];
 		$block_title = $block_info_temp['block_title'];
 
-		mx_admin::mx_add_search_words('single', $block_id, $parameter_value, $block_title);
+		$mx_admin->mx_add_search_words('single', $block_id, $parameter_value, $block_title);
 
 		return array('parameter_value' => $parameter_value, 'parameter_opt' => $parameter_opt);
 	}

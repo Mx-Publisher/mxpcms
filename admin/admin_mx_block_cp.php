@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: admin_mx_block_cp.php,v 1.25 2008/07/15 22:02:42 jonohlsson Exp $
+* @version $Id: admin_mx_block_cp.php,v 1.29 2013/06/28 15:32:37 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -19,7 +19,7 @@ if( !empty($setmodules) )
 //
 // Security and Page header
 //
-define('IN_PORTAL', 1);
+@define('IN_PORTAL', 1);
 $mx_root_path = './../';
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
 $no_page_header = TRUE;
@@ -49,22 +49,18 @@ $action = $mx_request_vars->request('action', MX_TYPE_NO_TAGS, '');
 $blog_mode = $mx_request_vars->request('blog_mode', MX_TYPE_NO_TAGS, '');
 $sid = $mx_request_vars->request('sid', MX_TYPE_NO_TAGS, '');
 
-//
 // Initial vars
-//
 $block_id = $mx_request_vars->is_request('block_id') ? $mx_request_vars->request('block_id', MX_TYPE_INT, '') : $mx_request_vars->request('id', MX_TYPE_INT, '');
 $portalpage = $mx_request_vars->request('portalpage', MX_TYPE_INT, 0);
 $sub_id = $mx_request_vars->request('sub_id', MX_TYPE_INT, 0);
 $blog_u = $mx_request_vars->request('u', MX_TYPE_INT, $userdata['user_id']);
 
-//
 // Parameters
-//
 $submit = $mx_request_vars->is_post('submit');
 $submit_pars = $mx_request_vars->is_post('submit_pars');
 $cancel = $mx_request_vars->is_post('cancel');
 $preview = $mx_request_vars->is_post('preview');
-$refresh = $preview || $submit_search;
+$refresh = $preview || $submit;
 
 //
 // Cancel
@@ -158,9 +154,7 @@ if( !empty($mode) && !empty($action) && !$preview)
 
 } // if .. !empty($mode)
 
-//
 // Hidden vars
-//
 $s_hidden_fields = '<input type="hidden" name="sid" value="' . $userdata['session_id'] . '" />';
 $s_hidden_fields .= '<input type="hidden" name="block_id" value="' . $block_id . '" />';
 $s_hidden_fields .= '<input type="hidden" name="portalpage" value="' . $portalpage . '" />';
@@ -186,12 +180,11 @@ else if( file_exists($mx_root_path . $mx_blockcp->module_root_path . 'language/l
 $mx_dynamic_select = new mx_dynamic_select();
 $mx_dynamic_select->generate($block_id, true);
 $blockcptemplate->assign_block_vars('dynamic_select', array());
-
 //
 // Start output
 //
 $blockcptemplate->set_filenames(array(
-	'body' 						=> 'admin/mx_blockcp_admin_body.tpl'
+	'body' => 'admin/mx_blockcp_admin_body.tpl'
 ));
 
 //

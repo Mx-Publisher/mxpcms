@@ -3,6 +3,7 @@ DirectoryIndex index.php
 
 # Just in case, let's disable viewing of directory indexes.
 Options -Indexes
+Options +FollowSymLinks
 
 # Just in case, let's disable register globals (only valid for php4).
 # Do NOT enable this when running php5, or you may face internal server errors
@@ -70,7 +71,8 @@ deny from all
 	#
 	
 	#RewriteRule ^support/catlink([0-9]*)(.*)$ index.php?page=53&cat_link=$1 [L]
-	#RewriteRule ^support(.*)$ index.php?page=53 [L]	
+	#RewriteRule ^support(.*)$ index.php?page=53 [L]
+	#RewriteRule ^index.html$ index.php [L,NE]	
 	
 	#
 	# General

@@ -10,9 +10,6 @@
 <title>{SITENAME} :: {PAGE_TITLE}</title>
 
 <!-- This should not be included direct from phpBB but later from MXP template folder wich means can be ported to internal backend with no change in this file -->
-<!-- BEGIN switch_phpbb_stylesheet-->
-<link rel="stylesheet" href="{U_PHPBB_ROOT_PATH}styles/subsilver2/theme/stylesheet.css" type="text/css" >
-<!-- END switch_phpbb_stylesheet-->
 
 <!-- Load mxBB template *.css definition for mx, located in the the portal template folder -->
 <link rel="stylesheet" href="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}{T_MXBB_STYLESHEET}" type="text/css" >

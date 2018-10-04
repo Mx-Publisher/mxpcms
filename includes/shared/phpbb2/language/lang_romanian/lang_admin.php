@@ -13,7 +13,7 @@
  *     copyright 2          : (C) Bogdan Toma
  *     email     2          : bogdan@phpbb.ro
  *
- *     $Id: lang_admin.php,v 1.4 2008/10/04 07:04:25 orynider Exp $
+ *     $Id: lang_admin.php,v 1.5 2008/10/05 23:43:08 orynider Exp $
  *
  ****************************************************************************/
 
@@ -36,7 +36,7 @@
 //
 
 
-$lang['ENCODING'] = 'iso-8859-2';
+$lang['ENCODING'] = 'UTF-8';
 $lang['DIRECTION'] = 'ltr';
 $lang['LEFT'] = 'stânga';
 $lang['RIGHT'] = 'dreapta';

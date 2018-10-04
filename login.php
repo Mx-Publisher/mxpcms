@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: login.php,v 1.32 2008/09/30 07:04:35 orynider Exp $
+* @version $Id: login.php,v 1.35 2014/05/16 18:02:06 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -52,22 +52,9 @@ else
 	$sid = '';
 }
 
-if($mx_request_vars->is_request('login') || $mx_request_vars->is_request('logout') )
+if($mx_request_vars->is_request('login') || $mx_request_vars->is_request('logout'))
 {
-	switch (PORTAL_BACKEND)
-	{
-		case 'internal':
-
-		case 'phpbb2':
-
-			include($mx_root_path . 'includes/sessions/'.PORTAL_BACKEND.'/login.'.$phpEx);
-			break;
-
-		case 'phpbb3':
-
-			include($mx_root_path . 'includes/sessions/'.PORTAL_BACKEND.'/login.'.$phpEx);
-			break;
-	}
+	include($mx_root_path . 'includes/sessions/'.PORTAL_BACKEND.'/login.'.$phpEx);
 }
 else
 {
@@ -99,7 +86,7 @@ else
 				{
 					for($i = 1; $i < count($forward_match); $i++)
 					{
-						if( !ereg("sid=", $forward_match[$i]) )
+						if(!preg_match('#sid=#', $forward_match[$i]))
 						{
 							if( $forward_page != '' )
 							{

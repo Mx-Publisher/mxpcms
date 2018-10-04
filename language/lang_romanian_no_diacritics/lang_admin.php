@@ -1,31 +1,31 @@
 <?php
 /**
 *
-* @package mxBB Portal Core
-* @version $Id: lang_admin.php,v 1.3 2008/06/18 17:53:07 orynider Exp $
-* @copyright (c) 2002-2006 mxBB Project Team
+* @package MX-Publisher CMS Core
+* @version $Id: lang_admin.php,v 1.8 2013/06/28 17:08:52 orynider Exp $
+* @copyright (c) 2002-2006 Mx-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
-//
-// Editor Settings: Please set Tabsize to 4 ;-)
-// 
+/* Editor Settings: Please set Tabsize to 4 ;-) */ 
 
-//
-// The formata of this file is:
-//
-// ---> $lang["message"] = 'text';
-//
-// Specify your language character encoding... [optional]
-//
-setlocale(LC_ALL, "ro");
+/*  The format of this file is:  ---> $lang['message'] = 'text';
+/*  Specify your language character encoding... [optional] */ 
+setlocale(LC_ALL, 'ro');
 
-$lang['mxBB_adminCP']				= 'mxBB-Portal Administratie';	
+$lang['USER_LANG'] = 'ro';
+$lang['ENCODING'] = 'UTF-8';
+$lang['DIRECTION'] = 'ltr';
+$lang['LEFT'] = 'left';
+$lang['RIGHT'] = 'right';
+$lang['DATE_FORMAT'] =  'd/M/Y'; // This should be changed to the default date format for your language, php date() format
 
-//
-// Left AdminCP Panel
-//
+$lang['Mx-Publisher_adminCP']			= 'Mx-Publisher-Portal Administratie';	
+$lang['Portal_Desc'] 					= 'A little text to describe your website.';
+
+/* Left AdminCP Panel */
 $lang['1_General_admin']		= 'General';
 $lang['1_1_Management']			= 'Configuratie';
 $lang['1_2_WordCensors'] 		= 'Cenzori de cuvinte';
@@ -47,16 +47,10 @@ $lang['4_1_Meta']				= 'Taguri META';
 $lang['4_1_PHPinfo']			= 'phpInfo()';
 $lang['4_2_Translate'] 			= 'Panou de Control Traduceri';
 
-
-//
-// Index
-//
-$lang['Welcome_mxBB'] 				= 'Bine ati venit la panoul de control al portalului mxBB';
-$lang['Admin_intro_mxBB'] 			= 'Va multumim pentru ati ales mxBB-Portal ca solutie pentru portalul/cms-ul dumneavoastra si phpBB ca solutie pentru forumul dumneavoastra. Acest ecran va ofera o privire de ansamblu a diverselor statistici ale site-ului dumneavoastra. Puteti reveni la aceasta pagina folosind legatura <span style="text-decoration: underline;">Pagina de start a administratorului</span> din panel-ul stang. Pentru a reveni la pagina de start a forumului dumneavoastra, apasati pe logo-ul phpBB-ului aflat, de asemenea, in panel-ul stang. Celelalte legaturi din partea stanga va permit sa controlati orice aspect al forumului, fiecare ecran va avea instructiuni care dau explicatii despre cum se folosesc uneltele.';
-
-//
-// General
-//
+/* Index */
+$lang['Welcome_Mx-Publisher'] 				= 'Bine ati venit la panoul de control al portalului Mx-Publisher';
+$lang['Admin_intro_Mx-Publisher'] 			= 'Va multumim pentru ati ales Mx-Publisher-Portal ca solutie pentru portalul/cms-ul dumneavoastra si phpBB ca solutie pentru forumul dumneavoastra. Acest ecran va ofera o privire de ansamblu a diverselor statistici ale site-ului dumneavoastra. Puteti reveni la aceasta pagina folosind legatura <span style="text-decoration: underline;">Pagina de start a administratorului</span> din panel-ul stang. Pentru a reveni la pagina de start a forumului dumneavoastra, apasati pe logo-ul phpBB-ului aflat, de asemenea, in panel-ul stang. Celelalte legaturi din partea stanga va permit sa controlati orice aspect al forumului, fiecare ecran va avea instructiuni care dau explicatii despre cum se folosesc uneltele.';
+/* General */
 $lang['Yes']						= 'Da';
 $lang['No']							= 'Nu';
 $lang['No_modules']					= 'Nici un Modul instalat';
@@ -101,9 +95,7 @@ $lang['was_synced']                	= 'a fost sincronizat';
 
 $lang['error_no_field']				= 'Este un camp lipsa. Te rog complecteza toate campurile necesare...';
 
-//
-// Configuration
-//
+/* Configuration */
 $lang['Portal_admin']						= 'Administratia Portalului';
 $lang['Portal_admin_explain']				= 'Foloseste acest form pt. a customiza portalul tau';
 $lang['Portal_General_Config']				= 'Configuratie Portal';
@@ -113,19 +105,19 @@ $lang['Portal_General_config_info']			= 'Info General Configurare Portal ';
 $lang['Portal_General_config_info_explain'] 	= 'Postata informatii instalare din fisierul config.php (nu e nevoie de editare)';
 $lang['Portal_Name']					= 'Nume Portal:';
 $lang['Portal_PHPBB_Url']				= 'URL pt. instarea ta de forum phpBB:';
-$lang['Portal_Url']						= 'URL pentru mxBB-Portal:';
+$lang['Portal_Url']						= 'URL pentru Mx-Publisher-Portal:';
 $lang['Portal_Config_updated']				= 'Configuratia Portalului Actualizata cu Succes';
 $lang['Click_return_portal_config']			= 'Click %sAici%s pentru a te intoarce la Configurarea Portalului';
 $lang['PHPBB_info']						= 'Informatii phpBB';
 $lang['PHPBB_version']					= 'Versiunea phpBB:';
 $lang['PHPBB_script_path']				= 'phpBB Cale Script:';
 $lang['PHPBB_server_name']				= 'phpBB Domeniu (nume_server):';
-$lang['MX_Portal']						= 'mxBB-Portal';
-$lang['MX_Modules']						= 'mxBB-Module';
+$lang['MX_Portal']						= 'Mx-Publisher-Portal';
+$lang['MX_Modules']						= 'Mx-Publisher-Module';
 $lang['Phpbb']							= 'phpBB';
 $lang['Top_phpbb_links']				= 'phpBB Stats in Header (valoare impicita)<br /> - linkuri la postari noi/necitite etc';
-$lang['Portal_version']					= 'Versiune mxBB-Portal:';
-$lang['Mx_use_cache']					= 'Foloseste mxBB Bloc Cache';
+$lang['Portal_version']					= 'Versiune Mx-Publisher-Portal:';
+$lang['Mx_use_cache']					= 'Foloseste Mx-Publisher Bloc Cache';
 $lang['Mx_use_cache_explain']			= 'Datele din Bloc este in fisiere individuale cache/bloc_*.xml. Fisierele Bloc cache sunt create cand Blocurile sunt editate.';
 $lang['Mx_mod_rewrite'] 				= 'Foloseste mod_rewrite';
 $lang['Mx_mod_rewrite_explain'] 		= 'Daca esti pe server Apache, si ai mod_rewrite activat, poti rescrie url-urile ca \'page=x\' cu alternative mai intuitive. Citeste pentru mai multe documentatia pentru modulul mx_mod_rewrite.';
@@ -160,10 +152,7 @@ $lang['Portal_config_valid'] = 'Statut Backend Curent: ';
 $lang['Portal_config_valid_true'] = '<b><font color=\"green\">Valid</font></b>';
 $lang['Portal_config_valid_false'] = '<b><font color=\"red\">Instalare Invalida. Sau calea catre phpBB este gresita ori phpBB nu este instalat (baza de date phpBB nu este disponibila). Deci, este folosit backend \'intern\'.</font></b>';
 
-
-//
-// Module Management
-//
+/* Module Management */
 $lang['Module_admin']				= 'Administratie Module';
 $lang['Module_admin_explain']		= 'Foloseste acest form pentru a administra modulele: instalare, upgradare si dezvoltare module.<br /><b>Pentru a folosi acest panou, trebuie sa ai JavaScript si cooki-urile activate in browser!</b>';
 $lang['Modulecp_admin']				= 'Panou de Control Module';
@@ -179,9 +168,7 @@ $lang['Module_desc']				= 'Descriptie';
 $lang['Module_path']				= 'Cale, ex: \'modules/mx_textblocks/\'';
 $lang['Module_include_admin']		= 'Include acest modul in panoul din stanga Navigare Admin Meniu';
 
-//
-// Module Installation
-//
+/* Module Installation */
 $lang['Module_delete_db']			= 'Chiar vrei sa dezinstalezi acest Modul? Atentie: O sa pierzi tote datele modulului. Considera upgradare in loc...';
 $lang['Click_module_delete_yes']	= 'Click %sAici%s pt. a dezinstala modulul';
 $lang['Click_module_upgrade_yes']	= 'Click %sAici%s pt. a upgrada modulul';
@@ -209,9 +196,7 @@ $lang['module_upgrade'] = 'This is a upgrade';
 $lang['fresh_install'] = 'This is a fresh install';
 $lang['module_install_info'] = 'Mod Installation/Upgrading/Uninstalling Information - mod specific db tables';
 
-//
-// Functions & Parameters Administration
-//
+/* Functions & Parameters Administration*/
 $lang['Function_admin']					= 'Administratie Functiune Bloc';
 $lang['Function_admin_explain']			= 'Modulele au una sau mai multe Functiuni Bloc. Foloseste acest form pt. a edita, si, sau sterge Functiunea unui Bloc';
 $lang['Function']				= 'Functiune Bloc';
@@ -242,9 +227,7 @@ $lang['Delete_parameter']				= 'sterge Functiune Parametru';
 $lang['Delete_parameter_explain']			= 'Acesta va sterge parametru si va actualiza toate blocurile portalului asociate. Atentie, aceasta operatie nu este reversibila!';
 $lang['Click_parameter_delete_yes']			= 'Click %sAici%s pentru a sterge Parametru';
 
-//
-// Parameter Types
-//
+/* Parameter Types*/
 $lang['ParType_BBText'] 			= 'Simplu BBText BlocText';
 $lang['ParType_BBText_info'] 			= 'Acesta este un simplu bloctext, permite bbcod-uri';
 $lang['ParType_Html'] 				= 'Simplu Html BlocText';
@@ -269,9 +252,7 @@ $lang['ParType_Menu_multiple_select_info'] 		= '';
 $lang['ParType_Checkbox_multiple_select'] 		= 'Multiplu-Selectie Boxa Verificare';
 $lang['ParType_Checkbox_multiple_select_info'] 		= '';
 
-//
-// Blocks Administration
-//
+/* Blocks Administration */
 $lang['Block_admin']				= 'Panou de Contol Bloc';
 $lang['Block_admin_explain']			= 'Foloseste acest form pentru a administra Blocurile Portalului.<br /><b>Pentru a folosi acest panou, trebuie sa ai JavaScript si cooki-urile activate in browser!</b>';
 $lang['Block']					= 'Bloc';
@@ -296,17 +277,13 @@ $lang['Delete_block']				= 'sterge Bloc din Portal';
 $lang['Delete_block_explain']			= 'Acesta va sterge blocul si va actualiza toate paginile portalului asociate. Atentie, aceasta operatie nu este reversibila!';
 $lang['Click_block_delete_yes']			= 'Click %sAici%s pt. a sterge Blocul';
 
-//
-// BlockCP Administration
-//
+/* BlockCP Administration */
 $lang['Block_cp']                   	= 'BlockCP';
 $lang['Click_return_blockCP_admin']	= 'Click %sAici%s pt. intoarcere la Panoul de Control Bloc';
 $lang['Click_return_portalpage_admin']	= 'Click %sAici%s pt. intoarcere la Pagina Portalului';
 $lang['BlockCP_Config_updated']		= 'Blocul a fost Actualizat...';
 
-//
-// Pages Administration
-//
+/* Pages Administration */
 $lang['Page_admin']			= 'Administratia Paginii';
 $lang['Page_admin_explain']		= 'Foloseste acest form pt. a adauga, sterge si schimba setarile pentru Paginile Portalului si Paginile Templaturi.<br /><b>Pentru a folosi acest panou, trebuie sa ai JavaScript si cooki-urile activate in browser!</b>';
 $lang['Page_admin_edit']		= 'Editare Pagina';
@@ -364,9 +341,7 @@ $lang['Delete_page_column']			= 'sterge Coloana Paginii';
 $lang['Delete_page_column_explain']		= 'Acesta va sterge Coloana Paginii. Atentie, acesta operatie nu este reversibila!';
 $lang['Click_page_column_delete_yes']	= 'Click %sAici%s pt. a sterge Colana Paginii';
 
-//
-// Page templates
-//
+/* Page templates */
 $lang['Page_templates_admin']			= 'Administartie Templaturi Pagina';
 $lang['Page_templates_admin_explain'] 	= 'Foloseste acesta pt. a crea, edita ori sterge Templaturi';
 $lang['Page_template']					= 'Template Pagina';
@@ -386,33 +361,29 @@ $lang['Delete_page_template_column']	= 'sterge Pagina Template';
 $lang['Delete_page_template_column_explain']	= 'Acesta va sterge Templatul Paginii. Atentie, acesta operatie nu este reversibila!';
 $lang['Click_page_template_column_delete_yes']	= 'Click %sAici%s pt. a sterge Templatul Paginii';
 
-//
-// Cache
-//
+/* Cache */
 $lang['Cache_dir_write_protect']	= 'Directorul tau cache este protejat la scriere. Nu s-a putut genera fisierul cache';
 $lang['Cache_generate']				= 'Fisierele cache au fost generate.';
 $lang['Cache_submit']				= 'Sa generez fisierul cache?';
-$lang['Cache_explain']				= 'Cu acesta optiune poti sa generezi toate fisierele XML (fisiere cache) odata pentru toate blocurile portalului. Aceste fisiere permit reducerea numarului de cereri ale bazei de date necesare si imbunatatesc performanta portalului. <br />Noteaza: mxBB cache trebuie activat (in Portal General Admin CP) petru ca aceste fisiere sa fie folosite de sistem.<br>Mai Noteaza: fisierele cache sunt create on the fly cand sunt si blocurile de editare la fel.';
+$lang['Cache_explain']				= 'Cu acesta optiune poti sa generezi toate fisierele XML (fisiere cache) odata pentru toate blocurile portalului. Aceste fisiere permit reducerea numarului de cereri ale bazei de date necesare si imbunatatesc performanta portalului. <br />Noteaza: Mx-Publisher cache trebuie activat (in Portal General Admin CP) petru ca aceste fisiere sa fie folosite de sistem.<br>Mai Noteaza: fisierele cache sunt create on the fly cand sunt si blocurile de editare la fel.';
 $lang['Generate_mx_cache']			= 'Genereaza Bloc Cache';
 
-//
-// These are displayed in the drop down boxes for advanced
-// mode Module auth, try and keep them short!
-//
+/* These are displayed in the drop down boxes for advanced
+* mode Module auth, try and keep them short!*/
 $lang['Menu_Navigation']			= 'Meniu Navigare';
 $lang['Portal_index']				= 'Index Portal';
 $lang['Save_Settings']				= 'Salvare Setari';
 $lang['Translation_Tools']			= 'Unelte de Traducere';
 $lang['Preview_portal']				= 'Previzualizare Portal';
 
-//
-// META
-//
+/* META */
 $lang['Meta_admin']					= 'Administratie Meta Taguri';
 $lang['Mega_admin_explain']			= 'Foloseste acest form sa customizezi meta tagurile tale';
 $lang['Meta_Title']					= 'Titlu';
 $lang['Meta_Author']				= 'Autor';
 $lang['Meta_Copyright']				= 'Copyright';
+$lang['Meta_ImageToolBar'] 			= 'Image ToolBar';
+$lang['Meta_Distribution'] 			= 'Distribution';
 $lang['Meta_Keywords']				= 'Cuvinte Cheie';
 $lang['Meta_Keywords_explain']		= '(lista separata de virgula)';
 $lang['Meta_Description']			= 'Descriptie';
@@ -426,9 +397,7 @@ $lang['Meta_HTITLE']				= 'Setari Extra Header';
 $lang['Meta_data_updated']			= 'Fisierul de date meta (mx_meta.inc) a fost actualizat!<br />Click %sAICI%s pt. intoarcere la Administratie Meta Taguri.';
 $lang['Meta_data_ioerror']			= 'Nu se poate deschide mx_meta.inc. Asigurate ca fisierul e writabil (chmod 777).';
 
-//
-// Portal permissons
-//
+/* Portal permissons */
 $lang['Mx_Block_Auth_Title']		= 'Permisii Bloc Privat';
 $lang['Mx_Block_Auth_Explain']		= 'Aici poti sa configurezi Permisiile Blocului Privat';
 $lang['Mx_Page_Auth_Title']			= 'Permisii Pagina Privata';
@@ -444,36 +413,28 @@ $lang['AUTH_MOD']					= 'MOD';
 $lang['AUTH_ADMIN']					= 'ADMIN';
 $lang['AUTH_ANONYMOUS']				= 'ANONYMOUS';
 
-// -----------------------------------
-// BlockCP - Block Parameter Specific
-// -----------------------------------
-
-//
-// General
-//
+/* -----------------------------------
+ BlockCP - Block Parameter Specific 
+ ----------------------------------- */
+ 
+/* General*/
 $lang['target_block']				= 'Bloc tinta';
 $lang['target_block_explain']		= '- linkuri, date etc sunt referite cu acest bloc';
 
-//
-// Split column
-//
+/* Split column */
 $lang['block_ids']					= 'Blocuri Sursa';
 $lang['block_ids_explain']			= '- sa fie pozitionate stanga spre dreapta';
 $lang['block_sizes']				= 'Marimi Bloc (separate de virgula)';
 $lang['block_sizes_explain']		= '- Poti specifica marimile folosind numere (pixeli), procente (marimi relative, de ex. "40%") ori "*" pentru remainder.';
 $lang['space_between']				= 'Spatiu intre blocuri';
 
-//
-// Sitelog
-//
+/* Sitelog */
 $lang['log_filter_date']			= 'Filtru dupa timp';
 $lang['log_filter_date_explain']	= '- Arata loguri din saptamana trecuta, luna, anul...';
 $lang['numOfEvents']				= 'Numar';
 $lang['numOfEvents_explain']		= '- Numar evenimente de aratat';
 
-//
-// IncludeX
-//
+/* IncludeX */
 $lang['x_listen']					= 'Asculta (GET)';
 $lang['x_iframe']					= 'IFrame';
 $lang['x_textfile']					= 'Fisier Text';
@@ -489,9 +450,7 @@ $lang['x_2_explain']				= '- <i>IFrame:</i> inaltime frame (pixeli)<br /><i>Mult
 $lang['x_3']						= 'Variabila 3:';
 $lang['x_3_explain']				= '- <i>Multimedia:</i> inaltime (pixeli)';
 
-//
-// Announcement
-//
+/* Announcement */
 $lang['announce_nbr_display']		= 'Numar Maxim de Mesaje care sa fie Afisate';
 $lang['announce_nbr_days']			= 'Numar de Zile in care se Afiseaza Mesaje';
 $lang['announce_img']				= 'Imagine Anunturi';
@@ -505,36 +464,28 @@ $lang['announce_display_global']	= 'Afiseaza Anunturile Globale in acest Bloc';
 $lang['announce_forum']				= 'Forumuri Sursa';
 $lang['announce_forum_explain']		= '- Poti face selectii multiple<br />* Daca nu este selectat nimic, toate forumurile autorizate vor fi vizibile';
 
-//
-// Polls
-//
+/* Polls */
 $lang['Poll_Display']				= 'Care urna vrei sa o afisezi?';
 $lang['poll_forum']					= 'Forumuri Sursa';
 $lang['poll_forum_explain']			= '- Poti face selectii mutiple<br />* Daca nimic nu este selectat, toate forumurile autorizate vor fi vizibile';
 $lang['Not_Specified']				= 'Ne Specificat';
 
-//
-// Dynamic Block
-//
+/* Dynamic Block */
 $lang['default_block_id']			= 'Bloc Implicit';
 $lang['default_block_id_explain']	= '- Acesta este blocul implicit de afisat, exceptand daca un bloc dinamic este selectat';
 
-//
-// Menu Navigation
-//
+/* Menu Navigation */
 $lang['menu_display_mode']			= 'Mod Plan';
 $lang['menu_display_mode_explain ']	= 'Mod plan Orizonal ori Vertical';
 $lang['menu_page_sync']				= 'Lumineza cel curent?';
 $lang['menu_page_sync_explain']		= 'Lumineza intrare la Meniul de Nav. curent...';
 
-//
-// Version Checker
-//
-$lang['mxBB_Version_up_to_date'] = 'Instalarea mxBB este la zi. Nu exista actualizari pentru versiunea ta de mxBB.';
-$lang['mxBB_Version_outdated'] = 'Se pare ca instalarea ta mxBB <b>nu</b> este la zi. Actualizari exista pentru versiunea ta de mxBB. Te rog viziteza <a href="http://www.mx-publisher.com/index.php?page=4&action=file&file_id=2" target="_new">downloadare pachetul mxBB Core</a> pt. a obtine ultima versiune.';
-$lang['mxBB_Latest_version_info'] = 'Ultima veriune disponibila este <b>mxBB %s</b>. ';
-$lang['mxBB_Current_version_info'] = 'Tu ai <b>mxBB %s</b>.';
-$lang['mxBB_Mailing_list_subscribe_reminder'] = 'Pentru ultimile informatii de stiri si actualizari pentru mxBB, de ce nu <a href="http://lists.sourceforge.net/lists/listinfo/mxbb-news" target="_new">inscriete la lista de mailuri</a>.';
+/* Version Checker */
+$lang['MXP_Version_up_to_date'] = 'Instalarea Mx-Publisher este la zi. Nu exista actualizari pentru versiunea ta de Mx-Publisher.';
+$lang['MXP_Version_outdated'] = 'Se pare ca instalarea ta Mx-Publisher <b>nu</b> este la zi. Actualizari exista pentru versiunea ta de Mx-Publisher. Te rog viziteza <a href="http://mxpcms.sourceforge.net/index.php?page=4&action=file&file_id=2" target="_new">downloadare pachetul Mx-Publisher Core</a> pt. a obtine ultima versiune.';
+$lang['MXP_Latest_version_info'] = 'Ultima veriune disponibila este <b>Mx-Publisher %s</b>. ';
+$lang['MXP_Current_version_info'] = 'Tu ai <b>Mx-Publisher %s</b>.';
+$lang['MXP_Mailing_list_subscribe_reminder'] = 'Pentru ultimile informatii de stiri si actualizari pentru Mx-Publisher, de ce nu <a href="http://lists.sourceforge.net/lists/listinfo/mxpcms-news" target="_new">inscriete la lista de mailuri</a>.';
 
 $lang['Trans_title']				= 'Translate to your Language';
 $lang['Trans_description']			= 'Use Translate Control Panel to translate portal to your language';
@@ -548,11 +499,11 @@ $lang['Trans_lang_dest']			= 'Destination Language';
 $lang['Trans_lang_block']			= 'Language block';
 $lang['Trans_save_file']			= 'Save language file';
 
-//
-// Asta e tot lume!
-//
-// Translated from english to romanian by OryNider
-// orynider@rdslink.ro // http://mx-publisher.com/
-//
-// -------------------------------------------------
+/*
+* Asta e tot lume!
+*
+* Translated from english to romanian by OryNider
+* orynider@rdslink.ro // http://pubory.uv.ro/
+*
+* ------------------------------------------------- */
 ?>

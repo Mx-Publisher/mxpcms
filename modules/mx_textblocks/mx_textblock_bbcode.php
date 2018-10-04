@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Module - mx_textblocks
-* @version $Id: mx_textblock_bbcode.php,v 1.18 2008/03/09 23:39:14 jonohlsson Exp $
+* @version $Id: mx_textblock_bbcode.php,v 1.20 2013/06/28 15:36:45 orynider Exp $
 * @copyright (c) 2002-2008 [Jon Ohlsson] MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -65,7 +65,7 @@ $template->assign_vars(array(
 	'L_TITLE' => ( !empty($lang[$title]) ? $lang[$title] : $title ),
 	'U_TEXT' => $message,
 	'BLOCK_ID' => $block_id,
-	'S_HIDDEN_FORM_FIELDS' => $s_hidden_fields
+	'S_HIDDEN_FORM_FIELDS' => isset($s_hidden_fields) ? $s_hidden_fields : ''
 ));
 
 $template->pparse('body_block');

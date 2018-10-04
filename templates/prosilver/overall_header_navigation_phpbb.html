@@ -1,18 +1,17 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" dir="{S_CONTENT_DIRECTION}" lang="{S_USER_LANG}" xml:lang="{S_USER_LANG}">
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" dir="{S_CONTENT_DIRECTION}" xml:lang="{S_USER_LANG}">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset={S_CONTENT_ENCODING}" />
 <meta http-equiv="Content-Style-Type" content="text/css" />
-<!-- IF SET_BASE --><base href="{U_PORTAL_ROOT_PATH}" ><!-- ENDIF -->
+<!-- IF SET_BASE --><base href="{U_PORTAL_ROOT_PATH}" /><!-- ENDIF -->
 {META}
 {NAV_LINKS}
 <title>{SITENAME} :: {PAGE_TITLE}</title>
 
 <!-- This should not be included direct from phpBB but later from MXP template folder wich means can be ported to internal backend with no change in this file -->
-<!-- BEGIN switch_phpbb_stylesheet-->
-<link rel="stylesheet" href="{U_PHPBB_ROOT_PATH}styles/prosilver/theme/stylesheet.css" type="text/css" >
-<!-- END switch_phpbb_stylesheet-->
+<!-- IF PHPBB -->
+<!-- link rel="stylesheet" href="{U_PHPBB_ROOT_PATH}styles/prosilver/theme/stylesheet.css" type="text/css" / -->
+<!-- ENDIF -->
 
 <!-- This force template reloading in ie7 like CTRL+F5 does and is not very nice
 <script type="text/javascript" src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}styleswitcher.js"></script>
@@ -32,7 +31,7 @@
 
 <!-- IF GECKO -->
 <!-- Optionally, redefine some defintions for gecko browsers -->
-<link rel="stylesheet" href="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}{T_GECKO_STYLESHEET}" type="text/css" >
+<link rel="stylesheet" href="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}{T_GECKO_STYLESHEET}" type="text/css" />
 <!-- ENDIF -->
 
 {MX_ADDITIONAL_CSS}
@@ -40,7 +39,7 @@
 {MX_ICON_CSS}
 
 <!-- IF ENABLE_PM_POPUP -->
-<script language="javascript" type="text/javascript"><!--
+<script type="text/javascript"><!--
 	if( {PRIVATE_MESSAGE_NEW_FLAG} )
 	{
 		window.open('{U_PRIVATEMSGS_POPUP}', '_phpbbprivmsg', 'HEIGHT=225,resizable=yes,WIDTH=400');
@@ -48,7 +47,7 @@
 // --></script>
 <!-- ENDIF -->
 
-<script language="javascript" type="text/javascript"><!--
+<script type="text/javascript"><!--
 
 function checkSearch()
 {
@@ -80,31 +79,29 @@ function checkSearch()
 
 // --></script>
 
-<script language="javascript" type="text/javascript" src="{U_PORTAL_ROOT_PATH}modules/mx_shared/lib/Common.js"></script>
-<script language="javascript" type="text/javascript" src="{U_PORTAL_ROOT_PATH}modules/mx_shared/lib/Toggle.js"></script>
+<script type="text/javascript" src="{U_PORTAL_ROOT_PATH}modules/mx_shared/lib/Common.js"></script>
+<script type="text/javascript" src="{U_PORTAL_ROOT_PATH}modules/mx_shared/lib/Toggle.js"></script>
 
 {MX_ADDITIONAL_JS_FILES}
 {MX_ADDITIONAL_HEADER_TEXT}
 
 </head>
 <body id="mxbb" class="section-index {S_CONTENT_DIRECTION}">
-<div id="wrap">
-<a name="top" id="top"></a>
-	<div id="page-header" style="margin-bottom:0px;padding-bottom:0px;">
+<div id="mx-wrap">
+<a id="top"></a>
+	<div id="mx-page-header" style="margin-bottom:0px;padding-bottom:0px;">
 		<div class="headerbar" style="margin-bottom:0px;padding-bottom:0px;">
 			<div class="inner">
 			<span class="corners-top"><span></span></span>
 			<div style="float:right;padding-top:1em">
 				{PAGE_ICON}
 			</div>
-			<div align="right" style="float:right;text-align:right;">
-				<span align="right" style="width:100%;text-align:right;">
-				<h1 style="margin-right:0px">{PAGE_TITLE}</h1>
+			<div style="float:right;text-align:right;">
+				<h1>{PAGE_TITLE}</h1>
 				<p>{PAGE_DESCRIPTION}</p>
-				</span>
 			</div>
-			<div align="left" id="site-description" style="float:left">
-				<a href="{U_INDEX}" title="{L_INDEX}" id="logo"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/logo.gif" border="0" alt="{L_INDEX}" vspace="1"/></a>
+			<div id="site-description" style="float:left">
+				<a href="{U_INDEX}" title="{L_INDEX}" id="logo"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/logo.gif" alt="{L_INDEX}" /></a>
 				<h1>{SITENAME}</h1>
 				<p>{SITE_DESCRIPTION}</p>
 				<p style="display: none;"><a href="#start_here">{L_SKIP}</a></p>
@@ -147,7 +144,8 @@ function checkSearch()
 				</ul>
 				<!-- IF USER_LOGGED_IN -->
 				<ul class="linklist leftside">
-						<li class="icon-ucp"><a href="{U_PROFILE}">{L_PROFILE}</a> (<a href="{U_PRIVATEMSGS}">{L_PRIVATEMSGS}</a>)</li>
+						<li class="icon-ucp"><a href="{U_PROFILE}">{L_PROFILE}</a></li>
+						<li class="icon-msgs"><a href="{U_PRIVATEMSGS}">{L_PRIVATEMSGS}</a></li>
 				</ul>
 				<!-- ENDIF -->
 				<span class="corners-bottom"><span></span></span>
@@ -171,5 +169,4 @@ function checkSearch()
 				</ul>
 			<!-- ENDIF -->
 	</div>
-	<a name="start_here"></a>
-	<div id="page-body">
+	<div id="mx-page-body">

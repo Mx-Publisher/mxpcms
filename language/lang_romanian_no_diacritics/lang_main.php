@@ -2,7 +2,7 @@
 /**
 *
 * @package MXP Portal Core
-* @version $Id: lang_main.php,v 1.2 2008/06/18 11:39:41 orynider Exp $
+* @version $Id: lang_main.php,v 1.4 2013/06/28 15:34:33 orynider Exp $
 * @copyright (c) 2002-2006 MXP Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 *
@@ -18,6 +18,13 @@
 // 
 
 setlocale(LC_ALL, 'ro');
+
+$lang['USER_LANG'] = 'ro';
+$lang['ENCODING'] = 'UTF-8';
+$lang['DIRECTION'] = 'ltr';
+$lang['LEFT'] = 'stanga';
+$lang['RIGHT'] = 'dreapta';
+$lang['DATE_FORMAT'] =  'd/M/Y'; // This should be changed to the default date format for your language, php date() format
 
 //
 // General
@@ -111,7 +118,7 @@ $lang['mx_copy_translation_title'] 	= 'Despre traducere';
 // This is optional, if you would like a _SHORT_ message output
 // along with our copyright message indicating you are the translator
 // please add it here.
-$lang['TRANSLATION_INFO_MXBB'] = 'Traducerea in Limba Romana de <a href="http://www.mx-publisher.com/phpBB2/profile.php?mode=viewprofile&u=6605" target="_blank">FlorinCB</a>';
+$lang['TRANSLATION_INFO_MXBB'] = 'Traducerea in Limba Romana de <a href="http://mxpcms.sourceforge.net//phpBB2/profile.php?mode=viewprofile&u=6605" target="_blank">FlorinCB</a>';
 
 //
 // Installation

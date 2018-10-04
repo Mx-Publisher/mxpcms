@@ -2,11 +2,11 @@
 /**
 *
 * @package DBal
-* @version $Id: mssql_odbc.php,v 1.15 2008/03/07 00:59:02 orynider Exp $
+* @version $Id: mssql_odbc.php,v 1.18 2013/06/28 15:33:26 orynider Exp $
 * @copyright (c) 2005 phpBB Group
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU Public License
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -46,6 +46,29 @@ class dbal_mssql_odbc extends dbal
 		$this->user = $sqluser;
 		$this->server = $sqlserver . (($port) ? ':' . $port : '');
 		$this->dbname = $database;
+
+		$max_size = @ini_get('odbc.defaultlrl');
+		if (!empty($max_size))
+		{
+			$unit = strtolower(substr($max_size, -1, 1));
+			$max_size = (int) $max_size;
+
+			if ($unit == 'k')
+			{
+				$max_size = floor($max_size / 1024);
+			}
+			else if ($unit == 'g')
+			{
+				$max_size *= 1024;
+			}
+			else if (is_numeric($unit))
+			{
+				$max_size = floor((int) ($max_size . $unit) / 1048576);
+			}
+			$max_size = max(8, $max_size) . 'M';
+
+			@ini_set('odbc.defaultlrl', $max_size);
+		}
 
 		$this->db_connect_id = ($this->persistency) ? @odbc_pconnect($this->server, $this->user, $sqlpassword) : @odbc_connect($this->server, $this->user, $sqlpassword);
 
@@ -267,9 +290,23 @@ class dbal_mssql_odbc extends dbal
 	*/
 	function sql_rowseek($rownum, $query_id = false)
 	{
+		global $mx_cache;
+
 		if (!$query_id)
 		{
 			$query_id = $this->query_result;
+		}
+
+		/* Backported from Olympus, not compatible with MXP, yet
+		if (isset($mx_cache->sql_rowset[$query_id]))
+		{
+			return $mx_cache->sql_rowseek($rownum, $query_id);
+		}
+		*/
+
+		if (!$query_id)
+		{
+			return false;
 		}
 
 		$this->sql_freeresult($query_id);
@@ -318,10 +355,19 @@ class dbal_mssql_odbc extends dbal
 	*/
 	function sql_freeresult($query_id = false)
 	{
+		global $mx_cache;
+
 		if (!$query_id)
 		{
 			$query_id = $this->query_result;
 		}
+
+		/* Backported from Olympus, not compatible with MXP, yet
+		if (isset($mx_cache->sql_rowset[$query_id]))
+		{
+			return $mx_cache->sql_freeresult($query_id);
+		}
+		*/
 
 		if (isset($this->open_queries[(int) $query_id]))
 		{

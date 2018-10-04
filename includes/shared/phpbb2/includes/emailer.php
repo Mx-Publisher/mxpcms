@@ -6,7 +6,7 @@
     copyright            : (C) 2001 The phpBB Group
     email                : support@phpbb.com
 
-    $Id: emailer.php,v 1.3 2008/10/04 07:04:25 orynider Exp $
+    $Id: emailer.php,v 1.7 2014/05/09 07:52:17 orynider Exp $
 
 ***************************************************************************/
 
@@ -31,11 +31,13 @@ class emailer
 	var $use_smtp;
 
 	var $tpl_msg = array();
+	var $use_html = false;
 
 	function emailer($use_smtp)
 	{
 		$this->reset();
 		$this->use_smtp = $use_smtp;
+		$this->use_html = false;
 		$this->reply_to = $this->from = '';
 	}
 
@@ -77,16 +79,35 @@ class emailer
 	{
 		$this->subject = trim(preg_replace('#[\n\r]+#s', '', $subject));
 	}
+	
+	// set up skip mail
+	function email_skip($email_skip = false)
+	{
+		$this->email_skip = $email_skip;
+	}	
 
 	// set up extra mail headers
 	function extra_headers($headers)
 	{
 		$this->extra_headers .= trim($headers) . "\n";
 	}
+	
+	function set_mail_priority($priority = MAIL_NORMAL_PRIORITY)
+	{
+		$this->mail_priority = $priority;
+	}
+
+	/**
+	* Set the email html
+	*/
+	function set_mail_html($html = false)
+	{
+		$this->use_html = $html;
+	}	
 
 	function use_template($template_file, $template_lang = '')
 	{
-		global $board_config, $phpbb_root_path;
+		global $board_config, $phpbb_root_path, $module_root_path, $mx_root_path;
 
 		if (trim($template_file) == '')
 		{
@@ -100,29 +121,29 @@ class emailer
 
 		if (empty($this->tpl_msg[$template_lang . $template_file]))
 		{
-			$tpl_file = $phpbb_root_path . 'language/lang_' . $template_lang . '/email/' . $template_file . '.tpl';
+			$tpl_file = $mx_root_path . 'language/lang_' . $template_lang . '/email/' . $template_file . '.tpl';
 
-			if (!@file_exists(@$phpBB2->phpbb_realpath($tpl_file)))
+			if (!file_exists(realpath($tpl_file)))
 			{
-				$tpl_file = $phpbb_root_path . 'language/lang_' . $board_config['default_lang'] . '/email/' . $template_file . '.tpl';
+				$tpl_file = $mx_root_path . 'language/lang_' . $board_config['default_lang'] . '/email/' . $template_file . '.tpl';
 
-				if (!@file_exists(@$phpBB2->phpbb_realpath($tpl_file)))
+				if (!file_exists(realpath($tpl_file)))
 				{
-					mx_message_die(GENERAL_ERROR, 'Could not find email template file :: ' . $template_file, '', __LINE__, __FILE__);
+					mx_message_die(GENERAL_ERROR, 'Could not find email template file :: ' . $template_file . ' @:' . $tpl_file, '', __LINE__, __FILE__);
 				}
 			}
 
 			if (!($fd = @fopen($tpl_file, 'r')))
 			{
-				mx_message_die(GENERAL_ERROR, 'Failed opening template file :: ' . $tpl_file, '', __LINE__, __FILE__);
+				mx_message_die(GENERAL_ERROR, 'Failed opening template file :: ' . $template_file . ' @:' . $tpl_file, '', __LINE__, __FILE__);
 			}
 
-			$this->tpl_msg[$template_lang . $template_file] = fread($fd, filesize($tpl_file));
+			$this->tpl_msg[$template_lang . $template_file] = @fread($fd, filesize($tpl_file));
 			fclose($fd);
 		}
 
 		$this->msg = $this->tpl_msg[$template_lang . $template_file];
-
+		
 		return true;
 	}
 
@@ -135,7 +156,7 @@ class emailer
 	// Send the mail out to the recipients set previously in var $this->address
 	function send()
 	{
-		global $board_config, $lang, $phpEx, $phpbb_root_path, $db;
+		global $board_config, $lang, $phpEx, $phpbb_root_path, $db, $mx_root_path;
 
     	// Escape all quotes, else the eval will fail.
 		$this->msg = str_replace ("'", "\'", $this->msg);
@@ -143,7 +164,7 @@ class emailer
 
 		// Set vars
 		reset ($this->vars);
-		while (list($key, $val) = each($this->vars))
+		while (list($key, $val) = each($this->vars)) 
 		{
 			$$key = $val;
 		}
@@ -152,7 +173,7 @@ class emailer
 
 		// Clear vars
 		reset ($this->vars);
-		while (list($key, $val) = each($this->vars))
+		while (list($key, $val) = each($this->vars)) 
 		{
 			unset($$key);
 		}
@@ -187,59 +208,90 @@ class emailer
 		}
 
 		$to = $this->addresses['to'];
-
 		$cc = (count($this->addresses['cc'])) ? implode(', ', $this->addresses['cc']) : '';
 		$bcc = (count($this->addresses['bcc'])) ? implode(', ', $this->addresses['bcc']) : '';
+		$skip = ($this->email_skip == $this->addresses['to']) ? true : false; 
 
 		// Build header
-		$this->extra_headers = (($this->reply_to != '') ? "Reply-to: $this->reply_to\n" : '') . (($this->from != '') ? "From: $this->from\n" : "From: " . $board_config['board_email'] . "\n") . "Return-Path: " . $board_config['board_email'] . "\nMessage-ID: <" . md5(uniqid(time())) . "@" . $board_config['server_name'] . ">\nMIME-Version: 1.0\nContent-type: text/plain; charset=" . $this->encoding . "\nContent-transfer-encoding: 8bit\nDate: " . date('r', time()) . "\nX-Priority: 3\nX-MSMail-Priority: Normal\nX-Mailer: PHP\nX-MimeOLE: Produced By phpBB2\n" . $this->extra_headers . (($cc != '') ? "Cc: $cc\n" : '')  . (($bcc != '') ? "Bcc: $bcc\n" : '');
-
+		if ($this->use_html)
+		{
+			$this->extra_headers = (($this->reply_to != '') ? "Reply-to: $this->reply_to\n" : '') . (($this->from != '') ? "From: $this->from\n" : "From: " . $board_config['board_email'] . "\n") . "Return-Path: " . $board_config['board_email'] . "\n" . "Message-ID: <" . md5(uniqid(time())) . "@" . $board_config['server_name'] . ">\nMIME-Version: 1.0\nContent-type: text/html; charset=" . $this->encoding . "\n" . "Content-transfer-encoding: 8bit\nDate: " . date('r', time()) . "\n" . "X-Priority: 3\n" . "X-MSMail-Priority: Normal\n" . "X-Mailer: PHP\nX-MimeOLE: Produced By MXP\n" . $this->extra_headers . (($cc != '') ? "Cc: $cc\n" : '')  . (($bcc != '') ? "Bcc: $bcc\n" : '');			
+		}
+		else
+		{
+			$this->extra_headers = (($this->reply_to != '') ? "Reply-to: $this->reply_to\n" : '') . (($this->from != '') ? "From: $this->from\n" : "From: " . $board_config['board_email'] . "\n") . "Return-Path: " . $board_config['board_email'] . "\n" ."Message-ID: <" . md5(uniqid(time())) . "@" . $board_config['server_name'] . ">\nMIME-Version: 1.0\nContent-type: text/plain; charset=" . $this->encoding . "\n" . "Content-transfer-encoding: 8bit\nDate: " . date('r', time()) . "\n". "X-Priority: 3\n" . "X-MSMail-Priority: Normal\n" . "X-Mailer: PHP\nX-MimeOLE: Produced By Mx-Publisher\n" . $this->extra_headers . (($cc != '') ? "Cc: $cc\n" : '')  . (($bcc != '') ? "Bcc: $bcc\n" : ''); 
+		}
+		
 		// Send message ... removed $this->encode() from subject for time being
 		if ( $this->use_smtp )
 		{
-			if ( !defined('SMTP_INCLUDED') )
+			if ( !defined('SMTP_INCLUDED') ) 
 			{
-				include($phpbb_root_path . 'includes/smtp.' . $phpEx);
+				include($mx_root_path . 'includes/contact_smtp.' . $phpEx);
 			}
 
-			$result = smtpmail($to, $this->subject, $this->msg, $this->extra_headers);
+			$result = ($skip) ? false : smtpmail($to, $this->subject, $this->msg, $this->extra_headers);
 		}
 		else
 		{
 			$empty_to_header = ($to == '') ? TRUE : FALSE;
 			$to = ($to == '') ? (($board_config['sendmail_fix']) ? ' ' : 'Undisclosed-recipients:;') : $to;
-
-			$result = @mail($to, $this->subject, preg_replace("#(?<!\r)\n#s", "\n", $this->msg), $this->extra_headers);
-
+	
+			$result = ($skip) ? false : mail($to, $this->subject, preg_replace("#(?<!\r)\n#s", "\n", $this->msg), $this->extra_headers);
+			
 			if (!$result && !$board_config['sendmail_fix'] && $empty_to_header)
 			{
 				$to = ' ';
-
-				$sql = "UPDATE " . CONFIG_TABLE . "
-					SET config_value = '1'
-					WHERE config_name = 'sendmail_fix'";
-				if (!$db->sql_query($sql))
+				
+				switch (PORTAL_BACKEND)
 				{
-					mx_message_die(GENERAL_ERROR, 'Unable to update config table', '', __LINE__, __FILE__, $sql);
-				}
+					case 'phpbb2':
+
+						$sql = "UPDATE " . CONFIG_TABLE . " 
+							SET config_value = '1'
+							WHERE config_name = 'sendmail_fix'";
+						if (!$db->sql_query($sql))
+						{
+							mx_message_die(GENERAL_ERROR, 'Unable to update config table', '', __LINE__, __FILE__, $sql);
+						}
+					break;
+					
+					case 'internal':
+					case 'smf2':
+					case 'mybb':
+					case 'phpbb3':
+					case 'olympus':
+					case 'ascraeus':
+					case 'rhea':
+						if (!$board_config['board_email'])
+						{
+							mx_message_die(GENERAL_ERROR, 'The is no default email adress configured were to notify the admin.', '', __LINE__, __FILE__, '');
+						}
+					break;
+				}				
 
 				$board_config['sendmail_fix'] = 1;
-				$result = @mail($to, $this->subject, preg_replace("#(?<!\r)\n#s", "\n", $this->msg), $this->extra_headers);
+				$result = ($skip) ? false : mail($to, $this->subject, preg_replace("#(?<!\r)\n#s", "\n", $this->msg), $this->extra_headers);
 			}
 		}
 
 		// Did it work?
-		if (!$result)
+		if ((!$result) && (!$skip))
 		{
 			mx_message_die(GENERAL_ERROR, 'Failed sending email :: ' . (($this->use_smtp) ? 'SMTP' : 'PHP') . ' :: ' . $result, '', __LINE__, __FILE__);
+		}
+		
+		if (!$skip)
+		{
+			//print('Failed sending email :: Use another adress for sender.', __LINE__, __FILE__);
 		}
 
 		return true;
 	}
 
-	// Encodes the given string for proper display for this encoding ... nabbed
-	// from php.net and modified. There is an alternative encoding method which
-	// may produce lesd output but it's questionable as to its worth in this
+	// Encodes the given string for proper display for this encoding ... nabbed 
+	// from php.net and modified. There is an alternative encoding method which 
+	// may produce lesd output but it's questionable as to its worth in this 
 	// scenario IMO
 	function encode($str)
 	{
@@ -357,7 +409,7 @@ class emailer
 	//
 	function encode_file($sourcefile)
 	{
-		if (is_readable($phpBB2->phpbb_realpath($sourcefile)))
+		if (is_readable(realpath($sourcefile)))
 		{
 			$fd = fopen($sourcefile, "r");
 			$contents = fread($fd, filesize($sourcefile));

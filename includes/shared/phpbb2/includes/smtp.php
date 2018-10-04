@@ -6,7 +6,7 @@
  *   copyright            : (C) 2001 The phpBB Group
  *   email                : support@phpbb.com
  *
- *   $Id: smtp.php,v 1.1 2007/09/09 16:51:51 jonohlsson Exp $
+ *   $Id: smtp.php,v 1.2 2010/01/06 19:40:39 orynider Exp $
  *
  ***************************************************************************/
 
@@ -20,6 +20,16 @@
  ***************************************************************************/
 
 define('SMTP_INCLUDED', 1);
+
+/**
+* Send command to smtp server
+*/
+function server_send($command, $private_info = false)
+{
+	fputs($socket, $command . "\r\n");
+
+	// We could put additional code here
+}
 
 //
 // This function has been modified as provided
@@ -104,10 +114,12 @@ function smtpmail($mail_to, $subject, $message, $headers = '')
 	{
 		mx_message_die(GENERAL_ERROR, "Email message was blank", "", __LINE__, __FILE__);
 	}
+	
+	$board_config['smtp_port'] = ($board_config['smtp_port']) ? $board_config['smtp_port'] : $contact_config['smtp_port'];
 
 	// Ok we have error checked as much as we can to this point let's get on
 	// it already.
-	if( !$socket = @fsockopen($board_config['smtp_host'], 25, $errno, $errstr, 20) )
+	if( !$socket = @fsockopen($board_config['smtp_host'], $board_config['smtp_port'], $errno, $errstr, 20) )
 	{
 		mx_message_die(GENERAL_ERROR, "Could not connect to smtp host : $errno : $errstr", "", __LINE__, __FILE__);
 	}
@@ -118,6 +130,24 @@ function smtpmail($mail_to, $subject, $message, $headers = '')
 	// Do we want to use AUTH?, send RFC2554 EHLO, else send RFC821 HELO
 	// This improved as provided by SirSir to accomodate
 	if( !empty($board_config['smtp_username']) && !empty($board_config['smtp_password']) )
+	{
+		server_send('AUTH PLAIN');
+		if ($err_msg = server_parse('334', __LINE__))
+		{
+			return $err_msg;
+		}
+
+		$base64_method_plain = base64_encode("\0" . $board_config['smtp_username'] . "\0" . $board_config['smtp_password']);
+		server_send($base64_method_plain, true);
+		if ($err_msg = server_parse('235', __LINE__))
+		{
+			return $err_msg;
+		}
+
+		return false;		
+		
+	}
+	else if(!empty($board_config['smtp_username']) && !empty($board_config['smtp_login']))
 	{
 		fputs($socket, "EHLO " . $board_config['smtp_host'] . "\r\n");
 		server_parse($socket, "250", __LINE__);
@@ -130,7 +160,7 @@ function smtpmail($mail_to, $subject, $message, $headers = '')
 
 		fputs($socket, base64_encode($board_config['smtp_password']) . "\r\n");
 		server_parse($socket, "235", __LINE__);
-	}
+	}	
 	else
 	{
 		fputs($socket, "HELO " . $board_config['smtp_host'] . "\r\n");

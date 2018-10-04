@@ -5,7 +5,7 @@
 * @version $Id: lang_main.php,v 1.41 2008/06/18 11:37:47 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -132,7 +132,7 @@ $lang['mx_copy_translation_title'] = 'Σχετικά με την μετάφρα�
 // This is optional, if you would like a _SHORT_ message output
 // along with our copyright message indicating you are the translator
 // please add it here.
-$lang['TRANSLATION_INFO_MXBB'] = 'Greek Language by <a href="http://www.mx-publisher.com/index.php?page=2&phpbb_script=profile&mode=viewprofile&u=8128" target="_blank">georges</a>';
+$lang['TRANSLATION_INFO_MXBB'] = 'Greek Language by <a href="http://mxpcms.sourceforge.net//index.php?page=2&phpbb_script=profile&mode=viewprofile&u=8128" target="_blank">georges</a>';
 
 //
 // Installation

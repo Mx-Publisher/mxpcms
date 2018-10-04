@@ -291,7 +291,7 @@ CREATE TABLE `mx_table_menu_nav` (
 #
 INSERT INTO `mx_table_menu_nav` VALUES("5", "1", "phpBB Home", "", "http://www.phpbb.com", "0", "20", "a9ff189bf5", "icon_info.gif", "", "", "0", "0", "0", "0", "1");
 INSERT INTO `mx_table_menu_nav` VALUES("16", "7", "Page 1", "", "", "0", "10", "", "icon_home.gif", "", "", "0", "0", "3", "0", "0");
-INSERT INTO `mx_table_menu_nav` VALUES("4", "1", "MX-Publisher Home", "", "http://www.mx-publisher.com", "0", "10", "1f171544ea", "icon_info.gif", "", "", "0", "0", "0", "0", "1");
+INSERT INTO `mx_table_menu_nav` VALUES("4", "1", "MX-Publisher Home", "", "http://mxpcms.sourceforge.net", "0", "10", "1f171544ea", "icon_info.gif", "", "", "0", "0", "0", "0", "1");
 INSERT INTO `mx_table_menu_nav` VALUES("6", "1", "Demo Page", "On this page we demonstrate a basic subpage setup with textblocks.", "", "0", "30", "", "icon_message.gif", "", "", "0", "0", "3", "0", "0");
 INSERT INTO `mx_table_menu_nav` VALUES("1", "3", "Welcome to MXP", "Back to home", "", "0", "10", "", "", "", "", "0", "0", "1", "0", "0");
 INSERT INTO `mx_table_menu_nav` VALUES("17", "7", "Page 2", "", "", "0", "20", "", "icon_dot.gif", "", "", "0", "30", "3", "0", "0");
@@ -321,10 +321,10 @@ CREATE TABLE `mx_table_module` (
 #
 # Dumping data for table 'mx_table_module'
 #
-INSERT INTO `mx_table_module` VALUES("10", "Core Blocks", "modules/mx_coreblocks/", "MX-Publisher Core Blocks", "", "MX-Publisher Core Module", "Original mxBB <i>Core Blocks</i> module by <a href=\"http://www.mx-publisher.com\" target=\"_blank\">The MX-Publisher Development Team</a>");
-INSERT INTO `mx_table_module` VALUES("20", "Textblocks", "modules/mx_textblocks/", "MX-Publisher Textblocks", "", "MX-Publisher Core Module", "Original mxBB <i>Textblocks</i> module by <a href=\"http://www.mx-publisher.com\" target=\"_blank\">Jon</a>");
-INSERT INTO `mx_table_module` VALUES("40", "Users and Groups", "modules/mx_users/", "MX-Publisher Users and Groups", "1", "MX-Publisher Core Module", "Based on original phpBB <i>Admin Tool MODs</i> by Adam Alkins, Omar Ramadan & wGEric :: Adapted for MX-Publisher by <a href=\"http://www.mx-publisher.com\" target=\"_blank\">Jon</a>");
-INSERT INTO `mx_table_module` VALUES("50", "Navigation Menu", "modules/mx_navmenu/", "MX-Publisher Site Navigation", "", "MX-Publisher Core Module", "Original mxBB <i>Navigation Menu</i> module by <a href=\"http://www.mx-publisher.com\" target=\"_blank\">Jon</a>");
+INSERT INTO `mx_table_module` VALUES("10", "Core Blocks", "modules/mx_coreblocks/", "MX-Publisher Core Blocks", "", "MX-Publisher Core Module", "Original mxBB <i>Core Blocks</i> module by <a href=\"http://mxpcms.sourceforge.net\" target=\"_blank\">The MX-Publisher Development Team</a>");
+INSERT INTO `mx_table_module` VALUES("20", "Textblocks", "modules/mx_textblocks/", "MX-Publisher Textblocks", "", "MX-Publisher Core Module", "Original mxBB <i>Textblocks</i> module by <a href=\"http://mxpcms.sourceforge.net\" target=\"_blank\">Jon</a>");
+INSERT INTO `mx_table_module` VALUES("40", "Users and Groups", "modules/mx_users/", "MX-Publisher Users and Groups", "1", "MX-Publisher Core Module", "Based on original phpBB <i>Admin Tool MODs</i> by Adam Alkins, Omar Ramadan & wGEric :: Adapted for MX-Publisher by <a href=\"http://mxpcms.sourceforge.net\" target=\"_blank\">Jon</a>");
+INSERT INTO `mx_table_module` VALUES("50", "Navigation Menu", "modules/mx_navmenu/", "MX-Publisher Site Navigation", "", "MX-Publisher Core Module", "Original mxBB <i>Navigation Menu</i> module by <a href=\"http://mxpcms.sourceforge.net\" target=\"_blank\">Jon</a>");
 
 
 
@@ -401,14 +401,12 @@ CREATE TABLE `mx_table_parameter` (
   `function_id` smallint(5) unsigned NOT NULL DEFAULT '0',
   `parameter_name` varchar(150),
   `parameter_type` varchar(30),
-  `parameter_default` varchar(150),
+  `parameter_default` text,
   `parameter_function` varchar(255),
   `parameter_auth` tinyint(2) NOT NULL DEFAULT '0',
   `parameter_order` smallint(5) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`parameter_id`)
 ) CHARACTER SET `utf8` COLLATE `utf8mb3_bin`;
-
-
 
 #
 # Dumping data for table 'mx_table_parameter'

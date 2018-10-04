@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: lang_meta.php,v 1.8 2008/02/14 21:31:38 jonohlsson Exp $
+* @version $Id: lang_meta.php,v 1.9 2013/06/28 15:34:31 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 

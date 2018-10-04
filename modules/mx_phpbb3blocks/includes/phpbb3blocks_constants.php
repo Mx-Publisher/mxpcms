@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Module - mx_phpbb2blocks
-* @version $Id: phpbb3blocks_constants.php,v 1.3 2008/02/12 11:01:41 orynider Exp $
+* @version $Id: phpbb3blocks_constants.php,v 1.6 2014/05/19 18:15:12 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -14,9 +14,19 @@ if (!defined('IN_PORTAL'))
 	exit;
 }
 
-if ( PORTAL_BACKEND != 'phpbb3' )
+switch (PORTAL_BACKEND)
 {
-	mx_message_die(GENERAL_MESSAGE, 'There are blocks on this page designed for MX-Publisher with phpBB3 backend, thus not compatible with current setup.');
+	case 'internal':
+	case 'smf2':
+	case 'phpbb2':
+		mx_message_die(GENERAL_MESSAGE, 'There are blocks on this page designed for MX-Publisher with phpBB3 backend, thus not compatible with current setup.');
+	break;
+	
+	case 'phpbb3':
+	case 'olympus':
+	case 'ascraeus':
+	
+	break;
 }
 
 // -------------------------------------------------------------------------
@@ -47,4 +57,6 @@ if (is_object($mx_page))
 !defined('POST_STICKY') ? define('POST_STICKY', 1) : false;
 !defined('POST_ANNOUNCE') ? define('POST_ANNOUNCE', 2) : false;
 !defined('POST_GLOBAL') ? define('POST_GLOBAL', 3) : false;
+!defined('POST_GLOBAL_ANNOUNCE') ? define('POST_GLOBAL_ANNOUNCE', 3) : false;
+!defined('POST_NEWS') ? define('POST_NEWS', 4) : false;
 ?>

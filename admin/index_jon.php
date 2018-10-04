@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: index_jon.php,v 1.3 2008/09/30 07:04:34 orynider Exp $
+* @version $Id: index_jon.php,v 1.7 2013/06/28 15:32:37 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -17,7 +17,7 @@
 //
 // Security and Page header
 //
-define('IN_PORTAL', 1);
+@define('IN_PORTAL', 1);
 define('ADMIN_START', true);
 define('NEED_SID', true);
 
@@ -461,14 +461,14 @@ class mx_acp
 					$menu_link = mx_append_sid( $menu_link );
 				}
 
-				$template->assign_block_vars( 'category.panel', array( "ROW_COLOR" => "#" . $row_color,
+				$template->assign_block_vars('category.panel', array( "ROW_COLOR" => "#" . $row_color,
 						"ROW_CLASS" => $row_class,
 						// +MOD: DHTML Menu for ACP
 						'ROW_COUNT' => $row_count,
 						// -MOD: DHTML Menu for ACP
 						"L_PANEL" => $lang_menu,
 						'U_PANEL' => $menu_link,
-						'A_PANEL' => $this->panel == $panel?'activemenu':'',
+						'A_PANEL' => $this->panel == $panel ? 'activemenu' : '',
 						) );
 				$row_count++;
 			}
@@ -476,7 +476,7 @@ class mx_acp
 			$menu_cat_id++;
 			// -MOD: DHTML Menufor ACP
 		}
-		$this->menu_actions = array_merge( array( $this->action_script => $this->menu_actions[$this->action_script] ), $this->menu_actions );
+		$this->menu_actions = array_merge(array( $this->action_script => $this->menu_actions[$this->action_script] ), $this->menu_actions);
 	}
 
 	function prepare_action_script()
@@ -592,12 +592,12 @@ class mx_acp
 			default:
 				for( $i = 0; $i < $match_count; $i++ )
 				{
-					if ( eregi( 'javascript:', $match_links['LINK'][$i] ) || empty( $match_links['SCRIPT'][$i] ) || eregi( $mx_root_path . 'index.' . $phpEx, $match_links['LINK'][$i] ) || eregi( $admin_path . 'index.' . $phpEx, $match_links['LINK'][$i] ) )
+					if ( stristr($match_links['LINK'][$i], 'javascript:') || empty($match_links['SCRIPT'][$i]) || stristr($match_links['LINK'][$i], $mx_root_path . 'index.' . $phpEx) || stristr($match_links['LINK'][$i], $admin_path . 'index.' . $phpEx) )
 					{
 						continue;
 					}
-					if ( eregi( 'index.' . $phpEx, $match_links['LINK'][$i] ) )
-					{
+					if ( stristr($match_links['LINK'][$i],'index.' . $phpEx) )
+					{				
 						$text = str_replace( $match_links['LINK'][$i], PORTAL_URL . $admin_path . $match_links['LINK'][$i], $text );
 						continue;
 					} // if END
@@ -662,8 +662,8 @@ class mx_acp
 				$this->_convert_links( $acp_html, $matched_links );
 				break;
 			case OLYMPUS_CATEGORY:
-				$acp_html = $this->phpbb3_hook->assign_content_acp( $acp_html );
-				// $acp_html = '<h1>' . $this->panel_title . '</h1><p>Panel: ' . $this->panel . '</p>' . $acp_html;
+				//$acp_html = $this->phpbb3_hook->assign_content_acp( $acp_html );
+				$acp_html = '<h1>' . $this->panel_title . '</h1><p>Panel: ' . $this->panel . '</p>' . $acp_html;
 				break;
 		} // switch
 		$forms_cnt = preg_match_all( "#<form([^>]*)>#si", $acp_html, $forms );
@@ -746,13 +746,13 @@ class mx_acp
 			'MX_ICON_CSS' => $images['mx_graphics']['icon_style'],
 			'LOGO' => !empty( $images['mx_logo_acp'] ) ? @$images['mx_logo_acp']: @$images['mx_logo'],
 
-			"U_PORTAL_INDEX" => mx_append_sid( PORTAL_URL . basename( __FILE__ ) ),
+			"U_PORTAL_INDEX" => mx_append_sid( PORTAL_URL . basename( __FILE__ ) ),			
 			"U_FORUM_INDEX" => mx_append_sid( PHPBB_URL . "index.$phpEx" ),
 			"U_PORTAL_ADMIN_INDEX" => mx_append_sid( basename( __FILE__ ) ),
 			"U_ADMIN_INDEX" => mx_append_sid( basename( __FILE__ ) ),
 			'U_LOGOUT' => mx_append_sid( PORTAL_URL . 'login.' . $phpEx . '?logout=1' ),
 
-			'ADMIN_TITLE' => $lang['mxBB_adminCP'],
+			'ADMIN_TITLE' => $lang['Mx-Publisher_adminCP'],
 
 			'USERNAME' => $mx_user->data['username'],
 			'CATEGORY' => $this->category,
@@ -775,16 +775,12 @@ class mx_acp
 			'L_ADMIN' => $lang['Admin'],
 			'L_INDEX' => sprintf( $lang['Forum_Index'], $board_config['sitename'] ),
 			'L_FAQ' => $lang['FAQ'],
-			'U_INDEX' => mx_append_sid( '../index.' . $phpEx ),
+			'U_INDEX' => mx_append_sid('../index.'.$phpEx),
 
 			'S_TIMEZONE' => sprintf( $lang['All_times'], $l_timezone ),
 			'S_LOGIN_ACTION' => mx_append_sid( '../login.' . $phpEx ),
 			'S_JUMPBOX_ACTION' => mx_append_sid( '../viewforum.' . $phpEx ),
-			'S_CURRENT_TIME' =>
-			( PORTAL_BACKEND == 'phpbb3' )?
-			sprintf( $lang['Current_time'], $phpBB2->create_date( $board_config['default_dateformat'], time(), $board_config['board_timezone'] ) ):
-			sprintf( $lang['Current_time'], create_date( $board_config['default_dateformat'], time(), $board_config['board_timezone'] ) ),
-
+			'S_CURRENT_TIME' => sprintf($lang['Current_time'], phpBB2::create_date($board_config['default_dateformat'], time(), $board_config['board_timezone'])),
 			'S_CONTENT_DIRECTION' => $lang['DIRECTION'],
 			'S_CONTENT_ENCODING' => $lang['ENCODING'],
 			'S_CONTENT_DIR_LEFT' => $lang['LEFT'],
@@ -816,6 +812,8 @@ $i = 1;
 // $script = str_replace( '$phpBB2->', '', $script);
 // VERSION mxP v2.9
 //$script = str_replace( 'mx_$phpBB2->', '$phpBB2->', $script );
+// VERSION mxP v3.0
+//$script = str_replace( 'phpBB2::', 'mx_', $script );
 
 switch ( 0 )
 {

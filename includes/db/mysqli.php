@@ -2,11 +2,11 @@
 /**
 *
 * @package DBal
-* @version $Id: mysqli.php,v 1.20 2008/08/19 02:46:22 orynider Exp $
+* @version $Id: mysqli.php,v 1.28 2014/05/16 18:02:06 orynider Exp $
 * @copyright (c) 2005 phpBB Group
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU Public License
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -36,9 +36,10 @@ if (!is_object('dbal_mysqli'))
 class dbal_mysqli extends dbal
 {
 	var $multi_insert = true;
-	
+
 	/**
 	* Connect to server
+	* downgraded for phpBB2 backend
 	*/
 	function sql_connect($sqlserver, $sqluser, $sqlpassword, $database, $port = false, $persistency = false , $new_link = false)
 	{
@@ -47,25 +48,22 @@ class dbal_mysqli extends dbal
 		$this->server = $sqlserver;
 		$this->dbname = $database;
 		$port = (!$port) ? NULL : $port;
-
+		
 		// Persistant connections not supported by the mysqli extension?
 		$this->db_connect_id = @mysqli_connect($this->server, $this->user, $sqlpassword, $this->dbname, $port);
-
 		if ($this->db_connect_id && $this->dbname != '')
 		{
-			// mysqli only supported by phpBB3
-			//if (UTF_STATUS === 'phpbb3')
-			//{				
-			@mysqli_query($this->db_connect_id, "SET NAMES 'utf8'");
-			// enforce strict mode on databases that support it
-			//}			
+			// mysqli extension is only supported by mysql v. 4.1+
+			if (defined('DBCHARACTER_SET') && (DBCHARACTER_SET === 'utf8'))
+			{
+				mysqli_query($this->db_connect_id, "SET NAMES 'utf8'"); // enforce strict mode on databases that support it
+			}
 			if (mysqli_get_server_version($this->db_connect_id) >= 50002)
 			{
-				$result = @mysqli_query($this->db_connect_id, 'SELECT @@session.sql_mode AS sql_mode');
-				$row = @mysqli_fetch_assoc($result);
-				@mysqli_free_result($result);
+				$result = mysqli_query($this->db_connect_id, 'SELECT @@session.sql_mode AS sql_mode');
+				$row = mysqli_fetch_assoc($result);
+				mysqli_free_result($result);
 				$modes = array_map('trim', explode(',', $row['sql_mode']));
-
 				// TRADITIONAL includes STRICT_ALL_TABLES and STRICT_TRANS_TABLES
 				if (!in_array('TRADITIONAL', $modes))
 				{
@@ -73,21 +71,18 @@ class dbal_mysqli extends dbal
 					{
 						$modes[] = 'STRICT_ALL_TABLES';
 					}
-
 					if (!in_array('STRICT_TRANS_TABLES', $modes))
 					{
 						$modes[] = 'STRICT_TRANS_TABLES';
 					}
 				}
-
 				$mode = implode(',', $modes);
 				@mysqli_query($this->db_connect_id, "SET SESSION sql_mode='{$mode}'");
 			}
 			return $this->db_connect_id;
 		}
-
 		return $this->sql_error('');
-	}
+	}	
 
 	/**
 	* Version information about used database
@@ -248,7 +243,7 @@ class dbal_mysqli extends dbal
 			return $mx_cache->sql_fetchrow($query_id);
 		}
 
-		return ($query_id) ? @mysqli_fetch_assoc($query_id) : false;
+		return ($query_id) ? mysqli_fetch_assoc($query_id) : false;
 	}
 
 	/**
@@ -282,10 +277,19 @@ class dbal_mysqli extends dbal
 	*/
 	function sql_rowseek($rownum, $query_id = false)
 	{
+		global $mx_cache;
+
 		if (!$query_id)
 		{
 			$query_id = $this->query_result;
 		}
+
+		/* Backported from Olympus, not compatible with MXP, yet
+		if (!is_object($query_id) && isset($mx_cache->sql_rowset[$query_id]))
+		{
+			return $mx_cache->sql_rowseek($rownum, $query_id);
+		}
+		*/
 
 		return ($query_id) ? @mysqli_data_seek($query_id, $rownum) : false;
 	}
@@ -303,18 +307,21 @@ class dbal_mysqli extends dbal
 	*/
 	function sql_freeresult($query_id = false)
 	{
+		global $mx_cache;
+
 		if (!$query_id)
 		{
 			$query_id = $this->query_result;
 		}
 
-		// Make sure it is not a cached query
-		if (is_object($this->query_result))
+		/* Backported from Olympus, not compatible with MXP, yet
+		if (!is_object($query_id) && isset($mx_cache->sql_rowset[$query_id]))
 		{
-			return @mysqli_free_result($query_id);
+			return $mx_cache->sql_freeresult($query_id);
 		}
+		*/
 
-		return false;
+		return @mysqli_free_result($query_id);
 	}
 
 	/**

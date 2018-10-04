@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Module - mx_phpbb2blocks
-* @version $Id: mx_functions_display.php,v 1.8 2008/10/04 07:04:38 orynider Exp $
+* @version $Id: mx_functions_display.php,v 1.11 2013/06/28 15:37:22 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -32,12 +32,12 @@ function mx_display_forums($root_data = '', $display_moderators = true, $return_
 {
 	global $db, $phpbb_auth, $mx_user, $template;
 	global $phpbb_root_path, $phpEx, $board_config;
-	global $mx_request_vars, $phpBB3;
+	global $mx_request_vars;
 
 	$forum_rows = $subforums = $forum_ids = $forum_ids_moderator = $forum_moderators = $active_forum_ary = array();
 	$parent_id = $visible_forums = 0;
 	$sql_from = '';
-	
+
 	// Mark forums read?
 	$mark_read = $mx_request_vars->request('mark', MX_TYPE_NO_TAGS, '');
 
@@ -286,7 +286,7 @@ function mx_display_forums($root_data = '', $display_moderators = true, $return_
 				'FORUM_FOLDER_IMG_SRC'	=> '',
 				'FORUM_IMAGE'			=> ($row['forum_image']) ? '<img src="' . $phpbb_root_path . $row['forum_image'] . '" alt="' . $mx_user->lang['FORUM_CAT'] . '" />' : '',
 				'FORUM_IMAGE_SRC'		=> ($row['forum_image']) ? $phpbb_root_path . $row['forum_image'] : '',
-				'U_VIEWFORUM'			=> mx3_append_sid("{$phpbb_root_path}viewforum.$phpEx", 'f=' . $row['forum_id']))
+				'U_VIEWFORUM'			=> mx3_append_sid(PHPBB_URL . "viewforum.$phpEx", 'f=' . $row['forum_id']))
 			);
 
 			continue;
@@ -310,7 +310,7 @@ function mx_display_forums($root_data = '', $display_moderators = true, $return_
 				if ($subforum_row['display'] && $subforum_row['name'])
 				{
 					$subforums_list[] = array(
-						'link'		=> mx3_append_sid("{$phpbb_root_path}viewforum.$phpEx", 'f=' . $subforum_id),
+						'link'		=> mx3_append_sid(PHPBB_URL . "viewforum.$phpEx", 'f=' . $subforum_id),
 						'name'		=> $subforum_row['name'],
 						'unread'	=> $subforum_unread,
 					);
@@ -360,7 +360,7 @@ function mx_display_forums($root_data = '', $display_moderators = true, $return_
 		{
 			$last_post_subject = $row['forum_last_post_subject'];
 			$last_post_time = $mx_user->format_date($row['forum_last_post_time']);
-			$last_post_url = mx3_append_sid("{$phpbb_root_path}viewtopic.$phpEx", 'f=' . $row['forum_id_last_post'] . '&amp;p=' . $row['forum_last_post_id']) . '#p' . $row['forum_last_post_id'];
+			$last_post_url = mx3_append_sid(PHPBB_URL . "viewtopic.$phpEx", 'f=' . $row['forum_id_last_post'] . '&amp;p=' . $row['forum_last_post_id']) . '#p' . $row['forum_last_post_id'];
 		}
 		else
 		{
@@ -388,7 +388,7 @@ function mx_display_forums($root_data = '', $display_moderators = true, $return_
 
 		if ($row['forum_type'] != FORUM_LINK)
 		{
-			$u_viewforum = mx3_append_sid("{$phpbb_root_path}viewforum.$phpEx", 'f=' . $row['forum_id']);
+			$u_viewforum = mx3_append_sid(PHPBB_URL . "viewforum.$phpEx", 'f=' . $row['forum_id']);
 		}
 		else
 		{
@@ -396,19 +396,19 @@ function mx_display_forums($root_data = '', $display_moderators = true, $return_
 			// If the forum is having a password or no read access we do not expose the link, but instead handle it in viewforum
 			if (($row['forum_flags'] & FORUM_FLAG_LINK_TRACK) || $row['forum_password'] || !$phpbb_auth->acl_get('f_read', $forum_id))
 			{
-				$u_viewforum = mx3_append_sid("{$phpbb_root_path}viewforum.$phpEx", 'f=' . $row['forum_id']);
+				$u_viewforum = mx3_append_sid(PHPBB_URL . "viewforum.$phpEx", 'f=' . $row['forum_id']);
 			}
 			else
 			{
 				$u_viewforum = $row['forum_link'];
 			}
 		}
-		
+
 		//
 		//This was someting that MX-Publisher template sytsem didn't supported so S_LAST_CAT was introduced fom S_NO_CAT
 		//The template shold be changed allso ;)
 		//
-		
+
 		$template->assign_block_vars('forumrow', array(
 			'S_IS_CAT'			=> false,
 			'S_LAST_CAT'		=> $last_catless,
@@ -427,7 +427,7 @@ function mx_display_forums($root_data = '', $display_moderators = true, $return_
 			'FORUM_FOLDER_IMG_SRC'	=> $mx_user->img($folder_image, $folder_alt, false, '', 'src'),
 			'FORUM_IMAGE'			=> ($row['forum_image']) ? '<img src="' . $phpbb_root_path . $row['forum_image'] . '" alt="' . $mx_user->lang[$folder_alt] . '" />' : '',
 			'FORUM_IMAGE_SRC'		=> ($row['forum_image']) ? $phpbb_root_path . $row['forum_image'] : '',
-			'LAST_POST_SUBJECT'		=> $phpBB3->censor_text($last_post_subject),
+			'LAST_POST_SUBJECT'		=> phpBB3::censor_text($last_post_subject),
 			'LAST_POST_TIME'		=> $last_post_time,
 			'LAST_POSTER'			=> mx_get_username_string('username', $row['forum_last_poster_id'], $row['forum_last_poster_name'], $row['forum_last_poster_colour']),
 			'LAST_POSTER_COLOUR'	=> mx_get_username_string('colour', $row['forum_last_poster_id'], $row['forum_last_poster_name'], $row['forum_last_poster_colour']),
@@ -453,12 +453,12 @@ function mx_display_forums($root_data = '', $display_moderators = true, $return_
 				'S_UNREAD'		=> $subforum['unread'])
 			);
 		}
-		
+
 		$last_catless = $catless;
 	}
 
 	$template->assign_vars(array(
-		'U_MARK_FORUMS'		=> ($mx_user->data['is_registered'] || $board_config['load_anon_lastread']) ? mx3_append_sid("{$phpbb_root_path}viewforum.$phpEx", 'f=' . $root_data['forum_id'] . '&amp;mark=forums') : '',
+		'U_MARK_FORUMS'		=> ($mx_user->data['is_registered'] || $board_config['load_anon_lastread']) ? mx3_append_sid(PHPBB_URL . "viewforum.$phpEx", 'f=' . $root_data['forum_id'] . '&amp;mark=forums') : '',
 		'S_HAS_SUBFORUM'	=> ($visible_forums) ? true : false,
 		'L_SUBFORUM'		=> ($visible_forums == 1) ? $mx_user->lang['SUBFORUM'] : $mx_user->lang['SUBFORUMS'],
 		'LAST_POST_IMG'		=> $mx_user->img('icon_topic_latest', 'VIEW_LATEST_POST'))
@@ -532,7 +532,7 @@ function mx_generate_forum_nav(&$forum_data)
 				'S_IS_POST'		=> ($parent_type == FORUM_POST) ? true : false,
 				'FORUM_NAME'	=> $parent_name,
 				'FORUM_ID'		=> $parent_forum_id,
-				'U_VIEW_FORUM'	=> mx3_append_sid("{$phpbb_root_path}viewforum.$phpEx", 'f=' . $parent_forum_id))
+				'U_VIEW_FORUM'	=> mx3_append_sid(PHPBB_URL . "viewforum.$phpEx", 'f=' . $parent_forum_id))
 			);
 		}
 	}
@@ -543,7 +543,7 @@ function mx_generate_forum_nav(&$forum_data)
 		'S_IS_POST'		=> ($forum_data['forum_type'] == FORUM_POST) ? true : false,
 		'FORUM_NAME'	=> $forum_data['forum_name'],
 		'FORUM_ID'		=> $forum_data['forum_id'],
-		'U_VIEW_FORUM'	=> mx3_append_sid("{$phpbb_root_path}viewforum.$phpEx", 'f=' . $forum_data['forum_id']))
+		'U_VIEW_FORUM'	=> mx3_append_sid(PHPBB_URL . "viewforum.$phpEx", 'f=' . $forum_data['forum_id']))
 	);
 
 	$template->assign_vars(array(
@@ -703,7 +703,7 @@ function mx_get_moderators(&$forum_moderators, $forum_id = false)
 		}
 		else
 		{
-			$forum_moderators[$row['forum_id']][] = '<a' . (($row['group_colour']) ? ' style="color:#' . $row['group_colour'] . ';"' : '') . ' href="' . mx3_append_sid("{$phpbb_root_path}memberlist.$phpEx", 'mode=group&amp;g=' . $row['group_id']) . '">' . (($row['group_type'] == GROUP_SPECIAL) ? $mx_user->lang['G_' . $row['group_name']] : $row['group_name']) . '</a>';
+			$forum_moderators[$row['forum_id']][] = '<a' . (($row['group_colour']) ? ' style="color:#' . $row['group_colour'] . ';"' : '') . ' href="' . mx3_append_sid(PHPBB_URL . "memberlist.$phpEx", 'mode=group&amp;g=' . $row['group_id']) . '">' . (($row['group_type'] == GROUP_SPECIAL) ? $mx_user->lang['G_' . $row['group_name']] : $row['group_name']) . '</a>';
 		}
 	}
 	$db->sql_freeresult($result);
@@ -887,7 +887,7 @@ function mx_display_reasons($reason_id = 0)
 function mx_display_user_activity(&$mx_userdata)
 {
 	global $phpbb_auth, $template, $db, $mx_user;
-	global $phpbb_root_path, $phpEx, $phpBB3;
+	global $phpbb_root_path, $phpEx;
 
 	// Do not display user activity for users having more than 5000 posts...
 	if ($mx_userdata['user_posts'] > 5000)
@@ -982,11 +982,11 @@ function mx_display_user_activity(&$mx_userdata)
 		'ACTIVE_FORUM'			=> $active_f_name,
 		'ACTIVE_FORUM_POSTS'	=> ($active_f_count == 1) ? sprintf($mx_user->lang['USER_POST'], 1) : sprintf($mx_user->lang['USER_POSTS'], $active_f_count),
 		'ACTIVE_FORUM_PCT'		=> sprintf($l_active_pct, $active_f_pct),
-		'ACTIVE_TOPIC'			=> $phpBB3->censor_text($active_t_name),
+		'ACTIVE_TOPIC'			=> phpBB3::censor_text($active_t_name),
 		'ACTIVE_TOPIC_POSTS'	=> ($active_t_count == 1) ? sprintf($mx_user->lang['USER_POST'], 1) : sprintf($mx_user->lang['USER_POSTS'], $active_t_count),
 		'ACTIVE_TOPIC_PCT'		=> sprintf($l_active_pct, $active_t_pct),
-		'U_ACTIVE_FORUM'		=> mx3_append_sid("{$phpbb_root_path}viewforum.$phpEx", 'f=' . $active_f_id),
-		'U_ACTIVE_TOPIC'		=> mx3_append_sid("{$phpbb_root_path}viewtopic.$phpEx", 't=' . $active_t_id),
+		'U_ACTIVE_FORUM'		=> mx3_append_sid(PHPBB_URL . "viewforum.$phpEx", 'f=' . $active_f_id),
+		'U_ACTIVE_TOPIC'		=> mx3_append_sid(PHPBB_URL . "viewtopic.$phpEx", 't=' . $active_t_id),
 		'S_SHOW_ACTIVITY'		=> true)
 	);
 }
@@ -1035,7 +1035,7 @@ function mx_watch_topic_forum_old($mode, &$s_watching, &$s_watching_img, $mx_use
 					$db->sql_query($sql);
 				}
 
-				$redirect_url = mx3_append_sid("{$phpbb_root_path}view$mode.$phpEx", "$u_url=$match_id&amp;start=$start");
+				$redirect_url = mx3_append_sid(PHPBB_URL . "view$mode.$phpEx", "$u_url=$match_id&amp;start=$start");
 
 				meta_refresh(3, $redirect_url);
 
@@ -1069,7 +1069,7 @@ function mx_watch_topic_forum_old($mode, &$s_watching, &$s_watching_img, $mx_use
 					$db->sql_query($sql);
 				}
 
-				$redirect_url = mx3_append_sid("{$phpbb_root_path}view$mode.$phpEx", "$u_url=$match_id&amp;start=$start");
+				$redirect_url = mx3_append_sid(PHPBB_URL . "view$mode.$phpEx", "$u_url=$match_id&amp;start=$start");
 				meta_refresh(3, $redirect_url);
 
 				$message = $mx_user->lang['ARE_WATCHING_' . strtoupper($mode)] . '<br /><br />' . sprintf($mx_user->lang['RETURN_' . strtoupper($mode)], '<a href="' . $redirect_url . '">', '</a>');
@@ -1096,7 +1096,7 @@ function mx_watch_topic_forum_old($mode, &$s_watching, &$s_watching_img, $mx_use
 
 	if ($can_watch)
 	{
-		$s_watching['link'] = mx3_append_sid("{$phpbb_root_path}view$mode.$phpEx", "$u_url=$match_id&amp;" . (($is_watching) ? 'unwatch' : 'watch') . "=$mode&amp;start=$start");
+		$s_watching['link'] = mx3_append_sid(PHPBB_URL . "view$mode.$phpEx", "$u_url=$match_id&amp;" . (($is_watching) ? 'unwatch' : 'watch') . "=$mode&amp;start=$start");
 		$s_watching['title'] = $mx_user->lang[(($is_watching) ? 'STOP' : 'START') . '_WATCHING_' . strtoupper($mode)];
 		$s_watching['is_watching'] = $is_watching;
 	}
@@ -1148,7 +1148,7 @@ function mx_watch_topic_forum($mode, &$s_watching, $user_id, $forum_id, $topic_i
 					$db->sql_query($sql);
 				}
 
-				$redirect_url = mx3_append_sid("{$phpbb_root_path}view$mode.$phpEx", "$u_url=$match_id&amp;start=$start");
+				$redirect_url = mx3_append_sid(PHPBB_URL . "view$mode.$phpEx", "$u_url=$match_id&amp;start=$start");
 
 				meta_refresh(3, $redirect_url);
 
@@ -1182,7 +1182,7 @@ function mx_watch_topic_forum($mode, &$s_watching, $user_id, $forum_id, $topic_i
 					$db->sql_query($sql);
 				}
 
-				$redirect_url = mx3_append_sid("{$phpbb_root_path}view$mode.$phpEx", "$u_url=$match_id&amp;start=$start");
+				$redirect_url = mx3_append_sid(PHPBB_URL . "view$mode.$phpEx", "$u_url=$match_id&amp;start=$start");
 				meta_refresh(3, $redirect_url);
 
 				$message = $mx_user->lang['ARE_WATCHING_' . strtoupper($mode)] . '<br /><br />' . sprintf($mx_user->lang['RETURN_' . strtoupper($mode)], '<a href="' . $redirect_url . '">', '</a>');
@@ -1209,7 +1209,7 @@ function mx_watch_topic_forum($mode, &$s_watching, $user_id, $forum_id, $topic_i
 
 	if ($can_watch)
 	{
-		$s_watching['link'] = mx3_append_sid("{$phpbb_root_path}view$mode.$phpEx", "$u_url=$match_id&amp;" . (($is_watching) ? 'unwatch' : 'watch') . "=$mode&amp;start=$start");
+		$s_watching['link'] = mx3_append_sid(PHPBB_URL . "view$mode.$phpEx", "$u_url=$match_id&amp;" . (($is_watching) ? 'unwatch' : 'watch') . "=$mode&amp;start=$start");
 		$s_watching['title'] = $mx_user->lang[(($is_watching) ? 'STOP' : 'START') . '_WATCHING_' . strtoupper($mode)];
 		$s_watching['is_watching'] = $is_watching;
 	}
@@ -1233,8 +1233,8 @@ function mx_get_user_rank($user_rank, $user_posts, &$rank_title, &$rank_img, &$r
 
 	if (empty($ranks))
 	{
-		global $mx_cache;
-		$ranks = $mx_cache->obtain_ranks();
+		global $mx_backend;
+		$ranks = $mx_backend->obtain_ranks();
 	}
 
 	if (!empty($user_rank))

@@ -2,11 +2,11 @@
 /**
 *
 * @package DBal
-* @version $Id: sqlite.php,v 1.15 2008/03/07 00:59:03 orynider Exp $
+* @version $Id: sqlite.php,v 1.18 2013/06/28 15:33:26 orynider Exp $
 * @copyright (c) 2005 phpBB Group
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU Public License
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -252,10 +252,19 @@ class dbal_sqlite extends dbal
 	*/
 	function sql_rowseek($rownum, $query_id = false)
 	{
+		global $mx_cache;
+
 		if (!$query_id)
 		{
 			$query_id = $this->query_result;
 		}
+
+		/* Backported from Olympus, not compatible with MXP, yet
+		if (isset($mx_cache->sql_rowset[$query_id]))
+		{
+			return $mx_cache->sql_rowseek($rownum, $query_id);
+		}
+		*/
 
 		return ($query_id) ? @sqlite_seek($query_id, $rownum) : false;
 	}
@@ -273,6 +282,20 @@ class dbal_sqlite extends dbal
 	*/
 	function sql_freeresult($query_id = false)
 	{
+		global $mx_cache;
+
+		if ($query_id === false)
+		{
+			$query_id = $this->query_result;
+		}
+
+		/* Backported from Olympus, not compatible with MXP, yet
+		if (isset($mx_cache->sql_rowset[$query_id]))
+		{
+			return $mx_cache->sql_freeresult($query_id);
+		}
+		*/
+
 		return true;
 	}
 

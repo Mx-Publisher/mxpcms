@@ -1,6 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" dir="{S_CONTENT_DIRECTION}" lang="{S_USER_LANG}" xml:lang="{S_USER_LANG}">
-<html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset={S_CONTENT_ENCODING}" />
 <meta http-equiv="Content-Style-Type" content="text/css" />
@@ -10,9 +9,10 @@
 <title>{SITENAME} :: {PAGE_TITLE}</title>
 
 <!-- This should not be included direct from phpBB but later from MXP template folder wich means can be ported to internal backend with no change in this file -->
-<!-- BEGIN switch_phpbb_stylesheet-->
-<link rel="stylesheet" href="{U_PHPBB_ROOT_PATH}styles/prosilver/theme/stylesheet.css" type="text/css" >
-<!-- END switch_phpbb_stylesheet-->
+<!-- IF PHPBB -->
+<link rel="stylesheet" href="{U_PHPBB_ROOT_PATH}styles/prosilver/theme/stylesheet.css" type="text/css" />
+<!-- ENDIF -->
+
 
 <!-- This force template reloading in ie7 like CTRL+F5 does and is not very nice
 <script type="text/javascript" src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}styleswitcher.js"></script>

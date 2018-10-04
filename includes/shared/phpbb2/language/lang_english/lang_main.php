@@ -6,7 +6,7 @@
  *     copyright            : (C) 2001 The phpBB Group
  *     email                : support@phpbb.com
  *
- *     $Id: lang_main.php,v 1.5 2008/09/07 13:05:03 orynider Exp $
+ *     $Id: lang_main.php,v 1.6 2011/03/28 02:32:52 orynider Exp $
  *
  ****************************************************************************/
 
@@ -33,7 +33,7 @@
 // varies ... give it your best guess!
 //
 
-$lang['ENCODING'] = 'iso-8859-2';
+$lang['ENCODING'] = 'UTF-8'; //This is also for mx_phpbb3 and needs to be overwriten in module
 $lang['DIRECTION'] = 'ltr';
 $lang['LEFT'] = 'left';
 $lang['RIGHT'] = 'right';

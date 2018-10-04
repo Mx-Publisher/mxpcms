@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Module - mx_phpbb3blocks
-* @version $Id: mx_statistics.php,v 1.5 2008/10/04 07:04:38 orynider Exp $
+* @version $Id: mx_statistics.php,v 1.8 2013/06/28 15:36:44 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -106,39 +106,6 @@ $auth_data_sql_stats = $phpbb_auth->get_auth_forum();
 //
 // Getting voting bar info from template
 //
-/*
-if( !$board_config['override_user_style'] )
-{
-	if( $userdata['user_id'] != ANONYMOUS && isset($userdata['user_style']) )
-	{
-		$style = $userdata['user_style'];
-		if( !$theme )
-		{
-			$style = $board_config['default_style'];
-		}
-	}
-	else
-	{
-		$style = $board_config['default_style'];
-	}
-}
-else
-{
-	$style = $board_config['default_style'];
-}
-
-
-$sql = "SELECT * FROM " . THEMES_TABLE . " WHERE themes_id = $style";
-if( !($result = $db->sql_query($sql)) )
-{
-	mx_message_die(CRITICAL_ERROR, "Couldn't query database for theme info.");
-}
-if( !($row = $db->sql_fetchrow($result)) )
-{
-	mx_message_die(CRITICAL_ERROR, "Couldn't get theme data for themes_id=$style.");
-}
-*/
-
 $template->assign_vars(array(
 	"LEFT_GRAPH_IMAGE" => $vote_left,
 	"RIGHT_GRAPH_IMAGE" => $vote_right,
@@ -166,19 +133,19 @@ $percentage = 0;
 $bar_percent = 0;
 
 $firstcount = $user_data[0]['user_posts'];
-$get_db_stats = $phpBB2->get_db_stat( 'postcount' );
+$get_db_stats = phpBB2::get_db_stat( 'postcount' );
 
 for( $i = 0; $i < $user_count; $i++ )
 {
 	do_math($firstcount, $user_data[$i]['user_posts'], $get_db_stats, $percentage, $bar_percent);
-	
+
 	$top_poster_profile = mx_get_username_string('full', $user_data[$i]['user_id'], $user_data[$i]['username'], $user_data[$i]['user_colour']);
 
 	$template->assign_block_vars('users', array(
 		"RANK" => $i + 1,
 		"CLASS" => ( !( $i + 1 % 2 ) ) ? $theme['td_class2'] : $theme['td_class1'],
 		"USERNAME" => $user_data[$i]['username'],
-		"USERCOLOR" => $user_data[$i]['user_colour'],		
+		"USERCOLOR" => $user_data[$i]['user_colour'],
 		"PERCENTAGE" => $percentage,
 		"BAR" => $bar_percent,
 		"POSTER_URL" => $top_poster_profile,
@@ -254,10 +221,10 @@ for( $i = 0; $i < count($topic_data); $i++ )
 	// Get forum statistics
 	//
 	$total_posts = $get_db_stats; //Already queried above
-	$total_users = $phpBB2->get_db_stat('usercount');
-	$total_topics = $phpBB2->get_db_stat('topiccount');
+	$total_users = phpBB2::get_db_stat('usercount');
+	$total_topics = phpBB2::get_db_stat('topiccount');
 
-	$start_date = $phpBB2->create_date($board_config['default_dateformat'], $board_config['board_startdate'], $board_config['board_timezone']);
+	$start_date = phpBB2::create_date($board_config['default_dateformat'], $board_config['board_startdate'], $board_config['board_timezone']);
 
 	$boarddays = ( time() - $board_config['board_startdate'] ) / 86400;
 
@@ -413,7 +380,7 @@ for( $i = 0; $i < count($topic_data); $i++ )
 //
 // Newest user data
 //
-$newest_userdata = $phpBB2->get_db_stat('newestuser');
+$newest_userdata = phpBB2::get_db_stat('newestuser');
 $newest_user = $newest_userdata['username'];
 $newest_uid = $newest_userdata['user_id'];
 $sql = 'SELECT user_id, username, user_regdate, user_colour, user_birthday
@@ -443,12 +410,12 @@ if( !($result = $db->sql_query($sql)) )
 }
 $row = $db->sql_fetchrow($result);
 $db->sql_freeresult($result);
-$most_users_date = ( $row['config_value'] > 0 ) ? $phpBB2->create_date($board_config['default_dateformat'], $row['config_value'], $board_config['board_timezone']) : $lang['Not_available'];
+$most_users_date = ( $row['config_value'] > 0 ) ? phpBB2::create_date($board_config['default_dateformat'], $row['config_value'], $board_config['board_timezone']) : $lang['Not_available'];
 
 $most_users = ( $row['config_value'] > 0 ) ? $row['config_value'] : $lang['Not_available'];
 
 $statistic_array = array($lang['Number_posts'], $lang['Posts_per_day'], $lang['Number_topics'], $lang['Topics_per_day'], $lang['Number_users'], $lang['Users_per_day'], $lang['Board_started'], $lang['Board_Up_Days'], $lang['Database_size'], $lang['Avatar_dir_size'], $lang['Latest_Reg_User_Date'], $lang['Latest_Reg_User'], $lang['Most_Ever_Online_Date'], $lang['Most_Ever_Online'], $lang['Gzip_compression']);
-$value_array = array($total_posts, $posts_per_day, $total_topics, $topics_per_day, $total_users, $users_per_day, $start_date, sprintf('%.2f', $boarddays), $dbsize, $avatar_dir_size, $phpBB2->create_date($board_config['default_dateformat'], $newest_user_date, $board_config['board_timezone']), sprintf($newest_user_profile), $most_users_date, $most_users, ( $board_config['gzip_compress'] ) ? $lang['Enabled'] : $lang['Disabled']);
+$value_array = array($total_posts, $posts_per_day, $total_topics, $topics_per_day, $total_users, $users_per_day, $start_date, sprintf('%.2f', $boarddays), $dbsize, $avatar_dir_size, phpBB2::create_date($board_config['default_dateformat'], $newest_user_date, $board_config['board_timezone']), sprintf($newest_user_profile), $most_users_date, $most_users, ( $board_config['gzip_compress'] ) ? $lang['Enabled'] : $lang['Disabled']);
 
 //
 // Disk Usage, if Attachment Mod is installed

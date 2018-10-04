@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Installation
-* @version $Id: template.php,v 1.4 2008/02/04 15:58:08 joasch Exp $
+* @version $Id: template.php,v 1.5 2014/05/18 06:24:35 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net
 *
 */
 

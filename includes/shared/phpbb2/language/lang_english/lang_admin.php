@@ -7,7 +7,7 @@
  *     copyright            : (C) 2001 The phpBB Group
  *     email                : support@phpbb.com
  *
- *     $Id: lang_admin.php,v 1.2 2008/02/10 21:32:31 jonohlsson Exp $
+ *     $Id: lang_admin.php,v 1.3 2011/03/28 02:32:52 orynider Exp $
  *
  ****************************************************************************/
 

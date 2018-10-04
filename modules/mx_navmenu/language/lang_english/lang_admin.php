@@ -2,18 +2,31 @@
 /**
 *
 * @package MX-Publisher Module - mx_navmenu
-* @version $Id: lang_admin.php,v 1.11 2008/03/09 23:39:47 jonohlsson Exp $
+* @version $Id: lang_admin.php,v 1.13 2014/05/18 06:25:16 orynider Exp $
 * @copyright (c) 2002-2008 [Jon Ohlsson] MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net
 *
 */
 
-//
-// Menu Management
-//
+/*
+* Menu Management
+*/
+
 $lang['Nav_menu_cat']				= 'Navigation Menu Category';
 $lang['Nav_menu']					= 'Navigation Menu';
+
+$lang['menu_display_mode'] = 'Layout mode';
+$lang['menu_display_mode_explain '] = 'Horizonal or Vertical layout mode';
+
+$lang['Vertical']				= "Vertical";
+$lang['Horizontal']				= "Horizontal";
+$lang['Overall_navigation']		= "Overall_navigation";
+
+$lang['menu_custom_tpl']				= "Custom template file";
+$lang['menu_custom_tpl_explain ']		= "Eg mx_menu_custom.tpl";
+$lang['menu_page_parent']				= "Parent Page";
+$lang['menu_page_parent_explain ']		= "Navigation from this parent page";
 
 $lang['Menu_admin']					= 'Navigation Menu Administration';
 $lang['Menu_admin_explain']			= 'Use this form to customize your Navigation Menu';
@@ -54,14 +67,14 @@ $lang['Delete_nav_menu']			= 'Delete Navigation Menu entry';
 $lang['Delete_nav_menu_explain']	= 'This will delete the Navigation Menu entry. Beware, this operation cannot be undone!';
 $lang['Click_nav_menu_delete_yes']	= 'Click %sHere%s to delete the Navigation Menu.';
 
-//
-// Parameter Types
-//
+/*
+* Parameter Types
+*/
+
 $lang['ParType_nav_menu'] 			= 'Nav Menu';
 $lang['ParType_site_menu'] 			= 'Site Menu';
 
-//
-// Parameter Names
-//
-
+/*
+* Parameter Names
+*/
 ?>

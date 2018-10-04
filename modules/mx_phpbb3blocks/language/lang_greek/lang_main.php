@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Module - mx_phpbb2blocks
-* @version $Id: lang_main.php,v 1.1 2008/09/07 18:53:58 orynider Exp $
+* @version $Id: lang_main.php,v 1.4 2013/06/28 15:37:32 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -21,39 +21,55 @@
 //
 // Last Message Block
 //
-$lang['Latest_Post']               	= 'Ξ¤ΞµΞ»ΞµΟ…Ο„Ξ±Ξ―Ξ± Ξ”Ξ·ΞΌΞΏΟƒΞ―ΞµΟ…ΟƒΞ· ΞΞ·Ξ½ΟΞΌΞ±Ο„ΞΏΟ‚';
+$lang['Latest_Post']               	= 'Πρόσφατη Δημοσίευση Μηνύματος';
 
 //
 // Statistics Block
 //
-$lang['Statistics'] 				= 'Ξ£Ο„Ξ±Ο„ΞΉΟƒΟ„ΞΉΞΊΞ­Ο‚';
-$lang['Rank'] 						= 'ΞΞ±Ο„Ξ¬Ο„Ξ±ΞΎΞ·';
-$lang['Percent'] 					= 'Ξ ΞΏΟƒΞΏΟƒΟ„Ο';
-$lang['Graph'] 						= 'Ξ“ΟΞ¬Ο†Ξ·ΞΌΞ±';
-$lang['Uses'] 						= 'Ξ§ΟΞ®ΟƒΞµΞΉΟ‚';
-$lang['Board_Up_Days'] 				= 'Ξ Ξ―Ξ½Ξ±ΞΊΞ±Ο‚ Ξ—ΞΌΞµΟΟΞ½';
-$lang['Latest_Reg_User'] 			= 'Ξ¤ΞΏ Ξ½ΞµΟΟ„ΞµΟΞΏ ΞΌΞ­Ξ»ΞΏΟ‚';
-$lang['Latest_Reg_User_Date'] 		= 'Ξ—ΞΌ/Ξ½Ξ―Ξ± ΞµΞ³Ξ³ΟΞ±Ο†Ξ®Ο‚ Ξ½ΞµΟΟ„ΞµΟΞΏΟ… ΞΌΞ­Ξ»ΞΏΟ…Ο‚';
-$lang['Most_Ever_Online'] 			= 'Ξ ΞµΟΞΉΟƒΟƒΟΟ„ΞµΟΞΏΞΉ Ο‡ΟΞ®ΟƒΟ„ΞµΟ‚ Online';
-$lang['Most_Ever_Online_Date'] 		= 'Ξ—ΞΌ/Ξ½Ξ―Ξ± Ξ ΞµΟΞΉΟƒΟƒΟΟ„ΞµΟΟ‰Ξ½ Ξ§ΟΞ·ΟƒΟ„ΟΞ½ Online';
+$lang['Statistics'] 				= 'Στατιστικές';
+$lang['Rank'] 						= 'Κατάταξη';
+$lang['Percent'] 					= 'Ποσοστό';
+$lang['Graph'] 						= 'Γράφημα';
+$lang['Uses'] 						= 'Χρήσεις';
+$lang['Board_Up_Days'] 				= 'Πίνακας Ημερών';
+$lang['Latest_Reg_User'] 			= 'Το νεότερο μέλος';
+$lang['Latest_Reg_User_Date'] 		= 'Ημ/νία εγγραφής νεότερου μέλους';
+$lang['Most_Ever_Online'] 			= 'Περισσότεροι χρήστες Online';
+$lang['Most_Ever_Online_Date'] 		= 'Ημ/νία Περισσότερων Χρηστών Online';
 
-$lang['Admin_Stats'] 				= 'Ξ£Ο„Ξ±Ο„ΞΉΟƒΟ„ΞΉΞΊΞ­Ο‚ Ξ”ΞΉΞ±Ο‡ΞµΞΉΟΞΉΟƒΟ„Ξ®';
-$lang['Top_Posting_Users'] 			= 'ΞΞΏΟΟ…Ο†Ξ±Ξ―ΞΏΞΉ Ξ§ΟΞ®ΟƒΟ„ΞµΟ‚ Ξ”Ξ·ΞΌΞΏΟƒΞΉΞµΟΟƒΞµΟ‰Ξ½';
-$lang['Most_Active_Topics'] 		= 'ΞΞ­ΞΌΞ±Ο„Ξ± ΞΌΞµ ΞΌΞµΞ³Ξ±Ξ»ΟΟ„ΞµΟΞ· ΟƒΟ…ΞΌΞΌΞµΟ„ΞΏΟ‡Ξ®';
-$lang['Most_Viewed_Topics'] 		= 'ΞΞ­ΞΌΞ±Ο„Ξ± ΞΌΞµ ΞΌΞµΞ³Ξ±Ξ»ΟΟ„ΞµΟΞ· Ο€ΟΞΏΞ²ΞΏΞ»Ξ®';
-$lang['Top_Smilies'] 				= 'ΞΞΏΟΟ…Ο†Ξ±Ξ―Ξ± Ξ§ΟΞ·ΟƒΞΉΞΌΞΏΟ€ΞΏΞΉΞΏΟΞΌΞµΞ½Ξ± Ξ•ΞΉΞΊΞΏΞ½Ξ―Ξ΄ΞΉΞ±';
+$lang['Admin_Stats'] 				= 'Στατιστικές Διαχειριστή';
+$lang['Top_Posting_Users'] 			= 'Κορυφαίοι Χρήστες Δημοσιεύσεων';
+$lang['Most_Active_Topics'] 		= 'Θέματα με μεγαλύτερη συμμετοχή';
+$lang['Most_Viewed_Topics'] 		= 'Θέματα με μεγαλύτερη προβολή';
+$lang['Top_Smilies'] 				= 'Κορυφαία Χρησιμοποιούμενα Εικονίδια';
+
+//Announce
+$lang['POST_IMG'] 					= 'Post';
+$lang['POST_NEWS'] 					= 'News';
+$lang['POST_NEWS_GLOBAL'] 			= 'Global News';
+$lang['POST_NEW_IMG'] 				= 'Post New';
+$lang['POST_NEW_HOT_IMG'] 			= 'Post New Hot';
+$lang['POST_LOCKED_IMG'] 			= 'Post Locked';
+$lang['POST_REPLY'] 				= 'Post a reply';
+$lang['PRINT_IT'] 					= 'Print it';
+$lang['PROFILE_SMALL'] 				= 'UCP';
+$lang['POST_ANNOUNCEMENT_NEW'] 		= 'New Announcement';
+$lang['POST_ANNOUNCEMENT'] 			= 'Announcement';
+$lang['POSTED_BY'] 					= 'Posted by';
+$lang['PRINT_IT'] 					= 'Print it';
+$lang['VIEW_FULL_ARTICLE']			= 'Read full article';
 
 //
 // Polls
 //
-$lang['Surveys_Polls']          	= 'ΞΟΞµΟ…Ξ½ΞµΟ‚/Ξ¨Ξ·Ο†ΞΏΟ†ΞΏΟΞ―ΞµΟ‚';
-$lang['Already_voted']          	= 'ΞΟ‡ΞµΟ„Ξµ Ξ®Ξ΄Ξ· ΟΞ·Ο†Ξ―ΟƒΞµΞΉ';
-$lang['Click_view_voted']       	= 'Ξ Ξ±Ο„Ξ®ΟƒΟ„Ξµ %sΞ•Ξ΄Ο%s Ξ½Ξ± Ξ΄ΞµΞ―Ο„Ξµ Ο„Ξ± Ξ±Ο€ΞΏΟ„ΞµΞ»Ξ­ΟƒΞΌΞ±Ο„Ξ±';
+$lang['Surveys_Polls']          	= 'Έρευνες/Ψηφοφορίες';
+$lang['Already_voted']          	= 'Έχετε ήδη ψηφίσει';
+$lang['Click_view_voted']       	= 'Πατήστε %sΕδώ%s να δείτε τα αποτελέσματα';
 
 //
 // These Language Variables are only used if the Attachment Mod is installed
 //
-$lang['Disk_usage'] 				= 'Ξ§ΟΞ®ΟƒΞ· Ξ΄Ξ―ΟƒΞΊΞΏΟ…';
+$lang['Disk_usage'] 				= 'Χρήση δίσκου';
 
 //
 // That's all Folks!

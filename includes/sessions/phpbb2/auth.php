@@ -2,10 +2,10 @@
 /**
 *
 * @package Auth
-* @version $Id: auth.php,v 1.3 2008/02/05 18:37:20 joasch Exp $
+* @version $Id: auth.php,v 1.4 2013/06/28 15:33:47 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 

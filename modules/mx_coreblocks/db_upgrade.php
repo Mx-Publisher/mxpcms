@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Module - mx_coreblocks
-* @version $Id: db_upgrade.php,v 1.12 2008/02/16 21:42:41 jonohlsson Exp $
+* @version $Id: db_upgrade.php,v 1.13 2014/05/18 06:24:56 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net
 *
 */
 
@@ -32,7 +32,7 @@ if ( !defined( 'IN_ADMIN' ) )
 }
 
 $mx_module_version = 'MX-Publisher Core Module';
-$mx_module_copy = 'Original mx-Publisher <i>Core Blocks</i> module by <a href="http://www.mx-publisher.com" target="_blank">The MX-Publisher Development Team</a>';
+$mx_module_copy = 'Original mx-Publisher <i>Core Blocks</i> module by <a href="http://mxpcms.sourceforge.net" target="_blank">The MX-Publisher Development Team</a>';
 
 $message = "<b>" . $lang['upgrading'] . "!</b><br/><br/>";
 

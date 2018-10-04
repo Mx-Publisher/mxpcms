@@ -13,7 +13,7 @@
  *     copyright 2          : (C) Bogdan Toma
  *     email     2          : bogdan@phpbb.ro
  *
- *     $Id: lang_main.php,v 1.5 2008/10/04 07:04:25 orynider Exp $
+ *     $Id: lang_main.php,v 1.6 2013/08/25 18:21:04 orynider Exp $
  *
  ****************************************************************************/
 
@@ -67,7 +67,7 @@ $lang['Posted'] = 'Trimis';
 $lang['Username'] = 'Utilizator';
 $lang['Password'] = 'Parola';
 $lang['Email'] = 'Email';
-$lang['Poster'] = 'Autor';
+$lang['Poster'] = 'Trimis de';
 $lang['Author'] = 'Autor';
 $lang['Time'] = 'Timp';
 $lang['Hours'] = 'Ore';

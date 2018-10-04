@@ -2,31 +2,30 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: lang_admin.php,v 1.88 2008/06/18 17:53:05 orynider Exp $
+* @version $Id: lang_admin.php,v 1.95 2013/06/28 17:08:52 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
-//
-// Editor Settings: Please set Tabsize to 4 ;-)
-//
+/*  Editor Settings: Please set Tabsize to 4 ;-) */
+ 
+/*  The format of this file is:  ---> $lang['message'] = 'text';
+/*  Specify your language character encoding... [optional] */  
+setlocale(LC_ALL, 'en');
 
-//
-// The format of this file is:
-//
-// ---> $lang['message'] = 'text';
-//
-// Specify your language character encoding... [optional]
-//
-// setlocale(LC_ALL, 'en');
+$lang['ENCODING'] = 'UTF-8';
+$lang['DIRECTION'] = 'ltr';
+$lang['LEFT'] = 'left';
+$lang['RIGHT'] = 'right';
+$lang['DATE_FORMAT'] =  'd/M/Y'; // This should be changed to the default date format for your language, php date() format
 
-$lang['mxBB_adminCP'] = 'MX-Publisher Administration';
-
-//
-// Left AdminCP Panel
-//
+$lang['Mx-Publisher_adminCP']	= 'MX-Publisher Administration';
+$lang['Portal_Desc'] 			= 'A little text to describe your website.';
+/*
+* Left AdminCP Panel
+*/
 $lang['1_General_admin'] = 'General';
 $lang['1_1_Management'] = 'Configuration';
 $lang['1_2_WordCensors'] = 'Word Censors';
@@ -47,16 +46,17 @@ $lang['4_1_Cache'] = 'Regenerate Cache';
 $lang['4_1_Integrity'] = 'Integrity Checker';
 $lang['4_1_Meta'] = 'META Tags';
 $lang['4_1_PHPinfo'] = 'phpInfo()';
+$lang['4_2_Translate'] 	= 'Translation Pannel';
 
-//
-// Index
-//
-$lang['Welcome_mxBB'] = 'Welcome to MX-Publisher';
-$lang['Admin_intro_mxBB'] = 'Thank you for choosing MX-Publisher as your portal/cms solution and phpBB as your forum solution. This screen will give you a quick overview of all the various statistics of your site. You can get back to this page by clicking on the <span style="text-decoration: underline;">Admin Index</span> link in the left panel. To return to the index of your board, click the logo that is also in the left panel. The other links on the left hand side of this screen will allow you to control every aspect of your portal and forum experience. Each screen will have instructions on how to use the provided tools.';
+/*
+* Index
+*/
+$lang['Welcome_Mx-Publisher'] = 'Welcome to MX-Publisher';
+$lang['Admin_intro_Mx-Publisher'] = 'Thank you for choosing MX-Publisher as your portal/cms solution and phpBB as your forum solution. This screen will give you a quick overview of all the various statistics of your site. You can get back to this page by clicking on the <span style="text-decoration: underline;">Admin Index</span> link in the left panel. To return to the index of your board, click the logo that is also in the left panel. The other links on the left hand side of this screen will allow you to control every aspect of your portal and forum experience. Each screen will have instructions on how to use the provided tools.';
 
-//
-// General
-//
+/*
+* General
+*/
 $lang['Yes'] = 'Yes';
 $lang['No'] = 'No';
 $lang['No_modules'] = 'No modules are installed.';
@@ -100,10 +100,12 @@ $lang['was_moved'] = 'was moved';
 $lang['was_synced'] = 'was synchronized';
 
 $lang['error_no_field'] = 'There is a missing field. Please fill out all the required fields.';
+$lang['Cookie_settings_mxp'] = 'Cookie/session settings';
+$lang['Cookie_settings_explain_mxp'] = 'These details define how cookies/sessions are sent to your users\' browsers. In most cases the default values for the cookie settings should be sufficient, but if you need to change them do so with care -- incorrect settings can prevent users from logging in.';
 
-//
-// Configuration
-//
+/*
+* Configuration
+*/
 $lang['Portal_admin'] = 'Portal Administration';
 $lang['Portal_admin_explain'] = 'Use this form to customize your portal';
 $lang['Portal_General_Config'] = 'Portal Configuration';
@@ -155,10 +157,16 @@ $lang['Portal_Backend_submit'] = 'Change and validate Backend';
 $lang['Portal_config_valid'] = 'Current Backend Status: ';
 $lang['Portal_config_valid_true'] = '<b><font color="green">Valid</font></b>';
 $lang['Portal_config_valid_false'] = '<b><font color="red">Bad Setup. Either your phpBB relative path is wrong or phpBB is uninstalled (your phpBB database is unavailable). Thus, \'internal\' backend is used.</font></b>';
-
-//
-// Module Management
-//
+$lang['Phpbb_path'] = 'phpBB relative path';
+$lang['Phpbb_path_explain'] = 'Relative path to phpBB, ex. phpBB/ or ../phpBB/<br />Note the slashes "/", they are important!';
+$lang['Phpbb_url'] = 'Full phpBB URL';
+$lang['Phpbb_url_explain'] = 'Full phpBB URL, ex. <br />http://www.example.com/phpBB/';
+$lang['Portal_url'] = 'Full Portal URL';
+$lang['Portal_backend'] = 'Portal Backend';
+$lang['Portal_url_explain'] = 'Full Portal URL, ex. <br />http://www.example.com/';
+/*
+* Module Management
+*/
 $lang['Module_admin'] = 'Module Administration';
 $lang['Module_admin_explain'] = 'Use this form to manage modules: installation, upgrading and module development.<br /><b>To use this panel, you need to have JavaScript and cookies enabled in your browser!</b>';
 $lang['Modulecp_admin'] = 'Module Control Panel';
@@ -173,10 +181,9 @@ $lang['Module_name'] = 'Module Name';
 $lang['Module_desc'] = 'Description';
 $lang['Module_path'] = 'Path, ex. \'modules/mx_textblocks/\'';
 $lang['Module_include_admin'] = 'Include this module in the AdminCP navigation';
-
-//
-// Module Installation
-//
+/*
+* Module Installation
+*/
 $lang['Module_delete_db'] = 'Do you really want to uninstall the module? Warning: You will lose all module data. Consider upgrading instead.';
 $lang['Click_module_delete_yes'] = 'Click %sHere%s to uninstall the module';
 $lang['Click_module_upgrade_yes'] = 'Click %sHere%s to upgrade the module';
@@ -209,9 +216,9 @@ $lang['module_not_installed'] = 'Module not installed...and thus cannot be upgra
 $lang['fresh_install'] = 'This is a fresh install';
 $lang['module_install_info'] = 'Mod Installation/Upgrading/Uninstalling Information - mod specific db tables';
 
-//
-// Functions & Parameters Administration
-//
+/*
+* Functions & Parameters Administration
+*/
 $lang['Function_admin'] = 'Block Function Administration';
 $lang['Function_admin_explain'] = 'Modules have one or more block bunctions. Use this form to edit, add, or delete a block function';
 $lang['Function'] = 'Block Function';
@@ -229,6 +236,7 @@ $lang['Parameter_admin_explain'] = 'List all parameters for this function';
 $lang['Parameter'] = 'Parameter';
 $lang['Parameter_name'] = '<b>Parameter Name</b><br />- to be used to access the parameter';
 $lang['Parameter_type'] = '<b>Parameter Type</b>';
+$lang['Parameter_desc'] = "<b>Parameter Description</b>";
 $lang['Parameter_default'] = '<b>Default Value</b>';
 $lang['Parameter_function'] = '<b>Function/Options</b>';
 $lang['Parameter_function_explain'] = '<b>Function</b> (when using the \'Function\' type)<br />- You may pass the parameter data to an external function <br /> to generate the parameter form field.<br />- For example: <br />get_list_formatted("block_list","{parameter_value}","{parameter_id}[]")';
@@ -242,9 +250,9 @@ $lang['Delete_parameter'] = 'Delete Function Parameter';
 $lang['Delete_parameter_explain'] = 'This will delete the parameter and update all associated portal blocks. Beware: this operation cannot be undone!';
 $lang['Click_parameter_delete_yes'] = 'Click %sHere%s to delete the Parameter';
 
-//
-// Parameter Types
-//
+/*
+* Parameter Types
+*/
 $lang['ParType_BBText'] = 'Simple BBCode Textblock';
 $lang['ParType_BBText_info'] = 'This is a simple textblock that parses BBCode';
 $lang['ParType_Html'] = 'Simple HTML Textblock';
@@ -269,9 +277,9 @@ $lang['ParType_Menu_multiple_select_info'] = '';
 $lang['ParType_Checkbox_multiple_select'] = 'Multiple-Selection Checkbox';
 $lang['ParType_Checkbox_multiple_select_info'] = '';
 
-//
-// Blocks Administration
-//
+/*
+* Blocks Administration
+*/
 $lang['Block_admin'] = 'Block Control Panel';
 $lang['Block_admin_explain'] = 'Use this form to manage portal blocks.<br /><b>To use this panel, you need to have JavaScript and cookies enabled in your browser!</b>';
 $lang['Block'] = 'Block';
@@ -296,17 +304,17 @@ $lang['Delete_block'] = 'Delete Portal Block';
 $lang['Delete_block_explain'] = 'This will delete the block and update all associated Portal Pages. Beware: this operation cannot be undone!';
 $lang['Click_block_delete_yes'] = 'Click %sHere%s to delete the Block';
 
-//
-// BlockCP Administration
-//
+/*
+* BlockCP Administration
+*/
 $lang['Block_cp'] = 'BlockCP';
 $lang['Click_return_blockCP_admin'] = 'Click %sHere%s to return to the Block Control Panel';
 $lang['Click_return_portalpage_admin'] = 'Click %sHere%s to return to the Portal Page';
 $lang['BlockCP_Config_updated'] = 'This block has been updated.';
 
-//
-// Pages Administration
-//
+/*
+* Pages Administration
+*/
 $lang['Page_admin'] = 'Page Administration';
 $lang['Page_admin_explain'] = 'Use this form to add, delete and change the settings for Portal Pages and Page Templates.<br /><b>To use this panel, you need to have JavaScript and cookies enabled in your browser!</b>';
 $lang['Page_admin_edit'] = 'Page Edit';
@@ -378,9 +386,9 @@ $lang['Add_Dynamic_Block_explain'] 	= 'This dynamic block defines subpages, set 
 $lang['Add_Virtual_Block'] 			= 'Add Virtual (Page Blog) Block';
 $lang['Add_Virtual_Block_explain'] 	= 'This block turns the page into a virtual (blog) page';
 
-//
-// Page templates
-//
+/*
+* Page templates
+*/
 $lang['Page_templates_admin'] = 'Page Templates Administration';
 $lang['Page_templates_admin_explain'] = 'Use this page to create, edit or delete Page Templates';
 $lang['Page_template'] = 'Page Template';
@@ -400,33 +408,35 @@ $lang['Delete_page_template_column'] = 'Delete Page Template';
 $lang['Delete_page_template_column_explain'] = 'This will delete the Page Template. Beware: this operation cannot be undone!';
 $lang['Click_page_template_column_delete_yes'] = 'Click %sHere%s to delete the Page Template';
 
-//
-// Cache
-//
+/*
+* Cache
+*/
 $lang['Cache_dir_write_protect'] = 'Your cache directory is write-protected. MX-Publisher is unable to generate the cache file. Please make your cache directory writeable to continue.';
 $lang['Cache_generate'] = 'Your cache files have been generated.';
 $lang['Cache_submit'] = 'Generate the cache file?';
 $lang['Cache_explain'] = 'With this option you can generate all cache files (XMLs files) at once for all portal blocks. These files allow the reduction of the number of database queries needed and improves overall portal performance. <br />Note: the MX-Publisher cache must be enabled (in the Portal General Admin CP) for these files to be used by the system.<br>Further note: the cache files are created on the fly when editing blocks as well.';
 $lang['Generate_mx_cache'] = 'Generate Block Cache';
 
-//
-// These are displayed in the drop down boxes for advanced
-// mode Module auth, try and keep them short!
-//
+/*
+* These are displayed in the drop down boxes for advanced
+* mode Module auth, try and keep them short!
+*/
 $lang['Menu_Navigation'] = 'Navigation Menu';
 $lang['Portal_index'] = 'Portal Index';
 $lang['Save_Settings'] = 'Save Settings';
 $lang['Translation_Tools'] = 'Translation Tools';
 $lang['Preview_portal'] = 'Preview Portal';
 
-//
-// META
-//
+/*
+* META
+*/
 $lang['Meta_admin'] = 'META Tags Administration';
 $lang['Mega_admin_explain'] = 'Use this form to customize your META tags';
 $lang['Meta_Title'] = 'Title';
 $lang['Meta_Author'] = 'Author';
 $lang['Meta_Copyright'] = 'Copyright';
+$lang['Meta_ImageToolBar'] = 'Image ToolBar';
+$lang['Meta_Distribution'] = 'Distribution';
 $lang['Meta_Keywords'] = 'Keywords';
 $lang['Meta_Keywords_explain'] = '(comma seperated list)';
 $lang['Meta_Description'] = 'Description';
@@ -440,9 +450,9 @@ $lang['Meta_HTITLE'] = 'Extra Header Settings';
 $lang['Meta_data_updated'] = 'Meta data file (mx_meta.inc) has been updated!<br />Click %sHere%s to return to Meta Tags Administration.';
 $lang['Meta_data_ioerror'] = 'Unable to open mx_meta.inc. Make sure the file is writeable (chmod 777).';
 
-//
-// Portal permissons
-//
+/*
+* Portal permissons
+*/
 $lang['Mx_Block_Auth_Title'] = 'Private Block Permissions' ;
 $lang['Mx_Block_Auth_Explain'] = 'Here you can configure Private Block Permissions';
 $lang['Mx_Page_Auth_Title'] = 'Private Page Permissions' ;
@@ -458,36 +468,25 @@ $lang['AUTH_MOD'] = 'MOD';
 $lang['AUTH_ADMIN'] = 'ADMIN';
 $lang['AUTH_ANONYMOUS'] = 'ANONYMOUS';
 
-// -----------------------------------
-// BlockCP - Block Parameter Specific
-// -----------------------------------
+/* -----------------------------------/
+* BlockCP - Block Parameter Specific/
+* ----------------------------------- */
 
-//
-// General
-//
+/* General */
 $lang['target_block'] = 'Target Block';
 $lang['target_block_explain'] = '- links, data etc are refering with this block';
-
-//
-// Split column
-//
+/* Split column */
 $lang['block_ids'] = 'Source Blocks';
 $lang['block_ids_explain'] = '- to be placed left to right';
 $lang['block_sizes'] = 'Block Sizes (comma separated)';
 $lang['block_sizes_explain'] = '- You may specify size using numbers (pixels), percentages (relative sizes, ie. \'40%\') or \'*\' for the remainder.';
 $lang['space_between'] = 'Space between Blocks';
-
-//
-// Sitelog
-//
+/* Sitelog */
 $lang['log_filter_date'] = 'Filter by time';
 $lang['log_filter_date_explain'] = '- Show logs from last week, month, year...';
 $lang['numOfEvents'] = 'Number';
 $lang['numOfEvents_explain'] = '- Number of events to show';
-
-//
-// IncludeX
-//
+/* IncludeX */
 $lang['x_listen'] = 'Listen (GET)';
 $lang['x_iframe'] = 'IFrame';
 $lang['x_textfile'] = 'Textfile';
@@ -502,33 +501,24 @@ $lang['x_2'] = 'Variable 2:';
 $lang['x_2_explain'] = '- <i>IFrame:</i> frame height (pixels)<br /><i>Multimedia:</i> width (pixles)';
 $lang['x_3'] = 'Variable 3:';
 $lang['x_3_explain'] = '- <i>Multimedia:</i> height (pixles)';
-
-//
-// Dynamic Block
-//
+/* Dynamic Block */
 $lang['default_block_id'] = 'Default Block';
 $lang['default_block_id_explain'] = '- This is the default or first block to display, unless a dynamic block is set';
-
-//
-// Menu Navigation
-//
+/* Menu Navigation */
 $lang['menu_display_mode'] = 'Layout mode';
 $lang['menu_display_mode_explain '] = 'Horizonal or Vertical layout mode';
 $lang['menu_custom_tpl']				= "Custom template file";
 $lang['menu_custom_tpl_explain ']		= "Eg mx_menu_custom.tpl";
 $lang['menu_page_parent']				= "Parent Page";
 $lang['menu_page_parent_explain ']		= "Navigation from this parent page";
+/* Version Checker */
+$lang['MXP_Version_up_to_date'] = 'Your MX-Publisher installation is up to date. No updates are available for your version of MX-Publisher.';
+$lang['MXP_Version_outdated'] = 'Your MX-Publisher installation does <b>not</b> seem to be up to date. Updates are available for your version of MX-Publisher. Please visit <a href="http://mxpcms.sourceforge.net/download" target="_new">the MX-Publisher Core package download</a> to obtain the latest version.';
+$lang['MXP_Latest_version_info'] = 'The latest available version is <b>MX-Publisher %s</b>. ';
+$lang['MXP_Current_version_info'] = 'You are running <b>MX-Publisher %s</b>.';
+$lang['MXP_Mailing_list_subscribe_reminder'] = 'For the latest information on news and updates to MX-Publisher, why not <a href="http://lists.sourceforge.net/lists/listinfo/mxpcms-news" target="_new">subscribe to our mailing list</a>?';
 
-//
-// Version Checker
-//
-$lang['mxBB_Version_up_to_date'] = 'Your MX-Publisher installation is up to date. No updates are available for your version of MX-Publisher.';
-$lang['mxBB_Version_outdated'] = 'Your MX-Publisher installation does <b>not</b> seem to be up to date. Updates are available for your version of MX-Publisher. Please visit <a href="http://www.mx-publisher.com/download" target="_new">the MX-Publisher Core package download</a> to obtain the latest version.';
-$lang['mxBB_Latest_version_info'] = 'The latest available version is <b>MX-Publisher %s</b>. ';
-$lang['mxBB_Current_version_info'] = 'You are running <b>MX-Publisher %s</b>.';
-$lang['mxBB_Mailing_list_subscribe_reminder'] = 'For the latest information on news and updates to MX-Publisher, why not <a href="http://lists.sourceforge.net/lists/listinfo/mxbb-news" target="_new">subscribe to our mailing list</a>?';
-
-//
-// That's all Folks!
-// -------------------------------------------------
+/*
+* That's all Folks!
+* -------------------------------------------------*/
 ?>

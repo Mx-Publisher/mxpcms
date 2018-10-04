@@ -2,18 +2,19 @@
 /**
  *
  * @package mx-Publisher Core
- * @version $Id: index_new.php,v 1.16 2008/09/30 07:04:34 orynider Exp $
+ * @version $Id: index_new.php,v 1.19 2013/06/17 02:53:26 orynider Exp $
  * @copyright (c) 2002-2006 mxBB Project Team
  * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
  * @link http://www.mxbb.net
  * @origin This file is borrowed from phpBB, with some modifications
  */
 // Security and Page header
-define( 'IN_PORTAL', 1 );
+@define('IN_PORTAL', 1);
 $mx_root_path = './../';
-$phpEx = substr( strrchr( __FILE__, '.' ), 1 );
-$no_page_header = true;
-require( './pagestart.' . $phpEx );
+$phpEx = substr(strrchr(__FILE__, '.'), 1);
+$no_page_header = TRUE;
+
+require($mx_root_path.'admin/pagestart.' . $phpEx);
 error_reporting( E_ALL ^ E_NOTICE );
 // ------------------------------
 // DEBUG ONLY ;-)
@@ -616,11 +617,11 @@ class mx_acp
 			default:
 				for( $i = 0; $i < $match_count; $i++ )
 				{
-					if ( eregi( 'javascript:', $match_links['LINK'][$i] ) || empty( $match_links['SCRIPT'][$i] ) || eregi( $mx_root_path . 'index.' . $phpEx, $match_links['LINK'][$i] ) || eregi( $admin_path . 'index.' . $phpEx, $match_links['LINK'][$i] ) )
+					if ( stristr($match_links['LINK'][$i], 'javascript:') || empty($match_links['SCRIPT'][$i]) || stristr($match_links['LINK'][$i], $mx_root_path . 'index.' . $phpEx) || stristr($match_links['LINK'][$i], $admin_path . 'index.' . $phpEx) )
 					{
 						continue;
 					}
-					if ( eregi( 'index.' . $phpEx, $match_links['LINK'][$i] ) )
+					if ( stristr($match_links['LINK'][$i],'index.' . $phpEx) )
 					{
 						$text = str_replace( $match_links['LINK'][$i], PORTAL_URL . $admin_path . $match_links['LINK'][$i], $text );
 						continue;
@@ -776,7 +777,7 @@ class mx_acp
 			"U_ADMIN_INDEX" => mx_append_sid( basename( __FILE__ ) ),
 			'U_LOGOUT' => mx_append_sid( PORTAL_URL . 'login.' . $phpEx . '?logout=1' ),
 
-			'ADMIN_TITLE' => $lang['mxBB_adminCP'],
+			'ADMIN_TITLE' => $lang['Mx-Publisher_adminCP'],
 
 			'USERNAME' => $mx_user->data['username'],
 			'CATEGORY' => $this->category,
@@ -804,11 +805,7 @@ class mx_acp
 			'S_TIMEZONE' => sprintf( $lang['All_times'], $l_timezone ),
 			'S_LOGIN_ACTION' => mx_append_sid( '../login.' . $phpEx ),
 			'S_JUMPBOX_ACTION' => mx_append_sid( '../viewforum.' . $phpEx ),
-			'S_CURRENT_TIME' =>
-			( OLYMPUS_BACKEND == PORTAL_BACKEND )?
-			sprintf( $lang['Current_time'], $phpBB2->create_date( $board_config['default_dateformat'], time(), $board_config['board_timezone'] ) ):
-			sprintf( $lang['Current_time'], create_date( $board_config['default_dateformat'], time(), $board_config['board_timezone'] ) ),
-
+			'S_CURRENT_TIME' => sprintf($lang['Current_time'], phpBB2::create_date($board_config['default_dateformat'], time(), $board_config['board_timezone'])),
 			'S_CONTENT_DIRECTION' => $lang['DIRECTION'],
 			'S_CONTENT_ENCODING' => $lang['ENCODING'],
 			'S_CONTENT_DIR_LEFT' => $lang['LEFT'],
@@ -839,10 +836,10 @@ error_reporting( E_ALL ^ E_NOTICE );
 ini_set( 'display_errors', '1' );
 $i = 1;
 // VERSION mx v2.8
-// $script = str_replace( '$phpBB2->', '', $script);
+//$script = str_replace( '$phpBB2->', 'phpBB2::', $script);
 // VERSION mxP v2.9
 $script = str_replace( 'mx_$phpBB2->', '$phpBB2->', $script );
-
+$script = str_replace( 'phpBB2::', '', $script ); 
 $cache_file_name = cache_file( $script, 'PANEL');
 
 switch ( 0 )

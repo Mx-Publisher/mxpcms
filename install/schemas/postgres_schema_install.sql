@@ -1,7 +1,7 @@
 --
 -- MX-Publisher - PostgreSQL Schema - version 2.8.0
 --
--- $Id: postgres_schema_install.sql,v 1.6 2008/02/05 18:37:20 joasch Exp $
+-- $Id: postgres_schema_install.sql,v 1.7 2014/05/18 06:24:35 orynider Exp $
 --
 
 -- --------------------------------------------------------
@@ -150,7 +150,7 @@ INSERT INTO "mx_table_block_system_parameter" VALUES (28,15,'[b:31f05e4fa3]MX-Pu
 
 INSERT INTO "mx_table_block_system_parameter" VALUES (29,15,'On this page we [i:621ded23c6]demonstrate [/i:621ded23c6]a few basic portal blocks (not already present on this or other pages) - to get you started. Please, try out the top links.','621ded23c6',0);
 
-INSERT INTO "mx_table_block_system_parameter" VALUES (30,15,'You may enrich your portal with addon modules - for specific functionality:\r\n\r\n- Download manager\r\n- Picture Album\r\n- Calendar Tools\r\n- Knowledge Base\r\n- Links Gallery\r\n- Games\r\n\r\nand many more. Be sure to visit www.mx-publisher.com for latest available modules!','eacbc1f61a',0);
+INSERT INTO "mx_table_block_system_parameter" VALUES (30,15,'You may enrich your portal with addon modules - for specific functionality:\r\n\r\n- Download manager\r\n- Picture Album\r\n- Calendar Tools\r\n- Knowledge Base\r\n- Links Gallery\r\n- Games\r\n\r\nand many more. Be sure to visit mxpcms.sourceforge.net for latest available modules!','eacbc1f61a',0);
 
 
 
@@ -364,7 +364,7 @@ INSERT INTO "mx_table_menu_nav" VALUES (14,5,'Custom TextBlock','Custom TextBloc
 INSERT INTO "mx_table_menu_nav" VALUES (15,6,'Modules Info','Information','',0,10,'630ce0e7f0','icon_dot.gif',0,30,3,0,0);
 INSERT INTO "mx_table_menu_nav" VALUES (5,1,'phpBB Home','','http://www.phpbb.com',0,20,'a9ff189bf5','icon_info.gif',0,0,0,0,1);
 INSERT INTO "mx_table_menu_nav" VALUES (3,3,'Statistics','Site Statistics','',0,30,'98b16ec029','icon_stats.gif',0,0,4,0,0);
-INSERT INTO "mx_table_menu_nav" VALUES (4,1,'MX-Publisher Home','','http://www.mx-publisher.com',0,10,'1f171544ea','icon_info.gif',0,0,0,0,1);
+INSERT INTO "mx_table_menu_nav" VALUES (4,1,'MX-Publisher Home','','http://mxpcms.sourceforge.net',0,10,'1f171544ea','icon_info.gif',0,0,0,0,1);
 INSERT INTO "mx_table_menu_nav" VALUES (6,1,'Demo Pages','On this page are several demo blocks located','',0,30,'fb028ba583','icon_dot.gif',0,0,3,0,0);
 INSERT INTO "mx_table_menu_nav" VALUES (1,3,'Home','Back to home','',0,10,'bb51181967','icon_home.gif',0,0,1,0,0);
 INSERT INTO "mx_table_menu_nav" VALUES (2,3,'Forum','phpBB Forum Index','',0,20,'a33e401abc','icon_forum.gif',0,0,2,0,0);
@@ -390,10 +390,10 @@ CREATE TABLE "mx_table_module" (
 --
 -- Dumping data for table 'mx_table_module'
 --
-INSERT INTO "mx_table_module" VALUES (10,'Core Blocks','modules/mx_coreblocks/','MX-Publisher Core Blocks','','mxBB Core Module','Original mxBB <i>Core Blocks</i> module by <a href="http://www.mx-publisher.com" target="_blank">The MX-Publisher Development Team</a>');
-INSERT INTO "mx_table_module" VALUES (20,'Textblocks','modules/mx_textblocks/','MX-Publisher Textblocks','','mxBB Core Module','Original mxBB <i>Textblocks</i> module by <a href="http://www.mx-publisher.com" target="_blank">Jon</a>');
-INSERT INTO "mx_table_module" VALUES (30,'phpBB2 Blocks','modules/mx_phpbb2blocks/','MX-Publisher phpBB2 blocks','','mxBB Core Module','Original mxBB <i>phpBB2 Blocks</i> module by <a href="http://www.mx-publisher.com" target="_blank"> The MX-Publisher Development Team</a>');
-INSERT INTO "mx_table_module" VALUES (50,'Navigation Menu','modules/mx_navmenu/','MX-Publisher Site Navigation','','mxBB Core Module','Original mxBB <i>Navigation Menu</i> module by <a href="http://www.mx-publisher.com" target="_blank">Jon</a>');
+INSERT INTO "mx_table_module" VALUES (10,'Core Blocks','modules/mx_coreblocks/','MX-Publisher Core Blocks','','mxBB Core Module','Original mxBB <i>Core Blocks</i> module by <a href="http://mxpcms.sourceforge.net" target="_blank">The MX-Publisher Development Team</a>');
+INSERT INTO "mx_table_module" VALUES (20,'Textblocks','modules/mx_textblocks/','MX-Publisher Textblocks','','mxBB Core Module','Original mxBB <i>Textblocks</i> module by <a href="http://mxpcms.sourceforge.net" target="_blank">Jon</a>');
+INSERT INTO "mx_table_module" VALUES (30,'phpBB2 Blocks','modules/mx_phpbb2blocks/','MX-Publisher phpBB2 blocks','','mxBB Core Module','Original mxBB <i>phpBB2 Blocks</i> module by <a href="http://mxpcms.sourceforge.net" target="_blank"> The MX-Publisher Development Team</a>');
+INSERT INTO "mx_table_module" VALUES (50,'Navigation Menu','modules/mx_navmenu/','MX-Publisher Site Navigation','','mxBB Core Module','Original mxBB <i>Navigation Menu</i> module by <a href="http://mxpcms.sourceforge.net" target="_blank">Jon</a>');
 
 
 --

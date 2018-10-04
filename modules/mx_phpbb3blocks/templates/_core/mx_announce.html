@@ -26,14 +26,26 @@
 	<tr>
 		<td class="row1" width="100%" valign="top">
 			<table width="100%" border="0" cellpadding="2" cellspacing="1">
+				<tr>			
+		<td class="row1" width="100%" align="right" valign="bottom">
+			<span class="postdetails"><a href="{postrow.U_VIEW}"> <img src="{postrow.VIEW_IMG}" alt="{L_VIEW_FULL_ARTICLE}" title="{L_VIEW_FULL_ARTICLE}" /></a></span>
+			<a href="{postrow.U_PRINT}"> <img src="{postrow.PRINT_IMG}" alt="{L_PRINT_IT}" title="{L_PRINT_IT}" /></a></span>
+				<!-- IF postrow.ALLOW_POST -->
+					<span class="postdetails"><a href="{postrow.U_REPLY}"> <img src="{postrow.REPLY_IMG}" alt="{L_POST_COMMENTS}" title="{L_POST_COMMENTS}" /></a></span>
+				<!-- ENDIF -->
+			<span class="gensmall"><a href="#top" onclick="window.scrollTo(0,0); return false">{L_BACK_TO_TOP}</a></span>
+		</td>
+				</tr>				
+			</table>		
+			<table width="100%" border="0" cellpadding="2" cellspacing="1">
 				<tr>
 					<td class="row2" align="center" valign="middle"><span class="gensmall">{postrow.L_AUTHOR}:&nbsp;{postrow.POSTER_FULL}</span></td>
 					<td class="row2" align="center" valign="middle"><span class="gensmall">{postrow.L_POSTED}:<br />{postrow.FIRST_POST_TIME}</span></td>
 					<td class="row2" align="center" valign="middle"><span class="postdetails">{postrow.L_REPLIES}:<br />{postrow.REPLIES}</span></td>
 					<td class="row2" align="center" valign="middle"><span class="postdetails">{postrow.L_VIEWS}:<br />{postrow.VIEWS}</span></td>
-					<td class="row2" align="center" valign="middle"><span class="postdetails">{postrow.L_LASTPOST}:<br />{postrow.LAST_POST_TIME}&nbsp;{postrow.LAST_POST_AUTHOR}&nbsp;{postrow.LAST_POST_IMG}</span></td>
-				</tr>
-			</table>
+					<td class="row2" align="center" valign="middle"><span class="postdetails">{postrow.L_LASTPOST}:<br />{postrow.LAST_POST_TIME}&nbsp;{postrow.LAST_POST_AUTHOR}&nbsp;{postrow.LAST_POST_IMG}</span></td>	
+				</tr>				
+			</table>		
 		</td>
 	</tr>
 </table>

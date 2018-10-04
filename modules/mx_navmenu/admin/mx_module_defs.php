@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Module - mx_navmenu
-* @version $Id: mx_module_defs.php,v 1.39 2008/09/30 07:04:50 orynider Exp $
+* @version $Id: mx_module_defs.php,v 1.42 2014/05/18 06:25:07 orynider Exp $
 * @copyright (c) 2002-2008 [Jon Ohlsson] MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net
 *
 */
 
@@ -50,11 +50,36 @@ class mx_module_defs
 		{
 			$type_row = array();
 		}
-
+		
 		$type_row['nav_menu'] = !empty($lang['ParType_nav_menu']) ? $lang['ParType_nav_menu'] : "Navigation Menu";
 		$type_row['site_menu'] = !empty($lang['ParType_site_menu']) ? $lang['ParType_site_menu'] : "Site Nav Menu";
-
+		
 		return $type_row;
+	}
+	
+	// ===================================================
+	// Submit custom parameter field and data
+	// ===================================================
+	function submit_module_parameters( $parameter_data, $block_id )
+	{
+		global $mx_request_vars, $db, $board_config, $mx_blockcp, $mx_root_path, $phpEx;
+		global $html_entities_match, $html_entities_replace;
+		
+		$parameter_value = $mx_request_vars->post($parameter_data['parameter_name']);
+		$parameter_id = $mx_request_vars->post($parameter_data['parameter_id']);
+		$parameter_opt = '';
+		
+		switch ($parameter_data['parameter_type'])
+		{
+			case 'nav_menu':
+				$parameter_value = addslashes(serialize($parameter_value));
+				break;
+				
+			case 'site_menu':
+				// Nothing special to do for this simple integer
+				break;
+		}
+		return array('parameter_value' => $parameter_value, 'parameter_opt' => $parameter_opt);
 	}
 
 	// ===================================================
@@ -62,7 +87,7 @@ class mx_module_defs
 	// ===================================================
 	function display_module_parameters( $parameter_data, $block_id )
 	{
-		global $template, $mx_blockcp, $mx_root_path, $theme, $lang;
+		global $template, $mx_blockcp, $mx_root_path, $mx_user, $lang;
 
 		switch ( $parameter_data['parameter_type'] )
 		{
@@ -81,24 +106,25 @@ class mx_module_defs
 	// ===================================================
 	function display_panel_nav_menu( $parameter_data, $block_id )
 	{
-		global $template, $tplEx, $board_config, $db, $theme, $lang, $images, $mx_blockcp, $mx_root_path, $userdata, $mx_request_vars, $dynamic_block_id, $portalpage, $mx_cache, $phpEx;
-
-		//
-		// Includes
-		//
-		include_once( $mx_root_path . 'modules/mx_navmenu/includes/navmenu_functions.' . $phpEx );
-
+		global $template, $tplEx, $board_config, $db, $mx_user, $lang, $images, $mx_blockcp, $mx_root_path, $userdata, $mx_request_vars, $dynamic_block_id, $portalpage, $mx_cache, $phpEx;
+		
+		/*
+		* Includes
+		*/
+		include_once($mx_root_path . 'modules/mx_navmenu/includes/navmenu_functions.' . $phpEx);
+		
 		$parameter_id = $parameter_data['parameter_id'];
-
-		//
-		// Load states
-		//
+		$block_order = $parameter_data['parameter_order'];
+		
+		/*
+		* Load states
+		*/
 		$cookie_tmp = $board_config['cookie_name'].'_admincp_menustates';
 		$cookie_states = !empty($_COOKIE[$cookie_tmp]) ? explode(",", $_COOKIE[$cookie_tmp]) : array();
-
-		//
-		// Define some graphics
-		//
+		
+		/*
+		* Define some graphics
+		*/
 		$admin_icon_url = PORTAL_URL . $images['mx_graphics']['admin_icons'] . '/';
 		$admin_icon['contract'] = $admin_icon_url . 'contract.gif';
 		$admin_icon['expand'] = $admin_icon_url . 'expand.gif';
@@ -108,58 +134,58 @@ class mx_module_defs
 		$admin_icon['parameter'] = $admin_icon_url . 'icon_parameter.gif';
 		$admin_icon['block'] = $admin_icon_url . 'icon_block.gif';
 		$admin_icon['edit_block'] = $admin_icon_url . 'icon_edit.gif';
-
+		
 		$module_auth_ary = array('auth_view' => AUTH_ALL);
 		$module_auth_fields = array('auth_view');
 		$module_auth_levels = array('ALL', 'REG', 'PRIVATE', 'MOD', 'ADMIN', 'ANONYMOUS');
 		$module_auth_const = array(AUTH_ALL, AUTH_REG, AUTH_ACL, AUTH_MOD, AUTH_ADMIN, AUTH_ANONYMOUS);
 		$field_names = array('auth_view' => $lang['View']);
-
+		
 		$link_target_options = array();
 		$link_target_options = array("Default", "New browser", "IncludeX Block");
-
-		//
-		// Mode setting
-		//
+		
+		/*
+		* Mode setting
+		*/
 		$mode = $mx_request_vars->request('panel_mode', MX_TYPE_NO_TAGS, '');
 		$action = $mx_request_vars->request('panel_action', MX_TYPE_NO_TAGS, '');
-
-		//
-		// Parameters
-		//
+		
+		/*
+		* Parameters
+		*/
 		$submit = $mx_request_vars->is_post('submit');
 		$cancel = $mx_request_vars->is_post('cancel');
 		$preview = $mx_request_vars->is_post('preview');
-		$refresh = $preview || $submit_search;
-
-		//
-		// SUBMIT?
-		//
+		$refresh = $preview || isset($submit_search);
+		
+		/*
+		* SUBMIT?
+		*/
 		if( !empty($mode) && !empty($action) )
 		{
-			//
-			// Get vars
-			//
+			/*
+			* Get vars
+			*/
 			$portalpage = $mx_request_vars->request('portalpage', MX_TYPE_INT, 1);
 			$id = $mx_request_vars->request('id', MX_TYPE_INT, '');
-
-			//
-			// Send to db functions
-			//
+			
+			/*
+			* Send to db functions
+			*/
 			$result_message = $this->do_it($mode, $action, $id);
-
-			//
-			// If new
-			//
+			
+			/*
+			* If new
+			*/
 			if (is_array($result_message))
 			{
 				//$nav_page_id = $result_message['new_page_id'];
 				$result_message = $result_message['text'];
 			}
-
-			//
-			// Refresh mx_block object with new settings
-			//
+			
+			/*
+			* Refresh mx_block object with new settings
+			*/
 			$mx_blockcp->init($block_id, true);
 
 			//
@@ -167,44 +193,42 @@ class mx_module_defs
 			//
 			$mx_nav_data = mx_get_nav_menu($block_id);
 			$mx_cache->put( '_menu_' . $block_id, $mx_nav_data );
-
+			
 		} // if .. !empty($mode)
-
-		//
-		// Begin program proper
-		//
-
+		
+		/*
+		* Begin program proper
+		*/
 		$bbcode_on = $board_config['allow_bbcode'] ? true : false;
 		$html_on = $board_config['allow_html'] ? true : false;
 		$smilies_on = $board_config['allow_smilies'] ? true : false;
-
-		//
-		// HTML, BBCode & Smilies toggle selection
-		//
+		
+		/*
+		* HTML, BBCode & Smilies toggle selection
+		*/
 		$html_status = ( $html_on ) ? $lang['HTML_is_ON'] : $lang['HTML_is_OFF'];
 		$bbcode_status = ( $bbcode_on ) ? $lang['BBCode_is_ON'] : $lang['BBCode_is_OFF'];
 		$smilies_status = ( $smilies_on ) ? $lang['Smilies_are_ON'] : $lang['Smilies_are_OFF'];
-
+		
 		// DO IT DO IT
-
 		$template->set_filenames(array(
 			'parameter' => 'admin/mx_module_parameters.'.$tplEx)
 		);
-
-		$s_hidden_fields .= '<input type="hidden" name="block_id" value="' . $block_id . '" />';
-
+		
+		$s_hidden_fields = '<input type="hidden" name="block_id" value="' . $block_id . '" />';
+		
 		$show_cat_sel = '<select name="cat_show_sel"><option value="0">' . ( !empty($lang['Folded']) ? $lang['Folded'] : 'Folded' ) . '</option><option value="1" selected="selected">' . ( !empty($lang['Unfolded']) ? $lang['Unfolded'] : 'Unfolded' ) . '</option></select>';
-
-		//
-		// Generate generic form selects
-		//
+		
+		/*
+		* Generate generic form selects
+		*/
 		$functionlist = get_list_opt('functions', FUNCTION_TABLE, 'function_id', 'function_name', '', true);
 		$blocklist = get_list_formatted('block_list', '', 'blocks');
 		$pagelist = get_list_formatted('page_list', '', 'pages');
-
-		//
-		// Get group data
-		//
+		
+		/*
+		* Get group data
+		*/
 		switch (PORTAL_BACKEND)
 		{
 			case 'internal':
@@ -221,40 +245,40 @@ class mx_module_defs
 				ORDER BY group_name ASC";
 				break;
 		}
-
+		
 		if( !($result = $db->sql_query($sql)) )
 		{
 			mx_message_die(GENERAL_ERROR, "Couldn't get list of groups", '', __LINE__, __FILE__, $sql);
 		}
-
+		
 		$group_rowset = $db->sql_fetchrowset($result);
 		$db->sql_freeresult($result);
-
-		//
-		// Get blockcp mode -> to set action file
-		//
+		
+		/*
+		* Get blockcp mode -> to set action file
+		*/
 		$s_action_file = $mx_blockcp->blockcp_mode == 'mx_blockcp' ? 'modules/mx_coreblocks/mx_blockcp.' . $phpEx : 'admin/admin_mx_block_cp.' . $phpEx;
-
-		//
-		// Main parameters
-		//
+		
+		/*
+		* Main parameters
+		*/
 		$template->assign_vars(array(
 			'L_YES' 				=> $lang['Yes'],
 			'L_NO' 					=> $lang['No'],
-
+			
 			'SID'						=> $userdata['session_id'],
 			'RESULT_MESSAGE'			=> !empty($result_message) ? '<div style="overflow:auto; height:50px;"><span class="gensmall">' . $result_message  . '<br/> -::-</span></div>': '',
-
-			//
-			// Generic form selects
-			//
+			
+			/*
+			* Generic form selects
+			*/
 			'S_GEN_FUNCTION_LIST' 		=> $functionlist,
 			'S_GEN_BLOCK_LIST' 			=> $blocklist,
 			'S_GEN_PAGE_LIST' 			=> $pagelist,
-
-			//
-			// Graphics
-			//
+			
+			/*
+			* Graphics
+			*/
 			'IMG_URL_CONTRACT' 		=> $admin_icon['contract'],
 			'IMG_URL_EXPAND' 		=> $admin_icon['expand'],
 
@@ -264,77 +288,77 @@ class mx_module_defs
 			'IMG_ICON_PARAMETER' 	=> $admin_icon['parameter'],
 			'IMG_ICON_BLOCK' 		=> $admin_icon['block'],
 			'IMG_ICON_EDIT_BLOCK' 	=> $admin_icon['edit_block'],
-			//
-			// Cookies
-			//
+			
+			/*
+			* Cookies
+			*/
 			'COOKIE_NAME'		=> $board_config['cookie_name'],
 			'COOKIE_PATH'		=> $board_config['cookie_path'],
 			'COOKIE_DOMAIN'		=> $board_config['cookie_domain'],
 			'COOKIE_SECURE'		=> $board_config['cookie_secure'],
-
+			
 			'L_SUBJECT' 		=> $lang['Subject'],
 			'L_SUBMIT' 			=> $lang['Submit'],
 			'L_CANCEL' 			=> $lang['Cancel'],
 			'L_CONFIRM_DELETE' 	=> $lang['Confirm_delete'],
 			'L_DELETE_POST' 	=> $lang['Delete_post'],
-
+			
 			'L_SUBMIT' 			=> $lang['Update'],
 			'L_RESET' 			=> $lang['Reset'],
 			'L_MENU_PAR_TITLE' 	=> $lang['Menu_par_title'],
-
+			
 			'L_MENU_TITLE' 		=> $lang['Menu_admin'],
 			'L_MENU_EXPLAIN' 	=> $lang['Menu_admin_explain'],
-
+			
 			'S_SHOW_CAT' 			=> $show_cat_sel,
 			'U_PHPBB_ROOT_PATH' 	=> PHPBB_URL,
 			'TEMPLATE_ROOT_PATH' 	=> TEMPLATE_ROOT_PATH,
-			'U_PORTAL_ROOT_PATH'	=> PORTAL_URL, // DIV Templates. Images from root template folder. $phpBB3->prosilver template
-
+			'U_PORTAL_ROOT_PATH'	=> PORTAL_URL, // DIV Templates. Images from root template folder. phpBB3::prosilver template
+			
 			'L_CREATE_MENU' 		=> $lang['Create_menu'],
 			'L_CREATE_CATEGORY' 	=> $lang['Create_category'],
-
+			
 			'L_EDIT' 		=> $lang['Edit'],
 			'L_DELETE' 		=> $lang['Delete'],
 			'L_MOVE_UP' 	=> $lang['Move_up'],
 			'L_MOVE_DOWN' 	=> $lang['Move_down'],
 			'L_RESYNC' 		=> $lang['Resync'],
 			'L_CHANGE_NOW' 	=> $lang['Change'],
-
+			
 			'L_BLOCK' 		=> $lang['Block'],
 
 			'S_ACTION'		=> mx_append_sid(PORTAL_URL . $s_action_file),
 		));
-
+		
 		if( !empty($portalpage) )
 		{
 			$template->assign_block_vars('block_mode', array(
 				'U_RETURN' => mx_append_sid(PORTAL_URL . "index.$phpEx?page=$portalpage")
 			));
 		}
-
+		
 		//
 		// ---------------------------------------------------------------------------------- Cats
 		//
-
+		
 		// Display list of Categories ---------------------------------------------------------------
 		// ---------------------------------------------------------------------------------------
-
 		$sql = "SELECT *
 			FROM " . MENU_CAT_TABLE . "
 			WHERE block_id = '" . $block_id . "'
 			ORDER BY cat_order";
-
+			
 		if ( !( $result = $db->sql_query( $sql ) ) )
 		{
 			mx_message_die( GENERAL_ERROR, 'Couldnt query Navigation Categories', '', __LINE__, __FILE__, $sql );
 		}
-
+		
 		$cat_rows = array();
 		if( $total_cats = $db->sql_numrows($result) )
 		{
 			$cat_rows = $db->sql_fetchrowset($result);
 		}
-
+		
 		$db->sql_freeresult($result);
 
 		if ( $total_cats == 0 )
@@ -343,22 +367,22 @@ class mx_module_defs
 				'NONE' => $lang['No_pages']
 			));
 		}
-
+		
 		for( $cat_count = 0; $cat_count < $total_cats + 1; $cat_count++ )
 		{
 			$new_cat = $cat_count == $total_cats;
 			$cat_id = $new_cat ? 'new_cat' : $cat_rows[$cat_count]['cat_id'];
-
+			
 			$mode = MX_MENU_CAT_TYPE;
 			$action = $new_cat ? MX_DO_INSERT : MX_DO_UPDATE;
 			$deletemode = '?panel_mode=' . $mode . '&amp;panel_action=' . MX_DO_DELETE . '&amp;id=' . $cat_id . '&amp;block_id=' . $block_id . '&amp;portalpage=' . $portalpage. '&amp;dynamic_block=' . $dynamic_block_id;
-
+			
 			$upmode = '?panel_mode=' . $mode . '&amp;panel_action=' . MX_DO_MOVE . '&amp;id=' . $cat_id . '&amp;block_id=' . $block_id . '&amp;block_order=' . $block_order . '&amp;move=-15' . '&amp;portalpage=' . $portalpage. '&amp;dynamic_block=' . $dynamic_block_id;
 			$downmode = '?panel_mode=' . $mode . '&amp;panel_action=' . MX_DO_MOVE . '&amp;id=' . $cat_id . '&amp;block_id=' . $block_id . '&amp;block_order=' . $block_order . '&amp;move=15' . '&amp;portalpage=' . $portalpage. '&amp;dynamic_block=' . $dynamic_block_id;
-
-			//
-			// Hidden fields
-			//
+			
+			/*
+			* Hidden fields
+			*/
 			$s_hidden_cat_fields = 	'<input type="hidden" name="panel_mode" value="' . $mode . '" />
 											<input type="hidden" name="panel_action" value="' . $action . '" />
 											<input type="hidden" name="id" value="' . $cat_id . '" />
@@ -366,7 +390,7 @@ class mx_module_defs
 											<input type="hidden" name="dynamic_block" value="' . $dynamic_block_id . '" />
 											<input type="hidden" name="portalpage" value="' . $portalpage . '" />
 											<input type="hidden" name="sid" value="' . $userdata['session_id'] . '" />';
-
+											
 			$s_hidden_cat_delete_fields = 	'<input type="hidden" name="panel_mode" value="' . $mode . '" />
 											<input type="hidden" name="panel_action" value="' . MX_DO_DELETE . '" />
 											<input type="hidden" name="id" value="' . $cat_id . '" />
@@ -375,24 +399,24 @@ class mx_module_defs
 											<input type="hidden" name="dynamic_block" value="' . $dynamic_block_id . '" />
 											<input type="hidden" name="portalpage" value="' . $portalpage . '" />
 											<input type="hidden" name="sid" value="' . $userdata['session_id'] . '" />';
-
+											
 			$cat_title = !$new_cat ? $cat_rows[$cat_count]['cat_title'] : '';
 			$cat_desc = !$new_cat ? $cat_rows[$cat_count]['cat_desc'] : '';
-
-			//
-			// Page subpanel - edit
-			//
+			
+			/*
+			* Page subpanel - edit
+			*/
 			if (!$new_cat)
 			{
 				$bbcode_uid = $cat_rows[$cat_count]['bbcode_uid'];
-
+				
 				$cat_desc = preg_replace("/\:(([a-z0-9]:)?)$bbcode_uid/si", '', $cat_desc);
 				$cat_desc = str_replace('<br />', "\n", $cat_desc);
 				$cat_desc = preg_replace('#</textarea>#si', '&lt;/textarea&gt;', $cat_desc);
 			}
-
-			$show_cat = $cat_rows[$cat_count]['cat_show'];
-
+			
+			$show_cat = !$new_cat ? $cat_rows[$cat_count]['cat_show'] : '';
+			
 			if( $show_cat == 0 )
 			{
 				$show_cat_select = '<select name="cat_show_sel"><option value="0" selected="selected">' . ( !empty($lang['Folded']) ? $lang['Folded'] : 'Folded' ) . '</option><option value="1">' . ( !empty($lang['Unfolded']) ? $lang['Unfolded'] : 'Unfolded' ) . '</option></select>';
@@ -401,26 +425,27 @@ class mx_module_defs
 			{
 				$show_cat_select = '<select name="cat_show_sel"><option value="0">' . ( !empty($lang['Folded']) ? $lang['Folded'] : 'Folded' ) . '</option><option value="1" selected="selected">' . ( !empty($lang['Unfolded']) ? $lang['Unfolded'] : 'Unfolded' ) . '</option></select>';
 			}
-
-			$cat_url = $cat_rows[$cat_count]['cat_url'];
-			$cat_target = $link_target_options[$cat_rows[$cat_count]['cat_target']];
-
+			
+			$cat_url = !$new_cat ? $cat_rows[$cat_count]['cat_url'] : '';
+			$cat_target = !$new_cat ? $link_target_options[$cat_rows[$cat_count]['cat_target']] : '';
+			
 			$link_target_list = '<select name="cat_target_sel">';
+			
 			for( $j = 0; $j < count($link_target_options); $j++ )
 			{
 				$selected = ( $cat_target == $link_target_options[$j] ) ? ' selected="selected"' : '';
 				$link_target_list .= '<option value="' . $j . '" ' . $selected . '>' . $link_target_options[$j] . "</option>\n";
 			}
 			$link_target_list .= '</select>';
-
-			//
-			// Delete Cat
-			//
+			
+			/*
+			* Delete Cat
+			*/
 			if (!$new_cat)
 			{
 				$buttonvalue = $lang['Move_and_or_Delete'];
 				$name = $cat_rows[$cat_count]['cat_title'];
-
+				
 				if( $total_cats == 1 )
 				{
 					$select_to = $lang['Nowhere_to_move'];
@@ -430,66 +455,62 @@ class mx_module_defs
 					$select_to = mx_get_list('to_id', MENU_CAT_TABLE, 'cat_id', 'cat_title', $cat_id, false, 'block_id', $block_id);
 				}
 			}
-
+			
 			$visible_cat = in_array('adminCat_' . $cat_id, $cookie_states);
 			$visible_cat_edit = in_array('adminCatEdit_' . $cat_id, $cookie_states);
 			$visible_cat_delete = in_array('adminCatDelete_' . $cat_id, $cookie_states);
-
+			
 			$template->assign_block_vars('catrow', array(
 				'CAT_ID' 					=> $cat_id,
-
+				
 				'VISIBLE' 					=> $visible_cat ? 'block' : 'none',
-				'VISIBLE_EDIT' 				=> $visible_cat_edit || $new_page ? 'block' : 'none',
-				'VISIBLE_DELETE' 			=> $visible_cat_delete && !$new_page ? 'block' : 'none',
-
+				'VISIBLE_EDIT' 				=> $visible_cat_edit || isset($new_page) ? 'block' : 'none',
+				'VISIBLE_DELETE' 			=> $visible_cat_delete && !isset($new_page) ? 'block' : 'none',
+				
 				'IMG_URL' 					=> $visible_cat ? $admin_icon['contract'] : $admin_icon['expand'],
 				'IMG_URL_EDIT' 				=> $visible_cat_edit ? $admin_icon['contract'] : $admin_icon['expand'],
 				'IMG_URL_DELETE' 			=> $visible_cat_delete ? $admin_icon['contract'] : $admin_icon['expand'],
-
+				
 				'CAT_TITLE' 				=> $new_cat ? $lang['Create_category'] : $cat_title,
 				'CAT_DESC' 					=> ( $cat_desc != '' ) ? ' - ' . $cat_desc : '',
-
+				
 				'U_CAT_MOVE_UP' 			=> mx_append_sid($mx_root_path . $s_action_file . $upmode . '&amp;sid=' . $userdata['session_id']),
 				'U_CAT_MOVE_DOWN' 			=> mx_append_sid($mx_root_path . $s_action_file . $downmode . '&amp;sid=' . $userdata['session_id'] ),
-
-				//
+				
 				// EDIT CAT
-				//
 				'PAGE_NAV' 					=> $cat_url,
-
+				
 				'L_TITLE_DELETE' 			=> $lang['Delete'],
-				'L_TITLE_EDIT' 				=> $new_cat ? $lang['Create_category'] : $lang['Edit_Category'],
-
+				'L_TITLE_EDIT' 				=> isset($new_cat) ? t('Create_category') : t('Edit_Category'),
+				
 				'L_CAT_TITLE' 				=> $lang['Category'],
-				'L_CAT_DESC' 				=> $lang['Category_desc'],
+				'L_CAT_DESC' 				=> t('Category_desc'),
 				'L_CAT_SHOW_CAT' 			=> $lang['Show_cat'],
 				'L_CAT_MENU_PAGE' 			=> $lang['Menu_page'],
 				'L_CAT_MENU_LINKS' 			=> $lang['Menu_links'],
 				'L_CAT_LINK_TARGET' 		=> $lang['Link_target'],
-
+				
 				'E_CAT_TITLE' 				=> $cat_title,
 				'E_CAT_DESC' 				=> $cat_desc,
 				'S_CAT_SHOW_CAT' 			=> $show_cat_select,
 				'S_CAT_LINK_TARGET_LIST' 	=> $link_target_list,
-
+				
 				'HTML_STATUS' 				=> $html_status,
 				'BBCODE_STATUS' 			=> sprintf($bbcode_status, '<a href="' . mx_append_sid(PHPBB_URL . "faq.$phpEx?mode=bbcode") . '" target="_phpbbcode">', '</a>'),
 				'SMILIES_STATUS' 			=> $smilies_status,
-
-				//
-				// Delete CAT
-				//
+				
+				/*
+				* Delete CAT
+				*/
 				'NAME' => $name,
-				'L_MOVE_CONTENTS' => $lang['Move_contents'],
+				'L_MOVE_CONTENTS' => t('Move_contents'),
 				'L_MENU_NAME' => $lang['Menu_name'],
 				'S_HIDDEN_DELETE_FIELDS' => $s_hidden_cat_delete_fields,
 				'S_SELECT_TO' => $select_to,
 				'S_SUBMIT_DELETE' => $buttonvalue,
-
-
+				
 				'S_HIDDEN_FIELDS' 			=> $s_hidden_cat_fields,
 				'S_SUBMIT' 					=> $new_cat ? $lang['Create_category'] : $lang['Update']
-
 			));
 
 			if ($new_cat)
@@ -553,11 +574,11 @@ class mx_module_defs
 												<input type="hidden" name="portalpage" value="' . $portalpage . '" />
 												<input type="hidden" name="cat_id" value="' . $cat_id . '" />
 												<input type="hidden" name="sid" value="' . $userdata['session_id'] . '" />';
-
-
+												
 				$menuname = !$new_menu ? $menu_rows[$menu_count]['menu_name'] : '';
 				$menudesc = !$new_menu ? $menu_rows[$menu_count]['menu_desc'] : '';
-
+				$menuicon = !$new_menu ? $menu_rows[$menu_count]['menu_icon'] : '';
+				
 				$message_delete = $lang['Delete_nav_menu'] . ' - ' . $menuname
 							. '<br /><br />' . $lang['Delete_nav_menu_explain']
 							. '<br /><br />' . sprintf($lang['Click_nav_menu_delete_yes'], '<a href="' . mx_append_sid($mx_root_path . $s_action_file . $deletemode . '&amp;sid=' . $userdata['session_id']) . '">', '</a>')
@@ -583,8 +604,9 @@ class mx_module_defs
 				$link_target_list .= '</select>';
 
 				// Replace htmlentites for < and > with actual character.
-				$row_class = ( !( $menu_count % 2 ) ) ? 'row1' : 'row2';
-
+				$row_color = ( !( $menu_count % 2 ) ) ? 'color1' : 'color2';
+				$row_class = ( !( $menu_count % 2 ) ) ? $mx_user->theme['td_class1'] : $mx_user->theme['td_class2'];
+				
 				$visible_menu_edit = in_array('adminMenuEdit_' . $menu_id, $cookie_states);
 				$visible_menu_delete = in_array('adminMenuDelete_' . $menu_id, $cookie_states);
 
@@ -593,8 +615,8 @@ class mx_module_defs
 
 					"ROW_CLASS" 		=> $row_class,
 
-					'VISIBLE_EDIT' 		=> $visible_menu_edit ? 'block' : 'none',
-					'VISIBLE_DELETE' 	=> $visible_menu_delete || $new_page ? 'block' : 'none',
+					'VISIBLE_EDIT' 		=> isset($visible_menu_edit) ? 'block' : 'none',
+					'VISIBLE_DELETE' 	=> isset($visible_menu_delete) || isset($new_page) ? 'block' : 'none',
 
 					'IMG_URL_EDIT' 		=> $visible_menu_edit ? $admin_icon['contract'] : $admin_icon['expand'],
 					'IMG_URL_DELETE' 	=> $visible_menu_delete ? $admin_icon['contract'] : $admin_icon['expand'],
@@ -612,11 +634,10 @@ class mx_module_defs
 					'PAGE_NAV' 			=> 	$page_nav,
 					'BLOCK_NAV' 		=> 	$block_nav,
 					'FUNCTION_NAV' 		=>	$function_nav,
-
+					
 					'L_TITLE_DELETE' 		=> $lang['Delete'],
 					'L_TITLE_EDIT' 			=> $new_menu ? $lang['Create_menu'] : $lang['Edit'],
-
-					'L_MENU_TITLE' 				=> $l_title,
+					
 					'L_MENU_ACTION_TITLE' 		=> $lang['Menu_action_title'],
 					'L_MENU_ACTION_ADV' 		=> $lang['Menu_action_adv'],
 					'L_MENU_PERMISSIONS_TITLE' 	=> $lang['Menu_permissions_title'],
@@ -646,7 +667,7 @@ class mx_module_defs
 					'S_LINK_TARGET_LIST' 	=> $link_target_list,
 
 					'L_DAYS' 				=> $lang['Days'],
-					'L_AUTH_TITLE' 			=> $lang['Auth_Module'],
+					'L_AUTH_TITLE' 			=> t('Auth_Module'),
 
 					'MESSAGE_DELETE' 		=> $message_delete,
 
@@ -654,24 +675,28 @@ class mx_module_defs
 					'S_SUBMIT' 				=> $new_menu ? $lang['Create_menu'] : $lang['Update'],
 				));
 
-				//
-				// Output values of individual fields
-				//
+				/*
+				* Output values of individual fields
+				*/
+				$s_column_span = 0;
 				for( $j = 0; $j < count($module_auth_fields); $j++ )
 				{
 					$custom_auth[$j] = '&nbsp;<select name="' . $module_auth_fields[$j] . '">';
-
+					
 					for( $k = 0; $k < count($module_auth_levels); $k++ )
 					{
+						$menu_rows[$menu_count][$module_auth_fields[$j]]= isset($menu_rows[$menu_count][$module_auth_fields[$j]]) ? $menu_rows[$menu_count][$module_auth_fields[$j]] : "";
+						//$module_auth_const[$k] = isset($module_auth_const[$k]) ? $module_auth_const[$k] : "";
+						
 						$selected = ( $menu_rows[$menu_count][$module_auth_fields[$j]] == $module_auth_const[$k] ) ? ' selected="selected"' : '';
 						$custom_auth[$j] .= '<option value="' . $module_auth_const[$k] . '"' . $selected . '>' . $lang['AUTH_' . $module_auth_levels[$k]] . "</option>\n";
 					}
 					$custom_auth[$j] .= '</select>&nbsp;';
-
+					
 					$custom_group_auth = mx_get_groups($auth_view_group_id, 'auth_view_group', $group_rowset);
-
+					
 					$cell_title = $field_names[$module_auth_fields[$j]];
-
+					
 					$template->assign_block_vars('catrow.menurow.module_auth_titles', array(
 						'CELL_TITLE' => $cell_title)
 					);
@@ -679,11 +704,10 @@ class mx_module_defs
 						'S_AUTH_GROUP_LEVELS_SELECT' => $custom_group_auth,
 						'L_AUTH_GROUP_LEVELS_SELECT' => $lang['Auth_Page_group'],
 						'S_AUTH_LEVELS_SELECT' => $custom_auth[$j])
-					);
-
+					);	
 					$s_column_span++;
 				}
-
+				
 				if (!$new_menu)
 				{
 					$template->assign_block_vars('catrow.menurow.is_menu', array());
@@ -701,7 +725,7 @@ class mx_module_defs
 	// ===================================================
 	function display_panel_site_menu( $parameter_data, $block_id )
 	{
-		global $template, $tplEx, $board_config, $db, $theme, $lang, $images, $mx_blockcp, $mx_root_path, $userdata, $mx_request_vars, $dynamic_block_id, $portalpage, $mx_cache, $phpEx;
+		global $template, $tplEx, $board_config, $db, $mx_user, $lang, $images, $mx_blockcp, $mx_root_path, $userdata, $mx_request_vars, $dynamic_block_id, $portalpage, $mx_cache, $phpEx;
 
 		$mx_page = new mx_page();
 		$mx_page->init('1');
@@ -990,31 +1014,28 @@ class mx_module_defs
 				'S_SUBMIT' 					=> $lang['Update']
 
 			));
-
-			/*
+			
 			$num_of_menus = count($catData);
-			*/
-
-			/*
+			
+			//$menu_info = mx_get_info(MENU_NAV_TABLE, 'cat_id', $cat_id);
+			
 			$sql = "SELECT *
 				FROM " . MENU_NAV_TABLE . "
 				WHERE cat_id = '" . $cat_id . "'
 				ORDER BY menu_order";
-
+				
 			if ( !( $result = $db->sql_query( $sql ) ) )
 			{
 				mx_message_die( GENERAL_ERROR, 'Couldnt query Navigation menus', '', __LINE__, __FILE__, $sql );
 			}
-
+			
 			$menu_rows = array();
 			if( $total_menus = $db->sql_numrows($result) )
 			{
 				$menu_rows = $db->sql_fetchrowset($result);
 			}
-
 			$db->sql_freeresult($result);
-			*/
-
+			
 			$menu_rows = array();
 			if (isset($mx_page->subpage_rowset[$cat_id]))
 			{
@@ -1023,6 +1044,7 @@ class mx_module_defs
 						$menu_rows[] = $menu_row;
 				}
 			}
+			
 			$total_menus = count($menu_rows);
 
 			if ( $total_menus == 0 )
@@ -1041,10 +1063,8 @@ class mx_module_defs
 
 				$upmode = '?panel_mode=' . $mode . '&amp;panel_action=' . MX_DO_MOVE . '&amp;id=' . $menu_id . '&amp;cat_id=' . $cat_id . '&amp;block_id=' . $block_id . '&amp;block_order=' . $block_order . '&amp;move=-15';
 				$downmode = '?panel_mode=' . $mode . '&amp;panel_action=' . MX_DO_MOVE . '&amp;id=' . $menu_id . '&amp;cat_id=' . $cat_id . '&amp;block_id=' . $block_id . '&amp;block_order=' . $block_order . '&amp;move=15';
-
-				//
+				
 				// Hidden fields
-				//
 				$s_hidden_menu_fields = 	'<input type="hidden" name="panel_mode" value="' . $mode . '" />
 												<input type="hidden" name="panel_action" value="' . $action . '" />
 												<input type="hidden" name="id" value="' . $menu_id . '" />
@@ -1090,13 +1110,10 @@ class mx_module_defs
 
 					'U_MENU_MOVE_UP' 	=> mx_append_sid($mx_root_path . $s_action_file . $upmode . '&amp;sid=' . $userdata['session_id']),
 					'U_MENU_MOVE_DOWN' 	=> mx_append_sid($mx_root_path . $s_action_file . $downmode . '&amp;sid=' . $userdata['session_id']),
-
-					//
+					
 					// Menu EDIT
-					//
 					'L_TITLE_EDIT' 			=> $lang['Edit'],
-
-					'L_MENU_TITLE' 				=> $l_title,
+					
 					'L_MENU_ACTION_TITLE' 		=> $lang['Menu_action_title'],
 					'L_MENU_ACTION_ADV' 		=> $lang['Menu_action_adv'],
 					'L_MENU_PERMISSIONS_TITLE' 	=> $lang['Menu_permissions_title'],
@@ -1158,7 +1175,7 @@ class mx_module_defs
 	\********************************************************************************/
 	function _do_insert($type, $id )
 	{
-		global $mx_root_path, $phpbb_root_path, $template, $lang, $db, $board_config, $theme, $phpEx, $userdata, $mx_request_vars;
+		global $mx_root_path, $phpbb_root_path, $template, $lang, $db, $board_config, $mx_user, $phpEx, $userdata, $mx_request_vars;
 
 		switch ( $type )
 		{
@@ -1333,7 +1350,7 @@ class mx_module_defs
 	\********************************************************************************/
 	function _do_update($type, $id )
 	{
-		global $mx_root_path, $phpbb_root_path, $template, $lang, $db, $board_config, $theme, $phpEx, $userdata, $mx_request_vars, $mx_cache;
+		global $mx_root_path, $phpbb_root_path, $template, $lang, $db, $board_config, $mx_user, $phpEx, $userdata, $mx_request_vars, $mx_cache;
 
 		switch ( $type )
 		{
@@ -1517,7 +1534,7 @@ class mx_module_defs
 	\********************************************************************************/
 	function _do_delete($type, $id, $parent, $recache )
 	{
-		global $template, $lang, $db, $board_config, $theme, $phpEx, $mx_request_vars;
+		global $template, $lang, $db, $board_config, $mx_user, $phpEx, $mx_request_vars;
 
 		switch ( $type )
 		{
@@ -1606,7 +1623,7 @@ class mx_module_defs
 	\********************************************************************************/
 	function _do_move($type, $id)
 	{
-		global $template, $lang, $db, $board_config, $theme, $phpEx, $mx_request_vars;
+		global $template, $lang, $db, $board_config, $mx_user, $phpEx, $mx_request_vars;
 
 		switch ( $type )
 		{

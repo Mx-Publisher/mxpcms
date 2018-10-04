@@ -19,7 +19,7 @@ ul.topiclist li {
 }
 
 ul.topiclist dl {
-	position: relative;
+	/*position: relative;*/
 }
 
 ul.topiclist li.row dl {

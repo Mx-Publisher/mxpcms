@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: lang_meta.php,v 1.3 2008/06/03 20:04:30 jonohlsson Exp $
+* @version $Id: lang_meta.php,v 1.5 2013/06/28 15:34:33 orynider Exp $
 * @copyright (c) 2002-2006 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.MX-Publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -258,7 +258,7 @@ $lang['mx_meta']['langcode']['ug']		= 'Uyghur';
 $lang['mx_meta']['langcode']['uz']		= 'Uzbek';
 $lang['mx_meta']['langcode']['ve']		= 'Venda';
 $lang['mx_meta']['langcode']['vi']		= 'Vietnamese';
-$lang['mx_meta']['langcode']['vo']		= 'Volapük';
+$lang['mx_meta']['langcode']['vo']		= 'VolapÃ¼k';
 $lang['mx_meta']['langcode']['wa']		= 'Walloon';
 $lang['mx_meta']['langcode']['cy']		= 'Welsh';
 $lang['mx_meta']['langcode']['wo']		= 'Wolof';

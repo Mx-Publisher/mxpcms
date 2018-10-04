@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Module - mx_navmenu
-* @version $Id: mx_menu_nav.php,v 1.36 2008/09/04 18:05:27 orynider Exp $
+* @version $Id: mx_menu_nav.php,v 1.39 2014/05/09 07:53:11 orynider Exp $
 * @copyright (c) 2002-2008 [Jon Ohlsson] MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -29,7 +29,7 @@ include_once( $module_root_path . 'includes/navmenu_functions.' . $phpEx );
 //
 // Setup config parameters
 //
-$config_name = array('menu_custom_tpl', 'menu_display_mode');
+$config_name = array('menu_display_style', 'menu_display_mode', 'menu_page_sync', 'menu_page_parent', 'menu_custom_tpl');
 
 for( $i = 0; $i < count($config_name); $i++ )
 {
@@ -40,14 +40,24 @@ for( $i = 0; $i < count($config_name); $i++ )
 //
 // Define some parameters
 //
+/*
+$menu_display_style = 'Overall_navigation';
+$menu_display_mode == 'Horizontal';
+$menu_page_sync = true;
+*/
 $menu_custom_tpl = $mx_menu_config['menu_custom_tpl'];
+$menu_display_style = $mx_menu_config['menu_display_style'];
 $menu_display_mode = $mx_menu_config['menu_display_mode'];
+$menu_page_sync = ( $mx_menu_config['menu_page_sync'] != 'No' );
+
+$page_parent = !empty($mx_menu_config['menu_page_parent']) ? $mx_menu_config['menu_page_parent'] : 0;
 
 //
 // Prevent this block to be used both in overall_header and as a block
 // Define this menu block has been used on this page - either as a block or in the header. To avoid it being used several times
 //
 $nav_def_key = 'MX_NAV_MENU_' . $block_id;
+
 if ( defined($nav_def_key) )
 {
 	$mx_block->show_title = false;
@@ -56,17 +66,17 @@ if ( defined($nav_def_key) )
 }
 define($nav_def_key, true);
 
-//
-// Get the current MX page.
-//
+/*
+* Get the current MX page.
+**/
 $page_id = $mx_request_vars->request('page', MX_TYPE_INT, 1);
 $virtual_id = $mx_request_vars->request('virtual', MX_TYPE_INT, '');
 
 if (!empty($menu_custom_tpl) && !in_array($menu_custom_tpl, array('Classic','Advanced','Simple_CSS_menu','Advanced_CSS_menu','Overall_navigation')))
 {
-	$template_tmp = $menu_custom_tpl;
+	$template_tmp = array('body' => $menu_custom_tpl);
 	$template_tmp_path = str_replace(strrchr($template_tmp, '/'), '', $template_tmp) . '/';
-	$kick_js = file_exists($mx_root_path . $module_root_path . 'templates/' .$mx_user->template_names[$module_root_path] . $template_tmp_path) ? ($menu_display_mode == 'Horizontal' ? 'horizontal' : 'vertical') : '';
+	$kick_js = @file_exists($mx_root_path . $module_root_path . 'templates/' .$mx_user->template_names[$module_root_path] . $template_tmp_path) ? ($menu_display_mode == 'Horizontal' ? 'horizontal' : 'vertical') : '';
 	if (!empty($kick_js))
 	{
 		$mx_page->add_footer_text( 'templates/' . $mx_user->template_names[$module_root_path] . $template_tmp_path . $kick_js . '.js', true );
@@ -74,28 +84,53 @@ if (!empty($menu_custom_tpl) && !in_array($menu_custom_tpl, array('Classic','Adv
 }
 else
 {
-	switch( $menu_display_mode )
+	switch( $menu_display_style )
 	{
-		case 'Horizontal':
-			$template_tmp = "mx_menu_horizontal.$tplEx";
+		case 'Classic':
+			$template_tmp = $menu_display_mode == 'Horizontal' ? array('body' => 'mx_menu_classic_hor.tpl') : array('body' => 'mx_menu_classic_ver.tpl');
 			break;
-		case 'Vertical':
-			$template_tmp = "mx_menu_vertical.$tplEx";
+		case 'Advanced':
+			$template_tmp = $menu_display_mode == 'Horizontal' ? array('body' => 'mx_menu_advanced_hor.tpl') : array('body' => 'mx_menu_advanced_ver.tpl');
+			$kick_js = $menu_display_mode == 'Horizontal' ? 'adv_hor.js' : 'adv_ver.js';
+			$mx_page->add_footer_text( 'includes/js/' . $kick_js, true );
 			break;
+		case 'Simple_CSS_menu':
+			$template_tmp = $menu_display_mode == 'Horizontal' ? array('body' => 'mx_menu_simple_CSS_hor.tpl') : array('body' => 'mx_menu_simple_CSS_ver.tpl');
+			$kick_js = $menu_display_mode == 'Horizontal' ? 'simple_CSS_hor.js' : 'simple_CSS_ver.js';
+			$mx_page->add_footer_text( 'includes/js/' . $kick_js, true );
+			break;
+		case 'Advanced_CSS_menu':
+			$template_tmp = $menu_display_mode == 'Horizontal' ? array('body' => 'mx_menu_advanced_CSS_hor.tpl') : array('body' => 'mx_menu_advanced_CSS_ver.tpl');
+			$kick_js = $menu_display_mode == 'Horizontal' ? 'adv_CSS_hor.js' : 'adv_CSS_ver.js';
+			$mx_page->add_footer_text( 'includes/js/' . $kick_js, true );
+			break;
+		case 'Simple_x':
+			$template_tmp = $menu_display_mode == 'Horizontal' ? array('body' => 'mx_menu_simple_x_hor.tpl') : array('body' => 'mx_menu_simple_x_ver.tpl');
+			break;			
 		case 'Overall_navigation':
-			$template_tmp = "mx_menu_overall_navigation.$tplEx";
-			break;
+			$template_tmp = array('body' => 'mx_menu_overall_standard.tpl');
+			break;			
 		default:
-			$template_tmp = "mx_menu_vertical.$tplEx";
+			$template_tmp = $menu_display_mode == 'Horizontal' ? array('body' => 'mx_menu_classic_hor.tpl') : array('body' => 'mx_menu_classic_ver.tpl');
 			break;
 	}
+	
+	switch( $menu_display_mode )
+	{
+		case 'Overall_navigation':
+			$template_tmp = array('body' => "mx_menu_overall_standard.$tplEx");
+			break;
+		default:
+			$template_tmp = $template_tmp;
+			break;
+	}	
 }
 
-$template->set_filenames(array('body' => $template_tmp));
+$template->set_filenames($template_tmp);
 
-//
-// Get menu data
-//
+/*
+* Get menu data
+**/
 if ( $mx_cache->_exists( '_menu_' . $block_id ) )
 {
 	$mx_nav_data = $mx_cache->get( '_menu_' . $block_id );
@@ -116,7 +151,6 @@ foreach($navCategory as $cat_id => $catData)
 
 	//
 	// Check if this Category contains any authorized menus, or any at all
-	//
 	$menuIsCat = false;
 	foreach($catData as $key => $menuData)
 	{
@@ -156,21 +190,40 @@ foreach($navCategory as $cat_id => $catData)
 			}
 			$hasCurrentMenu = $catData[$key]['is_current'];
 		}
-
 	}
-
+	
 	if(!$menuIsCat)
 	{
 		continue;
 	}
-
-	$cat_title = $catData[0]['cat_title'];
-	global $mx_bbcode;
-
-	$cat = ( !empty($lang[$cat_title]) ? $lang[$cat_title] : $cat_title );
+	// Define the global bbcode bitfield, will be used to load bbcodes
 	$bbcode_uid = $catData[0]['bbcode_uid'];
-	$cat = $mx_bbcode->decode($cat, $bbcode_uid, false);
-
+	$bbcode_bitfield = 'cA==';	
+	//$bbcode_bitfield = $bbcode_bitfield | base64_decode($catData[0]['bbcode_bitfield']);	
+	// Instantiate BBCode if need be
+	if ($bbcode_bitfield !== '')
+	{
+		switch (PORTAL_BACKEND)
+		{
+			case 'internal':
+			case 'phpbb2':
+			case 'smf2':
+			case 'mybb':
+				$mx_bbcode = new mx_bbcode();
+			break;
+			case 'phpbb3':
+			case 'olympus':
+			case 'ascraeus':
+			case 'rhea':
+				$mx_bbcode = new mx_bbcode(base64_encode($bbcode_bitfield));
+			break;				
+		}		
+	}
+	//$depth = 0;
+	$cat_title = $catData[0]['cat_title'];
+	$cat = ( !empty($lang[$cat_title]) ? $lang[$cat_title] : $cat_title );
+	$cat = $mx_bbcode->decode($cat, $bbcode_uid, false, $bbcode_bitfield);
+	
 	$cat_desc = '';
 	$cat_desc = $catData[0]['cat_desc'];
 	$cat_desc = $mx_bbcode->decode($cat_desc, $bbcode_uid, false);
@@ -238,7 +291,6 @@ foreach($navCategory as $cat_id => $catData)
 
 	//
 	// Loop through each menu in this category
-	//
 	$first_menu = true;
 	foreach($catData as $key => $menuData)
 	{
@@ -352,6 +404,7 @@ foreach($navCategory as $cat_id => $catData)
 		}
 	}
 }
+//generate_site_menu($page_parent);
 
 $cat_width = $num_of_cats > 0 ? ceil(100 / $num_of_cats) . '%' : '100%';
 

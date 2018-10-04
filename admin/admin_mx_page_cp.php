@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: admin_mx_page_cp.php,v 1.34 2008/10/04 07:04:24 orynider Exp $
+* @version $Id: admin_mx_page_cp.php,v 1.41 2014/05/09 07:51:42 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -19,7 +19,7 @@ if( !empty($setmodules) )
 //
 // Security and Page header
 //
-define('IN_PORTAL', 1);
+@define('IN_PORTAL', 1);
 $mx_root_path = './../';
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
 $no_page_header = TRUE;
@@ -50,9 +50,16 @@ $nav_page_id = $mx_request_vars->request('page_id', MX_TYPE_INT, '');
 if ( empty($nav_page_id) )
 {
 	$cookie_tmp = $board_config['cookie_name'].'_adminPage_page_id';
-	$nav_page_id = !empty($_COOKIE[$cookie_tmp]) ? $_COOKIE[$cookie_tmp] : '1';
+	$nav_page_id = !empty($_COOKIE[$cookie_tmp]) ? $_COOKIE[$cookie_tmp] : 1;
 }
 
+$page_list = ''; //mx_get_list("page_id", PAGE_TABLE, 'page_id', 'page_name', $nav_page_id, true);
+$new_column = false;
+$sort_method = '';
+$sort_order = '';
+$include_all = '';
+$result = true;
+ 
 //
 // Update
 //
@@ -82,7 +89,7 @@ if( !empty($mode) && !empty($action) )
 
 } // if .. !empty($mode)
 
-setcookie($board_config['cookie_name'] . '_adminPage_page_id', $nav_page_id, time() + 10000000, $board_config['cookie_path'], $board_config['cookie_domain'], $board_config['cookie_secure']);
+@setcookie($board_config['cookie_name'] . '_adminPage_page_id', $nav_page_id, time() + 10000000, $board_config['cookie_path'], $board_config['cookie_domain'], $board_config['cookie_secure']);
 
 //
 // Load states
@@ -139,16 +146,16 @@ $template->assign_vars(array(
 	'L_EXPLAIN_TEMPLATE' 		=> $lang['Page_templates_admin_explain'],
 
 	'NAV_PAGE_ID' 				=> $nav_page_id,
-	'PAGELIST' 					=> $pagelist,
+	'PAGELIST' 					=> mx_get_list("page_id", PAGE_TABLE, 'page_id', 'page_name', $nav_page_id, true),
 	'L_CHANGE_NOW' 				=> $lang['Change'],
 	'S_SUBMIT' 					=> $lang['Update'],
-	'RESULT_MESSAGE'			=> !empty($result_message) ? '<div style="overflow:auto; height:50px;"><span class="gensmall">' . $result_message  . '<br/> -::-</span></div>': '',
+	'RESULT_MESSAGE'			=> isset($result_message) ? '<div style="overflow:auto; height:50px;"><span class="gensmall">' . $result_message  . '<br/> -::-</span></div>': '',
 
 	//
 	// General
 	//
 	'S_ACTION'					=> mx_append_sid(PORTAL_URL . "admin/admin_mx_page_cp.$phpEx"),
-	'BLOCK_SIZE'				=> ( !empty($block_size) ? $block_size : '100%' ),
+	'BLOCK_SIZE'				=> (isset($block_size) ? $block_size : '100%'),
 	'L_TITLE'					=> $lang['Page_admin'],
 	'L_COLUMN'					=> $lang['Column'],
 	'L_VIEW'					=> $lang['View'],
@@ -170,8 +177,8 @@ $template->assign_vars(array(
 	'L_CHANGE_NOW' 				=> $lang['Change'],
 	'L_RESYNC' 					=> $lang['Resync'],
 	'L_RESET' 					=> $lang['Reset'],
-	'L_MOVE_UP' 				=> $new_column ? '' : $lang['Move_up'],
-	'L_MOVE_DOWN' 				=> $new_column ? '' : $lang['Move_down'],
+	'L_MOVE_UP' 				=> $new_column ? 'up' : $lang['Move_up'],
+	'L_MOVE_DOWN' 				=> $new_column ? 'down' : $lang['Move_down'],
 
 	//
 	// Page Edit
@@ -179,19 +186,19 @@ $template->assign_vars(array(
 	'L_PAGE_TITLE'				=> $lang['Page'],
 	'L_PAGE_DESC'				=> $lang['Page_desc'],
 	'L_PAGE_PARENT'				=> $lang['Page_parent'],
-	'L_PAGE_ID'					=> empty($lang['Page_Id']) ? "Page Id" : $lang['Page_Id'],
-	'L_PAGE_ICON'				=> empty($lang['Page_icon']) ? "Page Icon" : $lang['Page_icon'],
-	'L_PAGE_ALT_ICON'			=> empty($lang['Page_alt_icon']) ? "Page Alt Icon" : $lang['Page_alt_icon'],
-	"L_DEFAULT_STYLE" 			=> empty($lang['Default_page_style']) ? "Default page style" : $lang['Default_page_style'],
-	"L_OVERRIDE_STYLE" 			=> empty($lang['Override_page_style']) ? "Override page style" : $lang['Override_page_style'],
-	"L_OVERRIDE_STYLE_EXPLAIN" 	=> empty($lang['Override_page_style_explain']) ? "Override page style explain" : $lang['Override_page_style_explain'],
-	'L_PAGE_HEADER'				=> empty($lang['Page_header']) ? "Page header file" : $lang['Page_header'],
-	'L_PAGE_FOOTER'				=> empty($lang['Page_footer']) ? "Page footer file" : $lang['Page_footer'],
-	'L_PAGE_MAIN_LAYOUT'		=> empty($lang['Page_main_layout']) ? "Page main_layout file" : $lang['Page_main_layout'],
+	'L_PAGE_ID'					=> t('Page_Id'),
+	'L_PAGE_ICON'				=> t('Page_icon'),
+	'L_PAGE_ALT_ICON'			=> t('Page_alt_icon'),
+	"L_DEFAULT_STYLE" 			=> t('Default_page_style'),
+	"L_OVERRIDE_STYLE" 			=> t('Override_page_style'),
+	"L_OVERRIDE_STYLE_EXPLAIN" 	=> t('Override_page_style_explain'),
+	'L_PAGE_HEADER'				=> !isset($lang['Page_header']) ? "Page header file" : $lang['Page_header'],
+	'L_PAGE_FOOTER'				=> !isset($lang['Page_footer']) ? "Page footer file" : $lang['Page_footer'],
+	'L_PAGE_MAIN_LAYOUT'		=> !isset($lang['Page_main_layout']) ? "Page main_layout file" : $lang['Page_main_layout'],
 	"L_NAVIGATION_BLOCK" 		=> $lang['Page_Navigation_block'],
 	"L_NAVIGATION_BLOCK_EXPLAIN" => $lang['Page_Navigation_block_explain'],
 
-	'L_AUTH_TITLE'				=> empty($lang['Auth_Page']) ? "Permission" : $lang['Auth_Page'],
+	'L_AUTH_TITLE'				=> !isset($lang['Auth_Page']) ? "Permission" : $lang['Auth_Page'],
 	'L_PRIVATE_AUTH_TITLE' 		=> $lang['Mx_Page_Auth_Title'],
 	'L_PRIVATE_AUTH_EXPLAIN' 	=> $lang['Mx_Page_Auth_Explain'],
 	'L_GROUPS' 					=> $lang['Usergroups'],
@@ -200,10 +207,8 @@ $template->assign_vars(array(
 	"L_IP_FILTER_EXPLAIN" => $lang['Mx_IP_filter_explain'],
 	"L_PHPBB_STATS" => $lang['Mx_phpBB_stats'],
 	"L_PHPBB_STATS_EXPLAIN" => $lang['Mx_phpBB_stats_explain'],
-
-	//
+	
 	// Graphics
-	//
 	'IMG_URL_CONTRACT' => $admin_icon['contract'],
 	'IMG_URL_EXPAND' => $admin_icon['expand'],
 
@@ -213,17 +218,14 @@ $template->assign_vars(array(
 	'IMG_ICON_PARAMETER' => $admin_icon['parameter'],
 	'IMG_ICON_BLOCK' => $admin_icon['block'],
 	'IMG_ICON_EDIT_BLOCK' => $admin_icon['edit_block'],
-	//
+	
 	// Cookies
-	//
 	'COOKIE_NAME'	=> $board_config['cookie_name'],
 	'COOKIE_PATH'	=> $board_config['cookie_path'],
 	'COOKIE_DOMAIN'	=> $board_config['cookie_domain'],
 	'COOKIE_SECURE'	=> $board_config['cookie_secure'],
-
-	//
+	
 	// Sorting
-	//
 	'L_SELECT_SORT_METHOD' => $lang['Select_sort_method'],
 	'L_ORDER' => $lang['Order'],
 	'L_SORT' => $lang['Sort'],
@@ -250,9 +252,7 @@ $template->assign_vars(array(
 
 ));
 
-//
 // Start Page Template
-//
 $sql = "SELECT * FROM " . PAGE_TEMPLATES . " WHERE page_template_id <> 1 ORDER BY page_template_id";
 
 if( !($q_templates = $db->sql_query($sql)) )
@@ -261,23 +261,21 @@ if( !($q_templates = $db->sql_query($sql)) )
 }
 
 $template_rows = array();
-if( $total_templates = $db->sql_numrows($q_templates) )
+if($total_templates = $db->sql_numrows($q_templates))
 {
 	$template_rows = $db->sql_fetchrowset($q_templates);
 }
 
 $db->sql_freeresult($result);
 
-if ( $total_templates == 0 )
+if ($total_templates == 0)
 {
 	$template->assign_block_vars('notemplate', array(
 		'NONE' => $lang['No_templates']
 	));
 }
 
-//
 // Templates loop
-//
 for( $template_count = 0; $template_count < $total_templates + 1; $template_count++ )
 {
 	$new_template = $template_count == $total_templates;
@@ -287,10 +285,8 @@ for( $template_count = 0; $template_count < $total_templates + 1; $template_coun
 	$mode = MX_PAGE_TEMPLATE_TYPE;
 	$action = $new_template ? MX_DO_INSERT : MX_DO_UPDATE;
 	$deletemode = '?mode=' . $mode . '&amp;action=' . MX_DO_DELETE . '&amp;id=' . $page_template_id;
-
-	//
+	
 	// Hidden fields
-	//
 	$s_hidden_template_fields = 	'<input type="hidden" name="mode" value="' . $mode . '" />
 								<input type="hidden" name="action" value="' . $action . '" />
 								<input type="hidden" name="id" value="' . $page_template_id . '" />
@@ -302,13 +298,11 @@ for( $template_count = 0; $template_count < $total_templates + 1; $template_coun
 			. '<br /><br />' . $lang['Delete_page_template_explain']
 			. '<br /><br />' . sprintf($lang['Click_page_template_delete_yes'], '<a href="' . mx_append_sid("admin_mx_page_cp.$phpEx" . $deletemode) . '">', '</a>')
 			. '<br /><br />';
-
-	//
+			
 	// Templates subpanel - edit
-	//
 	$visible_template = in_array('adminTemplateEdit_' . $page_template_id, $cookie_states);
 	$visible_template_delete = in_array('adminTemplateDelete_' . $page_template_id, $cookie_states);
-
+	
 	$template->assign_block_vars('templates', array(
 		'L_TITLE' 					=> $lang['Page_templates_admin'],
 		'L_EXPLAIN' 				=> $lang['Page_templates_admin_explain'],
@@ -326,33 +320,25 @@ for( $template_count = 0; $template_count < $total_templates + 1; $template_coun
 
 		'L_TEMPLATE_DELETE' 		=> $lang['Page_template_delete'],
 		'U_TEMPLATE_DELETE' 		=> mx_append_sid("admin_mx_page_cp_template_setting.$phpEx?mode=deletetemplate&amp;page_template_id=$page_template_id"),
-
+		
 		'L_CREATE_TEMPLATE' 		=> $lang['Add_Template'],
 		'L_TEMPLATE' 				=> $lang['Template'],
 		'L_TEMPLATE_NAME' 			=> $lang['Template_name'],
-
-		//
+		
 		// Page subpanel - edit
-		//
 		'E_TEMPLATE_TITLE'			=> $template_title,
-
-		//
+		
 		// Main
-		//
 		'U_PHPBB_ROOT_PATH' 		=> PHPBB_URL,
 		'TEMPLATE_ROOT_PATH' 		=> TEMPLATE_ROOT_PATH,
-
-		//
+		
 		// Quick Panels
-		//
 		'MESSAGE_DELETE' 			=> $message_delete,
-
 		'S_HIDDEN_FIELDS'			=> $s_hidden_template_fields,
-
 		'S_SUBMIT' 					=> $new_template ? $lang['Add_Template'] : $lang['Update']
 	));
 
-	if ( !$new_template )
+	if (!$new_template)
 	{
 		$template->assign_block_vars('templates.edit', array());
 		$template->assign_block_vars('templates.delete', array());
@@ -366,57 +352,52 @@ for( $template_count = 0; $template_count < $total_templates + 1; $template_coun
 	{
 		$template->assign_block_vars('templates.current_template', array());
 	}
-
+	
 	if ( $new_template )
 	{
 		continue;
 	}
-
+	
 	$sql = "SELECT *
 		FROM " . COLUMN_TEMPLATES . "
 		WHERE page_template_id = $page_template_id
 		ORDER BY page_template_id, column_order";
-
+		
 	if( !($q_column = $db->sql_query($sql)) )
 	{
 		mx_message_die(GENERAL_ERROR, "Could not query column list", "", __LINE__, __FILE__, $sql);
 	}
-
+	
+	$q_columns = false;
 	$column_rows = array();
 	if( $total_column = $db->sql_numrows($q_columns) )
 	{
 		$column_rows = $db->sql_fetchrowset($q_columns);
 	}
-
+	
 	$db->sql_freeresult($result);
-
-	//
+	
 	// Okay, let's build the index
-	//
 	for( $column = 0; $column < $total_column + 1; $column++ )
 	{
 		$new_column = $column == $total_column;
-
+		
 		$column_template_id = $new_column ? $page_template_id . '_0'  : $column_rows[$column]['column_template_id'];
-
+		
 		$mode = MX_PAGE_TEMPLATE_COLUMN_TYPE;
 		$action = $new_column ? MX_DO_INSERT : MX_DO_UPDATE;
 		$deletemode = '?mode=' . $mode . '&amp;action=' . MX_DO_DELETE . '&amp;id=' . $column_template_id;
 		$upmode = '?mode=' . $mode . '&amp;action=' . MX_DO_MOVE . '&amp;id=' . $column_template_id . '&amp;page_template_id=' . $page_template_id . '&amp;move=-15';
 		$downmode = '?mode=' . $mode . '&amp;action=' . MX_DO_MOVE . '&amp;id=' . $column_template_id . '&amp;page_template_id=' . $page_template_id . '&amp;move=15';
-
-		//
+		
 		// Hidden fields
-		//
 		$s_hidden_column_fields = 	'<input type="hidden" name="mode" value="' . $mode . '" />
 									<input type="hidden" name="action" value="' . $action . '" />
 									<input type="hidden" name="page_template_id" value="' . $page_template_id . '" />
 									<input type="hidden" name="id" value="' . $column_template_id . '" />
 									<input type="hidden" name="sid" value="' . $userdata['session_id'] . '" />';
-
-		//
+									
 		// Subpanel - column edit
-		//
 		$column_title = $new_column ? '' : $column_rows[$column]['column_title'];
 		$column_size = $new_column ? '100%' : $column_rows[$column]['column_size'];
 
@@ -424,7 +405,7 @@ for( $template_count = 0; $template_count < $total_templates + 1; $template_coun
 				. '<br /><br />' . $lang['Delete_page_template_column_explain']
 				. '<br /><br />' . sprintf($lang['Click_page_template_column_delete_yes'], '<a href="' . mx_append_sid("admin_mx_page_cp.$phpEx" . $deletemode) . '">', '</a>')
 				. '<br /><br />';
-
+				
 		$visible_column_edit = in_array('adminTemplateColumnEdit_' . $page_template_id . '_' . $column_template_id, $cookie_states);
 		$visible_column_delete = in_array('adminTemplateColumnDelete_' . $page_template_id . '_' . $column_template_id, $cookie_states);
 		$template->assign_block_vars('templates.columnrow', array(
@@ -432,63 +413,55 @@ for( $template_count = 0; $template_count < $total_templates + 1; $template_coun
 			'VISIBLE_DELETE' 		=> $visible_column_delete ? 'block' : 'none',
 			'IMG_URL' 				=> $visible_column_edit ? $admin_icon['contract'] : $admin_icon['expand'],
 			'IMG_URL_DELETE' 		=> $visible_column_delete ? $admin_icon['contract'] : $admin_icon['expand'],
-
+			
 			'COLUMN_ID' 			=> $column_template_id,
 			'COLUMN_TITLE' 			=> $new_column ? $lang['Create_column'] : $column_title,
-
+			
 			'U_COLUMN_DELETE' 		=> mx_append_sid("admin_mx_page_cp.$phpEx" . $deletemode),
 			'U_COLUMN_MOVE_UP' 		=> mx_append_sid("admin_mx_page_cp.$phpEx" . $upmode),
 			'U_COLUMN_MOVE_DOWN' 	=> mx_append_sid("admin_mx_page_cp.$phpEx" . $downmode),
-
-			//
+			
 			// Column Edit
-			//
 			'L_DELETE'				=> $new_column ? '' : $lang['Delete'],
 			'L_MOVE_UP' 			=> $new_column ? '' : $lang['Move_up'],
 			'L_MOVE_DOWN' 			=> $new_column ? '' : $lang['Move_down'],
-
+			
 			'L_COLUMN' 				=> $lang['Column'],
 			'L_COLUMN_NAME' 		=> $lang['Column_name'],
 			'L_COLUMN_SIZE' 		=> $lang['Column_Size'],
-
+			
 			'VISIBLE' 				=> $visible_column_edit ? 'block' : 'none',
 			'IMG_URL_EDIT' 			=> $visible_column_edit ? $admin_icon['contract'] : $admin_icon['expand'],
-
+			
 			'E_COLUMN_TITLE' 		=> $column_title,
 			'E_COLUMN_SIZE' 		=> $column_size,
-
+			
 			'S_SUBMIT' 				=> $new_column ? $lang['Create_column'] : $lang['Update'],
-
-			//
+			
 			// Quick Panels
-			//
 			'MESSAGE_DELETE' 		=> $message_delete,
-
+			
 			'S_HIDDEN_FIELDS' 		=> $s_hidden_column_fields
-
 		));
 	} // for ... column
 }
 
-//
-// Start Page Admin
-//
+/*
+* Start Page Admin
+*/
 
-//
 // Get the list of phpBB usergroups
-//
 $sql = $mx_backend->generate_group_select_sql();
 
 if( !($result = $db->sql_query($sql)) )
 {
 	mx_message_die(GENERAL_ERROR, 'Could not get group list', '', __LINE__, __FILE__, $sql);
 }
-
-while( $row = $db->sql_fetchrow($result) )
+$groupdata = array();
+while($row = $db->sql_fetchrow($result))
 {
 	$groupdata[] = $row;
 }
-
 $db->sql_freeresult($result);
 
 //
@@ -498,6 +471,8 @@ $db->sql_freeresult($result);
 // Display list of Pages ---------------------------------------------------------------
 // ---------------------------------------------------------------------------------------
 $mx_page->init($nav_page_id, true);
+
+$page_list .= '<option value="0" selected>' . 'Home' . '</option>\n';
 
 if ( !$mx_page->page_rowset[$nav_page_id]['page_parent'] )
 {
@@ -561,10 +536,10 @@ if ( ($total_pages_current + $total_pages) == 0 )
 $page_rows = array_merge($page_rows_current, $page_rows);
 $total_pages = $total_pages + $total_pages_current;
 
-//
-// Pages loop
-//
-for( $page_count = -1; $page_count < $total_pages; $page_count++ )
+/*
+* Pages loop
+*/
+for($page_count = -1; $page_count < $total_pages; $page_count++)
 {
 	$new_page = $page_count == -1;
 
@@ -579,32 +554,29 @@ for( $page_count = -1; $page_count < $total_pages; $page_count++ )
 	$mode = MX_PAGE_TYPE;
 	$action = $new_page ? MX_DO_INSERT : MX_DO_UPDATE;
 	$deletemode = '?mode=' . $mode . '&amp;action=' . MX_DO_DELETE . '&amp;id=' . $page_id;
-
-	//
+	
 	// Hidden fields
-	//
 	$s_hidden_page_fields = 	'<input type="hidden" name="mode" value="' . $mode . '" />
 								<input type="hidden" name="action" value="' . $action . '" />
 								<input type="hidden" name="id" value="' . $page_id . '" />
 								<input type="hidden" name="sid" value="' . $userdata['session_id'] . '" />';
-
+								
 	$s_hidden_private_fields = 	'<input type="hidden" name="mode" value="' . MX_PAGE_PRIVATE_TYPE . '" />
 								<input type="hidden" name="action" value="' . MX_DO_UPDATE . '" />
 								<input type="hidden" name="id" value="' . $page_id . '" />
 								<input type="hidden" name="sid" value="' . $userdata['session_id'] . '" />';
-
-
+								
 	$page_title = !$new_page ? $page_rows[$page_count]['page_name'] : '';
 	$page_desc = !$new_page ? $page_rows[$page_count]['page_desc'] : '';
 	$page_parent = !$new_page ? $page_rows[$page_count]['page_parent'] : '';
-	$page_icon = !$new_page ? $page_rows[$page_count]['page_icon'] : '';
+	$page_icon = !$new_page ? $page_rows[$page_count]['page_icon'] : 'default.gif';
 	$page_alt_icon = !$new_page ? $page_rows[$page_count]['page_alt_icon'] : '';
-	$page_header = $page_rows[$page_count]['page_header'];
-	$page_footer = $page_rows[$page_count]['page_footer'];
-	$page_main_layout = $page_rows[$page_count]['page_main_layout'];
-	$navigation_block_list = get_list_formatted('block_list', $page_rows[$page_count]['navigation_block'], 'navigation_block', 'mx_menu_nav.' . $phpEx);
-
-	$style_select = mx_style_select($page_rows[$page_count]['default_style'], 'mx_default_style', 'templates', true);
+	$page_header = !$new_page ? $page_rows[$page_count]['page_header'] : 'overall_header_navigation.html';
+	$page_footer = !$new_page ? $page_rows[$page_count]['page_footer'] : 'overall_footer.html';
+	$page_main_layout = !$new_page ? $page_rows[$page_count]['page_main_layout'] : 'mx_main_layout.html';
+	$navigation_block_list = get_list_formatted('block_list', $page_main_layout, 'navigation_block', 'mx_menu_nav.' . $phpEx);
+	$default_style = !$new_page ? $page_rows[$page_count]['default_style'] : '_core';
+	$style_select = mx_style_select($default_style, 'mx_default_style', 'templates', true);
 
 	$override_user_style_yes = !$new_page ? ( $page_rows[$page_count]['override_user_style'] == 1 ? "checked=\"checked\"" : "" ) : "";
 	$override_user_style_no = !$new_page ? ( $page_rows[$page_count]['override_user_style'] == 0 ? "checked=\"checked\"" : "" ) : "";
@@ -618,9 +590,7 @@ for( $page_count = -1; $page_count < $total_pages; $page_count++ )
 	$phpbb_stats_no = !$new_page ? ( $page_rows[$page_count]['phpbb_stats'] == 0 ? "checked=\"checked\"" : "" ) : "";
 	$phpbb_stats_default = !$new_page ? ( $page_rows[$page_count]['phpbb_stats'] == -1 ? "checked=\"checked\"" : "" ) : "checked=\"checked\"";
 
-	//
 	// Page subpanel - edit
-	//
 	$visible_page = in_array('adminPage_' . $page_id, $cookie_states);
 	$visible_page_delete = in_array('adminPageDelete_' . $page_id, $cookie_states);
 	$visible_page_edit = in_array('adminPageEdit_' . $page_id, $cookie_states);
@@ -631,20 +601,16 @@ for( $page_count = -1; $page_count < $total_pages; $page_count++ )
 			. '<br /><br />' . $lang['Delete_page_explain']
 			. '<br /><br />' . sprintf($lang['Click_page_delete_yes'], '<a href="' . mx_append_sid("admin_mx_page_cp.$phpEx" . $deletemode) . '">', '</a>')
 			. '<br /><br />';
-
-	//
+			
 	// Make the settings panel default when switching pages
-	//
 	if ($is_current_page && !$visible_page && !$visible_page_edit && !$visible_page_settings && !$visible_page_private)
 	{
 		$visible_page = $visible_page_settings = true;
 	}
 
 	$page_icon = post_icons('page_icons/', $page_icon);
-
-	//
+	
 	// Page templates dropdown
-	//
 	$template_list = !$new_page ? '' : mx_get_list('use_template', PAGE_TEMPLATES, 'page_template_id', 'template_name', 1, true);
 	$l_choose_page_template = !$new_page ? '' : empty($lang['Choose_page_template']) ? "Choose page template" : $lang['Choose_page_template'];
 
@@ -677,12 +643,10 @@ for( $page_count = -1; $page_count < $total_pages; $page_count++ )
 
 		'U_DELETE'					=> mx_append_sid("admin_mx_page_cp.$phpEx" . $deletemode),
 		'U_PREVIEW'					=> mx_append_sid($mx_root_path . "index.$phpEx" . '?page=' . $page_id),
-
-		//
+		
 		// Page subpanel - edit
-		//
 		'L_CHOOSE_PAGE_TEMPLATE'	=> $l_choose_page_template,
-
+		
 		'E_PAGE_TITLE'				=> $page_title,
 		'E_PAGE_DESC'				=> $page_desc,
 		'E_PAGE_PARENT'				=> $page_list,
@@ -693,58 +657,49 @@ for( $page_count = -1; $page_count < $total_pages; $page_count++ )
 		'E_PAGE_MAIN_LAYOUT'		=> $page_main_layout,
 		"E_NAVIGATION_BLOCK" 		=> $navigation_block_list,
 		'S_TEMPLATE_LIST'			=> $template_list,
-
-		//
+		
 		// Style
-		//
 		"STYLE_SELECT" => $style_select,
 		"OVERRIDE_STYLE_YES" => $override_user_style_yes,
 		"OVERRIDE_STYLE_NO" => $override_user_style_no,
 		"OVERRIDE_STYLE_DEFAULT" => $override_user_style_default,
-
-		//
+		
 		// IP filter
-		//
 		"IP_FILTER" => $ip_filter,
-
+		
 		'S_PHPBB_STATS_YES' 		=> $phpbb_stats_yes,
 		'S_PHPBB_STATS_NO' 			=> $phpbb_stats_no,
 		'S_PHPBB_STATS_DEFAULT' 	=> $phpbb_stats_default,
-
-		//
+		
 		// Main
-		//
 		'U_PHPBB_ROOT_PATH' 		=> PHPBB_URL,
 		'TEMPLATE_ROOT_PATH' 		=> TEMPLATE_ROOT_PATH,
-		'PAGELIST' 					=> $pagelist,
-
-		//
+		'PAGELIST' 					=> $page_list,
+		
 		// Quick Panels
-		//
 		'MESSAGE_DELETE' 			=> $message_delete,
-
+		
 		'S_HIDDEN_FIELDS'			=> $s_hidden_page_fields,
 		'S_HIDDEN_PRIVATE_FIELDS'	=> $s_hidden_private_fields,
-
+		
 		'S_SUBMIT' 					=> $new_page ? $lang['Add_Page'] : $lang['Update']
-
 	));
 
 	if ($new_page)
 	{
 		$template->assign_block_vars('pages.template', array());
 	}
-
-	//
+	
 	// Auth
-	//
-	for( $j = 0; $j < count($auth_fields); $j++ )
+	$s_column_span = 0;
+	for($j = 0; $j < count($auth_fields); $j++)
 	{
 		$custom_auth[$j] = '&nbsp;<select name="' . $auth_fields[$j] . '">';
 
-		for( $k = 0; $k < count($auth_levels); $k++ )
+		for($k = 0; $k < count($auth_levels); $k++)
 		{
-			$selected = ( $page_rows[$page_count][$auth_fields[$j]] == $auth_const[$k] ) ? ' selected="selected"' : '';
+			$auth_var = ($j > 0) ? $page_rows[$page_count][$auth_fields[$j]] : '';
+			$selected = ($auth_var == $auth_const[$k]) ? ' selected="selected"' : '';
 			$custom_auth[$j] .= '<option value="' . $auth_const[$k] . '"' . $selected . '>' . $lang['AUTH_' . $auth_levels[$k]] . '</option>';
 		}
 		$custom_auth[$j] .= '</select>&nbsp;';
@@ -812,10 +767,11 @@ for( $page_count = -1; $page_count < $total_pages; $page_count++ )
 
 	for( $i = 0; $i < count($groupdata); $i++ )
 	{
-		$row_color = ( !( $i % 2 ) ) ? 'row1' : 'row2';
-
+		$row_class = ( !( $i % 2 ) ) ? $mx_user->theme['td_class1'] : $mx_user->theme['td_class2'];				
+		$row_color = ( !( $i % 2 ) ) ? $mx_user->theme['td_color1'] : $mx_user->theme['td_color2'];
+		
 		$group_id = $groupdata[$i]['group_id'];
-
+		
 		if ( $page_rows[$page_count]['auth_view'] == AUTH_ACL )
 		{
 			$view_checked = in_array($groupdata[$i]['group_id'], $view_groups) ? 'checked="checked"' : '';
@@ -825,7 +781,7 @@ for( $page_count = -1; $page_count < $total_pages; $page_count++ )
 		{
 			$input_private = '-';
 		}
-
+		
 		$template->assign_block_vars('pages.grouprow', array(
 			'GROUP_ID' 			=> $group_id,
 			'GROUP_NAME' 		=> $groupdata[$i]['group_name'],
@@ -834,12 +790,12 @@ for( $page_count = -1; $page_count < $total_pages; $page_count++ )
 			'MODERATOR_CHECKED' => ( in_array($groupdata[$i]['group_id'], $moderator_groups) ) ? 'checked="checked"' : '')
 		);
 	}
-
+	
 	//
 	// Get blocklist for alternative add_block
 	//
 	$blocklist = get_list_formatted('block_list', 0, 'block_id');
-
+	$q_columns = false;
 	$sql = "SELECT *
 		FROM " . COLUMN_TABLE . "
 		WHERE page_id = $page_id
@@ -868,6 +824,7 @@ for( $page_count = -1; $page_count < $total_pages; $page_count++ )
 	$mx_block = new mx_block();
 
 	$radio_column_list = '';
+	$radio_column_checked = 'checked="checked"';
 
 	if ( $total_column > 0 )
 	{
@@ -880,9 +837,11 @@ for( $page_count = -1; $page_count < $total_pages; $page_count++ )
 	for( $column = 0; $column < $total_column + 1; $column++ )
 	{
 		$new_column = $column == $total_column;
-
 		$column_id = $new_column ? $page_id . '_0'  : $column_rows[$column]['column_id'];
-
+		
+		$row_class = ( !( $column % 2 ) ) ? $mx_user->theme['td_class1'] : $mx_user->theme['td_class2'];				
+		$row_color = ( !( $column % 2 ) ) ? $mx_user->theme['td_color1'] : $mx_user->theme['td_color2'];
+					
 		$mode = MX_PAGE_COLUMN_TYPE;
 		$action = $new_column ? MX_DO_INSERT : MX_DO_UPDATE;
 		$deletemode = '?mode=' . $mode . '&amp;action=' . MX_DO_DELETE . '&amp;id=' . $column_id . '&amp;page_id=' . $page_id;
@@ -950,22 +909,19 @@ for( $page_count = -1; $page_count < $total_pages; $page_count++ )
 
 			'S_HIDDEN_FIELDS' => $s_hidden_column_fields
 		));
-
-		//
 		// Add up radioboxes for block to column form
-		//
 		if (!$new_column)
 		{
 			$radio_column_list .= '<input type="radio" name="id" value="'.$column_id.'" '.$radio_column_checked.' /><span class="gensmall">'.$column_title.'&nbsp;&nbsp;</span><br />';
 		}
-
+		$column_id = isset($column_rows[$column]['column_id']) ? $column_rows[$column]['column_id'] : 0;
 		$sql = "SELECT cbl.*, blk.*, fnc.function_file, function_admin
 			FROM " . COLUMN_BLOCK_TABLE . " cbl,
 				" . BLOCK_TABLE . " blk,
 				" . FUNCTION_TABLE . " fnc
 			WHERE blk.function_id = fnc.function_id
 				AND blk.block_id = cbl.block_id
-				AND cbl.column_id = '" . $column_rows[$column]['column_id'] . "'
+				AND cbl.column_id = '" . $column_id . "'
 			ORDER BY column_id, block_order";
 
 		if( !($q_blocks = $db->sql_query($sql)) )
@@ -991,7 +947,7 @@ for( $page_count = -1; $page_count < $total_pages; $page_count++ )
 			$block_order = $block_rows[$block]['block_order'];
 			$editor_name_tmp = mx_get_userdata($mx_block->editor_id);
 			$editor_name = $editor_name_tmp['username'];
-			$edit_time = $phpBB2->create_date( $board_config['default_dateformat'], $mx_block->block_time, $board_config['board_timezone'] );
+			$edit_time = phpBB2::create_date( $board_config['default_dateformat'], $mx_block->block_time, $board_config['board_timezone'] );
 
 			$mode = MX_PAGE_BLOCK_TYPE;
 			$deletemode = '?mode=' . $mode . '&amp;action=' . MX_DO_DELETE . '&amp;id=' . $block_id . '&amp;column_id=' . $column_id . '&amp;block_order=' . $block_order;

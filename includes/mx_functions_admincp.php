@@ -2,21 +2,16 @@
 /**
 *
 * @package AdminCP
-* @version $Id: mx_functions_admincp.php,v 1.61 2008/10/04 07:04:25 orynider Exp $
+* @version $Id: mx_functions_admincp.php,v 1.76 2014/07/07 20:36:52 orynider Exp $
 * @copyright (c) 2002-2006 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
 if ( !defined( 'IN_PORTAL' ) )
 {
 	die( "Hacking attempt" );
-}
-
-if( !function_exists('sync') )
-{
-	include_once($mx_root_path . 'includes/shared/phpbb2/includes/functions_admin.' . $phpEx);
 }
 
 /**#@+
@@ -86,6 +81,91 @@ define('MX_ADMIN_DEBUG'					, false);
  */
 class mx_admin
 {
+	/**
+	* This will hold the text output for the inputted command (if the mod author would like to display the command that was ran)
+	*
+	* @var string
+	*/
+	var $command = '';
+
+	/**
+	* This will hold the text output for the result of the command.  $user->lang['SUCCESS'] if everything worked.
+	*
+	* @var string
+	*/
+	var $result = '';
+
+	/**
+	* Auto run $this->display_results after running a command
+	*/
+	var $auto_display_results = false;
+
+	/**
+	* Stand Alone option (this makes it possible to just use the single umil file and not worry about any language stuff
+	*/
+	var $stand_alone = false;
+
+	/**
+	* Were any new permissions added (used in umil_frontend)?
+	*/
+	var $permissions_added = false;
+
+	/**
+	* Database Object
+	*/
+	var $db = false;
+
+	/**
+	* Database Tools Object
+	*/
+	var $db_tools = false;
+
+	/**
+	* Do we want a custom prefix besides the phpBB table prefix?  You *probably* should not change this...
+	*/
+	var $table_prefix = false;	
+	
+	/**#@-*/
+	
+	/**
+	* Constructor
+	*/
+	function mx_admin($stand_alone = true, $db = false)
+	{
+		// Setup $this->db
+		if ($db == true)
+		{
+			if (!is_object($db) || !method_exists($db, 'sql_query'))
+			{
+				trigger_error('Invalid $db Object');
+			}
+
+			$this->db = $db;
+		}
+		else
+		{
+			global $db;
+			$this->db = $db;
+		}
+
+		// Setup $this->db_tools
+		if (!class_exists('mx_db_tools'))
+		{
+			global $mx_root_path, $phpEx;
+			include($mx_root_path . 'includes/db/db_tools.' . $phpEx);
+		}
+		$this->db_tools = new mx_db_tools($this->db);
+
+		$this->stand_alone = $stand_alone;
+
+		if (!$stand_alone)
+		{
+			global $portal_config, $mx_user, $mx_root_path, $phpEx;
+			// Include the language keys.  First we check if the language file for the user's language is available, if not we check if the board's default language is available, if not we use the english file.
+			//todo@  Dont foget to add any lang keys required to lang_admin.php
+		}
+	}
+	
 	// ------------------------------
 	// Private Methods
 	//
@@ -308,29 +388,12 @@ class mx_admin
 					$sql = "INSERT INTO " . BLOCK_SYSTEM_PARAMETER_TABLE . "(block_id, parameter_id, parameter_value)
 						SELECT " . $next_id . ", parameter_id,   parameter_default
 							FROM " . PARAMETER_TABLE . " par " . " WHERE function_id = " . $function_id;
-							
+
 					if( !($result = $db->sql_query($sql)) )
 					{
 						mx_message_die(GENERAL_ERROR, "Couldn't insert parameter information", "", __LINE__, __FILE__, $sql);
 					}
-					/*
-					$sql = "SELECT " . $next_id . ", parameter_id,   parameter_default
-							FROM " . PARAMETER_TABLE . " par " . " WHERE function_id = " . $function_id;
-					if( !($result = $db->sql_query($sql)) )
-					{
-						mx_message_die(GENERAL_ERROR, "Couldn't insert row in blocks table", "", __LINE__, __FILE__, $sql);
-					}
-					$row = $db->sql_fetchrow($result);
-					
-					$sql = array(					
-						'block_id'	=> (int) $row['block_id'],
-						'parameter_id'	=> (int) $row['parameter_id'],
-						'parameter_value'	=> $row['parameter_value'],
-					);							
-	
-					$result = $db->sql_query("INSERT INTO " . BLOCK_SYSTEM_PARAMETER_TABLE . $db->sql_build_array('INSERT', $sql));						
-					*/
-					
+
 					//
 					// Update cache
 					//
@@ -387,37 +450,29 @@ class mx_admin
 					$row = $db->sql_fetchrow($result);
 
 					$page_id_new = $row['next_id'] + 1;
-					
+
 					$page_order_new = $row['next_order'] + 1;
 
 					if( empty($page_id_new) )
 					{
 						die('Couldn\'t find max page_id');
 					}
-					
+
 					if( empty($page_order_new) )
 					{
 						$page_order_new = 0;
 					}
 
-					$parents_data = '';	 //To do					
-					
 					$page_row = array(
 						"page_id"				=> (int) $page_id_new,
 						"page_name"				=> $page_name,
 						"page_desc"				=> $page_desc,
 						"page_parent"			=> (int) $page_parent,
-						"parents_data"			=> $parents_data,
+						"parents_data"			=> (int) $parents_data,
 						"page_order"			=> (int) $page_order_new,
-						"page_icon"				=> $page_icon ,
+						"page_icon"				=> $page_icon,
 						"page_alt_icon"			=> $page_alt_icon,
-						//"menu_icon" 			=> $menu_icon,
-						//"menu_alt_icon"		=> $menu_alt_icon,
-						//"menu_alt_icon_hot"		=> $menu_alt_icon_hot,
-						//"menu_active"			=> (int) $menu_active,
 						"auth_view"				=> (int) $auth_view,
-						//"auth_view_group"		=> $auth_view_group,
-						//"auth_moderator_group"	=> $auth_moderator_group,
 						"default_style"			=> (int) $default_style,
 						"override_user_style"	=> (int) $override_user_style,
 						"page_header"			=> $page_header,
@@ -425,11 +480,11 @@ class mx_admin
 						"page_main_layout"		=> $page_main_layout,
 						"navigation_block"		=> (int) $navigation_block,
 						"ip_filter"				=> $ipfilter ,
-						"phpbb_stats"			=> (int) $phpbb_stats,						
+						"phpbb_stats"			=> (int) $phpbb_stats,
 						);
 
-					$sql = "INSERT INTO " . PAGE_TABLE . $db->sql_build_array('INSERT', $page_row);		
- 
+					$sql = "INSERT INTO " . PAGE_TABLE . $db->sql_build_array('INSERT', $page_row);
+
 					if( !($result = $db->sql_query($sql)) )
 					{
 						mx_message_die(GENERAL_ERROR, "Couldn't insert page information", '', __LINE__, __FILE__, $sql);
@@ -494,10 +549,8 @@ class mx_admin
 
 					$max_order = $row['max_order'];
 					$next_order = intval($max_order + 10);
-
-					//
+					
 					// There is no problem having duplicate page names so we won't check for it.
-					//
 					$sql = "INSERT INTO " . COLUMN_TABLE . " (column_title, column_order, column_size, page_id)
 						VALUES ('" . $column_title . "',  $next_order, '" . $column_size . "', $page_id)";
 					if( !($result = $db->sql_query($sql)) )
@@ -532,7 +585,7 @@ class mx_admin
 								$_POST['block_desc'] = 'Page: ' . $mx_request_vars->post('page_id', MX_TYPE_INT, 0);
 								$message = $this->do_it(MX_BLOCK_TYPE, MX_DO_INSERT, $temp_row['function_id']);
 								$_POST['block_id'] = $message['new_id'];
-								break;
+							break;
 
 							case 'dynamic':
 								$temp_row = mx_get_info(FUNCTION_TABLE, 'function_file', 'mx_dynamic.php');
@@ -540,7 +593,7 @@ class mx_admin
 								$_POST['block_desc'] = 'Page: ' . $mx_request_vars->post('page_id', MX_TYPE_INT, 0);
 								$message = $this->do_it(MX_BLOCK_TYPE, MX_DO_INSERT, $temp_row['function_id']);
 								$_POST['block_id'] = $message['new_id'];
-								break;
+							break;
 
 							case 'virtual':
 								$temp_row = mx_get_info(FUNCTION_TABLE, 'function_file', 'mx_virtual.php');
@@ -548,7 +601,7 @@ class mx_admin
 								$_POST['block_desc'] = 'Page: ' . $mx_request_vars->post('page_id', MX_TYPE_INT, 0);
 								$message = $this->do_it(MX_BLOCK_TYPE, MX_DO_INSERT, $temp_row['function_id']);
 								$_POST['block_id'] = $message['new_id'];
-								break;
+							break;
 						}
 					}
 
@@ -822,7 +875,6 @@ class mx_admin
 					// Now update affected block_id(s)
 					// ...and cache
 					//
-
 					if (empty($function_id))
 					{
 						//
@@ -968,6 +1020,10 @@ class mx_admin
 					$view_groups = @implode(',', $mx_request_vars->post('view', MX_TYPE_NO_STRIP, ''));
 					$edit_groups = @implode(',', $mx_request_vars->post('edit', MX_TYPE_NO_STRIP, ''));
 					$moderator_groups = @implode(',', $mx_request_vars->post('moderator', MX_TYPE_NO_STRIP, ''));
+					
+					//$view_groups = $mx_request_vars->post('view', MX_TYPE_NO_STRIP, '');
+					
+					//die("$view_groups");
 
 					$sql = "UPDATE " . BLOCK_TABLE . "
 						SET auth_view_group = '$view_groups',
@@ -1030,10 +1086,10 @@ class mx_admin
 					$sql = "UPDATE " . PAGE_TABLE . "
 						SET page_name         = '$page_name',
 							page_desc         = '$page_desc',
-							page_parent         = '$page_parent',
+							page_parent       = '$page_parent',
 							page_icon         = '$page_icon',
-							page_alt_icon         = '$page_alt_icon',
-							default_style       = '$default_style',
+							page_alt_icon     = '$page_alt_icon',
+							default_style     = '$default_style',
 							override_user_style = '$override_user_style',
 							page_header       = '$page_header',
 							page_footer       = '$page_footer',
@@ -1176,27 +1232,29 @@ class mx_admin
 	 * @param unknown_type $recache
 	 * @return unknown
 	 */
-	function _do_delete($type, $id, $parent, $recache )
+	function _do_delete($type, $id, $parent, $recache)
 	{
 		global $template, $lang, $db, $board_config, $theme, $phpEx, $mx_request_vars, $mx_cache, $mx_root_path, $mx_table_prefix, $table_prefix, $userdata;
 		global $controller_block;
-
+		
+		$message_child = '';
+		
 		switch ( $type )
 		{
 			case MX_MODULE_TYPE: // ????????
-
+			
 				$module_id = intval($id);
-
+				
 				//
 				// First delete all module functions
 				//
 				$message_child .= $this->do_it( MX_FUNCTION_TYPE, MX_DO_DELETE, $module_id, true, false );
-
+				
 				//
 				// Then delete module itself
 				//
 				$sql = "DELETE FROM " . MODULE_TABLE . " WHERE module_id = " . $module_id;
-
+				
 				if ( !MX_ADMIN_DEBUG )
 				{
 					if( !($result = $db->sql_query($sql)) )
@@ -1204,7 +1262,7 @@ class mx_admin
 						mx_message_die(GENERAL_ERROR, "Couldn't delete parameter information", "", __LINE__, __FILE__, $sql);
 					}
 					$words_removed = $db->sql_affectedrows();
-
+					
 					//
 					// Update cache
 					//
@@ -1216,13 +1274,12 @@ class mx_admin
 						$mx_cache->update(MX_CACHE_ALL);
 					}
 				}
-
+				
 				//
 				// Now also delete module tables
 				//
 				$module_path = $mx_request_vars->request('module_path', MX_TYPE_NO_TAGS, '');
 				//$file_name = $this->get_module_pak_file($module_path);
-
 				if( file_exists($mx_root_path . $module_path . "db_uninstall.php") )
 				{
 					ob_start();
@@ -1230,23 +1287,20 @@ class mx_admin
 					$output_message .= ob_get_contents();
 					ob_end_clean();
 				}
-
 				$message['is_pak'] = 'yes';
 				$message['text'] = $lang['AdminCP_action'] . ": " . $words_removed . ' ' . $lang['Module'] . ' (ID: ' . $module_id . ') ' . $lang['was_deleted'] . '<br />' . $message_child . '<br />' . $output_message;
-
 			break;
 
 			case MX_FUNCTION_TYPE:
-
+			
 				if( $parent )
 				{
 					$module_id = intval($id);
-
 					//
 					// First delete parameter(s) and block(s) for every module function
 					//
 					$sql_ids = "SELECT * FROM " . FUNCTION_TABLE . " WHERE module_id = $module_id";
-
+					
 					if( ($result = $db->sql_query($sql_ids)) )
 					{
 						$function_id = '';
@@ -1258,7 +1312,7 @@ class mx_admin
 							$function_id = empty($function_id) ?  $delete_ids[$i]['function_id'] : ', ' . $delete_ids[$i]['function_id'];
 						}
 					}
-
+					
 					//
 					// Then delete function(s) themselves
 					//
@@ -1267,15 +1321,15 @@ class mx_admin
 				else
 				{
 					$function_id = intval($id);
-
+					
 					// First delete parameter(s) and block(s) for this module function
 					$message_child .= $this->do_it( MX_BLOCK_TYPE, MX_DO_DELETE, $function_id, true, false);
 					$message_child .= $this->do_it( MX_PARAMETER_TYPE, MX_DO_DELETE, $function_id, true, false);
-
+					
 					// Then delete function itself
 					$sql = "DELETE FROM " . FUNCTION_TABLE . " WHERE function_id = " . $function_id;
 				}
-
+				
 				if ( !MX_ADMIN_DEBUG )
 				{
 					if( !($result = $db->sql_query($sql)) )
@@ -1283,7 +1337,7 @@ class mx_admin
 						mx_message_die(GENERAL_ERROR, "Couldn't delete function information", "", __LINE__, __FILE__, $sql);
 					}
 					$words_removed = $db->sql_affectedrows();
-
+					
 					//
 					// Update cache
 					//
@@ -1295,16 +1349,15 @@ class mx_admin
 						$mx_cache->update(MX_CACHE_ALL);
 					}
 				}
-
+				
 				if( !$parent || true)
 				{
 					$message = $lang['AdminCP_action'] . ": " . $words_removed . ' ' . $lang['Function'] . ' (ID: ' . $function_id . ') ' . $lang['was_deleted'] . '<br />' . $message_child;
 				}
-
 			break;
 
 			case MX_PARAMETER_TYPE:
-
+			
 				if( $parent )
 				{
 					$function_id = intval($id);
@@ -1314,7 +1367,7 @@ class mx_admin
 				{
 					$parameter_id = intval($id);
 					$sql = "DELETE FROM " . PARAMETER_TABLE . " WHERE parameter_id = " . $parameter_id;
-
+					
 					//
 					// Now get function_id (for later block data refresh)
 					//
@@ -1326,7 +1379,7 @@ class mx_admin
 					$temp_row = $db->sql_fetchrow($result);
 					$function_id = $temp_row['function_id'];
 				}
-
+				
 				if ( !MX_ADMIN_DEBUG )
 				{
 					if( !($result = $db->sql_query($sql)) )
@@ -1335,32 +1388,31 @@ class mx_admin
 					}
 					$words_removed = $db->sql_affectedrows();
 				}
-
+				
 				//
 				// Now update affected block_id(s)
 				// ...and cache
 				//
 				$message_tmp = $this->update_block_parameter_data($function_id);
 				$message_tmp = !empty($message_tmp) ? '<br /><br />' . $message_tmp : '';
-
+				
 				if( !$parent || true)
 				{
 					$message = $lang['AdminCP_action'] . ": " . $words_removed . ' ' . $lang['Parameter'] . ' ' . $lang['was_deleted'] . '<br />' . $message_child;
 				}
-
 			break;
-
+			
 			case MX_BLOCK_TYPE:
-
+			
 				if( $parent )
 				{
 					$function_id = intval($id);
-
+					
 					//
 					// First delete block(s) parameter data and page occurances for every module function
 					//
 					$sql_ids = "SELECT * FROM " . BLOCK_TABLE . " WHERE function_id = $function_id";
-
+					
 					if( ($result = $db->sql_query($sql_ids)) )
 					{
 						$delete_ids = $db->sql_fetchrowset($result);
@@ -1370,18 +1422,17 @@ class mx_admin
 							$message_child .= $this->do_it( MX_PAGE_BLOCK_TYPE, MX_DO_DELETE, $delete_ids[$i]['block_id'], false, false);
 						}
 					}
-
+					
 					//
 					// Then delete blocks(s) themselves
 					//
 					$sql = "DELETE FROM " . BLOCK_TABLE . " WHERE function_id = " . $function_id;
-
 				}
 				else
 				{
 					$delete_ids = '';
 					$block_id = intval($id);
-
+					
 					//
 					// First delete block parameter data and page occurances for this block
 					//
@@ -1390,14 +1441,13 @@ class mx_admin
 					{
 						$message_child .= $this->do_it( MX_PAGE_BLOCK_TYPE, MX_DO_DELETE, $block_id, false, false);
 					}
-
+					
 					//
 					// Then delete blocks itself
 					//
 					$sql = "DELETE FROM " . BLOCK_TABLE . " WHERE block_id = " . $block_id;
-
 				}
-
+				
 				if ( !MX_ADMIN_DEBUG )
 				{
 					if( !($result = $db->sql_query($sql)) )
@@ -1405,7 +1455,7 @@ class mx_admin
 						mx_message_die(GENERAL_ERROR, "Couldn't delete parameter information", "", __LINE__, __FILE__, $sql);
 					}
 					$words_removed = $db->sql_affectedrows();
-
+					
 					//
 					// Update cache
 					//
@@ -1429,33 +1479,30 @@ class mx_admin
 						}
 					}
 				}
-
+				
 				if( !$parent || true)
 				{
 					$message = $lang['AdminCP_action'] . ": " . $words_removed . ' ' . $lang['Block'] . ' (ID: ' . $block_id . ') ' . $lang['was_deleted'] . '<br />' . $message_child;
 				}
-
 			break;
-
+			
 			case MX_BLOCK_PARAMETER_TYPE:
 
 				$block_id = intval($id);
-
+				
 				//
 				// First delete Block parameter data
 				//
 				$sql = "DELETE FROM " . BLOCK_SYSTEM_PARAMETER_TABLE . "
 				   	WHERE block_id = " . $block_id;
-
+					
 				if ( !MX_ADMIN_DEBUG )
 				{
 					if( !($result = $db->sql_query($sql)) )
 					{
 						mx_message_die(GENERAL_ERROR, "Couldn't delete block parameter information", "", __LINE__, __FILE__, $sql);
 					}
-
 				}
-
 				//
 				// Update cache
 				//
@@ -1465,23 +1512,21 @@ class mx_admin
 				{
 					$message = $lang['AdminCP_action'] . ": " . $words_removed . ' ' . $lang['Block_parameter'] . ' (ID: ' . $block_id . ') ' . $lang['was_deleted'] . '<br />' . $message_child;
 				}
-
 			break;
 
 			case MX_PAGE_TYPE:
-
 				$page_id = intval($id);
-
+				
 				//
 				// First delete all Page columns
 				//
 				$message_child .= $this->do_it( MX_PAGE_COLUMN_TYPE, MX_DO_DELETE, $page_id, true, false);
-
+				
 				//
 				// Then delete Page itself
 				//
 				$sql = "DELETE FROM " . PAGE_TABLE . " WHERE page_id = " . $page_id;
-
+				
 				if ( !MX_ADMIN_DEBUG )
 				{
 					if( !($result = $db->sql_query($sql)) )
@@ -1489,7 +1534,7 @@ class mx_admin
 						mx_message_die(GENERAL_ERROR, "Couldn't delete page information", "", __LINE__, __FILE__, $sql);
 					}
 					$words_removed = $db->sql_affectedrows();
-
+					
 					//
 					// Update cache
 					//
@@ -1501,12 +1546,11 @@ class mx_admin
 						$mx_cache->update(MX_CACHE_PAGE_TYPE, $page_id);
 					}
 				}
-
+				
 				if( !$parent || true)
 				{
 					$message = $lang['AdminCP_action'] . ": " . $words_removed . ' ' . $lang['Page'] . ' (ID: ' . $page_id . ') ' . $lang['was_deleted'] . '<br />' . $message_child;
 				}
-
 			break;
 
 			case MX_PAGE_COLUMN_TYPE:
@@ -1514,12 +1558,10 @@ class mx_admin
 				if( $parent )
 				{
 					$page_id = intval($id);
-
-					//
+					
 					// First delete page column blocks for all page column(s)
-					//
 					$sql_ids = "SELECT column_id FROM " . COLUMN_TABLE . " WHERE page_id = " . $page_id;
-
+					
 					if( ($result = $db->sql_query($sql_ids)) )
 					{
 						$delete_ids = $db->sql_fetchrowset($result);
@@ -1528,40 +1570,31 @@ class mx_admin
 							$message_child .= $this->do_it( MX_PAGE_BLOCK_TYPE, MX_DO_DELETE, $delete_ids[$i]['column_id'], true, false );
 						}
 					}
-
-					//
+					
 					// Then delete page column(s) themselves
-					//
 					$sql = "DELETE FROM " . COLUMN_TABLE . " WHERE page_id = " . $page_id;
 				}
 				else
 				{
 					$column_id = intval($id);
-
-					//
+					
 					// First delete page column blocks for this page column
-					//
 					$message_child .= $this->do_it( MX_PAGE_BLOCK_TYPE, MX_DO_DELETE, $column_id, true, false );
-
-					//
+					
 					// Get parent page id, to update cache
-					//
 					$sql = " SELECT page_id FROM " . COLUMN_TABLE . " WHERE column_id = '" . $column_id . "'";
 					if( !($result = $db->sql_query($sql)) )
 					{
 						mx_message_die(GENERAL_ERROR, "Couldn't get list of Columns for this template", '', __LINE__, __FILE__, $sql);
 					}
-
+					
 					$row = $db->sql_fetchrow($result);
 					$page_id = $row['page_id'];
-
-					//
+					
 					// First delete page column itself
-					//
 					$sql = "DELETE FROM " . COLUMN_TABLE . " WHERE column_id = " . $column_id;
-
 				}
-
+				
 				if ( !MX_ADMIN_DEBUG )
 				{
 					if( !($result = $db->sql_query($sql)) )
@@ -1584,7 +1617,6 @@ class mx_admin
 				{
 					$message = $lang['AdminCP_action'] . ": " . $words_removed . ' ' . ($words_removed > 1 ? $lang['Columns'] : $lang['Column']) . ' ' . $lang['was_deleted'] . '<br />' . $message_child;
 				}
-
 			break;
 
 			case MX_PAGE_BLOCK_TYPE:
@@ -1662,7 +1694,7 @@ class mx_admin
 							$controller_block = 'yes';
 							$message_child .= $this->do_it(MX_BLOCK_TYPE, MX_DO_DELETE, $delete_id);
 						}
-					}
+					}			
 					$controller_block = '';
 
 					//
@@ -1928,9 +1960,9 @@ class mx_admin
 				if ( !MX_ADMIN_DEBUG )
 				{
 
-					// ????
+					// Not implemented
 					$column_id = $mx_request_vars->get('column_id', MX_TYPE_INT);
-					sync('block', $mx_request_vars->get('block_id', MX_TYPE_INT));
+					//sync('block', $mx_request_vars->get('block_id', MX_TYPE_INT));
 					$show_index = true;
 
 				}
@@ -1998,25 +2030,24 @@ class mx_admin
 	function _do_export($type )
 	{
 		global $template, $lang, $db, $board_config, $theme, $phpEx, $mx_request_vars;
-
-		switch ( $type )
+		
+		switch ($type)
 		{
 			case MX_MODULE_TYPE:
-
+			
 				if ( !MX_ADMIN_DEBUG )
 				{
 					$module_id = $mx_request_vars->request('id', MX_TYPE_INT, 0);
 					$this->export_pack($module_id);
 				}
 				$message = $lang['AdminCP_action'] . ": " . $lang['Module'] . ' ' . $lang['was_exported'];
-
+				
 			break;
-
+			
 			default:
 				$message = $lang['AdminCP_action'] . ": " . $lang['Invalid_action'];
 			break;
 		}
-
 		return $message;
 	}
 
@@ -2030,33 +2061,32 @@ class mx_admin
 	function get_module_pak_file($dir_module)
 	{
 		global $phpEx, $template, $mx_root_path;
-
+		
 		$pak_row = array();
-
-			if( $dir_module <> '..' )
+		
+		if($dir_module <> '..')
+		{
+			$dir = @opendir($mx_root_path . $dir_module);
+			while( $file = @readdir($dir) )
 			{
-				$dir = @opendir($mx_root_path . $dir_module);
-				while( $file = @readdir($dir) )
+				if( preg_match("/^.*?\.pak$/", $file) )
 				{
-					if( preg_match("/^.*?\.pak$/", $file) )
-					{
-						$ret = $dir_module . $file;
-						$pak_row[$ret] = $dir_module;
-					}
+					$ret = $dir_module . $file;
+					$pak_row[$ret] = $dir_module;
 				}
-				@closedir($dir);
 			}
-
-			if (count($pak_row) == 0)
-			{
-				die('PAK error - cannot locate a *.pak file for this module');
-			}
-
-			if (count($pak_row) > 1)
-			{
-				die('PAK error - you have more than 1 *.pak files for this module');
-			}
-
+			@closedir($dir);
+		}
+			
+		if (count($pak_row) == 0)
+		{
+			die('PAK error - cannot locate a *.pak file for this module');
+		}
+			
+		if (count($pak_row) > 1)
+		{
+			die('PAK error - you have more than 1 *.pak files for this module');
+		}
 		return $ret;
 	}
 
@@ -2070,20 +2100,19 @@ class mx_admin
 	function get_new_module_pak_files($dir_module = '')
 	{
 		global $phpEx, $template, $db, $mx_root_path;
-
+		
 		$sql = "SELECT module_path FROM " . MODULE_TABLE;
 		if( !($result = $db->sql_query($sql)) )
 		{
 			mx_message_die(GENERAL_ERROR, "Couldn't get $table information", '', __LINE__, __FILE__, $sql);
 		}
 		$module_row = $db->sql_fetchrowset($result);
-
+		
 		$module_paths = array();
 		foreach($module_row as $key => $value)
 		{
 			$module_paths[] = $value['module_path'];
 		}
-
 		$pak_row = array();
 
 		/*
@@ -2106,18 +2135,17 @@ class mx_admin
 			}
 		}
 		*/
-
+		
 		// Then get modules
 		$dir_mod = @opendir($mx_root_path . 'modules/');
-		while ( $dir_module = @readdir($dir_mod) )
+		while ($dir_module = @readdir($dir_mod))
 		{
-
 			if( $dir_module <> '..' && $dir_module <> '.')
 			{
 				$dir = @opendir($mx_root_path . 'modules/' . $dir_module);
 				while( $file = @readdir($dir) )
 				{
-					if( preg_match("/^.*?\.pak$/", $file) )
+					if(preg_match("/^.*?\.pak$/", $file))
 					{
 							if(!in_array('modules/' . $dir_module . '/', $module_paths))
 							{
@@ -2156,22 +2184,20 @@ class mx_admin
 		// 0: 'parameter', 1: function_id, 2: parameter_id, 3: parameter_name,
 		// 4: parameter_type, 5: parameter_default, 6: parameter_function
 		//
-
+		
 		global $table_prefix, $mx_table_prefix, $userdata, $phpEx, $template, $lang, $db, $board_config;
-
-		//
+		
 		// Initial checks
-		//
 		if( $pak_error )
 		{
 			return;
 		}
-
+		
 		if( empty($data) )
 		{
 			mx_message_die(GENERAL_MESSAGE, 'No function_id or parameter_row is given');
 		}
-
+		
 		if (is_array($data))
 		{
 			$parameter_row = $data;
@@ -2182,116 +2208,88 @@ class mx_admin
 		{
 			$function_id = $data;
 		}
-
 		$output_message = '&nbsp;&nbsp;  ---> Now get blocks_ids: <br />';
-
-		//
+		
 		// Now get associated block_id(s)
-		//
 		$sql = "SELECT block_id FROM " . BLOCK_TABLE . " WHERE function_id = '" . $function_id . "'";
-
+		
 		$result_ids = !$pak_debug ? $db->sql_query($sql) : true;
-
+		
 		$output_message .= !$result_ids ? '<font color=#00ff00> [db...no blocks...ok] </font>' : '<font color=#00ff00> [db...ok] </font>';
-
+		
 		while( $block_row = $db->sql_fetchrow($result_ids) )
 		{
 			$block_id = intval($block_row['block_id']);
-
-			//
+			
 			// delete old/removed block parameters when user change the function_id of a block or delete function parameters
-			//
 			$sql = "SELECT * FROM " . BLOCK_SYSTEM_PARAMETER_TABLE . " WHERE block_id = " . $block_id;
-
+			
 			if( !($result = $db->sql_query($sql)) )
 			{
 				mx_message_die(GENERAL_ERROR, "Couldn't get block_system_parameter information", "", __LINE__, __FILE__, $sql);
 			}
-
+			
 			$sys_param_rows = $db->sql_fetchrowset($result);
-
+			
 			for( $p = 0; $p < count($sys_param_rows); $p++ )
 			{
 				$sql_cnt = "SELECT COUNT(*) AS total FROM " . PARAMETER_TABLE . " WHERE function_id = " . $function_id . " AND parameter_id = " . $sys_param_rows[$p]['parameter_id'];
-
+				
 				if( !($result_cnt = $db->sql_query($sql_cnt)) )
 				{
 					mx_message_die(GENERAL_ERROR, "Couldn't get block_system_parameter information", "", __LINE__, __FILE__, $sql_cnt);
 				}
-
+				
 				$count = $db->sql_fetchrow($result_cnt);
 				$count = $count['total'];
-
+				
 				if( $count == 0 )
 				{
 					$sql_del = "DELETE FROM " . BLOCK_SYSTEM_PARAMETER_TABLE . " WHERE block_id = $block_id AND parameter_id = " . $sys_param_rows[$p]['parameter_id'];
 					$result_del = $db->sql_query($sql_del);
-
+					
 					$output_message .= '<br /> - (' . $sys_param_rows[$p]['parameter_name'] . ', ' . $sys_param_rows[$p]['parameter_id'] . ', ' . $block_id . '),';
 					$output_message .= !$result_del ? '<br /><b><font color=#0000ff>[db...error]</font></b> line: ' . __LINE__ . ' , ' . $result_del . '<br />' : '';
 				}
 			}
-
-			//
+			
 			// insert/update new block parameters when user change the function_id of a block or add/edit function parameters
-			//
 			$sql = "SELECT * FROM " . PARAMETER_TABLE . " WHERE function_id = " . $function_id;
-
+			
 			if( !($result = $db->sql_query($sql)) )
 			{
 				mx_message_die(GENERAL_ERROR, "Couldn't get parameter information", "", __LINE__, __FILE__, $sql);
 			}
-
+			
 			$sys_param_rows = $db->sql_fetchrowset($result);
-
+			
 			for( $p = 0; $p < count($sys_param_rows); $p++ )
 			{
 				$sql_cnt = "SELECT COUNT(*) AS total FROM " . BLOCK_SYSTEM_PARAMETER_TABLE . " WHERE block_id = " . $block_id . " AND parameter_id = " . $sys_param_rows[$p]['parameter_id'];
-
+				
 				if( !($result = $db->sql_query($sql_cnt)) )
 				{
 					mx_message_die(GENERAL_ERROR, "Couldn't get block_system_parameter information", "", __LINE__, __FILE__, $sql);
 				}
-
+				
 				$count = $db->sql_fetchrow($result);
 				$count = $count['total'];
-
+				
 				if( $count == 0 )
-				{				
+				{
 					$sql_add = "INSERT INTO " . BLOCK_SYSTEM_PARAMETER_TABLE . "( block_id, parameter_id, parameter_value )
 						SELECT " . $block_id . ", " . $sys_param_rows[$p]['parameter_id'] . ", parameter_default
 							FROM " . PARAMETER_TABLE . " par " . " WHERE function_id = " . $function_id . " AND parameter_id = " . $sys_param_rows[$p]['parameter_id'];
-					/*
-					$sql = "SELECT " . $block_id . ", " . $sys_param_rows[$p]['parameter_id'] . ", parameter_default
-							FROM " . PARAMETER_TABLE . " par " . " WHERE function_id = " . $function_id . " AND parameter_id = " . $sys_param_rows[$p]['parameter_id'];
-					if( !($result = $db->sql_query($sql)) )
-					{
-						mx_message_die(GENERAL_ERROR, "Couldn't insert row in blocks table", "", __LINE__, __FILE__, $sql);
-					}
-					while($row = $db->sql_fetchrow($result))
-					{					
-						$sql_array = array(					
-							'block_id'	=> (int) $block_id,
-							'parameter_id'	=> (int) $sys_param_rows[$p]['parameter_id'],
-							'parameter_value'	=> $row['parameter_value'],
-						);
-					}
-					$sql_add = "INSERT INTO " . BLOCK_SYSTEM_PARAMETER_TABLE . $db->sql_build_array('INSERT', $sql_array);					
-					*/
-					$result_add = $db->sql_query($sql_add);					
+							
+					$result_add = $db->sql_query($sql_add);
 					
 					$output_message .= '<br /> + (' . $sys_param_rows[$p]['parameter_name'] . ', ' . $sys_param_rows[$p]['parameter_id'] . ', ' . $block_id . '),';
 					$output_message .= !$result_add ? '<br /><b><font color=#0000ff>[db...error]</font></b> line: ' . __LINE__ . ' , ' . $sql_add . '<br />' : '';
 				}
-			}
-
-			//
+			}			
 			// Update cache
-			//
 			$mx_cache->update(MX_CACHE_BLOCK_TYPE, $block_id);
-
 		}
-
 		$output_message .= ' <br />';
 		return $output_message;
 	}
@@ -2307,7 +2305,6 @@ class mx_admin
 	function move($mode, $column = 0, $page_id)
 	{
 		global $db;
-
 		switch( $mode )
 		{
 			case 'column':
@@ -2316,7 +2313,7 @@ class mx_admin
 				$orderfield = 'column_order';
 				$columnfield = 'page_id';
 				$column = 0;
-				break;
+			break;
 
 			case 'template_column':
 				$table = COLUMN_TEMPLATES;
@@ -2324,25 +2321,25 @@ class mx_admin
 				$orderfield = 'column_order';
 				$columnfield = 'page_template_id';
 				$column = 0;
-				break;
+			break;
 
 			case 'block':
 				$table = COLUMN_BLOCK_TABLE;
 				$idfield = 'block_id';
 				$orderfield = 'block_order';
 				$columnfield = 'column_id';
-				break;
+			break;
 
 			case 'parameter':
 				$table = PARAMETER_TABLE;
 				$idfield = 'parameter_id';
 				$orderfield = 'parameter_order';
 				$columnfield = 'function_id';
-				break;
+			break;
 
 			default:
 				mx_message_die(GENERAL_ERROR, "Wrong mode for generating select list", "", __LINE__, __FILE__);
-				break;
+			break;
 		}
 
 		$sql = "SELECT * FROM $table";
@@ -2351,23 +2348,23 @@ class mx_admin
 		{
 			case 'column':
 				$sql .= " WHERE page_id = $page_id ";
-				break;
+			break;
 
 			case 'template_column':
 				$sql .= " WHERE page_template_id = $page_id ";
-				break;
+			break;
 
 			case 'block':
 				$sql .= " WHERE $columnfield = $column";
-				break;
+			break;
 
 			case 'parameter':
 				$sql .= " WHERE $columnfield = $column";
-				break;
+			break;
 
 			default:
 				mx_message_die(GENERAL_ERROR, "Wrong mode for generating select list", "", __LINE__, __FILE__);
-				break;
+			break;
 		}
 
 		$sql .= " ORDER BY $orderfield ASC";
@@ -2521,47 +2518,48 @@ class mx_admin
 	function getSafeObjects($fcontents)
 	{
 		global $template, $lang, $db, $board_config, $theme, $delimeter;
-
+		
 		$module_id_max = $this->getMaxId(MODULE_TABLE, 'module_id');
 		$function_id_max = $this->getMaxId(FUNCTION_TABLE, 'function_id');
 		$parameter_id_max = $this->getMaxId(PARAMETER_TABLE, 'parameter_id');
 		$option_id_max = $this->getMaxId(PARAMETER_OPTION_TABLE, 'option_id');
 		$block_id_max = $this->getMaxId(BLOCK_TABLE, 'block_id');
-
+		
 		$function_count = -1;
 		$parameter_count = -1;
 		$option_count = -1;
 		$block_count = -1;
-
+		
 		$delete_par = false;
 		$delete_opt = false;
 		$delete_fnc = false;
-
-		//
-		// Generate safe object identifiers for the target DB
-		// where this module pack is going to be imported...
-		//
+		
+		/* 
+		* Generate safe object identifiers for the target DB
+		* where this module pack is going to be imported...
+		*/
 		$i = 0;
-
+		$delete_option = false;
+		$exists_option_ids = array();
 		while( $i < count($fcontents) )
 		{
 			$module_data = explode($delimeter, trim($fcontents[$i]));
-
+			
 			switch( $module_data[0] )
 			{
-				//
-				// 0: module, 1: module_id, 2: module_name, 3: module_path,
-				// 4: module_desc, 5: module_include_admin
-				//
+				/*
+				* 0: module, 1: module_id, 2: module_name, 3: module_path,
+				* 4: module_desc, 5: module_include_admin
+				*/
 				case 'module':
 					$delete_fnc = false;
 					$exists_fnc_ids = array();
-
+					
 					$safe_row = mx_get_info(MODULE_TABLE, 'module_path', $module_data[3]);
-
-					//
-					// Switch to check if its updating or installing module
-					//
+					
+					/*
+					* Switch to check if its updating or installing module
+					*/
 					if( $safe_row )
 					{
 						$module_data[6] = 'upgrade';
@@ -2576,28 +2574,29 @@ class mx_admin
 						$module_data[1] = $module_id;
 					}
 					break;
-
-				//
-				// 0: function, 1: module_id, 2: function_id, 3: function_name,
-				//
-				// 4: function_desc, 5: function_file, 6: function_admin
+					
+				/*
+				* 0: function, 1: module_id, 2: function_id, 3: function_name,
+				*
+				* 4: function_desc, 5: function_file, 6: function_admin
+				*/
 				case 'function':
 					$delete_par = false;
 					$exists_par_ids = array();
-
+					
 					$module_data[1] = $module_id;
-
+					
 					if( $delete_fnc )
 					{
 						break;
 					}
-
+					
 					$safe_row = mx_get_info(FUNCTION_TABLE, 'module_id', $module_id, 'function_file', $module_data['5']);
-
+					
 					if( $module_data['4'] == 'endoflist' )
 					{
 						$old_items = $this->get_old_items(FUNCTION_TABLE, 'module_id', $module_id, 'function_id', $exists_fnc_ids);
-
+						
 						for( $f = 0; $f < count($old_items); $f++ )
 						{
 							$insert_array = implode($delimeter, array('function', $old_items[$f]['module_id'], $old_items[$f]['function_id'], $old_items[$f]['function_name'], 'delete'));
@@ -2620,28 +2619,28 @@ class mx_admin
 						$module_data[2] = $function_id;
 					}
 					break;
-
-				//
-				// 0: parameter, 1: function_id, 2: parameter_id, 3: parameter_name,
-				// 4: parameter_type, 5: parameter_default, 6: parameter_function
-				//
+					
+				/*
+				* 0: parameter, 1: function_id, 2: parameter_id, 3: parameter_name,
+				* 4: parameter_type, 5: parameter_default, 6: parameter_function
+				*/
 				case 'parameter':
 					$delete_option = false;
 					$exists_option_ids = array();
-
+					
 					$module_data[1] = $function_id;
-
+					
 					if( $delete_par )
 					{
 						break;
 					}
-
+					
 					$safe_row = mx_get_info(PARAMETER_TABLE, 'function_id', $function_id, 'parameter_name', $module_data['3']);
-
+					
 					if( $module_data['4'] == 'endoflist' )
 					{
 						$old_items = $this->get_old_items(PARAMETER_TABLE, 'function_id', $function_id, 'parameter_id', $exists_par_ids);
-
+						
 						for( $f = 0; $f < count( $old_items ); $f++ )
 						{
 							$insert_array = implode($delimeter, array('parameter', $old_items[$f]['function_id'], $old_items[$f]['parameter_id'], $old_items[$f]['parameter_name'], 'delete'));
@@ -2662,11 +2661,11 @@ class mx_admin
 						$module_data[2] = $parameter_id;
 					}
 					break;
-
-				//
-				// 0: block, 1: block_id, 2: block_title, 3: block_desc,
-				// 4: function_id, 5: auth_view, 6: auth_edit, 7: auth_delete
-				//
+					
+				/*
+				* 0: block, 1: block_id, 2: block_title, 3: block_desc,
+				* 4: function_id, 5: auth_view, 6: auth_edit, 7: auth_delete
+				*/
 				case 'block':
 					$safe_row = mx_get_info(BLOCK_TABLE, 'function_id', $function_id);
 					if( $safe_row  )
@@ -2683,17 +2682,17 @@ class mx_admin
 						$module_data[4] = $function_id;
 					}
 					break;
-
+					
 				case 'delete':
 					break;
-
+					
 				case 'New_function':
 					break;
-
+					
 				default:
 					mx_message_die(GENERAL_MESSAGE, "Invalid Pack Format. Line: " . ( $i + 1 ));
 			}
-
+			
 			if( !$delete_par && !$delete_option && !$delete_fnc )
 			{
 				$fcontents[$i] = implode($delimeter, $module_data);
@@ -2744,8 +2743,8 @@ class mx_admin
 		// Call parent function to get valid object ids, for db processing
 		//
 		$fcontents = $this->getSafeObjects($fcontents);
-		
-		$parameter_order = 0;
+
+		$parameter_order = 0; // Needed?
 
 		//
 		// Proceed with fixed object ids (fcontents) for install/upgrade...
@@ -2813,10 +2812,14 @@ class mx_admin
 					$table = PARAMETER_TABLE;
 					$fldkey = 'parameter_id';
 					$key = $module_data[2];
+					$sql_add = "INSERT INTO " . PARAMETER_TABLE . " (function_id, parameter_id, parameter_name, parameter_type, parameter_default, parameter_function, parameter_auth, parameter_order)
+						VALUES ( '" . intval($module_data[1]) . "', '" . intval($module_data[2]) . "', '" . str_replace("\'", "''", $module_data[3]) . "', '" . str_replace("\'", "''",$module_data[4]) . "', '" . str_replace("\'", "''", $module_data[5]) . "', '" . str_replace("\'", "''", $module_data[6]) . "', '" . str_replace("\'", "''", $module_data[7]) . "', '" . str_replace("\'", "''", $module_data[8]) . "' ) ";
+
+					/*
 					++$parameter_order;
 					$sql = array(
 						'function_id'        	=> (int) $module_data[1],
-						'parameter_id'  		=> (int) $module_data[2],						
+						'parameter_id'  		=> (int) $module_data[2],
 						'parameter_name'     	=> stripslashes($module_data[3]),
 						'parameter_type'     	=> stripslashes($module_data[4]),
 						'parameter_default'  	=> stripslashes($module_data[5]),
@@ -2824,7 +2827,8 @@ class mx_admin
 						'parameter_auth' 		=> stripslashes($module_data[7]),
 						'parameter_order' 		=> (int) $parameter_order,
 					);
-					$sql_add = "INSERT INTO $table " . $db->sql_build_array('INSERT', $sql);					
+					$sql_add = "INSERT INTO $table " . $db->sql_build_array('INSERT', $sql);
+					*/
 
 					$sql_update = "UPDATE " . PARAMETER_TABLE . "
 						SET function_id        	= '" . intval($module_data[1]) . "',
@@ -2838,7 +2842,31 @@ class mx_admin
 
 					$sql_delete = "DELETE FROM " . PARAMETER_TABLE . " WHERE function_id = " . $module_data[1] . " AND parameter_id = " . $module_data[2];
 					break;
-
+				//	
+				// 0: option, 1: option_id, 2: parameter_id, 3: option_code,
+				// 4: option_desc
+				//	
+				case 'option':
+					// Parameter Option
+					$sql = "SELECT * FROM " . PARAMETER_OPTION_TABLE . " WHERE parameter_id = ".intval($module_data[2])."  ORDER BY option_id";
+					if(($result = $db->sql_query($sql)))
+					{
+						$table = PARAMETER_OPTION_TABLE;
+						$fldkey = 'option_id';
+						$key = $module_data[1];
+		
+						$sql_add = "INSERT INTO " . PARAMETER_OPTION_TABLE . " (option_id, parameter_id, option_code, option_desc)
+							VALUES ('$module_data[1]', '$module_data[2]', '$module_data[3]', '$module_data[4]' )";
+		
+						$sql_update = "UPDATE " . PARAMETER_OPTION_TABLE . "
+							SET parameter_id = '$module_data[2]',
+								option_code  = '$module_data[3]',
+								option_desc  = '$module_data[4]'
+							WHERE option_id = '$module_data[1]'";
+		
+						$sql_delete = "DELETE FROM " . PARAMETER_OPTION_TABLE . " WHERE option_id = " . $module_data[1] . " AND parameter_id = " . $module_data[2];					
+					}				
+					break;	
 				//
 				// 0: block, 1: block_id, 2: block_title, 3: block_desc,
 				// 4: function_id, 5: auth_view, 6: auth_edit, 7: auth_delete
@@ -3137,6 +3165,28 @@ class mx_admin
 					$module_pak .= $resultset_param[$p]['parameter_order'] . "\n";
 
 					$paramater_id = $resultset_param[$p]['parameter_id'];
+					
+					// Parameter Option
+					$sql = "SELECT * FROM " . PARAMETER_OPTION_TABLE . " WHERE parameter_id = $paramater_id ORDER BY option_id";
+					if(($result = $db->sql_query($sql)))
+					{
+						$resultset_opt = $db->sql_fetchrowset($result);
+		
+						// 0: option, 1: option_id, 2: parameter_id, 3: option_code,
+						// 4: option_desc
+						for( $o = 0; $o < count($resultset_opt); $o++ )
+						{
+							$module_pak .= 'option' . $delimeter . $resultset_opt[$o]['option_id'] . $delimeter;
+							$module_pak .= $resultset_opt[$o]['parameter_id'] . $delimeter;
+							$module_pak .= $resultset_opt[$o]['option_code'] . $delimeter;
+							$module_pak .= $resultset_opt[$o]['option_desc'] . "\n";
+						}
+		
+						$module_pak .= 'option' . $delimeter. '0' . $delimeter;
+						$module_pak .= '0' . $delimeter;
+						$module_pak .= '0' . $delimeter;
+						$module_pak .= 'endoflist' . $delimeter . "\n";					
+					}									
 				}
 
 				$module_pak .= 'parameter' . $delimeter . '0' . $delimeter;
@@ -3185,7 +3235,7 @@ class mx_admin
 	 * Index search words for textblocks.
 	 *
 	 * This function indexes search words for textblocks.
-	 *
+	 * Old outdated function need to be fixed
 	 * @access private
 	 * @param string $mode single or ?
 	 * @param integer $block_id textblock id
@@ -3194,11 +3244,11 @@ class mx_admin
 	 */
 	function mx_add_search_words($mode, $block_id, $post_text, $post_title = '')
 	{
-		global $db, $phpbb_root_path, $board_config, $lang, $phpEx;
+		global $db, $phpbb_root_path, $board_config, $lang, $phpEx, $mx_cache;
 
 		if( !function_exists('add_search_words') )
 		{
-			mx_cache::load_file('functions_search', 'phpbb2');
+			$mx_cache->load_file('functions_search', 'phpbb2');
 		}
 
 		$search_match_table = MX_MATCH_TABLE;
@@ -3209,8 +3259,10 @@ class mx_admin
 		$synonym_array = @file($phpbb_root_path . 'language/lang_' . $board_config['default_lang'] . "/search_synonyms.txt");
 
 		$search_raw_words = array();
-		$search_raw_words['text'] = split_words(clean_words('post', $post_text, $stopword_array, $synonym_array));
-		$search_raw_words['title'] = split_words(clean_words('post', $post_title, $stopword_array, $synonym_array));
+
+		// Updated for utf-8
+		$search_raw_words['text'] = split_words(@clean_words('post', utf8_normalize_nfc($post_text), $stopword_array, $synonym_array));
+		$search_raw_words['title'] = split_words(@clean_words('post', utf8_normalize_nfc($post_title), $stopword_array, $synonym_array));
 
 		@set_time_limit(0);
 
@@ -3301,7 +3353,8 @@ class mx_admin
 						case 'mssql':
 						case 'mssql-odbc':
 							$value_sql .= ( ( $value_sql != '' ) ? ' UNION ALL ' : '' ) . "SELECT '" . $word[$i] . "', 0";
-							break;
+						break;
+						
 						default:
 							$sql = "INSERT INTO " . $search_word_table . " (word_text, word_common)
 								VALUES ('" . $word[$i] . "', 0)";
@@ -3309,7 +3362,7 @@ class mx_admin
 							{
 								mx_message_die(GENERAL_ERROR, 'Could not insert new word', '', __LINE__, __FILE__, $sql);
 							}
-							break;
+						break;
 					}
 				}
 			}
@@ -3322,16 +3375,17 @@ class mx_admin
 					case 'mysql4':
 					case 'mysqli':
 						$sql = "INSERT IGNORE INTO " . $search_word_table . " (word_text, word_common)
-							VALUES $value_sql";
-						break;
+							VALUES " . $value_sql;
+					break;
+					
 					case 'mssql':
 					case 'mssql-odbc':
 						$sql = "INSERT INTO " . $search_word_table . " (word_text, word_common)
-							$value_sql";
-						break;
+							" . $value_sql;
+					break;
 				}
 
-				if ( !$db->sql_query($sql) )
+				if (!$result = $db->sql_query($sql))
 				{
 					mx_message_die(GENERAL_ERROR, 'Could not insert new word', '', __LINE__, __FILE__, $sql);
 				}
@@ -3339,10 +3393,10 @@ class mx_admin
 			}
 		}
 
-		while( list($word_in, $match_sql) = @each($word_insert_sql) )
+		while(list($word_in, $match_sql) = @each($word_insert_sql))
 		{
 			$title_match = ( $word_in == 'title' ) ? 1 : 0;
-
+			
 			if ( $match_sql != '' )
 			{
 				$sql = "INSERT INTO " . $search_match_table . " ($db_key, word_id, title_match)
@@ -3351,17 +3405,52 @@ class mx_admin
 						WHERE word_text IN ($match_sql)";
 				if ( !$db->sql_query($sql) )
 				{
-					mx_message_die(GENERAL_ERROR, 'Could not insert new word matches', '', __LINE__, __FILE__, $sql);
+					//mx_message_die(GENERAL_ERROR, 'Could not insert new word matches', '', __LINE__, __FILE__, $sql);
 				}
 				$db->sql_freeresult($result);
+				/*
+				$sql = "SELECT $block_id, word_id, $title_match
+					FROM " . $search_word_table . "
+					WHERE word_text IN ($match_sql)";
+				if ( !($result = $db->sql_query($sql)) )
+				{
+					mx_message_die(GENERAL_ERROR, 'Could not select words', '', __LINE__, __FILE__, $sql);
+				}
+
+				while ( $row = $db->sql_fetchrow($result) )
+				{
+					$word_id = $row['word_id'];
+				}
+				$db->sql_freeresult($result);
+
+
+				//To do: Need to be upgraded for UTF-8
+				//$sql_where = ' IN (' . $match_sql . ')';
+				$sql = "INSERT INTO " . $search_match_table . " ($db_key, word_id, title_match)
+					SELECT $block_id, word_id, $title_match
+						FROM " . $search_word_table . "
+						WHERE word_text IN ($match_sql)";
+
+				$sql = array(
+					$db_key => $block_id,
+					'word_id' => $word_id,
+					'title_match' => $title_match,
+				);
+
+				$sql = "INSERT INTO $search_match_table " . $db->sql_build_array('INSERT', $sql);
+
+				if ( !($result = $db->sql_query($sql)) )
+				{
+					mx_message_die(GENERAL_ERROR, 'Could not insert new word matches', '', __LINE__, __FILE__, $sql);
+				}
+				*/
 			}
 		}
-
+		
 		if ($mode == 'single')
 		{
 			// remove_common('single', 4/10, $word);
 		}
-
 		return;
 	}
 
@@ -3382,7 +3471,7 @@ class mx_admin
 
 		$words_removed = false;
 
-		switch ( SQL_LAYER )
+		switch (SQL_LAYER)
 		{
 			case 'mysql':
 			case 'mysql4':
@@ -3398,7 +3487,6 @@ class mx_admin
 					{
 						$word_id_sql .= ( $word_id_sql != '' ) ? ', ' . $row['word_id'] : $row['word_id'];
 					}
-
 					$sql = "SELECT word_id
 						FROM " . $search_match_table . "
 						WHERE word_id IN ($word_id_sql)
@@ -3411,7 +3499,6 @@ class mx_admin
 						{
 							$word_id_sql .= ( $word_id_sql != '' ) ? ', ' . $row['word_id'] : $row['word_id'];
 						}
-
 						if ( $word_id_sql != '' )
 						{
 							$sql = "DELETE FROM " . $search_word_table . "
@@ -3420,13 +3507,12 @@ class mx_admin
 							{
 								mx_message_die(GENERAL_ERROR, 'Could not delete word list entry', '', __LINE__, __FILE__, $sql);
 							}
-
 							$words_removed = $db->sql_affectedrows();
 						}
 					}
 				}
-				break;
-
+			break;
+			
 			default:
 				$sql = "DELETE FROM " . $search_word_table . "
 					WHERE word_id IN (
@@ -3445,11 +3531,9 @@ class mx_admin
 				{
 					mx_message_die(GENERAL_ERROR, 'Could not delete old words from word table', '', __LINE__, __FILE__, $sql);
 				}
-
 				$words_removed = $db->sql_affectedrows();
 				$db->sql_freeresult($result);
-
-				break;
+			break;
 		}
 
 		$sql = "DELETE FROM " . $search_match_table . "
@@ -3458,7 +3542,6 @@ class mx_admin
 		{
 			mx_message_die(GENERAL_ERROR, 'Error in deleting post', '', __LINE__, __FILE__, $sql);
 		}
-
 		$db->sql_freeresult($result);
 		return $words_removed;
 	}
@@ -3528,6 +3611,195 @@ class mx_admin
 			return $message;
 		}
 	}
+	/**
+	* _start from umil_start
+	*
+	* A function which runs (almost) every time a function here is ran
+	*/
+	function _start()
+	{
+		global $mx_user;
+
+		// Set up the command.  This will get the arguments sent to the function.
+		$args = func_get_args();
+		$this->command = call_user_func_array(array($this, 'get_output_text'), $args);
+
+		$this->result = (isset($mx_user->lang['SUCCESS'])) ? $mx_user->lang['SUCCESS'] : 'SUCCESS';
+		$this->db->sql_return_on_error(true);
+
+		//$this->db->sql_transaction('begin');
+	}
+
+	/**
+	* _end from umil_end
+	*
+	* A function which runs (almost) every time a function here is ran
+	*/
+	function _end()
+	{
+		global $mx_user;
+
+		// Set up the result.  This will get the arguments sent to the function.
+		$args = func_get_args();
+		$result = call_user_func_array(array($this, 'get_output_text'), $args);
+		$this->result = ($result) ? $result : $this->result;
+
+		if ($this->db->sql_error_triggered)
+		{
+			if ($this->result == ((isset($mx_user->lang['SUCCESS'])) ? $mx_user->lang['SUCCESS'] : 'SUCCESS'))
+			{
+				$this->result = 'SQL ERROR ' . $this->db->sql_error_returned['message'];
+			}
+			else
+			{
+				$this->result .= '<br /><br />SQL ERROR ' . $this->db->sql_error_returned['message'];
+			}
+
+			//$this->db->sql_transaction('rollback');
+		}
+		else
+		{
+			//$this->db->sql_transaction('commit');
+		}
+
+		$this->db->sql_return_on_error(false);
+
+		// Auto output if requested.
+		if ($this->auto_display_results && method_exists($this, 'display_results'))
+		{
+			$this->display_results();
+		}
+
+		return '<strong>' . $this->command . '</strong><br />' . $this->result;
+	}	
+	
+	/**
+	* Multicall Helper from umil
+	*
+	* @param mixed $function Function name to call
+	* @param mixed $params The parameters array
+	*
+	* @return bool True if we have done a multicall ($params is an array), false if not ($params is not an array)
+	*/
+	function multicall($function, $params)
+	{
+		if (is_array($params) && !empty($params))
+		{
+			foreach ($params as $param)
+			{
+				if (!is_array($param))
+				{
+					call_user_func(array($this, $function), $param);
+				}
+				else
+				{
+					call_user_func_array(array($this, $function), $param);
+				}
+			}
+			return true;
+		}
+
+		return false;
+	}	
+	
+	/**
+	 * Enter description here...
+	 * from umil module_add()
+	 * @access public
+	 * @param unknown_type $module_id
+	 */
+	function module_select($class, $parent = 0, $data = array(), $include_path = false)
+	{
+		global $mx_cache, $mx_user, $mx_root_path, $module_root_path, $phpEx;
+
+		// Multicall
+		if ($this->multicall(__FUNCTION__, $class))
+		{
+			return;
+		}
+
+		// Prevent stupid things like trying to add a module with no name or any data on it
+		if (empty($data))
+		{
+			$this->_start('MODULE_ADD', $class, 'UNKNOWN');
+			return $this->_end('FAIL');
+		}
+
+        // Allows '' to be sent as 0
+		$parent = (!$parent) ? 0 : $parent;
+
+		// allow sending the name as a string in $data to create a category
+		if (!is_array($data))
+		{
+			$data = array('module_langname' => $data);
+		}
+
+		if (!isset($data['module_langname']))
+		{
+			// The "automatic" way
+			$basename = (isset($data['module_basename'])) ? $data['module_basename'] : '';
+			$basename = str_replace(array('/', '\\'), '', $basename);
+			$class = str_replace(array('/', '\\'), '', $class);
+			$info_file = "$class/info/{$class}_$basename.$phpEx";
+
+			// The manual and automatic ways both failed...
+			if (!file_exists((($include_path === false) ? $module_root_path . 'includes/' : $include_path) . $info_file))
+			{
+				$this->_start('MODULE_ADD', $class, $info_file);
+				return $this->_end('FAIL');
+			}
+
+			$classname = "{$class}_{$basename}_info";
+
+			if (!class_exists($classname))
+			{
+				include((($include_path === false) ? $module_root_path . 'includes/' : $include_path) . $info_file);
+			}
+
+			$info = new $classname;
+			$module = $info->module();
+			unset($info);
+
+			$result = '';
+			foreach ($module['modes'] as $mode => $module_info)
+			{
+				if (!isset($data['modes']) || in_array($mode, $data['modes']))
+				{
+					$new_module = array(
+						'module_basename'	=> $basename,
+						'module_langname'	=> $module_info['title'],
+						'module_mode'		=> $mode,
+						'module_auth'		=> $module_info['auth'],
+						'module_display'	=> (isset($module_info['display'])) ? $module_info['display'] : true,
+						'before'			=> (isset($module_info['before'])) ? $module_info['before'] : false,
+						'after'				=> (isset($module_info['after'])) ? $module_info['after'] : false,
+					);
+
+					// Run the "manual" way with the data we've collected.
+					//$result .= ((isset($data['spacer'])) ? $data['spacer'] : '<br />') . $this->module_add($class, $parent, $new_module);
+					return $new_module;
+				}
+			}
+
+			//return $result;
+		}
+
+		// The "manual" way
+		//$this->_start('MODULE_ADD', $class, ((isset($mx_user->lang[$data['module_langname']])) ? $mx_user->lang[$data['module_langname']] : $data['module_langname']));
+		//add_log('admin', 'LOG_MODULE_ADD', ((isset($mx_user->lang[$data['module_langname']])) ? $mx_user->lang[$data['module_langname']] : $data['module_langname']));
+		
+		$new_module = array(
+			'module_basename'	=> $data['module_basename'],
+			'module_langname'	=> $data['module_langname'],
+			'module_mode'		=> $data['module_mode'],
+			'module_auth'		=> $data['module_auth'],
+			'module_display'	=> (isset($data['display'])) ? $data['display'] : true,
+			'before'			=> (isset($data['before'])) ? $data['before'] : false,
+			'after'				=> (isset($data['after'])) ? $data['after'] : false,
+		);
+		
+		return $new_module;
+	}	
 }	// class mx_admin
 
 /**
@@ -3559,8 +3831,7 @@ class mx_dynamic_select
 
 	var $modules = array();
 	var $moduleFunctions = array();
-	var $functionBlocks = array();
-	/**#@-*/
+	var $functionBlocks = array();	
 
 	// ------------------------------
 	// Private Methods
@@ -3573,19 +3844,22 @@ class mx_dynamic_select
 	function _get_data($all_functions = false)
 	{
 		global $db, $template, $lang, $board_config, $userdata;
-
+		
 		if ($all_functions)
 		{
-			$is_admin = ( $userdata['user_level'] == ADMIN && $userdata['session_logged_in'] ) ? TRUE : 0;
-			if (!$is_admin)
+			$is_admin = ( $userdata['user_level'] == ADMIN && $userdata['session_logged_in'] ) ? true : false;
+			// Authorization SQL	
+			if ($is_admin !== false)
 			{
-				//
-				// Authorization SQL
-				//
 				$auth_blocks = get_auth_blocks();
 				$auth_sql = " AND blk.block_id in ( ". $auth_blocks. " ) ";
 			}
-
+			else
+			{
+				$auth_blocks = "";
+				$auth_sql = " ";
+			}
+			
 			//
 			// First, get a module, function, block mapping
 			//
@@ -3595,17 +3869,16 @@ class mx_dynamic_select
 				WHERE blk.function_id = fnc.function_id
 					" . $auth_sql . "
 				ORDER BY fnc.function_id ASC, blk.block_title ASC";
-
+				
 			if( !($result = $db->sql_query($sql)) )
 			{
 				mx_message_die(GENERAL_ERROR, "Couldn't get list of Functions/Block", '', __LINE__, __FILE__, $sql);
 			}
-
+			
 			if( $total_blocks = $db->sql_numrows($result) )
 			{
 				$row = $db->sql_fetchrowset($result);
 			}
-
 			$db->sql_freeresult($result);
 			$function_id = $block_id = 0;
 
@@ -3614,9 +3887,8 @@ class mx_dynamic_select
 			{
 				$functionBlocks[$row[$j]['function_id']][] = $row[$j];
 			}
-
 			unset($row);
-
+			
 			//
 			// Generate dynamic block select
 			//
@@ -3625,81 +3897,78 @@ class mx_dynamic_select
 					" . MODULE_TABLE . " mdl
 				WHERE mdl.module_id = fnc.module_id
 				ORDER BY mdl.module_name ASC, fnc.function_name ASC";
-
+				
 			if( !($result = $db->sql_query($sql)) )
 			{
 				mx_message_die(GENERAL_ERROR, "Couldn't get list of Modules/Functions", '', __LINE__, __FILE__, $sql);
 			}
-
+			
 			if( $total_functions = $db->sql_numrows($result) )
 			{
 				$row = $db->sql_fetchrowset($result);
 			}
-
 			$db->sql_freeresult($result);
 			$module_id = $function_id = 0;
-
-			for( $j = 0; $j < $total_functions; $j++ )
+			
+			for($j = 0; $j < $total_functions; $j++)
 			{
 				if ($row[$j]['function_file'] == 'mx_multiple_blocks.php' || $row[$j]['function_file'] == 'mx_dynamic.php' || $row[$j]['function_file'] == 'mx_virtual.php')
 				{
-					//continue;
+					continue;
 				}
-
-				if( $row[$j]['module_id'] != $row[$j-1]['module_id'] )
+				
+				$i = ($j > 0) ? abs($j - 1) : 0;		
+				if( $row[$j]['module_id'] != $row[$i]['module_id'] )
 				{
 					$module_desc_tmp = str_replace("\n", '', $row[$j]['module_desc']);
 					$module_desc_tmp = str_replace("\r", '', $module_desc_tmp);
-
+					
 					$module_id = $row[$j]['module_id'];
-					$module_title = !empty($row[$j]['module_name']) ? addslashes(strip_tags(trim($row[$j]['module_name']))) : '';
-					$module_desc = !empty($row[$j]['module_desc']) ? addslashes(strip_tags(trim($module_desc_tmp))) : '';
-
+					$module_title = ($row[$j]['module_name']) ? addslashes(strip_tags(trim($row[$j]['module_name']))) : '';
+					$module_desc = ($row[$j]['module_desc']) ? addslashes(strip_tags(trim($module_desc_tmp))) : '';
+					
 					$this->_addModule($module_id, $module_title, $module_desc);
 				}
-
+				
 				$function_desc_tmp = str_replace("\n", '', $row[$j]['function_desc']);
 				$function_desc_tmp = str_replace("\r", '', $function_desc_tmp);
-
+				
 				$function_id = $row[$j]['function_id'];
-				$function_title = !empty($row[$j]['function_name']) ? addslashes(strip_tags(trim($row[$j]['function_name']))) : '';
-				$function_desc = !empty($function_desc_tmp) ? addslashes(strip_tags(trim($function_desc_tmp))) : '';
-
-				$this->_addFunction($module_id, $function_id, $function_title, $function_desc);
-
-				//
+				$function_title = ($row[$j]['function_name']) ? addslashes(strip_tags(trim($row[$j]['function_name']))) : 'function';
+				$function_desc = ($function_desc_tmp) ? addslashes(strip_tags(trim($function_desc_tmp))) : 'function desc';
+				
+				if(!is_null($module_id) && ($module_id !== 0))
+				{
+					$this->_addFunction($module_id, $function_id, $function_title, $function_desc);
+				}
+				
 				// Get all function blocks (if any)
-				//
-				if (isset($functionBlocks[$function_id]))
+				if (isset($functionBlocks[$function_id]) && ($module_id !== 0))
 				{
 					foreach($functionBlocks[$function_id] as $key => $block_row)
 					{
 						$block_desc_tmp = str_replace("\n", '', $block_row['block_desc']);
 						$block_desc_tmp = str_replace("\r", '', $block_desc_tmp);
-
+						
 						$block_id = $block_row['block_id'];
-						$block_title = !empty($block_row['block_title']) ? substr(addslashes(strip_tags(trim($block_row['block_title']))), 0, 25 ) : '';
-						$block_desc = !empty($block_desc_tmp) ? ' (' . substr(addslashes(strip_tags(trim($block_desc_tmp))), 0, 25 ) . ')' : '';
-
+						$block_title = ($block_row['block_title']) ? substr(addslashes(strip_tags(trim($block_row['block_title']))), 0, 25 ) : '';
+						$block_desc = ($block_desc_tmp) ? ' (' . substr(addslashes(strip_tags(trim($block_desc_tmp))), 0, 25 ) . ')' : '';
+						
 						$this->_addBlock($module_id, $function_id, $block_id, $block_title, $block_desc);
 					}
 				}
 			}
 			unset($row);
-
 		}
 		else
 		{
+			//
+			// Authorization SQL
+			//
 			$is_admin = ( $userdata['user_level'] == ADMIN && $userdata['session_logged_in'] ) ? TRUE : 0;
-			if (!$is_admin)
-			{
-				//
-				// Authorization SQL
-				//
-				$auth_blocks = get_auth_blocks();
-				$auth_sql = " AND blk.block_id in ( ". $auth_blocks. " ) ";
-			}
-
+			$auth_blocks = get_auth_blocks();			
+			$auth_sql = (!$is_admin) ? " AND blk.block_id in ( ". $auth_blocks. " ) " : "";
+			
 			//
 			// Generate dynamic block select
 			//
@@ -3717,29 +3986,29 @@ class mx_dynamic_select
 				mx_message_die(GENERAL_ERROR, "Couldn't get list of Modules/Functions", '', __LINE__, __FILE__, $sql);
 			}
 
-			if( $total_blocks = $db->sql_numrows($result) )
+			if($total_blocks = $db->sql_numrows($result))
 			{
 				$row = $db->sql_fetchrowset($result);
 			}
-
 			$db->sql_freeresult($result);
 			$module_id = $function_id = $block_id = 0;
-
+			
 			for( $j = 0; $j < $total_blocks; $j++ )
 			{
-				if( $row[$j]['module_id'] != $row[$j-1]['module_id'] )
+				$i = ($j > 0) ? abs($j - 1) : 0;
+				if($row[$j]['module_id'] != $row[$i]['module_id'])
 				{
 					$module_desc_tmp = str_replace("\n", '', $row[$j]['module_desc']);
 					$module_desc_tmp = str_replace("\r", '', $module_desc_tmp);
-
+					
 					$module_id = $row[$j]['module_id'];
 					$module_title = !empty($row[$j]['module_name']) ? addslashes(strip_tags(trim($row[$j]['module_name']))) : '';
 					$module_desc = !empty($row[$j]['module_desc']) ? addslashes(strip_tags(trim($module_desc_tmp))) : '';
-
+					
 					$this->_addModule($module_id, $module_title, $module_desc);
 				}
-
-				if( $row[$j]['function_id'] != $row[$j-1]['function_id'] )
+				
+				if( $row[$j]['function_id'] != $row[$i]['function_id'] )
 				{
 					if ($row[$j]['function_file'] == 'mx_multiple_blocks.php' || $row[$j]['function_file'] == 'mx_dynamic.php' || $row[$j]['function_file'] == 'mx_virtual.php')
 					{
@@ -3747,21 +4016,23 @@ class mx_dynamic_select
 					}
 					$function_desc_tmp = str_replace("\n", '', $row[$j]['function_desc']);
 					$function_desc_tmp = str_replace("\r", '', $function_desc_tmp);
-
+					
 					$function_id = $row[$j]['function_id'];
 					$function_title = !empty($row[$j]['function_name']) ? addslashes(strip_tags(trim($row[$j]['function_name']))) : '';
 					$function_desc = !empty($function_desc_tmp) ? addslashes(strip_tags(trim($function_desc_tmp))) : '';
-
-					$this->_addFunction($module_id, $function_id, $function_title, $function_desc);
+					
+					if(!is_null($module_id) && ($module_id !== 0))
+					{
+						$this->_addFunction($module_id, $function_id, $function_title, $function_desc);
+					}					
 				}
-
 				$block_desc_tmp = str_replace("\n", '', $row[$j]['block_desc']);
 				$block_desc_tmp = str_replace("\r", '', $block_desc_tmp);
-
+				
 				$block_id = $row[$j]['block_id'];
 				$block_title = !empty($row[$j]['block_title']) ? substr(addslashes(strip_tags(trim($row[$j]['block_title']))), 0, 25 ) : '';
 				$block_desc = !empty($block_desc_tmp) ? ' (' . substr(addslashes(strip_tags(trim($block_desc_tmp))), 0, 25 ) . ')' : '';
-
+				
 				$this->_addBlock($module_id, $function_id, $block_id, $block_title, $block_desc);
 			}
 			unset($row);
@@ -3780,7 +4051,14 @@ class mx_dynamic_select
 	 */
 	function _addBlock($module_id = '', $function_id = '', $block_id = '', $block_title = '', $block_desc = '')
 	{
-		$this->functionBlocks[$module_id][$function_id] = $this->functionBlocks[$module_id][$function_id] . (!empty($this->functionBlocks[$module_id][$function_id]) ? ',' : '') . '"' . $block_title . $block_desc . '","' . $block_id . '"';
+		if (!empty($this->functionBlocks[$module_id][$function_id]))
+		{
+			$this->functionBlocks[$module_id][$function_id] = $this->functionBlocks[$module_id][$function_id] . (!empty($this->functionBlocks[$module_id][$function_id]) ? ',' : '') . '"' . $block_title . $block_desc . '","' . $block_id . '"';
+		}
+		else
+		{
+			$this->functionBlocks[$module_id][$function_id] = (!empty($this->functionBlocks[$module_id][$function_id]) ? ',' : '') . '"' . $block_title . $block_desc . '","' . $block_id . '"';
+		}		
 	}
 
 	/**
@@ -3794,9 +4072,16 @@ class mx_dynamic_select
 	 */
 	function _addFunction($module_id = '', $function_id = '', $function_title = '', $function_desc = '')
 	{
-		$this->moduleFunctions[$module_id] = $this->moduleFunctions[$module_id] . (!empty($this->moduleFunctions[$module_id]) ? ',' : '') . '"' . $function_title . '","' . $function_id . '"';
+		if (!empty($this->moduleFunctions[$module_id]))
+		{
+			$this->moduleFunctions[$module_id] = $this->moduleFunctions[$module_id] . (!empty($this->moduleFunctions[$module_id]) ? ',' : '') . '"' . $function_title . '","' . $function_id . '"';
+		}
+		else
+		{
+			$this->moduleFunctions[$module_id] =  '"' . $function_title . '","' . $function_id . '"';
+		}		
 	}
-
+	
 	/**
 	 * Enter description here...
 	 *
@@ -3807,7 +4092,14 @@ class mx_dynamic_select
 	 */
 	function _addModule($module_id = '', $module_title = '', $module_desc = '')
 	{
-		$this->modules[$module_id] = $module_title;
+		if (!empty($module_title))
+		{
+			$this->modules[$module_id] = $module_title;
+		}
+		else
+		{
+			$this->modules[$module_id] = 'Module';
+		}	
 	}
 
 	/**
@@ -3819,32 +4111,32 @@ class mx_dynamic_select
 	function _generate_tpl($block_id)
 	{
 		global $template, $blockcptemplate, $lang, $phpEx, $mx_request_vars, $mx_root_path, $userdata, $portalpage, $dynamic_block_id;
-
+		
 		$module_select_list = '';
 		$function_list = '';
 		$block_list = '';
 		$default_list = '';
-
+		
 		$this->module_default_id = $mx_request_vars->request('module_id', MX_TYPE_INT, '');
 		$this->function_default_id = $mx_request_vars->request('function_id', MX_TYPE_INT, '');
 		$this->block_default_id = $mx_request_vars->request('block_id', MX_TYPE_INT, $block_id);
-
+		
 		if (!empty($this->block_default_id) && (empty($this->module_default_id) || empty($this->function_default_id)))
 		{
 			$this->_get_default_data($this->block_default_id);
 		}
-
+		
 		foreach($this->modules as $key => $value)
 		{
 			$selected = ( $key == $this->module_default_id ) ? ' selected="selected"' : '';
 			$module_select_list .= '<option value="' . $key . '"' . $selected . '>' . $value . "</option>\n";
 		}
-
+		
 		foreach($this->moduleFunctions as $module_id => $functions)
 		{
 			$function_list .= 'makeModule.forValue("'.$module_id.'").addOptionsTextValue('.$functions.')'.";\n";
 		}
-
+		
 		foreach($this->functionBlocks as $module_id => $functions)
 		{
 			foreach($functions as $function_id => $blocks)
@@ -3852,34 +4144,34 @@ class mx_dynamic_select
 				$block_list .= 'makeModule.forValue("'.$module_id.'").forValue("'.$function_id. '").addOptionsTextValue('.$blocks.')'.";\n";
 			}
 		}
-
+		
 		$default_list = 'makeModule.forField("module_id").setValues("'.$this->module_default_id.'")'.";\n";
 		$default_list .= 'makeModule.forField("function_id").setValues("'.$this->function_default_id.'")'.";\n";
 		$default_list .= 'makeModule.forField("block_id").setValues("'.$this->block_default_id.'")'.";\n";
-
+		
 		//
 		// Hidden fields
 		//
 		$s_hidden_dyn_fields = 	'<input type="hidden" name="sid" value="' . $userdata['session_id'] . '" />
 								<input type="hidden" name="dynamic_block" value="' . $dynamic_block_id . '" />
 								<input type="hidden" name="portalpage" value="' . $portalpage . '" />';
-
+								
 		$tpl = array(
 			'S_HIDDEN_DYN_FILEDS' => $s_hidden_dyn_fields,
 			'MX_DYN_PATH' => $mx_root_path,
 			'L_MODULE' => $lang['Module'],
 			'L_FUNCTION' => $lang['Function'],
 			'L_BLOCK' => $lang['Block'],
-
+			
 			'S_UPDATE' => $lang['Update'],
 			'S_RESET' => $lang['Reset'],
-
+			
 			'DYNAMIC_MODULE_SELECT' => $module_select_list,
 			'DYNAMIC_FUNCTION_SETUP' => $function_list,
 			'DYNAMIC_BLOCK_SETUP' => $block_list,
 			'DYNAMIC_DEFAULT_SETUP' => $default_list,
 		);
-
+		
 		if (is_object($blockcptemplate))
 		{
 			$blockcptemplate->assign_vars($tpl);
@@ -3889,7 +4181,6 @@ class mx_dynamic_select
 			$template->assign_vars($tpl);
 		}
 		unset($tpl);
-
 	}
 
 	/**
@@ -3901,7 +4192,6 @@ class mx_dynamic_select
 	function _get_default_data($block_id)
 	{
 		global $db;
-
 		//
 		// Generate dynamic block select
 		//
@@ -3913,19 +4203,18 @@ class mx_dynamic_select
 				AND mdl.module_id = fnc.module_id
 				AND blk.block_id = '".$block_id."'
 			ORDER BY mdl.module_name ASC, fnc.function_name ASC";
-
+			
 		if( !($result = $db->sql_query($sql)) )
 		{
 			mx_message_die(GENERAL_ERROR, "Couldn't get default module/function id", '', __LINE__, __FILE__, $sql);
 		}
-
+		
 		if( $total_blocks = $db->sql_numrows($result) )
 		{
 			$row = $db->sql_fetchrow($result);
 		}
-
 		$db->sql_freeresult($result);
-
+		
 		$this->module_default_id = $row['module_id'];
 		$this->function_default_id = $row['function_id'];
 		unset($row);
@@ -3946,7 +4235,7 @@ class mx_dynamic_select
 	{
 		$this->_get_data($all_functions);
 		$this->_generate_tpl($block_id);
-	}
+	}	
 }
 
 /**
@@ -3957,7 +4246,7 @@ class mx_dynamic_select
  * @param unknown_type $main_install
  * @return unknown
  */
-function mx_do_install_upgrade( $sql = '', $main_install = false )
+function mx_do_install_upgrade($sql = '', $main_install = false)
 {
 	global $table_prefix, $mx_table_prefix, $userdata, $phpEx, $template, $lang, $db, $board_config;
 

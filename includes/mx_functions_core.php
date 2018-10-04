@@ -2,10 +2,10 @@
 /**
 *
 * @package Core
-* @version $Id: mx_functions_core.php,v 1.107 2008/10/04 07:04:25 orynider Exp $
+* @version $Id: mx_functions_core.php,v 1.140 2014/05/09 07:51:42 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -53,6 +53,43 @@ define('MX_GET_PAR_OPTIONS'	, -30);		// Flag - get parameter option
  */
 class mx_cache extends cache
 {
+	private $prefix;
+	private $path;
+	private $backend_path;	
+	private $php_ext;
+	private $mx_cache;
+	private $config;
+	
+	protected $mx_root_path;
+	protected $mx_backend;
+	protected $phbb_root_path;	
+	protected $phpEx;		
+	protected $db;
+	protected $portal_config;
+	
+	/**
+	* Creates a cache service around a cache driver
+	*
+	 * @return cache	
+	*/
+	public function __construct()
+	{
+		global $mx_root_path, $phpbb_root_path, $phpEx;
+		global $db, $portal_config;
+		global $mx_table_prefix, $table_prefix, $phpEx, $tplEx;
+		global $mx_backend, $phpbb_auth, $mx_bbcode;		
+		
+		$this->path = $mx_root_path;
+		$this->backend = $mx_backend;		
+		$this->backend_path = $phpbb_root_path;		
+		$this->db = $db;
+		$this->config = $portal_config; 		
+		$this->php_ex =	$phpEx; 
+		$this->tpl_ex =	$tplEx;		
+		$this->cache_dir = $mx_root_path . 'cache/';
+		$this->prefix = $mx_table_prefix;  			
+	}
+	
 	/**
 	 * load_backend
 	 *
@@ -60,53 +97,93 @@ class mx_cache extends cache
 	 * Set $portal_config, $phpbb_root_path, $tplEx, $table_prefix & PORTAL_BACKEND/$mx_backend
 	 *
 	 */
-	function load_backend()
+	public function load_backend($portal_backend = false)
 	{
-		global $db, $portal_config, $phpbb_root_path, $mx_root_path;
-		global $mx_table_prefix, $table_prefix, $phpEx, $tplEx;
-		global $mx_backend, $phpbb_auth, $mx_bbcode;
+		global $portal_config, $mx_table_prefix, $table_prefix, $phpEx, $tplEx;
+		global $mx_backend, $phpbb_auth, $mx_bbcode;	
 
-		//
 		// Get MX-Publisher config settings
-		//
 		$portal_config = $this->obtain_mxbb_config();
-
-		if ($portal_config['portal_version'] == '')
+		//print_r($portal_config);
+		// Check some vars
+		if (!$portal_config['portal_version'])
 		{
 			$portal_config = $this->obtain_mxbb_config(false);
 		}
-
-		//
+		
+		if (!$portal_config['portal_backend_path'])
+		{
+			$portal_config = $this->obtain_mxbb_config(false);
+		}
+		
+		// Overwrite Backend
+		$this->portal_config = $portal_config;
+		
+		if ($this->backend)
+		{
+			$portal_config['portal_backend'] = $this->backend;
+		}
+		
+		// No backend defined ? Portal not updated to v. 3 ?
+		if ((!$portal_config['portal_backend']) && @file_exists($this->phpbb_path . "profile.$phpEx"))
+		{
+			$portal_config['portal_backend'] = 'phpbb2';
+			$portal_config['portal_backend_path'] = $this->backend_path;			
+		}
+		
+		// No backend defined ? Try Internal.		
+		if (!$portal_config['portal_backend'])
+		{
+			$portal_config['portal_backend'] = 'internal';
+			$portal_config['portal_backend_path'] = $this->backend_path;			
+		}
 		// Load backend
-		//
-		include_once($mx_root_path . 'includes/sessions/'.$portal_config['portal_backend'].'/core.' . $phpEx);
-		//
-		// Instantiate the mx_backend class
-		//
-		$mx_backend = new mx_backend();
+		$mx_root_path = $this->path;
+		$phpbb_root_path = $this->backend_path; 
+		$phpEx = $this->php_ex;
+		$tplEx = $this->tpl_ex;			
+		require($this->path . 'includes/sessions/'.$portal_config['portal_backend'].'/core.'. $this->php_ex); 
+		
+		//Redirect to upgrade or redefine portal backend path
+		if (!$portal_config['portal_backend_path'])
+		{
+			if(@file_exists($this->path . "install"))
+			{
+				// Redirect via an HTML form for PITA webservers
+				if (@preg_match('/Microsoft|WebSTAR|Xitami/', getenv('SERVER_SOFTWARE')))
+				{
+					header('Refresh: 0; URL=' . $this->path . "install/mx_install.$phpEx");
+					echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"><html><head><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"><meta http-equiv="refresh" content="0; url=' . PORTAL_URL . $url . '"><title>Redirect</title></head><body><div align="center">If your browser does not support meta redirection please click <a href="' . PORTAL_URL . $url . '">HERE</a> to be redirected</div></body></html>';
+					exit;
+				}
 
-		//
+				// Behave as per HTTP/1.1 spec for others
+				header('Location: ' . $this->path . "install/mx_install.$phpEx");
+				exit;				
+			}
+			else
+			{
+				$portal_config['portal_backend_path'] = $this->path . 'includes/shared/phpbb2/';
+			}						
+		}
+		
+		// Instantiate the mx_backend class
+		$mx_backend = new mx_backend();
 		// Validate backend
-		//
 		if (!$mx_backend->validate_backend())
 		{
-			//
 			// If backend setup is bad, revert to standalone/internal. Thus we can access the adminCP ;)
-			//
 			define('PORTAL_BACKEND', 'internal');
-			$phpbb_root_path = $mx_root_path . 'includes/shared/phpbb2/';
+			$phpbb_root_path = $this->path . 'includes/shared/phpbb2/';
 			str_replace("//", "/", $phpbb_root_path);
-			$tplEx = 'tpl';
+			$tplEx ='tpl';
 		}
 		else
 		{
 			define('PORTAL_BACKEND', $portal_config['portal_backend']);
 		}
-
-		//
 		// Now, load backend specific constants
-		//
-		include_once($mx_root_path . 'includes/sessions/'.PORTAL_BACKEND.'/constants.' . $phpEx);
+		require($mx_root_path  . 'includes/sessions/'.PORTAL_BACKEND.'/constants.' . $phpEx);
 	}
 
 	/**
@@ -115,13 +192,13 @@ class mx_cache extends cache
 	 * @access public
 	 * @return unknown
 	 */
-	function obtain_mxbb_config($use_cache = true)
+	public function obtain_mxbb_config($use_cache = true)
 	{
 		global $db;
 
-		if ( ($config = $this->get('mxbb_config')) && ($use_cache) )
+		if ( ($portal_config = $this->get('mx_config')) && ($use_cache) )
 		{
-			return $config;
+			return $portal_config;
 		}
 		else
 		{
@@ -129,7 +206,7 @@ class mx_cache extends cache
 				FROM " . PORTAL_TABLE . "
 				WHERE portal_id = '1'";
 
-			if ( !( $result = $db->sql_query( $sql ) ) )
+			if ( !($result = $db->sql_query($sql)) )
 			{
 				if (!function_exists('mx_message_die'))
 				{
@@ -140,15 +217,15 @@ class mx_cache extends cache
 					mx_message_die( GENERAL_ERROR, 'Couldnt query portal configuration', '', __LINE__, __FILE__, $sql );
 				}
 			}
-			$row = $db->sql_fetchrow( $result );
-			foreach ( $row as $config_name => $config_value )
+			$row = $db->sql_fetchrow($result);
+			foreach ($row as $config_name => $config_value)
 			{
-				$config[$config_name] = trim( $config_value );
+				$portal_config[$config_name] = trim($config_value);
 			}
-			$db->sql_freeresult( $result );
-			$this->put('mxbb_config', $config);
+			$db->sql_freeresult($result);
+			$this->put('mx_config', $portal_config);
 
-			return ( $config );
+			return ($portal_config);
 		}
 	}
 
@@ -170,13 +247,13 @@ class mx_cache extends cache
 	 * @param unknown_type $backend
 	 * @param unknown_type $force_shared
 	 */
-	function load_file($file = '', $force_shared = false)
+	public function load_file($file = '', $force_shared = false)
 	{
-		global $mx_root_path, $phpbb_root_path, $phpEx, $mx_page;
+		global $mx_root_path, $phpbb_root_path, $phpEx, $mx_page, $mx_backend;
 
-		//
-		// Remember loaded files
-		//
+		/*
+		* Remember loaded files
+		*/
 		if (in_array(($file . (is_string($force_shared) ? $force_shared : '')), $mx_page->loaded_files))
 		{
 			return;
@@ -184,7 +261,7 @@ class mx_cache extends cache
 
 		$mx_page->loaded_files[] = $file . (is_string($force_shared) ? $force_shared : '');
 
-		$path = mx_backend::load_file($force_shared);
+		$path = $mx_backend->load_file($force_shared);
 
 		if (file_exists($path . $file.'.'.$phpEx))
 		{
@@ -196,7 +273,7 @@ class mx_cache extends cache
 	 * Enter description here...
 	 *
 	 */
-	function init_mod_rewrite()
+	public function init_mod_rewrite()
 	{
 		global $portal_config, $mx_root_path, $phpEx, $mx_mod_rewrite;
 
@@ -226,11 +303,11 @@ class mx_cache extends cache
 	 * @param unknown_type $cache
 	 * @return unknown
 	 */
-	function _read_config( $id, $sub_id = 0, $type, $force_query = false )
+	public function _read_config($id = 1, $sub_id = 0, $type, $force_query = false)
 	{
 		global $portal_config, $mx_root_path;
 
-		switch ( $type )
+		switch ($type)
 		{
 			case MX_CACHE_BLOCK_TYPE:
 
@@ -271,7 +348,6 @@ class mx_cache extends cache
 				{
 					$this->_get_page_config( $id );
 				}
-
 			break;
 		}
 	}
@@ -284,22 +360,18 @@ class mx_cache extends cache
 	 * @param unknown_type $sub_id
 	 * @return unknown
 	 */
-	function _get_block_config( $id = '', $sub_id = 0 )
+	public function _get_block_config($id = '', $sub_id = 0)
 	{
 		global $db;
 
 		$this->block_config = array();
 
-		//
 		// If this block doesn't have any parameters, we need this additional query :(
-		//
 		$sql_block =  !empty($id) ? " AND block_id = " . $id : '';
 
-		//
 		// Generate block parameter data
-		//
 		$sql = "SELECT 	blk.*,
-						mdl.module_path,
+						mdl.module_path, mdl.module_name,
 						fnc.function_file, fnc.function_id, fnc.function_admin
 			FROM " . BLOCK_TABLE . " blk,
 					" . FUNCTION_TABLE . " fnc,
@@ -309,16 +381,16 @@ class mx_cache extends cache
 
 		$sql .= $sql_block;
 		$sql .= " ORDER BY block_id";
-
+		
 		if ( !( $result = $db->sql_query( $sql ) ) )
 		{
 			mx_message_die( GENERAL_ERROR, 'Could not obtain block data information', '', __LINE__, __FILE__, $sql );
 		}
-
-		while ( $row = $db->sql_fetchrow( $result ) )
+		
+		while ($row = $db->sql_fetchrow($result))
 		{
 			$block_id = $row['block_id'];
-
+			
 			$block_row = array(
 				"block_id" => $row['block_id'],
 				"block_title" => $row['block_title'],
@@ -334,51 +406,52 @@ class mx_cache extends cache
 				"block_time" => $row['block_time'],
 				"block_editor_id" => $row['block_editor_id'],
 				"module_root_path" => $row['module_path'],
+				"module_name" => $row['module_name'],				
 				"block_file" => $row['function_file'],
 				"block_edit_file" => $row['function_admin'],
 				"function_id" => $row['function_id']
 			);
-
+			
 			$this->block_config[$block_id]['block_info'] = $block_row;
 		}
-
+		
 		$db->sql_freeresult($result);
 		$sql_block =  !empty( $id ) ? ' AND sys.block_id = ' . $id : '';
 		$sql_sub =  !empty( $sub_id ) ? ' AND sys.sub_id = ' . $sub_id : ' AND sys.sub_id = 0';
 
-		//
 		// Generate block parameter data
-		//
 		$sql = "SELECT 	blk.*,
 						sys.parameter_id, sys.parameter_value, sys.parameter_opt,
 						par.parameter_name, par.parameter_type, par.parameter_auth, par.parameter_function, par.parameter_default, par.parameter_order,
-						mdl.module_path,
+						mdl.module_path, mdl.module_name,
+						bct.column_id,
 						fnc.function_file, fnc.function_id, fnc.function_admin
 			FROM " . BLOCK_SYSTEM_PARAMETER_TABLE . " sys,
 				" . PARAMETER_TABLE . " par,
 				" . BLOCK_TABLE . " blk,
 				" . FUNCTION_TABLE . " fnc,
-				" . MODULE_TABLE . " mdl
-			WHERE sys.parameter_id = par.parameter_id
-				AND sys.block_id = blk.block_id
+				" . MODULE_TABLE . " mdl,
+				" . COLUMN_BLOCK_TABLE . " bct				
+			WHERE sys.parameter_id = par.parameter_id			
+				AND sys.block_id 	= blk.block_id
 				AND blk.function_id = fnc.function_id
 				AND fnc.module_id   = mdl.module_id";
-
+				
 		$sql .= $sql_block;
 		$sql .= $sql_sub;
 		$sql .= " ORDER BY sys.block_id, par.parameter_order";
 
-		if ( !( $result = $db->sql_query( $sql ) ) )
+		if (!($result = $db->sql_query($sql)))
 		{
 			mx_message_die( GENERAL_ERROR, 'Could not obtain block data information', '', __LINE__, __FILE__, $sql );
 		}
-
+		
 		$block_id = 0;
 		while ( $row = $db->sql_fetchrow( $result ) )
 		{
 			$next_block = ( $block_id != $row['block_id'] ) ? true : false;
 			$block_id = $row['block_id'];
-
+			
 			$block_row = array(
 				"block_id" => $row['block_id'],
 				"block_title" => $row['block_title'],
@@ -395,11 +468,12 @@ class mx_cache extends cache
 				"block_time" => $row['block_time'],
 				"block_editor_id" => $row['block_editor_id'],
 				"module_root_path" => $row['module_path'],
+				"module_name" => $row['module_name'],				
 				"block_file" => $row['function_file'],
 				"block_edit_file" => $row['function_admin'],
 				"function_id" => $row['function_id']
 			);
-
+			
 			$param_row = array(
 				"parameter_id" => $row['parameter_id'],
 				"function_id" => $row['function_id'],
@@ -409,23 +483,22 @@ class mx_cache extends cache
 				"parameter_value" => $row['parameter_value'],
 				"parameter_default" => $row['parameter_default'],
 				"parameter_function" => $row['parameter_function'],
-				"parameter_opt" => $row['parameter_opt']
+				"parameter_opt" => $row['parameter_opt'],
+				"parameter_order" => $row['parameter_order']				
 			);
-
+			
 			if ( $next_block )
 			{
 				$temp_row = array();
 				$temp_row = array( 'block_info' => $block_row );
 			}
-
+			
 			$temp_row['block_parameters'][$param_row['parameter_name']] = $param_row;
-
 			//
 			// Compose the pages config array
 			//
 			$this->block_config[$block_id] = $temp_row;
 		}
-
 		unset($row);
 		$db->sql_freeresult($result);
 	}
@@ -437,20 +510,21 @@ class mx_cache extends cache
 	 * @param unknown_type $id
 	 * @return unknown
 	 */
-	function _get_page_config( $id = '' )
+	public function _get_page_config($id = '')
 	{
 		global $db;
 
 		$this->pages_config = array();
-
+		$temp_row = $page_row = $column_row = $block_row = array();
 		$sql_page = !empty($id) ? " AND col.page_id = '" . $id . "'" : "";
 
-		//
 		// Get page_blocks data
-		//
 		$sql = "SELECT 	col.page_id,
+						col.column_title,
+						col.column_order,
+						col.column_size,
 						pag.page_name,
-						pag.page_desc,						
+						pag.page_desc,
 						pag.page_parent,
 						pag.parents_data,
 						pag.page_icon,
@@ -467,10 +541,9 @@ class mx_cache extends cache
 						pag.ip_filter,
 						pag.phpbb_stats,
 						bct.column_id,
-						col.column_title,
-						col.column_order,
-						col.column_size,
 						blk.block_id,
+						mdl.module_path,
+						mdl.module_name,						
 						fnc.function_file
 	    		FROM " . COLUMN_BLOCK_TABLE . " bct,
 					" . BLOCK_TABLE . " blk,
@@ -486,23 +559,24 @@ class mx_cache extends cache
 				$sql .= $sql_page;
 				$sql .= " ORDER BY col.page_id, column_order, block_order";
 
-		if ( !$result = $db->sql_query( $sql ) )
+		if (!$result = $db->sql_query($sql))
 		{
-			mx_message_die( GENERAL_ERROR, "Could not query page information", "", __LINE__, __FILE__, $sql );
+			mx_message_die(GENERAL_ERROR, "Could not query page information", "", __LINE__, __FILE__, $sql);
 		}
-
 		$page_id = 0;
-		while ( $row = $db->sql_fetchrow( $result ) )
+		$column_id = 0;
+		
+		while ($row = $db->sql_fetchrow($result))
 		{
-			$next_page = ( $page_id != $row['page_id'] ) ? true : false;
-			$next_column = ( $column_id != $row['column_id'] ) ? true : false;
+			$next_page = ($row['page_id'] != $page_id) ? true : false;
+			$next_column = ($row['column_id'] != $column_id) ? true : false;
 			$page_id = $row['page_id'];
 			$column_id = $row['column_id'];
 
 			$page_row = array(
 				"page_id" => $row['page_id'],
 				"page_name" => $row['page_name'],
-				"page_desc" => $row['page_desc'],				
+				"page_desc" => $row['page_desc'],
 				"page_parent" => $row['page_parent'],
 				"parent_data" => $row['parents_data'],
 				"page_icon" => $row['page_icon'],
@@ -531,34 +605,30 @@ class mx_cache extends cache
 				"block_id" => $row['block_id'],
 				"column_id" => $row['column_id'],
 				//"module_path" => $row['module_path'],
+				//"module_name" => $row['module_name'],
 				//"function_file" => $row['function_file'],
 				//"function_admin" => $row['function_admin']
 				);
 
-			if ( $next_page )
+			if ($next_page)
 			{
-				$temp_row = array();
-				$temp_row = array( 'page_info' => $page_row );
+				$temp_row = array('page_info' => $page_row);
 			}
-
-			if ( $next_column )
+			if ($next_column)
 			{
 				$temp_row['columns'][] = $column_row;
 			}
-
 			$temp_row['blocks'][] = $block_row;
-
-			//
 			// Is this a virtual page?
-			//
 			if ($row['function_file'] == 'mx_virtual.php')
 			{
 				$temp_row['virtual'] = true;
 			}
-
-			//
+			else
+			{
+				$temp_row['virtual'] = false;
+			}
 			// Compose the pages config array
-			//
 			$this->pages_config[$page_id] = $temp_row;
 		};
 
@@ -571,7 +641,7 @@ class mx_cache extends cache
 	 *
 	 * @access private
 	 */
-	function _update_cache( )
+	public function _update_cache( )
 	{
 		global $db, $mx_root_path, $phpbb_root_path, $mx_use_cache, $portal_config;
 
@@ -581,7 +651,7 @@ class mx_cache extends cache
 			SET portal_recached = '$portal_cache_time'
 			WHERE portal_id = 1";
 
-		if ( !( $result = $db->sql_query( $sql, BEGIN_TRANSACTION ) ) )
+		if (!($result = $db->sql_query($sql, BEGIN_TRANSACTION)))
 		{
 			mx_message_die( GENERAL_ERROR, "Could not update portal cache time.", "", __LINE__, __FILE__, $sql );
 		}
@@ -603,7 +673,7 @@ class mx_cache extends cache
 	 * @param unknown_type $force_query
 	 * @return unknown
 	 */
-	function read( $id = '', $type = MX_CACHE_BLOCK_TYPE, $force_query = false )
+	public function read( $id = '', $type = MX_CACHE_BLOCK_TYPE, $force_query = false )
 	{
 		if ( is_array( $id ) )
 		{
@@ -635,7 +705,7 @@ class mx_cache extends cache
 	 * @param unknown_type $type
 	 * @param unknown_type $id
 	 */
-	function update( $type = MX_CACHE_ALL, $id = '', $sub_id = 0 )
+	public function update( $type = MX_CACHE_ALL, $id = '', $sub_id = 0 )
 	{
 		global $mx_cache;
 
@@ -690,7 +760,7 @@ class mx_cache extends cache
 	 *
 	 * @access public
 	 */
-	function trash($type = 'all')
+	public function trash($type = 'all')
 	{
 		$dir = opendir($this->cache_dir);
 		while (($entry = readdir($dir)) !== false)
@@ -699,14 +769,14 @@ class mx_cache extends cache
 			{
 				if (preg_match('/^(sql_|_block_|_page_|data_(?!global))/', $entry))
 				{
-					unlink($this->cache_dir . $entry);
+					@unlink($this->cache_dir . $entry);
 				}
 			}
 			else if ($type == 'blocks')
 			{
 				if (preg_match('/^(_block_)/', $entry))
 				{
-					unlink($this->cache_dir . $entry);
+					@unlink($this->cache_dir . $entry);
 				}
 
 			}
@@ -714,7 +784,7 @@ class mx_cache extends cache
 			{
 				if (preg_match('/^(_page_|_pagemap_)/', $entry))
 				{
-					unlink($this->cache_dir . $entry);
+					@unlink($this->cache_dir . $entry);
 				}
 
 			}
@@ -722,13 +792,294 @@ class mx_cache extends cache
 			{
 				if (preg_match('/^(tpl2_|tpl_|_block_|_page_|data_(?!global))/', $entry)) // Cannot remove tpl cache files currently in use ;)
 				{
-					unlink($this->cache_dir . $entry);
+					@unlink($this->cache_dir . $entry);
 				}
 			}
 		}
 		@closedir($dir);
 	}
-}
+	/**
+	* Read cached data from a specified file
+	*
+	* @access private
+	* @param string $filename Filename to write
+	* @return mixed False if an error was encountered, otherwise the data type of the cached data
+	*/
+	public function _read($filename)
+	{
+		global $phpEx;
+
+		$file = "{$this->cache_dir}$filename.$phpEx";
+
+		$type = substr($filename, 0, strpos($filename, '_'));
+
+		if (!file_exists($file))
+		{
+			return false;
+		}
+
+		if (!($handle = @fopen($file, 'rb')))
+		{
+			return false;
+		}
+
+		// Skip the PHP header
+		fgets($handle);
+
+		if ($filename == 'data_global')
+		{
+			$this->vars = $this->var_expires = array();
+
+			$time = time();
+
+			while (($expires = (int) fgets($handle)) && !feof($handle))
+			{
+				// Number of bytes of data
+				$bytes = substr(fgets($handle), 0, -1);
+
+				if (!is_numeric($bytes) || ($bytes = (int) $bytes) === 0)
+				{
+					// We cannot process the file without a valid number of bytes
+					// so we discard it
+					fclose($handle);
+
+					$this->vars = $this->var_expires = array();
+					$this->is_modified = false;
+
+					$this->remove_file($file);
+
+					return false;
+				}
+
+				if ($time >= $expires)
+				{
+					fseek($handle, $bytes, SEEK_CUR);
+
+					continue;
+				}
+
+				$var_name = substr(fgets($handle), 0, -1);
+
+				// Read the length of bytes that consists of data.
+				$data = fread($handle, $bytes - strlen($var_name));
+				$data = @unserialize($data);
+
+				// Don't use the data if it was invalid
+				if ($data !== false)
+				{
+					$this->vars[$var_name] = $data;
+					$this->var_expires[$var_name] = $expires;
+				}
+
+				// Absorb the LF
+				fgets($handle);
+			}
+
+			fclose($handle);
+
+			$this->is_modified = false;
+
+			return true;
+		}
+		else
+		{
+			$data = false;
+			$line = 0;
+
+			while (($buffer = fgets($handle)) && !feof($handle))
+			{
+				$buffer = substr($buffer, 0, -1); // Remove the LF
+
+				// $buffer is only used to read integers
+				// if it is non numeric we have an invalid
+				// cache file, which we will now remove.
+				if (!is_numeric($buffer))
+				{
+					break;
+				}
+
+				if ($line == 0)
+				{
+					$expires = (int) $buffer;
+
+					if (time() >= $expires)
+					{
+						break;
+					}
+
+					if ($type == 'sql')
+					{
+						// Skip the query
+						fgets($handle);
+					}
+				}
+				else if ($line == 1)
+				{
+					$bytes = (int) $buffer;
+
+					// Never should have 0 bytes
+					if (!$bytes)
+					{
+						break;
+					}
+
+					// Grab the serialized data
+					$data = fread($handle, $bytes);
+
+					// Read 1 byte, to trigger EOF
+					fread($handle, 1);
+
+					if (!feof($handle))
+					{
+						// Somebody tampered with our data
+						$data = false;
+					}
+					break;
+				}
+				else
+				{
+					// Something went wrong
+					break;
+				}
+				$line++;
+			}
+			fclose($handle);
+
+			// unserialize if we got some data
+			$data = ($data !== false) ? @unserialize($data) : $data;
+
+			if ($data === false)
+			{
+				$this->remove_file($file);
+				return false;
+			}
+
+			return $data;
+		}
+	}
+
+	/**
+	* Write cache data to a specified file
+	*
+	* 'data_global' is a special case and the generated format is different for this file:
+	* <code>
+	* <?php exit; ?>
+	* (expiration)
+	* (length of var and serialised data)
+	* (var)
+	* (serialised data)
+	* ... (repeat)
+	* </code>
+	*
+	* The other files have a similar format:
+	* <code>
+	* <?php exit; ?>
+	* (expiration)
+	* (query) [SQL files only]
+	* (length of serialised data)
+	* (serialised data)
+	* </code>
+	*
+	* @access private
+	* @param string $filename Filename to write
+	* @param mixed $data Data to store
+	* @param int $expires Timestamp when the data expires
+	* @param string $query Query when caching SQL queries
+	* @return bool True if the file was successfully created, otherwise false
+	*/
+	public function _write($filename, $data = null, $expires = 0, $query = '')
+	{
+		global $phpEx;
+
+		$file = "{$this->cache_dir}$filename.$phpEx";
+
+		$lock = new mx_lock_flock($file);
+		$lock->acquire();
+
+		if ($handle = @fopen($file, 'wb'))
+		{
+			// File header
+			fwrite($handle, '<' . '?php exit; ?' . '>');
+
+			if ($filename == 'data_global')
+			{
+				// Global data is a different format
+				foreach ($this->vars as $var => $data)
+				{
+					if (strpos($var, "\r") !== false || strpos($var, "\n") !== false)
+					{
+						// CR/LF would cause fgets() to read the cache file incorrectly
+						// do not cache test entries, they probably won't be read back
+						// the cache keys should really be alphanumeric with a few symbols.
+						continue;
+					}
+					$data = serialize($data);
+
+					// Write out the expiration time
+					fwrite($handle, "\n" . $this->var_expires[$var] . "\n");
+
+					// Length of the remaining data for this var (ignoring two LF's)
+					fwrite($handle, strlen($data . $var) . "\n");
+					fwrite($handle, $var . "\n");
+					fwrite($handle, $data);
+				}
+			}
+			else
+			{
+				fwrite($handle, "\n" . $expires . "\n");
+
+				if (strpos($filename, 'sql_') === 0)
+				{
+					fwrite($handle, $query . "\n");
+				}
+				$data = serialize($data);
+
+				fwrite($handle, strlen($data) . "\n");
+				fwrite($handle, $data);
+			}
+
+			fclose($handle);
+
+			if (!function_exists('mx_chmod'))
+			{
+				global $mx_root_path;
+				include($mx_root_path . 'includes/mx_functions.' . $phpEx);
+			}
+
+			mx_chmod($file, CHMOD_READ | CHMOD_WRITE);
+
+			$return_value = true;
+		}
+		else
+		{
+			$return_value = false;
+		}
+
+		$lock->release();
+
+		return $return_value;
+	}
+
+	/**
+	* Removes/unlinks file
+	*/
+	public function remove_file($filename, $check = false)
+	{
+		if (!function_exists('phpbb_is_writable'))
+		{
+			global $phpbb_root_path, $phpEx;
+			include($phpbb_root_path . 'includes/functions.' . $phpEx);
+		}
+
+		if ($check && !phpbb_is_writable($this->cache_dir))
+		{
+			// E_USER_ERROR - not using language entry - intended.
+			trigger_error('Unable to remove files within ' . $this->cache_dir . '. Please check directory permissions.', E_USER_ERROR);
+		}
+
+		return @unlink($filename);
+	}
+}	
 
 /**
  * Class: cache.
@@ -760,23 +1111,41 @@ class cache
 	var $var_expires = array();
 	var $is_modified = false;
 	var $sql_rowset = array('1' => '1'); // Cache fix. Now also FIRST query can be cached. Unsolved phpBB bug...i think ;)
+
+	/**
+	* Root path.
+	*
+	* @var string
+	*/
+	protected $mx_root_path;
+
+	/**
+	* PHP extension.
+	*
+	* @var string
+	*/
+	protected $phpEx;	
+	
 	/**#@-*/
 
 	// ------------------------------
 	// Private Methods
 	//
-	//
+	//	
 
 	/**
-	 * Constructor.
-	 *
-	 * @return cache
-	 */
-	function cache()
+	* Creates a cache service around a cache driver
+	*
+	 * @return cache	
+	*/
+	public function __construct()
 	{
-		global $mx_root_path;
+		global $mx_root_path, $phpEx;
+		
+		$this->path = $mx_root_path;
+		$this->php_ext = $phpEx;		
 		$this->cache_dir = $mx_root_path . 'cache/';
-	}
+	}	
 
 	/**
 	 * Load.
@@ -784,7 +1153,7 @@ class cache
 	 * @access private
 	 * @return unknown
 	 */
-	function load()
+	public function load()
 	{
 		global $phpEx;
 		if (file_exists($this->cache_dir . 'data_global.' . $phpEx))
@@ -801,7 +1170,7 @@ class cache
 	 * Enter description here...
 	 * @access private
 	 */
-	function save()
+	public function save()
 	{
 		if (!$this->is_modified)
 		{
@@ -829,7 +1198,7 @@ class cache
 	 * @param unknown_type $array
 	 * @return unknown
 	 */
-	function format_array($array)
+	public function format_array($array)
 	{
 		$lines = array();
 		foreach ($array as $k => $v)
@@ -838,11 +1207,11 @@ class cache
 			{
 				$lines[] = "'$k'=>" . $this->format_array($v);
 			}
-			else if (is_int($v))
+			elseif (is_int($v))
 			{
 				$lines[] = "'$k'=>$v";
 			}
-			else if (is_bool($v))
+			elseif (is_bool($v))
 			{
 				$lines[] = "'$k'=>" . (($v) ? 'true' : 'false');
 			}
@@ -853,6 +1222,38 @@ class cache
 		}
 		return 'array(' . implode(',', $lines) . ')';
 	}
+	
+	/**
+	 * Replaces variable placeholders in a string with the requested values 
+	 * and escapes the values so they can be safely displayed as HTML.
+	 * Function to sanitize values.
+	 * @access private
+	* @param unknown_type $string
+	* @return unknown
+	 */
+	public function format_string($string, array $args = array())
+	{
+		$k = array();		
+		// Transform arguments before inserting them.
+		foreach ($args as $k => $v)
+		{
+			switch ($k[0])
+			{
+				case '@':
+				// Escaped only.
+				$args[$k] = htmlspecialchars($v, ENT_QUOTE, 'UTF-8');
+				break;
+				case '%':
+				default:
+				// Escaped and placeholder.
+				$args[$k] = '<em class="placeholder">' . htmlspecialchars($v, ENT_QUOTE, 'UTF-8') . '</em>';
+				break;
+				case '!':
+				// Pass-through.
+			}
+		}
+		return strtr($string, $args);
+	}	
 
 	/**
 	 * Enter description here...
@@ -861,13 +1262,13 @@ class cache
 	 * @param unknown_type $query
 	 * @return unknown
 	 */
-	function sql_load($query)
+	public function sql_load($query)
 	{
 		global $phpEx;
 
 		// Remove extra spaces and tabs
 		$query = preg_replace('/[\n\r\s\t]+/', ' ', $query);
-		$query_id = sizeof($this->sql_rowset);
+		$query_id = isset($this->sql_rowset) ? sizeof($this->sql_rowset) : 0;
 
 		if (!file_exists($this->cache_dir . 'sql_' . md5($query) . ".$phpEx"))
 		{
@@ -882,11 +1283,100 @@ class cache
 		}
 		else if ($expired)
 		{
-			unlink($this->cache_dir . 'sql_' . md5($query) . ".$phpEx");
+			@unlink($this->cache_dir . 'sql_' . md5($query) . ".$phpEx");
 			return false;
 		}
 		return $query_id;
 	}
+	
+	/**
+	* {@inheritDoc}.
+	 *
+	 * @access private
+	 * @param unknown_type $query
+	 * @param unknown_type $query_result
+	 * @param unknown_type $ttl
+	 */
+	public function sql_save($query, &$query_result, $ttl)
+	{
+		global $db, $phpEx;
+		
+		// Remove extra spaces and tabs
+		$query = preg_replace('/[\n\r\s\t]+/', ' ', $query);		
+		$hash = md5($query);
+		
+		// determine which tables this query belongs to
+		// Some queries use backticks, namely the get_database_size() query
+		// don't check for conformity, the SQL would error and not reach here.
+		if (!preg_match('/FROM \\(?(`?\\w+`?(?: \\w+)?(?:, ?`?\\w+`?(?: \\w+)?)*)\\)?/', $query, $regs))
+		{
+			// Bail out if the match fails.
+			return $query_result;
+		}
+		$tables = array_map('trim', explode(',', $regs[1]));
+		
+		$fp = @fopen($this->cache_dir . 'sql_' . md5($query) . '.' . $phpEx, 'wb');
+		@flock($fp, LOCK_EX);
+		foreach ($tables as $table_name)
+		{
+			// Remove backticks
+			$table_name = ($table_name[0] == '`') ? substr($table_name, 1, -1) : $table_name;
+
+			if (($pos = strpos($table_name, ' ')) !== false)
+			{
+				$table_name = substr($table_name, 0, $pos);
+			}
+
+			$temp = $this->_read('sql_' . $table_name);
+
+			if ($temp === false)
+			{
+				$temp = array();
+			}
+
+			$temp[$hash] = true;
+
+			// This must never expire
+			if ($fp === false)
+			{
+				$this->_write('sql_' . $table_name, $temp, 0);
+			}
+			else
+			{
+				fwrite($fp, "<?php\n\n/*\n$query\n*/\n\n\$temp[\$hash] = " . true . "; ?>");
+				@flock($fp, LOCK_UN);
+				fclose($fp);
+			}						
+		}		
+		
+		// store them in the right place
+		$lines = array();
+		$query_id = sizeof($this->sql_rowset);
+		$query_id = !empty($query_id) ? $query_id : 1;
+		$this->sql_rowset[$query_id] = array();
+		$this->sql_row_pointer[$query_id] = 0;
+
+		while ($row = $db->sql_fetchrow($query_result))
+		{
+			$this->sql_rowset[$query_id][] = $row;
+			$lines[] = "unserialize('" . str_replace("'", "\\'", str_replace('\\', '\\\\', serialize($row))) . "')";
+		}
+		$db->sql_freeresult($query_result);
+		
+		if ($fp === false)
+		{
+			$this->_write('sql_' . $hash, $this->sql_rowset[$query_id], $ttl);
+		}
+		else
+		{
+			@fwrite($fp, "<?php\n\n/*\n$query\n*/\n\n\$expired = (time() > " . (time() + $ttl) . ") ? true : false;\nif (\$expired) { return; }\n\n\$this->sql_rowset[\$query_id] = array(" . implode(',', $lines) . '); ?>');
+			@flock($fp, LOCK_UN);
+			@fclose($fp);		
+		}		
+		$query_result = $query_id;
+		
+		return $query_id;
+	}	
 
 	/**
 	 * Enter description here...
@@ -896,12 +1386,13 @@ class cache
 	 * @param unknown_type $query_result
 	 * @param unknown_type $ttl
 	 */
-	function sql_save($query, &$query_result, $ttl)
+	public function sql2_save($query, &$query_result, $ttl)
 	{
 		global $db, $phpEx;
 
 		// Remove extra spaces and tabs
 		$query = preg_replace('/[\n\r\s\t]+/', ' ', $query);
+		$hash = md5($query);
 
 		if ($fp = @fopen($this->cache_dir . 'sql_' . md5($query) . '.' . $phpEx, 'wb'))
 		{
@@ -909,6 +1400,7 @@ class cache
 
 			$lines = array();
 			$query_id = sizeof($this->sql_rowset);
+			$query_id = !empty($query_id) ? $query_id : 1;
 			$this->sql_rowset[$query_id] = array();
 
 			while ($row = $db->sql_fetchrow($query_result))
@@ -934,7 +1426,7 @@ class cache
 	 * @param unknown_type $query_id
 	 * @return unknown
 	 */
-	function sql_exists($query_id)
+	public function sql_exists($query_id)
 	{
 		return isset($this->sql_rowset[$query_id]);
 	}
@@ -946,7 +1438,7 @@ class cache
 	 * @param unknown_type $query_id
 	 * @return unknown
 	 */
-	function sql_fetchrow($query_id)
+	public function sql_fetchrow($query_id)
 	{
 		return @array_shift($this->sql_rowset[$query_id]);
 	}
@@ -963,7 +1455,7 @@ class cache
 	 * @param unknown_type $var_name
 	 * @return unknown
 	 */
-	function _exists($var_name)
+	public function _exists($var_name)
 	{
 		if ($var_name{0} == '_')
 		{
@@ -999,7 +1491,7 @@ class cache
 	 *
 	 * @access public
 	 */
-	function unload()
+	public function unload()
 	{
 		$this->save();
 		unset($this->vars);
@@ -1015,7 +1507,7 @@ class cache
 	 *
 	 * @access public
 	 */
-	function tidy()
+	public function tidy()
 	{
 		global $phpEx;
 
@@ -1031,7 +1523,7 @@ class cache
 			include($this->cache_dir . $entry);
 			if ($expired)
 			{
-				unlink($this->cache_dir . $entry);
+				@unlink($this->cache_dir . $entry);
 			}
 		}
 		@closedir($dir);
@@ -1061,7 +1553,7 @@ class cache
 	 * @param unknown_type $var_name
 	 * @return unknown
 	 */
-	function get($var_name)
+	public function get($var_name)
 	{
 		if ($var_name{0} == '_')
 		{
@@ -1090,7 +1582,7 @@ class cache
 	 * @param unknown_type $var
 	 * @param unknown_type $ttl
 	 */
-	function put($var_name, $var, $ttl = 31536000)
+	public function put($var_name, $var, $ttl = 31536000)
 	{
 		if ($var_name{0} == '_')
 		{
@@ -1123,7 +1615,7 @@ class cache
 	 * @param unknown_type $var_name
 	 * @param unknown_type $table
 	 */
-	function destroy($var_name, $table = '')
+	public function destroy($var_name, $table = '')
 	{
 		global $phpEx;
 
@@ -1140,12 +1632,12 @@ class cache
 				}
 
 				$fp = fopen($this->cache_dir . $entry, 'rb');
-				$file = fread($fp, filesize($this->cache_dir . $entry));
+				$file = @fread($fp, @filesize($this->cache_dir . $entry));
 				@fclose($fp);
 
 				if (preg_match('#/\*.*?\W' . $regex . '\W.*?\*/#s', $file, $m))
 				{
-					unlink($this->cache_dir . $entry);
+					@unlink($this->cache_dir . $entry);
 				}
 			}
 			@closedir($dir);
@@ -1178,7 +1670,7 @@ class cache
 	 *
 	 * @return unknown
 	 */
-	function obtain_icons()
+	public function obtain_icons()
 	{
 		if (($icons = $this->get('_icons')) === false)
 		{
@@ -1205,51 +1697,16 @@ class cache
 
 		return $icons;
 	}
-
-	/**
-	* Obtain list of naughty words and build preg style replacement arrays for use by the
-	* calling script
-	*
-	* * @return unknown
-	*/
-	function obtain_word_list()
-	{
-		global $board_config, $mx_user, $db;
-
-		if (!$mx_user->optionget('viewcensors') && $board_config['allow_nocensors'])
-		{
-			return array();
-		}
-
-		if (($censors = $this->get('_word_censors')) === false)
-		{
-			$sql = 'SELECT word, replacement
-				FROM ' . WORDS_TABLE;
-			$result = $db->sql_query($sql);
-
-			$censors = array();
-			while ($row = $db->sql_fetchrow($result))
-			{
-				$censors['match'][] = '#(?<!\w)(' . str_replace('\*', '\w*?', preg_quote($row['word'], '#')) . ')(?!\w)#i';
-				$censors['replace'][] = $row['replacement'];
-			}
-			$db->sql_freeresult($result);
-
-			$this->put('_word_censors', $censors);
-		}
-
-		return $censors;
-	}
 	
 	/**
 	* Obtain ranks
 	*/
-	function obtain_ranks()
+	public function obtain_ranks()
 	{
 		if (($ranks = $this->get('_ranks')) === false)
 		{
 			global $db;
-	
+
 			$sql = 'SELECT *
 				FROM ' . RANKS_TABLE . '
 				ORDER BY rank_min DESC';
@@ -1280,272 +1737,42 @@ class cache
 		}
 
 		return $ranks;
-	}
-
-	/**
-	* Obtain allowed extensions
-	*
-	* @param mixed $forum_id If false then check for private messaging, if int then check for forum id. If true, then only return extension informations.
-	*
-	* @return array allowed extensions array.
-	*/
-	function obtain_attach_extensions($forum_id)
-	{
-		if (($extensions = $this->get('_extensions')) === false)
-		{
-			global $db;
-
-			$extensions = array(
-				'_allowed_post'	=> array(),
-				'_allowed_pm'	=> array(),
-			);
-
-			// The rule is to only allow those extensions defined. ;)
-			$sql = 'SELECT e.extension, g.*
-				FROM ' . EXTENSIONS_TABLE . ' e, ' . EXTENSION_GROUPS_TABLE . ' g
-				WHERE e.group_id = g.group_id
-					AND (g.allow_group = 1 OR g.allow_in_pm = 1)';
-			$result = $db->sql_query($sql);
-
-			while ($row = $db->sql_fetchrow($result))
-			{
-				$extension = strtolower(trim($row['extension']));
-
-				$extensions[$extension] = array(
-					'display_cat'	=> (int) $row['cat_id'],
-					'download_mode'	=> (int) $row['download_mode'],
-					'upload_icon'	=> trim($row['upload_icon']),
-					'max_filesize'	=> (int) $row['max_filesize'],
-					'allow_group'	=> $row['allow_group'],
-					'allow_in_pm'	=> $row['allow_in_pm'],
-				);
-
-				$allowed_forums = ($row['allowed_forums']) ? unserialize(trim($row['allowed_forums'])) : array();
-
-				// Store allowed extensions forum wise
-				if ($row['allow_group'])
-				{
-					$extensions['_allowed_post'][$extension] = (!sizeof($allowed_forums)) ? 0 : $allowed_forums;
-				}
-
-				if ($row['allow_in_pm'])
-				{
-					$extensions['_allowed_pm'][$extension] = 0;
-				}
-			}
-			$db->sql_freeresult($result);
-
-			$this->put('_extensions', $extensions);
-		}
-
-		// Forum post
-		if ($forum_id === false)
-		{
-			// We are checking for private messages, therefore we only need to get the pm extensions...
-			$return = array('_allowed_' => array());
-
-			foreach ($extensions['_allowed_pm'] as $extension => $check)
-			{
-				$return['_allowed_'][$extension] = 0;
-				$return[$extension] = $extensions[$extension];
-			}
-
-			$extensions = $return;
-		}
-		else if ($forum_id === true)
-		{
-			return $extensions;
-		}
-		else
-		{
-			$forum_id = (int) $forum_id;
-			$return = array('_allowed_' => array());
-
-			foreach ($extensions['_allowed_post'] as $extension => $check)
-			{
-				// Check for allowed forums
-				if (is_array($check))
-				{
-					$allowed = (!in_array($forum_id, $check)) ? false : true;
-				}
-				else
-				{
-					$allowed = true;
-				}
-
-				if ($allowed)
-				{
-					$return['_allowed_'][$extension] = 0;
-					$return[$extension] = $extensions[$extension];
-				}
-			}
-
-			$extensions = $return;
-		}
-
-		if (!isset($extensions['_allowed_']))
-		{
-			$extensions['_allowed_'] = array();
-		}
-
-		return $extensions;
-	}
-
-	/**
-	* Obtain active bots
-	*/
-	function obtain_bots()
-	{
-		if (($bots = $this->get('_bots')) === false)
-		{
-			global $db;
-	
-			switch ($db->sql_layer)
-			{
-				case 'mssql':
-				case 'mssql_odbc':
-					$sql = 'SELECT user_id, bot_agent, bot_ip
-						FROM ' . BOTS_TABLE . '
-						WHERE bot_active = 1
-					ORDER BY LEN(bot_agent) DESC';
-				break;
-
-				case 'firebird':
-					$sql = 'SELECT user_id, bot_agent, bot_ip
-						FROM ' . BOTS_TABLE . '
-						WHERE bot_active = 1
-					ORDER BY CHAR_LENGTH(bot_agent) DESC';
-				break;
-
-				// LENGTH supported by MySQL, IBM DB2 and Oracle for sure...
-				default:
-					$sql = 'SELECT user_id, bot_agent, bot_ip
-						FROM ' . BOTS_TABLE . '
-						WHERE bot_active = 1
-					ORDER BY LENGTH(bot_agent) DESC';
-				break;
-			}
-			$result = $db->sql_query($sql);
-
-			$bots = array();
-			while ($row = $db->sql_fetchrow($result))
-			{
-				$bots[] = $row;
-			}
-			$db->sql_freeresult($result);
-
-			$this->put('_bots', $bots);
-		}
-	
-		return $bots;
-	}
-
-	/**
-	* Obtain cfg file data
-	*/
-	function obtain_cfg_items($theme)
-	{
-		global $config, $phpbb_root_path;
-
-		$parsed_items = array(
-			'theme'		=> array(),
-			'template'	=> array(),
-			'imageset'	=> array()
-		);
-
-		foreach ($parsed_items as $key => $parsed_array)
-		{
-			$parsed_array = $this->get('_cfg_' . $key . '_' . $theme[$key . '_path']);
-
-			if ($parsed_array === false)
-			{
-				$parsed_array = array();
-			}
-
-			$reparse = false;
-			$filename = $phpbb_root_path . 'styles/' . $theme[$key . '_path'] . '/' . $key . '/' . $key . '.cfg';
-
-			if (!file_exists($filename))
-			{
-				continue;
-			}
-
-			if (!isset($parsed_array['filetime']) || (($config['load_tplcompile'] && @filemtime($filename) > $parsed_array['filetime'])))
-			{
-				$reparse = true;
-			}
-
-			// Re-parse cfg file
-			if ($reparse)
-			{
-				$parsed_array = parse_cfg_file($filename);
-				$parsed_array['filetime'] = @filemtime($filename);
-
-				$this->put('_cfg_' . $key . '_' . $theme[$key . '_path'], $parsed_array);
-			}
-			$parsed_items[$key] = $parsed_array;
-		}
-
-		return $parsed_items;
-	}
-
-	/**
-	* Obtain disallowed usernames
-	*/
-	function obtain_disallowed_usernames()
-	{
-		if (($usernames = $this->get('_disallowed_usernames')) === false)
-		{
-			global $db;
-
-			$sql = 'SELECT disallow_username
-				FROM ' . DISALLOW_TABLE;
-			$result = $db->sql_query($sql);
-
-			$usernames = array();
-			while ($row = $db->sql_fetchrow($result))
-			{
-				$usernames[] = str_replace('%', '.*?', preg_quote(utf8_clean_string($row['disallow_username']), '#'));
-			}
-			$db->sql_freeresult($result);
-
-			$this->put('_disallowed_usernames', $usernames);
-		}
-
-		return $usernames;
-	}
-
-	/**
-	* Obtain hooks...
-	*/
-	function obtain_hooks()
-	{
-		global $phpbb_root_path, $phpEx;
-
-		if (($hook_files = $this->get('_hooks')) === false)
-		{
-			$hook_files = array();
-
-			// Now search for hooks...
-			$dh = @opendir($phpbb_root_path . 'includes/hooks/');
-
-			if ($dh)
-			{
-				while (($file = readdir($dh)) !== false)
-				{
-					if (strpos($file, 'hook_') === 0 && substr($file, -(strlen($phpEx) + 1)) === '.' . $phpEx)
-					{
-						$hook_files[] = substr($file, 0, -(strlen($phpEx) + 1));
-					}
-				}
-				closedir($dh);
-			}
-
-			$this->put('_hooks', $hook_files);
-		}
-
-		return $hook_files;
 	}	
+
+	/**
+	* Obtain list of naughty words and build preg style replacement arrays for use by the
+	* calling script
+	*
+	* * @return unknown
+	*/
+	public function obtain_word_list()
+	{
+		global $board_config, $mx_user, $db;
+
+		if (!$mx_user->optionget('viewcensors') && $board_config['allow_nocensors'])
+		{
+			return array();
+		}
+
+		if (($censors = $this->get('_word_censors')) === false)
+		{
+			$sql = 'SELECT word, replacement
+				FROM ' . WORDS_TABLE;
+			$result = $db->sql_query($sql);
+
+			$censors = array();
+			while ($row = $db->sql_fetchrow($result))
+			{
+				$censors['match'][] = '#(?<!\w)(' . str_replace('\*', '\w*?', preg_quote($row['word'], '#')) . ')(?!\w)#i';
+				$censors['replace'][] = $row['replacement'];
+			}
+			$db->sql_freeresult($result);
+
+			$this->put('_word_censors', $censors);
+		}
+
+		return $censors;
+	}
 }
 
 /**
@@ -1675,17 +1902,17 @@ class mx_block extends mx_block_parameter
 	 * @access private
 	 * @param unknown_type $unset
 	 */
-	function _set_all()
+	public function _set_all()
 	{
 		global $userdata, $lang;
-
-		//
+		
+		$is_admin = ($userdata['user_level'] == ADMIN && $userdata['session_logged_in']) ? true : 0;
+		
 		// Weird rewrite for php5 - anyone explaining why wins a medal ;)
-		//
-		$temp = $this->block_config[$this->block_id];
-		$this->block_info = $temp['block_info'];
-		$this->block_parameters = $temp['block_parameters'];
-		unset($temp);
+		$temp_row = isset($this->block_config[$this->block_id]) ? $this->block_config[$this->block_id] : false;
+		$this->block_info = isset($temp_row['block_info']) ? $temp_row['block_info'] : mx_get_info(BLOCK_TABLE, 'block_id', $this->block_id);
+		$this->block_parameters = isset($temp_row['block_parameters']) ? $temp_row['block_parameters'] : array();
+		unset($temp_row);
 
 		$this->block_id = $this->block_info['block_id'];
 		$this->block_title = !empty($lang['blocktitle_' . $this->block_info['block_title']]) ? $lang['blocktitle_' . $this->block_info['block_title']] : $this->block_info['block_title'];
@@ -1698,16 +1925,26 @@ class mx_block extends mx_block_parameter
 		$this->_auth_ary = $this->auth( AUTH_ALL );
 		$this->auth_view = $this->_auth_ary['auth_view'];
 		$this->auth_edit = $this->_auth_ary['auth_edit'];
-		$this->auth_mod = $this->_auth_ary['auth_mod'];
+		$this->auth_mod = isset($this->_auth_ary['auth_mod']) ? $this->_auth_ary['auth_mod'] : $is_admin;
 
 		$this->block_time = $this->block_info['block_time'];
 		$this->editor_id = $this->block_info['block_editor_id'];
-
-		$this->module_root_path = $this->block_info['module_root_path'];
-		$this->block_file = $this->block_info['block_file'];
-		$this->block_edit_file = $this->block_info['block_edit_file'];
-		$this->function_id = $this->block_info['function_id'];
-
+		
+		if (isset($this->block_info['module_root_path']) && !defined('IN_ADMIN'))
+		{
+			$this->module_root_path = $this->block_info['module_root_path'];
+			$this->block_file = $this->block_info['block_file'];
+			$this->block_edit_file = $this->block_info['block_edit_file'];
+			$this->function_id = $this->block_info['function_id'];
+		}
+		else
+		{
+			global $module_root_path;
+			$this->module_root_path = isset($this->block_info['module_root_path']) ? $this->block_info['module_root_path'] : $module_root_path;
+			$this->block_file = isset($this->block_info['block_file']) ? $this->block_info['block_file'] : '';
+			$this->block_edit_file = isset($this->block_info['block_edit_file']) ? $this->block_info['block_edit_file'] : '';
+			$this->function_id = isset($this->block_info['block_edit_file']) ? $this->block_info['block_edit_file'] : '';
+		}
 		$this->is_dynamic = $this->_is_dynamic();
 		$this->is_sub = $this->_is_sub();
 	}
@@ -1716,7 +1953,7 @@ class mx_block extends mx_block_parameter
 	 * Enter description here...
 	 * @access private
 	 */
-	function _unset()
+	public function _unset()
 	{
 		unset($this->block_config);
 		unset($this->block_info);
@@ -1759,7 +1996,7 @@ class mx_block extends mx_block_parameter
 	 * @access private
 	 * @return unknown
 	 */
-	function _is_dynamic()
+	public function _is_dynamic()
 	{
 		global $mx_request_vars, $phpEx;
 
@@ -1779,7 +2016,7 @@ class mx_block extends mx_block_parameter
 	 * @access private
 	 * @return unknown
 	 */
-	function _is_sub()
+	public function _is_sub()
 	{
 		global $phpEx;
 		$is_sub = ( ( $this->block_file == 'mx_multiple_blocks.' . $phpEx ) ? true : false );
@@ -1825,7 +2062,7 @@ class mx_block extends mx_block_parameter
 	 * @param unknown_type $block_id
 	 * @param unknown_type $force_query
 	 */
-	function init( $block_id, $force_query = false )
+	public function init( $block_id, $force_query = false )
 	{
 		global $mx_cache;
 
@@ -1838,7 +2075,7 @@ class mx_block extends mx_block_parameter
 	 * Enter description here...
 	 *
 	 */
-	function virtual_init($virtual_id = '', $create_virtual = false)
+	public function virtual_init($virtual_id = '', $create_virtual = false)
 	{
 		global $mx_cache, $userdata;
 
@@ -1873,7 +2110,7 @@ class mx_block extends mx_block_parameter
 	 * Enter description here...
 	 *
 	 */
-	function virtual_create($virtual_id = '', $project_name = '')
+	public function virtual_create($virtual_id = '', $project_name = '')
 	{
 		global $db, $mx_cache;
 
@@ -1927,7 +2164,7 @@ class mx_block extends mx_block_parameter
 	 * Enter description here...
 	 *
 	 */
-	function virtual_update($virtual_id = '', $project_name = '')
+	public function virtual_update($virtual_id = '', $project_name = '')
 	{
 		global $db, $mx_cache;
 
@@ -1955,7 +2192,7 @@ class mx_block extends mx_block_parameter
 	 * Enter description here...
 	 *
 	 */
-	function virtual_delete($virtual_id = '')
+	public function virtual_delete($virtual_id = '')
 	{
 		global $db, $mx_cache, $userdata;
 
@@ -1995,7 +2232,7 @@ class mx_block extends mx_block_parameter
 	 * Hide block
 	 * @access public
 	 */
-	function hide_me()
+	public function hide_me()
 	{
 		$this->show_block = false;
 	}
@@ -2004,7 +2241,7 @@ class mx_block extends mx_block_parameter
 	 * Destroys block object
 	 * @access public
 	 */
-	function kill_me()
+	public function kill_me()
 	{
 		$this->_unset();
 	}
@@ -2014,7 +2251,7 @@ class mx_block extends mx_block_parameter
 	 *
 	 * @access public
 	 */
-	function output()
+	public function output()
 	{
 		global $layouttemplate, $mx_page;
 
@@ -2039,7 +2276,7 @@ class mx_block extends mx_block_parameter
 	 *
 	 * @access public
 	 */
-	function output_full_page()
+	public function output_full_page()
 	{
 		global $layouttemplate, $mx_page;
 
@@ -2050,7 +2287,7 @@ class mx_block extends mx_block_parameter
 	 * Output block stats.
 	 * @access public
 	 */
-	function output_stats()
+	public function output_stats()
 	{
 		global $layouttemplate, $board_config, $lang, $userdata;
 
@@ -2059,7 +2296,7 @@ class mx_block extends mx_block_parameter
 			$is_admin = ( $userdata['user_level'] == ADMIN && $userdata['session_logged_in'] ) ? TRUE : 0;
 			$editor_name_tmp = mx_get_userdata($this->editor_id);
 			$editor_name = $editor_name_tmp['username'];
-			$edit_time = $phpBB2->create_date( $board_config['default_dateformat'], $this->block_time, $board_config['board_timezone'] );
+			$edit_time = phpBB2::create_date( $board_config['default_dateformat'], $this->block_time, $board_config['board_timezone'] );
 
 			$layouttemplate->assign_block_vars('layout_column.blocks.block_stats', array(
 				'L_BLOCK_UPDATED'	=> $lang['Block_updated_date'],
@@ -2077,7 +2314,7 @@ class mx_block extends mx_block_parameter
 	 * Output 'hidden' indicator.
 	 * @access public
 	 */
-	function output_hidden_indicator()
+	public function output_hidden_indicator()
 	{
 		global $layouttemplate, $lang, $images;
 
@@ -2091,7 +2328,7 @@ class mx_block extends mx_block_parameter
 	 * Output block title.
 	 * @access public
 	 */
-	function output_title()
+	public function output_title()
 	{
 		global $layouttemplate;
 
@@ -2105,7 +2342,7 @@ class mx_block extends mx_block_parameter
 	 * Output block editCP button.
 	 * @access public
 	 */
-	function output_cp_button($overall_header = false)
+	public function output_cp_button($overall_header = false)
 	{
 		global $layouttemplate, $userdata, $mx_root_path, $mx_page, $lang, $block_size, $images, $phpEx;
 
@@ -2142,6 +2379,8 @@ class mx_block extends mx_block_parameter
 		$edit_url = mx_append_sid( $mx_root_path . $edit_file . "?sid=" . $userdata['session_id'] );
 		$edit_img = '<input type="image" src="' . $block_edit_img . '" alt="' . $block_edit_alt . ' :: ' . $this->block_title . $block_desc . '" title="' . $block_edit_alt . ' :: ' . $this->block_title . $block_desc . '">';
 
+		$this->virtual_id = isset($this->virtual_id) ? $this->virtual_id : ''; //Virtual Id is Not Set ?		
+		
 		$s_hidden_fields .= '<input type="hidden" name="block_id" value="' . $this->block_id . '" />';
 		$s_hidden_fields .= '<input type="hidden" name="dynamic_block" value="' . $this->dynamic_block_id . '" />';
 		$s_hidden_fields .= '<input type="hidden" name="virtual" value="' . $this->virtual_id . '" />';
@@ -2192,7 +2431,7 @@ class mx_block extends mx_block_parameter
 	 * @param unknown_type $mode
 	 * @return unknown
 	 */
-	function get_parameters($key = MX_GET_ALL_PARS, $mode = MX_GET_PAR_VALUE)
+	public function get_parameters($key = MX_GET_ALL_PARS, $mode = MX_GET_PAR_VALUE)
 	{
 		global $mx_request_vars;
 
@@ -2218,7 +2457,7 @@ class mx_block extends mx_block_parameter
 	 * @param integer $type all, view or edit
 	 * @return array
 	 */
-	function auth($type)
+	public function auth($type)
 	{
 		global $db, $lang, $userdata;
 
@@ -2351,7 +2590,7 @@ class mx_block_parameter
 	 * @var unknown_type
 	 */
 	var $is_panel = false;
-
+	
 	/**
 	 * Load custom module parameters
 	 *
@@ -2360,26 +2599,23 @@ class mx_block_parameter
 	 * @param unknown_type $block_id
 	 * @return unknown
 	 */
-	function _get_custom_module_parameters($parameter_data, $block_id)
+	public function _get_custom_module_parameters($parameter_data, $block_id, $classname = 'mx_module_defs', $include_path = false)
 	{
 		global $mx_root_path, $phpEx;
-
-		if ( file_exists( $mx_root_path . $this->module_root_path . 'admin/mx_module_defs.' . $phpEx ) )
+		$info_file = "{$classname}.$phpEx";
+		if (file_exists((($include_path === false) ? $mx_root_path . $this->module_root_path . 'admin/' : $include_path) . $info_file))
 		{
-			include_once( $mx_root_path . $this->module_root_path . 'admin/mx_module_defs.' . $phpEx );
-
-			if (class_exists('mx_module_defs'))
+			include_once((($include_path === false) ? $mx_root_path . $this->module_root_path . 'admin/' : $include_path) . $info_file);
+			if (class_exists($classname))
 			{
-				$mx_module_defs = new mx_module_defs();
-
-				if ( method_exists( $mx_module_defs,  'display_module_parameters' ) )
+				$mx_module_defs = new $classname;
+				if (method_exists($mx_module_defs, 'display_module_parameters'))
 				{
 					$mx_module_defs->display_module_parameters($parameter_data, $block_id);
 				}
 			}
-		}
-
-		return $mx_module_defs->is_panel;
+			//return $mx_module_defs->is_parameter;
+		}				
 	}
 
 	/**
@@ -2389,26 +2625,25 @@ class mx_block_parameter
 	 * @param unknown_type $parameter_data
 	 * @param unknown_type $block_id
 	 */
-	function _get_custom_module_panels($parameter_data, $block_id)
+	public function _get_custom_module_panels($parameter_data, $block_id, $classname = 'mx_module_defs', $include_path = false)
 	{
 		global $mx_root_path, $phpEx;
-
-		if ( file_exists( $mx_root_path . $this->module_root_path . 'admin/mx_module_defs.' . $phpEx ) )
+		$info_file = "{$classname}.$phpEx";
+		if (file_exists((($include_path === false) ? $mx_root_path . $this->module_root_path . 'admin/' : $include_path) . $info_file))
 		{
-			include_once( $mx_root_path . $this->module_root_path . 'admin/mx_module_defs.' . $phpEx );
-
-			if (class_exists('mx_module_defs'))
+			include_once((($include_path === false) ? $mx_root_path . $this->module_root_path . 'admin/' : $include_path) . $info_file);
+			if (class_exists($classname))
 			{
-				$mx_module_defs = new mx_module_defs();
-
-				if ( method_exists( $mx_module_defs,  'display_module_panels' ) )
+				$mx_module_defs = new $classname;
+				if (method_exists($mx_module_defs, 'display_module_panels'))
 				{
 					$mx_module_defs->display_module_panels($parameter_data, $block_id);
 				}
 			}
+			return $mx_module_defs->is_panel;
 		}
 	}
-
+	
 	/**
 	 * submit custom module parameters
 	 *
@@ -2417,7 +2652,7 @@ class mx_block_parameter
 	 * @param unknown_type $block_id
 	 * @return unknown
 	 */
-	function _submit_custom_module_parameters($parameter_data, $block_id)
+	public function _submit_custom_module_parameters($parameter_data, $block_id)
 	{
 		global $mx_root_path, $phpEx;
 
@@ -2429,13 +2664,14 @@ class mx_block_parameter
 			{
 				$mx_module_defs = new mx_module_defs();
 
-				if ( method_exists( $mx_module_defs,  'submit_module_parameters' ) )
+				if (method_exists($mx_module_defs,  'submit_module_parameters'))
 				{
 					$parameter_custom = $mx_module_defs->submit_module_parameters($parameter_data, $block_id);
-				}
+					return $parameter_custom;
+				}				
 			}
 		}
-		return $parameter_custom;
+		return false;
 	}
 
 	/**
@@ -2444,7 +2680,7 @@ class mx_block_parameter
 	 * @access private
 	 * @return unknown
 	 */
-	function _parameter_data_exist()
+	public function _parameter_data_exist()
 	{
 		if ( !empty( $this->block_parameters ) )
 		{
@@ -2460,11 +2696,13 @@ class mx_block_parameter
 	 * @param unknown_type $block_id
 	 * @return unknown
 	 */
-	function submit_parameters( $block_id = false )
+	public function submit_parameters( $block_id = false )
 	{
 		global $mx_request_vars, $db, $mx_cache, $lang, $userdata, $mx_bbcode;
-
-		$return = false;
+		static $message, $return;
+		
+		$sub_id = $mx_request_vars->is_request('virtual') ? $mx_request_vars->request('virtual', MX_TYPE_INT, 0) : 0;
+		$table = BLOCK_SYSTEM_PARAMETER_TABLE;
 		if ( $this->_parameter_data_exist() )
 		{
 			foreach( $this->block_parameters as $parameter_name => $parameter_data )
@@ -2475,9 +2713,10 @@ class mx_block_parameter
 				if ($parameter_data['parameter_auth'] == 0 || $userdata['user_level'] == ADMIN)
 				{
 					$parameter_id = $parameter_data['parameter_id'];
+					$parameter_data['sub_id'] = isset($parameter_data['sub_id']) ? $parameter_data['sub_id'] : $sub_id;
 					$parameter_value = $mx_request_vars->post($parameter_id, MX_TYPE_NO_TAGS, $parameter_data['parameter_default']);
 					$parameter_opt = '';
-
+					
 					switch ( $parameter_data['parameter_type'] )
 					{
 						case 'Boolean':
@@ -2521,18 +2760,16 @@ class mx_block_parameter
 							$parameter_opt = $parameter_custom['parameter_opt'];
 						break;
 					}
-
-					//
+					
 					// Update block data
-					//
-					if ( true )
-					{
-						$sub_id = $mx_request_vars->is_request('virtual') ? $mx_request_vars->request('virtual', MX_TYPE_INT, 0) : 0;
-
+					if ($sub_id == $parameter_data['sub_id'] || true)
+					{	
+						$sub_id = $mx_request_vars->is_request('virtual') ? $mx_request_vars->request('virtual', MX_TYPE_INT, 0) : $sub_id;
+					
 						//
 						// If standard block
 						//
-						$sql = "UPDATE " . BLOCK_SYSTEM_PARAMETER_TABLE . "
+						$sql = "UPDATE " . $table . "
 							SET parameter_value		= '" . str_replace("\'", "''", $parameter_value) . "',
 								parameter_opt      	= '$parameter_opt'
 							WHERE block_id 			= '$block_id'
@@ -2541,14 +2778,12 @@ class mx_block_parameter
 					}
 					else
 					{
-						/*
 						//
 						// If subblock
 						//
 						$sql = "INSERT INTO " . BLOCK_SYSTEM_PARAMETER_TABLE . "(block_id, parameter_id, parameter_value, parameter_opt, sub_id)
 							VALUES('$block_id','$parameter_id','" . str_replace("\'", "''", $parameter_value) . "','$parameter_opt', '$sub_id')";
-						*/
-					}
+					}					
 
 					if( !($db->sql_query($sql)) )
 					{
@@ -2558,7 +2793,7 @@ class mx_block_parameter
 					//
 					// Update block itself
 					//
-					if( $sub_id == 0 )
+					if ($sub_id == $parameter_data['sub_id'] || false)
 					{
 						$block_time = time();
 						$block_editor_id = $userdata['user_id'];
@@ -2594,7 +2829,7 @@ class mx_block_parameter
 	 * @param unknown_type $block_id
 	 * @return unknown
 	 */
-	function load_block_parameters( $block_id = false )
+	public function load_block_parameters( $block_id = false )
 	{
 		global $mx_root_path, $module_root_path, $template, $blockcptemplate, $board_config, $theme, $userdata;
 
@@ -2697,7 +2932,7 @@ class mx_block_parameter
 	 * @param unknown_type $parameter_id
 	 * @param unknown_type $parameter_data
 	 */
-	function display_edit_Separator( $block_id, $parameter_id, $parameter_data )
+	public function display_edit_Separator( $block_id, $parameter_id, $parameter_data )
 	{
 		global $template, $board_config, $db, $theme, $lang;
 
@@ -2725,7 +2960,7 @@ class mx_block_parameter
 	 * @param unknown_type $parameter_id
 	 * @param unknown_type $parameter_data
 	 */
-	function display_edit_PlainTextField( $block_id, $parameter_id, $parameter_data )
+	public function display_edit_PlainTextField( $block_id, $parameter_id, $parameter_data )
 	{
 		global $template, $board_config, $db, $theme, $lang;
 
@@ -2754,7 +2989,7 @@ class mx_block_parameter
 	 * @param unknown_type $parameter_id
 	 * @param unknown_type $parameter_data
 	 */
-	function display_edit_PlainTextAreaField( $block_id, $parameter_id, $parameter_data )
+	public function display_edit_PlainTextAreaField( $block_id, $parameter_id, $parameter_data )
 	{
 		global $template, $board_config, $db, $theme, $lang;
 
@@ -2783,7 +3018,7 @@ class mx_block_parameter
 	 * @param unknown_type $parameter_id
 	 * @param unknown_type $parameter_data
 	 */
-	function display_edit_BBText( $block_id, $parameter_id, $parameter_data )
+	public function display_edit_BBText( $block_id, $parameter_id, $parameter_data )
 	{
 		global $template, $board_config, $db, $theme, $lang;
 
@@ -2816,7 +3051,7 @@ class mx_block_parameter
 	 * @param unknown_type $parameter_id
 	 * @param unknown_type $parameter_data
 	 */
-	function display_edit_Html( $block_id, $parameter_id, $parameter_data )
+	public function display_edit_Html( $block_id, $parameter_id, $parameter_data )
 	{
 		global $template, $board_config, $db, $theme, $lang;
 
@@ -2845,7 +3080,7 @@ class mx_block_parameter
 	 * @param unknown_type $parameter_id
 	 * @param unknown_type $parameter_data
 	 */
-	function display_edit_Number( $block_id, $parameter_id, $parameter_data )
+	public function display_edit_Number( $block_id, $parameter_id, $parameter_data )
 	{
 		global $template, $board_config, $db, $theme, $lang;
 
@@ -2874,7 +3109,7 @@ class mx_block_parameter
 	 * @param unknown_type $parameter_id
 	 * @param unknown_type $parameter_data
 	 */
-	function display_edit_Boolean( $block_id, $parameter_id, $parameter_data )
+	public function display_edit_Boolean( $block_id, $parameter_id, $parameter_data )
 	{
 		global $template, $board_config, $db, $theme, $lang;
 
@@ -2913,7 +3148,7 @@ class mx_block_parameter
 	 * @param unknown_type $parameter_id
 	 * @param unknown_type $parameter_data
 	 */
-	function display_edit_Function( $block_id, $parameter_id, $parameter_data )
+	public function display_edit_Function( $block_id, $parameter_id, $parameter_data )
 	{
 		global $template, $board_config, $db, $theme, $lang;
 
@@ -2944,7 +3179,7 @@ class mx_block_parameter
 	 * @param unknown_type $parameter_id
 	 * @param unknown_type $parameter_data
 	 */
-	function display_edit_Radio_single_select( $block_id, $parameter_id, $parameter_data )
+	public function display_edit_Radio_single_select( $block_id, $parameter_id, $parameter_data )
 	{
 		global $template, $board_config, $db, $theme, $lang;
 
@@ -2985,7 +3220,7 @@ class mx_block_parameter
 	 * @param unknown_type $parameter_id
 	 * @param unknown_type $parameter_data
 	 */
-	function display_edit_Menu_single_select( $block_id, $parameter_id, $parameter_data )
+	public function display_edit_Menu_single_select( $block_id, $parameter_id, $parameter_data )
 	{
 		global $template, $board_config, $db, $theme, $lang;
 
@@ -3026,7 +3261,7 @@ class mx_block_parameter
 	 * @param unknown_type $parameter_id
 	 * @param unknown_type $parameter_data
 	 */
-	function display_edit_Menu_multiple_select( $block_id, $parameter_id, $parameter_data )
+	public function display_edit_Menu_multiple_select( $block_id, $parameter_id, $parameter_data )
 	{
 		global $template, $board_config, $db, $theme, $lang;
 
@@ -3076,7 +3311,7 @@ class mx_block_parameter
 	 * @param unknown_type $parameter_id
 	 * @param unknown_type $parameter_data
 	 */
-	function display_edit_Checkbox_multiple_select( $block_id, $parameter_id, $parameter_data )
+	public function display_edit_Checkbox_multiple_select( $block_id, $parameter_id, $parameter_data )
 	{
 		global $template, $board_config, $db, $theme, $lang;
 
@@ -3224,21 +3459,27 @@ class mx_page
 	 * @param integer $page_id
 	 * @param boolean $force_query
 	 */
-	function init( $page_id, $force_query = false )
+	public function init($page_id, $force_query = false)
 	{
-		global $db, $userdata, $debug, $portal_config, $mx_cache;
+		global $db, $userdata, $debug, $portal_config, $mx_cache, $lang;
 
-		unset( $this->page_rowset );
-		unset( $this->subpage_rowset );
+		unset($this->page_rowset);
+		unset($this->subpage_rowset);
 
 		$sql = 'SELECT *
 			FROM ' . PAGE_TABLE . '
 			ORDER BY page_parent, page_order ASC';
 
-		if ( !( $result = $db->sql_query( $sql ) ) )
+		//display an error debuging message only if the portal is installed/upgraded 
+		if((!$result = @$db->sql_query($sql)) && @!file_exists('install'))
 		{
-			mx_message_die( GENERAL_ERROR, 'Couldnt Query pages info', '', __LINE__, __FILE__, $sql );
+			mx_message_die(GENERAL_ERROR, 'Couldnt Query pages info', '', __LINE__, __FILE__, $sql);
 		}
+		elseif((!$result = @$db->sql_query($sql)) && @file_exists('install'))
+		{
+			mx_message_die(GENERAL_ERROR, "Couldnt Query pages info"."<br />Please finish installin/upgrading the database. <br />".$lang['Please_remove_install_contrib'], "",__LINE__, __FILE__, $sql);
+		}
+		
 		$page_rowset = $db->sql_fetchrowset( $result );
 
 		$db->sql_freeresult( $result );
@@ -3250,23 +3491,21 @@ class mx_page
 			$this->total_page++;
 		}
 
-		//
 		// Load page data
-		//
 		$this->page_id = $page_id;
 	 	$this->page_config = $mx_cache->read( $this->page_id, MX_CACHE_PAGE_TYPE, $force_query );
 	 	$this->_set_all();
 	}
 
-	// ------------------------------
-	// Private Methods
-	//
+	/* ------------------------------
+	* Private Methods
+	*/
 
 	/**
 	 * Clean up
 	 * @access private
 	 */
-	function _core()
+	public function _core()
 	{
 		if ( $this->modified )
 		{
@@ -3278,7 +3517,7 @@ class mx_page
 	 * Sync All.
 	 * @access private
 	 */
-	function sync_all()
+	public function sync_all()
 	{
 		foreach( $this->page_rowset as $page_id => $void )
 		{
@@ -3294,7 +3533,7 @@ class mx_page
 	 * @param unknown_type $page_id
 	 * @param unknown_type $init
 	 */
-	function sync( $page_id, $init = true )
+	public function sync( $page_id, $init = true )
 	{
 		global $db;
 
@@ -3324,7 +3563,7 @@ class mx_page
 	 * @param unknown_type $parent_id
 	 * @param unknown_type $page_nav
 	 */
-	function core_nav( $parent_id, &$page_nav )
+	public function core_nav( $parent_id, &$page_nav )
 	{
 		if ( !empty( $this->page_rowset[$parent_id] ) )
 		{
@@ -3340,7 +3579,7 @@ class mx_page
 	 * @access public
 	 * @param unknown_type $true_false
 	 */
-	function modified( $true_false = false )
+	public function modified( $true_false = false )
 	{
 		$this->modified = $true_false;
 	}
@@ -3349,16 +3588,18 @@ class mx_page
 	 * Initiate and load page data
 	 * @access private
 	 */
-	function _set_all()
+	public function _set_all()
 	{
 		global $userdata, $mx_root_path, $mx_request_vars, $portal_config, $theme, $lang;
-		global $mx_block;
+		global $mx_block, $tplEx, $_GET;
 
-		$this->info = $this->page_config[$this->page_id]['page_info'];
-
-		//
-		// IP filter
-		//
+		$this->info = &$this->page_config[$this->page_id]['page_info'];	
+		
+		$is_admin = ($userdata['user_level'] == ADMIN && $userdata['session_logged_in']) ? true : 0;
+	
+		/*
+		* IP filter
+		*/
 		$mx_ip = new mx_ip;
 
 		//
@@ -3370,28 +3611,36 @@ class mx_page
 
 		$this->default_style = $this->info['default_style'] == -1 ? ($portal_config['default_style']) : ( $this->info['default_style'] );
 		$this->override_user_style = $this->info['override_user_style'] == -1 ? ($portal_config['override_user_style'] == 1 ? 1 : 0 ) : ( $this->info['override_user_style'] == 1 ? 1 : 0 );
-
-		$this->page_ov_header = !empty($this->info['page_header']) ? $this->info['page_header'] : $portal_config['overall_header'];
+		//
+		// Setup demo style
+		//
+		if (isset($_GET['strip']) && ($_GET['strip'] == true))
+		{
+			$this->page_ov_header = 'overall_header_print.'.$tplEx;
+		}
+		else		
+		{
+			$this->page_ov_header = !empty($this->info['page_header']) ? $this->info['page_header'] : $portal_config['overall_header'];
+		}
 		$this->page_ov_footer = !empty($this->info['page_footer']) ? $this->info['page_footer'] : $portal_config['overall_footer'];
 		$this->page_main_layout = !empty($this->info['page_main_layout']) ? $this->info['page_main_layout'] : $portal_config['main_layout'];
 		$this->phpbb_stats = $this->info['phpbb_stats'] == -1 ? ($portal_config['top_phpbb_links'] == 1 ? true : false ) : ( $this->info['phpbb_stats'] == 1 ? true : false );
 		$this->page_navigation_block = $this->info['page_navigation_block'] == 0 ? $portal_config['navigation_block'] : $this->info['page_navigation_block'];
 
-		//
 		// Set the public view auth
-		//
 		$this->_auth_ary = $this->auth();
 		$this->auth_view = $this->_auth_ary['auth_view'];
-		$this->auth_mod = $this->_auth_ary['auth_mod'];
+		//$this->auth_mod = $this->_auth_ary['auth_mod'];
+		$this->auth_mod = isset($this->_auth_ary['auth_mod']) ? $this->_auth_ary['auth_mod'] : $is_admin;
 		$this->auth_ip = $mx_ip->auth($this->info['ip_filter']);
 
-		$this->columns = $this->page_config[$this->page_id]['columns'];
+		$this->columns = &$this->page_config[$this->page_id]['columns'];
 		$this->total_column = count($this->columns);
 
-		$this->blocks = $this->page_config[$this->page_id]['blocks'];
+		$this->blocks = &$this->page_config[$this->page_id]['blocks'];
 		$this->total_block = count($this->blocks);
 
-		$this->block_border_graphics =  $theme['border_graphics'];
+		$this->block_border_graphics = isset($theme['border_graphics']) ? $theme['border_graphics'] : false;
 
 		$s_hidden_fields = '<input type="hidden" name="sid" value="' . $userdata['session_id'] . '" />';
 		$s_hidden_fields .= '<input type="hidden" name="portalpage" value="' . $this->page_id . '" />';
@@ -3406,7 +3655,7 @@ class mx_page
 		//
 		$this->editcp_show = ( $userdata['user_level'] == ADMIN && isset($_COOKIE['editCP_switch']) ) ? $_COOKIE['editCP_switch'] == 1 : true;
 
-		$this->is_virtual = $this->page_config[$this->page_id]['virtual'];
+		$this->is_virtual = isset($this->page_config[$this->page_id]['virtual']) ? $this->page_config[$this->page_id]['virtual'] : false;
 	}
 
 	/**
@@ -3416,7 +3665,7 @@ class mx_page
 	 * @param unknown_type $column
 	 * @return unknown
 	 */
-	function _get_colclass( $column )
+	public function _get_colclass( $column )
 	{
 		if ( $this->total_column == 1 )
 		{
@@ -3452,7 +3701,7 @@ class mx_page
 	 *
 	 * @access public
 	 */
-	function kill_me()
+	public function kill_me()
 	{
 		global $mx_cache;
 
@@ -3468,9 +3717,9 @@ class mx_page
 	 * @param unknown_type $default the page you wanted to be selected
 	 * @return unknown
 	 */
-	function generate_jumpbox( $page_id = 0, $depth = 0, $default = '' )
+	public function generate_jumpbox($page_id = 0, $depth = 0, $default = '')
 	{
-		$page_list .= '';
+		$page_list = '';
 
 		$pre = str_repeat( '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', $depth );
 
@@ -3514,7 +3763,7 @@ class mx_page
 	 * @access public
 	 * @param unknown_type $page_id
 	 */
-	function generate_navigation( $page_id )
+	public function generate_navigation( $page_id )
 	{
 		global $template, $db;
 
@@ -3564,7 +3813,7 @@ class mx_page
 	 * @access public
 	 * @param string $key
 	 */
-	function add_copyright($key = '')
+	public function add_copyright($key = '')
 	{
 		$this->mxbb_copyright_addup[] = $key;
 	}
@@ -3577,7 +3826,7 @@ class mx_page
 	 * @access public
 	 * @param string $path
 	 */
-	function add_css_file($filename = '')
+	public function add_css_file($filename = '')
 	{
 		global $mx_block, $theme, $mx_user;
 
@@ -3603,9 +3852,11 @@ class mx_page
 	 * @access public
 	 * @param string $path
 	 */
-	function add_js_file($path = '')
+	public function add_js_file($path = '')
 	{
-		$this->mxbb_js_addup[] = $mx_block->module_root_path . $path;
+		//global $mx_block, $module_root_path;
+		//$this->mxbb_js_addup[] = $mx_block->module_root_path . $path;
+		$this->mxbb_js_addup[] = $path;
 	}
 
 	/**
@@ -3617,7 +3868,7 @@ class mx_page
 	 * @param string $text
 	 * @param boolean $read_file
 	 */
-	function add_header_text($text = '', $read_file = false)
+	public function add_header_text($text = '', $read_file = false)
 	{
 		// Provide these variables to be evaluated in the file
 		global $mx_block, $theme;
@@ -3655,7 +3906,7 @@ class mx_page
 	 * @param string $text
 	 * @param boolean $read_file
 	 */
-	function add_footer_text($text = '', $read_file = false)
+	public function add_footer_text($text = '', $read_file = false)
 	{
 		// Provide these variables to be evaluated in the file
 		global $mx_block, $theme;
@@ -3696,7 +3947,7 @@ class mx_page
 	 *
 	 * @access private
 	 */
-	function editcp_exists()
+	public function editcp_exists()
 	{
 		global $userdata;
 
@@ -3712,7 +3963,7 @@ class mx_page
 	 * @access private
 	 * @param integer $column
 	 */
-	function output_column( $column )
+	public function output_column( $column )
 	{
 		global $layouttemplate;
 
@@ -3745,22 +3996,21 @@ class mx_page
 	 * @param unknown_type $moderator_data
 	 * @return array
 	 */
-	function auth($auth_data = '', $group_data = '', $moderator_data = '')
+	public function auth($auth_data = '', $group_data = '', $moderator_data = '')
 	{
-		global $db, $lang, $userdata;
+		global $db, $lang, $mx_user, $userdata;
 
 		$auth_label = array('auth_view');
 		$auth_fields = array('page_auth_view');
 		$auth_fields_groups = array('page_auth_view_group');
 
-		$is_admin = ( $userdata['user_level'] == ADMIN && $userdata['session_logged_in'] ) ? TRUE : 0;
-
+		$is_admin = ($userdata['user_level'] == ADMIN && $userdata['session_logged_in']) ? TRUE : 0;
+		$auth_user['auth_mod'] = $is_admin;
+		
 		$auth_user = array();
 		for( $i = 0; $i < count($auth_fields); $i++ )
 		{
-			//
 			// Fix for making this method useful also other pages, not only current one.
-			//
 			$auth_data = !empty($auth_data) ? $auth_data : $this->info[$auth_fields[$i]];
 			$group_data = !empty($group_data) ? $group_data : $this->info[$auth_fields_groups[$i]];
 			$moderator_data = !empty($moderator_data) ? $moderator_data : $this->info['page_auth_moderator_group'];
@@ -3773,22 +4023,22 @@ class mx_page
 					break;
 
 				case AUTH_REG:
-					$auth_user[$auth_label[$i]] = ( $userdata['session_logged_in'] ) ? TRUE : 0;
+					$auth_user[$auth_label[$i]] = ($userdata['session_logged_in']) ? TRUE : 0;
 					$auth_user[$auth_label[$i] . '_type'] = $lang['Auth_Registered_Users'];
 					break;
 
 				case AUTH_ANONYMOUS:
-					$auth_user[$auth_label[$i]] = ( ! $userdata['session_logged_in'] ) ? TRUE : 0;
+					$auth_user[$auth_label[$i]] = (!$userdata['session_logged_in']) ? TRUE : 0;
 					$auth_user[$auth_label[$i] . '_type'] = $lang['Auth_Anonymous_Users'];
 					break;
 
 				case AUTH_ACL: // PRIVATE
-					$auth_user[$auth_label[$i]] = ( $userdata['session_logged_in'] ) ? mx_is_group_member($group_data) || $is_admin : 0;
+					$auth_user[$auth_label[$i]] = ($userdata['session_logged_in']) ? mx_is_group_member($group_data) || $is_admin : 0;
 					$auth_user[$auth_label[$i] . '_type'] = $lang['Auth_Users_granted_access'];
 					break;
 
 				case AUTH_MOD:
-					$auth_user[$auth_label[$i]] = ( $userdata['session_logged_in'] ) ? mx_is_group_member($moderator_data) || $is_admin : 0;
+					$auth_user[$auth_label[$i]] = ($userdata['session_logged_in']) ? mx_is_group_member($moderator_data) || $is_admin : 0;
 					$auth_user[$auth_label[$i] . '_type'] = $lang['Auth_Moderators'];
 					break;
 
@@ -3802,10 +4052,8 @@ class mx_page
 					break;
 			}
 		}
-
-		//
 		// Is user a moderator?
-		$auth_user['auth_mod'] = ( $userdata['session_logged_in'] ) ? mx_is_group_member($moderator_data) || $is_admin : 0;
+		$auth_user['auth_mod'] = ($userdata['session_logged_in']) ? mx_is_group_member($moderator_data) || $is_admin : 0;
 
 		return $auth_user;
 	}
@@ -3830,7 +4078,7 @@ class mx_ip
 	 * @access public
 	 * @return string
 	 */
-	function mx_getip()
+	public function mx_getip()
 	{
 		if (getenv("HTTP_CLIENT_IP") && strcasecmp(getenv("HTTP_CLIENT_IP"), "unknown"))
 		{
@@ -3861,7 +4109,7 @@ class mx_ip
 	 * @param string $mx_page_allowed_ips serialized array of IPs
 	 * @return boolean
 	 */
-	function auth( $mx_page_allowed_ips = '' )
+	public function auth( $mx_page_allowed_ips = '' )
 	{
 		//
 		// Turn the serialized data into an array
@@ -3980,9 +4228,8 @@ class mx_request_vars
 	 * @param unknown_type $dflt
 	 * @return unknown
 	 */
-	function _read($var, $type = MX_TYPE_ANY, $dflt = '', $not_null = false)
+	public function _read($var, $type = MX_TYPE_ANY, $dflt = '', $not_null = false)
 	{
-		//global $_POST, $_GET; //is not required?
 		if( ($type & (MX_TYPE_POST_VARS|MX_TYPE_GET_VARS)) == 0 )
 		{
 			$type |= (MX_TYPE_POST_VARS|MX_TYPE_GET_VARS);
@@ -4084,7 +4331,7 @@ class mx_request_vars
 	 * @param string $dflt
 	 * @return string
 	 */
-	function post($var, $type = MX_TYPE_ANY, $dflt = '', $not_null = false)
+	public function post($var, $type = MX_TYPE_ANY, $dflt = '', $not_null = false)
 	{
 		return $this->_read($var, ($type | MX_TYPE_POST_VARS), $dflt, $not_null);
 	}
@@ -4100,7 +4347,7 @@ class mx_request_vars
 	 * @param string $dflt
 	 * @return string
 	 */
-	function get($var, $type = MX_TYPE_ANY, $dflt = '', $not_null = false)
+	public function get($var, $type = MX_TYPE_ANY, $dflt = '', $not_null = false)
 	{
 		return $this->_read($var, ($type | MX_TYPE_GET_VARS), $dflt, $not_null);
 	}
@@ -4116,7 +4363,7 @@ class mx_request_vars
 	 * @param string $dflt
 	 * @return string
 	 */
-	function request($var, $type = MX_TYPE_ANY, $dflt = '', $not_null = false)
+	public function request($var, $type = MX_TYPE_ANY, $dflt = '', $not_null = false)
 	{
 		return $this->_read($var, ($type | MX_TYPE_POST_VARS | MX_TYPE_GET_VARS), $dflt, $not_null);
 	}
@@ -4130,9 +4377,8 @@ class mx_request_vars
 	 * @param string $var
 	 * @return boolean
 	 */
-	function is_post($var)
+	public function is_post($var)
 	{
-		//global $_POST;
 		// Note: _x and _y are used by (at least IE) to return the mouse position at onclick of INPUT TYPE="img" elements.
 		return (isset($_POST[$var]) || ( isset($_POST[$var.'_x']) && isset($_POST[$var.'_y']))) ? 1 : 0;
 	}
@@ -4146,9 +4392,8 @@ class mx_request_vars
 	 * @param string $var
 	 * @return boolean
 	 */
-	function is_get($var)
+	public function is_get($var)
 	{
-		//global $_GET;	
 		return isset($_GET[$var]) ? 1 : 0 ;
 	}
 
@@ -4161,7 +4406,7 @@ class mx_request_vars
 	 * @param string $var
 	 * @return boolean
 	 */
-	function is_request($var)
+	public function is_request($var)
 	{
 		return ($this->is_get($var) || $this->is_post($var)) ? 1 : 0;
 	}
@@ -4175,9 +4420,8 @@ class mx_request_vars
 	 * @param string $var
 	 * @return boolean
 	 */
-	function is_empty_post($var)
+	public function is_empty_post($var)
 	{
-		//global $_POST;	
 		return (empty($_POST[$var]) && ( empty($_POST[$var.'_x']) || empty($_POST[$var.'_y']))) ? 1 : 0 ;
 	}
 	/**
@@ -4190,9 +4434,8 @@ class mx_request_vars
 	 * @param string $var
 	 * @return boolean
 	 */
-	function is_empty_get($var)
+	public function is_empty_get($var)
 	{
-		//global $_GET;	
 		return empty($_GET[$var]) ? 1 : 0 ;
 	}
 
@@ -4205,7 +4448,7 @@ class mx_request_vars
 	 * @param string $var
 	 * @return boolean
 	 */
-	function is_empty_request($var)
+	public function is_empty_request($var)
 	{
 		return ($this->is_empty_get($var) && $this->is_empty_post($var)) ? 1 : 0;
 	}

@@ -2,7 +2,7 @@
 /**
 *
 * @package mxBB Portal Core
-* @version $Id: lang_meta.php,v 1.1 2008/06/16 14:40:00 orynider Exp $
+* @version $Id: lang_meta.php,v 1.3 2011/03/30 21:16:40 orynider Exp $
 * @copyright (c) 2002-2006 mxBB Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 *
@@ -192,8 +192,8 @@ $lang['mx_meta']['langcode']['pt-br']	= "Portuguese (Brazil)";
 $lang['mx_meta']['langcode']['ps']		= "Pushto";
 $lang['mx_meta']['langcode']['qu']		= "Quechua";
 $lang['mx_meta']['langcode']['rm']		= "Raeto-Romance";
-$lang['mx_meta']['langcode']['ro']		= "Românã";
-$lang['mx_meta']['langcode']['ro-mo']	= "Românã (Moldova)";
+$lang['mx_meta']['langcode']['ro']		= "RomÃ¢nÄƒ";
+$lang['mx_meta']['langcode']['ro-mo']	= "RomÃ¢nÄƒ (Moldova)";
 $lang['mx_meta']['langcode']['rn']		= "Rundi";
 $lang['mx_meta']['langcode']['ru']		= "Russian";
 $lang['mx_meta']['langcode']['ru-mo']	= "Russian (Moldavia)";
@@ -257,7 +257,7 @@ $lang['mx_meta']['langcode']['ug']		= "Uyghur";
 $lang['mx_meta']['langcode']['uz']		= "Uzbek";
 $lang['mx_meta']['langcode']['ve']		= "Venda";
 $lang['mx_meta']['langcode']['vi']		= "Vietnamese";
-$lang['mx_meta']['langcode']['vo']		= "Volapük";
+$lang['mx_meta']['langcode']['vo']		= "VolapÃ¼k";
 $lang['mx_meta']['langcode']['wa']		= "Walloon";
 $lang['mx_meta']['langcode']['cy']		= "Welsh";
 $lang['mx_meta']['langcode']['wo']		= "Wolof";
@@ -272,11 +272,11 @@ $lang['mx_meta']['langcode']['zu']		= "Zulu";
 //
 $lang['mx_meta']['rating']['general']	= "General";
 $lang['mx_meta']['rating']['14 years']	= "14 ani";
-$lang['mx_meta']['rating']['restricted']= "Restricþionat";
+$lang['mx_meta']['rating']['restricted']= "RestricÅ£ionat";
 $lang['mx_meta']['rating']['mature']	= "Matur";
 
 $lang['mx_meta']['index']['index']		= "Index";
-$lang['mx_meta']['index']['noindex']	= "Fãrã index";
+$lang['mx_meta']['index']['noindex']	= "FÄƒrÄƒ index";
 
 $lang['mx_meta']['follow']['follow']	= "Follow";
 $lang['mx_meta']['follow']['nofollow']	= "No follow";

@@ -2,11 +2,11 @@
 /**
 *
 * @package DBal
-* @version $Id: mssql.php,v 1.17 2008/08/19 02:46:22 orynider Exp $
+* @version $Id: mssql.php,v 1.21 2013/06/28 15:33:26 orynider Exp $
 * @copyright (c) 2005 phpBB Group
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU Public License
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -36,9 +36,7 @@ class dbal_mssql extends dbal
 {
 	/**
 	* Connect to server
-	*/
-	/**
-	* Connect to server
+	* downgraded for phpBB2 backend
 	*/
 	function sql_connect($sqlserver, $sqluser, $sqlpassword, $database, $port = false, $persistency = false, $new_link = false)
 	{
@@ -47,11 +45,6 @@ class dbal_mssql extends dbal
 		$this->server = $sqlserver . (($port) ? ':' . $port : '');
 		$this->dbname = $database;
 
-		if (UTF_STATUS === 'phpbb3')
-		{				
-				@ini_set('mssql.charset', 'UTF-8');
-				// enforce strict mode on databases that support it
-		}		
 		@ini_set('mssql.textlimit', 2147483647);
 		@ini_set('mssql.textsize', 2147483647);
 
@@ -311,14 +304,14 @@ class dbal_mssql extends dbal
 	*/
 	function sql_nextid()
 	{
-		$result_id = @mssql_query('SELECT @@IDENTITY', $this->db_connect_id);
+		$result_id = @mssql_query('SELECT SCOPE_IDENTITY()', $this->db_connect_id);
 		if ($result_id)
 		{
-			if (@mssql_fetch_assoc($result_id))
+			if ($row = @mssql_fetch_assoc($result_id))
 			{
-				$id = @mssql_result($result_id, 1);
 				@mssql_free_result($result_id);
-				return $id;
+				return $row['computed'];
+
 			}
 			@mssql_free_result($result_id);
 		}
@@ -331,10 +324,19 @@ class dbal_mssql extends dbal
 	*/
 	function sql_freeresult($query_id = false)
 	{
+		global $mx_cache;
+
 		if (!$query_id)
 		{
 			$query_id = $this->query_result;
 		}
+
+		/* Backported from Olympus, not compatible with MXP, yet
+		if (isset($mx_cache->sql_rowset[$query_id]))
+		{
+			return $mx_cache->sql_freeresult($query_id);
+		}
+		*/
 
 		if (isset($this->open_queries[$query_id]))
 		{

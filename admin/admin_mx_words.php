@@ -6,7 +6,7 @@
  *   copyright            : (C) 2001 The phpBB Group
  *   email                : support@phpbb.com
  *
- *   $Id: admin_mx_words.php,v 1.3 2008/02/11 11:13:16 joasch Exp $
+ *   $Id: admin_mx_words.php,v 1.5 2013/06/25 17:15:34 orynider Exp $
  *
  *
  ***************************************************************************/
@@ -26,13 +26,10 @@ if( !empty($setmodules) )
 	$module['1_General_admin']['1_2_WordCensors'] = 'admin/' . $file;
 	return;
 }
-
-define('IN_PHPBB', 1);
-
 //
 // Security and Page header
 //
-define('IN_PORTAL', 1);
+@define('IN_PORTAL', 1);
 $mx_root_path = './../';
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
 $no_page_header = TRUE;
@@ -42,6 +39,9 @@ require('./pagestart.' . $phpEx);
 // Load default header
 //
 include_once('./page_header_admin.' . $phpEx);
+
+$cancel = ($mx_request_vars->is_request('cancel')) ? true : false;
+$no_page_header = $cancel;
 
 if ($cancel)
 {
@@ -252,8 +252,8 @@ else
 		$replacement = $word_rows[$i]['replacement'];
 		$word_id = $word_rows[$i]['word_id'];
 
-		$row_color = ( !($i % 2) ) ? $theme['td_color1'] : $theme['td_color2'];
-		$row_class = ( !($i % 2) ) ? $theme['td_class1'] : $theme['td_class2'];
+		$row_color = ( !($i % 2) ) ? $mx_user->theme['td_color1'] : $mx_user->theme['td_color2'];
+		$row_class = ( !($i % 2) ) ? $mx_user->theme['td_class1'] : $mx_user->theme['td_class2'];
 
 		$template->assign_block_vars("words", array(
 			"ROW_COLOR" => "#" . $row_color,

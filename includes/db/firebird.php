@@ -2,11 +2,11 @@
 /**
 *
 * @package DBal
-* @version $Id: firebird.php,v 1.15 2008/03/07 00:59:02 orynider Exp $
+* @version $Id: firebird.php,v 1.17 2013/06/28 15:33:26 orynider Exp $
 * @copyright (c) 2005 phpBB Group
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU Public License
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -47,23 +47,6 @@ class dbal_firebird extends dbal
 		$this->dbname = $database;
 
 		$this->db_connect_id = ($this->persistency) ? @ibase_pconnect($this->server . ':' . $this->dbname, $this->user, $sqlpassword, false, false, 3) : @ibase_connect($this->server . ':' . $this->dbname, $this->user, $sqlpassword, false, false, 3);
-
-		return ($this->db_connect_id) ? $this->db_connect_id : $this->sql_error('');
-	}
-
-	/**
-	* Connect to server
-	*/
-	function sql_connect($sqlserver, $sqluser, $sqlpassword, $database, $port = false, $persistency = false, $new_link = false)
-	{
-		$this->persistency = $persistency;
-		$this->user = $sqluser;
-		$this->server = $sqlserver . (($port) ? ':' . $port : '');
-		$this->dbname = $database;
-
-		$this->db_connect_id = ($this->persistency) ? @ibase_pconnect($this->server . ':' . $this->dbname, $this->user, $sqlpassword, false, false, 3) : @ibase_connect($this->server . ':' . $this->dbname, $this->user, $sqlpassword, false, false, 3);
-
-		$this->service_handle = (function_exists('ibase_service_attach')) ? @ibase_service_attach($this->server, $this->user, $sqlpassword) : false;
 
 		return ($this->db_connect_id) ? $this->db_connect_id : $this->sql_error('');
 	}

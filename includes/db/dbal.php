@@ -2,11 +2,11 @@
 /**
 *
 * @package DBal
-* @version $Id: dbal.php,v 1.13 2008/10/04 17:30:23 orynider Exp $
+* @version $Id: dbal.php,v 1.17 2013/06/28 15:33:26 orynider Exp $
 * @copyright (c) 2005 phpBB Group
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU Public License
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -414,35 +414,44 @@ class dbal
 	*/
 	function sql_error($sql = '')
 	{
-		global $mx_user;
+		global $mx_user, $mx_root_path, $phpEx, $lang, $board_config;
 
-		$error = $this->_sql_error();
+
+		// Set var to retrieve errored status
+		$this->sql_error_triggered = true;
+		$this->sql_error_sql = $sql;
+
+		$this->sql_error_returned = $this->_sql_error();
 
 		if (!$this->return_on_error)
 		{
-			$message = '<u>SQL ERROR</u> [ ' . SQL_LAYER . ' ]<br /><br />' . $error['message'] . ' [' . $error['code'] . ']';
+			$message = 'SQL ERROR [ ' . $this->sql_layer . ' ]<br /><br />' . $this->sql_error_returned['message'] . ' [' . $this->sql_error_returned['code'] . ']';
 
 			// Show complete SQL error and path to administrators only
-			if ($mx_user->is_admin)
+			// Additionally show complete error on installation or if extended debug mode is enabled
+			// The DEBUG_EXTRA constant is for development only!
+			if ((isset($phpbb_auth) && $phpbb_auth->acl_get('a_')) || defined('IN_INSTALL') || defined('DEBUG_EXTRA'))
 			{
-				// Print out a nice backtrace...
-				//$backtrace = get_backtrace();
-
-				$message .= ($sql) ? '<br /><br /><u>SQL</u><br /><br />' . $sql : '';
-				//$message .= ($backtrace) ? '<br /><br /><u>BACKTRACE</u><br />'  . $backtrace : '';
-				$message .= '<br />';
+				$message .= ($sql) ? '<br /><br />SQL<br /><br />' . htmlspecialchars($sql) : '';
 			}
 			else
 			{
 				// If error occurs in initiating the session we need to use a pre-defined language string
 				// This could happen if the connection could not be established for example (then we are not able to grab the default language)
-				if (!isset($mx_user->_lang['An_error_occured']))
+				if (!isset($lang['SQL_ERROR_OCCURRED']))
 				{
-					$message .= '<br /><br />An sql error occurred while fetching this page. Please contact an administrator if this problem persist.';
+					$message .= '<br /><br />An sql error occurred while fetching this page. Please contact an administrator if this problem persists.';
 				}
 				else
 				{
-					$message .= '<br /><br />' . $mx_user->_lang['An_error_occured'];
+					if (!empty($config['board_contact']))
+					{
+						$message .= '<br /><br />' . sprintf($lang['SQL_ERROR_OCCURRED'], '<a href="mailto:' . htmlspecialchars($board_config['board_contact']) . '">', '</a>');
+					}
+					else
+					{
+						$message .= '<br /><br />' . sprintf($lang['SQL_ERROR_OCCURRED'], '', '');
+					}
 				}
 			}
 
@@ -451,9 +460,26 @@ class dbal
 				$this->sql_transaction('rollback');
 			}
 
+			if (strlen($message) > 1024)
+			{
+				// We need to define $msg_long_text here to circumvent text stripping.
+				global $msg_long_text;
+				$msg_long_text = $message;
+
+				//trigger_error(false, E_USER_ERROR);
+				return $this->sql_error_returned;
+			}
+
+			//trigger_error($message, E_USER_ERROR);
+			return $this->sql_error_returned;
 		}
 
-		return $error;
+		if ($this->transaction)
+		{
+			$this->sql_transaction('rollback');
+		}
+
+		return $this->sql_error_returned;
 	}
 
 	/**

@@ -6,7 +6,7 @@
 *     copyright            : (C) 2002 The phpBB Group
 *     email                : support@phpbb.com
 *
-*     $Id: functions_search.php,v 1.2 2008/07/13 21:29:30 jonohlsson Exp $
+*     $Id: functions_search.php,v 1.3 2008/12/08 23:57:18 orynider Exp $
 *
 ****************************************************************************/
 
@@ -168,7 +168,7 @@ function add_search_words($mode, $post_id, $post_text, $post_title = '')
 					WHERE word_text IN ($word_text_sql)";
 				if ( !($result = $db->sql_query($sql)) )
 				{
-					mx_message_die(GENERAL_ERROR, 'Could not select words', '', __LINE__, __FILE__, $sql);
+					//mx_message_die(GENERAL_ERROR, 'Could not select words', '', __LINE__, __FILE__, $sql);
 				}
 
 				while ( $row = $db->sql_fetchrow($result) )
@@ -205,7 +205,7 @@ function add_search_words($mode, $post_id, $post_text, $post_title = '')
 							VALUES ('" . $word[$i] . "', 0)";
 						if( !$db->sql_query($sql) )
 						{
-							mx_message_die(GENERAL_ERROR, 'Could not insert new word', '', __LINE__, __FILE__, $sql);
+							//mx_message_die(GENERAL_ERROR, 'Could not insert new word', '', __LINE__, __FILE__, $sql);
 						}
 						break;
 				}
@@ -230,7 +230,7 @@ function add_search_words($mode, $post_id, $post_text, $post_title = '')
 
 			if ( !$db->sql_query($sql) )
 			{
-				mx_message_die(GENERAL_ERROR, 'Could not insert new word', '', __LINE__, __FILE__, $sql);
+				//mx_message_die(GENERAL_ERROR, 'Could not insert new word', '', __LINE__, __FILE__, $sql);
 			}
 		}
 	}
@@ -247,7 +247,7 @@ function add_search_words($mode, $post_id, $post_text, $post_title = '')
 					WHERE word_text IN ($match_sql)";
 			if ( !$db->sql_query($sql) )
 			{
-				mx_message_die(GENERAL_ERROR, 'Could not insert new word matches', '', __LINE__, __FILE__, $sql);
+				//mx_message_die(GENERAL_ERROR, 'Could not insert new word matches', '', __LINE__, __FILE__, $sql);
 			}
 		}
 	}
@@ -403,7 +403,7 @@ function remove_search_post($post_id_sql)
 				)";
 			if ( !$db->sql_query($sql) )
 			{
-				mx_message_die(GENERAL_ERROR, 'Could not delete old words from word table', '', __LINE__, __FILE__, $sql);
+				//mx_message_die(GENERAL_ERROR, 'Could not delete old words from word table', '', __LINE__, __FILE__, $sql);
 			}
 
 			$words_removed = $db->sql_affectedrows();
@@ -415,7 +415,7 @@ function remove_search_post($post_id_sql)
 		WHERE post_id IN ($post_id_sql)";
 	if ( !$db->sql_query($sql) )
 	{
-		mx_message_die(GENERAL_ERROR, 'Error in deleting post', '', __LINE__, __FILE__, $sql);
+		//mx_message_die(GENERAL_ERROR, 'Error in deleting post', '', __LINE__, __FILE__, $sql);
 	}
 
 	return $words_removed;

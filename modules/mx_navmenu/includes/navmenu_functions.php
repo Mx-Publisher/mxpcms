@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Module - mx_navmenu
-* @version $Id: navmenu_functions.php,v 1.16 2008/05/08 18:38:41 jonohlsson Exp $
+* @version $Id: navmenu_functions.php,v 1.17 2014/05/18 06:25:07 orynider Exp $
 * @copyright (c) 2002-2008 [Martin, Markus, Jon Ohlsson] MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net
 *
 */
 

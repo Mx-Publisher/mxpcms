@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: login.php,v 1.7 2008/10/04 07:04:25 orynider Exp $
+* @version $Id: login.php,v 1.13 2014/07/07 21:31:16 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -16,8 +16,9 @@ if ( !defined('IN_PORTAL') )
 
 if($mx_request_vars->is_request('login') && ($userdata['user_id'] == ANONYMOUS || $mx_request_vars->is_post('admin')) )
 {
-	$username = $mx_request_vars->is_post('username') ? $phpBB2->phpbb_clean_username($mx_request_vars->post('username', MX_TYPE_NO_TAGS)) : '';
+	$username = utf8_clean_string($mx_request_vars->post('username', MX_TYPE_NO_TAGS, ''));
 	$password = $mx_request_vars->post('password', MX_TYPE_NO_TAGS);
+	$viewonline = $mx_request_vars->post('viewonline', MX_TYPE_INT, 0);
 
 	$sql = "SELECT *
 		FROM " . USERS_TABLE . "
@@ -62,7 +63,7 @@ if($mx_request_vars->is_request('login') && ($userdata['user_id'] == ANONYMOUS |
 				$password_old_format = (!STRIP) ? addslashes($password_old_format) : $password_old_format;
 				$password_new_format = '';
 
-				$phpBB3->set_var($password_new_format, stripslashes($password_old_format), 'string');
+				phpBB3::set_var($password_new_format, stripslashes($password_old_format), 'string');
 
 				//mx_message_die(CRITICAL_ERROR, "Couldn't start session : login", $password_new_format, '');
 
@@ -70,14 +71,14 @@ if($mx_request_vars->is_request('login') && ($userdata['user_id'] == ANONYMOUS |
 				{
 					if (!function_exists('utf8_to_cp1252'))
 					{
-						global $phpbb_root_path, $phpEx;
-						include($phpbb_root_path . 'includes/utf/data/recode_basic.' . $phpEx);
+						global $mx_root_path, $phpEx;
+						include_once($mx_root_path . 'includes/utf/data/recode_basic.' . $phpEx);
 					}
 
 					// cp1252 is phpBB2's default encoding, characters outside ASCII range might work when converted into that encoding
 					if (md5($password_old_format) == $row['user_password'] || md5(utf8_to_cp1252($password_old_format)) == $row['user_password'])
 					{
-						$hash = $phpBB3->phpbb_hash($password_new_format);
+						$hash = phpBB3::phpbb_hash($password_new_format);
 
 						// Update the password in the users table to the new format and remove user_pass_convert flag
 						$sql = 'UPDATE ' . USERS_TABLE . '
@@ -97,7 +98,7 @@ if($mx_request_vars->is_request('login') && ($userdata['user_id'] == ANONYMOUS |
 							SET user_login_attempts = user_login_attempts + 1
 							WHERE user_id = ' . $row['user_id'];
 						$db->sql_query($sql);
-
+						mx_message_die(GENERAL_MESSAGE, 'We are sorry but password convertion failed, please login direct in forums or rewuest a new activation link.');
 						return array(
 							'status'		=> LOGIN_ERROR_PASSWORD_CONVERT,
 							'error_msg'		=> 'LOGIN_ERROR_PASSWORD_CONVERT',
@@ -112,31 +113,30 @@ if($mx_request_vars->is_request('login') && ($userdata['user_id'] == ANONYMOUS |
 				$password_old_format = isset($_REQUEST['password']) ? $_REQUEST['password'] : $password;
 				$password_old_format = (!STRIP) ? addslashes($password_old_format) : $password_old_format;
 				$password_new_format = '';
-				$phpBB3->set_var($password_new_format, stripslashes($password_old_format), 'string');
+				phpBB3::set_var($password_new_format, stripslashes($password_old_format), 'string');
 				//mx_message_die(CRITICAL_ERROR, "Couldn't start session : login", $password_new_format, '');
 
 				if ($password_new_format == $password_old_format)
 				{
 					if (!function_exists('utf8_to_cp1252'))
 					{
-							global $phpbb_root_path, $phpEx;
-							include($phpbb_root_path . 'includes/utf/data/recode_basic.' . $phpEx);
+							global $mx_root_path, $phpEx;
+							include_once($mx_root_path . 'includes/utf/data/recode_basic.' . $phpEx);
 					}
-				
+
 					// cp1252 is phpBB2's default encoding, characters outside ASCII range might work when converted into that encoding
-					if (md5($password_old_format) == $row['user_password'] || md5($password) == $row['user_password'] || $phpBB3->phpbb_check_hash($password, $row['user_password']))
+					if (md5($password_old_format) == $row['user_password'] || md5($password) == $row['user_password'] || phpBB3::phpbb_check_hash($password, $row['user_password']))
 					{
 						$autologin = $mx_request_vars->is_post('autologin');
 						$admin = $mx_request_vars->is_post('admin');
 						$mx_user->session_create($row['user_id'], $admin, $autologin, $viewonline = true);
 						$session_id = $mx_user->session_id;
 						
-
 						// Reset login tries
 						//$db->sql_query('UPDATE ' . USERS_TABLE . ' SET user_login_tries = 0, user_last_login_try = 0 WHERE user_id = ' . $row['user_id']); // phpBB2
 						$db->sql_query('UPDATE ' . USERS_TABLE . ' SET user_login_attempts = 0 WHERE user_id = ' . $row['user_id']); // phpBB3
 
-						if( $session_id )
+						if(!empty($session_id))
 						{
 							$fromurl = ( !empty($HTTP_REFERER) ) ? str_replace('&amp;', '&', htmlspecialchars($HTTP_REFERER)) : "index.$phpEx";
 							$url = !$mx_request_vars->is_empty_post('redirect') ? str_replace('&amp;', '&', $mx_request_vars->post('redirect', MX_TYPE_NO_TAGS)) : $fromurl;
@@ -174,7 +174,7 @@ if($mx_request_vars->is_request('login') && ($userdata['user_id'] == ANONYMOUS |
 					}
 				}
 				// Check password ...
-				if (!$row['user_pass_convert'] && $phpBB3->phpbb_check_hash($password, $row['user_password']))
+				if (!$row['user_pass_convert'] && phpBB3::phpbb_check_hash($password, $row['user_password']))
 				{
 					if ($row['user_login_attempts'] != 0)
 					{
@@ -188,19 +188,25 @@ if($mx_request_vars->is_request('login') && ($userdata['user_id'] == ANONYMOUS |
 					// User inactive...
 					if ($row['user_type'] == USER_INACTIVE || $row['user_type'] == USER_IGNORE)
 					{
-
+						mx_message_die(GENERAL_MESSAGE, 'Inactive User');
 					}
 
 					// Successful login... set user_login_attempts to zero...
-					if( $session_id )
+					if(!empty($session_id))
 					{
 						$url = !$mx_request_vars->is_empty_post('redirect') ? str_replace('&amp;', '&', $mx_request_vars->post('redirect', MX_TYPE_NO_TAGS)) : "index.$phpEx";
 						mx_redirect(mx3_append_sid($url, false));
 					}
-					else
+					else if(!empty($mx_user->session_id))
 					{
-						mx_message_die(CRITICAL_ERROR, "Couldn't start session : login", "", __LINE__, __FILE__);
+						$session_id = $mx_user->session_id;						
+						$url = !$mx_request_vars->is_empty_post('redirect') ? str_replace('&amp;', '&', $mx_request_vars->post('redirect', MX_TYPE_NO_TAGS)) : "index.$phpEx";
+						mx_redirect(mx3_append_sid($url, false));
 					}
+					else
+					{						
+						mx_message_die(CRITICAL_ERROR, "Couldn't start session : login", "", __LINE__, __FILE__);
+					}					
 				}
 			}
 		}

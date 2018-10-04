@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Module - mx_phpbb2blocks
-* @version $Id: lang_admin.php,v 1.2 2008/10/04 07:04:38 orynider Exp $
+* @version $Id: lang_admin.php,v 1.4 2013/06/28 15:37:32 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -21,59 +21,58 @@
 //
 // Last Message Post
 //
-$lang['Last_Msg_forum']            		= "Ξ Ξ»Ξ·ΟΞΏΟ†ΞΏΟΞ―ΞµΟ‚ Forums";
-$lang['Last_Msg_forum_explain']    		= "- ΞΟ€ΞΏΟΞµΞ―Ο„Ξµ Ξ½Ξ± ΞΊΞ¬Ξ½ΞµΟ„Ξµ Ο€ΞΏΞ»Ξ»Ξ±Ο€Ξ»Ξ­Ο‚ ΞµΟ€ΞΉΞ»ΞΏΞ³Ξ­Ο‚<br />* Ξ•Ξ¬Ξ½ Ξ΄ΞµΞ½ ΞµΟ€ΞΉΞ»Ξ­ΞΎΞµΟ„Ξµ, ΟΞ»Ξ± Ο„Ξ± ΞµΞΎΞΏΟ…ΟƒΞΉΞΏΞ΄ΞΏΟ„Ξ·ΞΌΞ­Ξ½Ξ± forums ΞΈΞ± ΞµΞ―Ξ½Ξ±ΞΉ ΞΏΟΞ±Ο„Ξ¬";
-$lang['Last_Msg_Display_Icon_View']   	= "Ξ ΟΞΏΞ²ΞΏΞ»Ξ® Ξ•ΞΉΞΊΟΞ½Ξ±Ο‚ Ξ³ΞΉΞ± 'ΞΞµΟ„Ξ±Ξ²Ξ―Ξ²Ξ±ΟƒΞ· ΟƒΟ„ΞΏ Ο„ΞµΞ»ΞµΟ…Ο„Ξ±Ξ―ΞΏ ΞΌΞ®Ξ½Ο…ΞΌΞ±'";
-$lang['Last_Msg_Display_Last_Author'] 	= "Ξ ΟΞΏΞ²ΞΏΞ»Ξ® Ξ¤ΞµΞ»ΞµΟ…Ο„Ξ±Ξ―Ξ±Ο‚ Ξ”Ξ·ΞΌΞΏΟƒΞ―ΞµΟ…ΟƒΞ·Ο‚";
-$lang['Last_Msg_Display_Author']      	= "Ξ ΟΞΏΞ²ΞΏΞ»Ξ® ΞΞ½ΟΞΌΞ±Ο„ΞΏΟ‚ Ξ£Ο…Ξ½Ο„Ξ¬ΞΊΟ„Ξ·";
-$lang['Last_Msg_Settings']         		= "Ξ”ΞΉΞ±ΞΌΟΟΟ†Ο‰ΟƒΞ· Ξ³ΞΉΞ± Ο„ΞΏ Ο„ΞµΞ»ΞµΟ…Ο„Ξ±Ξ―ΞΏ ΞΌΞ®Ξ½Ο…ΞΌΞ± Post Module:";
+$lang['Last_Msg_forum']            		= "Πληροφορίες Forums";
+$lang['Last_Msg_forum_explain']    		= "- Μπορείτε να κάνετε πολλαπλές επιλογές<br />* Εάν δεν επιλέξετε, όλα τα εξουσιοδοτημένα forums θα είναι ορατά";
+$lang['Last_Msg_Display_Icon_View']   	= "Προβολή Εικόνας για 'Μεταβίβαση στο τελευταίο μήνυμα'";
+$lang['Last_Msg_Display_Last_Author'] 	= "Προβολή Τελευταίας Δημοσίευσης";
+$lang['Last_Msg_Display_Author']      	= "Προβολή Ονόματος Συντάκτη";
+$lang['Last_Msg_Settings']         		= "Διαμόρφωση για το τελευταίο μήνυμα Post Module:";
 
-$lang['Last_Msg_Settings']         		= "Ξ”ΞΉΞ±ΞΌΟΟΟ†Ο‰ΟƒΞ· Ξ³ΞΉΞ± Ο„ΞΏ Ο„ΞµΞ»ΞµΟ…Ο„Ξ±Ξ―ΞΏ ΞΌΞ®Ξ½Ο…ΞΌΞ± Post Module:";
+$lang['Last_Msg_Settings']         		= "Διαμόρφωση για το τελευταίο μήνυμα Post Module:";
 
-$lang['Last_Msg_Number_Title']     		= "Ξ‘ΟΞΉΞΈΞΌΟΟ‚ Ο€ΟΞΏΞ²ΞΏΞ»Ξ®Ο‚ Ξ”Ξ·ΞΌΞΏΟƒΞΉΞµΟΟƒΞµΟ‰Ξ½:";
-$lang['Last_Msg_Display_Date']     		= "Ξ ΟΞΏΞ²ΞΏΞ»Ξ® Ξ—ΞΌΞ­ΟΞ±Ο‚?";
-$lang['Last_Msg_Title_Length']     		= "ΞΞ®ΞΊΞΏΟ‚ Ξ¤Ξ―Ο„Ξ»ΞΏΟ… (max. Ο‡Ξ±ΟΞ±ΞΊΟ„Ξ®ΟΞµΟ‚):";
+$lang['Last_Msg_Number_Title']     		= "Αριθμός προβολής Δημοσιεύσεων:";
+$lang['Last_Msg_Display_Date']     		= "Προβολή Ημέρας?";
+$lang['Last_Msg_Title_Length']     		= "Μήκος Τίτλου (max. χαρακτήρες):";
 
 $lang['Last_Msg_Title_Length_Info']		= "";
-$lang['Last_Msg_Display_Forum']    		= "Ξ ΟΞΏΞ²ΞΏΞ»Ξ® ΞΞ½ΟΞΌΞ±ΟƒΞ―Ξ±Ο‚ Forum?";
+$lang['Last_Msg_Display_Forum']    		= "Προβολή Ονόμασίας Forum?";
 
-$lang['Last_Msg_Align']            		= "Ξ•Ο…ΞΈΟ…Ξ³Ο. Ξ¤Ξ―Ο„Ξ»ΞΏΟ…:" ;
+$lang['Last_Msg_Align']            		= "Ευθυγρ. Τίτλου:" ;
 
-$lang['Last_Msg_Align_Left']       		= "Ξ±ΟΞΉΟƒΟ„ΞµΟΞ¬";
-$lang['Last_Msg_Align_Right']      		= "Ξ΄ΞµΞΎΞΉΞ¬";
-$lang['Last_Msg_Align_Center']     		= "ΞΊΞ­Ξ½Ο„ΟΞΏ";
+$lang['Last_Msg_Align_Left']       		= "αριστερά";
+$lang['Last_Msg_Align_Right']      		= "δεξιά";
+$lang['Last_Msg_Align_Center']     		= "κέντρο";
 
-$lang['Last_Msg_Target']           		= "'Ξ‘Ξ½ΞΏΞΉΞ³ΞΌΞ±:";
-$lang['Last_Msg_Target_1']         		= "ΞΞµΞΏ Ξ Ξ±ΟΞ¬ΞΈΟ…ΟΞΏ";
-$lang['Last_Msg_Target_2']         		= "Ξ¤ΟΞ­Ο‡Ο‰Ξ½ Ξ Ξ±ΟΞ¬ΞΈΟ…ΟΞΏ";
+$lang['Last_Msg_Target']           		= "'Ανοιγμα:";
+$lang['Last_Msg_Target_1']         		= "Νεο Παράθυρο";
+$lang['Last_Msg_Target_2']         		= "Τρέχων Παράθυρο";
 
-$lang['msg_filter_date']			= "Ξ§ΟΞΏΞ½ΞΉΞΊΟ Ξ¦ΞΉΞ»Ο„Ξ¬ΟΞΉΟƒΞΌΞ±";
-$lang['msg_filter_date_explain']	= "- Ξ Ξ±ΟΞΏΟ…ΟƒΞ―Ξ±ΟƒΞ· Ξ΄Ξ·ΞΌΞΏΟƒΞΉΞµΟΟƒΞµΟ‰Ξ½ Ο„ΞµΞ»ΞµΟ…Ο„Ξ±Ξ―Ξ± ΞµΞ²Ξ΄ΞΏΞΌΞ¬Ξ΄Ξ±, ΞΌΞ®Ξ½Ξ±, Ξ­Ο„ΞΏΟ‚...";
+$lang['msg_filter_date']			= "Χρονικό Φιλτάρισμα";
+$lang['msg_filter_date_explain']	= "- Παρουσίαση δημοσιεύσεων τελευταία εβδομάδα, μήνα, έτος...";
 
 //
 // Announcement
 //
-$lang['announce_nbr_display']		= "ΞΞ­Ξ³ΞΉΟƒΟ„ΞΏΟ‚ Ξ±ΟΞΉΞΈΞΌΟΟ‚ ΞΌΞ·Ξ½Ο…ΞΌΞ¬Ο„Ο‰Ξ½ Ο€ΟΞΏΟ‚ Ο€ΟΞΏΞ²ΞΏΞ»Ξ®";
-$lang['announce_nbr_days']			= "Ξ‘ΟΞΉΞΈΞΌΟΟ‚ Ξ·ΞΌΞµΟΟΞ½ Ξ³ΞΉΞ± Ο€ΟΞΏΞ²ΞΏΞ»Ξ® ΞΌΞ·Ξ½Ο…ΞΌΞ¬Ο„Ο‰Ξ½";
-$lang['announce_img']				= "Ξ•ΞΉΞΊΟΞ½Ξ± Ξ‘Ξ½Ξ±ΞΊΞΏΞ―Ξ½Ο‰ΟƒΞ·Ο‚";
+$lang['announce_nbr_display']		= "Μέγιστος αριθμός μηνυμάτων προς προβολή";
+$lang['announce_nbr_days']			= "Αριθμός ημερών για προβολή μηνυμάτων";
+$lang['announce_img']				= "Εικόνα Ανακοίνωσης";
 $lang['announce_img_sticky']		= "Sticky Image";
-$lang['announce_img_normal']		= "Ξ•ΞΉΞΊΟΞ½Ξ± ΞΞ±Ξ½ΞΏΞ½ΞΉΞΊΞΏΟ ΞΞ·Ξ½ΟΞΌΞ±Ο„ΞΏΟ‚";
-$lang['announce_img_global']		= "Ξ•ΞΉΞΊΟΞ½Ξ± Ξ“ΞµΞ½ΞΉΞΊΞ®Ο‚ Ξ‘Ξ½Ξ±ΞΊΞΏΞ―Ξ½Ο‰ΟƒΞ·Ο‚";
-$lang['announce_display']			= "Ξ ΟΞΏΞ²ΞΏΞ»Ξ® ΞΞ·Ξ½ΟΞΌΞ±Ο„ΞΏΟ‚ Ξ‘Ξ½Ξ±ΞΊΞΏΞ―Ξ½Ο‰ΟƒΞ·Ο‚(ΟƒΞµΟ‰Ξ½) ΟƒΞµ Ξ±Ο…Ο„Ο Ο„ΞΏ Block";
-$lang['announce_display_sticky']	= "Ξ ΟΞΏΞ²ΞΏΞ»Ξ® Sticky(ies) ΟƒΞµ Ξ±Ο…Ο„Ο Ο„ΞΏ Block";
-$lang['announce_display_normal']	= "Ξ ΟΞΏΞ²ΞΏΞ»Ξ® ΞΞ±Ξ½ΞΏΞ½ΞΉΞΊΞΏΟ ΞΞ·Ξ½ΟΞΌΞ±Ο„ΞΏΟ‚(Ο‰Ξ½) ΟƒΞµ Ξ±Ο…Ο„Ο Ο„ΞΏ Block";
-$lang['announce_display_global']	= "Ξ ΟΞΏΞ²ΞΏΞ»Ξ® Ξ“ΞµΞ½ΞΉΞΊΞ®Ο‚ Ξ‘Ξ½Ξ±ΞΊΞΏΞ―Ξ½Ο‰ΟƒΞ·Ο‚ ΟƒΞµ Ξ±Ο…Ο„Ο Ο„ΞΏ Block";
-$lang['announce_forum']				= "Ξ Ξ»Ξ·ΟΞΏΟ†ΞΏΟΞ―ΞµΟ‚ Forums";
-$lang['announce_truncate']			= "Truncate Announce Length";
-$lang['announce_forum_explain']		= "- ΞΟ€ΞΏΟΞµΞ―Ο„Ξµ Ξ½Ξ± ΞΊΞ¬Ξ½ΞµΟ„Ξµ Ο€ΞΏΞ»Ξ»Ξ±Ο€Ξ»Ξ­Ο‚ ΞµΟ€ΞΉΞ»ΞΏΞ³Ξ­Ο‚. Ξ Ξ±ΟΞ±Ξ΄ΞµΞ―Ξ³ΞΌΞ±Ο„ΞΏΟ‚ Ο‡Ξ¬ΟΞΉΞ½, ΞΊΟΞ±Ο„Ξ®ΟƒΟ„Ξµ Ο€Ξ±Ο„Ξ·ΞΌΞ­Ξ½ΞΏ Ο„ΞΏ ΞΊΞΏΟ…ΞΌΟ€Ξ―  CTRL ΟƒΟ„ΞΏ Ο€Ξ»Ξ·ΞΊΟ„ΟΞΏΞ»ΟΞ³ΞΉΞΏ ΟƒΞ±Ο‚ Ο€Ξ±Ο„ΟΞ½Ο„Ξ±Ο‚ Ο„ΞΉΟ‚ Ο€ΟΟΟƒΞΈΞµΟ„ΞµΟ‚ ΞµΟ€ΞΉΞ»ΞΏΞ³Ξ­Ο‚.<br />* Ξ•Ξ¬Ξ½ Ξ΄ΞµΞ½ ΞµΟ€ΞΉΞ»Ξ­ΞΎΞµΟ„Ξµ, ΟΞ»Ξ± Ο„Ξ± ΞµΞΎΞΏΟ…ΟƒΞΉΞΏΞ΄ΞΏΟ„Ξ·ΞΌΞ­Ξ½Ξ± forums ΞΈΞ± ΞµΞ―Ξ½Ξ±ΞΉ ΞΏΟΞ±Ο„Ξ¬";
+$lang['announce_img_normal']		= "Εικόνα Κανονικού Μηνύματος";
+$lang['announce_img_global']		= "Εικόνα Γενικής Ανακοίνωσης";
+$lang['announce_display']			= "Προβολή Μηνύματος Ανακοίνωσης(σεων) σε αυτό το Block";
+$lang['announce_display_sticky']	= "Προβολή Sticky(ies) σε αυτό το Block";
+$lang['announce_display_normal']	= "Προβολή Κανονικού Μηνύματος(ων) σε αυτό το Block";
+$lang['announce_display_global']	= "Προβολή Γενικής Ανακοίνωσης σε αυτό το Block";
+$lang['announce_forum']				= "Πληροφορίες Forums";
+$lang['announce_forum_explain']		= "- Μπορείτε να κάνετε πολλαπλές επιλογές. Παραδείγματος χάριν, κρατήστε πατημένο το κουμπί  CTRL στο πληκτρολόγιο σας πατώντας τις πρόσθετες επιλογές.<br />* Εάν δεν επιλέξετε, όλα τα εξουσιοδοτημένα forums θα είναι ορατά";
 
 //
 // Polls
 //
-$lang['Poll_Display']				= "Ξ ΞΏΞΉΞµΟ‚ Ξ¨Ξ·Ο†ΞΏΟ†ΞΏΟΞ―ΞµΟ‚ ΞΈΞ­Ξ»ΞµΟ„Ξµ Ξ½Ξ± Ο€ΟΞΏΞ²Ξ¬Ξ»ΞµΟ„Ξµ?";
-$lang['poll_forum']					= "Ξ Ξ»Ξ·ΟΞΏΟ†ΞΏΟΞ―ΞµΟ‚ Forums";
+$lang['Poll_Display']				= "Ποιες Ψηφοφορίες θέλετε να προβάλετε?";
+$lang['poll_forum']					= "Πληροφορίες Forums";
 $lang['poll_forum_explain']			= "- You may make multiple selections<br />* If nothing is selected, all authorized forums will be visible";
-$lang['Not_Specified']				= "ΞΞ· Ξ”ΞΉΞµΟ…ΞΊΟΞΉΞ½ΞΉΟƒΞΌΞ­Ξ½ΞΏ";
+$lang['Not_Specified']				= "Μη Διευκρινισμένο";
 
 //
 // That's all Folks!

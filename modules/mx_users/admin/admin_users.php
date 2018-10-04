@@ -6,7 +6,7 @@
  *   copyright            : (C) 2001 The phpBB Group
  *   email                : support@phpbb.com
  *
- *   $Id: admin_users.php,v 1.9 2008/09/30 07:04:55 orynider Exp $
+ *   $Id: admin_users.php,v 1.12 2013/06/25 18:24:07 orynider Exp $
  *
  *
  ***************************************************************************/
@@ -20,14 +20,12 @@
  *
  ***************************************************************************/
 
-define( 'IN_PORTAL', true );
-
 if ( !empty( $setmodules ) )
 {
 	$filename = basename( __FILE__ );
 	return;
 }
-
+@define('IN_PORTAL', 1);
 $mx_root_path = './../../../';
 $module_root_path = "./../";
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
@@ -271,7 +269,7 @@ if ( $mode == 'edit' || $mode == 'add' || $mode == 'save' && $mx_request_vars->i
 			mx_message_die(GENERAL_MESSAGE, $message);
 		}
 
-		$username = $phpBB2->phpbb_clean_username($mx_request_vars->post('username', MX_TYPE_NO_TAGS));
+		$username = phpBB2::phpbb_clean_username($mx_request_vars->post('username', MX_TYPE_NO_TAGS));
 		$email = $mx_request_vars->post('email', MX_TYPE_NO_TAGS);
 
 		$password = $mx_request_vars->post('password', MX_TYPE_NO_TAGS);

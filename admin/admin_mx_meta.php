@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: admin_mx_meta.php,v 1.19 2008/02/04 15:44:44 joasch Exp $
+* @version $Id: admin_mx_meta.php,v 1.22 2013/06/28 15:32:37 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -18,7 +18,7 @@ if( !empty($setmodules) )
 //
 // Security and Page header
 //
-define('IN_PORTAL', 1);
+@define('IN_PORTAL', 1);
 $mx_root_path = './../';
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
 $no_page_header = TRUE;
@@ -48,14 +48,16 @@ if( $mx_request_vars->is_post('submit') )
 	$title			= $mx_request_vars->post('title', (MX_TYPE_NO_TAGS | MX_TYPE_NO_STRIP), '');
 	$author			= $mx_request_vars->post('author', (MX_TYPE_NO_TAGS | MX_TYPE_NO_STRIP), '');
 	$copyright		= $mx_request_vars->post('copyright', (MX_TYPE_NO_TAGS | MX_TYPE_NO_STRIP), '');
+	$imagetoolbar	= $mx_request_vars->post('imagetoolbar', (MX_TYPE_NO_TAGS | MX_TYPE_NO_STRIP), 'no');
+	$distribution	= $mx_request_vars->post('distribution', (MX_TYPE_NO_TAGS | MX_TYPE_NO_STRIP), 'global');	
 	$keywords		= $mx_request_vars->post('keywords', (MX_TYPE_NO_TAGS | MX_TYPE_NO_STRIP), '');
 	$description	= $mx_request_vars->post('description', (MX_TYPE_NO_TAGS | MX_TYPE_NO_STRIP), '');
-	$langcode		= $mx_request_vars->post('langcode', (MX_TYPE_NO_TAGS | MX_TYPE_NO_STRIP), '');
-	$rating			= $mx_request_vars->post('rating', (MX_TYPE_NO_TAGS | MX_TYPE_NO_STRIP), '');
-	$index			= $mx_request_vars->post('index', (MX_TYPE_NO_TAGS | MX_TYPE_NO_STRIP), '');
-	$follow			= $mx_request_vars->post('follow', (MX_TYPE_NO_TAGS | MX_TYPE_NO_STRIP), '');
-	$pragma			= $mx_request_vars->post('pragma', (MX_TYPE_NO_TAGS | MX_TYPE_NO_STRIP), '');
-	$icon			= $mx_request_vars->post('icon', (MX_TYPE_NO_TAGS | MX_TYPE_NO_STRIP), '');
+	$langcode		= $mx_request_vars->post('langcode', (MX_TYPE_NO_TAGS | MX_TYPE_NO_STRIP), 'en-gb');
+	$rating			= $mx_request_vars->post('rating', (MX_TYPE_NO_TAGS | MX_TYPE_NO_STRIP), 'general');
+	$index			= $mx_request_vars->post('index', (MX_TYPE_NO_TAGS | MX_TYPE_NO_STRIP), 'follow');
+	$follow			= $mx_request_vars->post('follow', (MX_TYPE_NO_TAGS | MX_TYPE_NO_STRIP), 'index');
+	$pragma			= $mx_request_vars->post('pragma', (MX_TYPE_NO_TAGS | MX_TYPE_NO_STRIP), '7');
+	$icon			= $mx_request_vars->post('icon', (MX_TYPE_NO_TAGS | MX_TYPE_NO_STRIP), 'favicon.ico');
 
 	//
 	// Note we need to allow HTML Tags for the Extra Meta Settings!!!
@@ -63,9 +65,11 @@ if( $mx_request_vars->is_post('submit') )
 	$header			= $mx_request_vars->post('header', (MX_TYPE_NO_STRIP), '');
 
 	$config_data = '<?php';
-	$config_data .= "\n" . ' $title       = "' . $title . '";';
+	$config_data .= "\n" . ' $title       = "' . str_replace("\'", "`", htmlspecialchars(trim($title))) . '";';
 	$config_data .= "\n" . ' $author      = "' . $author . '";';
 	$config_data .= "\n" . ' $copyright   = "' . $copyright . '";';
+	$config_data .= "\n" . ' $imagetoolbar = "' . $imagetoolbar . '";';
+	$config_data .= "\n" . ' $distribution = "' . $distribution . '";';	
 	$config_data .= "\n" . ' $keywords    = "' . $keywords . '";';
 	$config_data .= "\n" . ' $description = "' . $description . '";';
 	$config_data .= "\n" . ' $langcode    = "' . $langcode . '";';
@@ -75,7 +79,7 @@ if( $mx_request_vars->is_post('submit') )
 	$config_data .= "\n" . ' $pragma      = "' . $pragma . '";';
 	$config_data .= "\n" . ' $icon        = "' . $icon . '";';
 	$config_data .= "\n" . ' $header      = "' . $header . '";';
-	$config_data .= "\n" . '?>';	// Done this to prevent highlighting editors getting confused!
+	$config_data .= "\n" . '?>';	// Done this to prevent highlighting editors getting confused
 
 	//
 	// Write out the config file.
@@ -120,6 +124,8 @@ $template->assign_vars(array(
 	'L_TITLE'					=> $lang['Meta_Title'],
 	'L_AUTHOR'					=> $lang['Meta_Author'],
 	'L_COPYRIGHT'				=> $lang['Meta_Copyright'],
+	'L_IMAGETOOLBAR'			=> $lang['Meta_ImageToolBar'],
+	'L_DISTRIBUTION'			=> $lang['Meta_Distribution'],	
 	'L_KEYWORDS'				=> $lang['Meta_Keywords'],
 	'L_KEYWORDS_EXPLAIN'		=> $lang['Meta_Keywords_explain'],
 	'L_DESCRIPTION'				=> $lang['Meta_Description'],
@@ -134,6 +140,8 @@ $template->assign_vars(array(
 	'TITLE'						=> $title,
 	'AUTHOR'					=> $author,
 	'COPYRIGHT'					=> $copyright,
+	'IMAGETOOLBAR'				=> $imagetoolbar,
+	'DISTRIBUTION'				=> $distribution,	
 	'KEYWORDS'					=> $keywords,
 	'DESCRIPTION'				=> $description,
 	'LANGUAGE'					=> mx_generate_meta_select($langcode, 'langcode'),

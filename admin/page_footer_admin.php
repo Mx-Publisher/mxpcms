@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: page_footer_admin.php,v 1.19 2008/02/04 15:44:45 joasch Exp $
+* @version $Id: page_footer_admin.php,v 1.22 2013/06/28 15:32:37 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -27,20 +27,7 @@ $template->set_filenames(array( 'page_footer' => 'admin/page_footer.tpl' ));
 $endtime = explode(' ', microtime());
 $stime = ( $endtime[1] + $endtime[0] ) - $mx_starttime;
 
-switch (PORTAL_BACKEND)
-{
-	case 'internal':
-
-	case 'phpbb2':
-
-		$current_phpbb_version = '2' . $board_config['version'];
-		break;
-
-	case 'phpbb3':
-
-		$current_phpbb_version = $board_config['version'];
-		break;
-}
+$current_phpbb_version = $mx_backend->get_phpbb_version();
 
 $execution_stats = sprintf($lang['Execution_Stats'], $db->num_queries, round($stime, 4));
 

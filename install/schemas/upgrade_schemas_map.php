@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Installation
-* @version $Id: upgrade_schemas_map.php,v 1.23 2008/02/04 15:58:07 joasch Exp $
+* @version $Id: upgrade_schemas_map.php,v 1.25 2011/07/27 19:44:58 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -22,6 +22,7 @@ $upgrade_schemas_map = array(
 	array('schema' => 'upgrade_to_2.9.0'	, 'sql' => "SELECT portal_desc FROM mx_table_portal"),
 	array('schema' => 'upgrade_to_2.9.1'	, 'sql' => "SELECT themes_id FROM mx_table_themes"),
 	array('schema' => 'upgrade_to_2.9.2'	, 'sql' => "SELECT smilies_id FROM mx_table_smilies"),
+	//array('schema' => 'upgrade_to_3.0.0'	, 'sql' => "SELECT //"),
 );
 
 // --------------------

@@ -1,6 +1,6 @@
 <!-- BEGIN dynamic_select -->
 <script type="text/javascript" src="{MX_DYN_PATH}modules/mx_shared/lib/DynamicOptionList_comp.js"></script>
-<script id="DYNAMIC_LIST">
+<script id="DYNAMIC_LIST" type="text/javascript">
 <!--
 window.onload = initDynamicOptionLists;
 var makeModule = new DynamicOptionList("module_id","function_id","block_id");
@@ -11,7 +11,7 @@ var makeModule = new DynamicOptionList("module_id","function_id","block_id");
 </script>
 <!-- END dynamic_select -->
 
-<script language="javascript" type="text/javascript">
+<script type="text/javascript">
 <!--
 function blockcp_getCookie(name)
 {
@@ -217,13 +217,10 @@ function preFormCheck()
 <div class="panel">
 	<div class="inner"><span class="corners-top"><span></span></span>
 <!-- END mx_blockcp -->
-
 <h1 class="blockcp">{L_TITLE}</h1>
-
 <p>{L_EXPLAIN}</p>
 
 <!-- BEGIN dynamic_select -->
-
 <form name="DYNAMIC_LIST" method="post" action="{S_ACTION}">
 <div id="quick_blocks">
 	<div style="float:left;width:20%">
@@ -319,6 +316,7 @@ function setActiveTab()
 setActiveTab();
 // -->
 </script>
+<div class="acp">
 <div id="adminBlockCP_general_add" style="display:{VISIBLE_GENERAL_ADD};" class="panel bg3">
 	<div class="inner">
 	<span class="corners-top"><span></span></span>
@@ -516,7 +514,7 @@ setActiveTab();
 	<div class="inner" align="center" style="padding:6px;">
 		<form action="{S_ACTION}" method="post">
 				<table style="width:100%">
-					<col class="col1" /><col class="col2" /><col class="col1" /><col class="col2" />
+					<col class="col1" width="40%" /><col class="col2" width="20%" /><col class="col1" width="20%" /><col class="col2" width="20%" />
 					<thead>
 					<tr>
 						<td><b>{L_GROUPS}</b></td>
@@ -577,4 +575,5 @@ setActiveTab();
 	</td>
 </tr>
 </table>
+</div>
 </div>

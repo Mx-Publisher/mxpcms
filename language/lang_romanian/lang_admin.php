@@ -2,122 +2,125 @@
 /**
 *
 * @package MXP Portal Core
-* @version $Id: lang_admin.php,v 1.7 2008/10/04 07:23:00 orynider Exp $
+* @version $Id: lang_admin.php,v 1.15 2013/06/28 17:08:52 orynider Exp $
 * @copyright (c) 2002-2006 MXP Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 *
 */
 
-//
-// Editor Settings: Please set Tabsize to 4 ;-)
-// 
+/*  Editor Settings: Please set Tabsize to 4 ;-) */
+ 
+/*  The format of this file is:  ---> $lang['message'] = 'text';
+/*  Specify your language character encoding... [optional] */  
+setlocale(LC_ALL, 'en');
 
-//
-// The format of this file is:
-//
-// ---> $lang["message"] = 'text';
-//
-// Specify your language character encoding... [optional]
-//
-setlocale(LC_ALL, "ro");
 
-$lang['MXP_adminCP']			= 'Mx-Publisher Administraþie';	
+$lang['ENCODING'] = 'UTF-8';
+$lang['DIRECTION'] = 'ltr';
+$lang['LEFT'] = 'stÃ¢nga';
+$lang['RIGHT'] = 'dreapta';
+$lang['DATE_FORMAT'] =  'd/M/Y'; // This should be changed to the default date format for your language, php date() format
 
-//
-// Left AdminCP Panel
-//
+$lang['Mx-Publisher_adminCP']	= 'Mx-Publisher AdministraÅ£ie';	
+$lang['Portal_Desc'] 			= 'A little text to describe your website.';
+
+/*
+* Left AdminCP Panel
+*/
 $lang['1_General_admin']		= 'General';
-$lang['1_1_Management']			= 'Configuraþie';
+$lang['1_1_Management']			= 'ConfiguraÅ£ie';
 $lang['1_2_WordCensors'] 		= 'Cenzori de cuvinte';
 
 $lang['2_CP']					= 'Management';
 $lang['2_1_Modules']			= 'Instalare Module<br /><hr>';
 $lang['2_2_ModuleCP']			= 'Panou de Control Module';
 $lang['2_3_BlockCP']			= 'Panou de Control Bloc';
-$lang['2_4_PageCP']				= 'Panou de Control Paginã';
+$lang['2_4_PageCP']				= 'Panou de Control PaginÄƒ';
 
 $lang['3_CP'] 					= 'Stiluri';
-$lang['2_1_new'] 				= 'Adaugã nou';
-$lang['2_2_manage'] 			= 'Configureazã';
+$lang['2_1_new'] 				= 'AdaugÄƒ nou';
+$lang['2_2_manage'] 			= 'ConfigureazÄƒ';
 $lang['2_3_smilies'] 			= 'Emoticoane';
 
 $lang['4_Panel_system']			= 'Unelte Sistem';
-$lang['4_1_Cache']				= 'Regenereazã Cache-ul';
+$lang['4_1_Cache']				= 'RegenereazÄƒ Cache-ul';
 $lang['4_1_Integrity']			= 'Verificator Integritate';
 $lang['4_1_Meta']				= 'Taguri META';
 $lang['4_1_PHPinfo']			= 'phpInfo()';
 $lang['4_2_Translate'] 			= 'Panou de Control Traduceri';
 
 
-//
-// Index
-//
-$lang['Welcome_mxBB'] 				= 'Bine aþi venit la panoul de control al MXP CMS';
-$lang['Admin_intro_mxBB'] 			= 'Vã mulþumim pentru aþi ales Mx-Publisher ca soluþie pentru portalul/cms-ul dumneavoastrã ºi phpBB ca soluþie pentru forumul dumneavoastrã. Acest ecran vã oferã o privire de ansamblu a diverselor statistici ale site-ului dumneavoastrã. Puteþi reveni la aceastã paginã folosind legãtura <span style="text-decoration: underline;">Pagina de start a administratorului</span> din panel-ul stâng. Pentru a reveni la pagina de start a forumului dumneavoastrã, apãsaþi pe logo-ul phpBB-ului aflat, de asemenea, în panel-ul stâng. Celelalte legãturi din partea stângã vã permit sã controlaþi orice aspect al forumului, fiecare ecran va avea instrucþiuni care dau explicaþii despre cum se folosesc uneltele.';
+/*
+* Index
+*/
+$lang['Welcome_Mx-Publisher'] 				= 'Bine aÅ£i venit la panoul de control al MXP CMS';
+$lang['Admin_intro_Mx-Publisher'] 			= 'VÄƒ mulÅ£umim pentru aÅ£i ales Mx-Publisher ca soluÅ£ie pentru portalul/cms-ul dumneavoastrÄƒ ÅŸi phpBB ca soluÅ£ie pentru forumul dumneavoastrÄƒ. Acest ecran vÄƒ oferÄƒ o privire de ansamblu a diverselor statistici ale site-ului dumneavoastrÄƒ. PuteÅ£i reveni la aceastÄƒ paginÄƒ folosind legÄƒtura <span style="text-decoration: underline;">Pagina de start a administratorului</span> din panel-ul stÃ¢ng. Pentru a reveni la pagina de start a forumului dumneavoastrÄƒ, apÄƒsaÅ£i pe logo-ul phpBB-ului aflat, de asemenea, Ã®n panel-ul stÃ¢ng. Celelalte legÄƒturi din partea stÃ¢ngÄƒ vÄƒ permit sÄƒ controlaÅ£i orice aspect al forumului, fiecare ecran va avea instrucÅ£iuni care dau explicaÅ£ii despre cum se folosesc uneltele.';
 
-//
-// General
-//
+/*
+* General
+*/
 $lang['Yes']						= 'Da';
 $lang['No']							= 'Nu';
 $lang['No_modules']					= 'Nici un Modul instalat';
-$lang['No_functions']				= 'Acest modul nu are funcþii bloc';
-$lang['No_parameters']				= 'Aceastã funcþie nu are parametri';
-$lang['No_blocks']					= 'Nici un bloc nu a fost creat pentru aceasta funcþie';
-$lang['No_pages']					= 'Nici o paginã nu a fost creatã';
-$lang['No_settings']				= 'Nu mai existã setari pentru acest bloc';
-$lang['Quick_nav']					= 'Navigare Quick-Rapidã';
-$lang['Include_all_modules']		= 'Listeazã toate modulele';
+$lang['No_functions']				= 'Acest modul nu are funcÅ£ii bloc';
+$lang['No_parameters']				= 'AceastÄƒ funcÅ£ie nu are parametri';
+$lang['No_blocks']					= 'Nici un bloc nu a fost creat pentru aceasta funcÅ£ie';
+$lang['No_pages']					= 'Nici o paginÄƒ nu a fost creatÄƒ';
+$lang['No_settings']				= 'Nu mai existÄƒ setari pentru acest bloc';
+$lang['Quick_nav']					= 'Navigare Quick-RapidÄƒ';
+$lang['Include_all_modules']		= 'ListeazÄƒ toate modulele';
 $lang['Include_block_quickedit']	= 'Include Blocul Panoul Quickedit';
 $lang['Include_block_private']		= 'Include Blocul Panoul Autentificare Prv';
-$lang['Include_all_pages']			= 'Liseazã toate paginile';
-$lang['View']						= 'Vizualizezã';
-$lang['Edit']						= 'Editeazã';
-$lang['Delete']						= 'ªterge';
-$lang['Settings']					= 'Setãri';
-$lang['Move_up']					= 'Mutã în sus';
-$lang['Move_down']					= 'Mutã în jos';
+$lang['Include_all_pages']			= 'LiseazÄƒ toate paginile';
+$lang['View']						= 'VizualizezÄƒ';
+$lang['Edit']						= 'EditeazÄƒ';
+$lang['Delete']						= 'Åžterge';
+$lang['Settings']					= 'SetÄƒri';
+$lang['Move_up']					= 'MutÄƒ Ã®n sus';
+$lang['Move_down']					= 'MutÄƒ Ã®n jos';
 $lang['Resync']						= 'Resinc';
 $lang['Update']						= 'Actualizare';
 $lang['Permissions']				= 'Permisii';
 $lang['Permissions_std']			= 'Permisii Standard';
 $lang['Permissions_adv']			= 'Permisii Avansate';
-$lang['return_to_page']				= 'Înapoi la Pagina Portalului';
-$lang['Use_default'] 				= 'Foloseºte setãri implicite';
+$lang['return_to_page']				= 'ÃŽnapoi la Pagina Portalului';
+$lang['Use_default'] 				= 'FoloseÅŸte setÄƒri implicite';
 
 $lang['AdminCP_status']				= '<b>Raport Progres</b>';
-$lang['AdminCP_action']				= '<b>Acþiune DB</b>';
+$lang['AdminCP_action']				= '<b>AcÅ£iune DB</b>';
 $lang['Invalid_action']				= 'Eroare';
 $lang['was_installed']             	= 'a fost instalat';
 $lang['was_uninstalled']           	= 'a fost dezinstalat';
 $lang['was_upgraded']              	= 'a fost upgradat';
 $lang['was_exported']               = 'a fost exportat';
-$lang['was_deleted']               	= 'a fost ºters';
+$lang['was_deleted']               	= 'a fost ÅŸters';
 $lang['was_removed']               	= 'a fost scos';
 $lang['was_inserted']              	= 'a fost inserat';
 $lang['was_updated']               	= 'a fost actualizat';
-$lang['was_added']                 	= 'a fost adãugat';
+$lang['was_added']                 	= 'a fost adÄƒugat';
 $lang['was_moved']                 	= 'a fost mutat';
 $lang['was_synced']                	= 'a fost sincronizat';
 
-$lang['error_no_field']				= 'Este un câmp lipsã. Te rog complectezã toate câmpurile necesare...';
+$lang['error_no_field']					= 'Este un cÃ¢mp lipsÄƒ. Te rog complectezÄƒ toate cÃ¢mpurile necesare...';
+$lang['Cookie_settings_mxp'] 			= 'ConfigurÄƒrile pentru cookie';
+$lang['Cookie_settings_explain_mxp']	= 'Aceste detalii definesc cum sunt cookie-urile trimise cÄƒtre browser-ele utilizatorilor. ÃŽn cele mai multe cazuri valorile standard pentru setÄƒrile cookie-urilor ar trebui sÄƒ fie suficiente dar dacÄƒ trebuie sÄƒ le schimbaÅ£i aveÅ£i mare grijÄƒ, setÄƒrile incorecte pot Ã®mpiedica utilizatorii sÄƒ se autentifice';
 
-//
-// Configuration
-//
-$lang['Portal_admin']						= 'Administraþia Portalului';
+/*
+* Configuration
+*/
+$lang['Portal_admin']						= 'AdministraÅ£ia Portalului';
 $lang['Portal_admin_explain']				= 'Foloseste acest form pt. a customiza portalul tau';
-$lang['Portal_General_Config']				= 'Configuraþie Portal';
+$lang['Portal_General_Config']				= 'ConfiguraÅ£ie Portal';
 $lang['Portal_General_Config_explain'] 		= 'Use this form to manage the main settings of your MX-Publisher site.';
 $lang['Portal_General_settings']			= 'Setari Generale';
 $lang['Portal_Style_settings'] 				= 'Setari Stiluri';
 $lang['Portal_General_config_info']			= 'Info General Configurare Portal ';
-$lang['Portal_General_config_info_explain'] = 'Postatã informaþii instalare din fiºierul config.php (nu e nevoie de editare)';
+$lang['Portal_General_config_info_explain'] = 'PostatÄƒ informaÅ£ii instalare din fiÅŸierul config.php (nu e nevoie de editare)';
 $lang['Portal_Name']					= 'Nume Portal:';
 $lang['Portal_Description']				= 'Descriptie Portal:';
 $lang['Portal_PHPBB_Url']				= 'URL pt. instarea ta de forum phpBB:';
 $lang['Portal_Url']						= 'URL pentru Mx-Publisher:';
-$lang['Portal_Config_updated']			= 'Configuraþia Portalului Actualizatã cu Succes';
+$lang['Portal_Config_updated']			= 'ConfiguraÅ£ia Portalului ActualizatÄƒ cu Succes';
 $lang['Click_return_portal_config']		= 'Click %sAici%s pentru a te intoarce la Configurarea Portalului';
 $lang['PHPBB_info']						= 'Informatii phpBB';
 $lang['PHPBB_version']					= 'Versiunea phpBB:';
@@ -126,84 +129,92 @@ $lang['PHPBB_server_name']				= 'phpBB Domeniu (nume_server):';
 $lang['MX_Portal']						= 'Mx-Publisher';
 $lang['MX_Modules']						= 'MXP-Module';
 $lang['Phpbb']							= 'phpBB';
-$lang['Top_phpbb_links']				= 'phpBB Stats în Header (valoare impicitã)<br /> - linkuri la postari noi/necitite etc';
+$lang['Top_phpbb_links']				= 'phpBB Stats Ã®n Header (valoare impicitÄƒ)<br /> - linkuri la postari noi/necitite etc';
+$lang['Top_phpbb_links_explain'] 		= '- Legaturi la noi, postari necitite';
 $lang['Portal_version']					= 'Versiune Mx-Publisher:';
-$lang['Mx_use_cache']					= 'Foloseºte MXP Bloc Cache';
-$lang['Mx_use_cache_explain']			= 'Datele din Bloc este în fiºiere individuale cache/bloc_*.xml. Fiºierele Bloc cache sunt create când Blocurile sunt editate.';
+$lang['Mx_use_cache']					= 'FoloseÅŸte MXP Bloc Cache';
+$lang['Mx_use_cache_explain']			= 'Datele din Bloc este Ã®n fiÅŸiere individuale cache/bloc_*.xml. FiÅŸierele Bloc cache sunt create cÃ¢nd Blocurile sunt editate.';
 $lang['Mx_mod_rewrite'] 				= 'Foloseste mod_rewrite';
-$lang['Mx_mod_rewrite_explain'] 		= 'Daca eºti pe server Apache, ºi ai mod_rewrite activat, poþi rescrie url-urile ca \'page=x\' cu alternative mai intuitive. Citeºte pentru mai multe documentaþia pentru modulul mx_mod_rewrite.';
+$lang['Mx_mod_rewrite_explain'] 		= 'Daca eÅŸti pe server Apache, ÅŸi ai mod_rewrite activat, poÅ£i rescrie url-urile ca \'page=x\' cu alternative mai intuitive. CiteÅŸte pentru mai multe documentaÅ£ia pentru modulul mx_mod_rewrite.';
 
-$lang['Portal_Overall_header'] 					= 'Fiºier Overall Header (valoare impicitã)';
-$lang['Portal_Overall_header_explain'] 			= '- Aceasta este valoarea implicitã a fiºierului overall_header, e.g. overall_header.tpl.';
+$lang['Portal_Overall_header'] 					= 'FiÅŸier Overall Header (valoare impicitÄƒ)';
+$lang['Portal_Overall_header_explain'] 			= '- Aceasta este valoarea implicitÄƒ a fiÅŸierului overall_header, e.g. overall_header.tpl.';
 
-$lang['Portal_Overall_footer'] 					= 'Fiºier Overall Footer (valoare impicitã)';
-$lang['Portal_Overall_footer_explain'] 			= '- Aceasta este valoarea implicitã a fiºierului overall_footer, e.g. overall_footer.tpl.';
+$lang['Portal_Overall_footer'] 					= 'FiÅŸier Overall Footer (valoare impicitÄƒ)';
+$lang['Portal_Overall_footer_explain'] 			= '- Aceasta este valoarea implicitÄƒ a fiÅŸierului overall_footer, e.g. overall_footer.tpl.';
 
-$lang['Portal_Main_layout'] 					= 'Fiºier Main Layout (valoare impicitã)';
+$lang['Portal_Main_layout'] 					= 'FiÅŸier Main Layout (valoare impicitÄƒ)';
 $lang['Portal_Main_layout_explain'] 			= '- This is the default template main_layout file, e.g. mx_main_layout.tpl.';
-$lang['Portal_Navigation_block'] 				= 'Overall Header Navigation Block (valoare impicitã)';
+$lang['Portal_Navigation_block'] 				= 'Overall Header Navigation Block (valoare impicitÄƒ)';
 $lang['Portal_Navigation_block_explain'] 		= '- This is the default template overall_header navigation block.';
 
 $lang['Default_style'] = 'Style Pagini Portal (implicit)';
 $lang['Default_admin_style'] = 'Style AdminCP';
-$lang['Select_page_style'] = 'Selecteazã (ori foloseºte implicit)';
+$lang['Select_page_style'] = 'SelecteazÄƒ (ori foloseÅŸte implicit)';
 $lang['Override_style'] = 'Supracrie stilul utilizatorului';
-$lang['Override_style_explain'] = 'Înlocuieºte stilul utilizatorului cu cel implicit (pentru pagini)';
+$lang['Override_style_explain'] = 'ÃŽnlocuieÅŸte stilul utilizatorului cu cel implicit (pentru pagini)';
 
 $lang['Portal_status'] = 'Stare Portal';
-$lang['Portal_status_explain'] = 'Un switch, când reconstruiþi website-ul. Doar administratorul poate sã vadã paginile ºi sã navigheze normal. Când e dezactivat mesajul de mai jos va fi afiºat.';
-$lang['Disabled_message'] = 'Mesaj când portalul e dezactivat';
+$lang['Portal_status_explain'] = 'Un switch, cÃ¢nd reconstruiÅ£i website-ul. Doar administratorul poate sÄƒ vadÄƒ paginile ÅŸi sÄƒ navigheze normal. CÃ¢nd e dezactivat mesajul de mai jos va fi afiÅŸat.';
+$lang['Disabled_message'] = 'Mesaj cÃ¢nd portalul e dezactivat';
 
 $lang['Portal_Backend'] = 'Utilizator Intern/Sesiune Backend';
-$lang['Portal_Backend_explain'] = 'Selecteazã intern, phpBB2 sau phpBB3 sessiuni ºi utilizatori';
-$lang['Portal_Backend_path'] = 'Cale relativã pentru phpBB [non-intern]';
-$lang['Portal_Backend_path_explain'] = 'Dacã folosiþi sessiuni ºi utilizatori non-interne, introduceþi calea relativã cãtre phpbb, ex \'phpBB2/\' sau \'../phpBB2/\'. Notã: slaºurile sunt importante.';
-$lang['Portal_Backend_submit'] = 'Modificã ºi valideazã Backendul';
+$lang['Portal_Backend_explain'] = 'SelecteazÄƒ intern, phpBB2 sau phpBB3 sessiuni ÅŸi utilizatori';
+$lang['Portal_Backend_path'] = 'Cale relativÄƒ pentru phpBB [non-intern]';
+$lang['Portal_Backend_path_explain'] = 'DacÄƒ folosiÅ£i sessiuni ÅŸi utilizatori non-interne, introduceÅ£i calea relativÄƒ cÄƒtre phpbb, ex \'phpBB2/\' sau \'../phpBB2/\'. NotÄƒ: slaÅŸurile sunt importante.';
+$lang['Portal_Backend_submit'] = 'ModificÄƒ ÅŸi valideazÄƒ Backendul';
 $lang['Portal_config_valid'] = 'Statut Backend Curent: ';
 $lang['Portal_config_valid_true'] = '<b><font color=\"green\">Valid</font></b>';
-$lang['Portal_config_valid_false'] = '<b><font color=\"red\">Instalare Invalidã. Sau calea cãtre phpBB este greºitã ori phpBB nu este instalat (baza de date phpBB nu este disponibilã). Deci, este folosit backend \'intern\'.</font></b>';
+$lang['Portal_config_valid_false'] = '<b><font color=\"red\">Instalare InvalidÄƒ. Sau calea cÄƒtre phpBB este greÅŸitÄƒ ori phpBB nu este instalat (baza de date phpBB nu este disponibilÄƒ). Deci, este folosit backend \'intern\'.</font></b>';
 
+$lang['Phpbb_path']					= 'phpBB cale relativÄƒ';
+$lang['Phpbb_path_explain'] 		= 'Cale relativÄƒ la phpBB, ex. phpBB/ or ../phpBB/<br />NoteazÄƒ slaÅŸurile "/", ele sunt importante!';
+$lang['Phpbb_url'] 					= 'URL phpBB Complet';
+$lang['Portal_backend'] 			= 'Portal Backend';
+$lang['Phpbb_url_explain']			= 'Exemplu URL phpBB Complect, ex. <br />http://www.exemplu.ro/phpBB/';
+$lang['Portal_url'] 				= 'URL Complet CMS';
+$lang['Portal_url_explain'] 		= 'URL Complet CMS, ex. <br />http://www.exemplu.ro/';
 
-//
-// Module Management
-//
-$lang['Module_admin']				= 'Administraþie Module';
-$lang['Module_admin_explain']		= 'Foloseºte acest form pentru a administra modulele: instalare, upgradare ºi dezvoltare module.<br /><b>Pentru a folosi acest panou, trebuie sã ai JavaScript ºi cooki-urile activate în browser!</b>';
+/*
+* Module Management
+*/
+$lang['Module_admin']				= 'AdministraÅ£ie Module';
+$lang['Module_admin_explain']		= 'FoloseÅŸte acest form pentru a administra modulele: instalare, upgradare ÅŸi dezvoltare module.<br /><b>Pentru a folosi acest panou, trebuie sÄƒ ai JavaScript ÅŸi cooki-urile activate Ã®n browser!</b>';
 $lang['Modulecp_admin']				= 'Panou de Control Module';
-$lang['Modulecp_admin_explain']		= 'Foloseºte acest form pentru a administra modulele: funcþii bloc (parametrii) ºi blocuri portal.<br /><b>Pentru a folosi acest panou, trebuie sã ai JavaScript ºi cooki-urile activate în browser!</b>';
+$lang['Modulecp_admin_explain']		= 'FoloseÅŸte acest form pentru a administra modulele: funcÅ£ii bloc (parametrii) ÅŸi blocuri portal.<br /><b>Pentru a folosi acest panou, trebuie sÄƒ ai JavaScript ÅŸi cooki-urile activate Ã®n browser!</b>';
 $lang['Modules']					= 'Module';
 $lang['Module']						= 'Modul';
-$lang['Module_delete']				= 'ªterge un Modul';
-$lang['Module_delete_explain']		= 'Foloseºte acest form pentru a ºterge un Modul (sau funcþie bloc)';
-$lang['Edit_module']				= 'Editeazã un Modul';
-$lang['Create_module']				= 'Creazã Modul Nou';
+$lang['Module_delete']				= 'Åžterge un Modul';
+$lang['Module_delete_explain']		= 'FoloseÅŸte acest form pentru a ÅŸterge un Modul (sau funcÅ£ie bloc)';
+$lang['Edit_module']				= 'EditeazÄƒ un Modul';
+$lang['Create_module']				= 'CreazÄƒ Modul Nou';
 $lang['Module_name']				= 'Nume Modul';
-$lang['Module_desc']				= 'Descripþie';
+$lang['Module_desc']				= 'DescripÅ£ie';
 $lang['Module_path']				= 'Cale, ex: \'modules/mx_textblocks/\'';
-$lang['Module_include_admin']		= 'Include acest modul în panoul din stânga Navigare Admin Meniu';
+$lang['Module_include_admin']		= 'Include acest modul Ã®n panoul din stÃ¢nga Navigare Admin Meniu';
 
-//
-// Module Installation
-//
-$lang['Module_delete_db']			= 'Chiar vrei sã dezinstalezi acest Modul? Atenþie: O sã pierzi tote datele modulului. Considerã upgradare în loc...';
+/*
+* Module Installation
+*/
+$lang['Module_delete_db']			= 'Chiar vrei sÄƒ dezinstalezi acest Modul? AtenÅ£ie: O sÄƒ pierzi tote datele modulului. ConsiderÄƒ upgradare Ã®n loc...';
 $lang['Click_module_delete_yes']	= 'Click %sAici%s pt. a dezinstala modulul';
 $lang['Click_module_upgrade_yes']	= 'Click %sAici%s pt. a upgrada modulul';
 $lang['Click_module_export_yes']	= 'Click %sAici%s pt. a exporta modulul';
-$lang['Error_no_db_install']		= 'Eroare: Fiºierul db_install.php nu existã. Te rog verificã ºi încearcã din nou...';
-$lang['Error_no_db_uninstall']		= 'Eroare: Fiºierul db_uninstall.php nu existã, sau funcþia de dezinstalare nu este suportatã în acest modul. Te rog verificã aceasta ºi încearcã din nou...';
-$lang['Error_no_db_upgrade']		= 'Eroare: Fiºierul db_upgrade.php nu existã, sau funþia de upgradare nu este suportatã în acest modul. Te rog verificã aceasta ºi încearcã din nou...';
-$lang['Error_module_installed']		= 'Eroare: Acest modul este deja instalat! Te rog înainte ori ºterge modulul, ori upgradeazã modul.';
-$lang['Uninstall_module']			= 'Dezinstaleazã Modul';
-$lang['import_module_pack']			= 'Instaleazã Modul';
-$lang['import_module_pack_explain']	= 'Aceasta va adauga un modul la portal. Asigurate cã Pachetul Modulului este uploadat în folderul /modules. Þine minte sã foloseºti unltima versiune de Modul!';
+$lang['Error_no_db_install']		= 'Eroare: FiÅŸierul db_install.php nu existÄƒ. Te rog verificÄƒ ÅŸi Ã®ncearcÄƒ din nou...';
+$lang['Error_no_db_uninstall']		= 'Eroare: FiÅŸierul db_uninstall.php nu existÄƒ, sau funcÅ£ia de dezinstalare nu este suportatÄƒ Ã®n acest modul. Te rog verificÄƒ aceasta ÅŸi Ã®ncearcÄƒ din nou...';
+$lang['Error_no_db_upgrade']		= 'Eroare: FiÅŸierul db_upgrade.php nu existÄƒ, sau funÅ£ia de upgradare nu este suportatÄƒ Ã®n acest modul. Te rog verificÄƒ aceasta ÅŸi Ã®ncearcÄƒ din nou...';
+$lang['Error_module_installed']		= 'Eroare: Acest modul este deja instalat! Te rog Ã®nainte ori ÅŸterge modulul, ori upgradeazÄƒ modul.';
+$lang['Uninstall_module']			= 'DezinstaleazÄƒ Modul';
+$lang['import_module_pack']			= 'InstaleazÄƒ Modul';
+$lang['import_module_pack_explain']	= 'Aceasta va adauga un modul la portal. Asigurate cÄƒ Pachetul Modulului este uploadat Ã®n folderul /modules. Å¢ine minte sÄƒ foloseÅŸti unltima versiune de Modul!';
 $lang['upgrade_module_pack']		= 'Upgradare Modul';
-$lang['upgrade_module_pack_explain']	= 'Aceasta va upgrada modulul tãu. Asigurãte cã ai citit Documentaþia Modulului înainte de a proceda, sau poþi risca pierderi de date la modul.';
+$lang['upgrade_module_pack_explain']	= 'Aceasta va upgrada modulul tÄƒu. AsigurÄƒte cÄƒ ai citit DocumentaÅ£ia Modulului Ã®nainte de a proceda, sau poÅ£i risca pierderi de date la modul.';
 $lang['export_module_pack']			= 'Exportare Modul';
-$lang['Export_Module']				= 'Selecteazã un Modul:';
-$lang['export_module_pack_explain']	= 'Aceasta va exporta fiºierul *.pak al modulului. Aceasta este intentat pentru scriitori de module numai...';
-$lang['Module_Config_updated']		= 'Configuraþia Modulului Actualizatã cu Succes';
-$lang['Click_return_module_admin']	= 'Click %sAici%s pt. a te întoarce la Administraþie Module';
-$lang['Module_updated']				= 'Informaþiile Modulului Actualizate cu Succes';
+$lang['Export_Module']				= 'SelecteazÄƒ un Modul:';
+$lang['export_module_pack_explain']	= 'Aceasta va exporta fiÅŸierul *.pak al modulului. Aceasta este intentat pentru scriitori de module numai...';
+$lang['Module_Config_updated']		= 'ConfiguraÅ£ia Modulului ActualizatÄƒ cu Succes';
+$lang['Click_return_module_admin']	= 'Click %sAici%s pt. a te Ã®ntoarce la AdministraÅ£ie Module';
+$lang['Module_updated']				= 'InformaÅ£iile Modulului Actualizate cu Succes';
 $lang['list_of_queries'] = 'This is the result list of the SQL queries needed for the install/upgrade';
 $lang['already_added'] = 'Error or Already added';
 $lang['added_upgraded'] = 'Added/Updated';
@@ -212,105 +223,106 @@ $lang['module_upgrade'] = 'This is a upgrade';
 $lang['fresh_install'] = 'This is a fresh install';
 $lang['module_install_info'] = 'Mod Installation/Upgrading/Uninstalling Information - mod specific db tables';
 
-//
-// Functions & Parameters Administration
-//
-$lang['Function_admin']					= 'Administraþie Funcþiune Bloc';
-$lang['Function_admin_explain']			= 'Modulele au una sau mai multe Funcþiuni Bloc. Foloseºte acest form pt. a edita, ºi, sau ºterge Funcþiunea unui Bloc';
-$lang['Function']				= 'Funcþiune Bloc';
-$lang['Function_name']				= 'Nume Funcþiune Bloc';
-$lang['Function_desc']				= 'Descripþie';
-$lang['Function_file']				= 'Fiºier ';
-$lang['Function_admin_file']       		= 'Fiºier (Script Editare Bloc) <br /> Parametrii extra pentru acest panou editare bloc. Lasã blank (gol) pentru a folosi panoul de editare implicit.';
-$lang['Create_function']			= 'Funcþiune Editare Bloc Nou';
-$lang['Delete_function']			= 'Funcþiune ªtergere Block';
-$lang['Delete_function_explain']		= 'Acesta va ºterge funcþiunea ºi toate blocurile portalului asociate. Atenþie, aceastã operaþie nu este reversibilã!';
-$lang['Click_function_delete_yes']		= 'Click %sAici%s pt. a ºterge Funcþiunea';
+/*
+* Functions & Parameters Administration
+*/
+$lang['Function_admin']				= 'AdministraÅ£ie FuncÅ£iune Bloc';
+$lang['Function_admin_explain']		= 'Modulele au una sau mai multe FuncÅ£iuni Bloc. FoloseÅŸte acest form pt. a edita, ÅŸi, sau ÅŸterge FuncÅ£iunea unui Bloc';
+$lang['Function']					= 'FuncÅ£iune Bloc';
+$lang['Function_name']				= 'Nume FuncÅ£iune Bloc';
+$lang['Function_desc']				= 'DescripÅ£ie';
+$lang['Function_file']				= 'FiÅŸier ';
+$lang['Function_admin_file']       	= 'FiÅŸier (Script Editare Bloc) <br /> Parametrii extra pentru acest panou editare bloc. LasÄƒ blank (gol) pentru a folosi panoul de editare implicit.';
+$lang['Create_function']			= 'FuncÅ£iune Editare Bloc Nou';
+$lang['Delete_function']			= 'FuncÅ£iune Åžtergere Block';
+$lang['Delete_function_explain']	= 'Acesta va ÅŸterge funcÅ£iunea ÅŸi toate blocurile portalului asociate. AtenÅ£ie, aceastÄƒ operaÅ£ie nu este reversibilÄƒ!';
+$lang['Click_function_delete_yes']	= 'Click %sAici%s pt. a ÅŸterge FuncÅ£iunea';
 
-$lang['Parameter_admin']			= 'Administrare Parametru Funcþiune';
-$lang['Parameter_admin_explain']		= 'Listeazã toþi Parametrii pt. aceastã Funcþiune';
-$lang['Parameter']				= 'Parametru';
+$lang['Parameter_admin']			= 'Administrare Parametru FuncÅ£iune';
+$lang['Parameter_admin_explain']	= 'ListeazÄƒ toÅ£i Parametrii pt. aceastÄƒ FuncÅ£iune';
+$lang['Parameter']					= 'Parametru';
 $lang['Parameter_name']				= '<b>Nume Parametru</b><br />- pt. a fi folosit pt. a accesa parametru';
 $lang['Parameter_type']				= '<b>Tip Parametru</b>';
-$lang['Parameter_default']			= '<b>Valoare Implicitã</b>';
-$lang['Parameter_function']			= '<b>Funcþiune/Opþiuni</b>';
-$lang['Parameter_function_explain']		= '<b>Funcþiune</b> (când foloseºti tipul \'Funcþiune\')<br />- Poþi pasa data parametrului la o funcþiune externã <br /> pt. a genera câmpul form al parametrului.<br />- De exemplu: <br />get_list_formatted(\"block_list\",\"{parameter_value}\",\"{parameter_id}[]\")';
-$lang['Parameter_function_explain']		.= '<br /><br /><b>Opþiune(s)</b> (când foloseºti \'Selecþie\' tipuri parametri)<br />- Pentru toþi parametri selecþiei (butoane radio, boxe verificare ºi meniuri) toate opþiunile sunt listate aici, o opþiune per linie.';
-$lang['Parameter_auth']				= '<b>Admin/Bloc ºi Moderatori numai</b>';
+$lang['Parameter_desc'] 			= "<b>Decriere Parametru</b>";
+$lang['Parameter_default']			= '<b>Valoare ImplicitÄƒ</b>';
+$lang['Parameter_function']			= '<b>FuncÅ£iune/OpÅ£iuni</b>';
+$lang['Parameter_function_explain']	= '<b>FuncÅ£iune</b> (cÃ¢nd foloseÅŸti tipul \'FuncÅ£iune\')<br />- PoÅ£i pasa data parametrului la o funcÅ£iune externÄƒ <br /> pt. a genera cÃ¢mpul form al parametrului.<br />- De exemplu: <br />get_list_formatted(\"block_list\",\"{parameter_value}\",\"{parameter_id}[]\")';
+$lang['Parameter_function_explain']	.= '<br /><br /><b>OpÅ£iune(s)</b> (cÃ¢nd foloseÅŸti \'SelecÅ£ie\' tipuri parametri)<br />- Pentru toÅ£i parametri selecÅ£iei (butoane radio, boxe verificare ÅŸi meniuri) toate opÅ£iunile sunt listate aici, o opÅ£iune per linie.';
+$lang['Parameter_auth']				= '<b>Admin/Bloc ÅŸi Moderatori numai</b>';
 
 $lang['Parameters']					= 'Parametrii';
-$lang['Parameter_id']					= 'ID';
-$lang['Create_parameter']				= 'Adaugã Parametru Nou';
-$lang['Delete_parameter']				= 'ªterge Funcþiune Parametru';
-$lang['Delete_parameter_explain']			= 'Acesta va ºterge parametru ºi va actualiza toate blocurile portalului asociate. Atenþie, aceastã operaþie nu este reversibilã!';
-$lang['Click_parameter_delete_yes']			= 'Click %sAici%s pentru a ºterge Parametru';
+$lang['Parameter_id']				= 'ID';
+$lang['Create_parameter']			= 'AdaugÄƒ Parametru Nou';
+$lang['Delete_parameter']			= 'Åžterge FuncÅ£iune Parametru';
+$lang['Delete_parameter_explain']	= 'Acesta va ÅŸterge parametru ÅŸi va actualiza toate blocurile portalului asociate. AtenÅ£ie, aceastÄƒ operaÅ£ie nu este reversibilÄƒ!';
+$lang['Click_parameter_delete_yes']	= 'Click %sAici%s pentru a ÅŸterge Parametru';
 
-//
-// Parameter Types
-//
+/*
+* Parameter Types
+*/
 $lang['ParType_BBText'] 			= 'Simplu BBText BlocText';
 $lang['ParType_BBText_info'] 		= 'Acesta este un simplu bloctext, permite bbcod-uri';
 $lang['ParType_Html'] 				= 'Simplu Html BlocText';
 $lang['ParType_Html_info'] 			= 'Acesta este un simplu bloctext, permite html';
-$lang['ParType_Text'] 				= 'Text Obiºnuit (singur-rând)';
-$lang['ParType_Text_info'] 			= 'Acesta este un simplu câmp de text';
-$lang['ParType_TextArea'] 			= 'Zona Text Obiºnuit (multiple-rânduri)';
-$lang['ParType_TextArea_info'] 		= 'Acesta este o simplã zonã câmp de text';
+$lang['ParType_Text'] 				= 'Text ObiÅŸnuit (singur-rÃ¢nd)';
+$lang['ParType_Text_info'] 			= 'Acesta este un simplu cÃ¢mp de text';
+$lang['ParType_TextArea'] 			= 'Zona Text ObiÅŸnuit (multiple-rÃ¢nduri)';
+$lang['ParType_TextArea_info'] 		= 'Acesta este o simplÄƒ zonÄƒ cÃ¢mp de text';
 $lang['ParType_Boolean'] 			= 'Boolean';
 $lang['ParType_Boolean_info'] 		= 'Acesta este un \'da\' sau \'nu\' comutator radio.';
-$lang['ParType_Number'] 			= 'Numãr Obiºnuit';
-$lang['ParType_Number_info'] 		= 'Acesta este un simplu câmp de numar';
-$lang['ParType_Function'] 			= 'Funcþie Parametru';
+$lang['ParType_Number'] 			= 'NumÄƒr ObiÅŸnuit';
+$lang['ParType_Number_info'] 		= 'Acesta este un simplu cÃ¢mp de numar';
+$lang['ParType_Function'] 			= 'FuncÅ£ie Parametru';
 $lang['ParType_Values'] 			= 'Valori';
 
-$lang['ParType_Radio_single_select'] 			= 'Singur-Selecþie Buton Radio';
+$lang['ParType_Radio_single_select'] 			= 'Singur-SelecÅ£ie Buton Radio';
 $lang['ParType_Radio_single_select_info'] 		= '';
-$lang['ParType_Menu_single_select'] 			= 'Singur-Selecþie Meniu';
+$lang['ParType_Menu_single_select'] 			= 'Singur-SelecÅ£ie Meniu';
 $lang['ParType_Menu_single_select_info'] 		= '';
-$lang['ParType_Menu_multiple_select'] 			= 'Multiplu-Selecþie Meniu';
+$lang['ParType_Menu_multiple_select'] 			= 'Multiplu-SelecÅ£ie Meniu';
 $lang['ParType_Menu_multiple_select_info'] 		= '';
-$lang['ParType_Checkbox_multiple_select'] 		= 'Multiplu-Selecþie Boxã Verificare';
+$lang['ParType_Checkbox_multiple_select'] 		= 'Multiplu-SelecÅ£ie BoxÄƒ Verificare';
 $lang['ParType_Checkbox_multiple_select_info'] 		= '';
 
-//
-// Blocks Administration
-//
+/*
+* Blocks Administration
+*/
 $lang['Block_admin']				= 'Panou de Contol Bloc';
-$lang['Block_admin_explain']		= 'Foloseºte acest form pentru a administra Blocurile Portalului.<br /><b>Pentru a folosi acest panou, trebuie sã ai JavaScript ºi cooki-urile activate în browser!</b>';
+$lang['Block_admin_explain']		= 'FoloseÅŸte acest form pentru a administra Blocurile Portalului.<br /><b>Pentru a folosi acest panou, trebuie sÄƒ ai JavaScript ÅŸi cooki-urile activate Ã®n browser!</b>';
 $lang['Block']						= 'Bloc';
 $lang['Show_title']					= 'Arata Titlu Bloc?';
-$lang['Show_title_explain']			= 'Dacã ori nu se aratã titlul blocului';
-$lang['Show_block']					= 'Aratã Bloc?';
-$lang['Show_block_explain']			= '- Daca \'nu\', Blocul este ascuns pt. toþi utilizatorii, exceptând administratorii';
-$lang['Show_stats']					= 'Aratã Statistice?';
-$lang['Show_stats_explain']			= '- Daca \'da\', \'editat de...\' va fi afiºat langã bloc';
-$lang['Show_blocks']               	= 'Vizualizezã Funcþia Blocurilor';
-$lang['Block_delete']				= 'ªterge un Bloc';
-$lang['Block_delete_explain']		= 'Foloseºte acest form pt. a ºterge un Bloc (ori coloanã)';
+$lang['Show_title_explain']			= 'DacÄƒ ori nu se aratÄƒ titlul blocului';
+$lang['Show_block']					= 'AratÄƒ Bloc?';
+$lang['Show_block_explain']			= '- Daca \'nu\', Blocul este ascuns pt. toÅ£i utilizatorii, exceptÃ¢nd administratorii';
+$lang['Show_stats']					= 'AratÄƒ Statistice?';
+$lang['Show_stats_explain']			= '- Daca \'da\', \'editat de...\' va fi afiÅŸat langÄƒ bloc';
+$lang['Show_blocks']               	= 'VizualizezÄƒ FuncÅ£ia Blocurilor';
+$lang['Block_delete']				= 'Åžterge un Bloc';
+$lang['Block_delete_explain']		= 'FoloseÅŸte acest form pt. a ÅŸterge un Bloc (ori coloanÄƒ)';
 $lang['Block_title']				= 'Titlu';
-$lang['Block_desc']					= 'Descripþie';
-$lang['Add_Block']					= 'Adaugã Bloc Nou';
+$lang['Block_desc']					= 'DescripÅ£ie';
+$lang['Add_Block']					= 'AdaugÄƒ Bloc Nou';
 $lang['Auth_Block']					= 'Permisii';
-$lang['Auth_Block_explain']			= 'TOÞI: Toþi utilizatorii<br />REG: utilizatori Înregistraþi<br />PRIVAT: Memberi Grup (vezi permisiile avansate)<br />MOD: bloc moderatori (vezi permisiile avansate)<br />ADMIN: Admin<br />ANONYMOUS: NUMAI utilizatori vizitatori';
+$lang['Auth_Block_explain']			= 'TOÅ¢I: ToÅ£i utilizatorii<br />REG: utilizatori ÃŽnregistraÅ£i<br />PRIVAT: Memberi Grup (vezi permisiile avansate)<br />MOD: bloc moderatori (vezi permisiile avansate)<br />ADMIN: Admin<br />ANONYMOUS: NUMAI utilizatori vizitatori';
 $lang['Block_quick_stats']			= 'Statistice Rapid';
-$lang['Block_quick_edit']			= 'Editare Rapidã';
+$lang['Block_quick_edit']			= 'Editare RapidÄƒ';
 $lang['Create_block']				= 'Creare Bloc Nou';
-$lang['Delete_block']				= 'ªterge Bloc din Portal';
-$lang['Delete_block_explain']		= 'Acesta va ºterge blocul ºi va actualiza toate paginile portalului asociate. Atenþie, aceastã operaþie nu este reversibilã!';
-$lang['Click_block_delete_yes']		= 'Click %sAici%s pt. a ºterge Blocul';
+$lang['Delete_block']				= 'Åžterge Bloc din Portal';
+$lang['Delete_block_explain']		= 'Acesta va ÅŸterge blocul ÅŸi va actualiza toate paginile portalului asociate. AtenÅ£ie, aceastÄƒ operaÅ£ie nu este reversibilÄƒ!';
+$lang['Click_block_delete_yes']		= 'Click %sAici%s pt. a ÅŸterge Blocul';
 
-//
-// BlockCP Administration
-//
+/*
+* BlockCP Administration
+*/
 $lang['Block_cp']                   	= 'BlockCP';
-$lang['Click_return_blockCP_admin']		= 'Click %sAici%s pt. întoarcere la Panoul de Control Bloc';
-$lang['Click_return_portalpage_admin']	= 'Click %sAici%s pt. întoarcere la Pagina Portalului';
+$lang['Click_return_blockCP_admin']		= 'Click %sAici%s pt. Ã®ntoarcere la Panoul de Control Bloc';
+$lang['Click_return_portalpage_admin']	= 'Click %sAici%s pt. Ã®ntoarcere la Pagina Portalului';
 $lang['BlockCP_Config_updated']			= 'Blocul a fost Actualizat...';
 
 
-//
-// Pages Administration
-//
+/*
+* Pages Administration
+*/
 $lang['Page_admin'] = 'Page Administration';
 $lang['Page_admin_explain'] = 'Use this form to add, delete and change the settings for Portal Pages and Page Templates.<br /><b>To use this panel, you need to have JavaScript and cookies enabled in your browser!</b>';
 $lang['Page_admin_edit'] = 'Page Edit';
@@ -382,9 +394,9 @@ $lang['Add_Dynamic_Block_explain'] 	= 'This dynamic block defines subpages, set 
 $lang['Add_Virtual_Block'] 			= 'Add Virtual (Page Blog) Block';
 $lang['Add_Virtual_Block_explain'] 	= 'This block turns the page into a virtual (blog) page';
 
-//
-// Page templates
-//
+/*
+* Page templates
+*/
 $lang['Page_templates_admin'] = 'Page Templates Administration';
 $lang['Page_templates_admin_explain'] = 'Use this page to create, edit or delete Page Templates';
 $lang['Page_template'] = 'Page Template';
@@ -404,66 +416,65 @@ $lang['Delete_page_template_column'] = 'Delete Page Template';
 $lang['Delete_page_template_column_explain'] = 'This will delete the Page Template. Beware: this operation cannot be undone!';
 $lang['Click_page_template_column_delete_yes'] = 'Click %sHere%s to delete the Page Template';
 
-
-//
-// Pages Administration
-//
-$lang['Page_admin']				= 'Administraþia Paginii';
-$lang['Page_admin_explain']		= 'Foloseºte acest form pt. a adãuga, ºterge ºi schimba setarile pentru Paginile Portalului ºi Paginile Templaturi.<br /><b>Pentru a folosi acest panou, trebuie sã ai JavaScript ºi cooki-urile activate în browser!</b>';
+/*
+* Pages Administration
+*/
+$lang['Page_admin']				= 'AdministraÅ£ia Paginii';
+$lang['Page_admin_explain']		= 'FoloseÅŸte acest form pt. a adÄƒuga, ÅŸterge ÅŸi schimba setarile pentru Paginile Portalului ÅŸi Paginile Templaturi.<br /><b>Pentru a folosi acest panou, trebuie sÄƒ ai JavaScript ÅŸi cooki-urile activate Ã®n browser!</b>';
 $lang['Page_admin_edit']		= 'Editare Pagina';
-$lang['Page_admin_private']		= 'Pagina Avansatã (PRIVAT) Permisii';
-$lang['Page_admin_settings']	= 'Setari Paginã';
-$lang['Page_admin_new_page']	= 'Administraþie Pagina Noua';
-$lang['Page']					= 'Paginã';
-$lang['Page_Id']				= 'ID Paginã';
-$lang['Page_icon']				= 'Iconiþa Paginii <br /> - pt. a fi folositã numai în AdminCP, ex. icon_home.gif (implicit)';
-$lang['Page_header']			= 'Fiºier Header Pagina <br /> - de ex. overall_header.tpl (implicit), overall_noheader.tpl (farã header) ori fiºier header custom a utilizatorului.';
+$lang['Page_admin_private']		= 'Pagina AvansatÄƒ (PRIVAT) Permisii';
+$lang['Page_admin_settings']	= 'Setari PaginÄƒ';
+$lang['Page_admin_new_page']	= 'AdministraÅ£ie Pagina Noua';
+$lang['Page']					= 'PaginÄƒ';
+$lang['Page_Id']				= 'ID PaginÄƒ';
+$lang['Page_icon']				= 'IconiÅ£a Paginii <br /> - pt. a fi folositÄƒ numai Ã®n AdminCP, ex. icon_home.gif (implicit)';
+$lang['Page_header']			= 'FiÅŸier Header Pagina <br /> - de ex. overall_header.tpl (implicit), overall_noheader.tpl (farÄƒ header) ori fiÅŸier header custom a utilizatorului.';
 $lang['Auth_Page']				= 'Permisii';
-$lang['Select_sort_method']		= 'Selecteazã Metoda de Sortare';
+$lang['Select_sort_method']		= 'SelecteazÄƒ Metoda de Sortare';
 $lang['Order']					= 'Ordine';
 $lang['Sort']					= 'Sortare';
-$lang['Width'] 					= 'Lãþime';
-$lang['Height'] 				= 'Înãlþime';
-$lang['Page_sort_title']		= 'Titlu paginã';
-$lang['Page_sort_desc']			= 'Descripþie paginã';
-$lang['Page_sort_created']		= 'Pagina creatã';
+$lang['Width'] 					= 'LÄƒÅ£ime';
+$lang['Height'] 				= 'ÃŽnÄƒlÅ£ime';
+$lang['Page_sort_title']		= 'Titlu paginÄƒ';
+$lang['Page_sort_desc']			= 'DescripÅ£ie paginÄƒ';
+$lang['Page_sort_created']		= 'Pagina creatÄƒ';
 $lang['Sort_Ascending']			= 'ASC';
 $lang['Sort_Descending']		= 'DESC';
-$lang['Return_to_page']			= 'Întoarcere la Pagina Portalului';
+$lang['Return_to_page']			= 'ÃŽntoarcere la Pagina Portalului';
 $lang['Auth_Page_group']		= '-> Grup PRIVAT';
-$lang['Page_desc']				= 'Descripþie';
-$lang['Page_graph_border']		= 'Graficã bordura paginii - fiºier prefix';
-$lang['Page_graph_border_explain']	= 'Pentru a folosi grafica bordurii în jurul Blocurilor, specificã prefixul pentru fiºierele grafice aici. De exemplu, introdu \'border_\' pt. a folosi fiºierele: border_1-1.gif, border_1-2.gif,..., border_3-3.gif pentru matricea de 3x3 cu imagini-gif. Lasã blank (gol) pt. a dezactiva grafica bordurii (implicit).';
-$lang['Add_Page']					= 'Adaugã Pagina Noua';
-$lang['Page_Config_updated']		= 'Configuraþia Paginii Actualizatã cu Succes';
-$lang['Click_return_page_admin']	= 'Click %sAici%s pt. întoarcere la Administratia Paginii';
+$lang['Page_desc']				= 'DescripÅ£ie';
+$lang['Page_graph_border']		= 'GraficÄƒ bordura paginii - fiÅŸier prefix';
+$lang['Page_graph_border_explain']	= 'Pentru a folosi grafica bordurii Ã®n jurul Blocurilor, specificÄƒ prefixul pentru fiÅŸierele grafice aici. De exemplu, introdu \'border_\' pt. a folosi fiÅŸierele: border_1-1.gif, border_1-2.gif,..., border_3-3.gif pentru matricea de 3x3 cu imagini-gif. LasÄƒ blank (gol) pt. a dezactiva grafica bordurii (implicit).';
+$lang['Add_Page']					= 'AdaugÄƒ Pagina Noua';
+$lang['Page_Config_updated']		= 'ConfiguraÅ£ia Paginii ActualizatÄƒ cu Succes';
+$lang['Click_return_page_admin']	= 'Click %sAici%s pt. Ã®ntoarcere la Administratia Paginii';
 $lang['Remove_block']				= 'Scoate Bloc al Portalului';
-$lang['Remove_block_explain']		= 'Acesta va scoate blocul din acestã pagina. Atenþie, acestã operaþie nu este reversibilã!';
+$lang['Remove_block_explain']		= 'Acesta va scoate blocul din acestÄƒ pagina. AtenÅ£ie, acestÄƒ operaÅ£ie nu este reversibilÄƒ!';
 $lang['Click_block_remove_yes']		= 'Click %sAici%s pt. a scoate Blocul';
-$lang['Delete_page']				= 'ªterge Pagina';
-$lang['Delete_page_explain']		= 'Acesta va ºterge Pagina. Atenþie, acestã operaþie nu este reversibilã!';
-$lang['Click_page_delete_yes']		= 'Click %sAici%s pt. a ºterge Pagina';
+$lang['Delete_page']				= 'Åžterge Pagina';
+$lang['Delete_page_explain']		= 'Acesta va ÅŸterge Pagina. AtenÅ£ie, acestÄƒ operaÅ£ie nu este reversibilÄƒ!';
+$lang['Click_page_delete_yes']		= 'Click %sAici%s pt. a ÅŸterge Pagina';
 
 $lang['Mx_IP_filter']				= 'Filtru IP';
-$lang['Mx_IP_filter_explain']		= 'Pentru a restrictiona accesul la acestã pagina dupã IP, introdu adresele IP valide - o adresã IP per linie.<br>Ex. 127.0.0.1 ori 127.1.*.*';
-$lang['Mx_phpBB_stats']				= 'phpBB Statistice în Header';
+$lang['Mx_IP_filter_explain']		= 'Pentru a restrictiona accesul la acestÄƒ pagina dupÄƒ IP, introdu adresele IP valide - o adresÄƒ IP per linie.<br>Ex. 127.0.0.1 ori 127.1.*.*';
+$lang['Mx_phpBB_stats']				= 'phpBB Statistice Ã®n Header';
 $lang['Mx_phpBB_stats_explain']		= '- linkuri la postari noi/necitite etc';
-$lang['Column_admin']				= 'Administraþie Coloane Paginã';
-$lang['Column_admin_explain']		= 'Administreazã Coloanele Paginii';
+$lang['Column_admin']				= 'AdministraÅ£ie Coloane PaginÄƒ';
+$lang['Column_admin_explain']		= 'AdministreazÄƒ Coloanele Paginii';
 $lang['Column']						= 'Coloana Paginii';
 $lang['Columns']					= 'Coloanele Paginii';
-$lang['Column_block']				= 'Bloc Coloanã Paginã';
+$lang['Column_block']				= 'Bloc ColoanÄƒ PaginÄƒ';
 $lang['Column_blocks']				= 'Blocuri Coloana Paginii';
-$lang['Edit_Column']				= 'Editeazã o Coloanã';
-$lang['Edit_Column_explain']		= 'Foloseºte acest form pt. a modifica o coloanã';
-$lang['Column_Size']				= 'Mãrimea coloanei';
-$lang['Column_name']				= 'Nume Coloanã';
-$lang['Column_delete']				= 'ªterge o Coloanã';
-$lang['Page_updated']				= 'Informaþia Paginii ºi Coloanei Actualizatã cu Succes';
-$lang['Create_column']				= 'Adaugã Coloanã Nouã';
-$lang['Delete_page_column']			= 'ªterge Coloana Paginii';
-$lang['Delete_page_column_explain']		= 'Acesta va ºterge Coloana Paginii. Atenþie, acestã operaþie nu este reversibilã!';
-$lang['Click_page_column_delete_yes']	= 'Click %sAici%s pt. a ºterge Colana Paginii';
+$lang['Edit_Column']				= 'EditeazÄƒ o ColoanÄƒ';
+$lang['Edit_Column_explain']		= 'FoloseÅŸte acest form pt. a modifica o coloanÄƒ';
+$lang['Column_Size']				= 'MÄƒrimea coloanei';
+$lang['Column_name']				= 'Nume ColoanÄƒ';
+$lang['Column_delete']				= 'Åžterge o ColoanÄƒ';
+$lang['Page_updated']				= 'InformaÅ£ia Paginii ÅŸi Coloanei ActualizatÄƒ cu Succes';
+$lang['Create_column']				= 'AdaugÄƒ ColoanÄƒ NouÄƒ';
+$lang['Delete_page_column']			= 'Åžterge Coloana Paginii';
+$lang['Delete_page_column_explain']		= 'Acesta va ÅŸterge Coloana Paginii. AtenÅ£ie, acestÄƒ operaÅ£ie nu este reversibilÄƒ!';
+$lang['Click_page_column_delete_yes']	= 'Click %sAici%s pt. a ÅŸterge Colana Paginii';
 
 
 $lang['Add_Split_Block'] 			= 'Add Split Column Block';
@@ -473,177 +484,179 @@ $lang['Add_Dynamic_Block_explain'] 	= 'This dynamic block defines subpages, set 
 $lang['Add_Virtual_Block'] 			= 'Add Virtual (Page Blog) Block';
 $lang['Add_Virtual_Block_explain'] 	= 'This block turns the page into a virtual (blog) page';
 
-//
-// Page templates
-//
-$lang['Page_templates_admin']			= 'Administartie Templaturi Paginã';
-$lang['Page_templates_admin_explain'] 	= 'Foloseºte acesta pt. a crea, edita ori ºterge Templaturi';
-$lang['Page_template']					= 'Template Paginã';
-$lang['Page_templates']					= 'Templaturi Paginã';
-$lang['Page_template_column']			= 'Coloanã Template Paginã';
-$lang['Page_template_columns']			= 'Coloane Template Paginã';
+/*
+* Page templates
+*/
+$lang['Page_templates_admin']			= 'Administartie Templaturi PaginÄƒ';
+$lang['Page_templates_admin_explain'] 	= 'FoloseÅŸte acesta pt. a crea, edita ori ÅŸterge Templaturi';
+$lang['Page_template']					= 'Template PaginÄƒ';
+$lang['Page_templates']					= 'Templaturi PaginÄƒ';
+$lang['Page_template_column']			= 'ColoanÄƒ Template PaginÄƒ';
+$lang['Page_template_columns']			= 'Coloane Template PaginÄƒ';
 $lang['Choose_page_template']			= 'Alege Templatul Paginii';
-$lang['Template_Config_updated']		= 'Configuraþia Templetului a fost Actualizatã';
-$lang['Add_Template']					= 'Adaugã Template Nou';
+$lang['Template_Config_updated']		= 'ConfiguraÅ£ia Templetului a fost ActualizatÄƒ';
+$lang['Add_Template']					= 'AdaugÄƒ Template Nou';
 $lang['Template']						= 'Template';
 $lang['Template_name']					= 'Nume Template';
-$lang['Page_template_delete']			= 'ªterge Template';
-$lang['Delete_page_template']			= 'ªterge Paginã Template';
-$lang['Delete_page_template_explain']	= 'Acesta va ºterge Templatul Paginii. Atenþie, acestã operaþie nu este reversibilã!';
-$lang['Click_page_template_delete_yes']	= 'Click %sAici%s pt. a ºterge Templatul Paginii';
-$lang['Delete_page_template_column']	= 'ªterge Pagina Template';
-$lang['Delete_page_template_column_explain']	= 'Acesta va ºterge Templatul Paginii. Atenþie, acestã operaþie nu este reversibilã!';
-$lang['Click_page_template_column_delete_yes']	= 'Click %sAici%s pt. a ºterge Templatul Paginii';
+$lang['Page_template_delete']			= 'Åžterge Template';
+$lang['Delete_page_template']			= 'Åžterge PaginÄƒ Template';
+$lang['Delete_page_template_explain']	= 'Acesta va ÅŸterge Templatul Paginii. AtenÅ£ie, acestÄƒ operaÅ£ie nu este reversibilÄƒ!';
+$lang['Click_page_template_delete_yes']	= 'Click %sAici%s pt. a ÅŸterge Templatul Paginii';
+$lang['Delete_page_template_column']	= 'Åžterge Pagina Template';
+$lang['Delete_page_template_column_explain']	= 'Acesta va ÅŸterge Templatul Paginii. AtenÅ£ie, acestÄƒ operaÅ£ie nu este reversibilÄƒ!';
+$lang['Click_page_template_column_delete_yes']	= 'Click %sAici%s pt. a ÅŸterge Templatul Paginii';
 
-//
-// Cache
-//
-$lang['Cache_dir_write_protect']	= 'Directorul tau cache este protejat la scriere. Nu s-a putut genera fiºierul cache';
-$lang['Cache_generate']				= 'Fiºierele cache au fost generate.';
-$lang['Cache_submit']				= 'Sã generez fiºierul cache?';
-$lang['Cache_explain']				= 'Cu acestã opþiune poþi sã generezi toate fiºierele XML (fiºiere cache) odatã pentru toate blocurile portalului. Aceste fiºiere permit reducerea numãrului de cereri ale bazei de date necesare ºi îmbunãtãþesc performanþa portalului. <br />Noteazã: MXP cache trebuie activat (în Portal General Admin CP) petru ca aceste fiºiere sã fie folosite de sistem.<br>Mai Noteazã: fiºierele cache sunt create on the fly când sunt ºi blocurile de editare la fel.';
-$lang['Generate_mx_cache']			= 'Genereazã Bloc Cache';
+/*
+* Cache
+*/
+$lang['Cache_dir_write_protect']	= 'Directorul tau cache este protejat la scriere. Nu s-a putut genera fiÅŸierul cache';
+$lang['Cache_generate']				= 'FiÅŸierele cache au fost generate.';
+$lang['Cache_submit']				= 'SÄƒ generez fiÅŸierul cache?';
+$lang['Cache_explain']				= 'Cu acestÄƒ opÅ£iune poÅ£i sÄƒ generezi toate fiÅŸierele XML (fiÅŸiere cache) odatÄƒ pentru toate blocurile portalului. Aceste fiÅŸiere permit reducerea numÄƒrului de cereri ale bazei de date necesare ÅŸi Ã®mbunÄƒtÄƒÅ£esc performanÅ£a portalului. <br />NoteazÄƒ: MXP cache trebuie activat (Ã®n Portal General Admin CP) petru ca aceste fiÅŸiere sÄƒ fie folosite de sistem.<br>Mai NoteazÄƒ: fiÅŸierele cache sunt create on the fly cÃ¢nd sunt ÅŸi blocurile de editare la fel.';
+$lang['Generate_mx_cache']			= 'GenereazÄƒ Bloc Cache';
 
-//
-// These are displayed in the drop down boxes for advanced
-// mode Module auth, try and keep them short!
-//
+/*
+* These are displayed in the drop down boxes for advanced
+* mode Module auth, try and keep them short!
+*/
 $lang['Menu_Navigation']			= 'Meniu Navigare';
 $lang['Portal_index']				= 'Index Portal';
-$lang['Save_Settings']				= 'Salvare Setãri';
+$lang['Save_Settings']				= 'Salvare SetÄƒri';
 $lang['Translation_Tools']			= 'Unelte de Traducere';
 $lang['Preview_portal']				= 'Previzualizare Portal';
 
-//
-// META
-//
+/*
+* META
+*/
 $lang['Meta_admin']					= 'Administratie Meta Taguri';
-$lang['Mega_admin_explain']			= 'Foloseste acest form sã customizezi meta tagurile tale';
+$lang['Mega_admin_explain']			= 'Foloseste acest form sÄƒ customizezi meta tagurile tale';
 $lang['Meta_Title']					= 'Titlu';
 $lang['Meta_Author']				= 'Autor';
 $lang['Meta_Copyright']				= 'Copyright';
+$lang['Meta_ImageToolBar'] 			= 'Image ToolBar';
+$lang['Meta_Distribution'] 			= 'Distribution';
 $lang['Meta_Keywords']				= 'Cuvinte Cheie';
-$lang['Meta_Keywords_explain']		= '(lista separatã de virgulã)';
-$lang['Meta_Description']			= 'Descripþie';
-$lang['Meta_Language']				= 'Cod Limbã';
+$lang['Meta_Keywords_explain']		= '(lista separatÄƒ de virgulÄƒ)';
+$lang['Meta_Description']			= 'DescripÅ£ie';
+$lang['Meta_Language']				= 'Cod LimbÄƒ';
 $lang['Meta_Rating']				= 'Clasare';
 $lang['Meta_Robots']				= 'Robots';
 $lang['Meta_Pragma']				= 'Pragma no-cache';
-$lang['Meta_Bookmark_icon']			= 'Bookmark Iconiþã';
-$lang['Meta_Bookmark_explain']		= '(locaþie relativã)';
-$lang['Meta_HTITLE']				= 'Setãri Extra Header';
-$lang['Meta_data_updated']			= 'Fiºierul de date meta (mx_meta.inc) a fost actualizat!<br />Click %sAICI%s pt. intoarcere la Administraþie Meta Taguri.';
-$lang['Meta_data_ioerror']			= 'Nu se poate deschide mx_meta.inc. Asigurãte cã fiºierul e writabil (chmod 777).';
+$lang['Meta_Bookmark_icon']			= 'Bookmark IconiÅ£Äƒ';
+$lang['Meta_Bookmark_explain']		= '(locaÅ£ie relativÄƒ)';
+$lang['Meta_HTITLE']				= 'SetÄƒri Extra Header';
+$lang['Meta_data_updated']			= 'FiÅŸierul de date meta (mx_meta.inc) a fost actualizat!<br />Click %sAICI%s pt. intoarcere la AdministraÅ£ie Meta Taguri.';
+$lang['Meta_data_ioerror']			= 'Nu se poate deschide mx_meta.inc. AsigurÄƒte cÄƒ fiÅŸierul e writabil (chmod 777).';
 
-//
-// Portal permissons
-//
+/*
+* Portal permissons
+*/
 $lang['Mx_Block_Auth_Title']		= 'Permisii Bloc Privat';
-$lang['Mx_Block_Auth_Explain']		= 'Aici poti sã configurezi Permisiile Blocului Privat';
-$lang['Mx_Page_Auth_Title']			= 'Permisii Pagina Privatã';
-$lang['Mx_Page_Auth_Explain']		= 'Aici poþi sã configurezi Permisiile Paginii Private';
+$lang['Mx_Block_Auth_Explain']		= 'Aici poti sÄƒ configurezi Permisiile Blocului Privat';
+$lang['Mx_Page_Auth_Title']			= 'Permisii Pagina PrivatÄƒ';
+$lang['Mx_Page_Auth_Explain']		= 'Aici poÅ£i sÄƒ configurezi Permisiile Paginii Private';
 $lang['Block_Auth_successfully']	= 'Permisiunile Blocului Actualizate cu Succes';
-$lang['Click_return_block_auth']	= 'Click %sAici%s pt. întoarcere la Permisii Bloc Privat';
+$lang['Click_return_block_auth']	= 'Click %sAici%s pt. Ã®ntoarcere la Permisii Bloc Privat';
 $lang['Page_Auth_successfully']		= 'Permisiunile Paginii Actualizate cu Succes';
-$lang['Click_return_page_auth']		= 'Click %sAici%s pt. întoarcere la Permisii Pagina Privata';
-$lang['AUTH_ALL']					= 'TOÞI';
+$lang['Click_return_page_auth']		= 'Click %sAici%s pt. Ã®ntoarcere la Permisii Pagina Privata';
+$lang['AUTH_ALL']					= 'TOÅ¢I';
 $lang['AUTH_REG']					= 'REG';
 $lang['AUTH_PRIVATE']				= 'PRIVAT';
 $lang['AUTH_MOD']					= 'MOD';
 $lang['AUTH_ADMIN']					= 'ADMIN';
 $lang['AUTH_ANONYMOUS']				= 'ANONYMOUS';
 
-// -----------------------------------
-// BlockCP - Block Parameter Specific
-// -----------------------------------
+/* -----------------------------------/
+* BlockCP - Block Parameter Specific/
+* ----------------------------------- */
 
-//
-// General
-//
-$lang['target_block']				= 'Bloc Þinta';
+/*
+* General
+*/
+$lang['target_block']				= 'Bloc Å¢inta';
 $lang['target_block_explain']		= '- linkuri, date etc sunt referite cu acest bloc';
 
-//
-// Split column
-//
-$lang['block_ids']					= 'Blocuri Sursã';
-$lang['block_ids_explain']			= '- sã fie poziþionate stânga spre dreapta';
-$lang['block_sizes']				= 'Marimi Bloc (separate de virgulã)';
-$lang['block_sizes_explain']		= '- Poþi specifica mãrimile folosind numere (pixeli), procente (mãrimi relative, de ex. "40%") ori "*" pentru remainder.';
-$lang['space_between']				= 'Spaþiu între blocuri';
+/*
+* Split column
+*/
+$lang['block_ids']					= 'Blocuri SursÄƒ';
+$lang['block_ids_explain']			= '- sÄƒ fie poziÅ£ionate stÃ¢nga spre dreapta';
+$lang['block_sizes']				= 'Marimi Bloc (separate de virgulÄƒ)';
+$lang['block_sizes_explain']		= '- PoÅ£i specifica mÄƒrimile folosind numere (pixeli), procente (mÄƒrimi relative, de ex. "40%") ori "*" pentru remainder.';
+$lang['space_between']				= 'SpaÅ£iu Ã®ntre blocuri';
 
-//
-// Sitelog
-//
-$lang['log_filter_date']			= 'Filtru dupã timp';
-$lang['log_filter_date_explain']	= '- Aratã loguri din sãptãmâna trecutã, luna, anul...';
-$lang['numOfEvents']				= 'Numãr';
-$lang['numOfEvents_explain']		= '- Numãr evenimente de arãtat';
+/*
+* Sitelog
+*/
+$lang['log_filter_date']			= 'Filtru dupÄƒ timp';
+$lang['log_filter_date_explain']	= '- AratÄƒ loguri din sÄƒptÄƒmÃ¢na trecutÄƒ, luna, anul...';
+$lang['numOfEvents']				= 'NumÄƒr';
+$lang['numOfEvents_explain']		= '- NumÄƒr evenimente de arÄƒtat';
 
-//
-// IncludeX
-//
-$lang['x_listen']					= 'Ascultã (GET)';
+/*
+* IncludeX
+*/
+$lang['x_listen']					= 'AscultÄƒ (GET)';
 $lang['x_iframe']					= 'IFrame';
-$lang['x_textfile']					= 'Fiºier Text';
+$lang['x_textfile']					= 'FiÅŸier Text';
 $lang['x_multimedia']				= 'WMP Multimedia';
-$lang['x_pic']						= 'Picturã';
-$lang['x_format']					= 'Fiºier text formatat';
+$lang['x_pic']						= 'PicturÄƒ';
+$lang['x_format']					= 'FiÅŸier text formatat';
 $lang['x_mode']						= 'IncludeX mode:';
-$lang['x_mode_explain']				= '- Blocul IncludeX opereazã în unul din urmatoarele moduri. Dacã modul \'Ascultã (GET)\' este selectat, modul pote fi setat de un url \'x_mode=mode\' ºi parametrul asociat cu \'x_1=, x_2=, etc\'.<br />Exemplu: Pentru a trimite un url la iframe foloseºte \'domain/index.php?page=x&x_mode=iframe&x_1=http://domain\'  ';
+$lang['x_mode_explain']				= '- Blocul IncludeX opereazÄƒ Ã®n unul din urmatoarele moduri. DacÄƒ modul \'AscultÄƒ (GET)\' este selectat, modul pote fi setat de un url \'x_mode=mode\' ÅŸi parametrul asociat cu \'x_1=, x_2=, etc\'.<br />Exemplu: Pentru a trimite un url la iframe foloseÅŸte \'domain/index.php?page=x&x_mode=iframe&x_1=http://domain\'  ';
 $lang['x_1']						= 'Variabila 1:';
-$lang['x_1_explain']				= '- <i>IFrame:</i> url<br /><i>FiºierText:</i> cale relativã din radacinã (ex în \'/include_file/my_file.xxx\')<br /><i>Multimedia:</i> cale relativã din radacinã (ex în \'/include_file/my_file.xxx\')<br /><i>Pic:</i> cale relativã din radacinã (ex în \'/include_file/my_file.xxx\')<br /><i>Fiºier Text Formatat:</i> indisponibil';
+$lang['x_1_explain']				= '- <i>IFrame:</i> url<br /><i>FiÅŸierText:</i> cale relativÄƒ din radacinÄƒ (ex Ã®n \'/include_file/my_file.xxx\')<br /><i>Multimedia:</i> cale relativÄƒ din radacinÄƒ (ex Ã®n \'/include_file/my_file.xxx\')<br /><i>Pic:</i> cale relativÄƒ din radacinÄƒ (ex Ã®n \'/include_file/my_file.xxx\')<br /><i>FiÅŸier Text Formatat:</i> indisponibil';
 $lang['x_2']						= 'Variabila 2:';
-$lang['x_2_explain']				= '- <i>IFrame:</i> înaltime frame (pixeli)<br /><i>Multimedia:</i> lãþime (pixeli)';
+$lang['x_2_explain']				= '- <i>IFrame:</i> Ã®naltime frame (pixeli)<br /><i>Multimedia:</i> lÄƒÅ£ime (pixeli)';
 $lang['x_3']						= 'Variabila 3:';
-$lang['x_3_explain']				= '- <i>Multimedia:</i> înaltime (pixeli)';
+$lang['x_3_explain']				= '- <i>Multimedia:</i> Ã®naltime (pixeli)';
 
-//
-// Announcement
-//
-$lang['announce_nbr_display']		= 'Numãr Maxim de Mesaje care sã fie Afiºate';
-$lang['announce_nbr_days']			= 'Numãr de Zile în care se Afiºeaza Mesaje';
-$lang['announce_img']				= 'Imagine Anunþuri';
-$lang['announce_img_sticky']		= 'Imagine Lipicioasã';
+/*
+* Announcement
+*/
+$lang['announce_nbr_display']		= 'NumÄƒr Maxim de Mesaje care sÄƒ fie AfiÅŸate';
+$lang['announce_nbr_days']			= 'NumÄƒr de Zile Ã®n care se AfiÅŸeaza Mesaje';
+$lang['announce_img']				= 'Imagine AnunÅ£uri';
+$lang['announce_img_sticky']		= 'Imagine LipicioasÄƒ';
 $lang['announce_img_normal']		= 'Imagine Mesaj Normal';
-$lang['announce_img_global']		= 'Imagine Anunþuri Globale';
-$lang['announce_display']			= 'Afiºeazã Mesaje Anunþ(uri) în acest Bloc';
-$lang['announce_display_sticky']	= 'Afiseazã Lipicios(asã) în acest Bloc';
-$lang['announce_display_normal']	= 'Afiseazã Mesaj(e) Normale în acest Bloc';
-$lang['announce_display_global']	= 'Afiseazã Anunþurile Globale în acest Bloc';
-$lang['announce_forum']				= 'Forumuri Sursã';
-$lang['announce_forum_explain']		= '- Poþi face selecþii multiple<br />* Dacã nu este selectat nimic, toate forumurile autorizate vor fi vizibile';
+$lang['announce_img_global']		= 'Imagine AnunÅ£uri Globale';
+$lang['announce_display']			= 'AfiÅŸeazÄƒ Mesaje AnunÅ£(uri) Ã®n acest Bloc';
+$lang['announce_display_sticky']	= 'AfiseazÄƒ Lipicios(asÄƒ) Ã®n acest Bloc';
+$lang['announce_display_normal']	= 'AfiseazÄƒ Mesaj(e) Normale Ã®n acest Bloc';
+$lang['announce_display_global']	= 'AfiseazÄƒ AnunÅ£urile Globale Ã®n acest Bloc';
+$lang['announce_forum']				= 'Forumuri SursÄƒ';
+$lang['announce_forum_explain']		= '- PoÅ£i face selecÅ£ii multiple<br />* DacÄƒ nu este selectat nimic, toate forumurile autorizate vor fi vizibile';
 
-//
-// Polls
-//
-$lang['Poll_Display']				= 'Care urnã vrei sã o afiºezi?';
-$lang['poll_forum']					= 'Forumuri Sursã';
-$lang['poll_forum_explain']			= '- Poþi face selecþii mutiple<br />* Dacã nimic nu este selectat, toate forumurile autorizate vor fi vizibile';
+/*
+* Polls
+*/
+$lang['Poll_Display']				= 'Care urnÄƒ vrei sÄƒ o afiÅŸezi?';
+$lang['poll_forum']					= 'Forumuri SursÄƒ';
+$lang['poll_forum_explain']			= '- PoÅ£i face selecÅ£ii mutiple<br />* DacÄƒ nimic nu este selectat, toate forumurile autorizate vor fi vizibile';
 $lang['Not_Specified']				= 'Ne Specificat';
 
-//
-// Dynamic Block
-//
+/*
+* Dynamic Block
+*/
 $lang['default_block_id']			= 'Bloc Implicit';
-$lang['default_block_id_explain']	= '- Acesta este blocul implicit de afiºat, exceptând dacã un bloc dinamic este selectat';
+$lang['default_block_id_explain']	= '- Acesta este blocul implicit de afiÅŸat, exceptÃ¢nd dacÄƒ un bloc dinamic este selectat';
 
-//
-// Menu Navigation
-//
+/*
+* Menu Navigation
+*/
 $lang['menu_display_mode']			= 'Mod Plan';
 $lang['menu_display_mode_explain ']	= 'Mod plan Orizonal ori Vertical';
-$lang['menu_page_sync']				= 'Luminezã cel curent?';
-$lang['menu_page_sync_explain']		= 'Luminezã intrare la Meniul de Nav. curent...';
+$lang['menu_page_sync']				= 'LuminezÄƒ cel curent?';
+$lang['menu_page_sync_explain']		= 'LuminezÄƒ intrare la Meniul de Nav. curent...';
 
-//
-// Version Checker
-//
-$lang['MXP_Version_up_to_date'] = 'Instalarea MXP este la zi. Nu existã actualizãri pentru versiunea ta de MXP.';
-$lang['MXP_Version_outdated'] = 'Se pare ca instalarea ta MXP <b>nu</b> este la zi. Actualizãri existã pentru versiunea ta de MXP. Te rog vizitezã <a href="http://www.mx-publisher.com/index.php?page=4&action=file&file_id=2" target="_new">downloadare pachetul MXP Core</a> pt. a obþine ultima versiune.';
-$lang['MXP_Latest_version_info'] = 'Ultima veriune disponibilã este <b>MXP %s</b>. ';
+/*
+* Version Checker
+*/
+$lang['MXP_Version_up_to_date'] = 'Instalarea MXP este la zi. Nu existÄƒ actualizÄƒri pentru versiunea ta de MXP.';
+$lang['MXP_Version_outdated'] = 'Se pare ca instalarea ta MXP <b>nu</b> este la zi. ActualizÄƒri existÄƒ pentru versiunea ta de MXP. Te rog vizitezÄƒ <a href="http://mxpcms.sourceforge.net/index.php?page=4&action=file&file_id=2" target="_new">downloadare pachetul MXP Core</a> pt. a obÅ£ine ultima versiune.';
+$lang['MXP_Latest_version_info'] = 'Ultima veriune disponibilÄƒ este <b>MXP %s</b>. ';
 $lang['MXP_Current_version_info'] = 'Tu ai <b>MXP %s</b>.';
-$lang['MXP_Mailing_list_subscribe_reminder'] = 'Pentru ultimile informaþii de ºtiri ºi actualizãri pentru MXP, de ce nu <a href="http://lists.sourceforge.net/lists/listinfo/MXP-news" target="_new">înscriete la lista de mailuri</a>.';
+$lang['MXP_Mailing_list_subscribe_reminder'] = 'Pentru ultimile informaÅ£ii de ÅŸtiri ÅŸi actualizÄƒri pentru MXP, de ce nu <a href="http://lists.sourceforge.net/lists/listinfo/mxpcms-news" target="_new">Ã®nscriete la lista de mailuri</a>.';
 
 $lang['Trans_title']				= 'Translate to your Language';
 $lang['Trans_description']			= 'Use Translate Control Panel to translate portal to your language';
@@ -657,11 +670,11 @@ $lang['Trans_lang_dest']			= 'Destination Language';
 $lang['Trans_lang_block']			= 'Language block';
 $lang['Trans_save_file']			= 'Save language file';
 
-//
-// Asta e tot lume!
-//
-// Translated from english to romanian by OryNider
-// orynider@rdslink.ro // http://pubory.uv.ro/
-//
-// -------------------------------------------------
+/*
+* Asta e tot lume!
+*
+* Translated from english to romanian by OryNider
+* orynider@rdslink.ro // http://pubory.uv.ro/
+*
+* ------------------------------------------------- */
 ?>

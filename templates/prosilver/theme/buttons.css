@@ -53,6 +53,7 @@
 .buttons div.pmreply-icon	{ width: 96px; height: 25px; }
 .buttons div.newpm-icon		{ width: 84px; height: 25px; }
 
+
 /* Sub-header (navigation bar)
 --------------------------------------------- */
 a.print, a.sendemail, a.fontsize {
@@ -92,7 +93,7 @@ a.fontsize:hover {
 /* Icon images
 ---------------------------------------- */
 .sitehome, .icon-faq, .icon-members, .icon-home, .icon-ucp, .icon-register, .icon-logout,
-.icon-bookmark, .icon-bump, .icon-subscribe, .icon-unsubscribe, .icon-pages, .icon-search{
+.icon-bookmark, .icon-bump, .icon-subscribe, .icon-unsubscribe, .icon-pages, .icon-search, .icon-msgs {
 	background-position: 0 50%;
 	background-repeat: no-repeat;
 	background-image: none;
@@ -100,7 +101,7 @@ a.fontsize:hover {
 }
 
 .rtl .sitehome, .rtl .icon-faq, .rtl .icon-members, .rtl .icon-home, .rtl .icon-ucp, .rtl .icon-register, .rtl .icon-logout,
-.rtl .icon-bookmark, .rtl .icon-bump, .rtl .icon-subscribe, .rtl .icon-unsubscribe, .rtl .icon-pages, .rtl .icon-search{
+.rtl .icon-bookmark, .rtl .icon-bump, .rtl .icon-subscribe, .rtl .icon-unsubscribe, .rtl .icon-pages, .rtl .icon-search, .rtl .icon-msgs {
 	background-position: 100% 50%;
 	padding: 1px 17px 0 0;
 }

@@ -6,7 +6,7 @@
  *   copyright            : (C) 2001 The phpBB Group
  *   email                : support@phpbb.com
  *
- *   $Id: functions.php,v 1.5 2008/10/04 07:04:25 orynider Exp $
+ *   $Id: functions.php,v 1.7 2013/06/16 01:10:14 orynider Exp $
  *
  *
  ***************************************************************************/
@@ -26,15 +26,7 @@
 //
 class phpBB2
 {
-	/**
-	* Constructor
-	*/
-	function __construct() 
-	{ 
-	  return;
-	}
-
-	function get_db_stat($mode)
+	public static function get_db_stat($mode)
 	{
 		global $db;
 
@@ -88,11 +80,10 @@ class phpBB2
 	}
 
 	// added at phpBB 2.0.11 to properly format the username
-	function phpbb_clean_username($username)
+	public static function phpbb_clean_username($username)
 	{
 		$username = substr(htmlspecialchars(str_replace("\'", "'", trim($username))), 0, 25);
-		//$username = $this->phpbb_rtrim($username, "\\");
-		$username = phpBB2::phpbb_rtrim($username, "\\"); // php4
+		$username = self::phpbb_rtrim($username, "\\");
 		$username = str_replace("'", "\'", $username);
 
 		return $username;
@@ -102,7 +93,7 @@ class phpBB2
 	* This function is a wrapper for ltrim, as charlist is only supported in php >= 4.1.0
 	* Added in phpBB 2.0.18
 	*/
-	function phpbb_ltrim($str, $charlist = false)
+	public static function phpbb_ltrim($str, $charlist = false)
 	{
 		if ($charlist === false)
 		{
@@ -128,7 +119,7 @@ class phpBB2
 	}
 
 	// added at phpBB 2.0.12 to fix a bug in PHP 4.3.10 (only supporting charlist in php >= 4.1.0)
-	function phpbb_rtrim($str, $charlist = false)
+	public static function phpbb_rtrim($str, $charlist = false)
 	{
 		if ($charlist === false)
 		{
@@ -160,7 +151,7 @@ class phpBB2
 	* With thanks to Anthrax101 for the inspiration on this one
 	* Added in phpBB 2.0.20
 	*/
-	function dss_rand()
+	public static function dss_rand()
 	{
 		global $db, $board_config, $dss_seeded;
 
@@ -187,14 +178,13 @@ class phpBB2
 	//
 	// Get Userdata, $user can be username or user_id. If force_str is true, the username will be forced.
 	//
-	function get_userdata($user, $force_str = false)
+	public static function get_userdata($user, $force_str = false)
 	{
 		global $db;
 
 		if (!is_numeric($user) || $force_str)
 		{
-			$user = $this->phpbb_clean_username($user);
-			//$user = phpBB2::phpbb_clean_username($user); // php4
+			$user = self::phpbb_clean_username($user);
 		}
 		else
 		{
@@ -213,7 +203,7 @@ class phpBB2
 		return ( $row = $db->sql_fetchrow($result) ) ? $row : false;
 	}
 
-	function make_jumpbox($action, $match_forum_id = 0)
+	public static function make_jumpbox($action, $match_forum_id = 0)
 	{
 		global $template, $userdata, $lang, $db, $nav_links, $phpEx, $SID;
 
@@ -332,7 +322,7 @@ class phpBB2
 		{
 			if ( !empty($userdata['user_lang']))
 			{
-				$default_lang = $this->phpbb_ltrim(basename($this->phpbb_rtrim($userdata['user_lang'])), "'");
+				$default_lang = self::phpbb_ltrim(basename(self::phpbb_rtrim($userdata['user_lang'])), "'");
 			}
 
 			if ( !empty($userdata['user_dateformat']) )
@@ -347,15 +337,15 @@ class phpBB2
 		}
 		else
 		{
-			$default_lang = $this->phpbb_ltrim(basename($this->phpbb_rtrim($board_config['default_lang'])), "'");
+			$default_lang = self::phpbb_ltrim(basename(self::phpbb_rtrim($board_config['default_lang'])), "'");
 		}
 
-		if ( !file_exists(@$this->phpbb_realpath($phpbb_root_path . 'language/lang_' . $default_lang . '/lang_main.'.$phpEx)) )
+		if ( !file_exists(@self::phpbb_realpath($phpbb_root_path . 'language/lang_' . $default_lang . '/lang_main.'.$phpEx)) )
 		{
 			if ( $userdata['user_id'] != ANONYMOUS )
 			{
 				// For logged in users, try the board default language next
-				$default_lang = $this->phpbb_ltrim(basename($this->phpbb_rtrim($board_config['default_lang'])), "'");
+				$default_lang = self::phpbb_ltrim(basename(self::phpbb_rtrim($board_config['default_lang'])), "'");
 			}
 			else
 			{
@@ -365,7 +355,7 @@ class phpBB2
 				$default_lang = 'english';
 			}
 
-			if ( !file_exists(@$this->phpbb_realpath($phpbb_root_path . 'language/lang_' . $default_lang . '/lang_main.'.$phpEx)) )
+			if ( !file_exists(@self::phpbb_realpath($phpbb_root_path . 'language/lang_' . $default_lang . '/lang_main.'.$phpEx)) )
 			{
 				mx_message_die(CRITICAL_ERROR, 'Could not locate valid language pack');
 			}
@@ -404,7 +394,7 @@ class phpBB2
 
 		if ( defined('IN_ADMIN') )
 		{
-			if( !file_exists(@$this->phpbb_realpath($phpbb_root_path . 'language/lang_' . $board_config['default_lang'] . '/lang_admin.'.$phpEx)) )
+			if( !file_exists(@self::phpbb_realpath($phpbb_root_path . 'language/lang_' . $board_config['default_lang'] . '/lang_admin.'.$phpEx)) )
 			{
 				$board_config['default_lang'] = 'english';
 			}
@@ -521,7 +511,7 @@ class phpBB2
 				mx_message_die(CRITICAL_ERROR, "Could not open $template_name template config file", '', __LINE__, __FILE__);
 			}
 
-			$img_lang = ( file_exists(@$this->phpbb_realpath($phpbb_root_path . $current_template_path . '/images/lang_' . $board_config['default_lang'])) ) ? $board_config['default_lang'] : 'english';
+			$img_lang = ( file_exists(@self::phpbb_realpath($phpbb_root_path . $current_template_path . '/images/lang_' . $board_config['default_lang'])) ) ? $board_config['default_lang'] : 'english';
 
 			while( list($key, $value) = @each($images) )
 			{
@@ -536,43 +526,88 @@ class phpBB2
 	}
 	*/
 
-	function encode_ip($dotquad_ip)
+	public static function encode_ip($dotquad_ip)
 	{
 		$ip_sep = explode('.', $dotquad_ip);
 		return sprintf('%02x%02x%02x%02x', $ip_sep[0], $ip_sep[1], $ip_sep[2], $ip_sep[3]);
 	}
 
-	function decode_ip($int_ip)
+	public static function decode_ip($int_ip)
 	{
 		$hexipbang = explode('.', chunk_split($int_ip, 2, '.'));
 		return hexdec($hexipbang[0]). '.' . hexdec($hexipbang[1]) . '.' . hexdec($hexipbang[2]) . '.' . hexdec($hexipbang[3]);
 	}
-
-	//
-	// Create date/time from format and timezone
-	//
-	function create_date($format, $gmepoch, $tz)
+	
+	/*
+	* Get DST
+	*/
+	public function get_dst($gmepoch, $tz = 0, $time_mode = 0)
 	{
-		global $board_config, $lang;
+		global $board_config, $mx_user;
+
+		$tz = empty($tz) ? $board_config['board_timezone'] : $tz;
+		$dst_time_lag = isset($mx_user->data['user_dst']) ? $mx_user->data['user_dst'] : $tz;
+
+		switch ($time_mode)
+		{
+			case 2:
+				//MANUAL_DST
+				$dst_sec = $dst_time_lag * 60;
+				break;
+			case 1:
+				//SERVER_SWITCH
+				$dst_sec = gmdate('I', $gmepoch + (3600 * $tz)) * $dst_time_lag * 60;
+				//$dst_sec = @date('I', $gmepoch) * $dst_time_lag * 60;
+				break;
+			default:
+				$dst_sec = (isset($mx_user->timezone) && isset($mx_user->dst)) ? (int) $mx_user->timezone + (int) $mx_user->dst : 0;
+				break;
+		}
+		return $dst_sec;
+	}	
+
+	/*
+	* Create date/time using the specified format and timezone
+	*/
+	public static function create_date($format, $gmepoch, $tz = 0)
+	{
+		global $board_config, $mx_user, $lang;
 		static $translate;
 
-		if ( empty($translate) && $board_config['default_lang'] != 'english' )
+		$tz = empty($tz) ? $board_config['board_timezone'] : $tz;
+		// We need to force this ==> isset($lang['datetime']) <== otherwise we may have $lang initialized and we don't want that...
+		if (empty($translate) && ($board_config['default_lang'] != 'english') && isset($lang['datetime']))
 		{
-			@reset($lang['datetime']);
-			while ( list($match, $replace) = @each($lang['datetime']) )
+			$use_short_names = false;
+			if (((strpos($format, '\M') === false) && (strpos($format, 'M') !== false)) || ((strpos($format, '\r') === false) && (strpos($format, 'r') !== false)))
 			{
-				$translate[$match] = $replace;
+				$use_short_names = true;
+			}
+			@reset($lang['datetime']);
+			while (list($match, $replace) = @each($lang['datetime']))
+			{
+				$var_name = $match;
+				if ((strpos($match, '_short') !== false) && $use_short_names)
+				{
+					$var_name = str_replace('_short', '', $match);
+				}
+				$translate[$var_name] = $replace;
 			}
 		}
-
-		return ( !empty($translate) ) ? strtr(@gmdate($format, $gmepoch + (3600 * $tz)), $translate) : @gmdate($format, $gmepoch + (3600 * $tz));
+		$tz = empty($tz) ? $board_config['board_timezone'] : $tz;
+		$dst_time_lag = isset($mx_user->data['user_dst']) ? $mx_user->data['user_dst'] : $tz;
+		$dst_sec = (isset($mx_user->timezone) && isset($mx_user->dst)) ? (int) $mx_user->timezone + (int) $mx_user->dst : $dst_time_lag * 60;		
+		//$dst_sec = self::get_dst($gmepoch, $tz);
+		$date = @gmdate($format, $gmepoch + (3600 * $tz) + $dst_sec);
+		$date = (is_array($translate) ? @strtr($date, $translate) : $date);
+		return $date;
 	}
 
 	//
 	// Pagination routine, generates
 	// page number sequence
 	//
-	function generate_pagination($base_url, $num_items, $per_page, $start_item, $add_prevnext_text = TRUE)
+	public static function generate_pagination($base_url, $num_items, $per_page, $start_item, $add_prevnext_text = TRUE)
 	{
 		global $lang;
 
@@ -669,7 +704,7 @@ class phpBB2
 	// This does exactly what preg_quote() does in PHP 4-ish
 	// If you just need the 1-parameter preg_quote call, then don't bother using this.
 	//
-	function phpbb_preg_quote($str, $delimiter)
+	public static function phpbb_preg_quote($str, $delimiter)
 	{
 		$text = preg_quote($str);
 		$text = str_replace($delimiter, '\\' . $delimiter, $text);
@@ -682,7 +717,7 @@ class phpBB2
 	// calling script, note that the vars are passed as references this just makes it easier
 	// to return both sets of arrays
 	//
-	function obtain_word_list(&$orig_word, &$replacement_word)
+	public static function obtain_word_list(&$orig_word, &$replacement_word)
 	{
 		global $db;
 
@@ -922,14 +957,14 @@ class phpBB2
 	// to do checks with some functions.  Older versions of PHP don't
 	// seem to need this, so we'll just return the original value.
 	// dougk_ff7 <October 5, 2002>
-	function phpbb_realpath($path)
+	public static function phpbb_realpath($path)
 	{
 		global $phpbb_root_path, $phpEx;
 
 		return (!@function_exists('realpath') || !@realpath($phpbb_root_path . 'includes/functions.'.$phpEx)) ? $path : @realpath($path);
 	}
 
-	function redirect($url)
+	public static function redirect($url)
 	{
 		global $db, $board_config;
 

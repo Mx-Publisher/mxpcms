@@ -2,33 +2,33 @@
 /**
 *
 * @package MX-Publisher Module - mx_textblocks
-* @version $Id: lang_admin.php,v 1.1 2008/09/07 18:54:15 orynider Exp $
+* @version $Id: lang_admin.php,v 1.3 2013/06/28 15:39:28 orynider Exp $
 * @copyright (c) 2002-2008 [Jon Ohlsson] MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
 //
 // Parameter Types
 //
-$lang['ParType_phpBBTextBlock'] = 'Ξ ΟΟΟ„Ο…Ο€ΞΏ phpBB TextBlock';
-$lang['ParType_phpBBTextBlock_info'] = 'Ξ‘Ο…Ο„Ο ΞµΞ―Ξ½Ξ±ΞΉ Ξ ΟΟΟ„Ο…Ο€ΞΏ phpBB TextBlock, Ο„ΞµΟ‡Ξ½ΞΏΞ»ΞΏΞ³Ξ―Ξ± bbcodes, html och smilies ΟΟ€Ο‰Ο‚ Ξ­Ο‡ΞΏΟ…Ξ½ ΞΏΟΞΉΟƒΟ„ΞµΞ― Ξ±Ο€Ο Ο„ΞΉΟ‚ Ξ³ΞµΞ½ΞΉΞΊΞ­Ο‚ ΟΟ…ΞΈΞΌΞ―ΟƒΞµΞΉΟ‚ Ο„ΞΏΟ… phpBB.';
-$lang['ParType_CustomizedTextBlock'] = 'Ξ ΟΞΏΟƒΞ±ΟΞΌΞΏΟƒΞΌΞ­Ξ½ΞΏ TextBlock';
-$lang['ParType_CustomizedTextBlock_info'] = 'Ξ‘Ο…Ο„Ο ΞµΞ―Ξ½Ξ±ΞΉ Ξ ΟΞΏΟƒΞ±ΟΞΌΞΏΟƒΞΌΞ­Ξ½ΞΏ TextBlock, Ο„ΞµΟ‡Ξ½ΞΏΞ»ΞΏΞ³Ξ―Ξ± bbcodes, html och smilies ΟΟ€Ο‰Ο‚ Ξ­Ο‡ΞΏΟ…Ξ½ ΞΏΟΞΉΟƒΟ„ΞµΞ― Ξ±Ο€Ο Ο„ΞΉΟ‚ Ξ³ΞµΞ½ΞΉΞΊΞ­Ο‚ ΟΟ…ΞΈΞΌΞ―ΟƒΞµΞΉΟ‚ Ο„ΞΏΟ… block';
+$lang['ParType_phpBBTextBlock'] = 'Πρότυπο phpBB TextBlock';
+$lang['ParType_phpBBTextBlock_info'] = 'Αυτό είναι Πρότυπο phpBB TextBlock, τεχνολογία bbcodes, html och smilies όπως έχουν οριστεί από τις γενικές ρυθμίσεις του phpBB.';
+$lang['ParType_CustomizedTextBlock'] = 'Προσαρμοσμένο TextBlock';
+$lang['ParType_CustomizedTextBlock_info'] = 'Αυτό είναι Προσαρμοσμένο TextBlock, τεχνολογία bbcodes, html och smilies όπως έχουν οριστεί από τις γενικές ρυθμίσεις του block';
 $lang['ParType_WysiwygTextBlock'] = 'Wysiwyg TextBlock';
-$lang['ParType_WysiwygTextBlock_info'] = 'Ξ‘Ο…Ο„Ο ΞµΞ―Ξ½Ξ±ΞΉ Wysiwyg TextBlock, Ο‡Ξ±ΟΞ±ΞΊΟ„Ξ·ΟΞΉΟƒΟ„ΞΉΞΊΟ ΞµΟ€ΞµΞΎΞµΟΞ³Ξ±ΟƒΞ―Ξ±Ο‚ html';
+$lang['ParType_WysiwygTextBlock_info'] = 'Αυτό είναι Wysiwyg TextBlock, χαρακτηριστικό επεξεργασίας html';
 
 //
 // Parameter Names
 //
-$lang['block_style'] = 'Ξ Ξ»Ξ±Ξ―ΟƒΞΉΞΏ Block:';
-$lang['title_style'] = 'Ξ£Ο„Ο…Ξ» Ξ•Ο€ΞΉΞ³ΟΞ±Ο†Ξ®Ο‚ Ξ¤Ξ―Ο„Ξ»ΞΏΟ…:';
-$lang['allow_bbcode'] = 'Ξ•Ο€ΞΉΟ„ΟΞ­ΟΟ„Ξµ BBCodes:';
-$lang['allow_html'] = 'Ξ•Ο€ΞΉΟ„ΟΞ­ΟΟ„Ξµ Html:';
-$lang['allow_smilies'] = 'Ξ•Ο€ΞΉΟ„ΟΞ­ΟΟ„Ξµ ΞµΞΉΞΊΞΏΞ½Ξ―Ξ΄ΞΉΞ±:';
-$lang['html_tags'] = 'Ξ•Ο€ΞΉΟ„ΟΞµΟ€ΟΞΌΞµΞ½Ξ± Html tags:';
+$lang['block_style'] = 'Πλαίσιο Block:';
+$lang['title_style'] = 'Στυλ Επιγραφής Τίτλου:';
+$lang['allow_bbcode'] = 'Επιτρέψτε BBCodes:';
+$lang['allow_html'] = 'Επιτρέψτε Html:';
+$lang['allow_smilies'] = 'Επιτρέψτε εικονίδια:';
+$lang['html_tags'] = 'Επιτρεπόμενα Html tags:';
 
-$lang['block_style_explain'] = 'Ξ ΟΞΏΞ²ΞΏΞ»Ξ® Ο€Ξ»Ξ±ΞΉΟƒΞ―ΞΏΟ… Ξ³ΟΟΟ‰ Ξ±Ο€Ο Ο„ΞΏ textblock:';
-$lang['title_style_explain'] = 'Ξ§ΟΞ®ΟƒΞ· ΟƒΟ„Ο…Ξ» css Ξ³ΞΉΞ± Ο„Ξ· ΟƒΞµΞΉΟΞ¬ Ο„Ξ―Ο„Ξ»ΞΏΟ…:';
+$lang['block_style_explain'] = 'Προβολή πλαισίου γύρω από το textblock:';
+$lang['title_style_explain'] = 'Χρήση στυλ css για τη σειρά τίτλου:';
 ?>

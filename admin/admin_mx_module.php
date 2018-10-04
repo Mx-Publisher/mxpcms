@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: admin_mx_module.php,v 1.51 2008/02/11 11:13:16 joasch Exp $
+* @version $Id: admin_mx_module.php,v 1.54 2013/06/28 15:32:37 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -18,7 +18,7 @@ if( !empty($setmodules) )
 //
 // Security and Page header
 //
-define('IN_PORTAL', 1);
+@define('IN_PORTAL', 1);
 $mx_root_path = './../';
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
 $no_page_header = TRUE;
@@ -117,15 +117,15 @@ $modules_select_list = get_list_static('module_path', $modules_list, '', false);
 //
 $s_hidden_module_install_fields = '<input type="hidden" name="mode" value="' . MX_MODULE_TYPE . '" />
 							<input type="hidden" name="action" value="' . MX_DO_INSTALL . '" />
-							<input type="hidden" name="id" value="' . $module_id . '" />
+							<input type="hidden" name="id" value="' . $nav_module_id . '" />
 							<input type="hidden" name="sid" value="' . $userdata['session_id'] . '" />';
 
-$result_message_height = $is_pak ? '300px' : '50px';
+$result_message_height = isset($is_pak) ? '300px' : '50px';
 
 //
 // Hidden vars
 //
-$s_hidden_fields_module = '<input type="hidden" name="mode" value="add" /><input type="hidden" name="id" value="' . $module_id . '" />';
+$s_hidden_fields_module = '<input type="hidden" name="mode" value="add" /><input type="hidden" name="id" value="' . $nav_module_id . '" />';
 
 //
 // Send to template
@@ -134,8 +134,8 @@ $template->assign_vars(array(
 	'L_TITLE' => $lang['Module_admin'],
 	'L_EXPLAIN' => $lang['Module_admin_explain'],
 
-	'NAV_MODULE_ID' => $nav_module_id,
-	'RESULT_MESSAGE'			=> !empty($result_message) ? '<div style="overflow:auto; height:'.$result_message_height.'"><span class="gensmall">' . $result_message  . '<br/> -::-</span></div>': '',
+	'NAV_MODULE_ID' 	=> $nav_module_id,
+	'RESULT_MESSAGE'	=> !empty($result_message) ? '<div style="overflow:auto; height:'.$result_message_height.'"><span class="gensmall">' . $result_message  . '<br/> -::-</span></div>': '',
 
 	//
 	// General
@@ -208,7 +208,7 @@ if( $total_modules_current = $db->sql_numrows($q_modules_current) )
 {
 	$module_rows_current = $db->sql_fetchrowset($q_modules_current);
 }
-$db->sql_freeresult($result);
+$db->sql_freeresult($q_modules_current);
 
 //
 // Get the rest modules
@@ -228,8 +228,7 @@ if( $total_modules = $db->sql_numrows($q_modules) )
 {
 	$module_rows = $db->sql_fetchrowset($q_modules);
 }
-
-$db->sql_freeresult($result);
+$db->sql_freeresult($q_modules);
 
 if ( $total_modules + $total_modules_current == 0 )
 {
@@ -249,12 +248,12 @@ $module_rows_select = array();
 //
 // Loop through the rows of modules setting block vars for the template.
 //
-for( $module_count = -1; $module_count < $total_modules; $module_count++ )
+for( $module_count = 0; $module_count < $total_modules; $module_count++ )
 {
 	//
 	// Give main vars specific names
 	//
-	$new_module = $module_count == -1;
+	$new_module = $module_count == 0;
 
 	$newmode = $new_module ? 'add' : 'modify';
 	$module_id = $new_module ? '0'  : $module_rows[$module_count]['module_id'];

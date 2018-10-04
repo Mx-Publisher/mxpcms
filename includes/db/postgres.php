@@ -2,11 +2,11 @@
 /**
 *
 * @package DBal
-* @version $Id: postgres.php,v 1.16 2008/07/20 02:41:41 orynider Exp $
+* @version $Id: postgres.php,v 1.19 2013/06/28 15:33:26 orynider Exp $
 * @copyright (c) 2005 phpBB Group
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU Public License
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -65,7 +65,7 @@ class dbal_postgres extends dbal
 			{
 				$connect_string .= "host=$sqlserver ";
 			}
-		
+
 			if ($port)
 			{
 				$connect_string .= "port=$port ";
@@ -322,10 +322,19 @@ class dbal_postgres extends dbal
 	*/
 	function sql_rowseek($rownum, $query_id = false)
 	{
+		global $mx_cache;
+
 		if (!$query_id)
 		{
 			$query_id = $this->query_result;
 		}
+
+		/* Backported from Olympus, not compatible with MXP, yet
+		if (isset($mx_cache->sql_rowset[$query_id]))
+		{
+			return $mx_cache->sql_rowseek($rownum, $query_id);
+		}
+		*/
 
 		return ($query_id) ? @pg_result_seek($query_id, $rownum) : false;
 	}
@@ -363,16 +372,26 @@ class dbal_postgres extends dbal
 	*/
 	function sql_freeresult($query_id = false)
 	{
+		global $mx_cache;
+
 		if (!$query_id)
 		{
 			$query_id = $this->query_result;
 		}
+
+		/* Backported from Olympus, not compatible with MXP, yet
+		if (isset($mx_cache->sql_rowset[$query_id]))
+		{
+			return $mx_cache->sql_freeresult($query_id);
+		}
+		*/
 
 		if (isset($this->open_queries[(int) $query_id]))
 		{
 			unset($this->open_queries[(int) $query_id]);
 			return @pg_free_result($query_id);
 		}
+		return false;
 	}
 
 	/**

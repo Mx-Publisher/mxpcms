@@ -2,11 +2,11 @@
 /**
 *
 * @package DBal
-* @version $Id: mysql4.php,v 1.20 2008/08/19 02:46:22 orynider Exp $
+* @version $Id: mysql4.php,v 1.25 2014/05/16 18:02:05 orynider Exp $
 * @copyright (c) 2005 phpBB Group
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU Public License
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -25,7 +25,7 @@ if (!is_object('dbal_mysql4'))
 {
 	define('SQL_LAYER', 'mysql4');
 	include_once($mx_root_path . 'includes/db/dbal.' . $phpEx);
-	$sql_db = 'dbal_' . $dbms;
+	$sql_db = 'dbal_' . $dbms; // Repopulated for multiple db connections
 
 /**
 * @package DBal
@@ -39,9 +39,7 @@ class dbal_mysql4 extends dbal
 {
 	var $mysql_version;
 	var $multi_insert = true;
-	/**
-	* Connect to server
-	*/
+
 	/**
 	* Connect to server
 	* @access public
@@ -52,33 +50,32 @@ class dbal_mysql4 extends dbal
 		$this->user = $sqluser;
 		$this->server = $sqlserver . (($port) ? ':' . $port : '');
 		$this->dbname = $database;
+		
+		$this->sql_layer = 'mysql4';
 
 		$this->db_connect_id = ($this->persistency) ? @mysql_pconnect($this->server, $this->user, $sqlpassword, $new_link) : @mysql_connect($this->server, $this->user, $sqlpassword, $new_link);
-
+		
 		if ($this->db_connect_id && $this->dbname != '')
 		{
 			if (@mysql_select_db($this->dbname, $this->db_connect_id))
 			{
 				// Determine what version we are using and if it natively supports UNICODE
 				$this->mysql_version = mysql_get_server_info($this->db_connect_id);
-
+				
 				if (version_compare($this->mysql_version, '4.1.3', '>='))
 				{
-					$this->sql_layer = 'mysql4';
-					
-					if (UTF_STATUS === 'phpbb3')
-					{				
+					if (defined('DBCHARACTER_SET') && (DBCHARACTER_SET === 'uft8'))
+					{
 						@mysql_query("SET NAMES 'utf8'", $this->db_connect_id);
 						// enforce strict mode on databases that support it
 					}
-
+					
 					if (version_compare($this->mysql_version, '5.0.2', '>='))
 					{
 						$result = @mysql_query('SELECT @@session.sql_mode AS sql_mode', $this->db_connect_id);
 						$row = @mysql_fetch_assoc($result);
 						@mysql_free_result($result);
 						$modes = array_map('trim', explode(',', $row['sql_mode']));
-
 						// TRADITIONAL includes STRICT_ALL_TABLES and STRICT_TRANS_TABLES
 						if (!in_array('TRADITIONAL', $modes))
 						{
@@ -86,34 +83,29 @@ class dbal_mysql4 extends dbal
 							{
 								$modes[] = 'STRICT_ALL_TABLES';
 							}
-
 							if (!in_array('STRICT_TRANS_TABLES', $modes))
 							{
 								$modes[] = 'STRICT_TRANS_TABLES';
 							}
 						}
-
 						$mode = implode(',', $modes);
 						@mysql_query("SET SESSION sql_mode='{$mode}'", $this->db_connect_id);
 					}
-
 				}
 				else if (version_compare($this->mysql_version, '4.0.0', '>='))
 				{
 					$this->sql_layer = 'mysql4';
 				}
-				else //if (version_compare($this->mysql_version, '4.0.0', '<'))
+				else
 				{
 					$this->sql_layer = 'mysql';
-				}				
-
+				}
 				return $this->db_connect_id;
 			}
 		}
-
 		return $this->sql_error('');
 	}
-	
+
 	/**
 	* Version information about used database
 	*/
@@ -311,10 +303,19 @@ class dbal_mysql4 extends dbal
 	*/
 	function sql_rowseek($rownum, $query_id = false)
 	{
+		global $mx_cache;
+
 		if (!$query_id)
 		{
 			$query_id = $this->query_result;
 		}
+
+		/* Backported from Olympus, not compatible with MXP, yet
+		if (isset($mx_cache->sql_rowset[$query_id]))
+		{
+			return $mx_cache->sql_rowseek($rownum, $query_id);
+		}
+		*/
 
 		return ($query_id) ? @mysql_data_seek($query_id, $rownum) : false;
 	}
@@ -332,10 +333,19 @@ class dbal_mysql4 extends dbal
 	*/
 	function sql_freeresult($query_id = false)
 	{
+		global $mx_cache;
+
 		if (!$query_id)
 		{
 			$query_id = $this->query_result;
 		}
+
+		/* Backported from Olympus, not compatible with MXP, yet
+		if (isset($mx_cache->sql_rowset[$query_id]))
+		{
+			return $mx_cache->sql_freeresult($query_id);
+		}
+		*/
 
 		if (isset($this->open_queries[(int) $query_id]))
 		{

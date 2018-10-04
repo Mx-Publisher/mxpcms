@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Module - mx_phpbb3blocks
-* @version $Id: mx_viewforum.php,v 1.6 2008/10/04 07:04:38 orynider Exp $
+* @version $Id: mx_viewforum.php,v 1.9 2013/06/28 15:36:44 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -608,7 +608,7 @@ if (sizeof($topic_list))
 			'TOPIC_AUTHOR_COLOUR'		=> get_username_string('colour', $row['topic_poster'], $row['topic_first_poster_name'], $row['topic_first_poster_colour']),
 			'TOPIC_AUTHOR_FULL'			=> get_username_string('full', $row['topic_poster'], $row['topic_first_poster_name'], $row['topic_first_poster_colour']),
 			'FIRST_POST_TIME'			=> $mx_user->format_date($row['topic_time']),
-			'LAST_POST_SUBJECT'			=> $phpBB3->censor_text($row['topic_last_post_subject']),
+			'LAST_POST_SUBJECT'			=> phpBB3::censor_text($row['topic_last_post_subject']),
 			'LAST_POST_TIME'			=> $mx_user->format_date($row['topic_last_post_time']),
 			'LAST_VIEW_TIME'			=> $mx_user->format_date($row['topic_last_view_time']),
 			'LAST_POST_AUTHOR'			=> get_username_string('username', $row['topic_last_poster_id'], $row['topic_last_poster_name'], $row['topic_last_poster_colour']),
@@ -618,7 +618,7 @@ if (sizeof($topic_list))
 			'PAGINATION'		=> topic_generate_pagination($replies, $view_topic_url),
 			'REPLIES'			=> $replies,
 			'VIEWS'				=> $row['topic_views'],
-			'TOPIC_TITLE'		=> $phpBB3->censor_text($row['topic_title']),
+			'TOPIC_TITLE'		=> phpBB3::censor_text($row['topic_title']),
 			'TOPIC_TYPE'		=> $topic_type,
 
 			'TOPIC_FOLDER_IMG'		=> $mx_user->img($folder_img, $folder_alt),
@@ -652,7 +652,7 @@ if (sizeof($topic_list))
 			'U_MCP_QUEUE'			=> $u_mcp_queue,
 
 			'S_TOPIC_TYPE_SWITCH'	=> ($s_type_switch == $s_type_switch_test) ? -1 : $s_type_switch_test,
-	         	'S_ROW_COUNT'	=> $i)
+			'S_ROW_COUNT'	=> $i)
 		);
 
 		$s_type_switch = ($row['topic_type'] == POST_ANNOUNCE || $row['topic_type'] == POST_GLOBAL) ? 1 : 0;

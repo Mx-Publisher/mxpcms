@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: lang_admin.php,v 1.5 2008/08/19 02:46:23 orynider Exp $
+* @version $Id: lang_admin.php,v 1.7 2014/05/13 17:59:43 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -32,7 +32,9 @@ $lang['Install_Instruction'] = 'Please fill out the details requested below. Thi
 $lang['Install_Instruction_mxBB'] = 'Be sure to fill out the form below carefully. If you need, consult the MXP documentation for further assistance.';
 $lang['Install_Instruction_MXP_Admin'] = 'If the MXP adminname and password are left blank, your admin account will be created: username (admin), password (admin). Modify this password asap!';
 $lang['Install_Instruction_phpBB'] = 'Please note, even if you plan to use MX-Publisher with phpBB, this installation does not modify your phpBB database in any way.';
-$lang['Upgrade_Instruction'] = 'MX-Publisher is already installed. Please make backups of your database now !<br /><br />The next step will modify the structure of your database (please note MX-Publisher does not modify your phpBB database in any way). If for whatever reason this upgrade procedure fails, there would be no other way to return to your current state. Please make backups of your database BEFORE proceeding !<br /><br />Once done, click the button below to start the upgrade procedure.';
+$lang['Install_Instruction_SMF'] = 'Please note, even if you plan to use MX-Publisher with SMF, this installation does not modify your SMF database in any way.';
+$lang['Install_Instruction_MyBB'] = 'Please note, even if you plan to use MX-Publisher with MyBB, this installation does not modify your SMF database in any way.';
+$lang['Upgrade_Instruction'] = 'MX-Publisher is already installed. Please make backups of your database now !<br /><br />The next step will modify the structure of your database (please note MX-Publisher does not modify your MyBB database in any way). If for whatever reason this upgrade procedure fails, there would be no other way to return to your current state. Please make backups of your database BEFORE proceeding !<br /><br />Once done, click the button below to start the upgrade procedure.';
 $lang['Install_moreinfo'] = '%sRelease Notes%s | %sOnline Manual%s | %sOnline KB%s | %sSupport Forums%s | %sTerms Of Use%s';
 $lang['Install_settings'] = 'Installation Settings';
 $lang['Choose_lang_explain'] = 'Please use the form below to select the language you wish to use throughout the installation process.';
@@ -42,7 +44,7 @@ $lang['Mxbb_only'] = '[Internal]';
 $lang['Language'] = 'Language';
 $lang['Portal_backend'] = 'Backend Name';
 $lang['Session_backend'] = 'Users & Sessions';
-$lang['Session_backend_explain'] = 'The MX-Publisher-IWizard has detected installed phpBB boards on this server. <br />Select here if you plan to use MX-Publisher with phpBB users and sessions. <br />If you are unsure (or if you want to install MX-Publisher without phpBB), select \'Internal\' setup. <br />You may update this setting later in the MX-Publisher adminCP';
+$lang['Session_backend_explain'] = 'The MX-Publisher-IWizard has detected installed forum boards on this server. <br />Select here if you plan to use MX-Publisher with forums users and sessions. <br />If you are unsure (or if you want to install MX-Publisher without phpBB), select \'Internal\' setup. <br />You may update this setting later in the MX-Publisher adminCP';
 $lang['Phpbb_path'] = 'phpBB relative path';
 $lang['Phpbb_path_explain'] = 'Relative path to phpBB, ex. phpBB/ or ../phpBB/<br />Note the slashes "/", they are important!';
 $lang['Phpbb_url'] = 'Full phpBB URL';
@@ -55,6 +57,8 @@ $lang['dbms'] = 'Database Type';
 $lang['DB_Host'] = 'Database Server Hostname/DSN';
 $lang['DB_Name'] = 'Your Database Name';
 $lang['DB_Username'] = 'Database Username';
+$lang['DB_Character_Set'] = 'Database Character Set';
+$lang['DB_Character_Set_explain'] = 'Character Set ex. utf8';
 $lang['MXP_Adminname'] = 'MXP Admin Username';
 $lang['DB_Password'] = 'Database Password';
 $lang['MXP_Password'] = 'MXP Admin Password';
@@ -74,6 +78,14 @@ $lang['Debug_Information'] = 'DEBUG INFORMATION';
 $lang['Install_phpbb_not_found'] = 'Sorry, we could not find any phpBB board installed on this server.<br />Please install phpBB BEFORE installing MX-Publisher.<br />\n<br />\n';
 $lang['Install_phpbb_db_failed'] = 'Sorry, we could not connect to the phpBB database.<br />Please check that your phpBB is correctly installed and up and running BEFORE installing MX-Publisher.<br />\n<br />\n';
 $lang['Install_phpbb_unsupported'] = 'Unfortunately, the phpBB board installed on this server is not supported by MX-Publisher.<br />Please check the release notes for installation requirements.<br />\n<br />\n';
+$lang['Install_smf_not_found'] = 'Sorry, we could not find any SMF board installed on this server.<br />Please install phpBB BEFORE installing MX-Publisher.<br />\n<br />\n';
+$lang['Install_smf_db_failed'] = 'Sorry, we could not connect to the SMF database.<br />Please check that your phpBB is correctly installed and up and running BEFORE installing MX-Publisher.<br />\n<br />\n';
+$lang['Install_smf_unsupported'] = 'Unfortunately, the phpBB board installed on this server is not supported by MX-Publisher.<br />Please check the release notes for installation requirements.<br />\n<br />\n';
+$lang['Install_mybb_not_found'] = 'Sorry, we could not find any myBB board installed on this server.<br />Please install myBB BEFORE installing MX-Publisher.<br />\n<br />\n';
+$lang['Install_mybb_db_failed'] = 'Sorry, we could not connect to the myBB database.<br />Please check that your myBB is correctly installed and up and running BEFORE installing MX-Publisher.<br />\n<br />\n';
+$lang['Install_mybb_unsupported'] = 'Unfortunately, the phpBB board installed on this server is not supported by MX-Publisher.<br />Please check the release notes for installation requirements.<br />\n<br />\n';
+$lang['Install_forums_not_found'] = 'Sorry, we could not find any forum board installed on this server.<br />Please install a forum suppported by this installer BEFORE installing MX-Publisher.<br />\n<br />\n';
+$lang['Install_forums_unsupported'] = 'Unfortunately, any forum board installed on this server is not supported by MX-Publisher.<br />Please check the release notes for installation requirements.<br />\n<br />\n';
 $lang['Install_noscript_warning'] = 'Sorry, this installation requires a JavaScript enabled browser. It might not work on your browser.';
 $lang['Upgrade_are_you_sure'] = 'This upgrade procedure will make modifications to your database. Are you sure you wish to proceed?';
 $lang['Writing_config'] = 'Writing config.php file';

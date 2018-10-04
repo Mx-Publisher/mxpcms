@@ -2,10 +2,10 @@
 /**
 *
 * @package Auth
-* @version $Id: core.php,v 1.13 2008/10/04 07:04:25 orynider Exp $
+* @version $Id: core.php,v 1.20 2014/07/07 20:36:53 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -21,6 +21,12 @@ if ( !defined( 'IN_PORTAL' ) )
 include_once($mx_root_path . 'includes/shared/phpbb2/includes/functions.' . $phpEx);
 include_once($mx_root_path . 'includes/shared/phpbb3/includes/functions.' . $phpEx);
 
+//
+// Instantiate Dummy phpBB Classes
+//
+$phpBB2 = new phpBB2();
+$phpBB3 = new phpBB3();
+
 /**
 * Backend specific tasks
 *
@@ -28,9 +34,7 @@ include_once($mx_root_path . 'includes/shared/phpbb3/includes/functions.' . $php
 */
 class mx_backend
 {
-	//
 	// XS Template - use backend db settings
-	//
 	var $edit_db = false;
 
 	/**
@@ -45,16 +49,12 @@ class mx_backend
 		global $db, $portal_config, $phpbb_root_path, $mx_root_path;
 		global $table_prefix, $phpEx, $tplEx;
 
-		//
 		// Define relative path to "phpBB", and validate
-		//
 		$phpbb_root_path = $mx_root_path . 'includes/shared/phpbb2/';
 		str_replace("//", "/", $phpbb_root_path);
 		$portal_backend_valid_file = @file_exists($phpbb_root_path . "includes/functions.$phpEx");
 
-		//
 		// Define backend template extension
-		//
 		$tplEx = 'tpl';
 
 		return $portal_backend_valid_file;
@@ -87,10 +87,10 @@ class mx_backend
 		$server_url_phpbb = $server_protocol . $server_name . $server_port . $script_name_phpbb;
 		define('PHPBB_URL', $server_url_phpbb);
 
-		//
-		// Now sync Configs
-		// In phpBB mode, we rely on native phpBB configs, thus we need to sync mxp and phpbb settings
-		//
+		/*
+		* Now sync Configs
+		* In phpBB mode, we rely on native phpBB configs, thus we need to sync mxp and phpbb settings
+		*/
 		$this->sync_configs();
 	}
 
@@ -214,16 +214,21 @@ class mx_backend
 	{
 		global $mx_root_path, $phpbb_root_path, $phpEx;
 
-		$backend = in_array($force_shared, array('internal', 'phpbb2', 'phpbb3')) ? $force_shared : PORTAL_BACKEND;
+		$backend = in_array($force_shared, array('internal', 'phpbb2', 'smf2', 'mybb', 'phpbb3', 'olympus', 'ascraeus', 'rhea')) ? $force_shared : PORTAL_BACKEND;
 		switch ($backend)
 		{
 			case 'internal':
 			case 'phpbb2':
+			case 'smf2':
+			case 'mybb':
 				$path = $mx_root_path . 'includes/shared/phpbb2/includes/';
-				break;
+			break;
 			case 'phpbb3':
+			case 'olympus':
+			case 'ascraeus':
+			case 'rhea':
 				$path = $mx_root_path . 'includes/shared/phpbb3/includes/';
-				break;
+			break;				
 		}
 		return $path;
 	}
@@ -236,26 +241,28 @@ class mx_backend
 	 */
 	function dss_rand()
 	{
-		global $db, $portal_config, $board_config, $dss_seeded;
-
+		global $db, $portal_config, $board_config, $lang, $dss_seeded;
+		
 		$val = $portal_config['rand_seed'] . microtime();
 		$val = md5($val);
 		$portal_config['rand_seed'] = md5($portal_config['rand_seed'] . $val . 'a');
-
 		if($dss_seeded !== true)
 		{
 			$sql = "UPDATE " . PORTAL_TABLE . " SET
 				rand_seed = '" . $portal_config['rand_seed'] . "'
 				WHERE portal_id = '1'";
-
-			if( !$db->sql_query($sql) )
+			//display an error debuging message only if the portal is installed/upgraded 
+			if(!@$db->sql_query($sql) && @!file_exists('install'))
 			{
 				mx_message_die(GENERAL_ERROR, "Unable to reseed PRNG", "", __LINE__, __FILE__, $sql);
 			}
-
+			elseif(!@$db->sql_query($sql) && @file_exists('install'))
+			{
+				mx_message_die(GENERAL_ERROR, "Unable to reseed PRNG"."<br />Please finish upgrading and <br />". t(isset($lang['Please_remove_install_contrib'])), "", __LINE__, __FILE__, $sql);
+			}
+			
 			$dss_seeded = true;
 		}
-
 		return substr($val, 4, 16);
 	}
 
@@ -267,7 +274,7 @@ class mx_backend
 	function page_header($mode = false)
 	{
 		global $db, $mx_root_path, $phpbb_root_path, $userdata, $mx_user, $lang, $images, $phpEx;
-		global $phpBB2, $board_config, $gen_simple_header, $layouttemplate, $mx_page;
+		global $board_config, $gen_simple_header, $layouttemplate, $mx_page;
 
 		switch ($mode)
 		{
@@ -286,15 +293,13 @@ class mx_backend
 					$l_login_logout = $lang['Login'];
 				}
 
-				$s_last_visit = ( $userdata['session_logged_in'] ) ? $phpBB2->create_date($board_config['default_dateformat'], $userdata['user_lastvisit'], $board_config['board_timezone']) : '';
-
-				//
+				$s_last_visit = ( $userdata['session_logged_in'] ) ? phpBB2::create_date($board_config['default_dateformat'], $userdata['user_lastvisit'], $board_config['board_timezone']) : '';
+				
 				// Obtain number of new private messages
 				// if user is logged in
-				//
 				if ( ($userdata['session_logged_in']) && (empty($gen_simple_header)) )
 				{
-					if ( $userdata['user_new_privmsg'] )
+					if (isset($userdata['user_new_privmsg']))
 					{
 						$l_message_new = ( $userdata['user_new_privmsg'] == 1 ) ? $lang['New_pm'] : $lang['New_pms'];
 						$l_privmsgs_text = sprintf($l_message_new, $userdata['user_new_privmsg']);
@@ -328,7 +333,7 @@ class mx_backend
 						$mx_priv_msg = $lang['Private_Messages'];
 					}
 
-					if ( $userdata['user_unread_privmsg'] )
+					if (isset($userdata['user_unread_privmsg']))
 					{
 						$l_message_unread = ( $userdata['user_unread_privmsg'] == 1 ) ? $lang['Unread_pm'] : $lang['Unread_pms'];
 						$l_privmsgs_text_unread = sprintf($l_message_unread, $userdata['user_unread_privmsg']);
@@ -489,7 +494,68 @@ class mx_backend
 			ORDER BY group_name ASC";
 		return $sql;
 	}
-	
+
+	/**
+	 * Enter description here...
+	 *
+	 * @return unknown
+	 */
+	function generate_session_online_sql($guest = false)
+	{
+		if ($guest)
+		{
+			$sql = "SELECT *
+				FROM " . SESSIONS_TABLE . "
+				WHERE session_logged_in = 0
+					AND session_time >= " . ( time() - 300 ) . "
+				ORDER BY session_time DESC";
+		}
+		else
+		{
+			$sql = "SELECT u.*, s.*
+				FROM " . USERS_TABLE . " u, " . SESSIONS_TABLE . " s
+				WHERE s.session_logged_in = " . TRUE . "
+					AND u.user_id = s.session_user_id
+					AND u.user_id <> " . ANONYMOUS . "
+					AND s.session_time >= " . ( time() - 300 ) . "
+				ORDER BY u.user_session_time DESC";
+		}
+		return $sql;
+	}
+
+	/**
+	 * Enter description here...
+	 *
+	 * @param unknown_type $str_ip
+	 * @return unknown
+	 */
+	function decode_ip($str_ip)
+	{
+		return phpBB2::decode_ip($str_ip);
+	}
+
+	/**
+	 * Enter description here...
+	 *
+	 * @return unknown
+	 */
+	function get_phpbb_version()
+	{
+		return '';
+	}
+
+	/**
+	 * Enter description here...
+	 *
+	 * @return unknown
+	 */
+	function confirm_backend()
+	{
+		global $portal_config;
+
+		return PORTAL_BACKEND == $portal_config['portal_backend'];
+	}
+
 	/**
 	* Get username details for placing into templates.
 	*
@@ -501,34 +567,34 @@ class mx_backend
 	* @param string $custom_profile_url optional parameter to specify a profile url. The user id get appended to this url as &amp;u={user_id}
 	*
 	* @return string A string consisting of what is wanted based on $mode.
-	*/	
+	*/
 	function get_username_string($mode, $user_id, $username = false, $user_color = false, $guest_username = false, $custom_profile_url = false)
 	{
 		global $lang, $userdata;
-		
-		$lang['Guest'] = !$guest_username ? $lang['Guest'] : $guest_username;
-		
-		$this_userdata = mx_get_userdata($user_id, false);
-		$username = ($username) ? $username : $this_userdata['username'];			
 
-		if ($this_userdata['user_level'] == ADMIN) 
-		{ 
+		$lang['Guest'] = !$guest_username ? $lang['Guest'] : $guest_username;
+
+		$this_userdata = mx_get_userdata($user_id, false);
+		$username = ($username) ? $username : $this_userdata['username'];
+
+		if ($this_userdata['user_level'] == ADMIN)
+		{
 			$user_color = $theme['fontcolor3'];
-			$user_style = 'style="color:#' . $user_color . '; font-weight : bold;"';  
-		} 
-		else if ($this_userdata['user_level'] == MOD) 
-		{ 
+			$user_style = 'style="color:#' . $user_color . '; font-weight : bold;"';
+		}
+		else if ($this_userdata['user_level'] == MOD)
+		{
 			$user_color = $theme['fontcolor2'];
-			$user_style = 'style="color:#' . $user_color . '; font-weight : bold;"';  
+			$user_style = 'style="color:#' . $user_color . '; font-weight : bold;"';
 		}
-		else 
-		{ 
+		else
+		{
 			$user_colour = $theme['fontcolor1'];
-			$topic_poster_style = 'style="font-weight : bold;"'; 
+			$topic_poster_style = 'style="font-weight : bold;"';
 		}
-				
-		$profile_url = '';
-				
+
+		$profile_url = $username;
+
 		$full_url = (($user_id == ANONYMOUS) || ($user_id == MUSIC_GUEST)) ? '<span ' . $topic_poster_style . '>' . $lang['Guest'] . '</span>' : '<span ' . $topic_poster_style . '>' . $username . '</span>';
 
 		switch ($mode)
@@ -549,9 +615,41 @@ class mx_backend
 			default:
 				return $full_url;
 			break;
-		}	
-	}	
-	
+		}
+		return $username;
+	}
+
+	//
+	// ACP
+	//
+	/**
+	 * Enter description here...
+	 *
+	 */
+	function load_phpbb_acp_menu()
+	{
+
+	}
+
+	/**
+	 * Enter description here...
+	 *
+	 */
+	function load_forum_stats()
+	{
+
+	}
+
+	/**
+	 * Enter description here...
+	 *
+	 * @return unknown
+	 */
+	function phpbb_version_check()
+	{
+		return '';
+	}
+
 }
 
 //

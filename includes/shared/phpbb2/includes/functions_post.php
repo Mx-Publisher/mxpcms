@@ -6,7 +6,7 @@
  *   copyright            : (C) 2001 The phpBB Group
  *   email                : support@phpbb.com
  *
- *   $Id: functions_post.php,v 1.5 2008/10/04 07:04:25 orynider Exp $
+ *   $Id: functions_post.php,v 1.6 2008/10/31 18:54:43 jonohlsson Exp $
  *
  *
  ***************************************************************************/
@@ -632,7 +632,7 @@ function user_notification($mode, &$post_data, &$topic_title, &$forum_id, &$topi
 
 					$orig_word = array();
 					$replacement_word = array();
-					$phpBB2->obtain_word_list($orig_word, $replacement_word);
+					phpBB2::obtain_word_list($orig_word, $replacement_word);
 
 					$emailer->from($board_config['board_email']);
 					$emailer->replyto($board_config['board_email']);

@@ -55,6 +55,11 @@ INSERT INTO mx_table_smilies (smilies_id, code, smile_url, emoticon) VALUES ( 40
 INSERT INTO mx_table_smilies (smilies_id, code, smile_url, emoticon) VALUES ( 41, ':neutral:', 'icon_neutral.gif', 'Neutral');
 INSERT INTO mx_table_smilies (smilies_id, code, smile_url, emoticon) VALUES ( 42, ':mrgreen:', 'icon_mrgreen.gif', 'Mr. Green');
 
+# ------------------------------------------------------------
+#
+# New Fields in Table `mx_parameter`
+#
+ALTER TABLE mx_table_parameter MODIFY parameter_default text default '';
 
 # --------------------------------------------------------
 #

@@ -14,9 +14,10 @@
 	<li id="config_info_tab"><a href="javascript:selectPart('config_info')"><span>INFO</span></a></li>
 	</ul>
 </div>
-<div class="panel bg3">
+<div class="acp">
+<div class="panel">
 	<span class="corners-top"><span></span></span>
-	<div class="inner" style="padding-left:5px;padding-right:5px;">
+	<div class="content" style="padding-left:5px;padding-right:5px;">
 <fieldset id="gen_sett">
 	<dl>
 		<dt><label for="portal_name">{L_PORTAL_NAME}</label></dt>
@@ -149,19 +150,19 @@
 		<dd>{ADMIN_STYLE_SELECT}</dd>
 	</dl>
 	<dl>
-		<dt><label for="overall_header">{L_OVERALL_HEADER}</label></dt>
+		<dt><label for="overall_header">{L_OVERALL_HEADER}</label><!-- IF L_OVERALL_HEADER_EXPLAIN neq '' --><br /><span class="explain">{L_OVERALL_HEADER_EXPLAIN}</span><!-- ENDIF --></dt>
 		<dd><input type="text" maxlength="150" size="50" name="overall_header" id="overall_header" value="{OVERALL_HEADER}" /></dd>
 	</dl>
 	<dl>
-		<dt><label for="overall_footer">{L_OVERALL_FOOTER}</label></dt>
+		<dt><label for="overall_footer">{L_OVERALL_FOOTER}</label><!-- IF L_OVERALL_FOOTER_EXPLAIN neq '' --><br /><span class="explain">{L_OVERALL_FOOTER_EXPLAIN}</span><!-- ENDIF --></dt>
 		<dd><input type="text" maxlength="150" size="50" name="overall_footer" id="overall_footer" value="{OVERALL_FOOTER}" /></dd>
 	</dl>
 	<dl>
-		<dt><label for="main_layout">{L_MAIN_LAYOUT}</label></dt>
+		<dt><label for="main_layout">{L_MAIN_LAYOUT}</label><!-- IF L_MAIN_LAYOUT_EXPLAIN neq '' --><br /><span class="explain">{L_MAIN_LAYOUT_EXPLAIN}</span><!-- ENDIF --></dt>
 		<dd><input type="text" maxlength="150" size="50" name="main_layout" id="main_layout" value="{MAIN_LAYOUT}" /></dd>
 	</dl>
 	<dl>
-		<dt><label for="navigation_block">{L_NAVIGATION_BLOCK}</label></dt>
+		<dt><label for="navigation_block">{L_NAVIGATION_BLOCK}</label><!-- IF L_NAVIGATION_BLOCK_EXPLAIN neq '' --><br /><span class="explain">{L_NAVIGATION_BLOCK_EXPLAIN}</span><!-- ENDIF --></dt>
 		<dd>{NAVIGATION_BLOCK}</dd>
 	</dl>
 	<dl>
@@ -260,7 +261,8 @@
 
 </form>
 </div>
-<span class="corners-bottom"><span></span></span>
+	<span class="corners-bottom"><span></span></span>
+</div>
 </div>
 <script type="text/javascript">
 

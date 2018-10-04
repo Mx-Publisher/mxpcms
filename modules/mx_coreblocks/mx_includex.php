@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Module - mx_coreblocks
-* @version $Id: mx_includex.php,v 1.15 2008/10/04 07:04:38 orynider Exp $
+* @version $Id: mx_includex.php,v 1.17 2014/05/18 06:24:56 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net
 *
 */
 
@@ -79,6 +79,7 @@ switch( $x_mode )
 		break;
 
 	case 'x_pic':			// Pic
+		$file_contents = '<img src="'.$x_1.'" alt="x_pic" width="'.$x_2.'" height="'.$x_3.'" border="0" />';	
 		$template->assign_block_vars('pic_mode', array(
 			'FILE_CONTENTS' => $file_contents
 		));

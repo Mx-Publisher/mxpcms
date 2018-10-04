@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Module - mx_mod_rewrite
-* @version $Id: rewrite_custom_defs.php,v 1.5 2008/02/04 16:51:35 joasch Exp $
+* @version $Id: rewrite_custom_defs.php,v 1.6 2013/06/28 15:35:15 orynider Exp $
 * @copyright (c) 2002-2008 [Jon Ohlsson] MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 

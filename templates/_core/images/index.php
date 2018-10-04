@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: index.php,v 1.4 2008/02/10 22:05:19 joasch Exp $
+* @version $Id: index.php,v 1.5 2014/05/18 06:25:31 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 *
@@ -842,10 +842,10 @@ elseif ($mx_request_vars->get('pane', MX_TYPE_NO_TAGS) == 'right' )
 	$errno = 0;
 	$errstr = $mxbb_version_info = '';
 
-	if ($fsock = @fsockopen('www.mx-publisher.com', 80, $errno, $errstr))
+	if ($fsock = @fsockopen('mxpcms.sourceforge.net', 80, $errno, $errstr))
 	{
 		@fputs($fsock, "GET /updatecheck/28x.txt HTTP/1.1\r\n");
-		@fputs($fsock, "HOST: www.mx-publisher.com\r\n");
+		@fputs($fsock, "HOST: mxpcms.sourceforge.net\r\n");
 		@fputs($fsock, "Connection: close\r\n\r\n");
 
 		$get_info = false;

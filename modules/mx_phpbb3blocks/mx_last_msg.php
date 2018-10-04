@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Module - mx_phpbb3blocks
-* @version $Id: mx_last_msg.php,v 1.5 2008/10/04 07:04:38 orynider Exp $
+* @version $Id: mx_last_msg.php,v 1.9 2013/06/28 15:36:44 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -18,6 +18,8 @@ if( !defined('IN_PORTAL') || !is_object($mx_block))
 // Include the constants file
 // ===================================================
 require_once($module_root_path .'includes/phpbb3blocks_constants.'. $phpEx);
+require_once($mx_root_path . 'includes/mx_functions_tools.' . $phpEx); 
+$mx_text_formatting = new mx_text_formatting();
 
 //
 // Read Block Settings
@@ -217,7 +219,11 @@ for( $row_count = 0; $row_count < count($postrow); $row_count++ )
 	$row_class = ( !( $row_count % 2 ) ) ? $theme['td_class1'] : $theme['td_class2'];
 
 	$message = $postrow[$row_count]['topic_title'];
-
+	$bbcode_uid = $postrow[$row_count]['bbcode_uid'];
+	$bbcode_bitfield = $postrow[$row_count]['bbcode_bitfield'] ? $postrow[$row_count]['bbcode_bitfield'] : true;
+	
+	$message = $mx_bbcode->decode($message, $bbcode_uid, true, $bbcode_bitfield);
+	
 	$url = mx_append_sid(PHPBB_URL . 'viewtopic.' . $phpEx . '?' . 'f=' . $postrow[$row_count]['forum_id'] . '&amp;lmsg_start='. $msg_start .'&amp;t='. $postrow[$row_count]['topic_id'] .'#'. $postrow[$row_count]['topic_last_post_id']);
 
 	if ( $postrow[$row_count]['topic_status'] == TOPIC_MOVED )
@@ -376,17 +382,13 @@ for( $row_count = 0; $row_count < count($postrow); $row_count++ )
 	$message_alt = $message;
 	if (strlen($message) > $nb_characteres)
 	{
-		$message = substr($message, 0, $nb_characteres);
-		$position_espace = strrpos($message,'');
-
-		$position_espace = empty($position_espace) ? $nb_characteres : $position_espace;
-		$message = substr($message, 0, $position_espace);
+		$message = $mx_text_formatting->truncate_text($message, $nb_characteres, true);
 		$message .='...';
 	}
 
 	if ($display_date == "TRUE")
 	{
-		//$message_date = $phpBB2->create_date($board_config['default_dateformat'], $postrow[$row_count]['post_time'], $board_config['board_timezone']);
+		//$message_date = phpBB2::create_date($board_config['default_dateformat'], $postrow[$row_count]['post_time'], $board_config['board_timezone']);
 		$message_date = $mx_user->format_date($postrow[$row_count]['post_time']);
 		$topic_date = $mx_user->format_date($postrow[$row_count]['topic_time']);
 		$last_message_date = $mx_user->format_date($postrow[$row_count]['topic_last_post_time']);
@@ -405,11 +407,7 @@ for( $row_count = 0; $row_count < count($postrow); $row_count++ )
 		$forum_name_alt = $forum_name;
 		if ( strlen($forum_name) > $nb_characteres )
 		{
-			$forum_name = substr($forum_name, 0, $nb_characteres);
-			$position_espace = strrpos($forum_name,'');
-
-			$position_espace = empty($position_espace) ? $nb_characteres : $position_espace;
-			$forum_name = substr($forum_name, 0, $position_espace);
+			$forum_name = $mx_text_formatting->truncate_text($forum_name, $nb_characteres, true);			
 			$forum_name .='...';
 		}
 

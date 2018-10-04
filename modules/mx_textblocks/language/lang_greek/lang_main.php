@@ -2,15 +2,15 @@
 /**
 *
 * @package MX-Publisher Module - mx_textblocks
-* @version $Id: lang_main.php,v 1.1 2008/09/07 18:54:20 orynider Exp $
+* @version $Id: lang_main.php,v 1.3 2013/06/28 15:39:28 orynider Exp $
 * @copyright (c) 2002-2008 [Jon Ohlsson] MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
-$lang['Toc_title'] = 'Ξ ΞµΟΞΉΞµΟ‡ΟΞΌΞµΞ½Ξ±:';
-$lang['Goto_page'] = 'Ξ Ξ·Ξ³Ξ±Ξ―Ξ½ΞµΟ„Ξµ ΟƒΟ„Ξ· ΟƒΞµΞ»Ξ―Ξ΄Ξ±:';
+$lang['Toc_title'] = 'Περιεχόμενα:';
+$lang['Goto_page'] = 'Πηγαίνετε στη σελίδα:';
 
-$lang['Blog_id'] = 'Blog id:<br />- "%s" Ξ±Ξ½Ο„ΞΉΞΊΞ±ΞΈΞ―ΟƒΟ„Ξ±Ο„Ξ±ΞΉ Ξ±Ο€Ο Ο„ΞΏ ΟΞ½ΞΏΞΌΞ± Ο‡ΟΞ®ΟƒΟ„Ξ·.';
+$lang['Blog_id'] = 'Blog id:<br />- "%s" αντικαθίσταται από το όνομα χρήστη.';
 ?>

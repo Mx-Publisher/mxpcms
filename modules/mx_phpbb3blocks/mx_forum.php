@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Module - mx_phpbb3blocks
-* @version $Id: mx_forum.php,v 1.5 2008/06/25 23:45:42 jonohlsson Exp $
+* @version $Id: mx_forum.php,v 1.7 2013/06/28 15:36:44 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -97,7 +97,7 @@ while ($row = $db->sql_fetchrow($result))
 	}
 	else
 	{
-		$legend .= (($legend != '') ? ', ' : '') . '<a' . $colour_text . ' href="' . mx3_append_sid("{$phpbb_root_path}memberlist.$phpEx", 'mode=group&amp;g=' . $row['group_id']) . '">' . (($row['group_type'] == GROUP_SPECIAL) ? $mx_user->lang['G_' . $row['group_name']] : $row['group_name']) . '</a>';
+		$legend .= (($legend != '') ? ', ' : '') . '<a' . $colour_text . ' href="' . mx3_append_sid(PHPBB_URL . "memberlist.$phpEx", 'mode=group&amp;g=' . $row['group_id']) . '">' . (($row['group_type'] == GROUP_SPECIAL) ? $mx_user->lang['G_' . $row['group_name']] : $row['group_name']) . '</a>';
 	}
 }
 $db->sql_freeresult($result);
@@ -146,11 +146,11 @@ $template->assign_vars(array(
 	'FORUM_LOCKED_IMG'		=> $mx_user->img('forum_read_locked', 'NO_NEW_POSTS_LOCKED'),
 	'FORUM_NEW_LOCKED_IMG'	=> $mx_user->img('forum_unread_locked', 'NO_NEW_POSTS_LOCKED'),
 
-	'S_LOGIN_ACTION'			=> mx3_append_sid("{$phpbb_root_path}ucp.$phpEx", 'mode=login'),
+	'S_LOGIN_ACTION'			=> mx3_append_sid(PHPBB_URL . "ucp.$phpEx", 'mode=login'),
 	'S_DISPLAY_BIRTHDAY_LIST'	=> ($board_config['load_birthdays']) ? true : false,
 
-	'U_MARK_FORUMS'		=> ($mx_user->data['is_registered'] || $board_config['load_anon_lastread']) ? mx3_append_sid("{$phpbb_root_path}index.$phpEx", 'mark=forums') : '',
-	'U_MCP'				=> ($phpbb_auth->acl_get('m_') || $phpbb_auth->acl_getf_global('m_')) ? mx3_append_sid("{$phpbb_root_path}mcp.$phpEx", 'i=main&amp;mode=front', true, $mx_user->session_id) : '')
+	'U_MARK_FORUMS'		=> ($mx_user->data['is_registered'] || $board_config['load_anon_lastread']) ? mx3_append_sid(PHPBB_URL . "index.$phpEx", 'mark=forums') : '',
+	'U_MCP'				=> ($phpbb_auth->acl_get('m_') || $phpbb_auth->acl_getf_global('m_')) ? mx3_append_sid(PHPBB_URL . "mcp.$phpEx", 'i=main&amp;mode=front', true, $mx_user->session_id) : '')
 );
 
 

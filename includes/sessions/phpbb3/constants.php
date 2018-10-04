@@ -2,10 +2,10 @@
 /**
 *
 * @package Style
-* @version $Id: constants.php,v 1.3 2008/06/15 09:15:44 jonohlsson Exp $
+* @version $Id: constants.php,v 1.10 2013/06/28 15:33:47 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -53,6 +53,16 @@
 @define('LOGIN_ERROR_ATTEMPTS', 13);
 @define('LOGIN_ERROR_EXTERNAL_AUTH', 14);
 @define('LOGIN_ERROR_PASSWORD_CONVERT', 15);
+
+// SQL codes phpBB2
+@define('BEGIN_TRANSACTION', 1);
+@define('END_TRANSACTION', 2);
+
+// Error codes (from phpbb2)
+@define('GENERAL_MESSAGE', 200);
+@define('GENERAL_ERROR', 202);
+@define('CRITICAL_MESSAGE', 203);
+@define('CRITICAL_ERROR', 204);
 
 // Group settings
 @define('GROUP_OPEN', 0);
@@ -159,7 +169,26 @@
 @define('FIELD_DROPDOWN', 5);
 @define('FIELD_DATE', 6);
 
+// referer validation
+define('REFERER_VALIDATE_NONE', 0);
+define('REFERER_VALIDATE_HOST', 1);
+define('REFERER_VALIDATE_PATH', 2);
+
+// phpbb_chmod() permissions
+@define('CHMOD_ALL', 7);
+@define('CHMOD_READ', 4);
+@define('CHMOD_WRITE', 2);
+@define('CHMOD_EXECUTE', 1);
+
+// Captcha code length
+define('CAPTCHA_MIN_CHARS', 4);
+define('CAPTCHA_MAX_CHARS', 7);
+
 // Additional constants
+define('VOTE_CONVERTED', 127);
+
+// Additional constants
+@define('RANKS_PATH', 'images/ranks/');
 
 // Table names
 @define('ACL_GROUPS_TABLE',			$table_prefix . 'acl_groups');
@@ -227,4 +256,8 @@
 
 // Additional tables
 
+// Additional constants
+@define('INHERIT_LANG_NONE', 0);
+@define('INHERIT_LANG_EN', 1);
+@define('INHERIT_LANG_DEFAULT', 2);
 ?>

@@ -15,7 +15,7 @@
 
 //-->
 
-<div align="center"><span class="copyright">{POWERED_BY} <a href="http://www.mx-publisher.com/" target="_mx-publisher" class="copyright">MX-Publisher (MXP)</a> {MX_VERSION} &copy; 2001-2008 <!-- IF PHPBB_BACKEND --> &amp; <a href="http://www.phpbb.com/" target="_phpbb" class="copyright">phpBB</a> {PHPBB_VERSION} &copy; 2001, 2003 phpBB Group <!-- ENDIF --></span></div>
+<div align="center"><span class="copyright">{POWERED_BY} <a href="http://mxpcms.sourceforge.net/" target="_mx-publisher" class="copyright">MX-Publisher (MXP)</a> {MX_VERSION} &copy; 2001-2008 <!-- IF PHPBB_BACKEND --> &amp; <a href="http://www.phpbb.com/" target="_phpbb" class="copyright">phpBB</a> {PHPBB_VERSION} &copy; 2001, 2003 phpBB Group <!-- ENDIF --></span></div>
 <!-- This displays generation info at the bottom of the page -->
 <div align="center"><span class="copyright">{EXECUTION_STATS}</span></div>
 </body>

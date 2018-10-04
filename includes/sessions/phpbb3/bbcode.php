@@ -2,10 +2,10 @@
 /**
 *
 * @package Functions_phpBB
-* @version $Id: bbcode.php,v 1.1 2008/10/04 07:04:25 orynider Exp $
+* @version $Id: bbcode.php,v 1.17 2014/05/09 07:52:03 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -14,10 +14,10 @@ if (!defined('IN_PORTAL'))
 	exit;
 }
 
-//
-// Here comes a mxp version of original phpbb2 bbcode.php
-// Last in file are the mxp wrapper functions
-//
+/*
+* Here comes a mxp version of phpbb2 bbcode.php ported to phpbb3 backend
+* Last in file are the mxp wrapper functions
+*/
 
 define("BBCODE_UID_LEN", 10);
 
@@ -30,6 +30,11 @@ $bbcode_uid = null;
 // Need to initialize the random numbers only ONCE
 mt_srand( (double) microtime() * 1000000);
 
+//
+// Now load some bbcodes, to be extended for this backend (see below)
+//
+//include_once($mx_root_path . 'includes/mx_functions_bbcode.' . $phpEx); // BBCode associated functions
+//
 
 /**
  * MXP BBcodes
@@ -39,6 +44,7 @@ class mx_bbcode
 {
 	var $smiley_path_url = '';
 	var $smiley_root_path =	'';
+	var $smilies_path = ''; 
 
 	var $smiley_url = 'smiley_url';
 	var $smiley_id = 'smiley_id';
@@ -53,6 +59,12 @@ class mx_bbcode
 
 	var $template_bitfield;
 	var $template_filename = '';
+	
+	var $site_url = '';
+	var $document_id = '';
+	var $access_key = '';
+	var $height = 0;
+	var $width = 0;
 
 	/**
 	* Constructor
@@ -71,6 +83,7 @@ class mx_bbcode
 		$this->smiley_path_url = PHPBB_URL; //change this to PORTAL_URL when shared folder will be removed
 		$this->smiley_root_path =	$phpbb_root_path; //same here
 		$board_config['smilies_path'] = str_replace("smiles", "smilies", $board_config['smilies_path']);
+		$this->smilies_path = str_replace("//", "/", $board_config['smilies_path']);	
 	}
 	
 	/**
@@ -85,7 +98,7 @@ class mx_bbcode
 
 		if ($bbcode_bitfield !== false)
 		{
-			$this->bbcode_bitfield = $bbcode_bitfield;
+			//$this->bbcode_bitfield = $bbcode_bitfield;
 
 			// Init those added with a new bbcode_bitfield (already stored codes will not get parsed again)
 			$this->bbcode_cache_init();
@@ -362,7 +375,8 @@ class mx_bbcode
 						)
 					);
 				break;
-
+				
+				
 				default:
 					if (isset($rowset[$bbcode_id]))
 					{
@@ -379,7 +393,7 @@ class mx_bbcode
 								// In order to use templates with custom bbcodes we need
 								// to replace all {VARS} to corresponding backreferences
 								// Note that backreferences are numbered from bbcode_match
-								if (preg_match_all('/\{(URL|LOCAL_URL|EMAIL|TEXT|SIMPLETEXT|IDENTIFIER|COLOR|NUMBER)[0-9]*\}/', $rowset[$bbcode_id]['bbcode_match'], $m))
+								if (preg_match_all('/\{(URL|LOCAL_URL|WEB|IPAPERLINK|EMAIL|TEXT|SIMPLETEXT|IDENTIFIER|COLOR|NUMBER)[0-9]*\}/', $rowset[$bbcode_id]['bbcode_match'], $m))
 								{
 									foreach ($m[0] as $i => $tok)
 									{
@@ -391,7 +405,7 @@ class mx_bbcode
 						else
 						{
 							// Default template
-							$bbcode_tpl = (!empty($rowset[$bbcode_id]['second_pass_replace'])) ? $rowset[$bbcode_id]['second_pass_replace'] : $rowset[$bbcode_id]['bbcode_tpl'];
+							$bbcode_tpl = ($rowset[$bbcode_id]['second_pass_replace']) ? $rowset[$bbcode_id]['second_pass_replace'] : $rowset[$bbcode_id]['bbcode_tpl'];
 						}
 
 						// Replace {L_*} lang strings
@@ -435,9 +449,11 @@ class mx_bbcode
 				'b_close'	=> '</span>',
 				'i_open'	=> '<span style="font-style: italic">',
 				'i_close'	=> '</span>',
+				'ipaper_open'	=> '<span>',
+				'ipaper_close'	=> '</span>',				
 				'u_open'	=> '<span style="text-decoration: underline">',
 				'u_close'	=> '</span>',
-				'img'		=> '<img src="$1" alt="' . $mx_user->lang['IMAGE'] . '" />',
+				'img'		=> '<center><img src="$1" alt="' . $mx_user->lang['IMAGE'] . '" /></center>',
 				'size'		=> '<span style="font-size: $1%; line-height: normal">$2</span>',
 				'color'		=> '<span style="color: $1">$2</span>',
 				'email'		=> '<a href="mailto:$1">$2</a>'
@@ -478,7 +494,8 @@ class mx_bbcode
 				$this->bbcode_template[$match[1][$i]] = $this->bbcode_tpl_replace($match[1][$i], $match[2][$i]);
 			}
 		}
-
+		
+		
 		return (isset($this->bbcode_template[$tpl_name])) ? $this->bbcode_template[$tpl_name] : ((isset($bbcode_hardtpl[$tpl_name])) ? $bbcode_hardtpl[$tpl_name] : false);
 	}
 
@@ -494,8 +511,14 @@ class mx_bbcode
 			'color'					=> array('{COLOR}'		=> '$1', '{TEXT}'			=> '$2'),
 			'size'					=> array('{SIZE}'		=> '$1', '{TEXT}'			=> '$2'),
 			'img'					=> array('{URL}'		=> '$1'),
-			'flash'					=> array('{WIDTH}'		=> '$1', '{HEIGHT}'			=> '$2', '{URL}'	=> '$3'),
+			'flash'					=> array('{WIDTH}'		=> '$1', '{HEIGHT}'			=> '$2', '{URL}'		=> '$3'),
+			'scribd'				=> array('{WIDTH}'		=> '$1', '{HEIGHT}'			=> '$2', '{SCRIBDURL}'	=> '$3'),
+			'youtube'				=> array('{YOUTUBEID}'	=> '$1', '{YOUTUBELINK}'		=> '$2', '{WIDTH}'		=> '$3', '{HEIGHT}'			=> '$4'),			
+			'ipaper'				=> array('{IPAPERID}'	=> '$1', '{IPAPERKEY}'		=> '$2', '{WIDTH}'		=> '$3', '{HEIGHT}'			=> '$4', '{IPAPERLINK}'	=> '$5'),			
+			'ipaper_open'			=> array('{IPAPERCODE}'	=> '$1'),			
 			'url'					=> array('{URL}'		=> '$1', '{DESCRIPTION}'	=> '$2'),
+			'web'					=> array('{URL}'		=> '$1', '{DESCRIPTION}'	=> '$2'),
+			'size'					=> array('{ID}'			=> '$1', '{TEXT}'			=> '$2'),			
 			'email'					=> array('{EMAIL}'		=> '$1', '{DESCRIPTION}'	=> '$2')
 		);
 
@@ -616,6 +639,7 @@ class mx_bbcode
 
 		return $code;
 	}
+		
 
 	/**
 	 * Loads bbcode templates from the bbcode.tpl file of the current template set.
@@ -663,6 +687,7 @@ class mx_bbcode
 	 */
 	function prepare_bbcode_template($bbcode_tpl)
 	{
+		global $document_id, $access_key, $height, $width;
 		global $lang;
 
 		$bbcode_tpl['olist_open'] = str_replace('{LIST_TYPE}', '\\1', $bbcode_tpl['olist_open']);
@@ -671,7 +696,7 @@ class mx_bbcode
 
 		$bbcode_tpl['size_open'] = str_replace('{SIZE}', '\\1', $bbcode_tpl['size_open']);
 
-		$bbcode_tpl['quote_open'] = str_replace('{L_QUOTE}', $lang['Quote'], $bbcode_tpl['quote_open']);
+		$bbcode_tpl['quote_open'] = str_replace('{L_QUOTE}', $lang['Quote'], $bbcode_tpl['quote_open']);		
 
 		$bbcode_tpl['quote_username_open'] = str_replace('{L_QUOTE}', $lang['Quote'], $bbcode_tpl['quote_username_open']);
 		$bbcode_tpl['quote_username_open'] = str_replace('{L_WROTE}', $lang['wrote'], $bbcode_tpl['quote_username_open']);
@@ -695,10 +720,28 @@ class mx_bbcode
 		$bbcode_tpl['url4'] = str_replace('{DESCRIPTION}', '\\3', $bbcode_tpl['url4']);
 
 		$bbcode_tpl['email'] = str_replace('{EMAIL}', '\\1', $bbcode_tpl['email']);
+		
+		// bbcode_box Mod 
+        $bbcode_tpl['align_open'] = str_replace('{ALIGN}', '\\1', $bbcode_tpl['align_open']); 
+       // $bbcode_tpl['stream'] = str_replace('{URL}', '\\1', $bbcode_tpl['stream']); 
+        $bbcode_tpl['ram'] = str_replace('{URL}', '\\1', $bbcode_tpl['ram']); 
+        $bbcode_tpl['marq_open'] = str_replace('{MARQ}', '\\1', $bbcode_tpl['marq_open']); 
+        $bbcode_tpl['table_open'] = str_replace('{TABLE}', '\\1', $bbcode_tpl['table_open']); 
+        $bbcode_tpl['cell_open'] = str_replace('{CELL}', '\\1', $bbcode_tpl['cell_open']); 
+        $bbcode_tpl['web'] = str_replace('{URL}', '\\1', $bbcode_tpl['web']);
+	    //$bbcode_tpl['center_open'] = str_replace('{CENTER}', '\\1', $bbcode_tpl['center_open']); 	
+        //$bbcode_tpl['flash'] = str_replace('{WIDTH}', '\\1', $bbcode_tpl['flash']); 
+        //$bbcode_tpl['flash'] = str_replace('{HEIGHT}', '\\2', $bbcode_tpl['flash']); 
+        //$bbcode_tpl['flash'] = str_replace('{URL}', '\\3', $bbcode_tpl['flash']); 
+        //$bbcode_tpl['video'] = str_replace('{URL}', '\\3', $bbcode_tpl['video']); 
+        //$bbcode_tpl['video'] = str_replace('{WIDTH}', '\\1', $bbcode_tpl['video']); 
+        //$bbcode_tpl['video'] = str_replace('{HEIGHT}', '\\2', $bbcode_tpl['video']); 
+        $bbcode_tpl['font_open'] = str_replace('{FONT}', '\\1', $bbcode_tpl['font_open']); 
+        $bbcode_tpl['poet_open'] = str_replace('{POET}', '\\1', $bbcode_tpl['poet_open']); 
+		// bbcode_box Mod 
 
 		//Start more bbcode
 		$bbcode_tpl['stream'] = str_replace('{URL}', '\\1', $bbcode_tpl['stream']);
-		$bbcode_tpl['web'] = str_replace('{URL}', '\\1', $bbcode_tpl['web']);
 		$bbcode_tpl['flash'] = str_replace('{WIDTH}', '\\1', $bbcode_tpl['flash']);
 		$bbcode_tpl['flash'] = str_replace('{HEIGHT}', '\\2', $bbcode_tpl['flash']);
 		$bbcode_tpl['flash'] = str_replace('{URL}', '\\3', $bbcode_tpl['flash']);
@@ -709,6 +752,17 @@ class mx_bbcode
 		$bbcode_tpl['GVideo'] = str_replace('{GVIDEOLINK}', $lang['Link'], $bbcode_tpl['GVideo']);
 		$bbcode_tpl['youtube'] = str_replace('{YOUTUBEID}', '\\1', $bbcode_tpl['youtube']);
 		$bbcode_tpl['youtube'] = str_replace('{YOUTUBELINK}', $lang['Link'], $bbcode_tpl['youtube']);
+		$bbcode_tpl['youtube'] = str_replace('{WIDTH}', '\\3', $bbcode_tpl['youtube']);
+		$bbcode_tpl['youtube'] = str_replace('{HEIGHT}', '\\4', $bbcode_tpl['youtube']);		
+		$bbcode_tpl['ipaper'] = str_replace('{IPAPERID}', '\\1', $bbcode_tpl['ipaper']);		
+		$bbcode_tpl['ipaper'] = str_replace('{IPAPERKEY}', '\\2', $bbcode_tpl['ipaper']);
+		$bbcode_tpl['ipaper'] = str_replace('{WIDTH}', '\\3', $bbcode_tpl['ipaper']);
+		$bbcode_tpl['ipaper'] = str_replace('{HEIGHT}', '\\4', $bbcode_tpl['ipaper']);	
+		$bbcode_tpl['ipaper'] = str_replace('{IPAPERLINK}', '\\5', $bbcode_tpl['ipaper']);
+		//$bbcode_tpl['scribd'] = str_replace('{WIDTH}', '\\1', $bbcode_tpl['scribd']);
+		//$bbcode_tpl['scribd'] = str_replace('{HEIGHT}', '\\2', $bbcode_tpl['scribd']);
+		$bbcode_tpl['scribd'] = str_replace('{SCRIBDID}', '\\1', $bbcode_tpl['scribd']);		
+		$bbcode_tpl['scribd'] = str_replace('{SCRIBDURL}', $lang['Link'], $bbcode_tpl['scribd']);
 		//Stop more bbcode
 
 		define("BBCODE_TPL_READY", true);
@@ -757,7 +811,7 @@ class mx_bbcode
 		}
 		
 		//$text = str_replace(array("\n", "\r"), array('<br />', "\n"), $text);
-
+		$text = str_replace(array("\n", "\r"), array('<br />', ""), $text);			
 		$text = preg_replace('#(script|about|applet|activex|chrome):#is', "\\1&#058;", $text);
 
 		// pad it with a space so we can distinguish between FALSE and matching the 1st char (index 0).
@@ -781,10 +835,13 @@ class mx_bbcode
 			// prepare array for use in regexps.
 			$bbcode_tpl = $this->prepare_bbcode_template($bbcode_tpl);
 		}
-
+		
 		// [CODE] and [/CODE] for posting code (HTML, PHP, C etc etc) in your posts.
 		$text = $this->bbencode_second_pass_code($text, $uid, $bbcode_tpl);
-
+		
+		// [IPAPER] and [/IPAPER] for posting iPaper in your posts.
+		$text = $this->bbencode_ipaper_pass_render($text, $uid, $bbcode_tpl);
+		
 		// [QUOTE] and [/QUOTE] for posting replies with quote, or just for quoting stuff.
 		$text = str_replace("[quote:$uid]", $bbcode_tpl['quote_open'], $text);
 		$text = str_replace("[/quote:$uid]", $bbcode_tpl['quote_close'], $text);
@@ -856,10 +913,49 @@ class mx_bbcode
 		$replacements[] = $bbcode_tpl['email'];
 
 		//Strat more bbcode
-
+        $text = preg_replace($patterns, $replacements, $text);
+        // align 
+        $text = preg_replace("/\[align=(left|right|center|justify):$uid\]/si", $bbcode_tpl['align_open'], $text); 
+        $text = str_replace("[/align:$uid]", $bbcode_tpl['align_close'], $text); 
+        // marquee 
+        $text = preg_replace("/\[marq=(left|right|up|down):$uid\]/si", $bbcode_tpl['marq_open'], $text); 
+        $text = str_replace("[/marq:$uid]", $bbcode_tpl['marq_close'], $text); 
+        // table 
+        $text = preg_replace("/\[table=(.*?):$uid\]/si", $bbcode_tpl['table_open'], $text); 
+        $text = str_replace("[/table:$uid]", $bbcode_tpl['table_close'], $text); 
+        // cell 
+        $text = preg_replace("/\[cell=(.*?):$uid\]/si", $bbcode_tpl['cell_open'], $text); 
+        $text = str_replace("[/cell:$uid]", $bbcode_tpl['cell_close'], $text); 
+        // center 
+        $text = preg_replace("/\[center:$uid\]/si", $bbcode_tpl['center_open'], $text); 
+        $text = str_replace("[/center:$uid]", $bbcode_tpl['center_close'], $text); 
+       // font 
+        $text = preg_replace("/\[font=(.*?):$uid\]/si", $bbcode_tpl['font_open'], $text); 
+        $text = str_replace("[/font:$uid]", $bbcode_tpl['font_close'], $text); 
+        // poet 
+        $text = preg_replace("/\[poet(.*?):$uid\]/si", $bbcode_tpl['poet_open'], $text); 
+        $text = str_replace("[/poet:$uid]", $bbcode_tpl['poet_close'], $text); 
+       //[hr] 
+        $text = str_replace("[hr:$uid]", $bbcode_tpl['hr'], $text); 
+       // bbcode_box Mod 		
+        // [fade] and [/fade] for faded text.
+		$text = str_replace("[fade:$uid]", $bbcode_tpl['fade_open'], $text);
+		$text = str_replace("[/fade:$uid]", $bbcode_tpl['fade_close'], $text);
+        // real
+        $patterns[] = "#\[ram:$uid\](.*?)\[/ram:$uid\]#si";
+        $replacements[] = $bbcode_tpl['ram'];		
 		// [stream]Sound URL[/stream] code..
 		$patterns[] = "#\[stream:$uid\](.*?)\[/stream:$uid\]#si";
 		$replacements[] = $bbcode_tpl['stream'];
+        //web
+        $patterns[] = "#\[web:$uid\](.*?)\[/web:$uid\]#si";
+        $replacements[] = $bbcode_tpl['web'];	   
+		// [flash width= height= loop= ] and [/flash] code..
+        $patterns[] = "#\[flash width=([0-6]?[0-9]?[0-9]) height=([0-4]?[0-9]?[0-9]):$uid\](.*?)\[/flash:$uid\]#si";
+        $replacements[] = $bbcode_tpl['flash'];
+        // [flash width= height= loop= ] and [/flash] code..
+        $patterns[10] = "#\[video width=([0-6]?[0-9]?[0-9]) height=([0-4]?[0-9]?[0-9]):$uid\](.*?)\[/video:$uid\]#si";
+        $replacements[10] = $bbcode_tpl['video'];		
 
 		// [flash width=X height=X]Flash URL[/flash] code..
 		$patterns[] = "#\[flash width=([0-6]?[0-9]?[0-9]) height=([0-4]?[0-9]?[0-9]):$uid\](.*?)\[/flash:$uid\]#si";
@@ -868,22 +964,36 @@ class mx_bbcode
 		// [video width=X height=X]Video URL[/video] code..
 		$patterns[] = "#\[video width=([0-6]?[0-9]?[0-9]) height=([0-4]?[0-9]?[0-9]):$uid\](.*?)\[/video:$uid\]#si";
 		$replacements[] = $bbcode_tpl['video'];
-		$text = preg_replace($patterns, $replacements, $text);
 
 		// [GVideo]GVideo URL[/GVideo] code..
 	    $patterns[] = "#\[GVideo\]http://video.google.[A-Za-z0-9.]{2,5}/videoplay\?docid=([0-9A-Za-z-_]*)[^[]*\[/GVideo\]#is";
 	    $replacements[] = $bbcode_tpl['GVideo'];
 
-	    // [youtube]YouTube URL[/youtube] code..
-	    $patterns[] = "#\[youtube\]http://(?:www\.)?youtube.com/watch\?v=([0-9A-Za-z-_]{11})[^[]*\[/youtube\]#is";
+		// [youtube]www.youtube.com[/youtube] 
+		$patterns[] = "#\[youtube\]http://(?:www\.)?youtube.com/watch\?v=([0-9A-Za-z-_]{11})[^[]*\[/youtube\]#is";
 	    $replacements[] = $bbcode_tpl['youtube'];
 
-		//Stop more bbcode
+		// [youtube=xxxx://www.youtube.com]Youtube[/youtube] code..
+		//$patterns[] = "#\[youtube=http://(?:www\.)?youtube.com/watch\?v=([0-9A-Za-z-_]{11})]([^?\n\r\t].*?)\[/youtube\]#is";
+	    //$replacements[] = $bbcode_tpl['youtube'];
+		
+	    // [scribd]Scribd URL[/scribd] code..
+		$patterns[] = "#\[scribd\]http://(?:d\.)?scribd.com/ScribdViewer.swf\?document_id=([0-9A-Za-z-_]*)[^[]*\[/scribd\]#is";		
+		$replacements[] = $bbcode_tpl['scribd'];		
 
+	    // [scribd]Scribd URL[/scribd] code..
+	    $patterns[] = "#\[scribd id=([0-9A-Za-z-_]{8}) key=([0-9A-Za-z-_]{24})\](.*?)\[/scribd\]#is";
+	    $replacements[] = $bbcode_tpl['scribd'];
+		
+	    // [ipaper]Scribd URL[/ipaper] code..
+	    $patterns[] = "#\[ipaper\]http://(?:d\.)?scribd.com/ScribdViewer.swf\?document_id=([0-9A-Za-z-_]*)\&access_key=([0-9A-Za-z-_]*)[^[]*\[/ipaper\]#is";
+	    $replacements[] = $bbcode_tpl['ipaper'];		
+
+		//Stop more bbcode
 		$text = preg_replace($patterns, $replacements, $text);
 
 		// Remove the uid from tags that have not been transformed into HTML
-		//$text = str_replace(':' . $uid, '', $text);
+		$text = str_replace(':' . $uid, '', $text);
 
 		// Remove our padding from the string..
 		$text = substr($text, 1);
@@ -928,10 +1038,20 @@ class mx_bbcode
 
 		// [CODE] and [/CODE] for posting code (HTML, PHP, C etc etc) in your posts.
 		$text = $this->bbencode_first_pass_pda($text, $uid, '[code]', '[/code]', '', true, '');
-
+		
 		// [QUOTE] and [/QUOTE] for posting replies with quote, or just for quoting stuff.
 		$text = $this->bbencode_first_pass_pda($text, $uid, '[quote]', '[/quote]', '', false, '');
 		$text = $this->bbencode_first_pass_pda($text, $uid, '/\[quote=\\\\&quot;(.*?)\\\\&quot;\]/is', '[/quote]', '', false, '', "[quote:$uid=\\\"\\1\\\"]");
+
+		// [ipaper] and [/ipaper] for posting scribd embed bbcode in your posts.
+		$text = $this->bbencode_first_pass_pda($text, $uid, '[ipaper]', '[/ipaper]', '', true, '');	
+		
+		// [youtube] and [/youtube] for posting scribd embed bbcode in your posts.
+		$text = $this->bbencode_first_pass_pda($text, $uid, '[youtube]', '[/youtube]', '', true, '');
+
+		// [scribd] and [/scribd] for posting scribd embed bbcode in your posts.		
+		$text = $this->bbencode_first_pass_pda($text, $uid, '[scribd]', '[/scribd]', '', false, '');
+		$text = $this->bbencode_first_pass_pda($text, $uid, '/\[scribd\\\\id=([0-9A-Za-z-_]{8})\\\\key=([0-9A-Za-z-_]{24})\](.*?)\]/is', '[/scribd]', '', false, '', "[scribd:$uid=\\\id=\\1\\\key=\\2\\\]");
 
 		// [list] and [list=x] for (un)ordered lists.
 		$open_tag = array();
@@ -964,12 +1084,46 @@ class mx_bbcode
 		// [img]image_url_here[/img] code..
 		$text = preg_replace("#\[img\]((http|ftp|https|ftps)://)([^ \?&=\#\"\n\r\t<]*?(\.(jpg|jpeg|gif|png)))\[/img\]#sie", "'[img:$uid]\\1' . str_replace(' ', '%20', '\\3') . '[/img:$uid]'", $text);
 
+        // bbcode_box Mod 
+        // [fade] and [/fade] for faded text. 
+		$text = preg_replace("#\[fade\](.*?)\[/fade\]#si", "[fade:$uid]\\1[/fade:$uid]", $text); 
+        // [align] and [/align] 
+        $text = preg_replace("#\[align=(left|right|center|justify)\](.*?)\[/align\]#si", "[align=\\1:$uid]\\2[/align:$uid]", $text); 
+        // [marq] and [/marq] 
+        $text = preg_replace("#\[marq=(left|right|up|down)\](.*?)\[/marq\]#si", "[marq=\\1:$uid]\\2[/marq:$uid]", $text); 
+        // [table] and [/table] 
+        $text = preg_replace("#\[table=(.*?)\](.*?)\[/table\]#si", "[table=\\1:$uid]\\2[/table:$uid]", $text); 
+        // [cell] and [/cell] 
+        $text = preg_replace("#\[cell=(.*?)\](.*?)\[/cell\]#si", "[cell=\\1:$uid]\\2[/cell:$uid]", $text); 
+        // [font] and [/font] 
+        $text = preg_replace("#\[font=(.*?)\](.*?)\[/font\]#si", "[font=\\1:$uid]\\2[/font:$uid]", $text); 
+        // [poet] and [/poet] 
+        $text = preg_replace("#\[poet(.*?)\](.*?)\[/poet\]#si", "[poet\\1:$uid]\\2[/poet:$uid]", $text); 
+        // [center] and [/center] 
+        $text = preg_replace("#\[center\](.*?)\[/center\]#si", "[center:$uid]\\1[/center:$uid]", $text); 
+        // [real]and[/real] 
+        $text = preg_replace("#\[ram\](.*?)\[/ram\]#si", "[ram:$uid]\\1[/ram:$uid]", $text); 
+        // [stream]and[/stream] 
+        //$text = preg_replace("#\[stream\](.*?)\[/stream\]#si", "[stream:$uid]\\1[/stream:$uid]", $text); 
+        // [web]and[/web] 
+        $text = preg_replace("#\[web\](http(s)?://)([a-z0-9\-\.,\?!%\*_\#:;~\\&$@\/=\+]+)\[/web\]#si", "[web:$uid]\\1\\3[/web:$uid]", $text); 
+        //[flash width= heigth= loop=] and [/flash] 
+        //$text = preg_replace("#\[flash width=([0-6]?[0-9]?[0-9]) height=([0-4]?[0-9]?[0-9])\](([a-z]+?)://([^, \n\r]+))\[\/flash\]#si","[flash width=\\1 height=\\2:$uid\]\\3[/flash:$uid]", $text); 
+        //[video width= heigth=] and [/video] 
+        //$text = preg_replace("#\[video width=([0-6]?[0-9]?[0-9]) height=([0-4]?[0-9]?[0-9])\](([a-z]+?)://([^, \n\r]+))\[\/video\]#si","[video width=\\1 height=\\2:$uid\]\\3[/video:$uid]", $text); 
+        // [hr] 
+        $text = preg_replace("#\[hr\]#si", "[hr:$uid]", $text); 
+        // bbcode_box Mod 
+
 		//Start more bbcode
 		$text = str_replace('url:' . $uid, 'url', $text);
 		
 		// [stream]Sound URL[/stream] code..
 		$text = preg_replace("#\[stream\](.*?)\[/stream\]#si", "[stream:$uid]\\1[/stream:$uid]", $text);
-
+		
+		// [scribd width=X height=X]Scribd URL[/scribd] code..
+		$text = preg_replace("#\[scribd width=([0-6]?[0-9]?[0-9]) height=([0-4]?[0-9]?[0-9])\](([a-z]+?)://([^, \n\r]+))\[\/scribd\]#si","[scribd width=\\1 height=\\2:$uid\]\\3[/scribd:$uid]", $text);
+	
 		// [flash width=X height=X]Flash URL[/flash] code..
 		$text = preg_replace("#\[flash width=([0-6]?[0-9]?[0-9]) height=([0-4]?[0-9]?[0-9])\](([a-z]+?)://([^, \n\r]+))\[\/flash\]#si","[flash width=\\1 height=\\2:$uid\]\\3[/flash:$uid]", $text);
 
@@ -981,7 +1135,8 @@ class mx_bbcode
 		// Remove our padding from the string..
 		return substr($text, 1);;
 
-	} // bbencode_first_pass()
+	} // bbencode_first_pass()	
+	
 
 	/**
 	 * $text - The text to operate on.
@@ -1294,8 +1449,158 @@ class mx_bbcode
 		return $text;
 
 	} // bbencode_second_pass_code()
+	
+	/**
+	 * Rewritten by Florin C Bodin - July 10, 2009.	
+	 * Description: Pass Embed Scibd iPaper in a post Pass
+	 * Version: 0.2
+	 * Original Author: Stuart Marsh
+	 * Author URI: http://www.beardygeek.com
+	 *  This should be used before displaying the message.
+	 */	
+	function bbencode_ipaper_pass_render($text, $uid, $bbcode_tpl)
+	{
+		global $document_id, $access_key, $height, $width;
+		global $lang;
+		
+		$params = array('document_id','access_key','height','width');
+		
+		$ipaper_start_html = $bbcode_tpl['ipaper_open'];
+		$ipaper_end_html =  $bbcode_tpl['ipaper_close'];
+		
+		// First, do all the 1st-level matches. 
+		$match_count = preg_match_all("#\[ipaper:1:$uid\](.*?)\[/ipaper:1:$uid\]#si", $text, $matches);
+		
+		for ($i = 0; $i < $match_count; $i++)
+		{
+			
+			$before_replace = $matches[1][$i];
+			$after_replace = $matches[1][$i];
+			
+			//Remove  ipaper open and close bbcode tags.
+			$before_replace  = str_replace(array($ipaper_start_html, $ipaper_end_html), "", $before_replace);
+			$after_replace  = str_replace(array($ipaper_start_html, $ipaper_end_html), "", $after_replace);
+			$after_replace = str_replace(array('&#8221;','&#8243;'), '', $after_replace);
+			
+			// Then, do the 2nd-level matches.				
+			$total = preg_match_all("|([^?&#=]+)=([^?&#=]+)(#{0,}[^?&#=]*)|", $after_replace, $attributes, PREG_SET_ORDER);
+			
+			if ($total)
+			{
+				$this->ipaper_head();
+			}
+				
+			$arguments[] = array();
+					
+			foreach ((array) $attributes as $elem)
+			{
+				if(!in_array($elem[$i], $params))
+				{
+					$arguments[$elem[1]] = $elem[2];
+				}
+			}					
+			
+			if ((!array_key_exists('document_id', $arguments)) && (!array_key_exists('access_key', $arguments)))
+			{
+				return '<div style="background-color:#f99; padding:10px;">Error: Required parameter "docId" or "access_key" is missing!</div>';
+			}
+				
+			// First, do all the 1st-level matches.
+			if (array_key_exists('document_id', $arguments))
+			{
+				$document_id = $arguments['document_id'];
+			}
+			else
+			{
+				$document_id = '';
+			}
+						
+			if (array_key_exists('access_key', $arguments))
+			{
+				$access_key = $arguments['access_key'];
+			}
+			else
+			{
+				$access_key = 'key-';
+			}
+						
+			if (array_key_exists('height', $arguments))
+			{
+				$height = $arguments['height'];
+			}
+			else
+			{
+				$height = 600;
+			}
+						
+			if (array_key_exists('width', $arguments))
+			{
+				$width = $arguments['width'];
+			}
+			else
+			{
+				$width = 400;
+			}		
+							
+			$after_replace = '';
+			$after_replace .= "\n".'<p id="embedded_flash" style="text-align: center;"><a href="http://www.scribd.com">Scribd</a></p>'."\n";
+			$after_replace .= '<script type="text/javascript">iPaper('.$document_id.', \''.$access_key.'\', '.$height.', '.$width.');</script>'."\n";
+								
+			$str_to_match = "[ipaper:1:$uid]" . $before_replace . "[/ipaper:1:$uid]";
 
-	//phpBB Temporary code ends
+			$replacement = $ipaper_start_html . $after_replace . $ipaper_end_html;
+
+			$text = str_replace($str_to_match, $replacement, $text);
+		
+		}
+	
+		// Now, do all the non-first-level matches. These are simple.
+		$text = str_replace("[ipaper:$uid]", $ipaper_start_html, $text);
+		$text = str_replace("[/ipaper:$uid]", $ipaper_end_html, $text);
+		
+		return $text;
+
+	} //bbencode_ipaper_pass_render()
+	
+	
+	function ipaper_head()
+	{
+		// -------------------------------------------------------------------------
+		// Extend page with additional header or footer data
+		// Examples:
+		//	$mx_page->add_css_file(); // Include style dependent *.css file, eg module_path/template_path/template/theme.css
+		//	$mx_page->add_js_file( 'includes/js.js' ); // Relative to module_root
+		//	$mx_page->add_header_text( 'header text' );
+		//	$mx_page->add_footer_text( 'includes/test.txt', true ); // Relative to module_root
+		//  Note: Included text from file (last example), will evaluate $theme and $mx_block->info variables.
+		// -------------------------------------------------------------------------
+	
+		global $document_id, $access_key, $height, $width;
+		global $mx_page;
+		
+		$addional_header_text = $header_text = "";
+		
+		$header_text .= '<script type="text/javascript" src="http://www.scribd.com/javascripts/view.js"></script>'."\n";
+		$header_text .= '<script type="text/javascript">'."\n";
+		$header_text .= '<!--'."\n";
+		$header_text .= 'function iPaper(docId, access_key, height, width) {'."\n";
+		$header_text .= 'var scribd_doc = scribd.Document.getDoc(docId, access_key);'."\n";
+		$header_text .= 'scribd_doc.addParam(\'height\', height);'."\n";
+		$header_text .= 'scribd_doc.addParam(\'width\', width);'."\n";
+		$header_text .= 'scribd_doc.write(\'embedded_flash\');'."\n";
+		$header_text .= '}'."\n";
+		$header_text .= '//-->'."\n";
+		$header_text .= '</script>';
+		
+		$addional_header_text .= "\n"."\n".$header_text;
+
+
+		if (is_object($mx_page))
+		{
+			$mx_page->add_header_text($addional_header_text);	
+		}		
+	}		
+
 
 	/**
 	 * Rewritten by Nathan Codding - Feb 6, 2001.
@@ -1371,30 +1676,118 @@ class mx_bbcode
 	function decode($mytext, $bbcode_uid, $smilies_on = true, $bbcode_bitfield = false)
 	{
 		global $mx_root_path, $phpbb_root_path, $phpEx, $mx_page;
+	
+		if (!$mytext)
+		{
+			return '';
+		}
+
+		$mytext = mx_censor_text($mytext);		
 		
-		//$mytext = stripslashes($mytext);
+		//Do some checks
+		$phpbb3_text = $bbcode_bitfield ? true : false;
+		$bbcode_bitfield = ($bbcode_bitfield && (strlen($bbcode_bitfield) < 2)) ? false : $bbcode_bitfield;
 		
-		if ($bbcode_uid)
+		if (!empty($bbcode_uid))
 		{
 			$mytext = $this->bbencode_second_pass($mytext, $bbcode_uid, $bbcode_bitfield);
 		}
-		if ($smilies_on)
+		
+		$mytext = str_replace(array("\n", "\r"), array('<br />', "\n"), $mytext);			
+		$mytext = $this->bbcode_nl2br($mytext);
+		
+		//$mytext = smiley_text($mytext, !($flags & OPTION_FLAG_SMILIES));		
+		if ($smilies_on && $phpbb3_text)
+		{
+			$mytext = $this->smilies3_pass($mytext);
+		}
+		else if ($smilies_on)
 		{
 			$mytext = $this->smilies_pass($mytext);
 		}
-		$mytext = str_replace("\n", "\n<br />\n", $mytext);
-		return $this->make_clickable($mytext);
+	
+		//$mytext = str_replace("\n", "\n<br />\n", $mytext);
+	
+		if ($mytext != '')
+		{
+			$mytext = $this->make_clickable($mytext);
+		}		
+		
+		return $mytext;
 	}
 
 	/**
-	 * phpBB Smilies pass.
+	 * Smilies pass.
 	 *
-	 * Hacking smilies_pass from phpbb/includes/bbcode.php
+	 * compatible with phpBB3 blocks
 	 *
 	 * @param string $message
 	 * @return string
 	 *
-	*/
+	*/	
+	function smilies3_pass($message)
+	{
+		static $orig, $repl;
+		global $board_config, $mx_root_path, $phpbb_root_path, $phpEx;
+
+		if (!isset($orig))
+		{
+			global $db;
+			$orig = $repl = array();
+
+			$sql = 'SELECT * FROM ' . SMILIES_TABLE;
+			if( !$result = $db->sql_query($sql) )
+			{
+				mx_message_die(GENERAL_ERROR, "Couldn't obtain smilies data", "", __LINE__, __FILE__, $sql);
+			}
+			
+			while ($row = $db->sql_fetchrow($result))
+			{
+				if (empty($row['code']))
+				{
+					continue;
+				}
+
+				// (assertion)
+				$match[] = '(?<=^|[\n .])' . preg_quote($row['code'], '#') . '(?![^<>]*>)';
+				$replace[] = '<!-- s' . $row['code'] . ' --><img src="{SMILIES_PATH}/' . $row['smiley_url'] . '" alt="' . $row['code'] . '" title="' . $row['emotion'] . '" /><!-- s' . $row['code'] . ' -->';
+			}
+			
+			$db->sql_freeresult($result);			
+
+			if (sizeof($match))
+			{
+				if ($max_smilies)
+				{
+					$num_matches = preg_match_all('#' . implode('|', $match) . '#', $message, $matches);
+					unset($matches);
+
+					if ($num_matches !== false && $num_matches > $max_smilies)
+					{
+						$this->warn_msg[] = sprintf($mx_user->lang['TOO_MANY_SMILIES'], $max_smilies);
+						return;
+					}
+				}
+
+				// Make sure the delimiter # is added in front and at the end of every element within $match
+				$message = trim(preg_replace(explode(chr(0), '#' . implode('#' . chr(0) . '#', $match) . '#'), $replace, $message));
+			}			
+		}
+
+		$message = str_replace("{SMILIES_PATH}", $this->smiley_path_url . $this->smilies_path . $smilies[$i][$this->smiley_url], ' ' . $message . ' ');
+		
+		return $message;
+	}
+	
+	/**
+	 * Smilies pass.
+	 *
+	 * compatible with phpBB2 blocks
+	 *
+	 * @param string $message
+	 * @return string
+	 *
+	*/		
 	function smilies_pass($message)
 	{
 		static $orig, $repl;
@@ -1432,7 +1825,7 @@ class mx_bbcode
 		}
 
 		return $message;
-	}
+	}	
 
 	/**
 	 * phpBB Smilies pass.
@@ -1527,13 +1920,10 @@ class mx_bbcode
 		$inline_rows = 5;
 		$window_columns = 8;
 
+		$start = phpBB3::request_var('start', 0);
+
 		if ($mode == 'window')
 		{
-			$mx_user->init($user_ip, PAGE_INDEX);
-
-			$gen_simple_header = TRUE;
-			$page_title = $lang['Emoticons'];
-
 			if ($forum_id)
 			{
 				$sql = 'SELECT forum_style
@@ -1550,11 +1940,25 @@ class mx_bbcode
 				$mx_user->setup('posting');
 			}
 
-			include($mx_root_path . 'includes/page_header.'.$phpEx);
+			//page_header($mx_user->lang['SMILIES']);
 
+			$sql = 'SELECT COUNT(smiley_id) AS item_count
+				FROM ' . SMILIES_TABLE . '
+				GROUP BY smiley_url';
+			$result = $db->sql_query($sql, 3600);
+
+			$smiley_count = 0;
+			while ($row = $db->sql_fetchrow($result))
+			{
+				++$smiley_count;
+			}
+			$db->sql_freeresult($result);
+			/*
 			$template->set_filenames(array(
-				'smiliesbody' => 'posting_smilies.html')
+				'body' => 'posting_smilies.html')
 			);
+			generate_pagination(mx3_append_sid("{$phpbb_root_path}posting.$phpEx", 'mode=smilies&amp;f=' . $forum_id), $smiley_count, $config['smilies_per_page'], $start);
+			*/
 		}
 
 		$display_link = false;
@@ -1572,27 +1976,41 @@ class mx_bbcode
 			$db->sql_freeresult($result);
 		}
 
-		$last_url = '';
+		if ($mode == 'window')
+		{
+			$sql = 'SELECT smiley_url, MIN(emotion) as emotion, MIN(code) AS code, smiley_width, smiley_height, MIN(smiley_order) AS min_smiley_order
+				FROM ' . SMILIES_TABLE . '
+				GROUP BY smiley_url, smiley_width, smiley_height
+				ORDER BY min_smiley_order';
+			$result = $db->sql_query_limit($sql, $config['smilies_per_page'], $start, 3600);
+		}
+		else
+		{
+			$sql = 'SELECT *
+				FROM ' . SMILIES_TABLE . '
+				WHERE display_on_posting = 1
+				ORDER BY smiley_order';
+			$result = $db->sql_query($sql, 3600);
+		}
 
-		$sql = 'SELECT *
-			FROM ' . SMILIES_TABLE .
-			(($mode == 'inline') ? ' WHERE display_on_posting = 1 ' : '') . '
-			ORDER BY smiley_order';
+		$smilies = array();
 
 		//phpBB2 code start
-		if ($result = $db->sql_query($sql))
+		if ($result)
 		{
 			$num_smilies = 0;
 			$rowset = array();
 			while ($row = $db->sql_fetchrow($result))
 			{
-				if (empty($rowset[$row['smiley_url']]))
+				if (empty($smilies[$row['smiley_url']]))
 				{
+					$smilies[$row['smiley_url']] = $row;
 					$rowset[$row['smiley_url']]['code'] = str_replace("'", "\\'", str_replace('\\', '\\\\', $row['code']));
-					$rowset[$row['smiley_url']]['emoticon'] = $row['emoticon'];
-					$num_smilies++;
+					$rowset[$row['smiley_url']]['emotion'] = $row['emotion'];
+					$num_smilies++;					
 				}
 			}
+			$db->sql_freeresult($result);			
 
 			if ($num_smilies)
 			{
@@ -1613,7 +2031,7 @@ class mx_bbcode
 					$template->assign_block_vars('smilies_row.smilies_col', array(
 						'SMILEY_CODE' => $data['code'],
 						'SMILEY_IMG' => $this->smiley_path_url  . $board_config['smilies_path'] . '/' . $smile_url,
-						'SMILEY_DESC' => $data['emoticon'])
+						'SMILEY_DESC' => isset($data['emotion']) ? $data['emotion'] : $row['emotion'])
 					);
 
 					$s_colspan = max($s_colspan, $col + 1);
@@ -1650,44 +2068,6 @@ class mx_bbcode
 				);
 			}
 		}
-
-		/*
-		$result = $db->sql_query($sql, 3600);
-
-		$smilies = array();
-		while ($row = $db->sql_fetchrow($result))
-		{
-			if (empty($smilies[$row['smiley_url']]))
-			{
-				$smilies[$row['smiley_url']] = $row;
-			}
-		}
-		$db->sql_freeresult($result);
-
-		if (sizeof($smilies))
-		{
-			foreach ($smilies as $row)
-			{
-				$template->assign_block_vars('smiley', array(
-					'SMILEY_CODE'	=> $row['code'],
-					'A_SMILEY_CODE'	=> addslashes($row['code']),
-					'SMILEY_IMG'	=> $this->smiley_root_path  . $board_config['smilies_path'] . '/' . $row['smiley_url'],
-					'SMILEY_WIDTH'	=> $row['smiley_width'],
-					'SMILEY_HEIGHT'	=> $row['smiley_height'],
-					'SMILEY_DESC'	=> $row['emotion'])
-				);
-			}
-		}
-
-		//What we do here with forum_id versus page_id ?
-		if ($mode == 'inline' && $display_link)
-		{
-			$template->assign_vars(array(
-				'S_SHOW_SMILEY_LINK' 	=> true,
-				'U_MORE_SMILIES' 		=> mx3_append_sid(PHPBB_URL . "posting.$phpEx", 'mode=smilies&amp;f=' . $forum_id))
-			);
-		}
-		*/
 
 		if ($mode == 'window')
 		{

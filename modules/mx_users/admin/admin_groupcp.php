@@ -1,15 +1,23 @@
 <?php
-/***************************************************************************
- *                               admin_groupcp.php
- *                            -------------------
- *   begin                : Saturday, Feb 13, 2001
- *   copyright            : (C) 2001 The phpBB Group
- *   email                : support@phpbb.com
- *
- *   $Id: admin_groupcp.php,v 1.6 2008/09/30 07:04:54 orynider Exp $
- *
- *
- ***************************************************************************/
+/**
+*
+* @package MX-Publisher Module - mx_users
+* @version $Id: admin_groupcp.php,v 1.11 2013/06/28 15:39:39 orynider Exp $
+* @copyright (c) 2002-2008 [Jon Ohlsson] MX-Publisher Project Team
+* @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
+* @link http://mxpcms.sourceforge.net//
+*
+*/
+
+/**
+*
+* @package MX-Publisher Module - mx_users
+* @version $Id: admin_groupcp.php,v 1.11 2013/06/28 15:39:39 orynider Exp $
+* @copyright (c) 2002-2008 [Jon Ohlsson] MX-Publisher Project Team
+* @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
+* @link http://mxpcms.sourceforge.net//
+*
+*/
 
 /***************************************************************************
  *
@@ -20,14 +28,12 @@
  *
  ***************************************************************************/
 
-define( 'IN_PORTAL', true );
-
 if ( !empty( $setmodules ) )
 {
 	$filename = basename( __FILE__ );
 	return;
 }
-
+@define('IN_PORTAL', 1);
 $mx_root_path = './../../../';
 $module_root_path = "./../";
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
@@ -54,7 +60,7 @@ function mx_generate_user_info(&$row, $date_format, $group_mod, &$from, &$posts,
 	global $lang, $images, $board_config, $phpEx;
 
 	$from = ( !empty($row['user_from']) ) ? $row['user_from'] : '&nbsp;';
-	$joined = $phpBB2->create_date($date_format, $row['user_regdate'], $board_config['board_timezone']);
+	$joined = phpBB2::create_date($date_format, $row['user_regdate'], $board_config['board_timezone']);
 	$posts = ( $row['user_posts'] ) ? $row['user_posts'] : 0;
 
 	/*
@@ -491,7 +497,7 @@ else if ( $group_id )
 
 			if ($mx_request_vars->is_post('add'))
 			{
-				$username = $mx_request_vars->is_post('username') ? $phpBB2->phpbb_clean_username($mx_request_vars->post('username', MX_TYPE_NO_TAGS)) : '';
+				$username = $mx_request_vars->is_post('username') ? phpBB2::phpbb_clean_username($mx_request_vars->post('username', MX_TYPE_NO_TAGS)) : '';
 
 				$sql = "SELECT *
 					FROM " . USERS_TABLE . "
@@ -726,8 +732,8 @@ else if ( $group_id )
 						$group_name_row = $db->sql_fetchrow($result);
 						$group_name = $group_name_row['group_name'];
 
-						include($phpbb_root_path . 'includes/emailer.'.$phpEx);
-						$emailer = new emailer($board_config['smtp_delivery']);
+						include($mx_root_path . 'includes/mx_functions_emailer.'.$phpEx);
+						$emailer = new mx_emailer($board_config['smtp_delivery']);
 
 						$emailer->from($board_config['board_email']);
 						$emailer->replyto($board_config['board_email']);
@@ -1082,7 +1088,7 @@ else if ( $group_id )
 	$current_page = ( !$members_count ) ? 1 : ceil( $members_count / $board_config['topics_per_page'] );
 
 	$template->assign_vars(array(
-		'PAGINATION' => $phpBB2->generate_pagination("admin_groupcp.$phpEx?" . POST_GROUPS_URL . "=$group_id", $members_count, $board_config['topics_per_page'], $start),
+		'PAGINATION' => phpBB2::generate_pagination("admin_groupcp.$phpEx?" . POST_GROUPS_URL . "=$group_id", $members_count, $board_config['topics_per_page'], $start),
 		'PAGE_NUMBER' => sprintf($lang['Page_of'], ( floor( $start / $board_config['topics_per_page'] ) + 1 ), $current_page ),
 
 		'L_GOTO_PAGE' => $lang['Goto_page'])

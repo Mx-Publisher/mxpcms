@@ -2,10 +2,10 @@
 /**
 *
 * @package Functions_phpBB3
-* @version $Id: message_parser.php,v 1.8 2008/10/04 07:04:25 orynider Exp $
+* @version $Id: message_parser.php,v 1.10 2013/06/28 15:34:11 orynider Exp $
  * @copyright (c) 2002-2008 MX-Publisher Project Team
  * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
- * @link http://www.mx-publisher.com
+ * @link http://mxpcms.sourceforge.net/
  */
 
 /**
@@ -1033,7 +1033,7 @@ class parse_message extends bbcode_firstpass
 	function parse_message($message = '')
 	{
 		// Init BBCode UID
-		$this->bbcode_uid = substr(base_convert($phpBB3->unique_id(), 16, 36), 0, BBCODE_UID_LEN);
+		$this->bbcode_uid = substr(base_convert(phpBB3::unique_id(), 16, 36), 0, BBCODE_UID_LEN);
 
 		if ($message)
 		{
@@ -1128,7 +1128,7 @@ class parse_message extends bbcode_firstpass
 		// Parse URL's
 		if ($allow_magic_url)
 		{
-			$this->magic_url($phpBB3->generate_board_url());
+			$this->magic_url(phpBB3::generate_board_url());
 
 			if ($board_config['max_' . $mode . '_urls'])
 			{
@@ -1210,7 +1210,7 @@ class parse_message extends bbcode_firstpass
 			$return_message = &$this->message;
 		}
 
-		($custom_bbcode_uid) ? $phpBB3->decode_message($this->message, $custom_bbcode_uid) : $phpBB3->decode_message($this->message, $this->bbcode_uid);
+		($custom_bbcode_uid) ? phpBB3::decode_message($this->message, $custom_bbcode_uid) : phpBB3::decode_message($this->message, $this->bbcode_uid);
 
 		if (!$update_this_message)
 		{
@@ -1231,7 +1231,7 @@ class parse_message extends bbcode_firstpass
 	function magic_url($server_url)
 	{
 		// We use the global make_clickable function
-		$this->message = $phpBB3->make_clickable($this->message, $server_url);
+		$this->message = phpBB3::make_clickable($this->message, $server_url);
 	}
 
 	/**
@@ -1318,14 +1318,14 @@ class parse_message extends bbcode_firstpass
 		$error = array();
 
 		$num_attachments = sizeof($this->attachment_data);
-		$this->filename_data['filecomment'] = utf8_normalize_nfc($phpBB3->request_var('filecomment', '', true));
+		$this->filename_data['filecomment'] = utf8_normalize_nfc(phpBB3::request_var('filecomment', '', true));
 		$upload_file = (isset($_FILES[$form_name]) && $_FILES[$form_name]['name'] != 'none' && trim($_FILES[$form_name]['name'])) ? true : false;
 
 		$add_file		= (isset($_POST['add_file'])) ? true : false;
 		$delete_file	= (isset($_POST['delete_file'])) ? true : false;
 
 		// First of all adjust comments if changed
-		$actual_comment_list = utf8_normalize_nfc($phpBB3->request_var('comment_list', array(''), true));
+		$actual_comment_list = utf8_normalize_nfc(phpBB3::request_var('comment_list', array(''), true));
 
 		foreach ($actual_comment_list as $comment_key => $comment)
 		{
@@ -1405,7 +1405,7 @@ class parse_message extends bbcode_firstpass
 			{
 				include_once($phpbb_root_path . 'includes/functions_admin.' . $phpEx);
 
-				$index = array_keys($phpBB3->request_var('delete_file', array(0 => 0)));
+				$index = array_keys(phpBB3::request_var('delete_file', array(0 => 0)));
 				$index = (!empty($index)) ? $index[0] : false;
 
 				if ($index !== false && !empty($this->attachment_data[$index]))
@@ -1503,7 +1503,7 @@ class parse_message extends bbcode_firstpass
 	{
 		global $mx_user, $db, $phpbb_root_path, $phpEx, $board_config;
 
-		$this->filename_data['filecomment'] = utf8_normalize_nfc($phpBB3->request_var('filecomment', '', true));
+		$this->filename_data['filecomment'] = utf8_normalize_nfc(phpBB3::request_var('filecomment', '', true));
 		$attachment_data = (isset($_POST['attachment_data'])) ? $_POST['attachment_data'] : array();
 		$this->attachment_data = array();
 

@@ -6,7 +6,7 @@
  *   copyright            : (C) 2001 The phpBB Group
  *   email                : support@phpbb.com
  *
- *   $Id: admin_mx_styles.php,v 1.8 2008/10/04 07:04:24 orynider Exp $
+ *   $Id: admin_mx_styles.php,v 1.10 2013/06/17 02:53:26 orynider Exp $
  *
  *
  ***************************************************************************/
@@ -34,7 +34,7 @@ if( !empty($setmodules) )
 //
 // Security and Page header
 //
-define('IN_PORTAL', 1);
+@define('IN_PORTAL', 1);
 $mx_root_path = './../';
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
 $no_page_header = TRUE;
@@ -96,9 +96,9 @@ switch( $mode )
 			{
 				while( $sub_dir = @readdir($dir) )
 				{
-					if( !is_file($phpBB2->phpbb_realpath($mx_root_path . 'templates/' .$sub_dir)) && !is_link($phpBB2->phpbb_realpath($mx_root_path . 'templates/' .$sub_dir)) && $sub_dir != "." && $sub_dir != ".." && $sub_dir != "CVS" )
+					if( !is_file(phpBB2::phpbb_realpath($mx_root_path . 'templates/' .$sub_dir)) && !is_link(phpBB2::phpbb_realpath($mx_root_path . 'templates/' .$sub_dir)) && $sub_dir != "." && $sub_dir != ".." && $sub_dir != "CVS" )
 					{
-						if( @file_exists(@$phpBB2->phpbb_realpath($mx_root_path. "templates/" . $sub_dir . "/$sub_dir.cfg")) )
+						if( @file_exists(@phpBB2::phpbb_realpath($mx_root_path. "templates/" . $sub_dir . "/$sub_dir.cfg")) )
 						{
 							@include($mx_root_path. "templates/" . $sub_dir . "/$sub_dir.cfg");
 

@@ -2,14 +2,12 @@
 /**
 *
 * @package MX-Publisher Module - mx_users
-* @version $Id: admin_userlist.php,v 1.4 2008/09/30 07:04:55 orynider Exp $
+* @version $Id: admin_userlist.php,v 1.9 2013/06/28 15:39:39 orynider Exp $
 * @copyright (c) 2002-2008 [wGEric, Jon Ohlsson] MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
-*
+* @link http://mxpcms.sourceforge.net/
+* @ author: jonohlsson
 */
-
-define( 'IN_PORTAL', true );
 
 if ( !empty( $setmodules ) )
 {
@@ -17,7 +15,7 @@ if ( !empty( $setmodules ) )
 	$module['phpbb2admin']['1_phpbb2admin_Userlist'] = 'modules/mx_users/admin/' . $filename;
 	return;
 }
-
+@define('IN_PORTAL', 1);
 $mx_root_path = './../../../';
 $module_root_path = "./../";
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
@@ -553,8 +551,8 @@ switch( $mode )
 			// add the users to the selected group
 			$group_id = $mx_request_vars->post(POST_GROUPS_URL, MX_TYPE_INT);
 
-			include($phpbb_root_path . 'includes/emailer.'.$phpEx);
-			$emailer = new emailer($board_config['smtp_delivery']);
+			include($mx_root_path . 'includes/mx_functions_emailer.'.$phpEx);
+			$emailer = new mx_emailer($board_config['smtp_delivery']);
 
 			$i = 0;
 			while( $i < count($user_ids) )
@@ -952,8 +950,8 @@ switch( $mode )
 				'I_RANK' => $rank_image,
 				'I_AVATAR' => $avatar_img,
 
-				'JOINED' => $phpBB2->create_date('d M Y', $row['user_regdate'], $board_config['board_timezone']),
-				'LAST_ACTIVITY' => ( !empty($row['user_session_time']) ) ? $phpBB2->create_date('d M Y', $row['user_session_time'], $board_config['board_timezone']) : $lang['Never'],
+				'JOINED' => phpBB2::create_date('d M Y', $row['user_regdate'], $board_config['board_timezone']),
+				'LAST_ACTIVITY' => ( !empty($row['user_session_time']) ) ? phpBB2::create_date('d M Y', $row['user_session_time'], $board_config['board_timezone']) : $lang['Never'],
 
 				'POSTS' => ( $row['user_posts'] ) ? $row['user_posts'] : 0,
 				'U_SEARCH' => mx_append_sid($phpbb_root_path . 'search.'.$phpEx.'?search_author=' . urlencode(strip_tags($row['username'])) . '&amp;showresults=posts'),
@@ -1046,7 +1044,7 @@ switch( $mode )
 		{
 			$total_members = $total['total'];
 
-			$pagination = $phpBB2->generate_pagination($module_root_path . "admin/admin_userlist.$phpEx?sort=$sort&amp;order=$sort_order&amp;show=$show" . ( ( isset($alphanum) ) ? "&amp;alphanum=$alphanum" : '' ), $total_members, $show, $start);
+			$pagination = phpBB2::generate_pagination($module_root_path . "admin/admin_userlist.$phpEx?sort=$sort&amp;order=$sort_order&amp;show=$show" . ( ( isset($alphanum) ) ? "&amp;alphanum=$alphanum" : '' ), $total_members, $show, $start);
 		}
 
 		$template->assign_vars(array(

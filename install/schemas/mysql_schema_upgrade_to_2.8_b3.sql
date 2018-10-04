@@ -1,7 +1,7 @@
 #
 # MX-Publisher - MySQL Schema - Upgrade "2.8.0 - b3"
 #
-# $Id: mysql_schema_upgrade_to_2.8_b3.sql,v 1.7 2008/02/04 15:58:07 joasch Exp $
+# $Id: mysql_schema_upgrade_to_2.8_b3.sql,v 1.8 2014/05/18 06:24:35 orynider Exp $
 #
 
 #
@@ -19,7 +19,7 @@ UPDATE mx_table_module
 	 	module_desc  = 'phpBB2 blocks Module',
 	 	module_include_admin  = '0',
 	 	module_version  = 'mxBB Core Module',
-	 	module_copy  = 'Original mxBB <i>phpBB2 Blocks</i> module by <a href=\"http://www.mx-publisher.com\" target=\"_blank\"> The MX-Publisher Development Team</a>'
+	 	module_copy  = 'Original mxBB <i>phpBB2 Blocks</i> module by <a href=\"http://mxpcms.sourceforge.net\" target=\"_blank\"> The MX-Publisher Development Team</a>'
 	WHERE module_id = '{module.module_id}';
 
 #

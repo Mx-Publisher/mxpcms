@@ -2,10 +2,10 @@
 /**
 *
 * @package Functions
-* @version $Id: mx_functions.php,v 1.96 2008/10/04 18:01:29 orynider Exp $
+* @version $Id: mx_functions.php,v 1.125 2014/07/07 20:36:52 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -35,18 +35,18 @@ if (!defined('IN_PORTAL'))
 function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = '', $err_file = '', $sql = '')
 {
 	global $db, $layouttemplate, $template, $board_config, $theme, $lang, $phpEx, $phpbb_root_path, $nav_links, $gen_simple_header, $images, $mx_root_path, $module_root_path;
-	global $userdata, $user_ip, $session_length, $mx_backend, $phpBB2;
+	global $userdata, $user_ip, $session_length, $mx_backend;
 	global $mx_starttime, $mx_page, $mx_block, $mx_user, $mx_request_vars, $mx_cache, $tplEx;
 
 	static $msg_history;
-
-	$default_lang = ($mx_user->lang['default_lang']) ? $mx_user->lang['default_lang'] : $board_config['default_lang'];
+	
+	$default_lang = (isset($mx_user->lang['default_lang'])) ? $mx_user->lang['default_lang'] : $board_config['default_lang'];
 
 	if( !isset($msg_history) )
 	{
 		$msg_history = array();
-	}
-
+	}	
+	
 	$msg_history[] = array(
 		'msg_code'	=> $msg_code,
 		'msg_text'	=> $msg_text,
@@ -55,6 +55,10 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 		'err_file'	=> $err_file,
 		'sql'		=> $sql
 	);
+	
+	//
+	//This will check whaever we are installing
+	//
 
 	if(defined('HAS_DIED'))
 	{
@@ -71,7 +75,7 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 		{
 			$custom_error_message = sprintf($custom_error_message, '', '');
 		}
-		echo "<html>\n<body>\n<b>Critical Error!</b><br />\nmx_message_die() was called multiple times.<br />&nbsp;<hr />";
+		echo "<html>\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n<body>\n<b>Critical Error!</b><br />\nmx_message_die() was called multiple times.<br />&nbsp;<hr />";
 		for( $i = 0; $i < count($msg_history); $i++ )
 		{
 			echo '<b>Error #' . ($i+1) . "</b>\n<br />\n";
@@ -90,19 +94,18 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 			}
 			echo "&nbsp;<hr />\n";
 		}
-		echo $custom_error_message . '<hr /><br clear="all">';
+		echo $custom_error_message . '<hr /><br clear="all" />';
 		die("</body>\n</html>");
 	}
-
+	
 	define('HAS_DIED', 1);
-
 	$sql_store = $sql;
 
 	//
 	// Get SQL error if we are debugging. Do this as soon as possible to prevent
 	// subsequent queries from overwriting the status of sql_error()
 	//
-	if ( DEBUG && ( $msg_code == GENERAL_ERROR || $msg_code == CRITICAL_ERROR ) )
+	if (DEBUG && ($msg_code == GENERAL_ERROR || $msg_code == CRITICAL_ERROR))
 	{
 		$sql_error = $db->sql_error();
 
@@ -181,7 +184,7 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 	//
 	$mx_page->init( $page_id );
 
-	$default_lang = ($mx_user->lang['default_lang']) ? $mx_user->encode_lang($mx_user->lang['default_lang']) : $board_config['default_lang'];
+	$default_lang = (isset($mx_user->lang['default_lang'])) ? $mx_user->encode_lang($mx_user->lang['default_lang']) : $board_config['default_lang'];
 
 	if ( empty($default_lang) )
 	{
@@ -318,12 +321,12 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 		}
 	}
 
-	if ($phpbb_lang_error)
+	if (isset($phpbb_lang_error))
 	{
 		$msg_text = $msg_text . '<br /><br /><b><u>ALLSO</u></b> ' . $phpbb_lang_error;
 	}
 
-	if ($mx_lang_error)
+	if (isset($mx_lang_error))
 	{
 		$msg_text = $msg_text . '<br /><br /><b><u>ALLSO</u></b> ' . $mx_lang_error;
 	}
@@ -334,7 +337,6 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 		{
 			$msg_text = $lang[$msg_text];
 		}
-
 		if ( !defined('IN_ADMIN') )
 		{
 			$message_file = $mx_block->full_page ? 'full_page_body.tpl' : 'message_body.tpl';
@@ -344,9 +346,8 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 		}
 		else
 		{
-			$template->set_filenames(array( 'message_body' => 'admin/admin_message_body.tpl') );
+			$template->set_filenames(array('message_body' => 'admin/admin_message_body.tpl'));
 		}
-
 		//
 		// Fix for correcting possible "bad" links to phpBB
 		//
@@ -358,14 +359,11 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 			$msg_text = str_replace('<a href="modcp', '<a href="'.$phpbb_root_path.'modcp', $msg_text);
 			$msg_text = str_replace('<a href="groupcp', '<a href="'.$phpbb_root_path.'groupcp', $msg_text);
 			$msg_text = str_replace('<a href="posting', '<a href="'.$phpbb_root_path.'posting', $msg_text);
-
 		}
-
 		$template->assign_vars(array(
 			'MESSAGE_TITLE' => $msg_title,
 			'MESSAGE_TEXT' => $msg_text)
 		);
-
 		ob_start();
 		$template->pparse('message_body');
 		$phpbb_output = ob_get_contents();
@@ -373,7 +371,7 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 		$phpbb_output = str_replace('"templates/'.$theme['template_name'], '"' . $phpbb_root_path . 'templates/'.$theme['template_name'], $phpbb_output);
 		echo($phpbb_output);
 		unset($phpbb_output);
-
+		
 		if ( !defined('IN_ADMIN') )
 		{
 			include($mx_root_path . 'includes/page_tail.'.$phpEx);
@@ -385,9 +383,26 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 	}
 	else
 	{
-		echo "<html>\n<body>\n" . $msg_title . "\n<br /><br />\n" . $msg_text . "</body>\n</html>";
+		if (!defined('TEMPLATE_ROOT_PATH'))
+		{
+			define('TEMPLATE_ROOT_PATH', $mx_root_path.'templates/'.$theme['template_name'].'/');
+		}
+		if (file_exists($mx_root_path . TEMPLATE_ROOT_PATH . 'msgdie_header.tpl'))
+		{		
+			$layouttemplate->set_filenames(array(
+				'overall_header' => 'msgdie_header.tpl',
+			));
+			$layouttemplate->pparse('overall_header');			
+		}	
+		echo "<html>\n<body>\n" . $msg_title . "\n<br /><br />\n" . $msg_text . "</body>\n</html>";		
+		if (file_exists($mx_root_path . TEMPLATE_ROOT_PATH . 'msgdie_footer.tpl'))
+		{		
+			$layouttemplate->set_filenames(array(
+				'overall_footer' => 'msgdie_footer.tpl',
+			));
+			$layouttemplate->pparse('overall_footer');			
+		}		
 	}
-
 	exit;
 }
 
@@ -447,8 +462,14 @@ function mx3_append_sid($url, $params = false, $is_amp = true, $session_id = fal
 	{
 		$session_id = $_SID;
 	}
+	
+	//Fix for login page
+	if ( !empty($url) && preg_match('#'.PORTAL_URL.'#', $url) && defined('IN_LOGIN') )
+	{
+		$url = preg_replace('#' . PORTAL_URL . '#', '', $url);
+	}		
 
-	if ( is_array($session_id) )
+	if (is_array($session_id))
 	{
 		$session_id = $mx_user->session_id;
 	}
@@ -529,6 +550,12 @@ function mx3_append_sid($url, $params = false, $is_amp = true, $session_id = fal
 function mx_append_sid($url, $non_html_amp = false, $mod_rewrite_only = false)
 {
 	global $SID, $_SID, $mx_mod_rewrite, $userdata;
+	
+	//Fix for login page
+	if ( !empty($url) && preg_match('#'.PORTAL_URL.'#', $url) && defined('IN_LOGIN') )
+	{
+		$url = preg_replace('#' . PORTAL_URL . '#', '', $url);
+	}		
 
 	// Is mod_rewrite enabled? If so, do some url rewrites...
 	if (is_object($mx_mod_rewrite))
@@ -615,18 +642,311 @@ function mx_redirect($url, $redirect_msg = '', $redirect_link = '')
 	{
 		mx_message_die(GENERAL_ERROR, 'Tried to redirect to potentially insecure url.');
 	}
+	
+	//Fix for login page
+	if (!defined('IN_LOGIN'))
+	{
+		$url = PORTAL_URL . $url;
+	}	
 
 	// Redirect via an HTML form for PITA webservers
 	if ( @preg_match('/Microsoft|WebSTAR|Xitami/', getenv('SERVER_SOFTWARE')) )
 	{
-		header('Refresh: 0; URL=' . PORTAL_URL . $url);
+		header('Refresh: 0; URL=' . $url);		
 		echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"><html><head><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"><meta http-equiv="refresh" content="0; url=' . PORTAL_URL . $url . '"><title>Redirect</title></head><body><div align="center">If your browser does not support meta redirection please click <a href="' . PORTAL_URL . $url . '">HERE</a> to be redirected</div></body></html>';
 		exit;
 	}
 
 	// Behave as per HTTP/1.1 spec for others
-	header('Location: ' . PORTAL_URL . $url);
+	header('Location: ' . $url);	
 	exit;
+}
+
+/**
+* Global function for chmodding directories and files for internal use
+*
+* This function determines owner and group whom the file belongs to and user and group of PHP and then set safest possible file permissions.
+* The function determines owner and group from common.php file and sets the same to the provided file.
+* The function uses bit fields to build the permissions.
+* The function sets the appropiate execute bit on directories.
+*
+* Supported constants representing bit fields are:
+*
+* CHMOD_ALL - all permissions (7)
+* CHMOD_READ - read permission (4)
+* CHMOD_WRITE - write permission (2)
+* CHMOD_EXECUTE - execute permission (1)
+*
+* NOTE: The function uses POSIX extension and fileowner()/filegroup() functions. If any of them is disabled, this function tries to build proper permissions, by calling is_readable() and is_writable() functions.
+*
+* @param string	$filename	The file/directory to be chmodded
+* @param int	$perms		Permissions to set
+*
+* @return bool	true on success, otherwise false
+* @author faw, phpBB Group
+*/
+function mx_chmod($filename, $perms = CHMOD_READ)
+{
+	static $_chmod_info;
+
+	// Return if the file no longer exists.
+	if (!file_exists($filename))
+	{
+		return false;
+	}
+
+	// Determine some common vars
+	if (empty($_chmod_info))
+	{
+		if (!function_exists('fileowner') || !function_exists('filegroup'))
+		{
+			// No need to further determine owner/group - it is unknown
+			$_chmod_info['process'] = false;
+		}
+		else
+		{
+			global $mx_root_path, $phpEx;
+
+			// Determine owner/group of common.php file and the filename we want to change here
+			$common_php_owner = @fileowner($mx_root_path . 'common.' . $phpEx);
+			$common_php_group = @filegroup($mx_root_path . 'common.' . $phpEx);
+
+			// And the owner and the groups PHP is running under.
+			$php_uid = (function_exists('posix_getuid')) ? @posix_getuid() : false;
+			$php_gids = (function_exists('posix_getgroups')) ? @posix_getgroups() : false;
+
+			// If we are unable to get owner/group, then do not try to set them by guessing
+			if (!$php_uid || empty($php_gids) || !$common_php_owner || !$common_php_group)
+			{
+				$_chmod_info['process'] = false;
+			}
+			else
+			{
+				$_chmod_info = array(
+					'process'		=> true,
+					'common_owner'	=> $common_php_owner,
+					'common_group'	=> $common_php_group,
+					'php_uid'		=> $php_uid,
+					'php_gids'		=> $php_gids,
+				);
+			}
+		}
+	}
+
+	if ($_chmod_info['process'])
+	{
+		$file_uid = @fileowner($filename);
+		$file_gid = @filegroup($filename);
+
+		// Change owner
+		if (@chown($filename, $_chmod_info['common_owner']))
+		{
+			clearstatcache();
+			$file_uid = @fileowner($filename);
+		}
+
+		// Change group
+		if (@chgrp($filename, $_chmod_info['common_group']))
+		{
+			clearstatcache();
+			$file_gid = @filegroup($filename);
+		}
+
+		// If the file_uid/gid now match the one from common.php we can process further, else we are not able to change something
+		if ($file_uid != $_chmod_info['common_owner'] || $file_gid != $_chmod_info['common_group'])
+		{
+			$_chmod_info['process'] = false;
+		}
+	}
+
+	// Still able to process?
+	if ($_chmod_info['process'])
+	{
+		if ($file_uid == $_chmod_info['php_uid'])
+		{
+			$php = 'owner';
+		}
+		else if (in_array($file_gid, $_chmod_info['php_gids']))
+		{
+			$php = 'group';
+		}
+		else
+		{
+			// Since we are setting the everyone bit anyway, no need to do expensive operations
+			$_chmod_info['process'] = false;
+		}
+	}
+
+	// We are not able to determine or change something
+	if (!$_chmod_info['process'])
+	{
+		$php = 'other';
+	}
+
+	// Owner always has read/write permission
+	$owner = CHMOD_READ | CHMOD_WRITE;
+	if (is_dir($filename))
+	{
+		$owner |= CHMOD_EXECUTE;
+
+		// Only add execute bit to the permission if the dir needs to be readable
+		if ($perms & CHMOD_READ)
+		{
+			$perms |= CHMOD_EXECUTE;
+		}
+	}
+
+	switch ($php)
+	{
+		case 'owner':
+			$result = @chmod($filename, ($owner << 6) + (0 << 3) + (0 << 0));
+			clearstatcache();
+			if (is_readable($filename) && mx_is_writable($filename))
+			{
+				break;
+			}
+
+		case 'group':
+			$result = @chmod($filename, ($owner << 6) + ($perms << 3) + (0 << 0));
+			clearstatcache();
+			if ((!($perms & CHMOD_READ) || is_readable($filename)) && (!($perms & CHMOD_WRITE) || mx_is_writable($filename)))
+			{
+				break;
+			}
+
+		case 'other':
+			$result = @chmod($filename, ($owner << 6) + ($perms << 3) + ($perms << 0));
+			clearstatcache();
+			if ((!($perms & CHMOD_READ) || is_readable($filename)) && (!($perms & CHMOD_WRITE) || mx_is_writable($filename)))
+			{
+				break;
+			}
+
+		default:
+			return false;
+		break;
+	}
+
+	return $result;
+}
+
+/**
+* Test if a file/directory is writable
+*
+* This function calls the native is_writable() when not running under
+* Windows and it is not disabled.
+*
+* @param string $file Path to perform write test on
+* @return bool True when the path is writable, otherwise false.
+*/
+function mx_is_writable($file)
+{
+	if (strtolower(substr(PHP_OS, 0, 3)) === 'win' || !function_exists('is_writable'))
+	{
+		if (file_exists($file))
+		{
+			// Canonicalise path to absolute path
+			$file = mx_realpath($file);
+
+			if (is_dir($file))
+			{
+				// Test directory by creating a file inside the directory
+				$result = @tempnam($file, 'i_w');
+
+				if (is_string($result) && file_exists($result))
+				{
+					unlink($result);
+
+					// Ensure the file is actually in the directory (returned realpathed)
+					return (strpos($result, $file) === 0) ? true : false;
+				}
+			}
+			else
+			{
+				$handle = @fopen($file, 'r+');
+
+				if (is_resource($handle))
+				{
+					fclose($handle);
+					return true;
+				}
+			}
+		}
+		else
+		{
+			// file does not exist test if we can write to the directory
+			$dir = dirname($file);
+
+			if (file_exists($dir) && is_dir($dir) && mx_is_writable($dir))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+	else
+	{
+		return is_writable($file);
+	}
+}
+
+/**
+* Generate portal url (example: http://www.example.com/phpBB)
+* @param bool $without_script_path if set to true the script path gets not appended (example: http://www.example.com)
+*/
+function generate_portal_url($without_script_path = false)
+{
+	global $board_config, $portal_config, $mx_user;
+	
+	$script_name = preg_replace('/^\/?(.*?)\/?$/', "\\1", trim($portal_config['script_path']));
+	$server_name = $mx_user->host ? $mx_user->host : trim($portal_config['server_name']);
+	$server_protocol = ( $portal_config['cookie_secure'] ) ? 'https://' : 'http://';
+	$server_port = (($portal_config['server_port']) && ($portal_config['server_port'] <> 80)) ? ':' . trim($portal_config['server_port']) . '/' : '/';
+	$server_url = $server_protocol . str_replace("//", "/", $server_name . $server_port . $script_name . '/'); //On some server the slash is not added and this trick will fix it
+	$server_port = (!empty($_SERVER['SERVER_PORT'])) ? (int) $_SERVER['SERVER_PORT'] : (int) getenv('SERVER_PORT');
+
+	// Forcing server vars is the only way to specify/override the protocol
+	if ($board_config['force_server_vars'] || !$server_name)
+	{
+		$server_protocol = ($server_protocol) ? $server_protocol : (($portal_config['cookie_secure']) ? 'https://' : 'http://');
+		$server_name = $portal_config['server_name'];
+		$server_port = (int) $portal_config['server_port'];
+		$script_path = preg_replace('/^\/?(.*?)\/?$/', "\\1", trim($portal_config['script_path']));
+
+		$url = $server_protocol . $server_name;
+		$cookie_secure = $portal_config['cookie_secure'];
+	}
+	else
+	{
+		// Do not rely on cookie_secure, users seem to think that it means a secured cookie instead of an encrypted connection
+		$cookie_secure = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 1 : 0;
+		$url = (($cookie_secure) ? 'https://' : 'http://') . $server_name;
+
+		$script_path = $mx_user->page['root_script_path'];
+	}
+
+	if ($server_port && (($cookie_secure && $server_port <> 443) || (!$cookie_secure && $server_port <> 80)))
+	{
+		// HTTP HOST can carry a port number (we fetch $user->host, but for old versions this may be true)
+		if (strpos($server_name, ':') === false)
+		{
+			$url .= ':' . $server_port;
+		}
+	}
+
+	if (!$without_script_path)
+	{
+		$url .= $script_path;
+	}
+
+	// Strip / from the end
+	if (substr($url, -1, 1) == '/')
+	{
+		$url = substr($url, 0, -1);
+	}
+
+	return $url;
 }
 
 /**
@@ -756,11 +1076,11 @@ function mx_generate_pagination($base_url, $num_items, $per_page, $start_item, $
  */
 function mx_get_userdata($user, $force_str = false)
 {
-	global $db, $phpBB2;
+	global $db;
 
 	if (!is_numeric($user) || $force_str)
 	{
-		$user = $phpBB2->phpbb_clean_username($user);
+		$user = phpBB2::phpbb_clean_username($user);
 	}
 	else
 	{
@@ -770,13 +1090,13 @@ function mx_get_userdata($user, $force_str = false)
 	$sql = "SELECT *
 		FROM " . USERS_TABLE . "
 		WHERE ";
-	$sql .= ( ( is_integer($user) ) ? "user_id = $user" : "username = '" .  str_replace("\'", "''", $user) . "'" ) . " AND user_id <> " . ANONYMOUS;
-	if ( !($result = $db->sql_query($sql, 120)) )
+	$sql .= ((is_integer($user)) ? "user_id = $user" : "username = '" .  str_replace("\'", "''", $user) . "'" ) . " AND user_id <> " . ANONYMOUS;
+	if (!($result = $db->sql_query($sql, 120)))
 	{
 		mx_message_die(GENERAL_ERROR, 'Tried obtaining data for a non-existent user', '', __LINE__, __FILE__, $sql);
 	}
 
-	$return = ( $row = $db->sql_fetchrow($result) ) ? $row : false;
+	$return = ($row = $db->sql_fetchrow($result)) ? $row : false;
 	$db->sql_freeresult($result);
 	return $return;
 }
@@ -794,13 +1114,13 @@ function mx_get_userdata($user, $force_str = false)
 function mx_language_select($default, $select_name = "language", $dirname="language")
 {
 	global $phpEx, $mx_root_path;
-	global $phpBB2;
+
 	$dir = opendir($mx_root_path . $dirname);
 
 	$lang = array();
 	while ( $file = readdir($dir) )
 	{
-		if (preg_match('#^lang_#i', $file) && !is_file(@$phpBB2->phpbb_realpath($mx_root_path . $dirname . '/' . $file)) && !is_link(@$phpBB2->phpbb_realpath($mx_root_path . $dirname . '/' . $file)))
+		if (preg_match('#^lang_#i', $file) && !is_file(@phpBB2::phpbb_realpath($mx_root_path . $dirname . '/' . $file)) && !is_link(@phpBB2::phpbb_realpath($mx_root_path . $dirname . '/' . $file)))
 		{
 			$filename = trim(str_replace("lang_", "", $file));
 			$displayname = preg_replace("/^(.*?)_(.*)$/", "\\1 [ \\2 ]", $filename);
@@ -837,34 +1157,52 @@ function mx_language_select($default, $select_name = "language", $dirname="langu
 function mx_style_select($default_style, $select_name = "style", $dirname = "templates", $show_instruction = false)
 {
 	global $db, $lang, $mx_root_path;
-
+	
 	$sql = "SELECT themes_id, style_name
 		FROM " . MX_THEMES_TABLE . "
 		WHERE portal_backend = '" . PORTAL_BACKEND . "'
 		ORDER BY template_name, themes_id";
-
-	if ( !($result = $db->sql_query($sql, 300)) )
+	if (!($result = $db->sql_query($sql, 300)))
 	{
-		message_die(GENERAL_ERROR, "Couldn't query themes table", "", __LINE__, __FILE__, $sql);
+		$sql = "SELECT themes_id, style_name
+			FROM " . MX_THEMES_TABLE . "
+			WHERE portal_backend <> '" . PORTAL_BACKEND . "'
+			ORDER BY template_name, themes_id";
+		if (!($result = $db->sql_query($sql, 300)))
+		{
+			mx_message_die(GENERAL_ERROR, "Couldn't query themes table", "", __LINE__, __FILE__, $sql);
+		}
+		$lang['Select_page_style'] = 'Bad Style-Backend';
+		$show_instruction = true;		
 	}
-
+	
 	$style_select = '<select name="' . $select_name . '">';
+	$selected1 = ($default_style == -1) ? ' selected="selected"' : '';
 	if ($show_instruction)
 	{
-		$selected1 = ( $default_style == -1 ) ? ' selected="selected"' : '';
 		$style_select .= '<option value="-1"' . $selected1 . '>' . $lang['Select_page_style'] . '</option>';
-	}
-
-	while ( $row = $db->sql_fetchrow($result) )
+	}			
+	
+	while (!($row = $db->sql_fetchrow($result)))
+	{
+		$sql = "SELECT themes_id, style_name
+			FROM " . MX_THEMES_TABLE . "
+			WHERE portal_backend <> '" . PORTAL_BACKEND . "'
+			ORDER BY template_name, themes_id";
+		if (!($result = $db->sql_query($sql, 300)))
+		{
+			mx_message_die(GENERAL_ERROR, "Couldn't query themes table", "", __LINE__, __FILE__, $sql);
+		}
+	}	
+	while ($row = $db->sql_fetchrow($result))
 	{
 		$id = $row['themes_id'];
-		$selected = ( $id == $default_style && !$selected1) ? ' selected="selected"' : '';
-			$style_select .= '<option value="' . $id . '"' . $selected . '>' . $row['style_name'] . '</option>';
+		$selected = ($id == $default_style && !$selected1) ? ' selected="selected"' : '';
+		$style_select .= '<option value="' . $id . '"' . $selected . '>' . $row['style_name'] . '</option>';
 	}
 	$db->sql_freeresult($result);
-
+	
 	$style_select .= "</select>";
-
 	return $style_select;
 }
 
@@ -962,18 +1300,18 @@ function mx_get_groups($sel_id, $field_entry = 'auth_view_group', $group_rowset 
  	if (empty($group_rowset))
  	{
  		$sql = $mx_backend->generate_group_select_sql();
-
+		
 		if( !($result = $db->sql_query($sql)) )
 		{
-			message_die(GENERAL_ERROR, "Couldn't get list of groups", '', __LINE__, __FILE__, $sql);
+			mx_message_die(GENERAL_ERROR, "Couldn't get list of groups", '', __LINE__, __FILE__, $sql);
 		}
-
+		
 		$group_rowset = $db->sql_fetchrowset($result);
+		$db->sql_freeresult($result);
  	}
- 	$db->sql_freeresult($result);
 
 	$grouplist = '<select name="'.$field_entry.'">';
-	$grouplist .= '<option value="0">' . $lang['Select_group'] . '</option>';
+	$grouplist .= '<option value="0">' . t('Select_group') . '</option>';
 
 	foreach($group_rowset as $key => $row)
 	{
@@ -1422,7 +1760,11 @@ function get_list_formatted($type, $id, $name_select = '', $function_file = '', 
 	{
 		$multiple_select_option = 'multiple="multiple"';
 	}
-
+	else
+	{
+		$multiple_select_option = '';
+	}
+	
 	$column_list = '<select name="' . $name_select . '" '.$multiple_select_option.'>';
 	if( $type == 'page_list' )
 	{
@@ -1434,34 +1776,30 @@ function get_list_formatted($type, $id, $name_select = '', $function_file = '', 
 		$row = $db->sql_fetchrowset($result);
 	}
 
-	for( $j = 0; $j < $total_blocks; $j++ )
+	for($j = 0; $j < $total_blocks; $j++)
 	{
-		if( $row[$j]['module_name'] != $row[$j-1]['module_name'] )
+		$i = ($j > 0) ? abs($j - 1) : 0;
+		if(empty($row[$j]['module_name']))
+		{
+			$row[$j]['module_name'] = '';
+		}
+		if($row[$j]['module_name'] != $row[$i]['module_name'])
 		{
 			$column_list .= '<option value="">' . 'Module: ' . $row[$j]['module_name'] . '----------' . "</option>\n";
 		}
-
+		$block_type = '';
 		if( $type == 'block_list' )
 		{
-			if( $row[$j]['function_name'] != $row[$j-1]['function_name'] )
+			if( $row[$j]['function_name'] != $row[$i]['function_name'] )
 			{
 				$block_type = $row[$j]['function_name'] . ': ';
 			}
 		}
-		else
-		{
-			$block_type = '';
-		}
-
+		$block_description_str = '';		
 		if( !empty($descfield) )
 		{
 			$block_description_str = !empty($row[$j][$descfield]) ? ' (' . $row[$j][$descfield] . ')' : ' (no desc)';
 		}
-		else
-		{
-			$block_description_str = '';
-		}
-
 		$selected = ( $row[$j][$idfield] == $id ) ? ' selected="selected"' : '';
 		$column_list .= '<option value="' . $row[$j][$idfield] . '"' . $selected . '>&nbsp;&nbsp;- ' . $block_type . $row[$j][$namefield] . $block_description_str . "</option>\n";
 	}
@@ -1754,25 +2092,25 @@ function mx_session_start()
 	//
 	//	$do_gzip_compress = FALSE;
 
-	if ( $board_config['gzip_compress'] && !defined('MX_GZIP_DISABLED') )
+	if ($board_config['gzip_compress'] && !defined('MX_GZIP_DISABLED'))
 	{
 		$phpver = phpversion();
 
 		$useragent = (isset($_SERVER['HTTP_USER_AGENT'])) ? $_SERVER['HTTP_USER_AGENT'] : getenv('HTTP_USER_AGENT');
 
-		if ( $phpver >= '4.0.4pl1' && ( strstr($useragent,'compatible') || strstr($useragent,'Gecko') ) )
+		if ($phpver >= '4.0.4pl1' && (strstr($useragent,'compatible') || strstr($useragent,'Gecko')))
 		{
-			if ( extension_loaded('zlib') )
+			if (extension_loaded('zlib'))
 			{
 				ob_end_clean();
 				ob_start('ob_gzhandler');
 			}
 		}
-		else if ( $phpver > '4.0' )
+		else if ($phpver > '4.0')
 		{
-			if ( strstr($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') )
+			if (strstr($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip'))
 			{
-				if ( extension_loaded('zlib') )
+				if (extension_loaded('zlib') )
 				{
 					$do_gzip_compress = TRUE;
 					ob_start();
@@ -1787,7 +2125,9 @@ function mx_session_start()
 	//
 	// Initialize PHP session
 	//
-	@session_start();
+	//phpinfo();
+	session_start();
+	//
 }
 
 /**
@@ -1884,13 +2224,10 @@ function get_page_id($search_item, $use_function_file = false, $get_page_data_ar
 			$db->sql_freeresult($result);
 			$p_row = $db->sql_fetchrow($p_result);
 		}
-
-
+		
 		if( empty($p_row['page_id']) )
 		{
-			//
 			// Find all subblock page_ids
-			//
 			$sql = "SELECT pag.page_id, pag.page_name, pag.page_desc, sys.parameter_value
 				FROM " . COLUMN_BLOCK_TABLE . " bct,
 					" . PAGE_TABLE . " pag,
@@ -1906,16 +2243,16 @@ function get_page_id($search_item, $use_function_file = false, $get_page_data_ar
 					AND par.function_id = fcn.function_id
 					AND fcn.function_file = 'mx_multiple_blocks.php'
 					ORDER BY sys.block_id";
-
+					
 			if( !($p_result = $db->sql_query($sql)) )
 			{
 				mx_message_die(GENERAL_ERROR, "Could not query column list", '', __LINE__, __FILE__, $sql);
 			}
-
+			
 			while( $temp_row = $db->sql_fetchrow($p_result) )
 			{
 				$block_ids_array = explode(',' , $temp_row['parameter_value']);
-
+				
 				foreach($block_ids_array as $key => $block_id)
 				{
 					if ($block_id == $search_item)
@@ -1924,7 +2261,7 @@ function get_page_id($search_item, $use_function_file = false, $get_page_data_ar
 						continue;
 					}
 				}
-
+				
 				if (!empty($p_row['page_id']))
 				{
 					continue;
@@ -1935,9 +2272,7 @@ function get_page_id($search_item, $use_function_file = false, $get_page_data_ar
 
 		if( empty($p_row['page_id']) )
 		{
-			//
 			// Find if block is a default dynamic block (desperate try)
-			//
 			$sql = "SELECT pag.page_id, pag.page_name, pag.page_desc, sys.parameter_value
 				FROM " . COLUMN_BLOCK_TABLE . " bct,
 			       	" . PAGE_TABLE . " pag,
@@ -1953,16 +2288,16 @@ function get_page_id($search_item, $use_function_file = false, $get_page_data_ar
 					AND par.function_id = fcn.function_id
 					AND fcn.function_file = 'mx_dynamic.php'
 		   		ORDER BY sys.block_id";
-
+				
 			if( !($p_result = $db->sql_query($sql)) )
 			{
 				mx_message_die(GENERAL_ERROR, "Could not query column list", '', __LINE__, __FILE__, $sql);
 			}
-
+			
 			while( $temp_row = $db->sql_fetchrow($p_result) )
 			{
 				$block_ids_array = explode(',' , $temp_row['parameter_value']);
-
+				
 				foreach($block_ids_array as $key => $block_id)
 				{
 					if ($block_id == $search_item)
@@ -1971,7 +2306,7 @@ function get_page_id($search_item, $use_function_file = false, $get_page_data_ar
 						continue;
 					}
 				}
-
+				
 				if (!empty($p_row['page_id']))
 				{
 					continue;
@@ -1979,19 +2314,19 @@ function get_page_id($search_item, $use_function_file = false, $get_page_data_ar
 			}
 			$db->sql_freeresult($result);
 		}
-
+		
 		$page_id_array = array();
 		if (!empty($p_row['page_id']))
 		{
 			$page_id_array['page_id'] = $p_row['page_id'];
 			$page_id_array['page_name'] = $p_row['page_name'];
 			$page_id_array['page_desc'] = $p_row['page_desc'];
-			$page_id_array['block_id'] = $p_row['block_id'];
+			$page_id_array['block_id'] = isset($p_row['block_id']) ? $p_row['block_id'] : 0;
 		}
 		unset($p_row);
 		$mx_cache->put( $cache_key, serialize($page_id_array) );
 	}
-
+	
 	if ( $get_page_data_array && !empty($page_id_array['page_id']) )
 	{
 		return $page_id_array;
@@ -2022,6 +2357,7 @@ function post_icons( $icon_dir = '', $file_posticon = '', $modules_path = '')
 	global $lang, $phpbb_root_path, $module_root_path, $mx_root_path, $is_block, $phpEx, $images;
 
 	$curicons = 1;
+	$posticons = '';
 	if ( $file_posticon == 'none' || $file_posticon == 'none.gif' or empty( $file_posticon ) )
 	{
 		$posticons .= '<input type="radio" name="menuicons" value="none" checked><a class="gensmall">' . $lang['None'] . '</a>&nbsp;';
@@ -2189,7 +2525,7 @@ function read_block_config( $block_id, $force_query = false )
 	if ( empty( $mx_block->block_config[$block_id] ) )
 	{
 		$block_config_temp = $mx_cache->read( $block_id, MX_CACHE_BLOCK_TYPE, $force_query );
-		$block_config_temp[$block_id] = array_merge($block_config_temp[$block_id]['block_info'], $block_config_temp[$block_id]['block_parameters']);
+		$block_config_temp[$block_id] = array_merge($block_config_temp[$block_id]['block_info'], (isset($block_config_temp[$block_id]['block_parameters']) ? $block_config_temp[$block_id]['block_parameters'] : array()));
 		return $block_config_temp;
 	}
 	$block_config_temp[$block_id] = array_merge($mx_block->block_info, $mx_block->block_parameters);
@@ -2391,7 +2727,7 @@ if( !function_exists('get_backtrace') )
 			WHERE config_name = '" . $db->sql_escape($config_name) . "'";
 		$db->sql_query($sql);
 
-		if (!$db->sql_affectedrows() && !isset($config[$config_name]))
+		if (!$db->sql_affectedrows() && !isset($portal_config[$config_name]))
 		{
 			$sql = 'INSERT INTO ' . PORTAL_TABLE . ' ' . $db->sql_build_array('INSERT', array(
 				'config_name'	=> $config_name,
@@ -2401,6 +2737,223 @@ if( !function_exists('get_backtrace') )
 
 		$portal_config[$config_name] = $config_value;
 		$mx_cache->put( 'mxbb_config', $portal_config );
+	}
+}
+
+/**
+* Checks if a path ($path) is absolute or relative
+*
+* @param string $path Path to check absoluteness of
+* @return boolean
+*/
+function mx_is_absolute($path)
+{
+	return (isset($path[0]) && $path[0] == '/' || preg_match('#^[a-z]:[/\\\]#i', $path)) ? true : false;
+}
+
+/**
+ * Borrowed from phpBB
+ *
+* @author Chris Smith <chris@project-minerva.org>
+* @copyright 2006 Project Minerva Team
+* @param string $path The path which we should attempt to resolve.
+* @return mixed
+*/
+function mx_own_realpath($path)
+{
+	global $request;
+
+	// Now to perform funky shizzle
+
+	// Switch to use UNIX slashes
+	$path = str_replace(DIRECTORY_SEPARATOR, '/', $path);
+	$path_prefix = '';
+
+	// Determine what sort of path we have
+	if (mx_is_absolute($path))
+	{
+		$absolute = true;
+
+		if ($path[0] == '/')
+		{
+			// Absolute path, *NIX style
+			$path_prefix = '';
+		}
+		else
+		{
+			// Absolute path, Windows style
+			// Remove the drive letter and colon
+			$path_prefix = $path[0] . ':';
+			$path = substr($path, 2);
+		}
+	}
+	else
+	{
+		// Relative Path
+		// Prepend the current working directory
+		if (function_exists('getcwd'))
+		{
+			// This is the best method, hopefully it is enabled!
+			$path = str_replace(DIRECTORY_SEPARATOR, '/', getcwd()) . '/' . $path;
+			$absolute = true;
+			if (preg_match('#^[a-z]:#i', $path))
+			{
+				$path_prefix = $path[0] . ':';
+				$path = substr($path, 2);
+			}
+			else
+			{
+				$path_prefix = '';
+			}
+		}
+		else if ($request->server('SCRIPT_FILENAME'))
+		{
+			// Warning: If chdir() has been used this will lie!
+			// Warning: This has some problems sometime (CLI can create them easily)
+			$filename = htmlspecialchars_decode($request->server('SCRIPT_FILENAME'));
+			$path = str_replace(DIRECTORY_SEPARATOR, '/', dirname($filename)) . '/' . $path;
+			$absolute = true;
+			$path_prefix = '';
+		}
+		else
+		{
+			// We have no way of getting the absolute path, just run on using relative ones.
+			$absolute = false;
+			$path_prefix = '.';
+		}
+	}
+
+	// Remove any repeated slashes
+	$path = preg_replace('#/{2,}#', '/', $path);
+
+	// Remove the slashes from the start and end of the path
+	$path = trim($path, '/');
+
+	// Break the string into little bits for us to nibble on
+	$bits = explode('/', $path);
+
+	// Remove any . in the path, renumber array for the loop below
+	$bits = array_values(array_diff($bits, array('.')));
+
+	// Lets get looping, run over and resolve any .. (up directory)
+	for ($i = 0, $max = sizeof($bits); $i < $max; $i++)
+	{
+		// @todo Optimise
+		if ($bits[$i] == '..' )
+		{
+			if (isset($bits[$i - 1]))
+			{
+				if ($bits[$i - 1] != '..')
+				{
+					// We found a .. and we are able to traverse upwards, lets do it!
+					unset($bits[$i]);
+					unset($bits[$i - 1]);
+					$i -= 2;
+					$max -= 2;
+					$bits = array_values($bits);
+				}
+			}
+			else if ($absolute) // ie. !isset($bits[$i - 1]) && $absolute
+			{
+				// We have an absolute path trying to descend above the root of the filesystem
+				// ... Error!
+				return false;
+			}
+		}
+	}
+
+	// Prepend the path prefix
+	array_unshift($bits, $path_prefix);
+
+	$resolved = '';
+
+	$max = sizeof($bits) - 1;
+
+	// Check if we are able to resolve symlinks, Windows cannot.
+	$symlink_resolve = (function_exists('readlink')) ? true : false;
+
+	foreach ($bits as $i => $bit)
+	{
+		if (@is_dir("$resolved/$bit") || ($i == $max && @is_file("$resolved/$bit")))
+		{
+			// Path Exists
+			if ($symlink_resolve && is_link("$resolved/$bit") && ($link = readlink("$resolved/$bit")))
+			{
+				// Resolved a symlink.
+				$resolved = $link . (($i == $max) ? '' : '/');
+				continue;
+			}
+		}
+		else
+		{
+			// Something doesn't exist here!
+			// This is correct realpath() behaviour but sadly open_basedir and safe_mode make this problematic
+			// return false;
+		}
+		$resolved .= $bit . (($i == $max) ? '' : '/');
+	}
+
+	// @todo If the file exists fine and open_basedir only has one path we should be able to prepend it
+	// because we must be inside that basedir, the question is where...
+	// @internal The slash in is_dir() gets around an open_basedir restriction
+	if (!@file_exists($resolved) || (!@is_dir($resolved . '/') && !is_file($resolved)))
+	{
+		return false;
+	}
+
+	// Put the slashes back to the native operating systems slashes
+	$resolved = str_replace('/', DIRECTORY_SEPARATOR, $resolved);
+
+	// Check for DIRECTORY_SEPARATOR at the end (and remove it!)
+	if (substr($resolved, -1) == DIRECTORY_SEPARATOR)
+	{
+		return substr($resolved, 0, -1);
+	}
+
+	return $resolved; // We got here, in the end!
+}
+
+/*
+* Is this even used ?
+**/
+function mx_phpbb_realpath($path)
+{	
+	return mx_realpath($path);
+}
+
+if (!function_exists('realpath'))
+{
+	/**
+	* A wrapper for realpath
+	* @ignore
+	*/
+	function mx_realpath($path)
+	{
+		return mx_own_realpath($path);
+	}
+}
+else
+{
+	/**
+	* A wrapper for realpath
+	*/
+	function mx_realpath($path)
+	{
+		$realpath = realpath($path);
+		
+		// Strangely there are provider not disabling realpath but returning strange values. :o
+		// We at least try to cope with them.
+		if ($realpath === $path || $realpath === false)
+		{
+			return mx_own_realpath($path);
+		}
+		
+		// Check for DIRECTORY_SEPARATOR at the end (and remove it!)
+		if (substr($realpath, -1) == DIRECTORY_SEPARATOR)
+		{
+			$realpath = substr($realpath, 0, -1);
+		}
+		return $realpath;
 	}
 }
 
@@ -2442,14 +2995,15 @@ function mx_get_langcode()
 function update_portal_backend($new_backend = PORTAL_BACKEND)
 {
 	global $mx_root_path, $lang, $phpEx, $portal_config;
-	
+
 	if( @file_exists($mx_root_path . "config.$phpEx") )
 	{
-		require($mx_root_path . "config.$phpEx");
-	}	
-	
+		@require($mx_root_path . "config.$phpEx");
+	}
+
 	$mx_portal_name = 'MX-Publisher Modular System';
-	
+	$dbcharacter_set = "uft8";
+
 	/*
 	$config = array(
 		'dbms'		=> $dbms,
@@ -2460,10 +3014,33 @@ function update_portal_backend($new_backend = PORTAL_BACKEND)
 		'mx_table_prefix'		=> $mx_table_prefix,
 		'portal_backend'		=> (!empty($portal_backend) ? $portal_backend : 'internal'),
 	);
-	*/	
-	
-	$new_backend = ($new_backend) ? $new_backend  : 'internal';	
-	
+	*/
+
+	$new_backend = ($new_backend) ? $new_backend  : 'internal';
+
+	switch ($new_backend)
+	{
+		case 'internal':
+		case 'phpbb3':
+		case 'olympus':	
+		case 'ascraeus':
+		case 'mybb':		
+			$dbcharacter_set = defined('DBCHARACTER_SET') ? DBCHARACTER_SET : 'utf8';
+		break;
+		
+		case 'phpbb2':
+			$dbcharacter_set = defined('DBCHARACTER_SET') ? DBCHARACTER_SET : 'latin1';
+		break;
+		
+		case 'smf2':
+			// Load the settings...  Settings.php (to get SMF settings)
+			if ((@include $smf_root_path . "Settings.$phpEx") === true)
+			{
+				$dbcharacter_set = (isset($db_character_set)) ? $db_character_set : "uft8";
+			}			
+		break;		
+	}
+
 	$process_msgs[] = 'Writing config ...<br />';
 
 	$config_data = "<"."?php\n\n";
@@ -2475,7 +3052,7 @@ function update_portal_backend($new_backend = PORTAL_BACKEND)
 	$config_data .= '$'."dbuser = '$dbuser';\n";
 	$config_data .= '$'."dbpasswd = '$dbpasswd';\n\n";
 	$config_data .= '$'."mx_table_prefix = '$mx_table_prefix';\n\n";
-	$config_data .= "define('UTF_STATUS', '$new_backend');\n\n";	
+	$config_data .= "define('DBCHARACTER_SET', '$dbcharacter_set');\n\n";
 	$config_data .= "define('MX_INSTALLED', true);\n\n";
 	$config_data .= '?' . '>';	// Done this to prevent highlighting editors getting confused!
 
@@ -2490,7 +3067,7 @@ function update_portal_backend($new_backend = PORTAL_BACKEND)
 	@fclose($fp);
 
 	$process_msgs[] = '<span style="color:pink;">'.str_replace("\n", "<br />\n", htmlspecialchars($config_data)).'</span>';
-	
+
 	$message = '<hr />';
 	for( $i=0; $i < count($process_msgs); $i++ )
 	{
@@ -2500,4 +3077,122 @@ function update_portal_backend($new_backend = PORTAL_BACKEND)
 
 	return $message;
 }
+
+function mx_clean_string($text)
+{
+	global $mx_root_path, $phpEx;
+	
+	//Unicode control characters
+	static $homographs = array();
+	if (empty($homographs) && ($homographs = @include($mx_root_path . 'includes/utf/data/confusables.' . $phpEx)))
+	{
+		$text = @utf8_case_fold_nfkc($text);
+		$text = strtr($text, $homographs);
+	}
+	else
+	{
+		// ASCI control characters
+		$text = preg_replace("/[^[:space:]a-zA-Z0-9åäöÅÄÖ.,-:]/", " ", $text);
+		$text = preg_replace("/[^[:space:]a-zA-Z0-9îãâºþÎÃÂªÞ.,-:]/", " ", $text);
+		
+		// we need to reduce multiple spaces to a single one   
+		$text = preg_replace('/\s+/', ' ', $text);		
+	}	
+
+	// Other control characters
+	$text = preg_replace('#(?:[\x00-\x1F\x7F]+|(?:\xC2[\x80-\x9F])+)#', '', $text);
+
+	// we need to reduce multiple spaces to a single one
+	$text = preg_replace('# {2,}#', ' ', $text);
+
+	// we can use trim here as all the other space characters should have been turned
+	// into normal ASCII spaces by now
+	return trim($text);
+}
+
+/**
+ * function mx_t
+* replacement for t()
+ *
+ */
+function t($string, array $args = array(), array $options = array()) 
+{
+	global $lang, $mx_cache, $mx_user, $board_config;
+	static $lang_string;
+	// Merge in default.
+	if (empty($options['langcode']))
+	{
+		$options['langcode'] = isset($lang['USER_LANG']) ? $lang['USER_LANG'] : $mx_user->encode_lang($board_config['default_lang']);
+	}
+	if (!empty($lang[$string]))
+	{
+		$lang_string = $lang[$string];
+	}
+	else
+	{
+		$lang_string = $string;
+	}
+	if (empty($args))
+	{
+		return $lang_string;
+	}
+	else
+	{
+		return $mx_cache->format_string($lang_string, $args);
+	}
+}
+
+/**
+* A wrapper for htmlcheck_plain($value, ENT_COMPAT, 'UTF-8')
+* See also
+* function utf8_htmlspecialchars($value)
+* from
+* @package utf
+*/
+function utf8_htmlcheck_plain($value)
+{
+	return htmlspecialchars($value, ENT_QUOTE, 'UTF-8');
+}
+
+/**
+* Trying to display in a placeholder inside a message or text
+*
+*/
+function mx_placeholder($message)
+{
+	// Adding placeholders to returned text
+	return '<em class="placeholder">' . utf8_htmlcheck_plain($text) . '</em>';
+}
+
+/**
+ * function eregi
+ *
+ * temp replacement for eregi()
+ *
+ *
+ */
+if (!@function_exists('eregi')) 
+{     
+	function eregi($find, $str) 
+	{         
+		return stristr($str, $find);     
+	} 
+}
+
+/**
+ * function ereg
+ *
+ * temp replacement for ereg()
+ *
+ *
+ */
+ /*
+if(!function_exists('ereg')) 
+{     
+	function ereg($pattern, $string, &$array)      
+	{          
+		return preg_match('#'.$pattern.'#', $string, $array);      
+	} 
+}
+*/ 
 ?>

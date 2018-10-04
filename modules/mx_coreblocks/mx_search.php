@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Module - mx_coreblocks
-* @version $Id: mx_search.php,v 1.31 2008/10/04 07:04:38 orynider Exp $
+* @version $Id: mx_search.php,v 1.33 2014/05/18 06:24:56 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net
 *
 */
 
@@ -445,7 +445,7 @@ switch ( $mode )
 				$editor_name = $editor_name_tmp[$searchdata['block_editor_id']]['username'];
 			}
 
-			$edit_time = !empty($searchdata['block_time']) ? '(' . $phpBB2->create_date($board_config['default_dateformat'], $searchdata['block_time'], $board_config['board_timezone'] ) . ')' : '';
+			$edit_time = !empty($searchdata['block_time']) ? '(' . phpBB2::create_date($board_config['default_dateformat'], $searchdata['block_time'], $board_config['board_timezone'] ) . ')' : '';
 
 			$block_editor = '<a href="' . mx_append_sid(PHPBB_URL . "profile.$phpEx?mode=viewprofile&amp;" . POST_USERS_URL . '=' . $searchdata['block_editor_id']) . '" class="name">';
 			$block_editor .= $editor_name;
@@ -476,7 +476,7 @@ switch ( $mode )
 		$new_search_url = mx_append_sid( PORTAL_URL . 'index.php?page=' . $page_id );
 
 		$template->assign_vars( array(
-			'PAGINATION' => $phpBB2->generate_pagination( $base_url, $total_match_count, $per_page, $start ),
+			'PAGINATION' => phpBB2::generate_pagination( $base_url, $total_match_count, $per_page, $start ),
 			'PAGE_NUMBER' => sprintf( $lang['Page_of'], ( floor( $start / $per_page ) + 1 ), ceil( $total_match_count / $per_page ) ),
 
 			'L_AUTHOR' => $lang['Author'],

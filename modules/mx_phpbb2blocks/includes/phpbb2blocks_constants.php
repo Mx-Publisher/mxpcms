@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Module - mx_phpbb2blocks
-* @version $Id: phpbb2blocks_constants.php,v 1.5 2008/02/05 14:51:28 joasch Exp $
+* @version $Id: phpbb2blocks_constants.php,v 1.6 2013/06/28 15:36:42 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 

@@ -2,10 +2,10 @@
 /**
 *
 * @package Tools
-* @version $Id: mx_functions_tools.php,v 1.45 2008/10/04 07:04:25 orynider Exp $
+* @version $Id: mx_functions_tools.php,v 1.69 2014/09/24 05:51:47 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -66,7 +66,7 @@ class mx_text
 	 */
 	function init($html_on = false, $bbcode_on = true, $smilies_on = false, $links_on = true, $images_on = true)
 	{
-		global $theme, $mx_cache, $phpBB2;
+		global $theme, $mx_cache;
 
 		//
 		// Toggles
@@ -80,10 +80,35 @@ class mx_text
 		//
 		// Define censored word matches
 		// Note: This is a workaraound for new Olympus style cache.
-		//
-		$censors = $mx_cache->obtain_word_list();
-		$this->orig_word = $censors['match'];
-		$this->replacement_word = $censors['replace'];
+		//		
+		static $censors;
+
+		// We moved the word censor checks in here because we call this function quite often - and then only need to do the check once
+		if (!isset($censors) || !is_array($censors))
+		{
+			global $mx_user;
+
+			// We check here in future if the user is having viewing censors disabled (and also allowed to do so).
+			if (!$mx_user->optionget('viewcensors'))
+			{
+				$censors = array();
+			}
+			else
+			{
+				$censors = $mx_cache->obtain_word_list();
+			}
+		}
+
+		if (sizeof($censors))
+		{
+			$this->orig_word = $censors['match'];
+			$this->replacement_word = $censors['replace'];
+		}
+		else
+		{
+			$this->orig_word = array();
+			$this->replacement_word = array();
+		}
 
 		//
 		// Was a highlight request part of the URI?
@@ -103,13 +128,13 @@ class mx_text
 			unset($words);
 
 			$this->highlight = urlencode($_GET['highlight']);
-			$this->highlight_match = $phpBB2->phpbb_rtrim($this->highlight_match, "\\");
+			$this->highlight_match = phpBB2::phpbb_rtrim($this->highlight_match, "\\");
 		}
 
 		//
 		// Highlight match color
 		//
-		$this->highlight_match_color = $theme['fontcolor3'];
+		$this->highlight_match_color = isset($theme['fontcolor3']) ? $theme['fontcolor3'] : 'FFFFFF';
 
 	}
 
@@ -140,9 +165,11 @@ class mx_text
 		if ($text != '' && $bbcode_uid != '')
 		{
 			$text = ($this->bbcode_on) ? $mx_bbcode->bbencode_second_pass($text, $bbcode_uid) : preg_replace("/\:$bbcode_uid/si", '', $text);
+			//$text = ($this->bbcode_on) ? $mx_bbcode->decode($text, $bbcode_uid): preg_replace("/\:$bbcode_uid/si", '', $text);
 		}
+		
 
-		if ( $text != '' )
+		if ($text != '')
 		{
 			$text = $mx_bbcode->make_clickable($text);
 		}
@@ -150,14 +177,14 @@ class mx_text
 		//
 		// Parse smilies
 		//
-		if ( $this->smilies_on )
+		if ($this->smilies_on)
 		{
-			if ( $text != '' )
+			if ($text != '')
 			{
 				$text = $mx_bbcode->smilies_pass($text);
 			}
 		}
-
+		
 		//
 		// Highlight active words (primarily for search)
 		//
@@ -326,14 +353,14 @@ class mx_text
 	 */
 	function encode_username($username)
 	{
-		global $board_config, $userdata, $lang, $phpEx, $phpbb_root_path,$phpBB2;
+		global $board_config, $userdata, $lang, $phpEx, $phpbb_root_path;
 
 		//
 		// Check username
 		//
 		if (!empty($username))
 		{
-			$username = $phpBB2->phpbb_clean_username($username);
+			$username = phpBB2::phpbb_clean_username($username);
 
 			if (!$userdata['session_logged_in'] || ($userdata['session_logged_in'] && $username != $userdata['username']))
 			{
@@ -1291,7 +1318,7 @@ class mx_text_formatting
 
 		return $mytext;
 	}
-
+	
 	/**
 	 * Enter description here...
 	 *
@@ -1303,7 +1330,7 @@ class mx_text_formatting
 	 * @param unknown_type $url
 	 * @return unknown
 	 */
-	function _magic_url( $url )
+	function _magic_url($url)
 	{
 		global $board_config;
 		// $url = stripslashes($url);
@@ -1331,7 +1358,7 @@ class mx_text_formatting
 
 			$url = preg_replace( $match, $replace, $url );
 			// Also fix already tagged links
-			$url = preg_replace( "/<a href=(.*?)>(.*?)<\/a>/ie", "(strlen(\"\\2\") > 25 && !eregi(\"<\", \"\\2\") ) ? '<a href='.stripslashes(\"\\1\").'>'.substr(str_replace(\"http://\",\"\",\"\\2\"), 0, 17) . '...</a>' : '<a href='.stripslashes(\"\\1\").'>'.\"\\2\".'</a>'", $url );
+			$url = preg_replace( "/<a href=(.*?)>(.*?)<\/a>/ie", "(strlen(\"\\2\") > 25 && !stristr(\"\\2\", \"<\") ) ? '<a href='.stripslashes(\"\\1\").'>'.substr(str_replace(\"http://\",\"\",\"\\2\"), 0, 17) . '...</a>' : '<a href='.stripslashes(\"\\1\").'>'.\"\\2\".'</a>'", $url );
 			// $url = preg_replace("/<a href=(.*?)>(.*?)<\/a>/ie", "(strlen(\"\\2\") > 25 && !eregi(\"<\", \"\\2\") ) ? '<a href='.stripslashes(\"\\1\").'>'.substr(str_replace(\"http://\",\"\",\"\\2\"), 0, 12) . ' ... ' . substr(\"\\2\", -3).'</a>' : '<a href='.stripslashes(\"\\1\").'>'.\"\\2\".'</a>'", $url);
 			return $url;
 		}
@@ -1607,6 +1634,69 @@ class mx_text_formatting
 		}
 		return $mytext;
 	}
+	
+	/**
+	* Truncates string while retaining special characters if going over the max length
+	* The default max length is 60 at the moment
+	* The maximum storage length is there to fit the string within the given length. The string may be further truncated due to html entities.
+	* For example: string given is 'a "quote"' (length: 9), would be a stored as 'a &quot;quote&quot;' (length: 19)
+	*
+	* @param string $string The text to truncate to the given length. String is specialchared.
+	* @param int $max_length Maximum length of string (multibyte character count as 1 char / Html entity count as 1 char)
+	* @param int $max_store_length Maximum character length of string (multibyte character count as 1 char / Html entity count as entity chars).
+	* @param bool $allow_reply Allow Re: in front of string
+	* @param string $append String to be appended
+	*/
+	function truncate_string($string, $max_length = 60, $max_store_length = 255, $allow_reply = true, $append = '')
+	{
+		$chars = array();
+
+		$strip_reply = false;
+		$stripped = false;
+		if ($allow_reply && strpos($string, 'Re: ') === 0)
+		{
+			$strip_reply = true;
+			$string = substr($string, 4);
+		}
+
+		$_chars = utf8_str_split(htmlspecialchars_decode($string));
+		$chars = array_map('utf8_htmlspecialchars', $_chars);
+
+		// Now check the length ;)
+		if (sizeof($chars) > $max_length)
+		{
+			// Cut off the last elements from the array
+			$string = implode('', array_slice($chars, 0, $max_length - utf8_strlen($append)));
+			$stripped = true;
+		}
+
+		// Due to specialchars, we may not be able to store the string...
+		if (utf8_strlen($string) > $max_store_length)
+		{
+			// let's split again, we do not want half-baked strings where entities are split
+			$_chars = utf8_str_split(htmlspecialchars_decode($string));
+			$chars = array_map('utf8_htmlspecialchars', $_chars);
+
+			do
+			{
+				array_pop($chars);
+				$string = implode('', $chars);
+			}
+			while (!empty($chars) && utf8_strlen($string) > $max_store_length);
+		}
+
+		if ($strip_reply)
+		{
+			$string = 'Re: ' . $string;
+		}
+
+		if ($append != '' && $stripped)
+		{
+			$string = $string . $append;
+		}
+
+		return $string;
+	} 		
 }
 
 define('MX_MAIL_MODE'						, 1);
@@ -1619,18 +1709,21 @@ define('MX_APPROVED_NOTIFICATION'			, 12);
 define('MX_UNAPPROVED_NOTIFICATION'			, 13);
 define('MX_DELETED_NOTIFICATION'			, 14);
 
-//
-// Includes
-//
-if( !function_exists('prepare_message') )
+/*
+* Includes
+*/
+if(!function_exists('prepare_message'))
 {
-	include_once($mx_root_path . 'includes/shared/phpbb2/includes/functions_post.' . $phpEx);
+	//include_once($mx_root_path . 'includes/shared/phpbb2/includes/functions_post.' . $phpEx);
+	mx_cache::load_file('functions_post', 'phpbb2');
 }
 
 if( !function_exists('add_search_words') )
 {
-	include_once($mx_root_path . 'includes/shared/phpbb2/includes/functions_search.' . $phpEx);
+	//include_once($mx_root_path . 'includes/shared/phpbb2/includes/functions_search.' . $phpEx);
+	mx_cache::load_file('functions_search', 'phpbb2');
 }
+/*/
 
 /**
  * Class: mx_notification.
@@ -1661,6 +1754,10 @@ class mx_notification
 	var $html_on = 0;
 	var $bbcode_on = 1;
 	var $smilies_on = 1;
+	var $wysiwyg_on = 0;
+	
+	var $bbcode_uid = '';
+	var $bbcode_bitfield = '';	
 
 	var $first_commnent = ''; // only used for phpBB comments
 	var $next_commnent = '';
@@ -1705,9 +1802,9 @@ class mx_notification
 	 * @param unknown_type $bbcode_on
 	 * @param unknown_type $smilies_on
 	 */
-	function notify( $mode = MX_PM_MODE, $action = MX_NEW_NOTIFICATION, $to_id = 0, $from_id = '', $subject = '', $message = '', $html_on = '', $bbcode_on = '', $smilies_on = '' )
+	function notify($mode = MX_PM_MODE, $action = MX_NEW_NOTIFICATION, $to_id = 0, $from_id = '', $subject = '', $message = '', $html_on = true, $bbcode_on = true, $smilies_on = true, $wysiwyg_on = false)
 	{
-		global $lang, $board_config, $db, $phpbb_root_path, $mx_root_path, $phpEx, $userdata;
+		global $lang, $board_config, $pafiledb_config, $db, $phpbb_root_path, $mx_root_path, $phpEx, $userdata;
 
 		//
 		// Precheck
@@ -1730,15 +1827,16 @@ class mx_notification
 			mx_message_die(GENERAL_ERROR, 'Bad notify pars - no to_id');
 		}
 
-	    $this->from_id = empty( $from_id ) ? $userdata['user_id'] : $from_id;
+	    $this->from_id = empty($from_id) ? $userdata['user_id'] : $from_id;
 
 		//
 		// Toggles
 		//
-		$this->html_on = !empty($html_on) ? $html_on : $this->html_on;
-		$this->bbcode_on = !empty($bbcode_on) ? $bbcode_on : $this->bbcode_on;
-		$this->smilies_on = !empty($smilies_on) ? $smilies_on : $this->smilies_on;
-
+		$this->html_on = ($html_on) ? $html_on : $this->html_on;
+		$this->bbcode_on = ($bbcode_on) ? $bbcode_on : $this->bbcode_on;
+		$this->smilies_on = ($smilies_on) ? $smilies_on : $this->smilies_on;
+		$this->allow_comment_wysiwyg = $pafiledb_config['allow_comment_wysiwyg']; 
+		$this->wysiwyg_on = ($wysiwyg_on) ? $wysiwyg_on : $this->allow_comment_wysiwyg;
 		$this->subject = $subject;
 		$this->message = $message;
 
@@ -1796,180 +1894,256 @@ class mx_notification
 	 */
 	function _insert_pm()
 	{
-	   global $db, $lang, $user_ip, $board_config, $userdata, $phpbb_root_path, $phpEx, $mx_bbcode;
+		global $db, $lang, $user_ip, $mx_user, $board_config, $userdata, $phpbb_root_path, $phpEx, $mx_bbcode;
 
-	   //
-	   // get varibles ready
-	   //
-	   $msg_time = time();
-	   $attach_sig = $userdata['user_attachsig'];
-
-	   //
-	   //get 'to user's info
-	   //
-	   $sql = "SELECT user_id, user_email
+		//
+		// get varibles ready
+		//
+		$msg_time = time();
+		
+		switch (PORTAL_BACKEND)
+		{
+			case 'internal':
+			case 'smf2':
+			case 'mybb':
+			case 'phpbb2':
+				$attach_sig = $userdata['user_attachsig'];
+			break;
+			
+			case 'phpbb3':
+			case 'olympus':
+			case 'ascraeus':
+			case 'rhea':
+				$attach_sig = ($board_config['allow_sig'] && $mx_user->data['user_sig']) ? TRUE : 0;
+			break;
+		}		
+		
+		$is_admin = ($userdata['user_level'] == ADMIN && $userdata['session_logged_in']) ? TRUE : 0;
+		
+		//
+		//get 'to user's info
+		/*
+		$sql = "SELECT user_id, user_email
 	      FROM " . USERS_TABLE . "
 	      WHERE user_id = '" . $this->to_id . "'
 	         AND user_id <> " . ANONYMOUS;
 
-	   if ( !($result = $db->sql_query($sql)) )
-	   {
-	      $error = TRUE;
-	      $error_msg = $lang['No_such_user'];
-	   }
+		if ( !($result = $db->sql_query($sql)) )
+		{
+			$error = TRUE;
+			$error_msg = $lang['No_such_user'];
+		}
 
-	   $to_userdata = $db->sql_fetchrow($result);
-	   $privmsg_subject = trim(strip_tags($this->subject));
+		$to_userdata = $db->sql_fetchrow($result);
+		*/
+		$to_userdata = mx_get_userdata($this->to_id);
 
-	   if ( empty($privmsg_subject) )
-	   {
-	      $error = TRUE;
-	      $error_msg .= ( ( !empty($error_msg) ) ? '<br />' : '' ) . $lang['Empty_subject'];
-	   }
+		$privmsg_subject = trim(strip_tags($this->subject));
 
-	   if ( !empty($this->message) )
-	   {
-	      if ( !$error )
-	      {
-	         if ( $this->bbcode_on )
-	         {
-	            $bbcode_uid = $mx_bbcode->make_bbcode_uid();
-	         }
+		if ( empty($privmsg_subject) )
+		{
+			$error = TRUE;
+			$error_msg .= ( ( !empty($error_msg) ) ? '<br />' : '' ) . $lang['Empty_subject'];
+		}
 
-	         $privmsg_message = prepare_message(addslashes($this->message), $this->html_on, $this->bbcode_on, $this->smilies_on, $bbcode_uid);
-	         $privmsg_message = str_replace('\\\n', '\n', $privmsg_message);
-	      }
-	   }
-	   else
-	   {
-	      $error = TRUE;
-	      $error_msg .= ( ( !empty($error_msg) ) ? '<br />' : '' ) . $lang['Empty_message'];
-	   }
+		if (!empty($this->message))
+		{
+			if (!$error)
+			{
+				if ($this->bbcode_on)
+				{
+					$bbcode_uid = $mx_bbcode->make_bbcode_uid();
+				}
+				
+				if (method_exists($this, 'lookup'))
+				{
+					$privmsg_message = $this->prepare_message(addslashes($this->message), $this->html_on, $this->bbcode_on, $this->smilies_on, $bbcode_uid);
+					$privmsg_message = str_replace('\\\n', '\n', $privmsg_message);
+				}				
+			}
+		}
+		else
+		{
+			$error = TRUE;
+			$error_msg .= ( ( !empty($error_msg) ) ? '<br />' : '' ) . $lang['Empty_message'];
+		}
 
-	   //
-	   // See if recipient is at their inbox limit
-	   //
-	   $sql = "SELECT COUNT(privmsgs_id) AS inbox_items, MIN(privmsgs_date) AS oldest_post_time
-	      FROM " . PRIVMSGS_TABLE . "
-	      WHERE ( privmsgs_type = " . PRIVMSGS_NEW_MAIL . "
-	            OR privmsgs_type = " . PRIVMSGS_READ_MAIL . "
-	            OR privmsgs_type = " . PRIVMSGS_UNREAD_MAIL . " )
-	         AND privmsgs_to_userid = " . $to_userdata['user_id'];
+		//
+		// See if recipient is at their inbox limit
+		//
+		switch (PORTAL_BACKEND)
+		{
+			case 'internal':
+			case 'smf2':
+			case 'mybb':
+			case 'phpbb2':
+			
+				$sql = "SELECT COUNT(privmsgs_id) AS inbox_items, MIN(privmsgs_date) AS oldest_post_time
+			      FROM " . PRIVMSGS_TABLE . "
+			      WHERE ( privmsgs_type = " . PRIVMSGS_NEW_MAIL . "
+			            OR privmsgs_type = " . PRIVMSGS_READ_MAIL . "
+			            OR privmsgs_type = " . PRIVMSGS_UNREAD_MAIL . " )
+			         AND privmsgs_to_userid = " . $to_userdata['user_id'];
+ 			break;
+			
+			case 'phpbb3':
+			case 'olympus':
+			case 'ascraeus':
+			case 'rhea':
+			
+			$sql = 'SELECT t.msg_id, COUNT(t.msg_id) as inbox_items, SUM(t.pm_unread) as oldest_post_time 
+				FROM ' . PRIVMSGS_TO_TABLE . ' t, ' . PRIVMSGS_TABLE . ' p
+					WHERE t.msg_id = p.msg_id
+					AND t.user_id = ' . $to_userdata['user_id'] . '
+					AND t.folder_id <> ' . PRIVMSGS_NO_BOX . '				
+					ORDER BY p.message_time ASC';
+				break;
+		}
+	
+		//$result = $db->sql_query($sql); //To Do
+		if ( !($result = $db->sql_query($sql)) )
+		{
+			mx_message_die( GENERAL_ERROR, $lang['No_such_user'], '', __LINE__, __FILE__, $sql );			
+		}	
+		$db->sql_freeresult($result);
+		
+		$sql_priority = ( SQL_LAYER == 'mysql' ) ? 'LOW_PRIORITY' : '';
 
-	   if ( !($result = $db->sql_query($sql)) )
-	   {
-	      mx_message_die(GENERAL_MESSAGE, $lang['No_such_user']);
-	   }
-
-	   $sql_priority = ( SQL_LAYER == 'mysql' ) ? 'LOW_PRIORITY' : '';
-
-	   if ( $inbox_info = $db->sql_fetchrow($result) )
-	   {
-	      if ( $inbox_info['inbox_items'] >= $board_config['max_inbox_privmsgs'] )
-	      {
-	         $sql = "SELECT privmsgs_id FROM " . PRIVMSGS_TABLE . "
-	            WHERE ( privmsgs_type = " . PRIVMSGS_NEW_MAIL . "
+		if ( $inbox_info = $db->sql_fetchrow($result) )
+		{
+			if ( $inbox_info['inbox_items'] >= $board_config['max_inbox_privmsgs'] )
+			{
+				$sql = "SELECT privmsgs_id FROM " . PRIVMSGS_TABLE . "
+					WHERE ( privmsgs_type = " . PRIVMSGS_NEW_MAIL . "
 	                  OR privmsgs_type = " . PRIVMSGS_READ_MAIL . "
 	                  OR privmsgs_type = " . PRIVMSGS_UNREAD_MAIL . "  )
-	               AND privmsgs_date = " . $inbox_info['oldest_post_time'] . "
-	               AND privmsgs_to_userid = " . $to_userdata['user_id'];
+					AND privmsgs_date = " . $inbox_info['oldest_post_time'] . "
+					AND privmsgs_to_userid = " . $to_userdata['user_id'];
 
-	         if ( !$result = $db->sql_query($sql) )
-	         {
-	            mx_message_die(GENERAL_ERROR, 'Could not find oldest privmsgs (inbox)', '', __LINE__, __FILE__, $sql);
-	         }
+				if ( !$result = $db->sql_query($sql) )
+				{
+					//mx_message_die(GENERAL_ERROR, 'Could not find oldest privmsgs (inbox)', '', __LINE__, __FILE__, $sql);
+				}
 
-	         $old_privmsgs_id = $db->sql_fetchrow($result);
-	         $old_privmsgs_id = $old_privmsgs_id['privmsgs_id'];
+				$old_privmsgs_id = $db->sql_fetchrow($result);
+				$old_privmsgs_id = $old_privmsgs_id['privmsgs_id'];
 
-	         $sql = "DELETE $sql_priority FROM " . PRIVMSGS_TABLE . "
-	            WHERE privmsgs_id = $old_privmsgs_id";
+				$sql = "DELETE $sql_priority FROM " . PRIVMSGS_TABLE . "
+					WHERE privmsgs_id = $old_privmsgs_id";
 
-	         if ( !$db->sql_query($sql) )
-	         {
-	            mx_message_die(GENERAL_ERROR, 'Could not delete oldest privmsgs (inbox)'.$sql, '', __LINE__, __FILE__, $sql);
-	         }
+				if ( !$db->sql_query($sql) )
+				{
+					//mx_message_die(GENERAL_ERROR, 'Could not delete oldest privmsgs (inbox)'.$sql, '', __LINE__, __FILE__, $sql);
+				}
 
-	         $sql = "DELETE $sql_priority FROM " . PRIVMSGS_TEXT_TABLE . "
-	            WHERE privmsgs_text_id = $old_privmsgs_id";
+				$sql = "DELETE $sql_priority FROM " . PRIVMSGS_TEXT_TABLE . "
+					WHERE privmsgs_text_id = $old_privmsgs_id";
 
-	         if ( !$db->sql_query($sql) )
-	         {
-	            mx_message_die(GENERAL_ERROR, 'Could not delete oldest privmsgs text (inbox)', '', __LINE__, __FILE__, $sql);
-	         }
-	      }
-	   }
+				if ( !$db->sql_query($sql) )
+				{
+					//mx_message_die(GENERAL_ERROR, 'Could not delete oldest privmsgs text (inbox)', '', __LINE__, __FILE__, $sql);
+				}
+			}
+		}
+		
+		switch (PORTAL_BACKEND)
+		{
+			case 'internal':
+			case 'smf2':
+			case 'mybb':
+			case 'phpbb2':			
+				$sql_info = "INSERT INTO " . PRIVMSGS_TABLE . " (privmsgs_type, privmsgs_subject, privmsgs_from_userid, privmsgs_to_userid, privmsgs_date, privmsgs_ip, privmsgs_enable_html, privmsgs_enable_bbcode, privmsgs_enable_smilies, privmsgs_attach_sig)
+					VALUES (" . PRIVMSGS_NEW_MAIL . ", '" . str_replace("\'", "''", $privmsg_subject) . "', " . $this->from_id . ", " . $to_userdata['user_id'] . ", $msg_time, '$user_ip', $this->html_on, $this->bbcode_on, $this->smilies_on, $attach_sig)";
+				if ( !($result = $db->sql_query($sql_info)) )
+				{
+					mx_message_die(GENERAL_ERROR, "Could not insert/update private message sent info.", "", __LINE__, __FILE__, $sql_info);
+				}
+				$privmsg_sent_id = $db->sql_nextid();
+				$sql = "INSERT INTO " . PRIVMSGS_TEXT_TABLE . " (privmsgs_text_id, privmsgs_bbcode_uid, privmsgs_text) VALUES ($privmsg_sent_id, '" . $bbcode_uid . "', '" . str_replace("\'", "''", $privmsg_message) . "')";
+				if ( !$db->sql_query($sql) )
+				{
+					mx_message_die(GENERAL_ERROR, "Could not insert/update private message sent text.", "", __LINE__, __FILE__, $sql);
+				}
+				
+			   // Add to the users new pm counter
+			   $sql = "UPDATE " . USERS_TABLE . "
+			      SET user_new_privmsg = user_new_privmsg + 1, user_last_privmsg = " . time() . "
+			      WHERE user_id = " . $to_userdata['user_id'];
 
-	   $sql_info = "INSERT INTO " . PRIVMSGS_TABLE . " (privmsgs_type, privmsgs_subject, privmsgs_from_userid, privmsgs_to_userid, privmsgs_date, privmsgs_ip, privmsgs_enable_html, privmsgs_enable_bbcode, privmsgs_enable_smilies, privmsgs_attach_sig)
-	      VALUES (" . PRIVMSGS_NEW_MAIL . ", '" . str_replace("\'", "''", $privmsg_subject) . "', " . $this->from_id . ", " . $to_userdata['user_id'] . ", $msg_time, '$user_ip', $this->html_on, $this->bbcode_on, $this->smilies_on, $attach_sig)";
+			   if ( !$status = $db->sql_query($sql) )
+			   {
+			      mx_message_die(GENERAL_ERROR, 'Could not update private message new/read status for user', '', __LINE__, __FILE__, $sql);
+			   }
+			   
+			   if ( $to_userdata['user_notify_pm'] && !empty($to_userdata['user_email']) && $to_userdata['user_active'] )
+			   {
+			      $script_name = preg_replace('/^\/?(.*?)\/?$/', "\\1", trim($board_config['script_path']));
+			      $script_name = ( $script_name != '' ) ? $script_name . '/privmsg.'.$phpEx : 'privmsg.'.$phpEx;
+			      $server_name = trim($board_config['server_name']);
+			      $server_protocol = ( $board_config['cookie_secure'] ) ? 'https://' : 'http://';
+			      $server_port = ( $board_config['server_port'] <> 80 ) ? ':' . trim($board_config['server_port']) . '/' : '/';
+				  
+			      // Include and initiate emailer
+			      include_once($mx_root_path . 'includes/mx_functions_emailer.'.$phpEx);
+			      $emailer = new mx_emailer($board_config['smtp_delivery']);
+				  
+			      $emailer->from($board_config['board_email']);
+			      $emailer->replyto($board_config['board_email']);
+				  
+			      $emailer->use_template('privmsg_notify', $to_userdata['user_lang']);
+			      $emailer->email_address($to_userdata['user_email']);
+			      $emailer->set_subject($lang['Notification_subject']);
+				  
+			      $emailer->assign_vars(array(
+			         'USERNAME' => $to_username,
+			         'SITENAME' => $board_config['sitename'],
+			         'EMAIL_SIG' => (!empty($board_config['board_email_sig'])) ? str_replace('<br />', "\n", "-- \n" . $board_config['board_email_sig']) : '',
+					 
+			         'U_INBOX' => $server_protocol . $server_name . $server_port . $script_name . '?folder=inbox')
+			      );
+				  
+			      $emailer->send();
+			      $emailer->reset();
+			   }
+			   //return;
+			   $msg = $lang['Message_sent'] . '<br /><br />' . sprintf($lang['Click_return_inbox'], '<a href="' . mx_append_sid("privmsg.$phpEx?folder=inbox") . '">', '</a> ') . '<br /><br />' . sprintf($lang['Click_return_index'], '<a href="' . mx_append_sid("index.$phpEx") . '">', '</a>');
+			   mx_message_die(GENERAL_MESSAGE, $msg);			   
+			   
+			break;
+			
+				case 'phpbb3':
+				case 'olympus':
+				case 'ascraeus':
+				case 'rhea':
+				
+				if (!class_exists('parse_message'))
+				{
+					require($mx_root_path . 'includes/shared/phpbb3/includes/message_parser.' . $phpEx);
+				}		
+				
+				$message_parser = new parse_message($privmsg_message);
+				
+				$message_parser->message = $privmsg_message;
+				$message_parser->parse(true, true, true, false, false, true, true);
+				
+				$pm_data = array(
+					'from_user_id'			=> $this->from_id,
+					'from_user_ip'			=> $user->ip,
+					'from_username'			=> $to_userdata['user_id'],
+					'enable_sig'			=> $attach_sig,
+					'enable_bbcode'			=> $this->bbcode_on,
+					'enable_smilies'		=> $this->smilies_on,
+					'enable_urls'			=> $this->html_on,
+					'icon_id'				=> 0,
+					'bbcode_bitfield'		=> $message_parser->bbcode_bitfield,
+					'bbcode_uid'			=> $message_parser->bbcode_uid,
+					'message'				=> $message_parser->message,
+					'address_list'			=> array('u' => array($to_userdata['user_id'] => 'to')),
+				);
 
-	   if ( !($result = $db->sql_query($sql_info)) )
-	   {
-	      mx_message_die(GENERAL_ERROR, "Could not insert/update private message sent info.", "", __LINE__, __FILE__, $sql_info);
-	   }
-
-	   $privmsg_sent_id = $db->sql_nextid();
-
-	   $sql = "INSERT INTO " . PRIVMSGS_TEXT_TABLE . " (privmsgs_text_id, privmsgs_bbcode_uid, privmsgs_text)
-	      VALUES ($privmsg_sent_id, '" . $bbcode_uid . "', '" . str_replace("\'", "''", $privmsg_message) . "')";
-
-	   if ( !$db->sql_query($sql) )
-	   {
-	      mx_message_die(GENERAL_ERROR, "Could not insert/update private message sent text.", "", __LINE__, __FILE__, $sql);
-	   }
-
-	   //
-	   // Add to the users new pm counter
-	   //
-	   $sql = "UPDATE " . USERS_TABLE . "
-	      SET user_new_privmsg = user_new_privmsg + 1, user_last_privmsg = " . time() . "
-	      WHERE user_id = " . $to_userdata['user_id'];
-
-	   if ( !$status = $db->sql_query($sql) )
-	   {
-	      mx_message_die(GENERAL_ERROR, 'Could not update private message new/read status for user', '', __LINE__, __FILE__, $sql);
-	   }
-
-	   /*
-	   if ( $to_userdata['user_notify_pm'] && !empty($to_userdata['user_email']) && $to_userdata['user_active'] )
-	   {
-	      $script_name = preg_replace('/^\/?(.*?)\/?$/', "\\1", trim($board_config['script_path']));
-	      $script_name = ( $script_name != '' ) ? $script_name . '/privmsg.'.$phpEx : 'privmsg.'.$phpEx;
-	      $server_name = trim($board_config['server_name']);
-	      $server_protocol = ( $board_config['cookie_secure'] ) ? 'https://' : 'http://';
-	      $server_port = ( $board_config['server_port'] <> 80 ) ? ':' . trim($board_config['server_port']) . '/' : '/';
-
-	      //
-	      // Include and initiate emailer
-	      //
-	      include($phpbb_root_path . 'includes/emailer.'.$phpEx);
-	      $emailer = new emailer($board_config['smtp_delivery']);
-
-	      $emailer->from($board_config['board_email']);
-	      $emailer->replyto($board_config['board_email']);
-
-	      $emailer->use_template('privmsg_notify', $to_userdata['user_lang']);
-	      $emailer->email_address($to_userdata['user_email']);
-	      $emailer->set_subject($lang['Notification_subject']);
-
-	      $emailer->assign_vars(array(
-	         'USERNAME' => $to_username,
-	         'SITENAME' => $board_config['sitename'],
-	         'EMAIL_SIG' => (!empty($board_config['board_email_sig'])) ? str_replace('<br />', "\n", "-- \n" . $board_config['board_email_sig']) : '',
-
-	         'U_INBOX' => $server_protocol . $server_name . $server_port . $script_name . '?folder=inbox')
-	      );
-
-	      $emailer->send();
-	      $emailer->reset();
-	   }
-		*/
-	   return;
-
-	   $msg = $lang['Message_sent'] . '<br /><br />' . sprintf($lang['Click_return_inbox'], '<a href="' . mx_append_sid("privmsg.$phpEx?folder=inbox") . '">', '</a> ') . '<br /><br />' . sprintf($lang['Click_return_index'], '<a href="' . mx_append_sid("index.$phpEx") . '">', '</a>');
-
-	   mx_message_die(GENERAL_MESSAGE, $msg);
-
+				$this->submit_pm_phpbb3('post', $privmsg_subject, $pm_data, false);
+			break;
+		}			
 	}
 
 	/**
@@ -1978,7 +2152,7 @@ class mx_notification
 	 */
 	function _mailer()
 	{
-	   global $db, $lang, $user_ip, $board_config, $userdata, $phpbb_root_path, $phpEx, $mx_bbcode;
+	   global $db, $lang, $user_ip, $board_config, $userdata, $phpbb_root_path, $mx_root_path, $phpEx, $mx_bbcode;
 
 	   //
 	   //get varibles ready
@@ -2019,7 +2193,7 @@ class mx_notification
 	            $bbcode_uid = $mx_bbcode->make_bbcode_uid();
 	         }
 
-	         $mail_message = prepare_message($this->message, $this->html_on, $this->bbcode_on, $this->smilies_on, $bbcode_uid);
+	         $mail_message = $this->prepare_message($this->message, $this->html_on, $this->bbcode_on, $this->smilies_on, $bbcode_uid);
 	         $mail_message = str_replace('\\\n', '\n', $mail_message);
 
 	      }
@@ -2039,8 +2213,8 @@ class mx_notification
 	    //
 	    // Include and initiate mailer
 	    //
-	    include($phpbb_root_path . 'includes/emailer.'.$phpEx);
-	    $emailer = new emailer($board_config['smtp_delivery']);
+		include_once($mx_root_path . 'includes/mx_functions_emailer.'.$phpEx);
+	    $emailer = new mx_emailer($board_config['smtp_delivery']);
 
 	    //
 	    // Mail
@@ -2064,62 +2238,121 @@ class mx_notification
 	 */
 	function _compose_auto_note($action = '')
 	{
-		global $lang, $phpEx;
+		global $lang, $phpEx, $mx_backend;
 
-			$new_line_char = $this->allow_comment_wysiwyg  ? '<br /> ' : "\n ";
-
-			//
-			// Compose phpBB post header
-			//
-			$this->auto_message = $this->langs['item_title'] . ":  " . $this->data['item_title'] . $new_line_char;
-			$this->auto_message .= $this->langs['author'] . ": " . $this->data['item_author'] . $new_line_char;
-			$this->auto_message .= $this->langs['item_description'] . ": " . $this->data['item_desc'] . $new_line_char;
-
-			if ($action != MX_DELETED_NOTIFICATION)
-			{
-				$this->auto_message .= $new_line_char . $this->langs['read_full_item'] . ": " . $new_line_char . $this->temp_url . $new_line_char;
+		//
+		// Toggle tags language replacemets
+		//		
+		static $bbcode_hardchar = array();
+		if (empty($bbcode_hardchar))
+		{
+			if ($this->wysiwyg_on)
+			{			
+				$bbcode_hardchar = array(
+					'b_open'	=> "<span style=\"font-weight: bold\">",
+					'b_close'	=> "</span>",
+					'i_open'	=> "<span style=\"font-style: italic\">",
+					'i_close'	=> "</span>",
+					'u_open'	=> "<span style=\"text-decoration: underline\">",
+					'u_close'	=> "</span>",
+					'url'		=> "<a href=" . $this->temp_url . ">" . $this->langs['read_full_item'] . "</a>",						
+					'break'		=> "\n"						
+				);			
 			}
-
-			//
-			// Update message
-			//
-			$this->auto_message_update = $this->langs['edited_item_info'] . $this->data['item_editor'] . $new_line_char;
-
-			//
-			// Auto generated subject and message
-			//
-			switch ( $action )
+			elseif ($this->bbcode_on)
 			{
-				case MX_NEW_NOTIFICATION:
-					$this->topic_title = $this->langs['module_title'] . ' - ' . $this->data['item_title'];
-					$this->subject = $this->langs['module_title'] . ' - ' . $this->langs['notify_subject_new'];
-					$this->message = $this->langs['notify_new_body'] . $new_line_char . $new_line_char . $this->auto_message;
-				break;
+				$bbcode_hardchar = array(
+					'b_open'	=> "[b]", 	// To Do: Unique ID for this message (phpBB3 Backend)
+					'b_close'	=> "[/b]",
+					'i_open'	=> "[i]",
+					'i_close'	=> "[/i]",
+					'u_open'	=> "[u]",
+					'u_close'	=> "[/u]",
+					'url'		=> "[url=" . $this->temp_url . "]" . $this->langs['read_full_item'] . "[/url]",
+					'break'		=> "<br />"					
+				);			
+			}			
+			elseif ($this->html_on)
+			{			
+				$bbcode_hardchar = array(
+					'b_open'	=> "<b>",
+					'b_close'	=> "</b>",
+					'i_open'	=> "<i>",
+					'i_close'	=> "</i>",
+					'u_open'	=> "<u>",
+					'u_close'	=> "</u>",
+					'url'		=> "<a href=" . $this->temp_url . ">" . $this->langs['read_full_item'] . "</a>",						
+					'break'		=> "\n"						
+				);			
+			}				
+			else
+			{			
+				$bbcode_hardchar = array(
+					'b_open'	=> "",
+					'b_close'	=> "",
+					'i_open'	=> "",
+					'i_close'	=> "",
+					'u_open'	=> "",
+					'u_close'	=> "",
+					'url'		=> $this->langs['read_full_item'] . ": " . "\n" . $this->temp_url,						
+					'break'		=> "\n"						
+				);			
+			}				
+		}			
+		$new_line_char = $bbcode_hardchar['break'];
+			
+		//
+		// Compose phpBB post header
+		//
+		$this->auto_message = '';			
+		$this->auto_message .= $bbcode_hardchar['b_open'] . $this->langs['item_title'] . ": " . $bbcode_hardchar['b_close'] . $this->data['item_title'] . $new_line_char;
+		$this->auto_message .= $bbcode_hardchar['b_open'] . $this->langs['author'] . ": " . $bbcode_hardchar['b_close'] . $this->data['item_author'] . $new_line_char;
+		$this->auto_message .= $bbcode_hardchar['b_open'] . $this->langs['item_description'] . ": " . $bbcode_hardchar['b_close'] . $bbcode_hardchar['i_open'] . $this->data['item_desc'] . $bbcode_hardchar['i_close'] . $new_line_char . $new_line_char;
+			
+		if ($action != MX_DELETED_NOTIFICATION)
+		{
+			$this->auto_message .= $new_line_char . $new_line_char . $bbcode_hardchar['b_open'] . $bbcode_hardchar['url'] . $bbcode_hardchar['b_close'];
+		}			
 
-				case MX_EDITED_NOTIFICATION:
-					$this->topic_title = $this->langs['module_title'] . ' - ' . $this->data['item_title'];
-					$this->subject = $this->langs['module_title'] . ' - ' . $this->langs['notify_subject_edited'];
-					$this->message = $this->langs['notify_edited_body'] . $new_line_char . $new_line_char . $this->auto_message_update . $this->auto_message;
-				break;
+		//
+		// Update message
+		//
+		$this->auto_message_update = $bbcode_hardchar['i_open'] . $this->langs['edited_item_info'] . $this->data['item_editor'] . $bbcode_hardchar['i_close'] . $new_line_char . $new_line_char;
 
+		//
+		// Auto generated subject and message
+		//
+		switch ($action)
+		{
+			case MX_NEW_NOTIFICATION:
+				$this->topic_title = $this->langs['module_title'] . ' - ' . $this->data['item_title'];
+				$this->subject = $this->langs['module_title'] . ' - ' . $this->langs['notify_subject_new'];
+				$this->message = $this->langs['notify_new_body'] . $new_line_char . $new_line_char . $this->auto_message;
+		break;
+
+			case MX_EDITED_NOTIFICATION:
+				$this->topic_title = $this->langs['module_title'] . ' - ' . $this->data['item_title'];
+				$this->subject = $this->langs['module_title'] . ' - ' . $this->langs['notify_subject_edited'];
+				$this->message = $this->langs['notify_edited_body'] . $new_line_char . $new_line_char . $this->auto_message_update . $this->auto_message;
+			break;
 				case MX_APPROVED_NOTIFICATION:
-					$this->subject = $this->langs['module_title'] . ' - ' . $this->langs['notify_subject_approved'];
-					$this->message = $this->langs['notify_approved_body'] . $new_line_char . $new_line_char . $this->auto_message;
-				break;
+				$this->subject = $this->langs['module_title'] . ' - ' . $this->langs['notify_subject_approved'];
+				$this->message = $this->langs['notify_approved_body'] . $new_line_char . $new_line_char . $this->auto_message;
+			break;
 
-				case MX_UNAPPROVED_NOTIFICATION:
-					$this->subject = $this->langs['module_title'] . ' - ' . $this->langs['notify_subject_unapproved'];
-					$this->message = $this->langs['notify_unapproved_body'] . $new_line_char . $new_line_char . $this->auto_message;
-				break;
+			case MX_UNAPPROVED_NOTIFICATION:
+				$this->subject = $this->langs['module_title'] . ' - ' . $this->langs['notify_subject_unapproved'];
+				$this->message = $this->langs['notify_unapproved_body'] . $new_line_char . $new_line_char . $this->auto_message;
+			break;
 
-				case MX_DELETED_NOTIFICATION:
-					$this->subject = $this->langs['module_title'] . ' - ' . $this->langs['notify_subject_deleted'];
-					$this->message = $this->langs['notify_deleted_body'] . $new_line_char . $new_line_char . $this->auto_message;
-				break;
+			case MX_DELETED_NOTIFICATION:
+				$this->subject = $this->langs['module_title'] . ' - ' . $this->langs['notify_subject_deleted'];
+				$this->message = $this->langs['notify_deleted_body'] . $new_line_char . $new_line_char . $this->auto_message;
+			break;
 
-				default:
-					mx_message_die(GENERAL_ERROR, 'Bad notify action');
-			}
+			default:
+				mx_message_die(GENERAL_ERROR, 'Bad notify action');
+		}
 	}
 
 	/**
@@ -2133,16 +2366,35 @@ class mx_notification
 		global $db;
 
 		$admin_type = ADMIN;
-
-		$sql = "SELECT *
-	       		FROM " . USERS_TABLE . "
-	      		WHERE user_level = '$admin_type'";
-
+		
+		switch (PORTAL_BACKEND)
+		{
+			case 'internal':
+			case 'phpbb2':
+			case 'smf2':
+			case 'mybb':
+			
+			$sql = "SELECT *
+		       		FROM " . USERS_TABLE . "
+		      		WHERE user_level = '$admin_type'";
+				break;
+				
+			case 'phpbb3':
+			case 'olympus':
+			case 'ascraeus':
+			case 'rhea':
+			
+			$sql = "SELECT *
+		       		FROM " . USERS_TABLE . "
+		      		WHERE user_type = 1";
+				break;
+		}
+		
 		if ( !( $result = $db->sql_query( $sql ) ) )
 		{
 			mx_message_die( GENERAL_ERROR, "Could not obtain author data", '', __LINE__, __FILE__, $sql );
 		}
-
+		
 		$user_ids_array = array();
 		while( $row = $db->sql_fetchrow( $result ) )
 		{
@@ -2155,7 +2407,6 @@ class mx_notification
 				$user_ids_array[] = $row['user_id'];
 			}
 		}
-
 		return $user_ids_array;
 	}
 
@@ -2198,6 +2449,440 @@ class mx_notification
 			}
 		}
 		return $user_ids_array;
+	}
+	
+	/**
+	* Submit PM
+	*/
+	function submit_pm_phpbb3($mode, $subject, &$data, $put_in_outbox = true)
+	{
+		global $db, $auth, $config, $phpEx, $template, $user, $phpbb_root_path;
+
+		// We do not handle erasing pms here
+		if ($mode == 'delete')
+		{
+			return false;
+		}
+
+		$current_time = time();
+
+		// Collect some basic information about which tables and which rows to update/insert
+		$sql_data = array();
+		$root_level = 0;
+
+		// Recipient Information
+		$recipients = $to = $bcc = array();
+
+		if ($mode != 'edit')
+		{
+			// Build Recipient List
+			// u|g => array($user_id => 'to'|'bcc')
+			$_types = array('u', 'g');
+			foreach ($_types as $ug_type)
+			{
+				if (isset($data['address_list'][$ug_type]) && sizeof($data['address_list'][$ug_type]))
+				{
+					foreach ($data['address_list'][$ug_type] as $id => $field)
+					{
+						$id = (int) $id;
+
+						// Do not rely on the address list being "valid"
+						if (!$id || ($ug_type == 'u' && $id == ANONYMOUS))
+						{
+							continue;
+						}
+
+						$field = ($field == 'to') ? 'to' : 'bcc';
+						if ($ug_type == 'u')
+						{
+							$recipients[$id] = $field;
+						}
+						${$field}[] = $ug_type . '_' . $id;
+					}
+				}
+			}
+
+			if (isset($data['address_list']['g']) && sizeof($data['address_list']['g']))
+			{
+				// We need to check the PM status of group members (do they want to receive PM's?)
+				// Only check if not a moderator or admin, since they are allowed to override this user setting
+				$sql_allow_pm = (!$auth->acl_gets('a_', 'm_') && !$auth->acl_getf_global('m_')) ? ' AND u.user_allow_pm = 1' : '';
+
+				$sql = 'SELECT u.user_type, ug.group_id, ug.user_id
+					FROM ' . USERS_TABLE . ' u, ' . USER_GROUP_TABLE . ' ug
+					WHERE ' . $db->sql_in_set('ug.group_id', array_keys($data['address_list']['g'])) . '
+						AND ug.user_pending = 0
+						AND u.user_id = ug.user_id
+						AND u.user_type IN (' . USER_NORMAL . ', ' . USER_FOUNDER . ')' .
+						$sql_allow_pm;
+				$result = $db->sql_query($sql);
+
+				while ($row = $db->sql_fetchrow($result))
+				{
+					$field = ($data['address_list']['g'][$row['group_id']] == 'to') ? 'to' : 'bcc';
+					$recipients[$row['user_id']] = $field;
+				}
+				$db->sql_freeresult($result);
+			}
+
+			if (!sizeof($recipients))
+			{
+				trigger_error('NO_RECIPIENT');
+			}
+		}
+
+		$db->sql_transaction('begin');
+
+		$sql = '';
+
+		switch ($mode)
+		{
+			case 'reply':
+			case 'quote':
+				$root_level = ($data['reply_from_root_level']) ? $data['reply_from_root_level'] : $data['reply_from_msg_id'];
+
+				// Set message_replied switch for this user
+				$sql = 'UPDATE ' . PRIVMSGS_TO_TABLE . '
+					SET pm_replied = 1
+					WHERE user_id = ' . $data['from_user_id'] . '
+						AND msg_id = ' . $data['reply_from_msg_id'];
+
+			// no break
+
+			case 'forward':
+			case 'post':
+			case 'quotepost':
+				$sql_data = array(
+					'root_level'		=> $root_level,
+					'author_id'			=> $data['from_user_id'],
+					'icon_id'			=> $data['icon_id'],
+					'author_ip'			=> $data['from_user_ip'],
+					'message_time'		=> $current_time,
+					'enable_bbcode'		=> $data['enable_bbcode'],
+					'enable_smilies'	=> $data['enable_smilies'],
+					'enable_magic_url'	=> $data['enable_urls'],
+					'enable_sig'		=> $data['enable_sig'],
+					'message_subject'	=> $subject,
+					'message_text'		=> $data['message'],
+					'message_attachment'=> (!empty($data['attachment_data'])) ? 1 : 0,
+					'bbcode_bitfield'	=> $data['bbcode_bitfield'],
+					'bbcode_uid'		=> $data['bbcode_uid'],
+					'to_address'		=> implode(':', $to),
+					'bcc_address'		=> implode(':', $bcc)
+				);
+			break;
+
+			case 'edit':
+				$sql_data = array(
+					'icon_id'			=> $data['icon_id'],
+					'message_edit_time'	=> $current_time,
+					'enable_bbcode'		=> $data['enable_bbcode'],
+					'enable_smilies'	=> $data['enable_smilies'],
+					'enable_magic_url'	=> $data['enable_urls'],
+					'enable_sig'		=> $data['enable_sig'],
+					'message_subject'	=> $subject,
+					'message_text'		=> $data['message'],
+					'message_attachment'=> (!empty($data['attachment_data'])) ? 1 : 0,
+					'bbcode_bitfield'	=> $data['bbcode_bitfield'],
+					'bbcode_uid'		=> $data['bbcode_uid']
+				);
+			break;
+		}
+
+		if (sizeof($sql_data))
+		{
+			$query = '';
+
+			if ($mode == 'post' || $mode == 'reply' || $mode == 'quote' || $mode == 'quotepost' || $mode == 'forward')
+			{
+				$db->sql_query('INSERT INTO ' . PRIVMSGS_TABLE . ' ' . $db->sql_build_array('INSERT', $sql_data));
+				$data['msg_id'] = $db->sql_nextid();
+			}
+			else if ($mode == 'edit')
+			{
+				$sql = 'UPDATE ' . PRIVMSGS_TABLE . '
+					SET message_edit_count = message_edit_count + 1, ' . $db->sql_build_array('UPDATE', $sql_data) . '
+					WHERE msg_id = ' . $data['msg_id'];
+				$db->sql_query($sql);
+			}
+		}
+
+		if ($mode != 'edit')
+		{
+			if ($sql)
+			{
+				$db->sql_query($sql);
+			}
+			unset($sql);
+
+			$sql_ary = array();
+			foreach ($recipients as $user_id => $type)
+			{
+				$sql_ary[] = array(
+					'msg_id'		=> (int) $data['msg_id'],
+					'user_id'		=> (int) $user_id,
+					'author_id'		=> (int) $data['from_user_id'],
+					'folder_id'		=> PRIVMSGS_NO_BOX,
+					'pm_new'		=> 1,
+					'pm_unread'		=> 1,
+					'pm_forwarded'	=> ($mode == 'forward') ? 1 : 0
+				);
+			}
+
+			$db->sql_multi_insert(PRIVMSGS_TO_TABLE, $sql_ary);
+
+			$sql = 'UPDATE ' . USERS_TABLE . '
+				SET user_new_privmsg = user_new_privmsg + 1, user_unread_privmsg = user_unread_privmsg + 1, user_last_privmsg = ' . time() . '
+				WHERE ' . $db->sql_in_set('user_id', array_keys($recipients));
+			$db->sql_query($sql);
+
+			// Put PM into outbox
+			if ($put_in_outbox)
+			{
+				$db->sql_query('INSERT INTO ' . PRIVMSGS_TO_TABLE . ' ' . $db->sql_build_array('INSERT', array(
+					'msg_id'		=> (int) $data['msg_id'],
+					'user_id'		=> (int) $data['from_user_id'],
+					'author_id'		=> (int) $data['from_user_id'],
+					'folder_id'		=> PRIVMSGS_OUTBOX,
+					'pm_new'		=> 0,
+					'pm_unread'		=> 0,
+					'pm_forwarded'	=> ($mode == 'forward') ? 1 : 0))
+				);
+			}
+		}
+
+		// Set user last post time
+		if ($mode == 'reply' || $mode == 'quote' || $mode == 'quotepost' || $mode == 'forward' || $mode == 'post')
+		{
+			$sql = 'UPDATE ' . USERS_TABLE . "
+				SET user_lastpost_time = $current_time
+				WHERE user_id = " . $data['from_user_id'];
+			$db->sql_query($sql);
+		}
+
+		// Submit Attachments
+		if (!empty($data['attachment_data']) && $data['msg_id'] && in_array($mode, array('post', 'reply', 'quote', 'quotepost', 'edit', 'forward')))
+		{
+			$space_taken = $files_added = 0;
+			$orphan_rows = array();
+
+			foreach ($data['attachment_data'] as $pos => $attach_row)
+			{
+				$orphan_rows[(int) $attach_row['attach_id']] = array();
+			}
+
+			if (sizeof($orphan_rows))
+			{
+				$sql = 'SELECT attach_id, filesize, physical_filename
+					FROM ' . ATTACHMENTS_TABLE . '
+					WHERE ' . $db->sql_in_set('attach_id', array_keys($orphan_rows)) . '
+						AND in_message = 1
+						AND is_orphan = 1
+						AND poster_id = ' . $user->data['user_id'];
+				$result = $db->sql_query($sql);
+
+				$orphan_rows = array();
+				while ($row = $db->sql_fetchrow($result))
+				{
+					$orphan_rows[$row['attach_id']] = $row;
+				}
+				$db->sql_freeresult($result);
+			}
+
+			foreach ($data['attachment_data'] as $pos => $attach_row)
+			{
+				if ($attach_row['is_orphan'] && !isset($orphan_rows[$attach_row['attach_id']]))
+				{
+					continue;
+				}
+
+				if (!$attach_row['is_orphan'])
+				{
+					// update entry in db if attachment already stored in db and filespace
+					$sql = 'UPDATE ' . ATTACHMENTS_TABLE . "
+						SET attach_comment = '" . $db->sql_escape($attach_row['attach_comment']) . "'
+						WHERE attach_id = " . (int) $attach_row['attach_id'] . '
+							AND is_orphan = 0';
+					$db->sql_query($sql);
+				}
+				else
+				{
+					// insert attachment into db
+					if (!@file_exists($phpbb_root_path . $config['upload_path'] . '/' . basename($orphan_rows[$attach_row['attach_id']]['physical_filename'])))
+					{
+						continue;
+					}
+
+					$space_taken += $orphan_rows[$attach_row['attach_id']]['filesize'];
+					$files_added++;
+
+					$attach_sql = array(
+						'post_msg_id'		=> $data['msg_id'],
+						'topic_id'			=> 0,
+						'is_orphan'			=> 0,
+						'poster_id'			=> $data['from_user_id'],
+						'attach_comment'	=> $attach_row['attach_comment'],
+					);
+
+					$sql = 'UPDATE ' . ATTACHMENTS_TABLE . ' SET ' . $db->sql_build_array('UPDATE', $attach_sql) . '
+						WHERE attach_id = ' . $attach_row['attach_id'] . '
+							AND is_orphan = 1
+							AND poster_id = ' . $user->data['user_id'];
+					$db->sql_query($sql);
+				}
+			}
+
+			if ($space_taken && $files_added)
+			{
+				set_config_count('upload_dir_size', $space_taken, true);
+				set_config_count('num_files', $files_added, true);
+			}
+		}
+
+		// Delete draft if post was loaded...
+		$draft_id = phpBB3::request_var('draft_loaded', 0);
+		if ($draft_id)
+		{
+			$sql = 'DELETE FROM ' . DRAFTS_TABLE . "
+				WHERE draft_id = $draft_id
+					AND user_id = " . $data['from_user_id'];
+			$db->sql_query($sql);
+		}
+
+		$db->sql_transaction('commit');
+
+		// Send Notifications
+		if ($mode != 'edit')
+		{
+			$this->pm_notification($mode, $data['from_username'], $recipients, $subject, $data['message']);
+		}
+
+		return $data['msg_id'];
+	}
+
+	/**
+	* PM Notification
+	*/
+	function pm_notification($mode, $author, $recipients, $subject, $message)
+	{
+		global $db, $lang, $mx_user, $board_config, $phpbb_root_path, $mx_root_path, $phpEx, $phpbb_auth, $page_id;
+
+		$subject = mx_censor_text($subject);
+
+		unset($recipients[ANONYMOUS], $recipients[$mx_user->data['user_id']]);
+
+		if (!sizeof($recipients))
+		{
+			return;
+		}
+
+		// Get banned User ID's
+		$sql = 'SELECT ban_userid
+			FROM ' . BANLIST_TABLE . '
+			WHERE ' . $db->sql_in_set('ban_userid', array_map('intval', array_keys($recipients))) . '
+				AND ban_exclude = 0';
+		$result = $db->sql_query($sql);
+
+		while ($row = $db->sql_fetchrow($result))
+		{
+			unset($recipients[$row['ban_userid']]);
+		}
+		$db->sql_freeresult($result);
+
+		if (!sizeof($recipients))
+		{
+			return;
+		}
+
+		$sql = 'SELECT user_id, username, user_email, user_lang, user_notify_pm, user_notify_type, user_jabber
+			FROM ' . USERS_TABLE . '
+			WHERE ' . $db->sql_in_set('user_id', array_map('intval', array_keys($recipients)));
+		$result = $db->sql_query($sql);
+
+		$msg_list_ary = array();
+		while ($row = $db->sql_fetchrow($result))
+		{
+			if ($row['user_notify_pm'] == 1 && trim($row['user_email']))
+			{
+				$msg_list_ary[] = array(
+					'method'	=> $row['user_notify_type'],
+					'email'		=> $row['user_email'],
+					'jabber'	=> $row['user_jabber'],
+					'name'		=> $row['username'],
+					'lang'		=> $row['user_lang']
+				);
+			}
+		}
+		$db->sql_freeresult($result);
+
+		if (!sizeof($msg_list_ary))
+		{
+			return;
+		}
+
+	    //
+	    // Include and initiate mailer
+	    //
+	    include_once($mx_root_path . 'includes/mx_functions_emailer.'.$phpEx);
+
+		//
+		// Let's do some checking to make sure that mass mail functions
+		// are working in win32 versions of php.
+		//
+		if ( preg_match('/[c-z]:\\\.*/i', getenv('PATH')) && !$board_config['smtp_delivery'])
+		{
+			$ini_val = ( @phpversion() >= '4.0.0' ) ? 'ini_get' : 'get_cfg_var';
+
+			// We are running on windows, force delivery to use our smtp functions
+			// since php's are broken by default
+			$board_config['smtp_delivery'] = 1;
+			$board_config['smtp_host'] = @$ini_val('SMTP');
+		}
+
+		$emailer = new mx_emailer($board_config['smtp_delivery']);
+		
+		foreach ($msg_list_ary as $pos => $addr)
+		{
+			//$emailer->to($addr['email'], $addr['name']);
+			//$emailer->im($addr['jabber'], $addr['name']);
+			
+			$emailer_from = $board_config['board_email'];
+			$emailer_to = $addr['email'];
+			$emailer_skip = ($emailer_to == $emailer_from) ? $emailer_to : false;			
+			
+		    //
+		    // Mail
+		    //
+			$emailer->set_mail_html(true);	
+			$emailer->use_template('privmsg_notify');
+			$emailer->email_skip($emailer_skip);		
+			$emailer->email_address($board_config['board_email']);
+			$emailer->set_subject(htmlspecialchars_decode($subject));
+			$emailer->extra_headers($email_antetes);		
+
+			$emailer->assign_vars(array(
+				'SITENAME' 		=> $board_config['sitename'],
+				'BOARD_EMAIL' 	=> $board_config['board_email'],				
+				'SUBJECT'		=> htmlspecialchars_decode($subject),
+				'MESSAGE' 		=> $message,				
+				'AUTHOR_NAME'	=> htmlspecialchars_decode($author),
+				'USERNAME'		=> htmlspecialchars_decode($addr['name']),
+
+				'U_INBOX'		=> PHPBB_URL . "/ucp.$phpEx?i=pm&folder=inbox")
+			);
+
+			$emailer->send();
+			$emailer->reset();
+		}
+		
+		unset($msg_list_ary);
+		//$emailer->save_queue();
+		unset($emailer);
+		
+		$msg = $lang['Message_sent'] . '<br /><br />' . sprintf($lang['Click_return_inbox'], '<a href="' . mx_append_sid(PHPBB_URL . "/ucp.$phpEx?i=pm&folder=inbox") . '">', '</a> ') . '<br /><br />' . sprintf($lang['Click_return_index'], '<a href="' . mx_append_sid(PORTAL_URL . 'index.' . $phpEx . '?page=' . $page_id) . '">', '</a>');
+
+		mx_message_die(GENERAL_MESSAGE, $msg);		
+		
 	}
 }
 
@@ -2388,36 +3073,39 @@ class module_cache
 
 		return isset( $this->vars[$varname] );
 	}
-
+	
 	/**
 	 * Enter description here...
 	 *
 	 * @param unknown_type $array
 	 * @return unknown
 	 */
-	function format_array( $array )
+	function format_array($array)
 	{
 		$lines = array();
-		foreach ( $array as $k => $v )
+		foreach ($array as $k => $v)
 		{
-			if ( is_array( $v ) )
+			if (is_array( $v ))
 			{
-				$lines[] = "'$k'=>" . $this->format_array( $v );
-			}elseif ( is_int( $v ) )
+				$lines[] = "'$k'=>" . $this->format_array($v);
+			}
+			elseif (is_int($v))
 			{
 				$lines[] = "'$k'=>$v";
-			}elseif ( is_bool( $v ) )
+			}
+			elseif (is_bool($v))
 			{
-				$lines[] = "'$k'=>" . ( ( $v ) ? 'TRUE' : 'FALSE' );
+				$lines[] = "'$k'=>" . (($v) ? 'TRUE' : 'FALSE');
 			}
 			else
 			{
 				$lines[] = "'$k'=>'" . str_replace( "'", "\'", str_replace( '\\', '\\\\', $v ) ) . "'";
 			}
 		}
-		return 'array(' . implode( ',', $lines ) . ')';
-	}
+		return 'array(' . implode(',', $lines) . ')';
+	}	
 }
+
 
 /**
  * Class mx_custom_field.
@@ -2523,7 +3211,7 @@ class mx_custom_field
 	 * @param unknown_type $file_id
 	 * @return unknown
 	 */
-	function add_comment( $file_id )
+	function add_comment($file_id)
 	{
 		global $template;
 		if ( $this->field_data_exist() )
@@ -2560,7 +3248,7 @@ class mx_custom_field
 
 						if ( !( $db->sql_query( $sql ) ) )
 						{
-							mx_message_die( GENERAL_ERROR, 'Could not delete custom data', '', __LINE__, __FILE__, $sql );
+							mx_message_die(GENERAL_ERROR, 'Could not delete custom data', '', __LINE__, __FILE__, $sql);
 						}
 					}
 				}
@@ -3114,7 +3802,8 @@ class phpbb_posts
 	    $post_id = '',
 	    $subject_update_first = '',
 	    $message_update_first = '',
-	    $bbcode_uid = '',
+	    $bbcode_bitfield = 'cA==',
+	    $bbcode_uid = 'cxx4izak',		
 	    $topic_type = POST_NORMAL,
 	    $do_notification = false,
 	    $notify_user = false,
@@ -3124,7 +3813,7 @@ class phpbb_posts
 	    $bbcode_on = 1,
 	    $smilies_on = 1)
 	{
-		global $db, $phpbb_root_path, $phpEx, $board_config, $user_ip, $portal_config, $lang, $userdata, $phpBB2;
+		global $db, $phpbb_root_path, $phpEx, $board_config, $user_ip, $portal_config, $lang, $userdata, $mx_user, $phpbb_auth, $mx_bbcode, $mx_backend;
 
 		//
 		// initialise some variables
@@ -3133,6 +3822,7 @@ class phpbb_posts
 		$poll_title = '';
 		$poll_options = '';
 		$poll_length = '';
+		$url = '';
 
 	    $error_die_function = ($error_die_function == '') ? "mx_message_die" : $error_die_function;
 	    $current_time = ($current_time == 0) ? time() : $current_time;
@@ -3141,34 +3831,63 @@ class phpbb_posts
 	    $subject = addslashes(trim($subject));
 		$subject = substr($subject, 0, 60);
 		$subject = mx_censor_text($subject);
-		
+
 	    $username = addslashes(unprepare_message(trim($user_name)));
-	    $username = $phpBB2->phpbb_clean_username( $username );
+	    $username = phpBB2::phpbb_clean_username($username);
+		
+
+		// Unique ID for this message..
+		$uid = $mx_backend->dss_rand();
+		
+		// BBCode UID length fix
+		@define('BBCODE_UID_LEN', (PORTAL_BACKEND == 'phpbb3') ? 8 : 10);		
+		
+		$uid = substr($uid, 0, BBCODE_UID_LEN);
+	
+		
+		// We do not handle erasing posts here
+		if ($mode == 'delete')
+		{
+			return false;
+		}
+
+		$data = array();
+			
+		$mx_text_formatting = new mx_text_formatting();
+
+		// First of all make sure the subject and topic title are having the correct length.
+		// To achieve this without cutting off between special chars we convert to an array and then count the elements.
+		$data['topic_title'] = $mx_text_formatting->truncate_string($subject);
+		$data['post_id'] = $post_id;		
 
 	    //
 	    // We always require the forum_id
 	    //
-	    if ( empty( $forum_id ) )
+	    if (empty($forum_id))
 	    {
-	    	$error_die_function( GENERAL_ERROR, 'no forum id - be sure to configure this category correctly in the adminCP');
+	    	$error_die_function(GENERAL_ERROR, "no forum id: '$forum_id' - be sure to configure this category correctly in the AdminCP");
 	    }
-
+		
 		//
 		// Validate vars and find correct $mode
 		//
-	    if ( empty( $topic_id ) )
+	    if (empty($topic_id))
 	    {
 		    //
 			// If $topic_id is empty we assume you want a new topic
 			//
 			$mode = 'newtopic';
+			$post_mode = 'post';
+			$update_message = true;			
 	    }
-		else if ( empty($post_id) )
+		else if (empty($post_id))
 		{
 			//
 			// If $post_id is empty we assume you want a 'reply'
 			//
 			$mode = 'reply';
+			$post_mode = 'reply';
+			$update_message = true;			
 
 		}
 		else
@@ -3177,23 +3896,75 @@ class phpbb_posts
 			// So this must be a 'editpost'
 			// but is this first topic post or last post
 			//
-			$sql = "SELECT topic_first_post_id, topic_last_post_id
-		       		FROM " . TOPICS_TABLE . "
-		      		WHERE topic_id = '$topic_id'";
+			$mode = 'editpost';
+			$post_mode = 'edit';
+			
+			// Collect some basic information about which tables and which rows to update/insert
+			$sql_data = $topic_row = array();
+			$poster_id = ($mode == 'editpost') ? $data['poster_id'] : (int) $mx_user->data['user_id'];
 
-			if ( !( $result = $db->sql_query( $sql ) ) )
+			// Retrieve some additional information if not present
+			switch (PORTAL_BACKEND)
 			{
-				mx_message_die( GENERAL_ERROR, "Could not obtain first_post_id data", '', __LINE__, __FILE__, $sql );
-			}
+				case 'internal':
+				case 'smf2':
+				case 'mybb':				
+				break;
 
-			$row_tmp = $db->sql_fetchrow( $result );
-			$first_post_id = $row_tmp['topic_first_post_id'];
-			$last_post_id = $row_tmp['topic_last_post_id'];
+				case 'phpbb2':
+				
+					$sql = "SELECT topic_first_post_id, topic_last_post_id
+			       		FROM " . TOPICS_TABLE . "
+			      		WHERE topic_id = '$topic_id'";
+				break;
+				
+				case 'phpbb3':
+				case 'olympus':
+				case 'ascraeus':
+				case 'rhea':											
+					$sql = 'SELECT p.post_approved, t.topic_first_post_id, t.topic_last_post_id, t.topic_type, t.topic_replies, t.topic_replies_real, t.topic_approved
+						FROM ' . TOPICS_TABLE . ' t, ' . POSTS_TABLE . ' p
+						WHERE t.topic_id = p.topic_id
+							AND p.post_id = ' . $data['post_id'];					
+						
+				break;
+			}
+			
+			if (!($result = $db->sql_query($sql)))
+			{
+				mx_message_die(GENERAL_ERROR, "Could not obtain first_post_id data", '', __LINE__, __FILE__, $sql);
+			}						
+			$topic_row = $db->sql_fetchrow($result);
+			$db->sql_freeresult($result);
+				
+			$first_post_id = $topic_row['topic_first_post_id'];
+			$last_post_id = $topic_row['topic_last_post_id'];
 
 			$is_first_post = ($first_post_id == $post_id) ? true : false;
 			$is_last_post = ($last_post_id == $post_id) ? true : false;
 
-			$mode = 'editpost';
+			switch (PORTAL_BACKEND)
+			{
+				case 'internal':
+				break;
+
+				case 'phpbb2':
+
+					$data['topic_approved'] = (!$phpbb_auth->acl_get('f_noapprove', $forum_id) && !$phpbb_auth->acl_get('m_approve', $forum_id)) ? 0 : 1;
+					$data['post_approved'] = (!$phpbb_auth->acl_get('f_noapprove', $forum_id) && !$phpbb_auth->acl_get('m_approve', $forum_id)) ? 0 : 1;
+				break;
+
+				case 'phpbb3':
+				case 'olympus':
+				case 'ascraeus':
+				case 'rhea':										
+					$data['topic_approved'] = $topic_row['topic_approved'];
+					$data['post_approved'] = $topic_row['post_approved'];
+				break;
+			}			
+	
+			// This variable indicates if the user is able to post or put into the queue - it is used later for all code decisions regarding approval
+			$post_approval = 1;
 		}
 
 		//
@@ -3204,16 +3975,103 @@ class phpbb_posts
 		//
 		// New topic or updated first topic post
 		//
-		if ( $mode == 'newtopic' || ($mode == 'editpost' && $is_first_post) )
+		if ($mode == 'newtopic' || ($mode == 'editpost' && $is_first_post))
 		{
-			//$mode = 'newtopic';
+			if ($mode == 'newtopic')
+			{			
+				switch (PORTAL_BACKEND)
+				{
+					case 'internal':
+					case 'smf2':
+					case 'mybb':					
+					break;
+					
+					case 'phpbb2':
+						//
+						// Inserting new topic
+						//
+						$sql = "INSERT INTO " . TOPICS_TABLE . " (topic_title, topic_poster, topic_time, forum_id, topic_status, topic_type, topic_vote) VALUES ('$subject', " . $user_id . ", $current_time, $forum_id, " . TOPIC_UNLOCKED . ", $topic_type, $topic_vote)";
+						
+						if (!$db->sql_query($sql))
+						{
+							$error_die_function(GENERAL_ERROR, 'Error in posting', '', __LINE__, __FILE__, $sql);
+						}
+						
+						$topic_id = $mode == 'newtopic' ? $db->sql_nextid() : $topic_id;						
+					break;
+					
+					case 'phpbb3':
+					case 'olympus':
+					case 'ascraeus':
+					case 'rhea':				
+						/*
+						if (!function_exists('submit_post'))
+						{
+							include_once($mx_root_path . 'includes/shared/phpbb3/includes/functions_posting.' . $phpEx);
+						}					
+						*/
+						$post_data = array();
+					
+						// Determine some vars
+						if (isset($user_id) && $user_id == ANONYMOUS)
+						{
+							$post_data['username'] = isset($username) ? $username : '';
+						}
 
-			if ( $mode == 'newtopic' )
-			{
-				//
-				// Inserting new topic
-				//
-				$sql = "INSERT INTO " . TOPICS_TABLE . " (topic_title, topic_poster, topic_time, forum_id, topic_status, topic_type, topic_vote) VALUES ('$subject', " . $user_id . ", $current_time, $forum_id, " . TOPIC_UNLOCKED . ", $topic_type, $topic_vote)";
+						$post_data['post_edit_locked']	= (isset($post_data['post_edit_locked'])) ? (int) $post_data['post_edit_locked'] : 0;
+						$post_data['post_subject']		= (in_array($mode, array('quote', 'edit'))) ? $post_data['post_subject'] : ((isset($post_data['topic_title'])) ? $post_data['topic_title'] : '');
+						$post_data['topic_time_limit']	= (isset($post_data['topic_time_limit'])) ? (($post_data['topic_time_limit']) ? (int) $post_data['topic_time_limit'] / 86400 : (int) $post_data['topic_time_limit']) : 0;
+						$post_data['poll_length']		= (!empty($post_data['poll_length'])) ? (int) $post_data['poll_length'] / 86400 : 0;
+						$post_data['poll_start']		= (!empty($post_data['poll_start'])) ? (int) $post_data['poll_start'] : 0;
+						$post_data['icon_id']			= (!isset($post_data['icon_id']) || in_array($mode, array('quote', 'reply'))) ? 0 : (int) $post_data['icon_id'];
+						$post_data['poll_options']		= array();
+					
+						$post_data['post_subject'] = $subject; 
+						$post_data['topic_type'] = $topic_type; 
+						$poll = array();
+						
+						$data = array(
+							'topic_title'			=> (empty($post_data['topic_title'])) ? $post_data['post_subject'] : $post_data['topic_title'],
+							'topic_first_post_id'	=> (isset($post_data['topic_first_post_id'])) ? (int) $post_data['topic_first_post_id'] : 0,
+							'topic_last_post_id'	=> (isset($post_data['topic_last_post_id'])) ? (int) $post_data['topic_last_post_id'] : 0,
+							'topic_time_limit'		=> (int) $post_data['topic_time_limit'],
+							'topic_attachment'		=> (isset($post_data['topic_attachment'])) ? (int) $post_data['topic_attachment'] : 0,
+							'post_id'				=> (int) $post_id,
+							'topic_id'				=> (int) $topic_id,
+							'forum_id'				=> (int) $forum_id,
+							'icon_id'				=> (int) $post_data['icon_id'],
+							'poster_id'				=> (int) $post_data['poster_id'],
+							'enable_sig'			=> (bool) $post_data['enable_sig'],
+							'enable_bbcode'			=> (bool) $post_data['enable_bbcode'],
+							'enable_smilies'		=> (bool) $post_data['enable_smilies'],
+							'enable_urls'			=> (bool) $post_data['enable_urls'],
+							'enable_indexing'		=> (bool) $post_data['enable_indexing'],
+							'message_md5'			=> (string) $message_md5,
+							'post_time'				=> (isset($post_data['post_time'])) ? (int) $post_data['post_time'] : $current_time,
+							'post_checksum'			=> (isset($post_data['post_checksum'])) ? (string) $post_data['post_checksum'] : md5($message),
+							'post_edit_reason'		=> $post_data['post_edit_reason'],
+							'post_edit_user'		=> ($mode == 'edit') ? $user->data['user_id'] : ((isset($post_data['post_edit_user'])) ? (int) $post_data['post_edit_user'] : 0),
+							'forum_parents'			=> $post_data['forum_parents'],
+							'forum_name'			=> $post_data['forum_name'],
+							'notify'				=> $notify,
+							'notify_set'			=> $post_data['notify_set'],
+							'poster_ip'				=> (isset($post_data['poster_ip'])) ? $post_data['poster_ip'] : $mx_user->ip,
+							'post_edit_locked'		=> (int) $post_data['post_edit_locked'],
+							'message'				=> $mx_bbcode->bbcode_nl2br($message),
+							'bbcode_bitfield'		=> $bbcode_bitfield,
+							'bbcode_uid'			=> $bbcode_uid,
+							'message'				=> $message,
+							'attachment_data'		=> (!empty($attachment_data)) ? 1 : 0,
+							'filename_data'			=> $filename_data,
+							'topic_approved'		=> (isset($post_data['topic_approved'])) ? $post_data['topic_approved'] : false,
+							'post_approved'			=> (isset($post_data['post_approved'])) ? $post_data['post_approved'] : false,
+						); 
+						
+						$update_message = false;
+									
+						$topic_id = $this->submit_phpbb_post($post_mode, $post_data['post_subject'], $post_data['username'], $post_data['topic_type'], $poll, $data, $update_message);						
+					break;
+				}
 			}
 			else
 			{
@@ -3221,14 +4079,15 @@ class phpbb_posts
 				// Updating topic
 				//
 				$sql = "UPDATE " . TOPICS_TABLE . " SET topic_title = '$subject', topic_type = $topic_type WHERE topic_id = $topic_id";
-			}
-
-			if ( !$db->sql_query( $sql ) )
-			{
-				$error_die_function( GENERAL_ERROR, 'Error in posting', '', __LINE__, __FILE__, $sql );
-			}
-
-			$topic_id = $mode == 'newtopic' ? $db->sql_nextid() : $topic_id;
+				
+				if (!$db->sql_query($sql))
+				{
+					$error_die_function(GENERAL_ERROR, 'Error in posting', '', __LINE__, __FILE__, $sql);
+				}
+				
+				$topic_id = $mode == 'newtopic' ? $db->sql_nextid() : $topic_id;
+			}			
+			
 		}
 
 		//
@@ -3244,36 +4103,114 @@ class phpbb_posts
 		//
 		if ( $mode == 'newtopic' || $mode == 'reply' )
 		{
-			$sql = "INSERT INTO " . POSTS_TABLE . " (topic_id, forum_id, poster_id, post_username, post_time, poster_ip, enable_bbcode, enable_html, enable_smilies, enable_sig) VALUES ($topic_id, $forum_id, " . $user_id . ", '$username', $current_time, '$user_ip', $bbcode_on, $html_on, $smilies_on, $user_attach_sig)";
+			$update_message = true;
+		
+			switch (PORTAL_BACKEND)
+			{
+				case 'internal':
+				case 'smf2':
+				case 'mybb':				
+				break;
+				
+				case 'phpbb2':
+					$sql = "INSERT INTO " . POSTS_TABLE . " (topic_id, forum_id, poster_id, post_username, post_time, poster_ip, enable_bbcode, enable_html, enable_smilies, enable_sig) VALUES ($topic_id, $forum_id, " . $user_id . ", '$username', $current_time, '$user_ip', $bbcode_on, $html_on, $smilies_on, $user_attach_sig)";
+
+					if (!$db->sql_query($sql))
+					{
+						$error_die_function(GENERAL_ERROR, 'Error in posting', '', __LINE__, __FILE__, $sql);
+					}					
+				break;
+
+				case 'phpbb3':
+				case 'olympus':
+				case 'ascraeus':
+				case 'rhea':				
+				/*				
+					$sql_data = array(
+						'post_id'			=> (int) $post_id,
+						'topic_id'			=> (int) $topic_id,
+						'forum_id'			=> (int) $forum_id,
+						'poster_id'			=> (int) $mx_user->data['user_id'],
+						'icon_id'			=> (!empty($icon_id)) ? $icon_id : 0,
+						'poster_ip'			=> $mx_user->ip,
+						'post_time'			=> $current_time,
+						'post_approved'		=> (!$phpbb_auth->acl_get('f_noapprove', $forum_id) && !$phpbb_auth->acl_get('m_approve', $forum_id)) ? 0 : 1,
+						'enable_bbcode'		=> !empty($bbcode_on) ? $bbcode_on : 0,
+						'enable_smilies'	=> !empty($smilies_on) ? $smilies_on : 0,
+						'enable_magic_url'	=> !empty($bbcode_on) ? $bbcode_on : 0,
+						'enable_sig'		=> $user_attach_sig,
+						'post_username'		=> $username,
+						'post_subject'		=> $subject,
+						'post_text'			=> $mx_bbcode->bbcode_nl2br($message),
+						'post_checksum'		=> md5($message),
+						'post_attachment'	=> (!empty($attachment_data)) ? 1 : 0,
+						'bbcode_bitfield'	=> $bbcode_bitfield,
+						'bbcode_uid'		=> $bbcode_uid,
+						'post_postcount'	=> ($phpbb_auth->acl_get('f_postcount', $forum_id)) ? 1 : 0,
+						'post_edit_locked'	=> !empty($post_edit_locked) ? $post_edit_locked : 0
+					);
+
+					$sql = "INSERT INTO " . POSTS_TABLE . $db->sql_build_array('INSERT', $sql_data);
+					
+					if (!$db->sql_query($sql))
+					{
+						$error_die_function(GENERAL_ERROR, 'Error in posting', '', __LINE__, __FILE__, $sql);
+					}					
+					
+				*/
+				break;
+			}
+
 		}
 		else
 		{
 			$edited_sql = !$is_last_post ? ", post_edit_time = $current_time, post_edit_count = post_edit_count + 1 " : "";
-			$sql = "UPDATE " . POSTS_TABLE . " SET post_username = '$username', enable_bbcode = $bbcode_on, enable_html = $html_on, enable_smilies = $smilies_on, enable_sig = $user_attach_sig" . $edited_sql . " WHERE post_id = $post_id";
-		}
 
-		if ( !$db->sql_query( $sql ) )
-		{
-			$error_die_function( GENERAL_ERROR, 'Error in posting', '', __LINE__, __FILE__, $sql );
+			$sql = "UPDATE " . POSTS_TABLE . "
+				SET post_username = '$username', enable_bbcode = $bbcode_on, enable_smilies = $smilies_on, enable_sig = $user_attach_sig" . $edited_sql . "
+				WHERE post_id = $post_id"; //Temp fix - removed html_on
+				
+			if (!$db->sql_query($sql))
+			{
+				$error_die_function(GENERAL_ERROR, 'Error in posting', '', __LINE__, __FILE__, $sql);
+			}				
 		}
-
+		
 		$post_id = $mode == 'newtopic' || $mode == 'reply' ? $db->sql_nextid() : $post_id;
 
 		//
 		// insert the actual post text for our new post
 		//
-		if ( $mode == 'newtopic' || $mode == 'reply' )
+		switch (PORTAL_BACKEND)
 		{
-			$sql = "INSERT INTO " . POSTS_TEXT_TABLE . " (post_id, post_subject, bbcode_uid, post_text) VALUES ($post_id, '$subject', '$bbcode_uid', '$message')";
-		}
-		else
-		{
-			$sql = "UPDATE " . POSTS_TEXT_TABLE . " SET post_text = '$message',  bbcode_uid = '$bbcode_uid', post_subject = '$subject' WHERE post_id = $post_id";
-		}
+			case 'internal':
+			case 'smf2':
+			case 'mybb':			
+			break;
 
-		if ( !$db->sql_query( $sql ) )
-		{
-			$error_die_function( GENERAL_ERROR, 'Error in posting', '', __LINE__, __FILE__, $sql );
+			case 'phpbb2':
+				if ( $mode == 'newtopic' || $mode == 'reply' )
+				{
+					$sql = "INSERT INTO " . POSTS_TEXT_TABLE . " (post_id, post_subject, bbcode_uid, post_text) VALUES ($post_id, '$subject', '$bbcode_uid', '$message')";
+				}
+				else
+				{
+					$sql = "UPDATE " . POSTS_TEXT_TABLE . " SET post_text = '$message',  bbcode_uid = '$bbcode_uid', post_subject = '$subject' WHERE post_id = $post_id";
+				}
+
+				if ( !$db->sql_query( $sql ) )
+				{
+					$error_die_function( GENERAL_ERROR, 'Error in posting', '', __LINE__, __FILE__, $sql );
+				}
+
+			break;
+
+			case 'phpbb3':
+			case 'olympus':
+			case 'ascraeus':
+			case 'rhea':			
+				//$topic_id = $this->submit_phpbb_post($post_mode, $post_data['post_subject'], $post_data['username'], $post_data['topic_type'], $poll, $data, $update_message);
+			break;
 		}
 
 		//
@@ -3322,7 +4259,25 @@ class phpbb_posts
 		//
 		// add the search words for our new/edited post
 		//
-		add_search_words('single', $post_id, stripslashes($message), stripslashes($subject));
+		switch (PORTAL_BACKEND)
+		{
+			case 'internal':
+			case 'smf2':
+			case 'mybb':			
+			break;
+
+			case 'phpbb2':
+				phpBB2::add_search_words('single', $post_id, stripslashes($message), stripslashes($subject));
+
+			break;
+			
+			case 'phpbb3':
+			case 'olympus':
+			case 'ascraeus':
+			case 'rhea':			
+				//To do
+			break;
+		}
 
 		//
 		// update first topic post
@@ -3368,11 +4323,26 @@ class phpbb_posts
 			{
 				mx_message_die( GENERAL_ERROR, 'Error in posting', '', __LINE__, __FILE__, $sql );
 			}
-
-			//
+			
 			// Add search words
-			//
-			add_search_words('single', $first_post_id, stripslashes($message_update_first), stripslashes($subject_update_first));
+			switch (PORTAL_BACKEND)
+			{
+				case 'internal':
+				case 'smf2':
+				case 'mybb':				
+				break;
+
+				case 'phpbb2':
+					phpBB2::add_search_words('single', $first_post_id, stripslashes($message_update_first), stripslashes($subject_update_first));
+
+				break;
+				case 'phpbb3':
+				case 'olympus':
+				case 'ascraeus':
+				case 'rhea':				
+					//To do
+				break;
+			}
 		}
 
 		//
@@ -3389,7 +4359,903 @@ class phpbb_posts
 		//
 		return array( 'post_id' => $post_id, 'topic_id' => $topic_id, 'notify' => $message_tmp );
 	}
+	
+	/**
+	* Submit Post
+	*/
+	function submit_phpbb_post($mode, $subject, $mx_username, $topic_type, &$poll, &$data, $update_message = true)
+	{
+		global $db, $phpbb_auth, $mx_user, $config, $phpEx, $template, $phpbb_root_path;
 
+		// We do not handle erasing posts here
+		if ($mode == 'delete')
+		{
+			return false;
+		}
+		
+		$mx_text_formatting = new mx_text_formatting();
+
+		$current_time = time();
+
+		if ($mode == 'post')
+		{
+			$post_mode = 'post';
+			$update_message = true;
+		}
+		else if ($mode != 'edit')
+		{
+			$post_mode = 'reply';
+			$update_message = true;
+		}
+		else if ($mode == 'edit')
+		{
+			$post_mode = ($data['topic_replies_real'] == 0) ? 'edit_topic' : (($data['topic_first_post_id'] == $data['post_id']) ? 'edit_first_post' : (($data['topic_last_post_id'] == $data['post_id']) ? 'edit_last_post' : 'edit'));
+		}
+		
+		// First of all make sure the subject and topic title are having the correct length.
+		// To achieve this without cutting off between special chars we convert to an array and then count the elements.
+		$subject = $mx_text_formatting->truncate_string($subject);
+		$data['topic_title'] = $mx_text_formatting->truncate_string($data['topic_title']);
+
+		// Collect some basic information about which tables and which rows to update/insert
+		$sql_data = $topic_row = array();
+		$poster_id = ($mode == 'edit') ? $data['poster_id'] : (int) $mx_user->data['user_id'];
+
+		// Retrieve some additional information if not present
+		if ($mode == 'edit' && (!isset($data['post_approved']) || !isset($data['topic_approved']) || $data['post_approved'] === false || $data['topic_approved'] === false))
+		{
+			$sql = 'SELECT p.post_approved, t.topic_type, t.topic_replies, t.topic_replies_real, t.topic_approved
+				FROM ' . TOPICS_TABLE . ' t, ' . POSTS_TABLE . ' p
+				WHERE t.topic_id = p.topic_id
+					AND p.post_id = ' . $data['post_id'];
+			$result = $db->sql_query($sql);
+			$topic_row = $db->sql_fetchrow($result);
+			$db->sql_freeresult($result);
+
+			$data['topic_approved'] = $topic_row['topic_approved'];
+			$data['post_approved'] = $topic_row['post_approved'];
+		}
+
+		// Start the transaction here
+		$db->sql_transaction('begin');
+
+
+		// Collect Information
+		switch ($post_mode)
+		{
+			case 'post':
+			case 'reply':
+				$sql_data[POSTS_TABLE]['sql'] = array(
+					'forum_id'			=> ($topic_type == POST_GLOBAL) ? 0 : $data['forum_id'],
+					'poster_id'			=> (int) $mx_user->data['user_id'],
+					'icon_id'			=> $data['icon_id'],
+					'poster_ip'			=> $mx_user->ip,
+					'post_time'			=> $current_time,
+					'post_approved'		=> (!$phpbb_auth->acl_get('f_noapprove', $data['forum_id']) && !$phpbb_auth->acl_get('m_approve', $data['forum_id'])) ? 0 : 1,
+					'enable_bbcode'		=> $data['enable_bbcode'],
+					'enable_smilies'	=> $data['enable_smilies'],
+					'enable_magic_url'	=> $data['enable_urls'],
+					'enable_sig'		=> $data['enable_sig'],
+					'post_username'		=> (!$mx_user->data['is_registered']) ? $mx_username : '',
+					'post_subject'		=> $subject,
+					'post_text'			=> $data['message'],
+					'post_checksum'		=> $data['message_md5'],
+					'post_attachment'	=> (!empty($data['attachment_data'])) ? 1 : 0,
+					'bbcode_bitfield'	=> $data['bbcode_bitfield'],
+					'bbcode_uid'		=> $data['bbcode_uid'],
+					'post_postcount'	=> ($phpbb_auth->acl_get('f_postcount', $data['forum_id'])) ? 1 : 0,
+					'post_edit_locked'	=> $data['post_edit_locked']
+				);
+			break;
+
+			case 'edit_first_post':
+			case 'edit':
+
+			case 'edit_last_post':
+			case 'edit_topic':
+
+				// If edit reason is given always display edit info
+
+				// If editing last post then display no edit info
+				// If m_edit permission then display no edit info
+				// If normal edit display edit info
+
+				// Display edit info if edit reason given or user is editing his post, which is not the last within the topic.
+				if ($data['post_edit_reason'] || (!$phpbb_auth->acl_get('m_edit', $data['forum_id']) && ($post_mode == 'edit' || $post_mode == 'edit_first_post')))
+				{
+					$sql_data[POSTS_TABLE]['sql'] = array(
+						'post_edit_time'	=> $current_time,
+						'post_edit_reason'	=> $data['post_edit_reason'],
+						'post_edit_user'	=> (int) $data['post_edit_user'],
+					);
+
+					$sql_data[POSTS_TABLE]['stat'][] = 'post_edit_count = post_edit_count + 1';
+				}
+
+				// If the person editing this post is different to the one having posted then we will add a log entry stating the edit
+				// Could be simplified by only adding to the log if the edit is not tracked - but this may confuse admins/mods
+				if ($mx_user->data['user_id'] != $poster_id)
+				{
+					$log_subject = ($subject) ? $subject : $data['topic_title'];
+					add_log('mod', $data['forum_id'], $data['topic_id'], 'LOG_POST_EDITED', $log_subject, (!empty($mx_username)) ? $mx_username : $mx_user->lang['GUEST']);
+				}
+
+				if (!isset($sql_data[POSTS_TABLE]['sql']))
+				{
+					$sql_data[POSTS_TABLE]['sql'] = array();
+				}
+
+				$sql_data[POSTS_TABLE]['sql'] = array_merge($sql_data[POSTS_TABLE]['sql'], array(
+					'forum_id'			=> ($topic_type == POST_GLOBAL) ? 0 : $data['forum_id'],
+					'poster_id'			=> $data['poster_id'],
+					'icon_id'			=> $data['icon_id'],
+					'post_approved'		=> (!$phpbb_auth->acl_get('f_noapprove', $data['forum_id']) && !$phpbb_auth->acl_get('m_approve', $data['forum_id'])) ? 0 : $data['post_approved'],
+					'enable_bbcode'		=> $data['enable_bbcode'],
+					'enable_smilies'	=> $data['enable_smilies'],
+					'enable_magic_url'	=> $data['enable_urls'],
+					'enable_sig'		=> $data['enable_sig'],
+					'post_username'		=> ($mx_username && $data['poster_id'] == ANONYMOUS) ? $mx_username : '',
+					'post_subject'		=> $subject,
+					'post_checksum'		=> $data['message_md5'],
+					'post_attachment'	=> (!empty($data['attachment_data'])) ? 1 : 0,
+					'bbcode_bitfield'	=> $data['bbcode_bitfield'],
+					'bbcode_uid'		=> $data['bbcode_uid'],
+					'post_edit_locked'	=> $data['post_edit_locked'])
+				);
+
+				if ($update_message)
+				{
+					$sql_data[POSTS_TABLE]['sql']['post_text'] = $data['message'];
+				}
+
+			break;
+		}
+
+		$post_approved = $sql_data[POSTS_TABLE]['sql']['post_approved'];
+		$topic_row = array();
+
+		// And the topic ladies and gentlemen
+		switch ($post_mode)
+		{
+			case 'post':
+				$sql_data[TOPICS_TABLE]['sql'] = array(
+					'topic_poster'				=> (int) $mx_user->data['user_id'],
+					'topic_time'				=> $current_time,
+					'forum_id'					=> ($topic_type == POST_GLOBAL) ? 0 : $data['forum_id'],
+					'icon_id'					=> $data['icon_id'],
+					'topic_approved'			=> (!$phpbb_auth->acl_get('f_noapprove', $data['forum_id']) && !$phpbb_auth->acl_get('m_approve', $data['forum_id'])) ? 0 : 1,
+					'topic_title'				=> $subject,
+					'topic_first_poster_name'	=> (!$mx_user->data['is_registered'] && $mx_username) ? $mx_username : (($mx_user->data['user_id'] != ANONYMOUS) ? $mx_user->data['username'] : ''),
+					'topic_first_poster_colour'	=> $mx_user->data['user_colour'],
+					'topic_type'				=> $topic_type,
+					'topic_time_limit'			=> ($topic_type == POST_STICKY || $topic_type == POST_ANNOUNCE) ? ($data['topic_time_limit'] * 86400) : 0,
+					'topic_attachment'			=> (!empty($data['attachment_data'])) ? 1 : 0,
+				);
+
+				if (isset($poll['poll_options']) && !empty($poll['poll_options']))
+				{
+					$sql_data[TOPICS_TABLE]['sql'] = array_merge($sql_data[TOPICS_TABLE]['sql'], array(
+						'poll_title'		=> $poll['poll_title'],
+						'poll_start'		=> ($poll['poll_start']) ? $poll['poll_start'] : $current_time,
+						'poll_max_options'	=> $poll['poll_max_options'],
+						'poll_length'		=> ($poll['poll_length'] * 86400),
+						'poll_vote_change'	=> $poll['poll_vote_change'])
+					);
+				}
+
+				$sql_data[USERS_TABLE]['stat'][] = "user_lastpost_time = $current_time" . (($phpbb_auth->acl_get('f_postcount', $data['forum_id'])) ? ', user_posts = user_posts + 1' : '');
+
+				if ($topic_type != POST_GLOBAL)
+				{
+					if ($phpbb_auth->acl_get('f_noapprove', $data['forum_id']) || $phpbb_auth->acl_get('m_approve', $data['forum_id']))
+					{
+						$sql_data[FORUMS_TABLE]['stat'][] = 'forum_posts = forum_posts + 1';
+					}
+					$sql_data[FORUMS_TABLE]['stat'][] = 'forum_topics_real = forum_topics_real + 1' . (($phpbb_auth->acl_get('f_noapprove', $data['forum_id']) || $phpbb_auth->acl_get('m_approve', $data['forum_id'])) ? ', forum_topics = forum_topics + 1' : '');
+				}
+			break;
+
+			case 'reply':
+				$sql_data[TOPICS_TABLE]['stat'][] = 'topic_replies_real = topic_replies_real + 1, topic_bumped = 0, topic_bumper = 0' . (($phpbb_auth->acl_get('f_noapprove', $data['forum_id']) || $phpbb_auth->acl_get('m_approve', $data['forum_id'])) ? ', topic_replies = topic_replies + 1' : '') . ((!empty($data['attachment_data']) || (isset($data['topic_attachment']) && $data['topic_attachment'])) ? ', topic_attachment = 1' : '');
+
+				$sql_data[USERS_TABLE]['stat'][] = "user_lastpost_time = $current_time" . (($phpbb_auth->acl_get('f_postcount', $data['forum_id'])) ? ', user_posts = user_posts + 1' : '');
+
+				if (($phpbb_auth->acl_get('f_noapprove', $data['forum_id']) || $phpbb_auth->acl_get('m_approve', $data['forum_id'])) && $topic_type != POST_GLOBAL)
+				{
+					$sql_data[FORUMS_TABLE]['stat'][] = 'forum_posts = forum_posts + 1';
+				}
+			break;
+
+			case 'edit_topic':
+			case 'edit_first_post':
+
+				$sql_data[TOPICS_TABLE]['sql'] = array(
+					'forum_id'					=> ($topic_type == POST_GLOBAL) ? 0 : $data['forum_id'],
+					'icon_id'					=> $data['icon_id'],
+					'topic_approved'			=> (!$phpbb_auth->acl_get('f_noapprove', $data['forum_id']) && !$phpbb_auth->acl_get('m_approve', $data['forum_id'])) ? 0 : $data['topic_approved'],
+					'topic_title'				=> $subject,
+					'topic_first_poster_name'	=> $mx_username,
+					'topic_type'				=> $topic_type,
+					'topic_time_limit'			=> ($topic_type == POST_STICKY || $topic_type == POST_ANNOUNCE) ? ($data['topic_time_limit'] * 86400) : 0,
+					'poll_title'				=> (isset($poll['poll_options'])) ? $poll['poll_title'] : '',
+					'poll_start'				=> (isset($poll['poll_options'])) ? (($poll['poll_start']) ? $poll['poll_start'] : $current_time) : 0,
+					'poll_max_options'			=> (isset($poll['poll_options'])) ? $poll['poll_max_options'] : 1,
+					'poll_length'				=> (isset($poll['poll_options'])) ? ($poll['poll_length'] * 86400) : 0,
+					'poll_vote_change'			=> (isset($poll['poll_vote_change'])) ? $poll['poll_vote_change'] : 0,
+
+					'topic_attachment'			=> (!empty($data['attachment_data'])) ? 1 : (isset($data['topic_attachment']) ? $data['topic_attachment'] : 0),
+				);
+
+				// Correctly set back the topic replies and forum posts... only if the topic was approved before and now gets disapproved
+				if (!$phpbb_auth->acl_get('f_noapprove', $data['forum_id']) && !$phpbb_auth->acl_get('m_approve', $data['forum_id']) && $data['topic_approved'])
+				{
+					// Do we need to grab some topic informations?
+					if (!sizeof($topic_row))
+					{
+						$sql = 'SELECT topic_type, topic_replies, topic_replies_real, topic_approved
+							FROM ' . TOPICS_TABLE . '
+							WHERE topic_id = ' . $data['topic_id'];
+						$result = $db->sql_query($sql);
+						$topic_row = $db->sql_fetchrow($result);
+						$db->sql_freeresult($result);
+					}
+
+					// If this is the only post remaining we do not need to decrement topic_replies.
+					// Also do not decrement if first post - then the topic_replies will not be adjusted if approving the topic again.
+
+					// If this is an edited topic or the first post the topic gets completely disapproved later on...
+					$sql_data[FORUMS_TABLE]['stat'][] = 'forum_topics = forum_topics - 1';
+					$sql_data[FORUMS_TABLE]['stat'][] = 'forum_posts = forum_posts - ' . ($topic_row['topic_replies'] + 1);
+
+					set_config('num_topics', $config['num_topics'] - 1, true);
+					set_config('num_posts', $config['num_posts'] - ($topic_row['topic_replies'] + 1), true);
+				}
+
+			break;
+
+			case 'edit':
+			case 'edit_last_post':
+
+				// Correctly set back the topic replies and forum posts... but only if the post was approved before.
+				if (!$phpbb_auth->acl_get('f_noapprove', $data['forum_id']) && !$phpbb_auth->acl_get('m_approve', $data['forum_id']) && $data['post_approved'])
+				{
+					$sql_data[TOPICS_TABLE]['stat'][] = 'topic_replies = topic_replies - 1';
+					$sql_data[FORUMS_TABLE]['stat'][] = 'forum_posts = forum_posts - 1';
+
+					set_config('num_posts', $config['num_posts'] - 1, true);
+				}
+
+			break;
+		}
+
+		// Submit new topic
+		if ($post_mode == 'post')
+		{
+			$sql = 'INSERT INTO ' . TOPICS_TABLE . ' ' .
+				$db->sql_build_array('INSERT', $sql_data[TOPICS_TABLE]['sql']);
+			$db->sql_query($sql);
+
+			$data['topic_id'] = $db->sql_nextid();
+
+			$sql_data[POSTS_TABLE]['sql'] = array_merge($sql_data[POSTS_TABLE]['sql'], array(
+				'topic_id' => $data['topic_id'])
+			);
+			unset($sql_data[TOPICS_TABLE]['sql']);
+		}
+
+		// Submit new post
+		if ($post_mode == 'post' || $post_mode == 'reply')
+		{
+			if ($post_mode == 'reply')
+			{
+				$sql_data[POSTS_TABLE]['sql'] = array_merge($sql_data[POSTS_TABLE]['sql'], array(
+					'topic_id' => $data['topic_id'])
+				);
+			}
+
+			$sql = 'INSERT INTO ' . POSTS_TABLE . ' ' . $db->sql_build_array('INSERT', $sql_data[POSTS_TABLE]['sql']);
+			$db->sql_query($sql);
+			$data['post_id'] = $db->sql_nextid();
+
+			if ($post_mode == 'post')
+			{
+				$sql_data[TOPICS_TABLE]['sql'] = array(
+					'topic_first_post_id'		=> $data['post_id'],
+					'topic_last_post_id'		=> $data['post_id'],
+					'topic_last_post_time'		=> $current_time,
+					'topic_last_poster_id'		=> (int) $mx_user->data['user_id'],
+					'topic_last_poster_name'	=> (!$mx_user->data['is_registered'] && $mx_username) ? $mx_username : (($mx_user->data['user_id'] != ANONYMOUS) ? $mx_user->data['username'] : ''),
+					'topic_last_poster_colour'	=> $mx_user->data['user_colour'],
+				);
+			}
+
+			unset($sql_data[POSTS_TABLE]['sql']);
+		}
+
+		$make_global = false;
+
+		// Are we globalising or unglobalising?
+		if ($post_mode == 'edit_first_post' || $post_mode == 'edit_topic')
+		{
+			if (!sizeof($topic_row))
+			{
+				$sql = 'SELECT topic_type, topic_replies, topic_replies_real, topic_approved, topic_last_post_id
+					FROM ' . TOPICS_TABLE . '
+					WHERE topic_id = ' . $data['topic_id'];
+				$result = $db->sql_query($sql);
+				$topic_row = $db->sql_fetchrow($result);
+				$db->sql_freeresult($result);
+			}
+
+			// globalise/unglobalise?
+			if (($topic_row['topic_type'] != POST_GLOBAL && $topic_type == POST_GLOBAL) || ($topic_row['topic_type'] == POST_GLOBAL && $topic_type != POST_GLOBAL))
+			{
+				if (!empty($sql_data[FORUMS_TABLE]['stat']) && implode('', $sql_data[FORUMS_TABLE]['stat']))
+				{
+					$db->sql_query('UPDATE ' . FORUMS_TABLE . ' SET ' . implode(', ', $sql_data[FORUMS_TABLE]['stat']) . ' WHERE forum_id = ' . $data['forum_id']);
+				}
+
+				$make_global = true;
+				$sql_data[FORUMS_TABLE]['stat'] = array();
+			}
+
+			// globalise
+			if ($topic_row['topic_type'] != POST_GLOBAL && $topic_type == POST_GLOBAL)
+			{
+				// Decrement topic/post count
+				$sql_data[FORUMS_TABLE]['stat'][] = 'forum_posts = forum_posts - ' . ($topic_row['topic_replies_real'] + 1);
+				$sql_data[FORUMS_TABLE]['stat'][] = 'forum_topics_real = forum_topics_real - 1' . (($topic_row['topic_approved']) ? ', forum_topics = forum_topics - 1' : '');
+
+				// Update forum_ids for all posts
+				$sql = 'UPDATE ' . POSTS_TABLE . '
+					SET forum_id = 0
+					WHERE topic_id = ' . $data['topic_id'];
+				$db->sql_query($sql);
+			}
+			// unglobalise
+			else if ($topic_row['topic_type'] == POST_GLOBAL && $topic_type != POST_GLOBAL)
+			{
+				// Increment topic/post count
+				$sql_data[FORUMS_TABLE]['stat'][] = 'forum_posts = forum_posts + ' . ($topic_row['topic_replies_real'] + 1);
+				$sql_data[FORUMS_TABLE]['stat'][] = 'forum_topics_real = forum_topics_real + 1' . (($topic_row['topic_approved']) ? ', forum_topics = forum_topics + 1' : '');
+
+				// Update forum_ids for all posts
+				$sql = 'UPDATE ' . POSTS_TABLE . '
+					SET forum_id = ' . $data['forum_id'] . '
+					WHERE topic_id = ' . $data['topic_id'];
+				$db->sql_query($sql);
+			}
+		}
+
+		// Update the topics table
+		if (isset($sql_data[TOPICS_TABLE]['sql']))
+		{
+			$sql = 'UPDATE ' . TOPICS_TABLE . '
+				SET ' . $db->sql_build_array('UPDATE', $sql_data[TOPICS_TABLE]['sql']) . '
+				WHERE topic_id = ' . $data['topic_id'];
+			$db->sql_query($sql);
+		}
+
+		// Update the posts table
+		if (isset($sql_data[POSTS_TABLE]['sql']))
+		{
+			$sql = 'UPDATE ' . POSTS_TABLE . '
+				SET ' . $db->sql_build_array('UPDATE', $sql_data[POSTS_TABLE]['sql']) . '
+				WHERE post_id = ' . $data['post_id'];
+			$db->sql_query($sql);
+		}
+
+		// Update Poll Tables
+		if (isset($poll['poll_options']) && !empty($poll['poll_options']))
+		{
+			$cur_poll_options = array();
+
+			if ($poll['poll_start'] && $mode == 'edit')
+			{
+				$sql = 'SELECT *
+					FROM ' . POLL_OPTIONS_TABLE . '
+					WHERE topic_id = ' . $data['topic_id'] . '
+					ORDER BY poll_option_id';
+				$result = $db->sql_query($sql);
+
+				$cur_poll_options = array();
+				while ($row = $db->sql_fetchrow($result))
+				{
+					$cur_poll_options[] = $row;
+				}
+				$db->sql_freeresult($result);
+			}
+
+			$sql_insert_ary = array();
+			for ($i = 0, $size = sizeof($poll['poll_options']); $i < $size; $i++)
+			{
+				if (trim($poll['poll_options'][$i]))
+				{
+					if (empty($cur_poll_options[$i]))
+					{
+						// If we add options we need to put them to the end to be able to preserve votes...
+						$sql_insert_ary[] = array(
+							'poll_option_id'	=> (int) sizeof($cur_poll_options) + 1 + sizeof($sql_insert_ary),
+							'topic_id'			=> (int) $data['topic_id'],
+							'poll_option_text'	=> (string) $poll['poll_options'][$i]
+						);
+					}
+					else if ($poll['poll_options'][$i] != $cur_poll_options[$i])
+					{
+						$sql = 'UPDATE ' . POLL_OPTIONS_TABLE . "
+							SET poll_option_text = '" . $db->sql_escape($poll['poll_options'][$i]) . "'
+							WHERE poll_option_id = " . $cur_poll_options[$i]['poll_option_id'] . '
+								AND topic_id = ' . $data['topic_id'];
+						$db->sql_query($sql);
+					}
+				}
+			}
+
+			$db->sql_multi_insert(POLL_OPTIONS_TABLE, $sql_insert_ary);
+
+			if (sizeof($poll['poll_options']) < sizeof($cur_poll_options))
+			{
+				$sql = 'DELETE FROM ' . POLL_OPTIONS_TABLE . '
+					WHERE poll_option_id >= ' . sizeof($poll['poll_options']) . '
+						AND topic_id = ' . $data['topic_id'];
+				$db->sql_query($sql);
+			}
+
+			// If edited, we would need to reset votes (since options can be re-ordered above, you can't be sure if the change is for changing the text or adding an option
+			if ($mode == 'edit' && sizeof($poll['poll_options']) != sizeof($cur_poll_options))
+			{
+				$db->sql_query('DELETE FROM ' . POLL_VOTES_TABLE . ' WHERE topic_id = ' . $data['topic_id']);
+				$db->sql_query('UPDATE ' . POLL_OPTIONS_TABLE . ' SET poll_option_total = 0 WHERE topic_id = ' . $data['topic_id']);
+			}
+		}
+
+		// Submit Attachments
+		if (!empty($data['attachment_data']) && $data['post_id'] && in_array($mode, array('post', 'reply', 'quote', 'edit')))
+		{
+			$space_taken = $files_added = 0;
+			$orphan_rows = array();
+
+			foreach ($data['attachment_data'] as $pos => $attach_row)
+			{
+				$orphan_rows[(int) $attach_row['attach_id']] = array();
+			}
+
+			if (sizeof($orphan_rows))
+			{
+				$sql = 'SELECT attach_id, filesize, physical_filename
+					FROM ' . ATTACHMENTS_TABLE . '
+					WHERE ' . $db->sql_in_set('attach_id', array_keys($orphan_rows)) . '
+						AND is_orphan = 1
+						AND poster_id = ' . $mx_user->data['user_id'];
+				$result = $db->sql_query($sql);
+
+				$orphan_rows = array();
+				while ($row = $db->sql_fetchrow($result))
+				{
+					$orphan_rows[$row['attach_id']] = $row;
+				}
+				$db->sql_freeresult($result);
+			}
+
+			foreach ($data['attachment_data'] as $pos => $attach_row)
+			{
+				if ($attach_row['is_orphan'] && !in_array($attach_row['attach_id'], array_keys($orphan_rows)))
+				{
+					continue;
+				}
+
+				if (!$attach_row['is_orphan'])
+				{
+					// update entry in db if attachment already stored in db and filespace
+					$sql = 'UPDATE ' . ATTACHMENTS_TABLE . "
+						SET attach_comment = '" . $db->sql_escape($attach_row['attach_comment']) . "'
+						WHERE attach_id = " . (int) $attach_row['attach_id'] . '
+							AND is_orphan = 0';
+					$db->sql_query($sql);
+				}
+				else
+				{
+					// insert attachment into db
+					if (!@file_exists($phpbb_root_path . $config['upload_path'] . '/' . basename($orphan_rows[$attach_row['attach_id']]['physical_filename'])))
+					{
+						continue;
+					}
+
+					$space_taken += $orphan_rows[$attach_row['attach_id']]['filesize'];
+					$files_added++;
+
+					$attach_sql = array(
+						'post_msg_id'		=> $data['post_id'],
+						'topic_id'			=> $data['topic_id'],
+						'is_orphan'			=> 0,
+						'poster_id'			=> $poster_id,
+						'attach_comment'	=> $attach_row['attach_comment'],
+					);
+
+					$sql = 'UPDATE ' . ATTACHMENTS_TABLE . ' SET ' . $db->sql_build_array('UPDATE', $attach_sql) . '
+						WHERE attach_id = ' . $attach_row['attach_id'] . '
+							AND is_orphan = 1
+							AND poster_id = ' . $mx_user->data['user_id'];
+					$db->sql_query($sql);
+				}
+			}
+
+			if ($space_taken && $files_added)
+			{
+				set_config('upload_dir_size', $config['upload_dir_size'] + $space_taken, true);
+				set_config('num_files', $config['num_files'] + $files_added, true);
+			}
+		}
+
+		// we need to update the last forum information
+		// only applicable if the topic is not global and it is approved
+		// we also check to make sure we are not dealing with globaling the latest topic (pretty rare but still needs to be checked)
+		if ($topic_type != POST_GLOBAL && !$make_global && ($post_approved || !$data['post_approved']))
+		{
+			// the last post makes us update the forum table. This can happen if...
+			// We make a new topic
+			// We reply to a topic
+			// We edit the last post in a topic and this post is the latest in the forum (maybe)
+			// We edit the only post in the topic
+			// We edit the first post in the topic and all the other posts are not approved
+			if (($post_mode == 'post' || $post_mode == 'reply') && $post_approved)
+			{
+				$sql_data[FORUMS_TABLE]['stat'][] = 'forum_last_post_id = ' . $data['post_id'];
+				$sql_data[FORUMS_TABLE]['stat'][] = "forum_last_post_subject = '" . $db->sql_escape($subject) . "'";
+				$sql_data[FORUMS_TABLE]['stat'][] = 'forum_last_post_time = ' . $current_time;
+				$sql_data[FORUMS_TABLE]['stat'][] = 'forum_last_poster_id = ' . (int) $mx_user->data['user_id'];
+				$sql_data[FORUMS_TABLE]['stat'][] = "forum_last_poster_name = '" . $db->sql_escape((!$mx_user->data['is_registered'] && $mx_username) ? $mx_username : (($mx_user->data['user_id'] != ANONYMOUS) ? $mx_user->data['username'] : '')) . "'";
+				$sql_data[FORUMS_TABLE]['stat'][] = "forum_last_poster_colour = '" . $db->sql_escape($mx_user->data['user_colour']) . "'";
+			}
+			else if ($post_mode == 'edit_last_post' || $post_mode == 'edit_topic' || ($post_mode == 'edit_first_post' && !$data['topic_replies']))
+			{
+				// this does not _necessarily_ mean that we must update the info again,
+				// it just means that we might have to
+				$sql = 'SELECT forum_last_post_id, forum_last_post_subject
+					FROM ' . FORUMS_TABLE . '
+					WHERE forum_id = ' . (int) $data['forum_id'];
+				$result = $db->sql_query($sql);
+				$row = $db->sql_fetchrow($result);
+				$db->sql_freeresult($result);
+
+				// this post is the latest post in the forum, better update
+				if ($row['forum_last_post_id'] == $data['post_id'])
+				{
+					if ($post_approved && $row['forum_last_post_subject'] !== $subject)
+					{
+						// the only data that can really be changed is the post's subject
+						$sql_data[FORUMS_TABLE]['stat'][] = 'forum_last_post_subject = \'' . $db->sql_escape($subject) . '\'';
+					}
+					else if ($data['post_approved'] !== $post_approved)
+					{
+						// we need a fresh change of socks, everything has become invalidated
+						$sql = 'SELECT MAX(topic_last_post_id) as last_post_id
+							FROM ' . TOPICS_TABLE . '
+							WHERE forum_id = ' . (int) $data['forum_id'] . '
+								AND topic_approved = 1';
+						$result = $db->sql_query($sql);
+						$row = $db->sql_fetchrow($result);
+						$db->sql_freeresult($result);
+
+						// any posts left in this forum?
+						if (!empty($row['last_post_id']))
+						{
+							$sql = 'SELECT p.post_id, p.post_subject, p.post_time, p.poster_id, p.post_username, u.user_id, u.username, u.user_colour
+								FROM ' . POSTS_TABLE . ' p, ' . USERS_TABLE . ' u
+								WHERE p.poster_id = u.user_id
+									AND p.post_id = ' . (int) $row['last_post_id'];
+							$result = $db->sql_query($sql);
+							$row = $db->sql_fetchrow($result);
+							$db->sql_freeresult($result);
+
+							// salvation, a post is found! jam it into the forums table
+							$sql_data[FORUMS_TABLE]['stat'][] = 'forum_last_post_id = ' . (int) $row['post_id'];
+							$sql_data[FORUMS_TABLE]['stat'][] = "forum_last_post_subject = '" . $db->sql_escape($row['post_subject']) . "'";
+							$sql_data[FORUMS_TABLE]['stat'][] = 'forum_last_post_time = ' . (int) $row['post_time'];
+							$sql_data[FORUMS_TABLE]['stat'][] = 'forum_last_poster_id = ' . (int) $row['poster_id'];
+							$sql_data[FORUMS_TABLE]['stat'][] = "forum_last_poster_name = '" . $db->sql_escape(($row['poster_id'] == ANONYMOUS) ? $row['post_username'] : $row['username']) . "'";
+							$sql_data[FORUMS_TABLE]['stat'][] = "forum_last_poster_colour = '" . $db->sql_escape($row['user_colour']) . "'";
+						}
+						else
+						{
+							// just our luck, the last topic in the forum has just been turned unapproved...
+							$sql_data[FORUMS_TABLE]['stat'][] = 'forum_last_post_id = 0';
+							$sql_data[FORUMS_TABLE]['stat'][] = "forum_last_post_subject = ''";
+							$sql_data[FORUMS_TABLE]['stat'][] = 'forum_last_post_time = 0';
+							$sql_data[FORUMS_TABLE]['stat'][] = 'forum_last_poster_id = 0';
+							$sql_data[FORUMS_TABLE]['stat'][] = "forum_last_poster_name = ''";
+							$sql_data[FORUMS_TABLE]['stat'][] = "forum_last_poster_colour = ''";
+						}
+					}
+				}
+			}
+		}
+		else if ($make_global)
+		{
+			// somebody decided to be a party pooper, we must recalculate the whole shebang (maybe)
+			$sql = 'SELECT forum_last_post_id
+				FROM ' . FORUMS_TABLE . '
+				WHERE forum_id = ' . (int) $data['forum_id'];
+			$result = $db->sql_query($sql);
+			$forum_row = $db->sql_fetchrow($result);
+			$db->sql_freeresult($result);
+
+			// we made a topic global, go get new data
+			if ($topic_row['topic_type'] != POST_GLOBAL && $topic_type == POST_GLOBAL && $forum_row['forum_last_post_id'] == $topic_row['topic_last_post_id'])
+			{
+				// we need a fresh change of socks, everything has become invalidated
+				$sql = 'SELECT MAX(topic_last_post_id) as last_post_id
+					FROM ' . TOPICS_TABLE . '
+					WHERE forum_id = ' . (int) $data['forum_id'] . '
+						AND topic_approved = 1';
+				$result = $db->sql_query($sql);
+				$row = $db->sql_fetchrow($result);
+				$db->sql_freeresult($result);
+
+				// any posts left in this forum?
+				if (!empty($row['last_post_id']))
+				{
+					$sql = 'SELECT p.post_id, p.post_subject, p.post_time, p.poster_id, p.post_username, u.user_id, u.username, u.user_colour
+						FROM ' . POSTS_TABLE . ' p, ' . USERS_TABLE . ' u
+						WHERE p.poster_id = u.user_id
+							AND p.post_id = ' . (int) $row['last_post_id'];
+					$result = $db->sql_query($sql);
+					$row = $db->sql_fetchrow($result);
+					$db->sql_freeresult($result);
+
+					// salvation, a post is found! jam it into the forums table
+					$sql_data[FORUMS_TABLE]['stat'][] = 'forum_last_post_id = ' . (int) $row['post_id'];
+					$sql_data[FORUMS_TABLE]['stat'][] = "forum_last_post_subject = '" . $db->sql_escape($row['post_subject']) . "'";
+					$sql_data[FORUMS_TABLE]['stat'][] = 'forum_last_post_time = ' . (int) $row['post_time'];
+					$sql_data[FORUMS_TABLE]['stat'][] = 'forum_last_poster_id = ' . (int) $row['poster_id'];
+					$sql_data[FORUMS_TABLE]['stat'][] = "forum_last_poster_name = '" . $db->sql_escape(($row['poster_id'] == ANONYMOUS) ? $row['post_username'] : $row['username']) . "'";
+					$sql_data[FORUMS_TABLE]['stat'][] = "forum_last_poster_colour = '" . $db->sql_escape($row['user_colour']) . "'";
+				}
+				else
+				{
+					// just our luck, the last topic in the forum has just been globalized...
+					$sql_data[FORUMS_TABLE]['stat'][] = 'forum_last_post_id = 0';
+					$sql_data[FORUMS_TABLE]['stat'][] = "forum_last_post_subject = ''";
+					$sql_data[FORUMS_TABLE]['stat'][] = 'forum_last_post_time = 0';
+					$sql_data[FORUMS_TABLE]['stat'][] = 'forum_last_poster_id = 0';
+					$sql_data[FORUMS_TABLE]['stat'][] = "forum_last_poster_name = ''";
+					$sql_data[FORUMS_TABLE]['stat'][] = "forum_last_poster_colour = ''";
+				}
+			}
+			else if ($topic_row['topic_type'] == POST_GLOBAL && $topic_type != POST_GLOBAL && $forum_row['forum_last_post_id'] < $topic_row['topic_last_post_id'])
+			{
+				// this post has a higher id, it is newer
+				$sql = 'SELECT p.post_id, p.post_subject, p.post_time, p.poster_id, p.post_username, u.user_id, u.username, u.user_colour
+					FROM ' . POSTS_TABLE . ' p, ' . USERS_TABLE . ' u
+					WHERE p.poster_id = u.user_id
+						AND p.post_id = ' . (int) $topic_row['topic_last_post_id'];
+				$result = $db->sql_query($sql);
+				$row = $db->sql_fetchrow($result);
+				$db->sql_freeresult($result);
+
+				// salvation, a post is found! jam it into the forums table
+				$sql_data[FORUMS_TABLE]['stat'][] = 'forum_last_post_id = ' . (int) $row['post_id'];
+				$sql_data[FORUMS_TABLE]['stat'][] = "forum_last_post_subject = '" . $db->sql_escape($row['post_subject']) . "'";
+				$sql_data[FORUMS_TABLE]['stat'][] = 'forum_last_post_time = ' . (int) $row['post_time'];
+				$sql_data[FORUMS_TABLE]['stat'][] = 'forum_last_poster_id = ' . (int) $row['poster_id'];
+				$sql_data[FORUMS_TABLE]['stat'][] = "forum_last_poster_name = '" . $db->sql_escape(($row['poster_id'] == ANONYMOUS) ? $row['post_username'] : $row['username']) . "'";
+				$sql_data[FORUMS_TABLE]['stat'][] = "forum_last_poster_colour = '" . $db->sql_escape($row['user_colour']) . "'";
+			}
+		}
+
+		// topic sync time!
+		// simply, we update if it is a reply or the last post is edited
+		if ($post_approved)
+		{
+			// reply requires the whole thing
+			if ($post_mode == 'reply')
+			{
+				$sql_data[TOPICS_TABLE]['stat'][] = 'topic_last_post_id = ' . (int) $data['post_id'];
+				$sql_data[TOPICS_TABLE]['stat'][] = 'topic_last_poster_id = ' . (int) $mx_user->data['user_id'];
+				$sql_data[TOPICS_TABLE]['stat'][] = "topic_last_poster_name = '" . $db->sql_escape((!$mx_user->data['is_registered'] && $mx_username) ? $mx_username : (($mx_user->data['user_id'] != ANONYMOUS) ? $mx_user->data['username'] : '')) . "'";
+				$sql_data[TOPICS_TABLE]['stat'][] = "topic_last_poster_colour = '" . (($mx_user->data['user_id'] != ANONYMOUS) ? $db->sql_escape($mx_user->data['user_colour']) : '') . "'";
+				$sql_data[TOPICS_TABLE]['stat'][] = "topic_last_post_subject = '" . $db->sql_escape($subject) . "'";
+				$sql_data[TOPICS_TABLE]['stat'][] = 'topic_last_post_time = ' . (int) $current_time;
+			}
+			else if ($post_mode == 'edit_last_post' || $post_mode == 'edit_topic' || ($post_mode == 'edit_first_post' && !$data['topic_replies']))
+			{
+				// only the subject can be changed from edit
+				$sql_data[TOPICS_TABLE]['stat'][] = "topic_last_post_subject = '" . $db->sql_escape($subject) . "'";
+			}
+		}
+		else if (!$data['post_approved'] && ($post_mode == 'edit_last_post' || $post_mode == 'edit_topic' || ($post_mode == 'edit_first_post' && !$data['topic_replies'])))
+		{
+			// like having the rug pulled from under us
+			$sql = 'SELECT MAX(post_id) as last_post_id
+				FROM ' . POSTS_TABLE . '
+				WHERE topic_id = ' . (int) $data['topic_id'] . '
+					AND post_approved = 1';
+			$result = $db->sql_query($sql);
+			$row = $db->sql_fetchrow($result);
+			$db->sql_freeresult($result);
+
+			// any posts left in this forum?
+			if (!empty($row['last_post_id']))
+			{
+				$sql = 'SELECT p.post_id, p.post_subject, p.post_time, p.poster_id, p.post_username, u.user_id, u.username, u.user_colour
+					FROM ' . POSTS_TABLE . ' p, ' . USERS_TABLE . ' u
+					WHERE p.poster_id = u.user_id
+						AND p.post_id = ' . (int) $row['last_post_id'];
+				$result = $db->sql_query($sql);
+				$row = $db->sql_fetchrow($result);
+				$db->sql_freeresult($result);
+
+				// salvation, a post is found! jam it into the topics table
+				$sql_data[TOPICS_TABLE]['stat'][] = 'topic_last_post_id = ' . (int) $row['post_id'];
+				$sql_data[TOPICS_TABLE]['stat'][] = "topic_last_post_subject = '" . $db->sql_escape($row['post_subject']) . "'";
+				$sql_data[TOPICS_TABLE]['stat'][] = 'topic_last_post_time = ' . (int) $row['post_time'];
+				$sql_data[TOPICS_TABLE]['stat'][] = 'topic_last_poster_id = ' . (int) $row['poster_id'];
+				$sql_data[TOPICS_TABLE]['stat'][] = "topic_last_poster_name = '" . $db->sql_escape(($row['poster_id'] == ANONYMOUS) ? $row['post_username'] : $row['username']) . "'";
+				$sql_data[TOPICS_TABLE]['stat'][] = "topic_last_poster_colour = '" . $db->sql_escape($row['user_colour']) . "'";
+			}
+		}
+
+		// Update total post count, do not consider moderated posts/topics
+		if ($phpbb_auth->acl_get('f_noapprove', $data['forum_id']) || $phpbb_auth->acl_get('m_approve', $data['forum_id']))
+		{
+			if ($post_mode == 'post')
+			{
+				set_config('num_topics', $config['num_topics'] + 1, true);
+				set_config('num_posts', $config['num_posts'] + 1, true);
+			}
+
+			if ($post_mode == 'reply')
+			{
+				set_config('num_posts', $config['num_posts'] + 1, true);
+			}
+		}
+
+		// Update forum stats
+		$where_sql = array(POSTS_TABLE => 'post_id = ' . $data['post_id'], TOPICS_TABLE => 'topic_id = ' . $data['topic_id'], FORUMS_TABLE => 'forum_id = ' . $data['forum_id'], USERS_TABLE => 'user_id = ' . $mx_user->data['user_id']);
+
+		foreach ($sql_data as $table => $update_ary)
+		{
+			if (isset($update_ary['stat']) && implode('', $update_ary['stat']))
+			{
+				$sql = "UPDATE $table SET " . implode(', ', $update_ary['stat']) . ' WHERE ' . $where_sql[$table];
+				$db->sql_query($sql);
+			}
+		}
+
+		// Delete topic shadows (if any exist). We do not need a shadow topic for an global announcement
+		if ($make_global)
+		{
+			$sql = 'DELETE FROM ' . TOPICS_TABLE . '
+				WHERE topic_moved_id = ' . $data['topic_id'];
+			$db->sql_query($sql);
+		}
+
+		// Committing the transaction before updating search index
+		$db->sql_transaction('commit');
+
+		// Delete draft if post was loaded...
+		$draft_id = phpBB3::request_var('draft_loaded', 0);
+		if ($draft_id)
+		{
+			$sql = 'DELETE FROM ' . DRAFTS_TABLE . "
+				WHERE draft_id = $draft_id
+					AND user_id = {$mx_user->data['user_id']}";
+			$db->sql_query($sql);
+		}
+
+		// Index message contents
+		if ($update_message && $data['enable_indexing'])
+		{
+			// Select the search method and do some additional checks to ensure it can actually be utilised
+			$search_type = basename($config['search_type']);
+
+			if (!file_exists($phpbb_root_path . 'includes/search/' . $search_type . '.' . $phpEx))
+			{
+				trigger_error('NO_SUCH_SEARCH_MODULE');
+			}
+
+			if (!class_exists($search_type))
+			{
+				include("{$phpbb_root_path}includes/search/$search_type.$phpEx");
+			}
+
+			$error = false;
+			$search = new $search_type($error);
+
+			if ($error)
+			{
+				trigger_error($error);
+			}
+
+			$search->index($mode, $data['post_id'], $data['message'], $subject, $poster_id, ($topic_type == POST_GLOBAL) ? 0 : $data['forum_id']);
+		}
+
+		// Topic Notification, do not change if moderator is changing other users posts...
+		if ($mx_user->data['user_id'] == $poster_id)
+		{
+			if (!$data['notify_set'] && $data['notify'])
+			{
+				$sql = 'INSERT INTO ' . TOPICS_WATCH_TABLE . ' (user_id, topic_id)
+					VALUES (' . $mx_user->data['user_id'] . ', ' . $data['topic_id'] . ')';
+				$db->sql_query($sql);
+			}
+			else if ($data['notify_set'] && !$data['notify'])
+			{
+				$sql = 'DELETE FROM ' . TOPICS_WATCH_TABLE . '
+					WHERE user_id = ' . $mx_user->data['user_id'] . '
+						AND topic_id = ' . $data['topic_id'];
+				$db->sql_query($sql);
+			}
+		}
+
+		if ($mode == 'post' || $mode == 'reply' || $mode == 'quote')
+		{
+			// Mark this topic as posted to
+			phpBB3::markread('post', $data['forum_id'], $data['topic_id'], $data['post_time']);
+		}
+
+		// Mark this topic as read
+		// We do not use post_time here, this is intended (post_time can have a date in the past if editing a message)
+		phpBB3::markread('topic', $data['forum_id'], $data['topic_id'], time());
+
+		//
+		if ($config['load_db_lastread'] && $mx_user->data['is_registered'])
+		{
+			$sql = 'SELECT mark_time
+				FROM ' . FORUMS_TRACK_TABLE . '
+				WHERE user_id = ' . $mx_user->data['user_id'] . '
+					AND forum_id = ' . $data['forum_id'];
+			$result = $db->sql_query($sql);
+			$f_mark_time = (int) $db->sql_fetchfield('mark_time');
+			$db->sql_freeresult($result);
+		}
+		else if ($config['load_anon_lastread'] || $mx_user->data['is_registered'])
+		{
+			$f_mark_time = false;
+		}
+
+		if (($config['load_db_lastread'] && $mx_user->data['is_registered']) || $config['load_anon_lastread'] || $mx_user->data['is_registered'])
+		{
+			// Update forum info
+			$sql = 'SELECT forum_last_post_time
+				FROM ' . FORUMS_TABLE . '
+				WHERE forum_id = ' . $data['forum_id'];
+			$result = $db->sql_query($sql);
+			$forum_last_post_time = (int) $db->sql_fetchfield('forum_last_post_time');
+			$db->sql_freeresult($result);
+
+			phpBB3::update_forum_tracking_info($data['forum_id'], $forum_last_post_time, $f_mark_time, false);
+		}
+
+		// Send Notifications
+		if ($mode != 'edit' && $mode != 'delete' && ($phpbb_auth->acl_get('f_noapprove', $data['forum_id']) || $phpbb_auth->acl_get('m_approve', $data['forum_id'])))
+		{
+			phpBB3::user_notification($mode, $subject, $data['topic_title'], $data['forum_name'], $data['forum_id'], $data['topic_id'], $data['post_id']);
+		}
+		/*
+		$params = $add_anchor = '';
+
+		if ($phpbb_auth->acl_get('f_noapprove', $data['forum_id']) || $phpbb_auth->acl_get('m_approve', $data['forum_id']))
+		{
+			$params .= '&amp;t=' . $data['topic_id'];
+
+			if ($mode != 'post')
+			{
+				$params .= '&amp;p=' . $data['post_id'];
+				$add_anchor = '#p' . $data['post_id'];
+			}
+		}
+		else if ($mode != 'post' && $post_mode != 'edit_first_post' && $post_mode != 'edit_topic')
+		{
+			$params .= '&amp;t=' . $data['topic_id'];
+		}
+
+		$url = (!$params) ? "{$phpbb_root_path}viewforum.$phpEx" : "{$phpbb_root_path}viewtopic.$phpEx";
+		$url = mx3_append_sid($url, 'f=' . $data['forum_id'] . $params) . $add_anchor;
+		*/
+		return $data['topic_id'];
+	}	
+	
 	/**
 	 * Delete a post/poll.
 	 *
@@ -3401,9 +5267,32 @@ class phpbb_posts
 	{
 		global $board_config, $lang, $db, $phpbb_root_path, $phpEx;
 		global $userdata, $user_ip;
+		
+		$current_time = time();
 
-		$forum_update_sql = "forum_posts = forum_posts - 1";
-		$topic_update_sql = '';
+		// Correctly set back the topic replies and forum posts... 
+		$topic_update_sql = 'topic_replies = topic_replies - 1';
+		$forum_update_sql = 'forum_posts = forum_posts - 1';
+		//set_config_count('num_posts', -1, true);
+		$user_update_sql = 'user_posts = user_posts - 1';
+		
+		switch (PORTAL_BACKEND)
+		{
+			case 'internal':
+			case 'smf2':
+			case 'mybb':
+			case 'phpbb2':
+					
+			break;
+
+			case 'phpbb3':
+			case 'olympus':
+			case 'ascraeus':
+			case 'rhea':		
+				$topic_update_sql .= ', topic_last_view_time = ' . $current_time;
+			break;
+		}
+		
 
 		//
 		// is this first topic post or last topic post
@@ -3424,9 +5313,7 @@ class phpbb_posts
 		$is_first_post = ($first_post_id == $post_id) ? true : false;
 		$is_last_post = ($last_post_id == $post_id) ? true : false;
 
-		//
 		// Start delete
-		//
 		$sql = "DELETE FROM " . POSTS_TABLE . "
 			WHERE post_id = $post_id";
 
@@ -3434,13 +5321,29 @@ class phpbb_posts
 		{
 			mx_message_die(GENERAL_ERROR, 'Error in deleting post', '', __LINE__, __FILE__, $sql);
 		}
-
-		$sql = "DELETE FROM " . POSTS_TEXT_TABLE . "
-			WHERE post_id = $post_id";
-
-		if (!$db->sql_query($sql))
+		
+		switch (PORTAL_BACKEND)
 		{
-			mx_message_die(GENERAL_ERROR, 'Error in deleting post', '', __LINE__, __FILE__, $sql);
+			case 'internal':
+			case 'smf2':
+			case 'mybb':
+			break;
+			
+			case 'phpbb2':
+
+				$sql = "DELETE FROM " . POSTS_TEXT_TABLE . "
+					WHERE post_id = $post_id";
+				if (!$db->sql_query($sql))
+				{
+					mx_message_die(GENERAL_ERROR, 'Error in deleting post', '', __LINE__, __FILE__, $sql);
+				}					
+			break;
+
+			case 'phpbb3':
+			case 'olympus':
+			case 'ascraeus':
+			case 'rhea':
+			break;
 		}
 
 		if ($is_last_post && $is_first_post)
@@ -3465,57 +5368,40 @@ class phpbb_posts
 
 		remove_search_post($post_id);
 
-		//
-		// Update stats
-		//
+
 		if ($is_last_post)
 		{
-			if ($is_first_post)
+			//Topic 
+			$sql = "SELECT MAX(post_id) AS last_post_id
+				FROM " . POSTS_TABLE . "
+				WHERE topic_id = $topic_id";
+
+			if (!($result = $db->sql_query($sql)))
 			{
-				$forum_update_sql .= ', forum_topics = forum_topics - 1';
-			}
-			else
-			{
-				$topic_update_sql .= 'topic_replies = topic_replies - 1';
-
-				$sql = "SELECT MAX(post_id) AS last_post_id
-					FROM " . POSTS_TABLE . "
-					WHERE topic_id = $topic_id";
-
-				if (!($result = $db->sql_query($sql)))
-				{
-					mx_message_die(GENERAL_ERROR, 'Error in deleting post', '', __LINE__, __FILE__, $sql);
-				}
-
-				if ($row = $db->sql_fetchrow($result))
-				{
-					$topic_update_sql .= ', topic_last_post_id = ' . $row['last_post_id'];
-				}
+				mx_message_die(GENERAL_ERROR, 'Error in deleting post', '', __LINE__, __FILE__, $sql);
 			}
 
-			/*
-			if ($post_data['last_topic'])
+			if ($row = $db->sql_fetchrow($result))
 			{
-			*/
-				$sql = "SELECT MAX(post_id) AS last_post_id
-					FROM " . POSTS_TABLE . "
-					WHERE forum_id = $forum_id";
-
-				if (!($result = $db->sql_query($sql)))
-				{
-					mx_message_die(GENERAL_ERROR, 'Error in deleting post', '', __LINE__, __FILE__, $sql);
-				}
-
-				if ($row = $db->sql_fetchrow($result))
-				{
-					$forum_update_sql .= ($row['last_post_id']) ? ', forum_last_post_id = ' . $row['last_post_id'] : ', forum_last_post_id = 0';
-				}
-			/*
+				$topic_update_sql .= ', topic_last_post_id = ' . $row['last_post_id'];
 			}
-			*/
+			//Forums
+			$sql = "SELECT MAX(post_id) AS last_post_id
+				FROM " . POSTS_TABLE . "
+				WHERE forum_id = $forum_id";
 
+			if (!($result = $db->sql_query($sql)))
+			{
+				mx_message_die(GENERAL_ERROR, 'Error in deleting post', '', __LINE__, __FILE__, $sql);
+			}
+
+			if ($row = $db->sql_fetchrow($result))
+			{
+				$forum_update_sql .= ($row['last_post_id']) ? ', forum_last_post_id = ' . $row['last_post_id'] : ', forum_last_post_id = 0';
+			}
+			
 		}
-		else if ($is_first_post)
+		elseif ($is_first_post)
 		{
 			$sql = "SELECT MIN(post_id) AS first_post_id
 				FROM " . POSTS_TABLE . "
@@ -3528,12 +5414,8 @@ class phpbb_posts
 
 			if ($row = $db->sql_fetchrow($result))
 			{
-				$topic_update_sql .= 'topic_replies = topic_replies - 1, topic_first_post_id = ' . $row['first_post_id'];
+				$topic_update_sql .= ', topic_first_post_id = ' . $row['first_post_id'];
 			}
-		}
-		else
-		{
-			$topic_update_sql .= 'topic_replies = topic_replies - 1';
 		}
 
 		$sql = "UPDATE " . FORUMS_TABLE . " SET
@@ -3545,18 +5427,16 @@ class phpbb_posts
 			mx_message_die(GENERAL_ERROR, 'Error in posting', '', __LINE__, __FILE__, $sql);
 		}
 
-		if ($topic_update_sql != '')
-		{
-			$sql = "UPDATE " . TOPICS_TABLE . " SET
+		$sql = "UPDATE " . TOPICS_TABLE . " SET
 				$topic_update_sql
-				WHERE topic_id = $topic_id";
+				WHERE topic_id = " . $topic_id;
 
-			if (!$db->sql_query($sql))
-			{
-				mx_message_die(GENERAL_ERROR, 'Error in posting', '', __LINE__, __FILE__, $sql);
-			}
+		if (!$db->sql_query($sql))
+		{
+			//mx_message_die(GENERAL_ERROR, 'Error in posting', '', __LINE__, __FILE__, $sql);
 		}
 
+		
 		$sql = "UPDATE " . USERS_TABLE . "
 			SET user_posts = user_posts - 1
 			WHERE user_id = " . $userdata['user_id'];
@@ -3666,9 +5546,9 @@ class mx_comments extends phpbb_posts
 	 * Dummy entry. To be used by the extended comments class
 	 *
 	 */
-	function init()
+	function init($item_data, $comments_type = 'internal')
 	{
-
+		return false;
 	}
 
 	/**
@@ -3678,7 +5558,35 @@ class mx_comments extends phpbb_posts
 	 */
 	function obtain_ranks( &$ranks )
 	{
+		global $db, $mx_cache;
 
+		if (PORTAL_BACKEND != 'internal')
+		{
+			if ($mx_cache->exists('ranks'))
+			{
+				$ranks = $mx_cache->get('ranks');
+			}
+			else
+			{
+				$sql = "SELECT *
+					FROM " . RANKS_TABLE . "
+					ORDER BY rank_special, rank_min";
+
+				if (!( $result = $db->sql_query($sql)))
+				{
+					mx_message_die(GENERAL_ERROR, "Could not obtain ranks information.", '', __LINE__, __FILE__, $sql);
+				}
+
+				$ranks = array();
+				while ($row = $db->sql_fetchrow($result))
+				{
+					$ranks[] = $row;
+				}
+
+				$db->sql_freeresult($result);
+				$mx_cache->put('ranks', $ranks);
+			}
+		}
 	}
 
 	/**
@@ -3772,7 +5680,7 @@ class mx_comments extends phpbb_posts
 	 */
 	function display_internal_comments()
 	{
-		global $template, $lang, $board_config, $phpEx, $db, $userdata, $images, $mx_user, $phpBB2;
+		global $template, $lang, $board_config, $phpEx, $db, $userdata, $images, $mx_user;
 		global $mx_root_path, $module_root_path, $phpbb_root_path, $is_block, $phpEx, $mx_request_vars, $portal_config;
 
 		//
@@ -3824,7 +5732,7 @@ class mx_comments extends phpbb_posts
 
 		while ( $this->comments_row = $db->sql_fetchrow( $result ) )
 		{
-			$time = $phpBB2->create_date( $board_config['default_dateformat'], $this->comments_row['comments_time'], $board_config['board_timezone'] );
+			$time = phpBB2::create_date( $board_config['default_dateformat'], $this->comments_row['comments_time'], $board_config['board_timezone'] );
 
 			//
 			// Decode comment for display
@@ -3874,7 +5782,7 @@ class mx_comments extends phpbb_posts
 					if ( $this->comments_row['user_rank'] == $ranksrow[$j]['rank_id'] && $ranksrow[$j]['rank_special'] )
 					{
 						$poster_rank = $ranksrow[$j]['rank_title'];
-						$rank_image = ( $ranksrow[$j]['rank_image'] ) ? '<img src="' . $phpbb_root_path . $ranksrow[$j]['rank_image'] . '" alt="' . $poster_rank . '" title="' . $poster_rank . '" border="0" /><br />' : '';
+						$rank_image = ( $ranksrow[$j]['rank_image'] ) ? '<img src="' . $phpbb_root_path . RANKS_PATH . $ranksrow[$j]['rank_image'] . '" alt="' . $poster_rank . '" title="' . $poster_rank . '" border="0" /><br />' : '';
 					}
 				}
 			}
@@ -3885,7 +5793,7 @@ class mx_comments extends phpbb_posts
 					if ( $this->comments_row['user_posts'] >= $ranksrow[$j]['rank_min'] && !$ranksrow[$j]['rank_special'] )
 					{
 						$poster_rank = $ranksrow[$j]['rank_title'];
-						$rank_image = ( $ranksrow[$j]['rank_image'] ) ? '<img src="' . $phpbb_root_path . $ranksrow[$j]['rank_image'] . '" alt="' . $poster_rank . '" title="' . $poster_rank . '" border="0" /><br />' : '';
+						$rank_image = ( $ranksrow[$j]['rank_image'] ) ? '<img src="' . $phpbb_root_path . RANKS_PATH . $ranksrow[$j]['rank_image'] . '" alt="' . $poster_rank . '" title="' . $poster_rank . '" border="0" /><br />' : '';
 					}
 				}
 			}
@@ -3965,7 +5873,7 @@ class mx_comments extends phpbb_posts
 		}
 
 		$num_of_replies = intval( $this->total_comments );
-		//$pagination = $phpBB2->generate_pagination( $this->u_pagination($page_num), $num_of_replies, $this->pagination_num, $this->start ) . '&nbsp;';
+		//$pagination = phpBB2::generate_pagination( $this->u_pagination($page_num), $num_of_replies, $this->pagination_num, $this->start ) . '&nbsp;';
 		$pagination = mx_generate_pagination( $this->u_pagination($page_num), $num_of_replies, $this->pagination_num, $this->start, true, true, true, false ) . '&nbsp;';
 		if ($num_of_replies > 0)
 		{
@@ -3985,12 +5893,12 @@ class mx_comments extends phpbb_posts
 	 */
 	function display_phpbb_comments( )
 	{
-		global $template, $lang, $board_config, $phpEx, $db, $userdata, $images, $mx_user, $phpBB2;
+		global $template, $lang, $board_config, $phpEx, $db, $userdata, $images, $mx_user;
 		global $mx_root_path, $module_root_path, $phpbb_root_path, $is_block, $phpEx, $mx_request_vars, $portal_config;
 
 		if ( !isset($this->topic_id) || $this->topic_id < 0 )
 		{
-			mx_message_die( GENERAL_MESSAGE, 'no or bad topic id' );
+			mx_message_die(GENERAL_MESSAGE, 'no or bad topic id');
 		}
 
 		//
@@ -4049,10 +5957,10 @@ class mx_comments extends phpbb_posts
 		{
 			$poster_id = $this->comments_row['user_id'];
 			$poster = ( $poster_id == ANONYMOUS ) ? $lang['Guest'] : $this->comments_row['username'];
-			$time = $phpBB2->create_date( $board_config['default_dateformat'], $this->comments_row['post_time'], $board_config['board_timezone'] );
+			$time = phpBB2::create_date( $board_config['default_dateformat'], $this->comments_row['post_time'], $board_config['board_timezone'] );
 			$poster_posts = ( $this->comments_row['user_id'] != ANONYMOUS ) ? $lang['Posts'] . ': ' . $this->comments_row['user_posts'] : '';
 			$poster_from = ( $this->comments_row['user_from'] && $this->comments_row['user_id'] != ANONYMOUS ) ? $lang['Location'] . ': ' . $this->comments_row['user_from'] : '';
-			$poster_joined = ( $this->comments_row['user_id'] != ANONYMOUS ) ? $lang['Joined'] . ': ' . $phpBB2->create_date( $lang['DATE_FORMAT'], $this->comments_row['user_regdate'], $board_config['board_timezone'] ) : '';
+			$poster_joined = ( $this->comments_row['user_id'] != ANONYMOUS ) ? $lang['Joined'] . ': ' . phpBB2::create_date( $lang['DATE_FORMAT'], $this->comments_row['user_regdate'], $board_config['board_timezone'] ) : '';
 
 			//
 			// Handle anon users posting with usernames
@@ -4103,7 +6011,7 @@ class mx_comments extends phpbb_posts
 			{
 				$l_edit_time_total = ( $this->comments_row['post_edit_count'] == 1 ) ? $lang['Edited_time_total'] : $lang['Edited_times_total'];
 
-				$l_edited_by = '<br /><br />' . sprintf( $l_edit_time_total, $poster, $phpBB2->create_date( $board_config['default_dateformat'], $this->comments_row['post_edit_time'], $board_config['board_timezone'] ), $this->comments_row['post_edit_count'] );
+				$l_edited_by = '<br /><br />' . sprintf( $l_edit_time_total, $poster, phpBB2::create_date( $board_config['default_dateformat'], $this->comments_row['post_edit_time'], $board_config['board_timezone'] ), $this->comments_row['post_edit_count'] );
 			}
 			else
 			{
@@ -4143,7 +6051,7 @@ class mx_comments extends phpbb_posts
 					if ( $this->comments_row['user_rank'] == $ranksrow[$j]['rank_id'] && $ranksrow[$j]['rank_special'] )
 					{
 						$poster_rank = $ranksrow[$j]['rank_title'];
-						$rank_image = ( $ranksrow[$j]['rank_image'] ) ? '<img src="' . $phpbb_root_path . $ranksrow[$j]['rank_image'] . '" alt="' . $poster_rank . '" title="' . $poster_rank . '" border="0" /><br />' : '';
+						$rank_image = ( $ranksrow[$j]['rank_image'] ) ? '<img src="' . $phpbb_root_path . RANKS_PATH . $ranksrow[$j]['rank_image'] . '" alt="' . $poster_rank . '" title="' . $poster_rank . '" border="0" /><br />' : '';
 					}
 				}
 			}
@@ -4154,7 +6062,7 @@ class mx_comments extends phpbb_posts
 					if ( $this->comments_row['user_posts'] >= $ranksrow[$j]['rank_min'] && !$ranksrow[$j]['rank_special'] )
 					{
 						$poster_rank = $ranksrow[$j]['rank_title'];
-						$rank_image = ( $ranksrow[$j]['rank_image'] ) ? '<img src="' . $phpbb_root_path . $ranksrow[$j]['rank_image'] . '" alt="' . $poster_rank . '" title="' . $poster_rank . '" border="0" /><br />' : '';
+						$rank_image = ( $ranksrow[$j]['rank_image'] ) ? '<img src="' . $phpbb_root_path . RANKS_PATH . $ranksrow[$j]['rank_image'] . '" alt="' . $poster_rank . '" title="' . $poster_rank . '" border="0" /><br />' : '';
 					}
 				}
 			}
@@ -4208,7 +6116,7 @@ class mx_comments extends phpbb_posts
 		}
 
 		$num_of_replies = intval( $this->total_comments );
-		$pagination = $phpBB2->generate_pagination( $this->u_pagination($page_num), $num_of_replies, $this->pagination_num, $this->start ) . '&nbsp;';
+		$pagination = phpBB2::generate_pagination( $this->u_pagination($page_num), $num_of_replies, $this->pagination_num, $this->start ) . '&nbsp;';
 
 		if ($num_of_replies > 0)
 		{
@@ -4286,46 +6194,23 @@ class mx_comments extends phpbb_posts
 
 		$this->total_comments = ( $row = $db->sql_fetchrow($result) ) ? intval($row['number']) : 0;
 
-		
+
 		//
 		// Go ahead and pull all data for this topic
-		//		
-		switch (PORTAL_BACKEND)
+		//
+		$sql = "SELECT u.*, p.*,  pt.post_text, pt.post_subject, pt.bbcode_uid
+			FROM " . POSTS_TABLE . " p, " . USERS_TABLE . " u, " . ((PORTAL_BACKEND == 'phpbb2') ? POSTS_TEXT_TABLE : POSTS_TABLE) . " pt
+			WHERE p.topic_id = '" . $this->topic_id . "'
+				AND pt.post_id = p.post_id
+				AND u.user_id = p.poster_id
+				ORDER BY p.post_id DESC";
+
+		if ( $this->start > -1 && $this->pagination_num > 0 )
 		{
-			case 'internal':
-
-			case 'phpbb2':
-
-				$sql = "SELECT u.username, u.user_id, u.user_posts, u.user_from, u.user_website, u.user_email, u.user_icq, u.user_aim, u.user_yim, u.user_regdate, u.user_msnm, u.user_viewemail, u.user_rank, u.user_sig, u.user_sig_bbcode_uid, u.user_avatar, u.user_avatar_type, u.user_allowavatar, u.user_allowsmile, p.*,  pt.post_text, pt.post_subject, pt.bbcode_uid
-					FROM " . POSTS_TABLE . " p, " . USERS_TABLE . " u, " . POSTS_TEXT_TABLE . " pt
-					WHERE p.topic_id = '" . $this->topic_id . "'
-						AND pt.post_id = p.post_id
-						AND u.user_id = p.poster_id
-						ORDER BY p.post_id DESC";
-				break;
-
-			case 'phpbb3':
-
-				$sql = "SELECT u.*, p.*,  pt.post_text, pt.post_subject, pt.bbcode_uid
-					FROM " . POSTS_TABLE . " p, " . USERS_TABLE . " u, " . POSTS_TABLE . " pt
-					WHERE p.topic_id = '" . $this->topic_id . "'
-						AND pt.post_id = p.post_id
-						AND u.user_id = p.poster_id
-						ORDER BY p.post_id DESC";
-			break;
-		}		
-		
-
-		if ($this->start > -1 && $this->pagination_num > 0)
-		{
-			$result = $db->sql_query_limit($sql, $this->start, $this->pagination_num);
+			$sql .= " LIMIT $this->start, $this->pagination_num ";
 		}
-		else
-		{
-			$result = $db->sql_query_limit($sql, $this->start, $this->pagination_num);
-		}		
 
-		if (!$result)
+		if ( !( $result = $db->sql_query( $sql ) ) )
 		{
 			mx_message_die( GENERAL_ERROR, "Could not obtain post/user information.", '', __LINE__, __FILE__, $sql );
 		}

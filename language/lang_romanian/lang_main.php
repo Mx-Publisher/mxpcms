@@ -1,9 +1,9 @@
 <?php
 /**
 *
-* @package mxBB Portal Core
-* @version $Id: lang_main.php,v 1.4 2008/10/04 07:13:11 orynider Exp $
-* @copyright (c) 2002-2006 mxBB Project Team
+* @package MX-Publisher CMS Core
+* @version $Id: lang_main.php,v 1.8 2013/06/28 15:34:32 orynider Exp $
+* @copyright (c) 2002-2006 Mx-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 *
 */
@@ -19,7 +19,7 @@
 setlocale(LC_ALL, 'ro');
 
 $lang['USER_LANG'] = 'ro';
-$lang['ENCODING'] = 'Windows-1250';
+$lang['ENCODING'] = 'UTF-8';
 $lang['DIRECTION'] = 'ltr';
 $lang['LEFT'] = 'left';
 $lang['RIGHT'] = 'right';
@@ -29,51 +29,53 @@ $lang['DATE_FORMAT'] =  'd/M/Y'; // This should be changed to the default date f
 //
 // General
 //
-$lang['Page_Not_Authorised']    	= 'Ne pare rãu, dar nu eºti autorizat sã accesezi aceastã paginã.';
-$lang['Execution_Stats'] 			= 'Pagina a generat %s querie - Timpul generãrii: %s secunde';
-$lang['Redirect_login']    			= 'Click %sAici%s sã te logezi.';
-$lang['Show_admin_options']    		= 'Aratã/Ascunde Opþiunile Admin pe Paginã: ';
+$lang['Page_Not_Authorised']    	= 'Ne pare rÄƒu, dar nu eÅŸti autorizat sÄƒ accesezi aceastÄƒ paginÄƒ.';
+$lang['Execution_Stats'] 			= 'Pagina a generat %s querie - Timpul generÄƒrii: %s secunde';
+$lang['Redirect_login']    			= 'Click %sAici%s sÄƒ te logezi.';
+$lang['Show_admin_options']    		= 'AratÄƒ/Ascunde OpÅ£iunile Admin pe PaginÄƒ: ';
 $lang['Block_updated_date'] 		= 'Updatat ';
 $lang['Block_updated_by'] 			= 'de ';
+$lang['Page_updated_date'] 			= 'Pagina actualizatÄƒ ';
+$lang['Page_updated_by'] 			= 'de ';
 $lang['Powered_by'] 				= 'Powered by ';
 
 $lang['mx_spacer'] 					= 'Spacer';
 $lang['Yes'] 						= 'Da';
 $lang['No'] 						= 'Nu';
 
-$lang['Link'] = 'Legãturã';
+$lang['Link'] = 'LegÄƒturÄƒ';
 
 $lang['Hidden_block'] 				= 'Block ascuns...';
-$lang['Hidden_block_explain'] 		= 'Acest bloc este \'ascuns\', dar visibil deoarece eºti un admin/moderator.';
+$lang['Hidden_block_explain'] 		= 'Acest bloc este \'ascuns\', dar visibil deoarece eÅŸti un admin/moderator.';
 
 //
 // Overall Navigation Navigation
 //
-$lang['MX_home'] 					= 'Acasã';
+$lang['MX_home'] 					= 'AcasÄƒ';
 $lang['MX_forum'] 					= 'Forum';
 
 //
 // Core Blocks - Language
 //
-$lang['Change_default_lang']   		= 'Seteazã Limba Implicitã'; 
-$lang['Change_user_lang']      		= 'Seteazã Limba Ta'; 
+$lang['Change_default_lang']   		= 'SeteazÄƒ Limba ImplicitÄƒ'; 
+$lang['Change_user_lang']      		= 'SeteazÄƒ Limba Ta'; 
 $lang['Portal_lang']            	= 'LimbaCP';
-$lang['Select_lang']          		= 'Selecteazã Limba:';
+$lang['Select_lang']          		= 'SelecteazÄƒ Limba:';
 
 //
 // Core Blocks - Theme
 //
-$lang['Change']                 	= 'Schimbã Acum';
-$lang['Change_default_style']   	= 'Seteazã Silul Implicit'; 
-$lang['Change_user_style']      	= 'Seteazã Stilul Tãu'; 
-$lang['Theme']                  	= 'CP Temã/Stil';  // Blocktitle
-$lang['SelectTheme']            	= 'Selecteazã Tema/Stilul:';
+$lang['Change']                 	= 'SchimbÄƒ Acum';
+$lang['Change_default_style']   	= 'SeteazÄƒ Silul Implicit'; 
+$lang['Change_user_style']      	= 'SeteazÄƒ Stilul TÄƒu'; 
+$lang['Theme']                  	= 'CP TemÄƒ/Stil';  // Blocktitle
+$lang['SelectTheme']            	= 'SelecteazÄƒ Tema/Stilul:';
 
 //
 // Core Blocks - Search
 //
-$lang['Mx_Page'] 					= 'Paginã';
-$lang['Mx_Block'] 					= 'Secþiune';
+$lang['Mx_Page'] 					= 'PaginÄƒ';
+$lang['Mx_Block'] 					= 'SecÅ£iune';
 
 //
 // Core Blocks - Site Log (and many last 'item' blocks)
@@ -84,16 +86,16 @@ $lang['No_items_found'] 			= 'Nimic nou de raportat. ';
 // BlockCP
 //
 $lang['Block_Title']            	= 'Titlu';
-$lang['Block_Info']            		= 'Informaþii';
+$lang['Block_Info']            		= 'InformaÅ£ii';
 
-$lang['Block_Config_updated']   	= 'Configuraþia blocului actualizatã cu succes';
-$lang['Block_Edit']             	= 'Editeazã Bloc';
-$lang['Block_Edit_dyn']         	= 'Editeazã Blocul pãrinte dinamic';
-$lang['Block_Edit_sub']         	= 'Editeazã Blocul pãrinte împãrþit';
+$lang['Block_Config_updated']   	= 'ConfiguraÅ£ia blocului actualizatÄƒ cu succes';
+$lang['Block_Edit']             	= 'EditeazÄƒ Bloc';
+$lang['Block_Edit_dyn']         	= 'EditeazÄƒ Blocul pÄƒrinte dinamic';
+$lang['Block_Edit_sub']         	= 'EditeazÄƒ Blocul pÄƒrinte Ã®mpÄƒrÅ£it';
 
 
-$lang['General_updated_return_settings'] 	= 'Configuraþia upgradatã cu succes...<br /><br />Click %saici%s pentru a continua.'; // %s petru parametrii URI - NU IL SCOATE
-$lang['General_update_error'] 			= 'Configuraþia nu se poate upgrada...';
+$lang['General_updated_return_settings'] 	= 'ConfiguraÅ£ia upgradatÄƒ cu succes...<br /><br />Click %saici%s pentru a continua.'; // %s petru parametrii URI - NU IL SCOATE
+$lang['General_update_error'] 			= 'ConfiguraÅ£ia nu se poate upgrada...';
 
 //
 // Header
@@ -103,27 +105,27 @@ $lang['Mx_search_forum'] 		= 'Forum';
 $lang['Mx_search_kb'] 			= 'Articole';
 $lang['Mx_search_pafiledb'] 	= 'Download-uri';
 $lang['Mx_search_google'] 		= 'Google';
-$lang['Mx_new_search'] 			= 'Nouã Cãutare';
+$lang['Mx_new_search'] 			= 'NouÄƒ CÄƒutare';
 
 
 //
 // Copyrights page
 //
-$lang['mx_about_title'] 			= 'Despre mxBB Portal';
-$lang['mx_copy_title'] 				= 'mxBB Portal Informaþii';
-$lang['mx_copy_modules_title'] 		= 'Module mxBB Portal Instalate';
+$lang['mx_about_title'] 			= 'Despre Mx-Publisher CMS';
+$lang['mx_copy_title'] 				= 'Mx-Publisher :: InformaÅ£ii';
+$lang['mx_copy_modules_title'] 		= 'Module MXP Instalate';
 $lang['mx_copy_template_title'] 	= 'Despre stil';
 $lang['mx_copy_translation_title'] 	= 'Despre traducere';
 
 // This is optional, if you would like a _SHORT_ message output
 // along with our copyright message indicating you are the translator
 // please add it here.
-$lang['TRANSLATION_INFO_MXBB'] = 'Traducerea în Limba Românã de <a href="http://www.mx-publisher.com/phpBB2/profile.php?mode=viewprofile&u=6605" target="_blank">FlorinCB</a>';
+$lang['TRANSLATION_INFO_MXBB'] = 'Traducerea Ã®n Limba RomÃ¢nÄƒ de <a href="http://mxpcms.sourceforge.net//phpBB2/profile.php?mode=viewprofile&u=6605" target="_blank">FlorinCB</a>';
 
 //
 // Installation
 //
-$lang['Please_remove_install_contrib'] = 'Te rog asigurã-te cã amândouã directoarele install/ ºi contrib/ sunt ºterse';
+$lang['Please_remove_install_contrib'] = 'Te rog asigurÄƒ-te cÄƒ amÃ¢ndouÄƒ directoarele install/ ÅŸi contrib/ sunt ÅŸterse';
 
 //
 // Multilangual page titles

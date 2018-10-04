@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: admin_mx_module_cp.php,v 1.25 2008/10/04 07:04:24 orynider Exp $
+* @version $Id: admin_mx_module_cp.php,v 1.31 2014/05/09 07:51:42 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -18,10 +18,10 @@ if( !empty($setmodules) )
 //
 // Security and Page header
 //
-define('IN_PORTAL', 1);
+@define('IN_PORTAL', 1);
 $mx_root_path = './../';
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
-$no_page_header = TRUE;
+$no_page_header = true;
 require('./pagestart.' . $phpEx);
 
 //
@@ -312,30 +312,14 @@ $template->assign_vars(array(
 
 if ($mx_modulecp_include_block_private)
 {
-	//
 	// Get the list of phpBB usergroups
-	//
-	switch (PORTAL_BACKEND)
-	{
-		case 'internal':
-		case 'phpbb2':
-			$sql = "SELECT group_id, group_name
-				FROM " . GROUPS_TABLE . "
-				WHERE group_single_user <> " . TRUE . "
-				ORDER BY group_name ASC";
-			break;
-		case 'phpbb3':
-			$sql = "SELECT group_id, group_name
-				FROM " . GROUPS_TABLE . "
-				WHERE group_name NOT IN ('BOTS', 'GUESTS')
-				ORDER BY group_name ASC";
-			break;
-	}
+	$sql = $mx_backend->generate_group_select_sql();
+
 	if( !($result = $db->sql_query($sql)) )
 	{
 		mx_message_die(GENERAL_ERROR, 'Could not get group list', '', __LINE__, __FILE__, $sql);
 	}
-
+	$groupdata = array();
 	while( $row = $db->sql_fetchrow($result) )
 	{
 		$groupdata[] = $row;
@@ -361,11 +345,11 @@ if( $total_modules_current = $db->sql_numrows($q_modules_current) )
 {
 	$module_rows_current = $db->sql_fetchrowset($q_modules_current);
 }
-$db->sql_freeresult($result);
+$db->sql_freeresult($q_modules_current);
 
-//
-// Get the rest modules
-//
+/*
+* Get the rest modules
+*/
 $sql = "SELECT *
 	FROM " . MODULE_TABLE . "
 	WHERE module_id <> '" . $nav_module_id . "'
@@ -381,8 +365,7 @@ if( $total_modules = $db->sql_numrows($q_modules) )
 {
 	$module_rows = $db->sql_fetchrowset($q_modules);
 }
-
-$db->sql_freeresult($result);
+$db->sql_freeresult($q_modules);
 
 if ( $total_modules + $total_modules_current == 0 )
 {
@@ -402,7 +385,7 @@ $module_rows_select = array();
 //
 // Module loop
 //
-for( $module_count = 0; $module_count < $total_modules + 1; $module_count++ )
+for( $module_count = 0; $module_count < $total_modules; $module_count++ )
 {
 	//
 	// Give main vars specific names
@@ -556,8 +539,7 @@ for( $module_count = 0; $module_count < $total_modules + 1; $module_count++ )
 	{
 		$function_rows = $db->sql_fetchrowset($q_functions);
 	}
-
-	$db->sql_freeresult($result);
+	$db->sql_freeresult($q_functions);
 
 	if ( $total_functions == 0 )
 	{
@@ -692,36 +674,34 @@ for( $module_count = 0; $module_count < $total_modules + 1; $module_count++ )
 				'NONE' => $lang['No_parameters']
 			));
 		}
-
-		//
+		
 		// Parameter loop
-		//
 		for( $parameter_count = 0; $parameter_count < $total_parameters + 1; $parameter_count++ )
 		{
 			$new_parameter = $parameter_count == $total_parameters;
-			$parameter_id = $new_parameter ? $function_id . '_0': $parameter_rows[$parameter_count]['parameter_id'];
+			$parameter_id = isset($new_parameter) ? $function_id . '_0': $parameter_rows[$parameter_count]['parameter_id'];
+			$parameter_desc = isset($parameter_rows[$parameter_count]['parameter_desc']) ? $parameter_rows[$parameter_count]['parameter_desc'] : 0;
+			$parameter_order = isset($parameter_rows[$parameter_count]['parameter_order']) ? $parameter_rows[$parameter_count]['parameter_order'] : 0;
 			$id = $new_parameter ? $function_id : $parameter_id;
 
 			$mode = MX_PARAMETER_TYPE;
 			$action = $new_parameter ? MX_DO_INSERT : MX_DO_UPDATE;
 			$deletemode = '?mode=' . $mode . '&amp;action=' . MX_DO_DELETE . '&amp;id=' . $parameter_id;
 
-			$upmode = '?mode=' . $mode . '&amp;action=' . MX_DO_MOVE . '&amp;id=' . $parameter_id . '&amp;function_id=' . $function_id . '&amp;block_order=' . $block_order . '&amp;move=-15';
-			$downmode = '?mode=' . $mode . '&amp;action=' . MX_DO_MOVE . '&amp;id=' . $parameter_id . '&amp;function_id=' . $function_id . '&amp;block_order=' . $block_order . '&amp;move=15';
-
-			//
+			$upmode = '?mode=' . $mode . '&amp;action=' . MX_DO_MOVE . '&amp;id=' . $parameter_id . '&amp;function_id=' . $function_id . '&amp;parameter_order=' . $parameter_order . '&amp;move=-15';
+			$downmode = '?mode=' . $mode . '&amp;action=' . MX_DO_MOVE . '&amp;id=' . $parameter_id . '&amp;function_id=' . $function_id . '&amp;parameter_order=' . $parameter_order . '&amp;move=15';
+			
 			// Hidden fields
-			//
 			$s_hidden_parameter_fields = 	'<input type="hidden" name="mode" value="' . $mode . '" />
 										<input type="hidden" name="action" value="' . $action . '" />
 										<input type="hidden" name="id" value="' . $id . '" />
 										<input type="hidden" name="sid" value="' . $userdata['session_id'] . '" />';
 
 			$parameter_title = !$new_parameter ? $parameter_rows[$parameter_count]['parameter_name'] : '';
-			$parameter_type_key = $parameter_rows[$parameter_count]['parameter_type'];
+			$parameter_type_key = isset($parameter_rows[$parameter_count]['parameter_type']) ? $parameter_rows[$parameter_count]['parameter_type'] : 0;
 			$parameter_type = !$new_parameter ? get_list_static('parameter_type', $type_row, $parameter_type_key) : get_list_static('parameter_type', $type_row, 'BBText');
 
-			$parameter_function = $parameter_rows[$parameter_count]['parameter_function'];
+			$parameter_function = isset($parameter_rows[$parameter_count]['parameter_function']) ? $parameter_rows[$parameter_count]['parameter_function'] : 0;
 			$parameter_function = !$new_parameter && !empty($parameter_function) ? ( $parameter_rows[$parameter_count]['parameter_type'] != 'Function' ? implode( "\n", unserialize( stripslashes( $parameter_function ) ) ) : $parameter_function ) : '';
 
 			$parameter_auth = !$new_parameter ? $parameter_rows[$parameter_count]['parameter_auth'] : 0;
@@ -831,32 +811,26 @@ for( $module_count = 0; $module_count < $total_modules + 1; $module_count++ )
 				'NONE' => $lang['No_blocks']
 			));
 		}
-
-		//
+		
 		// Block loop
-		//
 		for( $block_count = 0; $block_count < $total_blocks + 1; $block_count++ )
 		{
 			$new_block = $block_count == $total_blocks;
 			$block_id = $new_block ? $function_id . '_0' : $block_rows[$block_count]['block_id'];
 			$id = $new_block ? $function_id : $block_id;
-
+			$s_column_span = 0;
 			$mode = MX_BLOCK_TYPE;
 			$mode_private = MX_BLOCK_PRIVATE_TYPE;
 			$action = $new_block ? MX_DO_INSERT : MX_DO_UPDATE;
 			$deletemode = '?mode=' . $mode . '&amp;action=' . MX_DO_DELETE . '&amp;id=' . $block_id;
-
-			//
+			
 			// Hidden fields
-			//
 			$s_hidden_block_fields = 	'<input type="hidden" name="mode" value="' . $mode . '" />
 										<input type="hidden" name="action" value="' . $action . '" />
 										<input type="hidden" name="id" value="' . $id . '" />
 										<input type="hidden" name="sid" value="' . $userdata['session_id'] . '" />';
 
-			//
 			// Hidden fields
-			//
 			$s_hidden_block_private_fields = 	'<input type="hidden" name="mode" value="' . $mode_private . '" />
 										<input type="hidden" name="action" value="' . MX_DO_UPDATE . '" />
 										<input type="hidden" name="id" value="' . $id . '" />
@@ -888,17 +862,15 @@ for( $module_count = 0; $module_count < $total_modules + 1; $module_count++ )
 			$editor_name = $editor_name_tmp['username'];
 
 			$block_time = !$new_block ? $block_rows[$block_count]['block_time'] : time();
-			$edit_time = $phpBB2->create_date( $board_config['default_dateformat'], $block_time, $board_config['board_timezone'] );
+			$edit_time = phpBB2::create_date( $board_config['default_dateformat'], $block_time, $board_config['board_timezone'] );
 
 			if ($new_block)
 			{
 				$block_rows[$block_count][$block_auth_fields[0]] = AUTH_ALL;
 				$block_rows[$block_count][$block_auth_fields[1]] = AUTH_ADMIN;
 			}
-
-			//
+			
 			// Block subpanel - edit
-			//
 			$visible_tag_edit = in_array('adminEdit_' . $block_id, $cookie_states);
 			$visible_tag_private = in_array('adminPrivate_' . $block_id, $cookie_states);
 			$visible_tag_delete = in_array('adminBlockDelete_' . $block_id, $cookie_states);
@@ -931,9 +903,7 @@ for( $module_count = 0; $module_count < $total_modules + 1; $module_count++ )
 				'U_BLOCK_DELETE' => mx_append_sid(PORTAL_URL . "admin/admin_mx_module_cp.$phpEx" . $deletemode),
 				'U_BLOCK_PERMISSIONS' => mx_append_sid(PORTAL_URL . "admin/admin_mx_block_auth.$phpEx?cat_id=$block_id"),
 
-				//
 				// Block subpanel - edit
-				//
 				'L_FUNCTION' => $lang['Function'],
 
 				'L_AUTH_TITLE' => $lang['Auth_Block'],
@@ -959,9 +929,7 @@ for( $module_count = 0; $module_count < $total_modules + 1; $module_count++ )
 				'S_SHOW_STATS_YES' => $show_stats_yes,
 				'S_SHOW_STATS_NO' => $show_stats_no,
 
-				//
 				// Quick Panels
-				//
 				'MESSAGE_DELETE' => $message_delete,
 
 				'S_HIDDEN_FIELDS' => $s_hidden_block_fields,
@@ -972,9 +940,7 @@ for( $module_count = 0; $module_count < $total_modules + 1; $module_count++ )
 
 			if ($mx_modulecp_include_block_quickedit)
 			{
-				//
 				// Auth
-				//
 				for( $l = 0; $l < count($block_auth_fields); $l++ )
 				{
 					$custom_auth[$l] = '&nbsp;<select name="' . $block_auth_fields[$l] . '">';
@@ -1009,9 +975,11 @@ for( $module_count = 0; $module_count < $total_modules + 1; $module_count++ )
 				$moderator_groups = @explode(',', $block_rows[$block_count]['auth_moderator_group']);
 
 				$row_private = '';
+				
 				for( $i = 0; $i < count($groupdata); $i++ )
 				{
-					$row_color = ( !( $i % 2 ) ) ? 'row1' : 'row2';
+					$row_class = ( !( $i % 2 ) ) ? $mx_user->theme['td_class1'] : $mx_user->theme['td_class2'];				
+					$row_color = ( !( $i % 2 ) ) ? $mx_user->theme['td_color1'] : $mx_user->theme['td_color2'];
 					$row_private .= '<tr>' . "\n";
 					$row_private .= '<td width="40%" class="'.$row_color.'" align="center"><span class="gen">'.$groupdata[$i]['group_name'].'</span></td>';
 					$row_private .= '<td width="20%" class="'.$row_color.'" align="center">';
@@ -1055,12 +1023,12 @@ for( $module_count = 0; $module_count < $total_modules + 1; $module_count++ )
 			if (!$new_block)
 			{
 				$template->assign_block_vars('module.function.block.is_block', array());
-			
+
 				if ( $mx_modulecp_include_block_private )
 				{
 					$template->assign_block_vars('module.function.block.is_block.include_block_private', array());
 				}
-	
+
 				if ( $mx_modulecp_include_block_quickedit )
 				{
 					$template->assign_block_vars('module.function.block.is_block.include_block_edit', array());

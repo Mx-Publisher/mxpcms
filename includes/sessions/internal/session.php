@@ -2,10 +2,10 @@
 /**
 *
 * @package Style
-* @version $Id: session.php,v 1.16 2008/09/29 01:00:04 orynider Exp $
+* @version $Id: session.php,v 1.22 2014/09/29 11:42:31 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team & (C) 2001 The phpBB Group
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -55,18 +55,15 @@ class session
 	{
 		global $portal_config;
 
-		$this->data = $this->session_pagestart($this->user_ip, - ( MX_PORTAL_PAGES_OFFSET + $this->page_id ));
+		$this->data = $this->session_pagestart($this->user_ip, - (MX_PORTAL_PAGES_OFFSET + $this->page_id));
 
-		//
 		// Simulate the user lang setting
-		//
 		$this->data['user_lang'] = $portal_config['default_lang'];
-		$this->data['user_dateformat'] = $portal_config['user_dateformat'];
-		$this->data['user_timezone'] = $portal_config['user_timezone'];
+		$this->data['user_dateformat'] = $portal_config['default_dateformat'];
+		$this->data['user_timezone'] = $portal_config['board_timezone'];
+		$this->data['user_dst']	= 1;	
 
-		//
 		// Populate session_id
-		//
 		$this->session_id = $this->data['session_id'];
 	}
 
@@ -93,7 +90,7 @@ class session
 		else
 		{
 			$sessiondata = array();
-			$session_id = $mx_request_vars->get('sid', mztnt);
+			$session_id = $mx_request_vars->get('sid', MX_TYPE_NO_TAGS);
 			$sessionmethod = SESSION_METHOD_GET;
 		}
 
@@ -364,11 +361,17 @@ class session
 					AND u.user_id = s.session_user_id";
 			if ( !($result = $db->sql_query($sql)) )
 			{
-				mx_message_die(CRITICAL_ERROR, 'Error doing DB query userdata row fetch', '', __LINE__, __FILE__, $sql);
+				$user_id = ( isset($sessiondata['userid']) ) ? intval($sessiondata['userid']) : ANONYMOUS;
+
+				if ( !($userdata = $this->session_begin($user_id, $user_ip, $thispage_id, TRUE)) )
+				{
+					mx_message_die(CRITICAL_ERROR, 'Error doing DB query userdata row fetch', '', __LINE__, __FILE__, $sql);
+				}
 			}
-
-			$userdata = $db->sql_fetchrow($result);
-
+			else
+			{			
+				$userdata = $db->sql_fetchrow($result);
+			}			
 			//
 			// Did the session exist in the DB?
 			//
@@ -619,7 +622,7 @@ class session
 	function setup($lang_set = false, $style = false)
 	{
 		global $db, $template, $board_config, $userdata, $phpbb_auth, $phpEx, $phpbb_root_path, $mx_root_path, $mx_cache;
-		global $mx_request_vars, $portal_config; //added for mxp
+		global $mx_request_vars, $portal_config, $shared_lang_path; //added for mxp
 
 		$lang_set = !$lang_set ? (defined('IN_ADMIN') ? 'lang_admin' : 'lang_main') : $lang_set;
 
@@ -627,7 +630,7 @@ class session
 		$this->lang_path = $shared_lang_path;
 
 		$this->date_format = $board_config['default_dateformat'];
-		$this->timezone = $board_config['user_timezone'] * 3600;
+		$this->timezone = $board_config['board_timezone'] * 3600;
 		$this->dst = $this->data['user_dst'] * 3600;
 
 		//
@@ -654,7 +657,67 @@ class session
 
 		return;
 	}
+	/**
+	 * Sync UserData
+	 * @access private
+	 */	
+	function sync_userdata($userdata = false)
+	{
+		if (empty($userdata))
+		{
+			return false;
+		}	
+		foreach ($userdata as $key => $value)
+		{
+			$do = true;
+			switch ($key)
+			{
+				// Rename user_data keys and get internal sitename/sitedesc
+				case 'user_id':				
+				case 'user_name':			
+				case 'user_regdate':			
+				case 'user_posts':			
+				case 'user_level':			
+				case 'user_lang':
+				break;
+				/*
+				case 'last_login':
+					$key = 'user_lastvisit';
+				break;
+				*/				
+			}
+			if ($do)
+			{
+				return $userdata[$key] = $value;
+			}
+		}		
+	}
 
+	/**
+	 * A replacement for unserialize that returns whether it worked and
+	 * populates the unserialized variable by reference.
+	 *
+	 * @author walf
+	 * @link   http://www.php.net/manual/pt_BR/function.unserialize.php#105500
+	 * @param  string $serialized the serialized data
+	 * @param  array $into the variable to hold the unserialized array
+	 * @return bool whether the data was unserialized or not
+	 * borrowed here from SMF Backend
+	 * @since  0.1.2
+	 *
+	 */
+	function funserialize($serialized, &$into)
+	{
+	    static $sfalse;
+	    if ($sfalse === null)
+		{		
+	        $sfalse = serialize(false);
+		}	    
+		$into = @unserialize($serialized);
+	    return $into !== false || @rtrim($serialized) === $sfalse;
+	    //whitespace at end of serialized var is ignored by PHP
+	}
+	
 	/**
 	 * Setup style
 	 *
@@ -762,6 +825,240 @@ class session
 		// We include common language file here to not load it every time a custom language file is included
 		$this->lang = &$lang;
 	}
+	
+	/**
+	* Specify/Get image
+	//
+	// phpBB2 Graphics - redefined for mxBB
+	// - Uncomment and redefine phpBB graphics
+	//
+	// If you need to redefine some phpBB graphics, look within the phpBB/templates folder for the template_name.cfg file and
+	// redefine those $image['xxx'] you want. Note: Many phpBB images are reused all over mxBB (eg see below), thus if you redefine
+	// common phpBB images, this will have immedaite effect for all mxBB pages.
+	//
+	*/
+	function img($img, $alt = '', $width = false, $suffix = '', $type = 'full_tag')
+	{
+		static $imgs;
+		global $phpbb_root_path, $mx_root_path, $mx_images;
+		
+		//
+		// Load phpBB Template configuration data
+		// - First try current template
+		//
+		if ( file_exists( $phpbb_root_path . $this->current_template_path . "/images" ) )
+		{
+			$current_template_path = $this->current_template_path;
+			$template_name = $this->template_name;
+
+			@include($phpbb_root_path . $this->current_template_path . '/' . $this->template_name . '.cfg');
+		}
+
+		//
+		// Since we have no current Template Config file, try the cloned template instead
+		//
+		if ( file_exists( $phpbb_root_path . $this->cloned_current_template_path . "/images" ) && !defined('TEMPLATE_CONFIG') )
+		{
+			$current_template_path = $this->cloned_current_template_path;
+			$template_name = $this->cloned_template_name;
+
+			@include($phpbb_root_path . $this->cloned_current_template_path . '/' . $this->cloned_template_name . '.cfg');
+		}
+
+		//
+		// Last attempt, use default template intead
+		//
+		if ( file_exists( $phpbb_root_path . $this->default_current_template_path . "/images" ) && !defined('TEMPLATE_CONFIG') )
+		{
+			$current_template_path = $this->default_current_template_path;
+			$template_name = $this->default_template_name;
+
+			@include($phpbb_root_path . $this->default_current_template_path . '/' . $this->default_template_name . '.cfg');
+		}
+
+		$this->img_lang = (file_exists($phpbb_root_path . $current_template_path . $this->lang_name)) ? $this->lang_name : $board_config['default_lang'];		
+
+		/* Here we overwrite phpBB images from the template configuration file with images from database  */
+		
+		$this->img_array['image_filename'] = array(
+			'img_site_logo' => "logo.gif",
+			'img_upload_bar' => "upload_bar.gif",
+			'img_icon_contact_aim' => "icon_aim.gif",
+			'img_icon_contact_email' => "icon_email.gif",
+			'img_icon_contact_icq' => "icon_icq_add.gif",
+			'img_icon_contact_jabber' => "icon_jabber.gif",
+			'img_icon_contact_msnm' => "icon_msnm.gif",
+			'img_icon_contact_pm' => "icon_pm.gif",
+			'img_icon_contact_yahoo' => "icon_yim.gif",
+			'img_icon_contact_www' => "icon_www.gif",
+			'img_icon_post_delete' => "icon_delete.gif",
+			'img_icon_post_edit' => "icon_edit.gif",
+			'img_icon_post_info' => "icon_info.gif",
+			'img_icon_post_quote' => "icon_quote.gif",
+			'img_icon_post_report' => "icon_report.gif",
+			'img_icon_user_online' => "icon_online.gif",
+			'img_icon_user_offline' => "icon_offline.gif",
+			'img_icon_user_profile' => "icon_profile.gif",
+			'img_icon_user_search' => "icon_search.gif",
+			'img_icon_user_warn' => "icon_warn.gif",
+			'img_button_pm_forward' => "reply.gif",
+			'img_button_pm_new' => "msg_newpost.gif",
+			'img_button_pm_reply' => "reply.gif",
+			'img_button_topic_locked' => "msg_newpost.gif",
+			'img_button_topic_new' => "post.gif",
+			'img_button_topic_reply' => "reply.gif",
+			'img_forum_link' => "forum_link.gif",
+			'img_forum_read' => "forum_read.gif",
+			'img_forum_read_locked' => "forum_read_locked.gif",
+			'img_forum_read_subforum' => "forum_read_subforum.gif",
+			'img_forum_unread' => "forum_unread.gif",
+			'img_forum_unread_locked' => "forum_unread_locked.gif",
+			'img_forum_unread_subforum' => "forum_unread_subforum.gif",
+			'img_topic_moved' => "topic_moved.gif",
+			'img_topic_read' => "topic_read.gif",
+			'img_topic_read_mine' => "topic_read_mine.gif",
+			'img_topic_read_hot' => "topic_read_hot.gif",
+			'img_topic_read_hot_mine' => "topic_read_hot_mine.gif",
+			'img_topic_read_locked' => "topic_read_locked.gif",
+			'img_topic_read_locked_mine' => "topic_read_locked_mine.gif",
+			'img_topic_unread' => "topic_unread.gif",
+			'img_topic_unread_mine' => "topic_unread_mine.gif",
+			'img_topic_unread_hot' => "topic_unread_hot.gif",
+			'img_topic_unread_hot_mine' => "topic_unread_hot_mine.gif",
+			'img_topic_unread_locked' => "topic_unread_locked.gif",
+			'img_topic_unread_locked_mine' => "topic_unread_locked_mine.gif",
+			'img_sticky_read' => "sticky_read.gif",
+			'img_sticky_read_mine' => "sticky_read_mine.gif",
+			'img_sticky_read_locked' => "sticky_read_locked.gif",
+			'img_sticky_read_locked_mine' => "ticky_read_locked_mine.gif",
+			'img_sticky_unread' => "sticky_unread.gif",
+			'img_sticky_unread_mine' => "sticky_unread_mine.gif",
+			'img_sticky_unread_locked' => "sticky_unread_locked.gif",
+			'img_sticky_unread_locked_mine' => "sticky_unread_locked_mine.gif",
+			'img_announce_read' => "announce_read.gif",
+			'img_announce_read_mine' => "announce_read_mine.gif",
+			'img_announce_read_locked' => "announce_read_locked.gif",
+			'img_announce_read_locked_mine' => "announce_read_locked_mine.gif",
+			'img_announce_unread' => "announce_unread.gif",
+			'img_announce_unread_mine' => "announce_unread_mine.gif",
+			'img_announce_unread_locked' => "announce_unread_locked.gif",
+			'img_announce_unread_locked_mine' => "announce_unread_locked_mine.gif",
+			'img_global_read' => "announce_read.gif",
+			'img_global_read_mine' => "announce_read_mine.gif",
+			'img_global_read_locked' => "announce_read_locked.gif",
+			'img_global_read_locked_mine' => "announce_read_locked_mine.gif",
+			'img_global_unread' => "announce_unread.gif",
+			'img_global_unread_mine' => "announce_unread_mine.gif",
+			'img_global_unread_locked' => "announce_unread_locked.gif",
+			'img_global_unread_locked_mine' => "announce_unread_locked_mine.gif",
+			'img_subforum_read' => "", 
+			'img_subforum_unread' => "",
+			'img_pm_read' => "topic_read.gif",
+			'img_pm_unread' => "topic_unread.gif",
+			'img_icon_back_top' => "",
+			'img_icon_post_target' => "icon_post_target.gif",
+			'img_icon_post_target_unread' => "icon_post_target_unread.gif",
+			'img_icon_topic_attach' => "icon_topic_attach.gif",
+			'img_icon_topic_latest' => "icon_topic_latest.gif",
+			'img_icon_topic_newest' => "icon_topic_newest.gif",
+			'img_icon_topic_reported' => "icon_topic_reported.gif",
+			'img_icon_topic_unapproved' => "icon_topic_unapproved.gif"			
+		);
+		
+		$this->img_array['image_lang'] = array(
+			'img_icon_post_edit' => $this->img_lang,
+			'img_icon_post_quote' => $this->img_lang,
+			'img_button_pm_forward' => $this->img_lang,
+			'img_button_pm_new' => $this->img_lang,
+			'img_button_pm_reply' => $this->img_lang,
+			'img_button_topic_new' => $this->img_lang,
+			'img_button_topic_reply' => $this->img_lang		
+		);		
+		
+		$img_data = &$imgs[$img];
+
+		if (empty($img_data))
+		{
+			if (!isset($this->img_array[$img]))
+			{
+				// Do not fill the image to let designers decide what to do if the image is empty
+				$img_data = '';
+				return $img_data;
+			}
+
+			$img_data['src'] = PHPBB_URL . $current_template_path . ($this->img_array[$img]['image_lang'] ? $this->img_array[$img]['image_lang'] .'/' : '') . $this->img_array[$img]['image_filename'];
+			$img_data['width'] = (!empty($width)) ? $width : ''; //$this->img_array[$img]['image_width'];
+			$img_data['height'] = (!empty($height)) ? $height : ''; //$this->img_array[$img]['image_height'];
+		}
+
+		$alt = (!empty($this->lang[$alt])) ? $this->lang[$alt] : $alt;
+
+		switch ($type)
+		{
+			case 'src':
+				return $img_data['src'];
+			break;
+
+			case 'width':
+				return ($width === false) ? $img_data['width'] : $width;
+			break;
+
+			case 'height':
+				return $img_data['height'];
+			break;
+
+			default:
+				$use_width = ($width === false) ? $img_data['width'] : $width;
+
+				return '<img src="' . $img_data['src'] . '"' . (($use_width) ? ' width="' . $use_width . '"' : '') . (($img_data['height']) ? ' height="' . $img_data['height'] . '"' : '') . ' alt="' . $alt . '" title="' . $alt . '" />';
+			break;
+		}
+	}
+
+	/**
+	* Get option bit field from user options
+	*/
+	function optionget($key, $data = false)
+	{
+		if (!isset($this->keyvalues[$key]))
+		{
+			$var = ($data) ? $data : $this->data['user_options'];
+			$this->keyvalues[$key] = ($var & 1 << $this->keyoptions[$key]) ? true : false;
+		}
+
+		return $this->keyvalues[$key];
+	}
+
+	/**
+	* Set option bit field for user options
+	*/
+	function optionset($key, $value, $data = false)
+	{
+		$var = ($data) ? $data : $this->data['user_options'];
+
+		if ($value && !($var & 1 << $this->keyoptions[$key]))
+		{
+			$var += 1 << $this->keyoptions[$key];
+		}
+		else if (!$value && ($var & 1 << $this->keyoptions[$key]))
+		{
+			$var -= 1 << $this->keyoptions[$key];
+		}
+		else
+		{
+			return ($data) ? $var : false;
+		}
+
+		if (!$data)
+		{
+			$this->data['user_options'] = $var;
+			return true;
+		}
+		else
+		{
+			return $var;
+		}
+	}	
 
 	/**
 	 * encode_lang

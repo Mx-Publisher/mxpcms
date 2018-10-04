@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Module - mx_navmenu
-* @version $Id: navmenu_constants.php,v 1.3 2008/02/04 16:52:02 joasch Exp $
+* @version $Id: navmenu_constants.php,v 1.5 2014/05/18 06:25:07 orynider Exp $
 * @copyright (c) 2002-2008 [Martin, Markus, Jon Ohlsson] MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net
 *
 */
 
@@ -38,6 +38,6 @@ if (is_object($mx_page))
 		// - LANG: MX_LANG_MAIN (default), MX_LANG_ADMIN, MX_LANG_ALL, MX_LANG_NONE
 		// - IMAGES: MX_IMAGES (default), MX_IMAGES_NONE
 		// -------------------------------------------------------------------------
-		$mx_user->extend(MX_LANG_NONE, MX_IMAGES);
+		$mx_user->extend(MX_LANG_ALL, MX_IMAGES);
 }
 ?>

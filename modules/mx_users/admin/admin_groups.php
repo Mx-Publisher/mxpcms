@@ -6,7 +6,7 @@
  *   copyright            : (C) 2001 The phpBB Group
  *   email                : support@phpbb.com
  *
- *   $Id: admin_groups.php,v 1.4 2008/02/09 12:51:06 joasch Exp $
+ *   $Id: admin_groups.php,v 1.6 2013/06/25 18:24:07 orynider Exp $
  *
  *
  ***************************************************************************/
@@ -20,7 +20,6 @@
  *
  ***************************************************************************/
 
-define( 'IN_PORTAL', true );
 
 if ( !empty( $setmodules ) )
 {
@@ -28,7 +27,7 @@ if ( !empty( $setmodules ) )
 	$module['phpbb2admin']['2_phpbb2admin_Groups'] = 'modules/mx_users/admin/' . $filename;
 	return;
 }
-
+@define('IN_PORTAL', 1);
 $mx_root_path = './../../../';
 $module_root_path = "./../";
 $phpEx = substr(strrchr(__FILE__, '.'), 1);

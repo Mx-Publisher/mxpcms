@@ -5,8 +5,10 @@
 <meta http-equiv="Content-Type" content="text/html; charset={S_CONTENT_ENCODING}">
 <meta http-equiv="Content-Style-Type" content="text/css">
 <!-- IF SET_BASE --><base href="{U_PORTAL_ROOT_PATH}" ><!-- ENDIF -->
+
 {META}
 {NAV_LINKS}
+
 <title>{SITENAME} :: {PAGE_TITLE}</title>
 <!-- IF PHPBB -->
 <!-- First load standard template *.css definition, located in the the phpbb template folder -->
@@ -19,6 +21,7 @@
 <!-- Optionally, redefine some defintions for gecko browsers -->
 <link rel="stylesheet" href="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}{T_GECKO_STYLESHEET}" type="text/css" >
 <!-- ENDIF -->
+
 {MX_ADDITIONAL_CSS_FILES}
 {MX_ICON_CSS}
 

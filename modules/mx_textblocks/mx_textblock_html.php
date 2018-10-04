@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Module - mx_textblocks
-* @version $Id: mx_textblock_html.php,v 1.19 2008/06/17 16:32:57 orynider Exp $
+* @version $Id: mx_textblock_html.php,v 1.20 2013/06/28 15:36:45 orynider Exp $
 * @copyright (c) 2002-2008 [Jon Ohlsson] MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 

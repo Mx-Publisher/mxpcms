@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Module - mx_coreblocks
-* @version $Id: mx_blockcp.php,v 1.25 2008/07/13 19:31:26 jonohlsson Exp $
+* @version $Id: mx_blockcp.php,v 1.27 2014/05/18 06:24:56 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net
 *
 */
 
@@ -113,7 +113,7 @@ $submit = $mx_request_vars->is_post('submit');
 $submit_pars = $mx_request_vars->is_post('submit_pars');
 $cancel = $mx_request_vars->is_post('cancel');
 $preview = $mx_request_vars->is_post('preview');
-$refresh = $preview || $submit_search;
+$refresh = $preview || isset($submit_search);
 
 //
 // Cancel
@@ -205,20 +205,23 @@ if( !empty($mode) && !empty($action) && !$preview)
 		//
 		$result_message = $mx_blockcp->submit_parameters($block_id);
 	}
+	$block_info = mx_get_info(BLOCK_TABLE, 'block_id', $block_id);
+	$module_id = !empty($module_id) ? $module_id : '';
+	$function_id = !empty($function_id) ? $function_id : $block_info['function_id'];
 
 	$has_dyn_block_id = $dynamic_block_id > 0 ? '&amp;dynamic_block='.$dynamic_block_id : '';
 	$message = $lang['BlockCP_Config_updated'] . '<br /><br />' . sprintf($lang['Click_return_blockCP_admin'], '<a href="' . mx_append_sid( PORTAL_URL ."modules/mx_coreblocks/mx_blockcp.$phpEx?block_id=$block_id&amp;module_id=$module_id&amp;function_id=$function_id&amp;portalpage=$portalpage$has_dyn_block_id&amp;sid=$sid") . '">', '</a>') . '<br /><br />' . sprintf($lang['Click_return_portalpage_admin'], '<a href="' . mx_append_sid(PORTAL_URL . "index.$phpEx?page=$portalpage&amp;virtual=$virtual_id$has_dyn_block_id") . '">', '</a>');
 	mx_message_die(GENERAL_MESSAGE, $message);
 
 } // if .. !empty($mode)
-
+$blog_u = isset($blog_u) ? $blog_u : "/";
 $s_hidden_fields = '<input type="hidden" name="sid" value="' . $userdata['session_id'] . '" />';
 $s_hidden_fields .= '<input type="hidden" name="block_id" value="' . $block_id . '" />';
 $s_hidden_fields .= '<input type="hidden" name="virtual" value="' . $virtual_id . '" />';
 $s_hidden_fields .= '<input type="hidden" name="portalpage" value="' . $portalpage . '" />';
 $s_hidden_fields .= '<input type="hidden" name="sub_id" value="' . $sub_id . '" />';
 $s_hidden_fields .= '<input type="hidden" name="u" value="' . $blog_u . '" />';
-$s_hidden_fields .= '<input type="hidden" name="blog_mode" value="' . $blog_mode . '" />';
+$s_hidden_fields .= '<input type="hidden" name="blog_mode" value="' . $mode . '" />';
 
 // **********************************************************************
 // Read language definition
@@ -243,20 +246,20 @@ if ($is_admin)
 	//
 	// Removed from here atm
 	//
-	// $mx_dynamic_select = new mx_dynamic_select();
-	// $mx_dynamic_select->generate($block_id);
-	// $blockcptemplate->assign_block_vars('dynamic_select', array());
+	$mx_dynamic_select = new mx_dynamic_select();
+	$mx_dynamic_select->generate($block_id);
+	$blockcptemplate->assign_block_vars('dynamic_select', array());
 }
 
 //
 // Setup config parameters
 //
-//$block_config = $mode == 'editblog' ? read_block_config($block_id, false, $sub_id) : read_block_config($block_id, false);
+$block_config = $mode == 'editblog' ? read_block_config($block_id, false, $sub_id) : read_block_config($block_id, false);
 
 //
 // Blog mode:
 //
-//$blog_validate = ( $blog_mode == 'group' ) ? mx_auth_group($sub_id, true) : $sub_id == $userdata['user_id'];
+$blog_validate = ( $mode == 'group' ) ? mx_auth_group($sub_id, true) : $sub_id == $userdata['user_id'];
 
 /*
 if( !($blog_validate || $is_auth_ary['auth_edit']) )

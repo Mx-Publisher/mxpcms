@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Module - mx_users
-* @version $Id: lang_admin.php,v 1.3 2008/06/14 20:41:32 jonohlsson Exp $
+* @version $Id: lang_admin.php,v 1.6 2013/06/28 15:39:51 orynider Exp $
 * @copyright (c) 2002-2008 [Adam Alkins (http://www.rasadam.com), Jon Ohlsson] MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 

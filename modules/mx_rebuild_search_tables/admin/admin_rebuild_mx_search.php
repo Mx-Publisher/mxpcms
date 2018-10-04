@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Module - mx_rebuild_search_tables
-* @version $Id: admin_rebuild_mx_search.php,v 1.15 2008/08/27 22:26:48 orynider Exp $
+* @version $Id: admin_rebuild_mx_search.php,v 1.16 2013/06/28 15:39:02 orynider Exp $
 * @copyright (c) 2002-2008 [phpBB, Jon Ohlsson] MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 

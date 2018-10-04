@@ -37,6 +37,13 @@
 </table>
 <span class="postbody"><!-- END code_close -->
 
+<!-- BEGIN inline_attachment_open -->
+<div class="attachtitle">{L_ATTACHMENT}:</div><div class="attachcontent">
+<!-- END inline_attachment_open -->
+
+<!-- BEGIN inline_attachment_close -->
+</div>
+<!-- END inline_attachment_close -->
 
 <!-- BEGIN b_open --><span style="font-weight: bold"><!-- END b_open -->
 <!-- BEGIN b_close --></span><!-- END b_close -->
@@ -72,27 +79,83 @@
 
 <!-- BEGIN GVideo -->
 <div style="text-align:center;">
-<object width="425" height="350">
+<object codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,0,0" id="flv_video" name="flv_video" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" align="center" height="500" width="640">
         <param name="movie" value="http://video.google.com/googleplayer.swf?docId={GVIDEOID}"></param>
-<embed style="width:400px; height:326px;" id="VideoPlayback"
+<embed style="width:640px; height:500px;" id="VideoPlayback"
         align="middle" type="application/x-shockwave-flash"
         src="http://video.google.com/googleplayer.swf?docId={GVIDEOID}"
         allowScriptAccess="sameDomain" quality="best" bgcolor="#ffffff"
         scale="noScale" salign="TL"  FlashVars="playerMode=embedded">
 </embed>
 </object><br />
-<a href="http://video.google.com/googleplayer.swf?docId={GVIDEOID}" target="_blank">{GVIDEOLINK}</a><br />
+<a href="http://video.google.com/googleplayer.swf?docId={GVIDEOID}" target="_blank">http://video.google.com/videoplay?docid={GVIDEOID}</a><br />
 </div>
 <!-- END GVideo -->
 
 <!-- BEGIN youtube -->
 <div style="text-align:center;">
-<object width="425" height="350">
-   <param name="movie" value="http://www.youtube.com/v/{YOUTUBEID}"></param>
-   <embed src="http://www.youtube.com/v/{YOUTUBEID}" type="application/x-shockwave-flash" width="425" height="350"></embed>
-</object><br />
+<center>
+<object codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,0,0" id="flv_video" name="flv_video" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" align="center" height="500" width="640">
+<param name="movie" value="http://www.youtube.com/v/{YOUTUBEID}"></param>
+	<param name="quality" value="high">
+	<param name="play" value="true">
+	<param name="loop" value="true">
+	<param name="scale" value="showall">
+	<param name="wmode" value="opaque">
+	<param name="devicefont" value="false">
+	<param name="bgcolor" value="#ffffff">
+	<param name="menu" value="true">
+	<param name="allowFullScreen" value="true">
+	<param name="allowScriptAccess" value="always">
+	<param name="salign" value="">   
+   <center><embed src="http://www.youtube.com/v/{YOUTUBEID}" type="application/x-shockwave-flash" width="640" height="500"></embed></center>
+</object>
+</center><br />
 <a href="http://youtube.com/watch?v={YOUTUBEID}" target="_blank">{YOUTUBELINK}</a></div><br />
 <!-- END youtube -->
+
+<!-- BEGIN scribd -->
+<div style="text-align:center;">
+<object codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,0,0" id="{SCRIBDID}" name="{SCRIBDID}" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" height="500" width="640" align="center">
+	<param name="movie"   value="{SCRIBDURL}">
+	<param name="quality" value="high">
+	<param name="play" value="true">
+	<param name="loop" value="true">
+	<param name="scale" value="showall">
+	<param name="wmode" value="opaque">
+	<param name="devicefont" value="false">
+	<param name="bgcolor" value="#ffffff">
+	<param name="menu" value="true">
+	<param name="allowFullScreen" value="true">
+	<param name="allowScriptAccess" value="always">
+	<param name="salign" value="">
+<embed src="{SCRIBDURL}" quality="high" pluginspage="http://www.macromedia.com/go/getflashplayer" play="true" loop="true" scale="showall" wmode="opaque" devicefont="false" bgcolor="#ffffff" name="doc_326877108105255_object" menu="true" allowfullscreen="true" allowscriptaccess="always" salign="" type="application/x-shockwave-flash" align="middle"  height="500" width="100%"></embed>
+</object>		
+<a title="View Article / Book" href="{SCRIBDURL}" style="margin: 12px auto 6px auto; font-family: Helvetica,Arial,Sans-serif; font-style: normal; font-variant: normal; font-weight: normal; font-size: 14px; line-height: normal; font-size-adjust: none; font-stretch: normal; -x-system-font: none; display: block; text-decoration: underline;">View Article / Book</a> 
+</div><br />
+<!-- END scribd -->
+
+<!-- BEGIN ipaper -->
+<div style="text-align:center;">
+<script type="text/javascript" src="http://www.scribd.com/javascripts/view.js"></script>
+<script type="text/javascript">
+<!-- //
+var docId = '{IPAPERID}';
+var access_key = '{IPAPERKEY}';
+var height = '{HEIGHT}';
+var width = '{WIDTH}';
+
+function iPaper(docId, access_key, height, width) {
+	var scribd_doc = scribd.Document.getDoc(docId, access_key);	
+	scribd_doc.addParam('height', height);
+	scribd_doc.addParam('width', width);
+	scribd_doc.write('embedded_flash');
+}
+//-->
+</script>		
+<a title="View Article / Book" href="{URL}" style="margin: 12px auto 6px auto; font-family: Helvetica,Arial,Sans-serif; font-style: normal; font-variant: normal; font-weight: normal; font-size: 14px; line-height: normal; font-size-adjust: none; font-stretch: normal; -x-system-font: none; display: block; text-decoration: underline;">View Article / Book</a> 
+</div><br />
+<!-- END ipaper -->
 
 <!-- BEGIN stream -->
 <div style="text-align:center;">
@@ -124,6 +187,7 @@ src="{URL}" name=MediaPlayer2 showcontrols=1 showdisplay=0 showstatusbar=1 autos
 <!-- BEGIN fade_open -->
 <span style="height: 1; Filter: Alpha(Opacity=100, FinishOpacity=0, Style=1, StartX=0, FinishX=100%)">
 <!-- END fade_open -->
+
 <!-- BEGIN fade_close -->
 </span>
 <!-- END fade_close -->

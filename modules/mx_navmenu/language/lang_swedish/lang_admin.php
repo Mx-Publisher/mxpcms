@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Module - mx_navmenu
-* @version $Id: lang_admin.php,v 1.3 2008/06/03 20:05:12 jonohlsson Exp $
+* @version $Id: lang_admin.php,v 1.4 2013/07/02 02:24:04 orynider Exp $
 * @copyright (c) 2002-2006 [Jon Ohlsson] MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 *
@@ -13,6 +13,18 @@
 //
 $lang['Nav_menu_cat']				= 'Navigeringsmenykategori';
 $lang['Nav_menu']					= 'Navigeringsmeny';
+
+$lang['menu_display_mode'] = 'Layout mode';
+$lang['menu_display_mode_explain '] = 'Horizonal or Vertical layout mode';
+
+$lang['Vertical']				= "Vertical";
+$lang['Horizontal']				= "Horizontal";
+$lang['Overall_navigation']		= "Overall_navigation";
+
+$lang['menu_custom_tpl']				= "Custom template file";
+$lang['menu_custom_tpl_explain ']		= "Eg mx_menu_custom.tpl";
+$lang['menu_page_parent']				= "Parent Page";
+$lang['menu_page_parent_explain ']		= "Navigation from this parent page";
 
 $lang['Menu_admin']                	= 'Navigeringsadministration';
 $lang['Menu_admin_explain']        	= 'Använd detta formulär för att skräddarsy din navigering';

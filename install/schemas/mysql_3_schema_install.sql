@@ -26,7 +26,7 @@ CREATE TABLE `mx_table_block` (
   `block_time` varchar(255) NOT NULL DEFAULT '',
   `block_editor_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`block_id`)
-) CHARACTER SET `utf8` COLLATE `utf8_bin`;
+);
 
 
 
@@ -66,7 +66,7 @@ CREATE TABLE `mx_table_block_system_parameter` (
   `parameter_opt` text,
   `sub_id` int(255) unsigned NOT NULL default '0',
   PRIMARY KEY  (`block_id`,`parameter_id`,`sub_id`)
-) CHARACTER SET `utf8` COLLATE `utf8_bin`;
+);
 
 
 
@@ -121,7 +121,7 @@ CREATE TABLE `mx_table_column` (
   `page_id` smallint(5) NOT NULL DEFAULT '0',
   PRIMARY KEY (`column_id`),
    KEY cat_order (`column_order`)
-) CHARACTER SET `utf8` COLLATE `utf8_bin`;
+);
 
 
 
@@ -146,7 +146,7 @@ CREATE TABLE `mx_table_column_block` (
   `block_id` smallint(5) NOT NULL DEFAULT '0',
   `block_order` smallint(5) NOT NULL DEFAULT '0',
   PRIMARY KEY (`column_id`,`block_id`)
-) CHARACTER SET `utf8` COLLATE `utf8_bin`;
+);
 
 
 
@@ -175,7 +175,7 @@ CREATE TABLE `mx_table_column_templates` (
   `page_template_id` smallint(5) NOT NULL DEFAULT '0',
   PRIMARY KEY (`column_template_id`),
    KEY cat_order (`column_order`)
-) CHARACTER SET `utf8` COLLATE `utf8_bin`;
+);
 
 
 
@@ -205,7 +205,7 @@ CREATE TABLE `mx_table_function` (
   `function_admin` varchar(255),
   PRIMARY KEY (`function_id`),
    KEY module_id (`module_id`)
-) CHARACTER SET `utf8` COLLATE `utf8_bin`;
+);
 
 
 
@@ -246,7 +246,7 @@ CREATE TABLE `mx_table_menu_categories` (
   `cat_target` tinyint(2) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`cat_id`),
    KEY cat_order (`cat_order`)
-) CHARACTER SET `utf8` COLLATE `utf8_bin`;
+);
 
 
 
@@ -282,18 +282,18 @@ CREATE TABLE `mx_table_menu_nav` (
   `link_target` tinyint(2) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`menu_id`),
    KEY cat_id (`cat_id`)
-) CHARACTER SET `utf8` COLLATE `utf8_bin`;
+);
 
 
 
 #
 # Dumping data for table 'mx_table_menu_nav'
 #
-INSERT INTO `mx_table_menu_nav` VALUES("5", "1", "phpBB Home", "", "http://www.phpbb.com", "0", "20", "a9ff189bf5", "icon_info.gif", "", "", "0", "0", "0", "0", "1");
-INSERT INTO `mx_table_menu_nav` VALUES("16", "7", "Page 1", "", "", "0", "10", "", "icon_home.gif", "", "", "0", "0", "3", "0", "0");
-INSERT INTO `mx_table_menu_nav` VALUES("4", "1", "MX-Publisher Home", "", "http://www.mx-publisher.com", "0", "10", "1f171544ea", "icon_info.gif", "", "", "0", "0", "0", "0", "1");
-INSERT INTO `mx_table_menu_nav` VALUES("6", "1", "Demo Page", "On this page we demonstrate a basic subpage setup with textblocks.", "", "0", "30", "", "icon_message.gif", "", "", "0", "0", "3", "0", "0");
 INSERT INTO `mx_table_menu_nav` VALUES("1", "3", "Welcome to MXP", "Back to home", "", "0", "10", "", "", "", "", "0", "0", "1", "0", "0");
+INSERT INTO `mx_table_menu_nav` VALUES("4", "1", "MX-Publisher Home", "", "http://mxpcms.sourceforge.net/", "0", "10", "1f171544ea", "icon_info.gif", "", "", "0", "0", "0", "0", "1");
+INSERT INTO `mx_table_menu_nav` VALUES("5", "1", "phpBB Home", "", "http://www.phpbb.com", "0", "20", "a9ff189bf5", "icon_info.gif", "", "", "0", "0", "0", "0", "1");
+INSERT INTO `mx_table_menu_nav` VALUES("6", "1", "Demo Page", "On this page we demonstrate a basic subpage setup with textblocks.", "", "0", "30", "", "icon_message.gif", "", "", "0", "0", "3", "0", "0");
+INSERT INTO `mx_table_menu_nav` VALUES("16", "7", "Page 1", "", "", "0", "10", "", "icon_home.gif", "", "", "0", "0", "3", "0", "0");
 INSERT INTO `mx_table_menu_nav` VALUES("17", "7", "Page 2", "", "", "0", "20", "", "icon_dot.gif", "", "", "0", "30", "3", "0", "0");
 INSERT INTO `mx_table_menu_nav` VALUES("18", "7", "Page 3", "", "", "0", "30", "", "icon_dot.gif", "", "", "0", "1", "3", "0", "0");
 INSERT INTO `mx_table_menu_nav` VALUES("19", "7", "WYSIWYG", "", "", "0", "40", "", "icon_dot.gif", "", "", "0", "10", "3", "0", "0");
@@ -314,7 +314,7 @@ CREATE TABLE `mx_table_module` (
   `module_version` varchar(255),
   `module_copy` text,
   PRIMARY KEY (`module_id`)
-) CHARACTER SET `utf8` COLLATE `utf8_bin`;
+);
 
 
 
@@ -357,7 +357,7 @@ CREATE TABLE `mx_table_page` (
   `ip_filter` varchar(255) NOT NULL DEFAULT '',
   `phpbb_stats` tinyint(2) NOT NULL DEFAULT '-1',
   PRIMARY KEY (`page_id`)
-) CHARACTER SET `utf8` COLLATE `utf8_bin`;
+);
 
 
 
@@ -378,7 +378,7 @@ CREATE TABLE `mx_table_page_templates` (
   `page_template_id` smallint(3) unsigned NOT NULL auto_increment,
   `template_name` varchar(255) NOT NULL default '',
   PRIMARY KEY  (`page_template_id`)
-) CHARACTER SET `utf8` COLLATE `utf8_bin`;
+);
 
 
 
@@ -406,7 +406,7 @@ CREATE TABLE `mx_table_parameter` (
   `parameter_auth` tinyint(2) NOT NULL DEFAULT '0',
   `parameter_order` smallint(5) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`parameter_id`)
-) CHARACTER SET `utf8` COLLATE `utf8_bin`;
+);
 
 
 
@@ -500,7 +500,7 @@ CREATE TABLE `mx_table_portal` (
   `record_online_users` varchar(255) NOT NULL DEFAULT '0',
   `record_online_date` varchar(255) NOT NULL DEFAULT '0',
   PRIMARY KEY  (`portal_id`)
-) CHARACTER SET `utf8` COLLATE `utf8_bin`;
+);
 
 
 
@@ -514,7 +514,7 @@ CREATE TABLE `mx_table_search_results` (
   `search_array` text NOT NULL,
   PRIMARY KEY  (`search_id`),
   KEY `session_id` (`session_id`)
-) CHARACTER SET `utf8` COLLATE `utf8_bin`;
+);
 
 
 
@@ -528,7 +528,7 @@ CREATE TABLE `mx_table_wordlist` (
   `word_common` tinyint(1) unsigned NOT NULL default '0',
   PRIMARY KEY  (`word_text`),
   KEY `word_id` (`word_id`)
-) CHARACTER SET `utf8` COLLATE `utf8_bin`;
+);
 
 
 
@@ -542,7 +542,7 @@ CREATE TABLE `mx_table_wordmatch` (
   `title_match` tinyint(1) NOT NULL default '0',
   KEY `block_id` (`block_id`),
   KEY `word_id` (`word_id`)
-) CHARACTER SET `utf8` COLLATE `utf8_bin`;
+);
 
 
 
@@ -556,7 +556,7 @@ CREATE TABLE `mx_table_user_group` (
    user_pending tinyint(1),
    KEY group_id (group_id),
    KEY user_id (user_id)
-) CHARACTER SET `utf8` COLLATE `utf8_bin`;
+);
 
 
 
@@ -573,7 +573,7 @@ CREATE TABLE `mx_table_groups` (
    group_single_user tinyint(1) DEFAULT '1' NOT NULL,
    PRIMARY KEY (group_id),
    KEY group_single_user (group_single_user)
-) CHARACTER SET `utf8` COLLATE `utf8_bin`;
+);
 
 
 
@@ -600,7 +600,7 @@ CREATE TABLE `mx_table_sessions` (
    PRIMARY KEY (session_id),
    KEY session_user_id (session_user_id),
    KEY session_id_ip_user_id (session_id, session_ip, session_user_id)
-) CHARACTER SET `utf8` COLLATE `utf8_bin`;
+);
 
 
 
@@ -616,7 +616,7 @@ CREATE TABLE `mx_table_sessions_keys` (
   last_login int(11) DEFAULT '0' NOT NULL,
   PRIMARY KEY (key_id, user_id),
   KEY last_login (last_login)
-) CHARACTER SET `utf8` COLLATE `utf8_bin`;
+);
 
 
 
@@ -640,7 +640,7 @@ CREATE TABLE `mx_table_users` (
    user_email varchar(255),
    PRIMARY KEY (user_id),
    KEY user_session_time (user_session_time)
-) CHARACTER SET `utf8` COLLATE `utf8_bin`;
+);
 
 
 
@@ -673,7 +673,7 @@ CREATE TABLE `mx_table_themes` (
    head_stylesheet varchar(100) default NULL,
    portal_backend varchar(30) NOT NULL default '',
    PRIMARY KEY  (themes_id)
-) CHARACTER SET `utf8` COLLATE `utf8_bin`;
+);
 
 
 
@@ -683,6 +683,8 @@ INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_styles
 INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (4, 'subSilver', 'subSilver', 'subSilver.css', 'phpbb2');
 INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (5, 'subsilver2', 'subsilver2', 'subsilver2.css', 'phpbb3');
 INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (6, 'prosilver', 'prosilver', 'prosilver.css', 'phpbb3');
+
+
 
 
 
@@ -697,7 +699,7 @@ CREATE TABLE `mx_table_smilies` (
    smile_url varchar(100),
    emoticon varchar(75),
    PRIMARY KEY (smilies_id)
-) CHARACTER SET `utf8` COLLATE `utf8_bin`;
+);
 
 
 
@@ -757,4 +759,4 @@ CREATE TABLE `mx_table_words` (
    word char(100) NOT NULL,
    replacement char(100) NOT NULL,
    PRIMARY KEY (word_id)
-) CHARACTER SET `utf8` COLLATE `utf8_bin`;
+);

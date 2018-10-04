@@ -122,7 +122,7 @@ INSERT INTO mx_table_block_system_parameter VALUES("16", "95", "5", NULL, "0");
 INSERT INTO mx_table_block_system_parameter VALUES("3", "91", "3 months", "", "0");
 INSERT INTO mx_table_block_system_parameter VALUES("28", "15", "[b:31f05e4fa3]MX-Publisher[/b:31f05e4fa3] is a fully modular portal and CMS for phpBB, featuring dynamic pages, blocks, themes, and more by means of a powerful yet flexible AdminCP. It works without touching phpBB by using integrated features and functions.  MX-Publisher requires phpBB to run, and currently supports the mySQL and postgreSQL databases, with planned support for MS-SQL and other DBMSs. MX-Publisher is the classical phpBB portal add-on, improved and enhanced for every phpBB version released since 2001.\r\n\r\n[i:31f05e4fa3]Welcome, and thanks for using MX-Publisher![/i:31f05e4fa3] \r\n\r\n :lol:", "31f05e4fa3", "0");
 INSERT INTO mx_table_block_system_parameter VALUES("29", "15", "On this page we [i:621ded23c6]demonstrate [/i:621ded23c6]a few basic portal blocks (not already present on this or other pages) - to get you started. Please, try out the top links.", "621ded23c6", "0");
-INSERT INTO mx_table_block_system_parameter VALUES("30", "15", "You may enrich your portal with addon modules - for specific functionality:\r\n\r\n- Download manager\r\n- Picture Album\r\n- Calendar Tools\r\n- Knowledge Base\r\n- Links Gallery\r\n- Games\r\n\r\nand many more. Be sure to visit www.mx-publisher.com for latest available modules!", "eacbc1f61a", "0");
+INSERT INTO mx_table_block_system_parameter VALUES("30", "15", "You may enrich your portal with addon modules - for specific functionality:\r\n\r\n- Download manager\r\n- Picture Album\r\n- Calendar Tools\r\n- Knowledge Base\r\n- Links Gallery\r\n- Games\r\n\r\nand many more. Be sure to visit mxpcms.sourceforge.net for latest available modules!", "eacbc1f61a", "0");
 INSERT INTO mx_table_block_system_parameter VALUES("3", "92", "5", "", "0");
 INSERT INTO mx_table_block_system_parameter VALUES("9", "50", "This is basically a [i:021a122fa6]standard[/i:021a122fa6] TextBlock, but you may configure settings for bbcodes, html and smilies for [i:021a122fa6]this[/i:021a122fa6] block.\r\n\r\nTry it out! \r\n(to edit use the top right edit button)", "021a122fa6", "0");
 INSERT INTO mx_table_block_system_parameter VALUES("9", "51", "none", "", "0");
@@ -354,7 +354,7 @@ INSERT INTO mx_table_menu_nav VALUES("14", "5", "Custom TextBlock", "Custom Text
 INSERT INTO mx_table_menu_nav VALUES("15", "6", "Modules Info", "Information", "", "0", "10", "630ce0e7f0", "icon_dot.gif", "0", "30", "3", "0", "0");
 INSERT INTO mx_table_menu_nav VALUES("5", "1", "phpBB Home", "", "http://www.phpbb.com", "0", "20", "a9ff189bf5", "icon_info.gif", "0", "0", "0", "0", "1");
 INSERT INTO mx_table_menu_nav VALUES("3", "3", "Statistics", "Site Statistics", "", "0", "30", "98b16ec029", "icon_stats.gif", "0", "0", "4", "0", "0");
-INSERT INTO mx_table_menu_nav VALUES("4", "1", "MX-Publisher Home", "", "http://www.mx-publisher.com", "0", "10", "1f171544ea", "icon_info.gif", "0", "0", "0", "0", "1");
+INSERT INTO mx_table_menu_nav VALUES("4", "1", "MX-Publisher Home", "", "http://mxpcms.sourceforge.net", "0", "10", "1f171544ea", "icon_info.gif", "0", "0", "0", "0", "1");
 INSERT INTO mx_table_menu_nav VALUES("6", "1", "Demo Pages", "On this page are several demo blocks located", "", "0", "30", "fb028ba583", "icon_dot.gif", "0", "0", "3", "0", "0");
 INSERT INTO mx_table_menu_nav VALUES("1", "3", "Home", "Back to home", "", "0", "10", "bb51181967", "icon_home.gif", "0", "0", "1", "0", "0");
 INSERT INTO mx_table_menu_nav VALUES("2", "3", "Forum", "phpBB Forum Index", "", "0", "20", "a33e401abc", "icon_forum.gif", "0", "0", "2", "0", "0");
@@ -381,10 +381,10 @@ CREATE TABLE `mx_table_module` (
 #
 # Dumping data for table 'mx_table_module'
 #
-INSERT INTO mx_table_module VALUES("10", "Core Blocks", "modules/mx_coreblocks/", "MX-Publisher Core Blocks", "", "mxBB Core Module", "Original mxBB <i>Core Blocks</i> module by <a href=\"http://www.mx-publisher.com\" target=\"_blank\">The MX-Publisher Development Team</a>");
-INSERT INTO mx_table_module VALUES("20", "Textblocks", "modules/mx_textblocks/", "MX-Publisher Textblocks", "", "mxBB Core Module", "Original mxBB <i>Textblocks</i> module by <a href=\"http://www.mx-publisher.com\" target=\"_blank\">Jon</a>");
-INSERT INTO mx_table_module VALUES("30", "phpBB2 Blocks", "modules/mx_phpbb2blocks/", "MX-Publisher phpBB2 blocks", "", "mxBB Core Module", "Original mxBB <i>phpBB2 Blocks</i> module by <a href=\"http://www.mx-publisher.com\" target=\"_blank\"> The MX-Publisher Development Team</a>");
-INSERT INTO mx_table_module VALUES("50", "Navigation Menu", "modules/mx_navmenu/", "MX-Publisher Site Navigation", "", "mxBB Core Module", "Original mxBB <i>Navigation Menu</i> module by <a href=\"http://www.mx-publisher.com\" target=\"_blank\">Jon</a>");
+INSERT INTO mx_table_module VALUES("10", "Core Blocks", "modules/mx_coreblocks/", "MX-Publisher Core Blocks", "", "mxBB Core Module", "Original mxBB <i>Core Blocks</i> module by <a href=\"http://mxpcms.sourceforge.net\" target=\"_blank\">The MX-Publisher Development Team</a>");
+INSERT INTO mx_table_module VALUES("20", "Textblocks", "modules/mx_textblocks/", "MX-Publisher Textblocks", "", "mxBB Core Module", "Original mxBB <i>Textblocks</i> module by <a href=\"http://mxpcms.sourceforge.net\" target=\"_blank\">Jon</a>");
+INSERT INTO mx_table_module VALUES("30", "phpBB2 Blocks", "modules/mx_phpbb2blocks/", "MX-Publisher phpBB2 blocks", "", "mxBB Core Module", "Original mxBB <i>phpBB2 Blocks</i> module by <a href=\"http://mxpcms.sourceforge.net\" target=\"_blank\"> The MX-Publisher Development Team</a>");
+INSERT INTO mx_table_module VALUES("50", "Navigation Menu", "modules/mx_navmenu/", "MX-Publisher Site Navigation", "", "mxBB Core Module", "Original mxBB <i>Navigation Menu</i> module by <a href=\"http://mxpcms.sourceforge.net\" target=\"_blank\">Jon</a>");
 
 
 #
@@ -502,7 +502,7 @@ INSERT INTO mx_table_parameter VALUES("72", "5", "x_1", "Text", "", "", "0", "0"
 INSERT INTO mx_table_parameter VALUES("73", "5", "x_2", "Text", "", "", "0", "0");
 INSERT INTO mx_table_parameter VALUES("63", "51", "menu_display_mode", "Radio_single_select", "Vertical", "a:2:{i:0;s:8:\"vertical\";i:1;s:10:\"horizontal\";}", "0", "20");
 INSERT INTO mx_table_parameter VALUES("64", "51", "menu_page_sync", "Boolean", "0", "", "0", "30");
-INSERT INTO mx_table_parameter VALUES("71", "5", "x_3", "Text", "http://www.mx-publisher.com", "", "0", "0");
+INSERT INTO mx_table_parameter VALUES("71", "5", "x_3", "Text", "http://mxpcms.sourceforge.net", "", "0", "0");
 INSERT INTO mx_table_parameter VALUES("81", "21", "Blog", "BBText", "Add your text here...", "", "0", "0");
 INSERT INTO mx_table_parameter VALUES("92", "10", "numOfEvents", "Number", "5", "", "0", "0");
 INSERT INTO mx_table_parameter VALUES("57", "22", "allow_smilies", "Boolean", "TRUE", "", "1", "0");

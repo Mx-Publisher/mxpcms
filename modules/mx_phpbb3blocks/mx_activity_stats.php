@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Module - mx_phpbb3blocks
-* @version $Id: mx_activity_stats.php,v 1.1 2008/10/04 07:04:38 orynider Exp $
+* @version $Id: mx_activity_stats.php,v 1.2 2013/06/28 15:36:43 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 

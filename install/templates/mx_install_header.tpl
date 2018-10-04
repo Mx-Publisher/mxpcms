@@ -258,7 +258,7 @@ if( document.all ) { document.write('<sty'+'le type="text/css">\n'+
 					<td>
 						<table width="100%" border="0" cellspacing="0" cellpadding="0">
 							<tr>
-								<td><a href="http://www.mx-publisher.com" target="_blank"><img src="../templates/_core/images/logo.gif" border="0" alt="MX-Publisher" vspace="1" /></a></td>
+								<td><a href="http://mxpcms.sourceforge.net" target="_blank"><img src="../templates/_core/images/logo.gif" border="0" alt="MX-Publisher" vspace="1" /></a></td>
 								<td align="center" width="100%" valign="middle"><span class="maintitle">{L_INSTALLATION}</span></td>
 								<td align="center" valign="top" nowrap><span class="gensmall">{L_PORTAL_NAME}<br />v. {L_PORTAL_VERSION}</span></td>
 							</tr>

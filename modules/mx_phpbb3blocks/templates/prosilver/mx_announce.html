@@ -2,8 +2,8 @@
 <div class="clear"></div>
 <div class="forabg block">
 	<div id="p1" class="post bg2 online">
-		<div class="inner"><span class="corners-top"><span></span></span>
-			<dl class="textbody">
+		<div class="inner" style="min-height:50px; width:100%;"><span class="corners-top"><span></span></span>
+			<dl class="textbody news_body">
 				<dt>
 					<p>
 						<a href="{postrow.U_TOPIC_URL}">
@@ -13,23 +13,44 @@
 						<img src="{postrow.FOLDER_IMG}" alt="{postrow.L_TOPIC_FOLDER_ALT}" title="{postrow.L_TOPIC_FOLDER_ALT}" border="0" align="absmiddle" /></a>
 						<a href="{postrow.U_TOPIC_URL}" class="topictitle">{postrow.TITLE}</a>
 					</p>
-					<span class="postbody">{postrow.MESSAGE}</span>
+					<div class="postbody contents">{postrow.MESSAGE}</div>
+					<!-- IF announce_row.S_HAS_ATTACHMENTS -->
+					<div class="highslide-gallery">
+						<dl class="attachbox">
+							<dt style="vertical-align:middle; text-align:center;">{L_ATTACHMENTS}</dt>
+							<!-- BEGIN attachment -->
+								<dd>{postrow.attachment.DISPLAY_ATTACHMENT}</dd>
+							<!-- END attachment -->
+						</dl>
+					</div>
+					<!-- ENDIF -->
+					<!-- IF postrow.S_DISPLAY_NOTICE --><div class="rules">{L_DOWNLOAD_NOTICE}</div><!-- ENDIF -->					
 				</dt>
 			</dl>
 		</div>
 	</div>
 	<div id="p1" class="post bg2 online">
-		<div class="inner"><span class="corners-top"><span></span></span>	
+		<div class="inner" style="min-height:50px; width:100%;"><span class="corners-top"><span></span></span>	
 		<ul class="topiclist">
 			<li class="header"></li>
 		</ul>
-			<dl class="textbody">
+			<dl class="textbody news_poster">
 				<dt style="vertical-align:middle; text-align:center;"><span class="gensmall">{postrow.L_AUTHOR}:&nbsp;{postrow.POSTER_FULL}</span></dt>
 				<dt style="vertical-align:middle; text-align:center;"><span class="gensmall">{postrow.L_POSTED}:<br />{postrow.FIRST_POST_TIME}</span></dt>
 				<dt style="vertical-align:middle; text-align:center;"><span class="postdetails">{postrow.L_REPLIES}:<br />{postrow.REPLIES}</span></dt>
 				<dt style="vertical-align:middle; text-align:center;"><span class="postdetails">{postrow.L_VIEWS}:<br />{postrow.VIEWS}</span></dt>
 				<dt style="vertical-align:middle; text-align:center;"><span class="postdetails">{postrow.L_LASTPOST}:<br />{postrow.LAST_POST_TIME}&nbsp;{postrow.LAST_POST_AUTHOR}&nbsp;{postrow.LAST_POST_IMG}</span></dt>
 			</dl>
+			<dl class="textbody news_reply">
+				<dt style="vertical-align:middle; text-align:right;">
+					<a href="{postrow.U_VIEW}"> <img src="{postrow.VIEW_IMG}" alt="{L_VIEW_FULL_ARTICLE}" title="{L_VIEW_FULL_ARTICLE}" /></a>
+					<a href="{postrow.U_PRINT}"> <img src="{postrow.PRINT_IMG}" alt="{L_PRINT_IT}" title="{L_PRINT_IT}" /></a>
+					<!-- IF postrow.ALLOW_POST -->
+						<a href="{postrow.U_REPLY}"> <img src="{postrow.REPLY_IMG}" alt="{L_POST_COMMENTS}" title="{L_POST_COMMENTS}" /></a>
+					<!-- ENDIF -->
+					<span class="gensmall"><a href="#top" onclick="window.scrollTo(0,0); return false">{L_BACK_TO_TOP}</a></span>
+				</dt>
+			</dl>			
 		</div>
 	</div>
 	<span class="corners-bottom"><span></span></span>

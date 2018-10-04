@@ -1,10 +1,10 @@
-Subject: Your account is inactive.
+Subject: Ο λογαριασμός σας είναι ανενεργός.
 Charset: iso-8859-1
 
-Hello {USERNAME}
+Γειά σου {USERNAME}
 
-You are receiving this email because your account on {SITENAME} is considered inactive. If you wish to keep your account, please visit the forum and login on a regular basis. Otherwise please contact the board administrator to have your account terminated. If you do not visit the forum on a regular basis, your account will be deleted.
+Λαμβάνετε αυτό το ηλεκτρονικό ταχυδρομείο καθότι ο λογαριασμός σας στην ιστοσελίδα {SITENAME} θεωρείται ανενεργός. Εάν επιθυμείτε να διατηρήσετε τον λογαριασμό σας, παρακαλώ επισκεφτείτε το φόρουμ και συνδεθείτε σε κανονική βάση. Διαφορετικά παρακαλώ ελάτε σε επαφή Διαχειριστή της ιστοσελίδας να ολοκληρώσετε την οριστική διαγραφή του λογαριασμού σας. Εάν δεν επισκέπτεστε το φόρουμ σε κανονική βάση, ο λογαριασμός σας θα διαγραφεί.
 
-Thank you for your cooperation.
+Σας ευχαριστώ για τη συνεργασία σας.
 
 {EMAIL_SIG}

@@ -6,7 +6,7 @@
  *     copyright            : (C) 2001 The phpBB Group and (C) 2003 Jonathan Gulbrandsen
  *     email                : support@phpbb.com (translator:virtuality@carlssonplanet.com)
  *
- *     $Id: lang_main.php,v 1.2 2008/02/16 21:41:57 jonohlsson Exp $
+ *     $Id: lang_main.php,v 1.3 2013/06/28 15:34:00 orynider Exp $
  *
  ****************************************************************************/
 
@@ -74,7 +74,7 @@ $lang['DATE_FORMAT'] = 'd F Y'; // This should be changed to the default date fo
 // This is optional, if you would like a _SHORT_ message output
 // along with our copyright message indicating you are the translator
 // please add it here.
-$lang['TRANSLATION_INFO'] = '<a href="http://www.mx-publisher.com" target="_blank" class="gensmall">Swedish</a> translation by <a href="mailto:jon.ohlsson@mx-publisher.com" title="Jon Ohlsson" class="gensmall">Jon Ohlsson</a> &copy; 2004-2008';
+$lang['TRANSLATION_INFO'] = '<a href="http://mxpcms.sourceforge.net/" target="_blank" class="gensmall">Swedish</a> translation by <a href="mailto:jon.ohlsson@mx-publisher.com" title="Jon Ohlsson" class="gensmall">Jon Ohlsson</a> &copy; 2004-2008';
 
 //
 // Common, these terms are used

@@ -87,7 +87,7 @@ function checkSearch()
 						{OVERALL_NAVIGATION}
 					</td>
 				</tr>
-						
+
 				<!-- BEGIN editcp -->
 				<tr>
 					<td class="row2" align="center" valign="middle" colspan="3">
@@ -105,16 +105,7 @@ function checkSearch()
 						</div>
 					</td>
 				</tr>
-				<!-- END editcp -->						
-						
-				<!-- BEGIN switch_view -->
-				<tr>
-					<td align="left" valign="bottom" colspan="3" ><span class="gensmall">{CURRENT_TIME}</span></td>
-				</tr>
-				<tr>
-					<td align="left" valign="bottom" colspan="3" ><span class="nav"><a href="{U_INDEX}" class="nav">{L_INDEX}</a></span></td>
-				</tr>
-				<!-- END switch_view -->
+				<!-- END editcp -->
 
 			</table>
 

@@ -2,11 +2,11 @@
 /**
 *
 * @package DBal
-* @version $Id: oracle.php,v 1.15 2008/03/07 00:59:03 orynider Exp $
+* @version $Id: oracle.php,v 1.18 2013/06/28 15:33:26 orynider Exp $
 * @copyright (c) 2005 phpBB Group
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU Public License
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -44,6 +44,16 @@ class dbal_oracle extends dbal
 		$this->user = $sqluser;
 		$this->server = $sqlserver . (($port) ? ':' . $port : '');
 		$this->dbname = $database;
+
+		// support for "easy connect naming"
+		if ($sqlserver !== '' && $sqlserver !== '/')
+		{
+			if (substr($sqlserver, -1, 1) == '/')
+			{
+				$sqlserver == substr($sqlserver, 0, -1);
+			}
+			$connect = $sqlserver . (($port) ? ':' . $port : '') . '/' . $database;
+		}
 
 		$this->db_connect_id = ($this->persistency) ? @ociplogon($this->user, $sqlpassword, $this->server) : @ocinlogon($this->user, $sqlpassword, $this->server);
 
@@ -124,7 +134,92 @@ class dbal_oracle extends dbal
 					$in_transaction = true;
 				}
 
+				$array = array();
+
+				// We overcome Oracle's 4000 char limit by binding vars
+				if (strlen($query) > 4000)
+				{
+					if (preg_match('/^(INSERT INTO[^(]++)\\(([^()]+)\\) VALUES[^(]++\\((.*?)\\)$/s', $query, $regs))
+					{
+						if (strlen($regs[3]) > 4000)
+						{
+							$cols = explode(', ', $regs[2]);
+							preg_match_all('/\'(?:[^\']++|\'\')*+\'|[\d-.]+/', $regs[3], $vals, PREG_PATTERN_ORDER);
+
+							$inserts = $vals[0];
+							unset($vals);
+
+							foreach ($inserts as $key => $value)
+							{
+								if (!empty($value) && $value[0] === "'" && strlen($value) > 4002) // check to see if this thing is greater than the max + 'x2
+								{
+									$inserts[$key] = ':' . strtoupper($cols[$key]);
+									$array[$inserts[$key]] = str_replace("''", "'", substr($value, 1, -1));
+								}
+							}
+
+							$query = $regs[1] . '(' . $regs[2] . ') VALUES (' . implode(', ', $inserts) . ')';
+						}
+					}
+					else if (preg_match_all('/^(UPDATE [\\w_]++\\s+SET )([\\w_]++\\s*=\\s*(?:\'(?:[^\']++|\'\')*+\'|[\d-.]+)(?:,\\s*[\\w_]++\\s*=\\s*(?:\'(?:[^\']++|\'\')*+\'|[\d-.]+))*+)\\s+(WHERE.*)$/s', $query, $data, PREG_SET_ORDER))
+					{
+						if (strlen($data[0][2]) > 4000)
+						{
+							$update = $data[0][1];
+							$where = $data[0][3];
+							preg_match_all('/([\\w_]++)\\s*=\\s*(\'(?:[^\']++|\'\')*+\'|[\d-.]++)/', $data[0][2], $temp, PREG_SET_ORDER);
+							unset($data);
+
+							$cols = array();
+							foreach ($temp as $value)
+							{
+								if (!empty($value[2]) && $value[2][0] === "'" && strlen($value[2]) > 4002) // check to see if this thing is greater than the max + 'x2
+								{
+									$cols[] = $value[1] . '=:' . strtoupper($value[1]);
+									$array[$value[1]] = str_replace("''", "'", substr($value[2], 1, -1));
+								}
+								else
+								{
+									$cols[] = $value[1] . '=' . $value[2];
+								}
+							}
+
+							$query = $update . implode(', ', $cols) . ' ' . $where;
+							unset($cols);
+						}
+					}
+				}
+
+				switch (substr($query, 0, 6))
+				{
+					case 'DELETE':
+						if (preg_match('/^(DELETE FROM [\w_]++ WHERE)((?:\s*(?:AND|OR)?\s*[\w_]+\s*(?:(?:=|<>)\s*(?>\'(?>[^\']++|\'\')*+\'|[\d-.]+)|(?:NOT )?IN\s*\((?>\'(?>[^\']++|\'\')*+\',? ?|[\d-.]+,? ?)*+\)))*+)$/', $query, $regs))
+						{
+							$query = $regs[1] . $this->_rewrite_where($regs[2]);
+							unset($regs);
+						}
+					break;
+
+					case 'UPDATE':
+						if (preg_match('/^(UPDATE [\\w_]++\\s+SET [\\w_]+\s*=\s*(?:\'(?:[^\']++|\'\')*+\'|[\d-.]++|:\w++)(?:, [\\w_]+\s*=\s*(?:\'(?:[^\']++|\'\')*+\'|[\d-.]++|:\w++))*+\\s+WHERE)(.*)$/s',  $query, $regs))
+						{
+							$query = $regs[1] . $this->_rewrite_where($regs[2]);
+							unset($regs);
+						}
+					break;
+
+					case 'SELECT':
+						$query = preg_replace_callback('/([\w_.]++)\s*(?:(=|<>)\s*(?>\'(?>[^\']++|\'\')*+\'|[\d-.]++|([\w_.]++))|(?:NOT )?IN\s*\((?>\'(?>[^\']++|\'\')*+\',? ?|[\d-.]++,? ?)*+\))/', array($this, '_rewrite_col_compare'), $query);
+					break;
+				}
+
 				$this->query_result = @ociparse($this->db_connect_id, $query);
+
+				foreach ($array as $key => $value)
+				{
+					@ocibindbyname($this->query_result, $key, $array[$key], -1);
+				}
+
 				$success = @ociexecute($this->query_result, OCI_DEFAULT);
 
 				if (!$success)
@@ -286,10 +381,19 @@ class dbal_oracle extends dbal
 	*/
 	function sql_rowseek($rownum, $query_id = false)
 	{
+		global $mx_cache;
+
 		if (!$query_id)
 		{
 			$query_id = $this->query_result;
 		}
+
+		/* Backported from Olympus, not compatible with MXP, yet
+		if (isset($mx_cache->sql_rowset[$query_id]))
+		{
+			return $mx_cache->sql_rowseek($rownum, $query_id);
+		}
+		*/
 
 		if (!$query_id)
 		{
@@ -348,10 +452,19 @@ class dbal_oracle extends dbal
 	*/
 	function sql_freeresult($query_id = false)
 	{
+		global $mx_cache;
+
 		if (!$query_id)
 		{
 			$query_id = $this->query_result;
 		}
+
+		/* Backported from Olympus, not compatible with MXP, yet
+		if (isset($mx_cache->sql_rowset[$query_id]))
+		{
+			return $mx_cache->sql_freeresult($query_id);
+		}
+		*/
 
 		if (isset($this->open_queries[(int) $query_id]))
 		{

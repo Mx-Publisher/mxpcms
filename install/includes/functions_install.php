@@ -2,11 +2,11 @@
 /**
 *
 * @package MX-Publisher Installation
-* @version $Id: functions_install.php,v 1.20 2008/09/30 07:04:45 orynider Exp $
+* @version $Id: functions_install.php,v 1.26 2014/05/18 06:24:35 orynider Exp $
 * @copyright (c) 2006 phpBB Group
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net
 *
 */
 
@@ -16,14 +16,17 @@
 */
 function page_header_install($title, $instruction_text = '')
 {
-	global $template, $lang, $mx_root_path, $mx_portal_name, $mx_portal_version, $tplEx;
+	global $template, $lang, $mx_root_path, $mx_portal_name, $mx_portal_version, $tplEx, $phpEx;
 
 	$template->set_filenames(array('header' => 'mx_install_header.'.$tplEx));
 	$template->assign_vars(array(
+		'S_CONTENT_ENCODING'	=> 'UTF-8',	
 		'L_PORTAL_NAME'			=> $mx_portal_name,
 		'L_PORTAL_VERSION'		=> $mx_portal_version,
 		'U_INSTALL_URL'			=> $mx_root_path . 'install/',
 		'L_INSTALLATION'		=> $title,
+		'U_INDEX'				=> $mx_root_path . 'install/mx_install.'.$phpEx,
+		'U_LOGO'				=> $mx_root_path . 'install/templates/logo.gif',		
 		'L_INSTRUCTION_TEXT'	=> $instruction_text,
 	));
 	$template->pparse('header');
@@ -91,6 +94,8 @@ function get_available_dbms($dbms = false, $return_unavailable = false, $only_20
 			'DELIM'			=> ';',
 			'COMMENTS'		=> 'remove_remarks',
 			'DRIVER'		=> 'mysqli',
+			'version' 		=> '5.0',
+			'utf8_default' 	=> true,			
 			'AVAILABLE'		=> true,
 			'2.0.x'			=> true,
 		),
@@ -101,6 +106,8 @@ function get_available_dbms($dbms = false, $return_unavailable = false, $only_20
 			'DELIM'			=> ';',
 			'COMMENTS'		=> 'remove_remarks',
 			'DRIVER'		=> 'mysqli',
+			'version'		=> '4.1.0',
+			'utf8_default' 		=> true,			
 			'AVAILABLE'		=> true,
 			'2.0.x'			=> true,
 		),
@@ -111,6 +118,8 @@ function get_available_dbms($dbms = false, $return_unavailable = false, $only_20
 			'DELIM'			=> ';',
 			'COMMENTS'		=> 'remove_remarks',
 			'DRIVER'		=> 'mysql',
+			'version' 		=> '3',
+			'utf8_default' 		=> false,			
 			'AVAILABLE'		=> true,
 			'2.0.x'			=> true,
 		),
@@ -121,6 +130,8 @@ function get_available_dbms($dbms = false, $return_unavailable = false, $only_20
 			'DELIM'			=> ';',
 			'COMMENTS'		=> 'remove_remarks',
 			'DRIVER'		=> 'mysql',
+			'version'		=> '4.0',			
+			'utf8_default' 		=> true,			
 			'AVAILABLE'		=> true,
 			'2.0.x'			=> true,
 		),		
@@ -155,25 +166,43 @@ function get_available_dbms($dbms = false, $return_unavailable = false, $only_20
 //			'2.0.x'			=> false,
 //		),
 		'postgres' => array(
-			'LABEL'			=> 'PostgreSQL 7.x/8.x',
-			'SCHEMA'		=> 'postgres',
-			'MODULE'		=> 'pgsql',
-			'DELIM'			=> ';',
+			'LABEL'	=> 'PostgreSQL 8.3+',
+			'name'	=> 'PostgreSQL',		
+			'SCHEMA'	=> 'postgres',
+			'MODULE'	=> 'pgsql',
+			'DELIM'		=> ';',
+			'DELIM_BASIC'	=> ';',		
+			'DRIVER'	=> 'postgres',
+			'version'	=> '8.0',		
 			'COMMENTS'		=> 'remove_comments',
-			'DRIVER'		=> 'postgres',
+			'utf8_default' 		=> true,			
 			'AVAILABLE'		=> true,
-			'2.0.x'			=> true,
+			'2.0.x'			=> true,			
 		),
-//		'sqlite'		=> array(
-//			'LABEL'			=> 'SQLite',
-//			'SCHEMA'		=> 'sqlite',
-//			'MODULE'		=> 'sqlite',
-//			'DELIM'			=> ';',
-//			'COMMENTS'		=> 'remove_remarks',
-//			'DRIVER'		=> 'sqlite',
-//			'AVAILABLE'		=> true,
-//			'2.0.x'			=> false,
-//		),
+		'sqlite'		=> array(
+			'LABEL'			=> 'SQLite',
+			'SCHEMA'		=> 'sqlite',
+			'MODULE'		=> 'sqlite',
+			'DELIM'			=> ';',
+			'COMMENTS'		=> 'remove_remarks',
+			'DRIVER'		=> 'sqlite',
+			'version' 		=> '1',
+			'utf8_default' 		=> true,			
+			'AVAILABLE'		=> true,
+			'2.0.x'			=> false,		
+		),
+		'sqlite3'	=> array(
+			'LABEL'			=> 'SQLite3',
+			'SCHEMA'		=> 'sqlite',
+			'MODULE'		=> 'sqlite3',
+			'DELIM'			=> ';',
+			'DRIVER'		=> 'sqlite3',
+			'version' 		=> '3',
+			'utf8_default' 		=> true,		
+			'AVAILABLE'		=> true,
+			'2.0.x'			=> false,
+			'COMMENTS'		=> 'mx_remove_comments'		
+		),		
 	);
 
 	if ($dbms)
@@ -228,21 +257,35 @@ function get_available_dbms($dbms = false, $return_unavailable = false, $only_20
 	{
 		$available_dbms['ANY_DB_SUPPORT'] = $any_db_support;
 	}
-	return $available_dbms;
+	return $available_dbms;	
 }
 
 /**
 * Generate the drop down of available database options
 */
-function dbms_select($default = '', $only_20x_options = false)
+function dbms_select($default = 'mysqli', $only_20x_options = false)
 {
 	global $lang;
 
 	$available_dbms = get_available_dbms(false, false, $only_20x_options);
 	$dbms_options = '';
+	$selected = '';	
 	foreach ($available_dbms as $dbms_name => $details)
 	{
-		$selected = ($dbms_name == $default) ? ' selected="selected"' : '';
+		/*
+		if ($details['LABEL'])
+		{
+			if (!file_exists($mx_root_path . 'install/schemas/' . $details['SCHEMA'] . '_schema_install.sql'))
+			{			
+				$available_dbms[$dbms]['AVAILABLE'] = false;			
+			}
+			else
+			{
+				$available_dbms[$dbms]['AVAILABLE'] = true;					
+			}			
+		}
+		*/
+		$selected = ($dbms_name == $default) ? ' selected="selected"' : '';		
 		$dbms_options .= '<option value="' . $dbms_name . '"' . $selected .'>' . $dbms_name . '</option>';
 	}
 	return $dbms_options;
@@ -310,7 +353,7 @@ function get_tables($db)
 * Used to test whether we are able to connect to the database the user has specified
 * and identify any problems (eg there are already tables with the names we want to use
 * @param	array	$dbms should be of the format of an element of the array returned by {@link get_available_dbms get_available_dbms()}
-*					necessary extensions should be loaded already
+* necessary extensions should be loaded already
 */
 function connect_check_db($error_connect, &$error, $dbms, $table_prefix, $dbhost, $dbuser, $dbpasswd, $dbname, $dbport, $prefix_may_exist = false, $load_dbal = true, $unicode_check = true)
 {
@@ -361,7 +404,6 @@ function connect_check_db($error_connect, &$error, $dbms, $table_prefix, $dbhost
 				$error[] = $lang['INST_ERR_PREFIX_INVALID'];
 				return false;
 			}
-
 		// no break;
 
 		case 'postgres':
@@ -645,7 +687,7 @@ function install_language_select(&$lang_select, $default, $select_name = 'langua
 	$lang = array();
 	while ( $file = @readdir($dir) )
 	{
-		if ( ereg("^lang_", $file) && !@is_file($dirname . '/' . $file) && !@is_link($dirname . '/' . $file) )
+		if ( preg_match("#^lang_#", '', $file) && !@is_file($dirname . '/' . $file) && !@is_link($dirname . '/' . $file) )
 		{
 			$filename = trim(str_replace('lang_', '', $file));
 			$displayname = preg_replace("/^(.*?)_(.*)$/", "\\1 [ \\2 ]", $filename);
@@ -809,70 +851,193 @@ function _whereis($cwd, $pattern, $max_levels = 3 /*for internal use only !!! --
 function find_phpbb($basedir, $max_levels = 3)
 {
 	global $phpEx;
-
-	$basedir_length = strlen($basedir) + ( substr($basedir, -1) == '/' ? 0 : 1 );
-
-	//
-	// From the document_root scan up to specified level of dirs
-	// searching for files named config.* (regexp)
-	//
+	
+	$basedir_length = strlen($basedir) + (substr($basedir, -1) == '/' ? 0 : 1 );
+	
+	/*
+	* From the document_root scan up to specified level of dirs
+	* searching for files named config.* (regexp)
+	*/
 	$tmpary = _whereis($basedir, "/^config\\.$phpEx/", $max_levels);
-
-	//
-	// Now, let's see if we can find well known phpBB files...
-	// Note: ALL elements must exist!
-	//
+	
+	/*
+	* Now, let's see if we can find well known phpBB files...
+	* Note: ALL elements must exist!
+	*/
 	$phpbb_files = array(
+		"config.$phpEx",	
+		"index.$phpEx",	
 		"common.$phpEx",
 		"faq.$phpEx",
 		"posting.$phpEx",
 		"search.$phpEx",
 		"viewonline.$phpEx",
 		"viewtopic.$phpEx",
-		"includes/template.$phpEx",
+		"includes/constants.$phpEx",
 	);
 	$phpbb_dirs = array();
 	for( $i = 0; $i < count($tmpary); $i++ )
 	{
 		$is_phpbb_dir = true;
-		for( $j = 0; $j < count($phpbb_files); $j++ )
+		for($j = 0; $j < count($phpbb_files); $j++)
 		{
 			$fullname = $tmpary[$i] . '/' . $phpbb_files[$j];
-			if( !@is_file($fullname) )
+			if(!is_file($fullname))
 			{
 				$is_phpbb_dir = false;
 				break;
 			}
 		}
-		if( $is_phpbb_dir && is_phpbb_installed($tmpary[$i] . "/config.$phpEx") )
+		if($is_phpbb_dir && is_phpbb_installed($tmpary[$i] . "/config.$phpEx"))
 		{
 			$phpbb_dirs[] = substr($tmpary[$i], $basedir_length);
 		}
 	}
-
 	return $phpbb_dirs;
+}
+
+function find_smf($basedir, $max_levels = 3)
+{
+	global $phpEx;
+
+	$basedir_length = strlen($basedir) + (substr($basedir, -1) == '/' ? 0 : 1 );
+
+	/*
+	* From the document_root scan up to specified level of dirs
+	* searching for files named Settings* (regexp)
+	*/
+	$tmpary = _whereis($basedir, "/^Settings\\.$phpEx/", $max_levels);
+	
+	/*
+	* Now, let's see if we can find well known SMF files...
+	* Note: ALL elements must exist!
+	*/
+	$smf_files = array(
+		"Settings.$phpEx",
+		"index.$phpEx",
+		"SSI.$phpEx",		
+		"Sources/Themes.$phpEx",
+	);
+	$smf_dirs = array();
+	for( $i = 0; $i < count($tmpary); $i++ )
+	{
+		$is_smf_dir = true;
+		for( $j = 0; $j < count($smf_files); $j++ )
+		{
+			$fullname = $tmpary[$i] . '/' . $smf_files[$j];
+			if(!is_file($fullname))
+			{
+				$is_smf_dir = false;
+				break;
+			}
+		}
+		if( $is_smf_dir && is_smf_installed($tmpary[$i] . "/Settings.$phpEx") )
+		{
+			$smf_dirs[] = substr($tmpary[$i], $basedir_length);
+		}
+	}
+	return $smf_dirs;
+}
+
+function find_mybb($basedir, $max_levels = 3)
+{
+	global $phpEx;
+	
+	$basedir_length = strlen($basedir) + (substr($basedir, -1) == '/' ? 0 : 1 );
+	
+	/*
+	* From the document_root scan up to specified level of dirs
+	* searching for files named config.* (regexp)
+	*/
+	$tmpary = _whereis($basedir, "/^global\\.$phpEx/", $max_levels);
+	
+	/*
+	* Now, let's see if we can find well known phpBB files...
+	* Note: ALL elements must exist!
+	*/
+	$mybb_files = array(
+		"global.$phpEx",	
+		"index.$phpEx",	
+		"misc.$phpEx",
+		"newthread.$phpEx",
+		"search.$phpEx",
+		"online.$phpEx",
+		"showthread.$phpEx",
+		"inc/config.$phpEx",
+		"inc/settings.$phpEx",		
+	);
+	$mybb_dirs = array();
+	for( $i = 0; $i < count($tmpary); $i++ )
+	{
+		$is_mybb_dir = true;
+		for($j = 0; $j < count($mybb_files); $j++)
+		{
+			$fullname = $tmpary[$i] . '/' . $mybb_files[$j];
+			if(!is_file($fullname))
+			{
+				$is_mybb_dir = false;
+				break;
+			}
+		}
+		if($is_mybb_dir && is_mybb_installed($tmpary[$i] . "/inc/config.$phpEx"))
+		{
+			$mybb_dirs[] = substr($tmpary[$i], $basedir_length);
+		}
+	}
+	return $mybb_dirs;
 }
 
 function is_phpbb_installed($config)
 {
 	@include($config);
-	return ( !empty($dbhost) && !empty($dbname) && !empty($dbuser) );
+	return (!empty($dbname) && !empty($dbuser));
 }
 
-function get_phpbb_info($config)
+function is_smf_installed($settings)
 {
+	@include($settings);
+	return (!empty($db_server) && !empty($db_name) && !empty($db_user));
+}
 
+function is_mybb_installed($mybb_config)
+{
+	$config = array();
+	@include($mybb_config);
+	$dbhost = $config['database']['hostname'];
+	$dbname = $config['database']['database'];
+	$dbuser = $config['database']['username'];	
+	return (!empty($dbhost) && !empty($dbname) && !empty($dbuser));
+}
+
+/**
+* Get key_sufix 
+* we have so far in beta 3
+* $dbms = 'phpbb\\db\\driver\\mysqli';
+* $acm_type = 'phpbb\\cache\\driver\\file';
+* We only need the sufix in this installer
+*/
+function get_keys_sufix($key)
+{
+	$keys = explode("\\", $key);
+
+	$i = count($keys) - 1;
+	$rkey = $keys[$i];
+	$rkey = str_replace("\\", "", $rkey);	
+
+	return (isset($rkey)) ? $rkey : $key;
+}
+	
+function get_backend_info($config)
+{
 	if ((@include $config) === false)
 	{
 		install_die(GENERAL_ERROR, 'Configuration file ' . $config . ' couldn\'t be opened.');
-	}
-	
+	}	
 	// If we are on PHP < 5.0.0 we need to force include or we get a blank page
 	if (version_compare(PHP_VERSION, '5.0.0', '<')) 
 	{		
 		$dbms = str_replace('mysqli', 'mysql4', $dbms); //this version of php does not have mysqli extension and my crash the installer if finds a forum using this		
 	}	
-
 	return array(
 		'dbms'			=> $dbms,
 		'dbhost'		=> $dbhost,
@@ -885,44 +1050,182 @@ function get_phpbb_info($config)
 	);
 }
 
-function get_mxbb_info($config)
+function get_phpbb_info($config, $backend = 'phpbb3')
 {
-
 	if ((@include $config) === false)
 	{
 		install_die(GENERAL_ERROR, 'Configuration file ' . $config . ' couldn\'t be opened.');
 	}
-	
+	// Check the prefix length to ensure that index names are not too long and does not contain invalid characters
+	switch ($backend)
+	{
+		case 'internal':
+		// no break;
+		case 'phpbb2':
+			$phpbb_adm_relative_path = 'admin';
+		break;
+		
+		case 'phpbb3':
+		case 'olympus':		
+			$phpbb_adm_relative_path = 'adm';
+		break;
+		
+		case 'ascraeus':
+		case 'rhea':		
+			$phpbb_adm_relative_path = (isset($phpbb_adm_relative_path)) ? $phpbb_adm_relative_path : 'adm/';
+			$dbms = get_keys_sufix($dbms);
+			$acm_type = get_keys_sufix($acm_type);
+		break;
+	}
+	// If we are on PHP < 5.0.0 we need to force include or we get a blank page
+	if (version_compare(PHP_VERSION, '5.0.0', '<')) 
+	{		
+		$dbms = str_replace('mysqli', 'mysql4', $dbms); //this version of php does not have mysqli extension and my crash the installer if finds a forum using this		
+	}	
 	return array(
 		'dbms'			=> $dbms,
 		'dbhost'		=> $dbhost,
 		'dbname'		=> $dbname,
 		'dbuser'		=> $dbuser,
 		'dbpasswd'		=> $dbpasswd,
-		'mx_table_prefix'		=> $mx_table_prefix,
-		'status'		=> (defined('MX_INSTALLED') && (MX_INSTALLED === true)) ? true : false,
+		'table_prefix'	=> $table_prefix,
+		'acm_type'		=> $acm_type ? $acm_type : '',		
+		'status'		=> defined('PHPBB_INSTALLED') ? true : false,		
 	);
 }
 
+function get_smf_info($settings)
+{
 
-//
-// Get the full phpBB URL by reading its config table.
-//
-function get_phpbb_url($table_prefix, $portal_backend)
+	if ((@include $settings) === false)
+	{
+		install_die(GENERAL_ERROR, 'Configuration file ' . $settings . ' couldn\'t be opened.');
+	}
+	
+	// If we are on PHP < 5.0.0 we need to force include or we get a blank page
+	if (version_compare(PHP_VERSION, '5.0.0', '<')) 
+	{		
+		$db_type = str_replace('mysqli', 'mysql4', $db_type); //this version of php does not have mysqli extension and my crash the installer if finds a forum using this		
+	}
+
+	// If the UTF-8 setting was enabled, add it to the table definitions.
+	if ($db_character_set == 'utf8') 
+	{		
+		$db_type = str_replace('mysql', 'mysql4', $db_type);		
+	}	
+
+	return array(
+		'dbms'				=> $db_type, // 'mysql'
+		'dbhost'			=> $db_server, // 'localhost';
+		'dbname'			=> $db_name, // 'smf';
+		'dbuser'			=> $db_user, // 'root';
+		'dbpasswd'			=> $db_passwd, // '';
+		'ssi_dbuser'		=> $ssi_db_user, // '';
+		'ssi_dbpasswd'		=> $ssi_db_passwd, // '';
+		'table_prefix'		=> $db_prefix, // 'smf_';
+		'dbpersist'			=> $db_persist, // 0;
+		'dberror_send'		=> $db_error_send, // 1;
+		'dbcharacter_set'	=> $db_character_set,		
+		'acm_type'			=> '',
+		'mtitle'			=> $mtitle, //# Title for the Maintenance Mode message.
+		'status'			=> ($maintenance != 2) ? true : false, # Set to 1 to enable Maintenance Mode, 2 to make the forum untouchable. (you'll have to make it 0 again manually!)
+		'mbname'			=> $mbname, # The name of your forum.
+		'language'			=> $language, // 'english';		# The default language file set for the forum.
+		'boardurl'			=> $boardurl, // 'http://127.0.0.1/smf';		# URL to your forum's folder. (without the trailing /!)
+		'webmaster_email'	=> $webmaster_email, // 'noreply@myserver.com';		# Email address to send emails from. (like noreply@yourdomain.com.)
+		'cookiename'		=> $cookiename,	
+	);
+}
+
+function get_mybb_info($mybb_config)
+{
+	$config = array();
+	if ((@include $mybb_config) === false)
+	{
+		install_die(GENERAL_ERROR, 'Configuration file ' . $mybb_config . ' couldn\'t be opened.');
+	}	
+	return array(
+		'dbms'				=> $config['database']['type'], // 'mysqli';
+		'dbname'			=> $config['database']['database'], // 'mybb';
+		'table_prefix'		=> $config['database']['table_prefix'], // 'mybb_';
+
+		'dbhost'			=> $config['database']['hostname'], // 'localhost';
+		'dbname'			=> $config['database']['username'], // 'Admin';
+		'dbpasswd'			=> $config['database']['password'],
+		
+		'admin_dir'			=> $config['admin_dir'],
+		'dbcharacter_set'	=> $config['database']['encoding'],			
+	);
+}
+
+function get_mybb_settings($mybb_settings)
+{
+	$settings = array();
+	if ((@include $mybb_settings) === false)
+	{
+		install_die(GENERAL_ERROR, 'Configuration file ' . $mybb_settings . ' couldn\'t be opened.');
+	}	
+	return array(
+		'bbname'			=> $settings['bbname'], // "MyBB TestSite with MXP CMS";
+		'bburl'				=> $settings['bburl'], // "http://localhost/mybb";	
+		'status'			=> $settings['boardclosed'],	
+	);
+}
+
+function get_mxbb_info($config)
+{
+	if ((@include $config) === false)
+	{
+		install_die(GENERAL_ERROR, 'Configuration file ' . $config . ' couldn\'t be opened.');
+	}
+	return array(
+		'dbms'				=> $dbms,
+		'dbhost'			=> $dbhost,
+		'dbname'			=> $dbname,
+		'dbuser'			=> $dbuser,
+		'dbpasswd'			=> $dbpasswd,
+		'mx_table_prefix'	=> $mx_table_prefix,
+		'dbcharacter_set'	=> (defined('DB_CHARACTER_SET') ? DB_CHARACTER_SET : ''),		
+		'status'			=> (defined('MX_INSTALLED') && (MX_INSTALLED === true)) ? true : false,
+	);
+}
+
+/*
+* Get the full phpBB URL by reading its config table.
+*/
+function get_phpbb_url($table_prefix, $portal_backend = 'internal')
 {
 	global $mx_root_path, $phpEx, $db;
 	
 	$were_sql = ($portal_backend === 'phpbb3') ? 'WHERE is_dynamic = 1' : '';
 	
 	$sql = 'SELECT config_name, config_value
-		FROM ' . $table_prefix . 'config' . $were_sql;
-	$result = $db->sql_query($sql);
+		FROM ' . $table_prefix . 'config'
+		. $were_sql;
+	if ( !($result = $db->sql_query($sql)) )
+	{
+		if (!function_exists('mx_message_die'))
+		{
+			global $db;
 
-	while ($row = $db->sql_fetchrow($result))
+			$sql = "SELECT * FROM ".$table_prefix."config";
+			if( !($result = $db->sql_query($sql)) )
+			{
+				print("Couldnt query config information, Allso this hosting or server is using a cache optimizer not compatible with MX-Publisher or just lost connection to database wile query.");
+				return false;
+			}
+		}
+		else
+		{
+			mx_message_die( GENERAL_ERROR, 'Couldnt query config information', '', __LINE__, __FILE__, $sql );
+		}
+	}
+
+	while ( $row = $db->sql_fetchrow($result) )
 	{
 		$board_config[$row['config_name']] = $row['config_value'];
 	}
-	$db->sql_freeresult($result);
+	$db->sql_freeresult($result);	
 	
 	$server_protocol = ($board_config['cookie_secure']) ? 'https://' : 'http://';
 	$server_name = preg_replace('#^\/?(.*?)\/?$#', '\1', trim($board_config['server_name']));
@@ -933,9 +1236,67 @@ function get_phpbb_url($table_prefix, $portal_backend)
 	return $server_protocol . $server_name . $server_port . $script_name . '/';
 }
 
-//
-// Connecting to a phpBB Database.
-//
+/*
+* Get the full SMF URL by reading its config table.
+*/
+function get_smf_url($table_prefix, $portal_backend = 'smf2', $backend_root_path)
+{
+	global $mx_root_path, $phpEx, $db;
+	/*
+	$were_sql = ($portal_backend === 'smf3') ? 'WHERE smf_name = 1' : '';
+		
+	$sql = 'SELECT variable, value
+		FROM ' . $table_prefix . 'settings'
+		. $were_sql;
+	if ( !($result = $db->sql_query($sql)) )
+	{
+		if (!function_exists('mx_message_die'))
+		{
+			global $db;
+
+			$sql = "SELECT * FROM ".$table_prefix."settings";
+			if( !($result = $db->sql_query($sql)) )
+			{
+				print("Couldnt query config information, Allso this hosting or server is using a cache optimizer not compatible with MX-Publisher or just lost connection to database wile query.");
+				return false;
+			}
+		}
+		else
+		{
+			mx_message_die( GENERAL_ERROR, 'Couldnt query config information', '', __LINE__, __FILE__, $sql );
+		}
+	}
+
+	while ( $row = $db->sql_fetchrow($result) )
+	{
+		$board_config[$row['variable']] = $row['value'];
+	}
+	$db->sql_freeresult($result);	
+	*/
+	$smf_info = get_smf_info($backend_root_path . "Settings.$phpEx");
+	
+	return $smf_info['boardurl'];
+}
+
+/*
+* Get the full SMF URL by reading its config table.
+*/
+function get_mybb_url($table_prefix, $portal_backend = 'mybb', $backend_root_path)
+{
+	global $mx_root_path, $phpEx, $db;
+
+	$mybb_info = get_mybb_settings($backend_root_path . "inc/settings.$phpEx");
+	
+	return $mybb_info['bburl'];
+}
+
+/*
+* Here we port backend specific database connection functions 
+*/
+
+/*
+* Connecting to a phpBB Database.
+*/
 function open_phpbb_db(&$db, &$phpbb_info)
 {
 	global $mx_root_path, $phpEx;
@@ -982,10 +1343,112 @@ function open_phpbb_db(&$db, &$phpbb_info)
 		}
 	}	
 	
-	return $db->db_connect_id;
-	
+	return $db->db_connect_id;	
 }
 
+/*
+* Connecting to a SMF Database.
+*/
+function open_smf_db(&$db, &$backend_info)
+{
+	global $mx_root_path, $phpEx;
+	
+	if( !defined('BEGIN_TRANSACTION') )
+	{
+		define('BEGIN_TRANSACTION', 1);
+		define('END_TRANSACTION', 2);
+	}
+
+	$dbhost = $backend_info['dbhost'];
+	$dbuser = $backend_info['dbuser'];
+	$dbpasswd = $backend_info['dbpasswd'];
+	$dbname = $backend_info['dbname'];
+
+	$dbms = $backend_info['dbms'];
+	
+	// If we are on PHP < 5.0.0 we need to force include or we get a blank page
+	if (version_compare(PHP_VERSION, '5.0.0', '<')) 
+	{		
+		$dbms = str_replace('mysqli', 'mysql4', $dbms); //this version of php does not have mysqli extension and my crash the installer if finds a forum using this		
+	}
+	
+	// Load dbal and initiate class
+	//Apache 2.0.x and php < 5.2.5 combination will crash here this is fixed by upgrading to php 5.2.6 or Apache 2.2.x
+	require_once($mx_root_path . 'includes/db/' . $dbms . '.' . $phpEx);
+	
+	if(!$db->db_connect_id)
+	{
+		// Connect to DB
+		@define('SQL_LAYER', $dbms);
+		$sql_db = 'dbal_' . $dbms;
+			
+		$db	= new $sql_db();
+			
+		if(!is_object($db))
+		{
+			print("Could not load class " . $db . '<br />');
+		}
+
+		if(!$db->sql_connect($dbhost, $dbuser, $dbpasswd, $dbname, false))
+		{
+			print("Could not connect to all databases");
+		}
+	}	
+	
+	return $db->db_connect_id;	
+}
+
+/*
+* Connecting to a MyBB Database.
+*/
+function open_mybb_db(&$db, &$backend_info)
+{
+	global $mx_root_path, $phpEx;
+	
+	if( !defined('BEGIN_TRANSACTION') )
+	{
+		define('BEGIN_TRANSACTION', 1);
+		define('END_TRANSACTION', 2);
+	}
+
+	$dbhost = $backend_info['dbhost'];
+	$dbuser = $backend_info['dbuser'];
+	$dbpasswd = $backend_info['dbpasswd'];
+	$dbname = $backend_info['dbname'];
+
+	$dbms = $backend_info['dbms'];
+	
+	// If we are on PHP < 5.0.0 we need to force include or we get a blank page
+	if (version_compare(PHP_VERSION, '5.0.0', '<')) 
+	{		
+		$dbms = str_replace('mysqli', 'mysql4', $dbms); //this version of php does not have mysqli extension and my crash the installer if finds a forum using this		
+	}
+	
+	// Load dbal and initiate class
+	//Apache 2.0.x and php < 5.2.5 combination will crash here this is fixed by upgrading to php 5.2.6 or Apache 2.2.x
+	require_once($mx_root_path . 'includes/db/' . $dbms . '.' . $phpEx);
+	
+	if(!$db->db_connect_id)
+	{
+		// Connect to DB
+		@define('SQL_LAYER', $dbms);
+		$sql_db = 'dbal_' . $dbms;
+			
+		$db	= new $sql_db();
+			
+		if(!is_object($db))
+		{
+			print("Could not load class " . $db . '<br />');
+		}
+
+		if(!$db->sql_connect($dbhost, $dbuser, $dbpasswd, $dbname, false))
+		{
+			print("Could not connect to all databases");
+		}
+	}	
+	
+	return $db->db_connect_id;	
+}
 
 /*
 * Compute the Relative Path from dir A to dir B
@@ -997,18 +1460,17 @@ function get_relative_path($dir_a, $dir_b)
 	$ary_b = explode('/', trim($dir_b, '/'));
 	if( empty($ary_a[0]) ) unset($ary_a[0]);
 	if( empty($ary_b[0]) ) unset($ary_b[0]);
-	for( $i=0; $i < count($ary_a); $i++ )
+	for($i = 0; $i < count($ary_a); $i++)
 	{
-		if( isset($ary_b[$i]) && $ary_a[$i] == $ary_b[$i] )
+		if(isset($ary_b[$i]) && $ary_a[$i] == $ary_b[$i])
 		{
 			unset($ary_a[$i], $ary_b[$i]);
 			continue;
 		}
 		break;
 	}
-	return str_repeat('../', count($ary_a)) . implode('/', $ary_b) . ( count($ary_b) > 0 ? '/' : '' );
+	return str_repeat('../', count($ary_a)) . implode('/', $ary_b) . (count($ary_b) > 0 ? '/' : '' );
 }
-
 
 /*
 * Hey, I also wanted to create my own custom phpinfo
@@ -1018,44 +1480,64 @@ function show_phpinfo()
 {
 	global $template, $mx_root_path, $phpEx, $tplEx;
 
-	//
 	// Capture the phpInfo output
-	//
 	ob_start();
 	phpinfo();
 	$output = ob_get_contents();
 	ob_end_clean();
 
-	//
 	// Extract the BODY part.
-	//
 	preg_match_all('#<body[^>]*>(.*)</body>#siU', $output, $body_part);
 	$body_part = $body_part[1][0];
 
-	//
 	// Remove all, but some HTML Tags.
-	//
 	$allowedTags = '<h1><h2><h3><hr><ul><ol><li><b><i><u>'.
-		'<a><pre><blockquote><img><div><span><p><br>'.
+		'<a><pre><blockquote><img><div><dt><dd><span><p><br>'.
 		'<table><tr><td><th><thead><tbody><tfoot>';
 	$body_part = strip_tags($body_part, $allowedTags);
+	
+	switch ($tplEx)
+	{
+		case 'tpl':
+			// Alter some CSS related attributes.
+			$body_part = preg_replace('# (style|class)=["\'](.*?)["\']#si', '', $body_part);
+			$body_part = preg_replace('#<hr(.*?)>#si', '<hr size="1" width="600" />', $body_part);
+			$body_part = preg_replace('#<img(.*?)>#si', '<img style="float:right; border:0px;"\1>', $body_part);
+			$body_part = preg_replace('#<td(.*?)>(.*?)</td>#si', '<td\1><span class="genmed">\2</span></td>', $body_part);
+			$body_part = preg_replace('#cellpadding="(.*?)"#si', 'cellpadding="2"', $body_part);
+			$body_part = preg_replace('#cellspacing="(.*?)"#si', '', $body_part);
+			$body_part = preg_replace('#<table(.*?)>#si', '<table\1 cellspacing="1" class="forumline">', $body_part);
+			$body_part = preg_replace('#<td(.*?)>#si', '<td\1 class="row1">', $body_part);
+			$body_part = preg_replace('#<td(.*?)class="row1">#si', '<td\1class="row2">', $body_part);
+		break;					
+		case 'html':
+			// Alter some CSS related attributes.
+			$body_part = preg_replace('# (style|class)=["\'](.*?)["\']#si', '', $body_part);
+			$body_part = preg_replace('#<hr(.*?)>#si', '<hr size="1" width="600" />', $body_part);
+			$body_part = preg_replace('#<img(.*?)>#si', '<img style="float:right; border:0px;"\1>', $body_part);
+			$body_part = preg_replace('#<td(.*?)>(.*?)</td>#si', '<td\1><div class="forabg block"><span class="postbody">\2</span></div></td>', $body_part);
+			$body_part = preg_replace('#cellpadding="(.*?)"#si', 'cellpadding="2"', $body_part);
+			$body_part = preg_replace('#cellspacing="(.*?)"#si', '', $body_part);
+			$body_part = preg_replace('#<table(.*?)>#si', '<table\1 cellspacing="1" class="forabg block">', $body_part);
+			$body_part = preg_replace('#<td(.*?)>#si', '<td\1 class="bg1">', $body_part);
+			$body_part = preg_replace('#<td(.*?)class="row1">#si', '<td\1class="post bg2">', $body_part);				
+		break;				
+		case 'php':
+			// Alter some CSS related attributes.
+			$body_part = preg_replace('# (style|class)=["\'](.*?)["\']#si', '', $body_part);
+			$body_part = preg_replace('#<hr(.*?)>#si', '<hr size="1" width="600" />', $body_part);
+			$body_part = preg_replace('#<img(.*?)>#si', '<img style="float:right; border:0px;"\1>', $body_part);
+			$body_part = preg_replace('#<td(.*?)>(.*?)</td>#si', '<td\1><span class="genmed">\2</span></td>', $body_part);
+			$body_part = preg_replace('#cellpadding="(.*?)"#si', 'cellpadding="2"', $body_part);
+			$body_part = preg_replace('#cellspacing="(.*?)"#si', '', $body_part);
+			$body_part = preg_replace('#<table(.*?)>#si', '<table\1 cellspacing="1" class="forumline">', $body_part);
+			$body_part = preg_replace('#<td(.*?)>#si', '<td\1 class="row1">', $body_part);
+			$body_part = preg_replace('#<td(.*?)class="row1">#si', '<td\1class="row2">', $body_part);			
+		break;					
+	}	
 
-	//
-	// Alter some CSS related attributes.
-	//
-	$body_part = preg_replace('# (style|class)=["\'](.*?)["\']#si', '', $body_part);
-	$body_part = preg_replace('#<hr(.*?)>#si', '<hr size="1" width="600" />', $body_part);
-	$body_part = preg_replace('#<img(.*?)>#si', '<img style="float:right; border:0px;"\1>', $body_part);
-	$body_part = preg_replace('#<td(.*?)>(.*?)</td>#si', '<td\1><span class="genmed">\2</span></td>', $body_part);
-	$body_part = preg_replace('#cellpadding="(.*?)"#si', 'cellpadding="2"', $body_part);
-	$body_part = preg_replace('#cellspacing="(.*?)"#si', '', $body_part);
-	$body_part = preg_replace('#<table(.*?)>#si', '<table\1 cellspacing="1" class="forumline">', $body_part);
-	$body_part = preg_replace('#<td(.*?)>#si', '<td\1 class="row1">', $body_part);
-	$body_part = preg_replace('#<td(.*?)class="row1">#si', '<td\1class="row2">', $body_part);
 
-	//
 	// Send the result to the browser.
-	//
 	include_once($mx_root_path . "install/includes/template.$phpEx");
 	$template = new Template($mx_root_path . 'install/templates');
 	page_header_install('phpInfo()');
@@ -1113,6 +1595,36 @@ function get_upgrade_schemas()
 		}
 		$schemas[] = $upgrade_map['schema'];
 	}
+	return $schemas;
+}
+
+/*
+*
+* Build the array of install schemas required for the target system
+*/
+function get_install_schemas()
+{
+	global $available_dbms, $db, $mx_root_path, $phpEx, $mx_table_prefix;
+
+	$schemas = array();
+	// Is some database support even compiled in?
+	$install_from_here = false;
+	foreach ($available_dbms as $dbms => $database)
+	{
+		if ($database['LABEL'])
+		{
+			$db_type = $database['name'];
+			if (!file_exists($mx_root_path . 'install/schemas/' . $database['SCHEMA'] . '_schema_install.sql'))
+			{			
+				$available_dbms[$dbms]['AVAILABLE'] = false;				
+			}
+			else
+			{
+				$available_dbms[$dbms]['AVAILABLE'] = true;
+				$schemas[] = $database['SCHEMA'] . '__schema_install';
+			}
+		}
+	}	
 	return $schemas;
 }
 
@@ -1359,25 +1871,25 @@ function mx_install_cmd_sql( $sql = '', $main_install = false )
 function exec_post_process($mode, $upgrade_mode)
 {
 	global $mx_portal_name, $mx_portal_version, $tplEx, $db, $table_prefix;
-	global $language, $board_email, $script_path, $server_port, $server_name, $portal_backend, $phpbb_path;
+	global $language, $board_email, $script_path, $server_port, $server_name;
 	global $mx_root_path, $phpbb_root_path;
 	global $admin_name, $admin_pass1;
-	global $portal_backend;
-
-	if( $mode == 'install' )
+	global $portal_backend, $backend_path;
+	
+	if($mode == 'install')
 	{
 		$portal_table = array(
-			'portal_id'			=> 1,
-			'portal_name'		=> "'$mx_portal_name'",
-			'portal_version'	=> "'$mx_portal_version'",
-			'portal_startdate'	=> "'".time()."'",
-			'default_lang'		=> "'$language'",
-			'board_email'		=> "'$board_email'",
-			'script_path'		=> "'$script_path'",
-			'server_port'		=> "'$server_port'",
-			'server_name'		=> "'$server_name'",
-			'portal_backend'	=> "'$portal_backend'",
-			'portal_backend_path'	=> "'$phpbb_path'",
+			'portal_id'				=> 1,
+			'portal_name'			=> "'".$mx_portal_name."'",
+			'portal_version'		=> "'".$mx_portal_version."'",
+			'portal_startdate'		=> "'".time()."'",
+			'default_lang'			=> "'".$language."'",
+			'board_email'			=> "'".$board_email."'",
+			'script_path'			=> "'".$script_path."'",
+			'server_port'			=> "'".$server_port."'",
+			'server_name'			=> "'".$server_name."'",
+			'portal_backend'		=> "'".$portal_backend."'",
+			'portal_backend_path'	=> "'".$backend_path."'",
 		);
 
 		if ($_POST['mxbb']) // Internal install
@@ -1385,6 +1897,11 @@ function exec_post_process($mode, $upgrade_mode)
 			$portal_table['default_style'] = "'1'";
 			$portal_table['default_admin_style'] = "'3'";
 		}
+		else if (!$_POST['mxbb'] && $portal_backend = 'smf2') // smf2 install
+		{
+			$portal_table['default_style'] = "'1'";
+			$portal_table['default_admin_style'] = "'3'";
+		}		
 		else if (!$_POST['mxbb'] && $portal_backend = 'phpbb2') // phpBB2 install
 		{
 			$portal_table['default_style'] = "'4'";
@@ -1433,15 +1950,15 @@ function exec_post_process($mode, $upgrade_mode)
 					(user_id, username, user_password, user_email, user_level, user_regdate, user_active)
 					VALUES ('" . $user_id . "', '" . $row['username'] . "', '" . $row['user_password'] . "', '" . $row['user_email'] . "', '" . $row['user_level'] . "', '" . time() . "', '1')";
 
-					parse_cmd_sql($sql);
+				parse_cmd_sql($sql);
 			}
 		}		
 	}
 	else
 	{
 		$sql = "UPDATE ".PORTAL_TABLE."
-			SET portal_name='$mx_portal_name',
-			portal_version='$mx_portal_version'";
+			SET portal_name = '$mx_portal_name',
+			portal_version = '$mx_portal_version'";
 
 		if ($upgrade_mode == 'from28x')
 		{
@@ -1491,7 +2008,7 @@ function exec_post_process($mode, $upgrade_mode)
 				script_protocol	= '".$server_protocol."',
 				server_name	= '".$board_config['server_name']."',
 				portal_backend = 'phpbb2',
-				portal_backend_path	= '$phpbb_backend_path'";
+				portal_backend_path	= '".$phpbb_backend_path."'";
 		}
 
 		$sql .= " WHERE portal_id = 1";
@@ -1552,8 +2069,33 @@ function format_error($message)
 // function (in includes/functions.php). I never understood why they did it. Only if they
 // had documented the correct reason in their source code. ;-)
 //
-function mx_realpath($path)
+function mx_realpath($path, $errstr = false)
 {
+	global $mx_root_path;
+	//set error handler if save mode
+	if ((int)@ini_get("safe_mode") !== 0)
+	{
+		//@set_error_handler("mx_realpath");
+		return $path;
+		
+	}
+	/*
+	if ($errstr)
+	{
+		$errpath = array();
+		if ($errpath = @explode("www/", __FILE__))
+		{
+			$dir = $errpath[0] . "www/";
+		}
+		else
+		{
+			@set_error_handler(false);
+			$dir = $mx_root_path;			
+		}
+		//die("$dir");		
+		return $dir;
+	}
+	*/
 	return ( @function_exists('realpath') && @realpath(__FILE__) ? realpath($path) : $path );
 }
 

@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: admin_mx_portal.php,v 1.46 2008/10/04 07:04:24 orynider Exp $
+* @version $Id: admin_mx_portal.php,v 1.53 2014/05/19 18:14:40 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -18,7 +18,7 @@ if( !empty($setmodules) )
 //
 // Security and Page header
 //
-define('IN_PORTAL', 1);
+@define('IN_PORTAL', 1);
 $mx_root_path = './../';
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
 require('./pagestart.' . $phpEx);
@@ -40,8 +40,8 @@ if( !empty($mode) )
 		mx_message_die(GENERAL_ERROR, "Failed to update portal configuration, you didn't specified valid values or your admin templates are incompatible with this version of MXP.");
 	}
 
-	$new['portal_name'] 			= $mx_request_vars->post('portal_name', MX_TYPE_NO_TAGS, 'MX-Publisher');
-	$new['portal_desc'] 			= $mx_request_vars->post('portal_desc', MX_TYPE_NO_TAGS, 'Modular system');
+	$new['portal_name'] 			= utf8_normalize_nfc($mx_request_vars->post('portal_name', MX_TYPE_NO_TAGS, 'MX-Publisher'));
+	$new['portal_desc'] 			= utf8_normalize_nfc($mx_request_vars->post('portal_desc', MX_TYPE_NO_TAGS, 'Modular system'));
 	$new['portal_status'] 			= $mx_request_vars->post('portal_status', MX_TYPE_INT, '0');
 	$new['disabled_message'] 		= $mx_request_vars->post('disabled_message', MX_TYPE_NO_TAGS, 'Site disabled.');
 	$new['server_name'] 			= $mx_request_vars->post('server_name', MX_TYPE_NO_TAGS, '');
@@ -59,7 +59,7 @@ if( !empty($mode) )
 
 	$new['cookie_domain'] 			= $mx_request_vars->post('cookie_domain', MX_TYPE_NO_TAGS, '');
 	$new['cookie_name'] 			= $mx_request_vars->post('cookie_name', MX_TYPE_NO_TAGS, '');
-	$new['cookie_name'] 		= str_replace('.', '_', $new['cookie_name']);
+	$new['cookie_name'] 			= str_replace('.', '_', $new['cookie_name']);
 	$new['cookie_path'] 			= $mx_request_vars->post('cookie_path', MX_TYPE_NO_TAGS, '');
 	$new['cookie_secure'] 			= $mx_request_vars->post('cookie_secure', MX_TYPE_INT, '');
 	$new['session_length'] 			= $mx_request_vars->post('session_length', MX_TYPE_NO_TAGS, '');
@@ -93,27 +93,19 @@ if( !empty($mode) )
 	$new['smtp_username'] 			= $mx_request_vars->post('smtp_username', MX_TYPE_NO_TAGS, '0');
 	$new['smtp_password'] 			= $mx_request_vars->post('smtp_password', MX_TYPE_NO_TAGS, '0');
 
-	$sql = "UPDATE " . PORTAL_TABLE . "
-		SET ";
 
-	$is_first = true;
-	foreach ($new as $key => $value)
-	{
-		$sql .= ($is_first ? "" : ", ") . $key . " = '" . str_replace("\'", "''", $value) . "'";
-		$is_first = false;
-	}
-
+	$sql = "UPDATE  " . PORTAL_TABLE . " SET " . $db->sql_build_array('UPDATE', $new);
 	if( !($db->sql_query($sql)) )
 	{
 		mx_message_die(GENERAL_ERROR, "Failed to update portal configuration ", "", __LINE__, __FILE__, $sql);
 	}
-	
+
 	$message = update_portal_backend($new['portal_backend']) ? "The CMS configuration file was upgraded ...<br /><br />" : update_portal_backend($new['portal_backend']);
-
-	$mx_cache->put('mxbb_config', $new);
-
-	$message .= $lang['Portal_Config_updated'] . "<br /><br />" . sprintf($lang['Click_return_portal_config'], "<a href=\"" . mx_append_sid("admin_mx_portal.$phpEx") . "\">", "</a>") . "<br /><br />" . sprintf($lang['Click_return_admin_index'], "<a href=\"" . mx_append_sid("index.$phpEx?pane=right") . "\">", "</a>");
 	
+	$mx_cache->put('mxbb_config', $new);
+	
+	$message .= $lang['Portal_Config_updated'] . "<br /><br />" . sprintf($lang['Click_return_portal_config'], "<a href=\"" . mx_append_sid("admin_mx_portal.$phpEx") . "\">", "</a>") . "<br /><br />" . sprintf($lang['Click_return_admin_index'], "<a href=\"" . mx_append_sid("index.$phpEx?pane=right") . "\">", "</a>");
+
 	mx_message_die(GENERAL_MESSAGE, $message);
 }
 
@@ -126,7 +118,7 @@ $portal_config['default_admin_style'] = $portal_config['default_admin_style'] ==
 $portal_config['default_style'] = $portal_config['default_style'] == -1 ? $board_config['default_style'] : $portal_config['default_style'];
 $portal_config['override_user_style'] = $portal_config['override_user_style'] == -1 ? $board_config['override_user_style'] : $portal_config['override_user_style'];
 
-$portal_backend_select = get_list_static('portal_backend', array('internal' => 'Internal', 'phpbb2' => 'phpBB2', 'phpbb3' => 'phpBB3'), $portal_config['portal_backend']);
+$portal_backend_select = get_list_static('portal_backend', array('internal' => 'Internal', 'phpbb2' => 'phpBB2', 'phpbb3' => 'phpBB3', 'olympus' => 'Olympus', 'ascraeus' => 'Ascraeus', 'smf2' => 'SMF2', 'mybb' => 'myBB'), $portal_config['portal_backend']);
 
 $style_select = mx_style_select($portal_config['default_style'], 'mx_default_style');
 $style_admin_select = mx_style_select($portal_config['default_admin_style'], 'mx_default_admin_style');
@@ -134,25 +126,12 @@ $style_admin_select = mx_style_select($portal_config['default_admin_style'], 'mx
 $lang_select = mx_language_select($portal_config['default_lang'], 'default_lang', "language");
 $timezone_select = mx_tz_select($portal_config['board_timezone'], 'board_timezone');
 
-switch (PORTAL_BACKEND)
-{
-	case 'internal':
-
-	case 'phpbb2':
-
-		$current_phpbb_version = '2' . $board_config['version'];
-		break;
-
-	case 'phpbb3':
-
-		$current_phpbb_version = $board_config['version'];
-		break;
-}
+$current_phpbb_version = $mx_backend->get_phpbb_version(); // Empty if mxp is used standalone
 
 //
 // Valid portal backend
 //
-$valid_backend_text = PORTAL_BACKEND == $portal_config['portal_backend'] ? $lang['Portal_config_valid_true'] : $lang['Portal_config_valid_false'];
+$valid_backend_text = $mx_backend->confirm_backend() ? $lang['Portal_config_valid_true'] : $lang['Portal_config_valid_false'];
 
 $template->assign_vars(array(
 	"S_CONFIG_ACTION" => mx_append_sid("admin_mx_portal.$phpEx"),
@@ -380,28 +359,9 @@ $template->assign_vars(array(
 	"L_PORTAL_VERSION" => $lang['Portal_version'],
 	"PORTAL_VERSION" => $portal_config['portal_version'],
 
-	//
-	// Old
-	//
-	//"L_PORTAL_URL" => $lang['Portal_Url'] . "<br />" . $lang['Portal_url_explain'],
-	//"L_PORTAL_PHPBB_URL" => $lang['Portal_PHPBB_Url'] . "<br />" . $lang['Phpbb_url_explain'],
-	//"PORTAL_URL" => $portal_config['portal_url'],
-	//"PORTAL_PHPBB_URL" => $portal_config['portal_phpbb_url'],
-
-	'PHPBB_BACKEND'				=> PORTAL_BACKEND != 'internal',
+	'PHPBB_BACKEND'	=> !(PORTAL_BACKEND === 'internal'),
 
 ));
-
-switch (PORTAL_BACKEND)
-{
-	case 'internal':
-		break;
-
-	case 'phpbb2':
-	case 'phpbb3':
-		$template->assign_block_vars('phpbb_backend', array());
-		break;
-}
 
 $template->pparse('admin_portal');
 include_once('page_footer_admin.' . $phpEx);

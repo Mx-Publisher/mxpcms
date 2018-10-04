@@ -2,23 +2,23 @@
 /**
 *
 * @package MX-Publisher Module - mx_rebuild_search_tables
-* @version $Id: lang_admin_rebuild_search.php,v 1.1 2008/09/07 18:54:00 orynider Exp $
+* @version $Id: lang_admin_rebuild_search.php,v 1.3 2013/06/28 15:39:10 orynider Exp $
 * @copyright (c) 2002-2008 [phpBB, Jon Ohlsson] MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
-$lang['Rebuild_search'] = 'Î‘Î½Î±Î´ÏŒÎ¼Î·ÏƒÎ· Î‘Î½Î±Î¶Î®Ï„Î·ÏƒÎ·Ï‚';
-$lang['Rebuild_search_desc'] = 'Î‘Ï…Ï„ÏŒ Î¸Î± ÎºÎ±Ï„Î±Î³ÏÎ¬ÏˆÎµÎ¹ ÎºÎ¬Î¸Îµ Î´Î·Î¼Î¿ÏƒÎ¯ÎµÏ…ÏƒÎ· Ï„Î¿Ï… phpBB, ÎºÎ±Î¹ Î¸Î± Î´Î¿Î¼Î®ÏƒÎµÎ¹ Ï„Î¿Î½ ÎºÎ±Ï„Î¬Î»Î¿Î³Î¿ Î±Î½Î±Î¶Î®Ï„Î·ÏƒÎ·Ï‚. Î— Î´Î¹Î±Î´Î¹ÎºÎ±ÏƒÎ¯Î± Î¼Ï€Î¿ÏÎµÎ¯ Î½Î± ÎµÎ¯Î½Î±Î¹ Ï‡ÏÎ¿Î½Î¿Î²ÏŒÏÎ±, Ï€Î±ÏÎ±ÎºÎ±Î»ÏŽ Î¼Î·Î½ Î¼ÎµÏ„Î±ÎºÎ¹Î½Î·Î¸ÎµÎ¯Ï„Îµ Î±Ï€ÏŒ Î±Ï…Ï„Î® Ï„Î·Î½ ÏƒÎµÎ»Î¯Î´Î± Î¼Î­Ï‡ÏÎ¹ Ï„Î·Î½ Î¿Î»Î¿ÎºÎ»Î®ÏÏ‰ÏƒÎ·.';
+$lang['Rebuild_search'] = 'Áíáäüìçóç ÁíáæÞôçóçò';
+$lang['Rebuild_search_desc'] = 'Áõôü èá êáôáãñÜøåé êÜèå äçìïóßåõóç ôïõ phpBB, êáé èá äïìÞóåé ôïí êáôÜëïãï áíáæÞôçóçò. Ç äéáäéêáóßá ìðïñåß íá åßíáé ÷ñïíïâüñá, ðáñáêáëþ ìçí ìåôáêéíçèåßôå áðü áõôÞ ôçí óåëßäá ìÝ÷ñé ôçí ïëïêëÞñùóç.';
 
-$lang['Rebuild_mx_search'] = 'Î‘Î½Î±Î´ÏŒÎ¼Î·ÏƒÎ· MX-Publisher Î‘Î½Î±Î¶Î®Ï„Î·ÏƒÎ·Ï‚';
-$lang['Rebuild_mx_search_desc'] = 'Î‘Ï…Ï„ÏŒ Î¸Î± ÎºÎ±Ï„Î±Î³ÏÎ¬ÏˆÎµÎ¹ ÎºÎ¬Î¸Îµ textblock ÏƒÏ„Î¿ MX-Publisher portal, ÎºÎ±Î¹ Î¸Î± Î´Î¿Î¼Î®ÏƒÎµÎ¹ Ï„Î¿Î½ ÎºÎ±Ï„Î¬Î»Î¿Î³Î¿ Î±Î½Î±Î¶Î®Ï„Î·ÏƒÎ·Ï‚. Î— Î´Î¹Î±Î´Î¹ÎºÎ±ÏƒÎ¯Î± Î¼Ï€Î¿ÏÎµÎ¯ Î½Î± ÎµÎ¯Î½Î±Î¹ Ï‡ÏÎ¿Î½Î¿Î²ÏŒÏÎ±, Ï€Î±ÏÎ±ÎºÎ±Î»ÏŽ Î¼Î·Î½ Î¼ÎµÏ„Î±ÎºÎ¹Î½Î·Î¸ÎµÎ¯Ï„Îµ Î±Ï€ÏŒ Î±Ï…Ï„Î® Ï„Î·Î½ ÏƒÎµÎ»Î¯Î´Î± Î¼Î­Ï‡ÏÎ¹ Ï„Î·Î½ Î¿Î»Î¿ÎºÎ»Î®ÏÏ‰ÏƒÎ·.';
+$lang['Rebuild_mx_search'] = 'Áíáäüìçóç MX-Publisher ÁíáæÞôçóçò';
+$lang['Rebuild_mx_search_desc'] = 'Áõôü èá êáôáãñÜøåé êÜèå textblock óôï MX-Publisher portal, êáé èá äïìÞóåé ôïí êáôÜëïãï áíáæÞôçóçò. Ç äéáäéêáóßá ìðïñåß íá åßíáé ÷ñïíïâüñá, ðáñáêáëþ ìçí ìåôáêéíçèåßôå áðü áõôÞ ôçí óåëßäá ìÝ÷ñé ôçí ïëïêëÞñùóç.';
 
-$lang['Post_limit'] = 'ÎŒÏÎ¹Î¿ Î‘Î½Î±Î¶Î·Ï„Î®ÏƒÎµÏ‰Î½';
-$lang['Time_limit'] = 'Î§ÏÎ¿Î½Î¹ÎºÏŒ ÎŒÏÎ¹Î¿';
-$lang['Refresh_rate'] = 'Î¤Î¹Î¼Î® Î•Ï€Î±Î½Î±Ï†Î¿ÏÏ„ÏŽÏƒÎµÏ‰Î½';
+$lang['Post_limit'] = '¼ñéï ÁíáæçôÞóåùí';
+$lang['Time_limit'] = '×ñïíéêü ¼ñéï';
+$lang['Refresh_rate'] = 'ÔéìÞ Åðáíáöïñôþóåùí';
 
-$lang['Next'] = 'Î•Ï€ÏŒÎ¼ÎµÎ½Î¿';
-$lang['Finished'] = 'Î¤ÎµÎ»ÎµÎ¹Ï‰Î¼Î­Î½Î¿';
+$lang['Next'] = 'Åðüìåíï';
+$lang['Finished'] = 'ÔåëåéùìÝíï';
 ?>

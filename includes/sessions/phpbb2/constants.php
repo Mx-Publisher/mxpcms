@@ -2,10 +2,10 @@
 /**
 *
 * @package Style
-* @version $Id: constants.php,v 1.3 2008/06/15 09:15:43 jonohlsson Exp $
+* @version $Id: constants.php,v 1.6 2013/06/28 15:33:47 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -89,6 +89,8 @@ if ( !defined('IN_PHPBB') )
 @define('POST_USERS_URL', 'u');
 @define('POST_POST_URL', 'p');
 @define('POST_GROUPS_URL', 'g');
+
+@define('RANKS_PATH', 'images/ranks/');
 
 // Session parameters
 @define('SESSION_METHOD_COOKIE', 100);

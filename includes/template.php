@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Module - mx_xs
-* @version $Id: template.php,v 1.34 2008/09/01 02:14:18 orynider Exp $
+* @version $Id: template.php,v 1.42 2014/05/16 18:02:06 orynider Exp $
 * @copyright (c) 2002-2008 [CyberAlien, OryNider] MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -437,7 +437,7 @@ class Template {
 		// Check if sub_templates are defined for this theme
 		if ( $board_config['version'] > '.0.5' )
 		{
-			$sub_templates_cfg = @phpbb_realpath($this->root . '/sub_templates.cfg');
+			$sub_templates_cfg = mx_realpath($this->root . '/sub_templates.cfg');
 		}
 		else
 		{
@@ -600,7 +600,7 @@ class Template {
 			$real_root = $this->root;
 			if ( $board_config['version'] > '.0.5' )
 			{
-				$real_root = @phpbb_realpath($this->root);
+				$real_root = mx_realpath($this->root);
 			}
 			if (substr($filename, 0, 1) != '/')
 			{
@@ -919,9 +919,9 @@ class Template {
 	/**
 	 * includes file or executes code
 	 */
-	function execute($filename, $code, $handle)
+	function execute($filename, $code, $handle, $include_once = false)
 	{
-		global $lang, $theme, $board_config;
+		global $lang, $theme, $board_config, $mx_user;
 		global $admin_script;
 
 		//
@@ -940,14 +940,14 @@ class Template {
 		{
 			echo '<!-- template ', $this->files[$handle], ' start -->';
 		}			
-
+		//inlcude_once()  only includes one block per module
 		if ($filename)
 		{
-			($include_once) ? @include_once($filename) : @include($filename);
+			($include_once) ? @include_once($filename) : @require($filename);
 		}
 		elseif ($admin_script)
 		{
-			($include_once) ? @include_once($admin_script) : @include($admin_script); // See note above
+			($include_once) ? @include_once($admin_script) : @require($admin_script); // See note above
 		}
 		else
 		{

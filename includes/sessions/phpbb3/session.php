@@ -2,10 +2,10 @@
 /**
 *
 * @package Style
-* @version $Id: session.php,v 1.32 2008/10/04 07:04:25 orynider Exp $
+* @version $Id: session.php,v 1.63 2014/07/07 22:06:50 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team & (C) 2005 The phpBB Group
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -95,9 +95,7 @@ class session
 		//define('NEED_SID', 1);
 		$this->session_begin();
 
-		//
 		// Redefine some MXP stylish userdata
-		//
 		$this->data['session_logged_in'] = $this->data['user_id'] != ANONYMOUS ? 1 : 0;
 
 		if ( $this->data['user_id'] == ANONYMOUS )
@@ -119,6 +117,7 @@ class session
 		}
 
 		$this->data['session_id'] = $this->session_id;
+		$this->data['user_session_page'] = $this->data['session_page'];
 	}
 
 	/**
@@ -128,7 +127,6 @@ class session
 	*/
 	function extract_current_page($root_path)
 	{
-		global $phpBB2;
 		$page_array = array();
 
 		// First of all, get the request uri...
@@ -165,8 +163,8 @@ class session
 		$page_name = urlencode(htmlspecialchars($page_name));
 
 		// current directory within the phpBB root (for example: adm)
-		$root_dirs = explode('/', str_replace('\\', '/', $phpBB2->phpbb_realpath($root_path)));
-		$page_dirs = explode('/', str_replace('\\', '/', $phpBB2->phpbb_realpath('./')));
+		$root_dirs = explode('/', str_replace('\\', '/', phpBB2::phpbb_realpath($root_path)));
+		$page_dirs = explode('/', str_replace('\\', '/', phpBB2::phpbb_realpath('./')));
 		$intersection = array_intersect_assoc($root_dirs, $page_dirs);
 
 		$root_dirs = array_diff_assoc($root_dirs, $intersection);
@@ -228,13 +226,14 @@ class session
 	*/
 	function session_begin($update_session_page = true)
 	{
-		global $phpEx, $SID, $_SID, $_EXTRA_URL, $db, $board_config, $phpbb_root_path, $phpBB3;
+		global $phpEx, $SID, $_SID, $_EXTRA_URL, $db, $board_config, $phpbb_root_path, $page_id;
 
 		// Give us some basic information
 		$this->time_now				= time();
 		$this->cookie_data			= array('u' => 0, 'k' => '');
 		$this->update_session_page	= $update_session_page;
 		$this->browser				= (!empty($_SERVER['HTTP_USER_AGENT'])) ? htmlspecialchars((string) $_SERVER['HTTP_USER_AGENT']) : '';
+		$this->referer				= (!empty($_SERVER['HTTP_REFERER'])) ? htmlspecialchars((string) $_SERVER['HTTP_REFERER']) : '';		
 		$this->forwarded_for		= (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) ? (string) $_SERVER['HTTP_X_FORWARDED_FOR'] : '';
 		$this->host					= (!empty($_SERVER['HTTP_HOST'])) ? (string) $_SERVER['HTTP_HOST'] : 'localhost';
 		$this->page					= $this->extract_current_page($phpbb_root_path);
@@ -247,9 +246,9 @@ class session
 			// Whoa these look impressive!
 			// The code to generate the following two regular expressions which match valid IPv4/IPv6 addresses
 			// can be found in the develop directory
-			$ipv4 = '#^(?:(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$#';
-			$ipv6 = '#^(?:(?:(?:[\dA-F]{1,4}:){6}(?:[\dA-F]{1,4}:[\dA-F]{1,4}|(?:(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])))|(?:::(?:[\dA-F]{1,4}:){5}(?:[\dA-F]{1,4}:[\dA-F]{1,4}|(?:(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])))|(?:(?:[\dA-F]{1,4}:):(?:[\dA-F]{1,4}:){4}(?:[\dA-F]{1,4}:[\dA-F]{1,4}|(?:(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])))|(?:(?:[\dA-F]{1,4}:){1,2}:(?:[\dA-F]{1,4}:){3}(?:[\dA-F]{1,4}:[\dA-F]{1,4}|(?:(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])))|(?:(?:[\dA-F]{1,4}:){1,3}:(?:[\dA-F]{1,4}:){2}(?:[\dA-F]{1,4}:[\dA-F]{1,4}|(?:(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])))|(?:(?:[\dA-F]{1,4}:){1,4}:(?:[\dA-F]{1,4}:)(?:[\dA-F]{1,4}:[\dA-F]{1,4}|(?:(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])))|(?:(?:[\dA-F]{1,4}:){1,5}:(?:[\dA-F]{1,4}:[\dA-F]{1,4}|(?:(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])))|(?:(?:[\dA-F]{1,4}:){1,6}:[\dA-F]{1,4})|(?:(?:[\dA-F]{1,4}:){1,7}:))$#i';
-
+			$ipv4 = phpBB3::get_preg_expression('ipv4'); //'#^(?:(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$#';
+			$ipv6 = phpBB3::get_preg_expression('ipv6'); //'#^(?:(?:(?:[\dA-F]{1,4}:){6}(?:[\dA-F]{1,4}:[\dA-F]{1,4}|(?:(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])))|(?:::(?:[\dA-F]{1,4}:){5}(?:[\dA-F]{1,4}:[\dA-F]{1,4}|(?:(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])))|(?:(?:[\dA-F]{1,4}:):(?:[\dA-F]{1,4}:){4}(?:[\dA-F]{1,4}:[\dA-F]{1,4}|(?:(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])))|(?:(?:[\dA-F]{1,4}:){1,2}:(?:[\dA-F]{1,4}:){3}(?:[\dA-F]{1,4}:[\dA-F]{1,4}|(?:(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])))|(?:(?:[\dA-F]{1,4}:){1,3}:(?:[\dA-F]{1,4}:){2}(?:[\dA-F]{1,4}:[\dA-F]{1,4}|(?:(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])))|(?:(?:[\dA-F]{1,4}:){1,4}:(?:[\dA-F]{1,4}:)(?:[\dA-F]{1,4}:[\dA-F]{1,4}|(?:(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])))|(?:(?:[\dA-F]{1,4}:){1,5}:(?:[\dA-F]{1,4}:[\dA-F]{1,4}|(?:(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])))|(?:(?:[\dA-F]{1,4}:){1,6}:[\dA-F]{1,4})|(?:(?:[\dA-F]{1,4}:){1,7}:))$#i';
+			
 			// split the list of IPs
 			$ips = explode(', ', $this->forwarded_for);
 			foreach ($ips as $ip)
@@ -263,15 +262,19 @@ class session
 				}
 			}
 		}
-
+		else
+		{
+			$this->forwarded_for = '';
+		}
+		
 		// Add forum to the page for tracking online users - also adding a "x" to the end to properly identify the number
 		$this->page['page'] .= (isset($_REQUEST['f'])) ? ((strpos($this->page['page'], '?') !== false) ? '&' : '?') . '_f_=' . (int) $_REQUEST['f'] . 'x' : '';
 
 		if (isset($_COOKIE[$board_config['cookie_name'] . '_sid']) || isset($_COOKIE[$board_config['cookie_name'] . '_u']))
 		{
-			$this->cookie_data['u'] = $phpBB3->request_var($board_config['cookie_name'] . '_u', 0, false, true);
-			$this->cookie_data['k'] = $phpBB3->request_var($board_config['cookie_name'] . '_k', '', false, true);
-			$this->session_id 		= $phpBB3->request_var($board_config['cookie_name'] . '_sid', '', false, true);
+			$this->cookie_data['u'] = phpBB3::request_var($board_config['cookie_name'] . '_u', 0, false, true);
+			$this->cookie_data['k'] = phpBB3::request_var($board_config['cookie_name'] . '_k', '', false, true);
+			$this->session_id 		= phpBB3::request_var($board_config['cookie_name'] . '_sid', '', false, true);
 
 			// original code: $SID = (defined('NEED_SID')) ? 'sid=' . $this->session_id : 'sid=';
 			$SID = (defined('NEED_SID')) ? 'sid=' . $this->session_id : '';
@@ -279,22 +282,53 @@ class session
 
 			if (empty($this->session_id))
 			{
-				$this->session_id = $_SID = $phpBB3->request_var('sid', '');
+				$this->session_id = $_SID = phpBB3::request_var('sid', '');
 				$SID = 'sid=' . $this->session_id;
 				$this->cookie_data = array('u' => 0, 'k' => '');
 			}
 		}
 		else
 		{
-			$this->session_id = $_SID = $phpBB3->request_var('sid', '');
+			$this->session_id = $_SID = phpBB3::request_var('sid', '');
 			$SID = 'sid=' . $this->session_id;
 		}
-
+		$session_id = $this->session_id;
 		$_EXTRA_URL = array();
-
 		// Why no forwarded_for et al? Well, too easily spoofed. With the results of my recent requests
 		// it's pretty clear that in the majority of cases you'll at least be left with a proxy/cache ip.
 		$this->ip = (!empty($_SERVER['REMOTE_ADDR'])) ? htmlspecialchars($_SERVER['REMOTE_ADDR']) : '';
+		$this->ip = preg_replace('#[ ]{2,}#', ' ', str_replace(array(',', ' '), ' ', $this->ip));
+
+		// split the list of IPs
+		$ips = explode(' ', $this->ip);
+
+		// Default IP if REMOTE_ADDR is invalid
+		$this->ip = '127.0.0.1';
+
+		foreach ($ips as $ip)
+		{
+			// check IPv4 first, the IPv6 is hopefully only going to be used very seldomly
+			if (!empty($ip) && !preg_match(phpBB3::get_preg_expression('ipv4'), $ip) && !@preg_match(phpBB3::get_preg_expression('ipv6'), $ip))
+			{
+				// Just break
+				break;
+			}
+
+			// Quick check for IPv4-mapped address in IPv6
+			if (stripos($ip, '::ffff:') === 0)
+			{
+				$ipv4 = substr($ip, 7);
+
+				if (preg_match(phpBB3::get_preg_expression('ipv4'), $ipv4))
+				{
+					$ip = $ipv4;
+				}
+			}
+
+			// Use the last in chain
+			$this->ip = $ip;
+		}
+		
 		$this->load = false;
 
 		// Load limit check (if applicable)
@@ -322,7 +356,7 @@ class session
 			$result = $db->sql_query($sql);
 			$this->data = $db->sql_fetchrow($result);
 			$db->sql_freeresult($result);
-
+			
 			// Did the session exist in the DB?
 			if (isset($this->data['user_id']))
 			{
@@ -346,7 +380,18 @@ class session
 
 				$s_forwarded_for = ($board_config['forwarded_for_check']) ? substr($this->data['session_forwarded_for'], 0, 254) : '';
 				$u_forwarded_for = ($board_config['forwarded_for_check']) ? substr($this->forwarded_for, 0, 254) : '';
+				
+				// referer checks
+				// The @ before $config['referer_validation'] suppresses notices present while running the updater
+				$check_referer_path = (@$board_config['referer_validation'] == REFERER_VALIDATE_PATH);
+				$referer_valid = true;
 
+				// we assume HEAD and TRACE to be foul play and thus only whitelist GET
+				if (@$board_config['referer_validation'] && isset($_SERVER['REQUEST_METHOD']) && strtolower($_SERVER['REQUEST_METHOD']) !== 'get')
+				{
+					$referer_valid = $this->validate_referer($check_referer_path);
+				}
+				
 				if ($u_ip === $s_ip && $s_browser === $u_browser && $s_forwarded_for === $u_forwarded_for)
 				{
 					$session_expired = false;
@@ -398,11 +443,32 @@ class session
 							if ($this->update_session_page)
 							{
 								$sql_ary['session_page'] = substr($this->page['page'], 0, 199);
+								$sql_ary['session_forum_id'] = !empty($this->page['forum']) ? $this->page['forum'] : $page_id; //Added for phpBB 3.0.2 by Ory								
 							}
+
+							$db->sql_return_on_error(true);
 
 							$sql = 'UPDATE ' . SESSIONS_TABLE . ' SET ' . $db->sql_build_array('UPDATE', $sql_ary) . "
 								WHERE session_id = '" . $db->sql_escape($this->session_id) . "'";
-							$db->sql_query($sql);
+							$result = $db->sql_query($sql);
+
+							$db->sql_return_on_error(false);
+
+							// If the database is not yet updated, there will be an error due to the session_forum_id
+							// @todo REMOVE for 3.0.2
+							if ($result === false)
+							{
+								unset($sql_ary['session_forum_id']);
+
+								$sql = 'UPDATE ' . SESSIONS_TABLE . ' SET ' . $db->sql_build_array('UPDATE', $sql_ary) . "
+									WHERE session_id = '" . $db->sql_escape($this->session_id) . "'";
+								$db->sql_query($sql);
+							}
+
+							if ($this->data['user_id'] != ANONYMOUS && !empty($board_config['new_member_post_limit']) && $this->data['user_new'] && $board_config['new_member_post_limit'] <= $this->data['user_posts'])
+							{
+								$this->leave_newly_registered();
+							}
 						}
 
 						$this->data['is_registered'] = ($this->data['user_id'] != ANONYMOUS && ($this->data['user_type'] == USER_NORMAL || $this->data['user_type'] == USER_FOUNDER)) ? true : false;
@@ -417,7 +483,14 @@ class session
 					// Added logging temporarly to help debug bugs...
 					if (defined('DEBUG_EXTRA') && $this->data['user_id'] != ANONYMOUS)
 					{
-						mx_add_log('critical', 'LOG_IP_BROWSER_FORWARDED_CHECK', $u_ip, $s_ip, $u_browser, $s_browser, htmlspecialchars($u_forwarded_for), htmlspecialchars($s_forwarded_for));
+						if ($referer_valid)
+						{
+							mx_add_log('critical', 'LOG_IP_BROWSER_FORWARDED_CHECK', $u_ip, $s_ip, $u_browser, $s_browser, htmlspecialchars($u_forwarded_for), htmlspecialchars($s_forwarded_for));
+						}
+						else
+						{
+							mx_add_log('critical', 'LOG_REFERER_INVALID', $this->referer);
+						}
 					}
 				}
 			}
@@ -438,8 +511,7 @@ class session
 	*/
 	function session_create($user_id = false, $set_admin = false, $persist_login = false, $viewonline = true)
 	{
-		global $SID, $_SID, $db, $board_config, $cache, $phpbb_root_path, $phpEx;
-		global $phpBB3;
+		global $SID, $_SID, $db, $board_config, $cache, $phpbb_root_path, $phpEx, $mx_backend;
 
 		$this->data = array();
 
@@ -464,7 +536,7 @@ class session
 		* bot, act accordingly
 		*/
 		$bot = false;
-		$active_bots = $cache->obtain_bots();
+		$active_bots = $mx_backend->obtain_bots();
 
 		foreach ($active_bots as $row)
 		{
@@ -712,7 +784,7 @@ class session
 			}
 		}
 
-		$this->session_id = $this->data['session_id'] = md5($phpBB3->unique_id());
+		$this->session_id = $this->data['session_id'] = md5(phpBB3::unique_id());
 
 		$sql_ary['session_id'] = (string) $this->session_id;
 		$sql_ary['session_page'] = (string) substr($this->page['page'], 0, 199);
@@ -786,7 +858,7 @@ class session
 		{
 			$method($this->data, $new_session);
 		}
-
+		//else
 		if ($this->data['user_id'] != ANONYMOUS)
 		{
 			// Delete existing session, update last visit info first!
@@ -1203,13 +1275,13 @@ class session
 	*/
 	function set_login_key($user_id = false, $key = false, $user_ip = false)
 	{
-		global $board_config, $db, $phpBB3;
+		global $board_config, $db;
 
 		$user_id = ($user_id === false) ? $this->data['user_id'] : $user_id;
 		$user_ip = ($user_ip === false) ? $this->ip : $user_ip;
 		$key = ($key === false) ? (($this->cookie_data['k']) ? $this->cookie_data['k'] : false) : $key;
 
-		$key_id = $phpBB3->unique_id(hexdec(substr($this->session_id, 0, 8)));
+		$key_id = phpBB3::unique_id(hexdec(substr($this->session_id, 0, 8)));
 
 		$sql_ary = array(
 			'key_id'		=> (string) md5($key_id),
@@ -1274,6 +1346,55 @@ class session
 			$this->set_login_key($user_id);
 		}
 	}
+	
+	/**
+	* Check if the request originated from the same page.
+	* @param bool $check_script_path If true, the path will be checked as well
+	*/
+	function validate_referer($check_script_path = false)
+	{
+		global $board_config;
+
+		// no referer - nothing to validate, user's fault for turning it off (we only check on POST; so meta can't be the reason)
+		if (empty($this->referer) || empty($this->host))
+		{
+			return true;
+		}
+
+		$host = htmlspecialchars($this->host);
+		$ref = substr($this->referer, strpos($this->referer, '://') + 3);
+
+		if (!(stripos($ref, $host) === 0) && (!$board_config['force_server_vars'] || !(stripos($ref, $board_config['server_name']) === 0)))
+		{
+			return false;
+		}
+		else if ($check_script_path && rtrim($this->page['root_script_path'], '/') !== '')
+		{
+			$ref = substr($ref, strlen($host));
+			$server_port = (!empty($_SERVER['SERVER_PORT'])) ? (int) $_SERVER['SERVER_PORT'] : (int) getenv('SERVER_PORT');
+
+			if ($server_port !== 80 && $server_port !== 443 && stripos($ref, ":$server_port") === 0)
+			{
+				$ref = substr($ref, strlen(":$server_port"));
+			}
+
+			if (!(stripos(rtrim($ref, '/'), rtrim($this->page['root_script_path'], '/')) === 0))
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	function unset_admin()
+	{
+		global $db;
+		$sql = 'UPDATE ' . SESSIONS_TABLE . '
+			SET session_admin = 0
+			WHERE session_id = \'' . $db->sql_escape($this->session_id) . '\'';
+		$db->sql_query($sql);
+	}	
 
 	/** *******************************************************************************************************
 	 * Include the User class
@@ -1288,12 +1409,69 @@ class session
 		global $db, $template, $board_config, $userdata, $phpbb_auth, $phpEx, $phpbb_root_path, $mx_root_path, $mx_cache;
 		global $mx_request_vars, $portal_config; //added for mxp
 		global $lang; //added for mxp
+		
+		$session_lang = '';
+		/*
+		* Added here for reference and future implementation of a lang block in mx_coreblocks were board_config can be taken from portal_config 
+		*
+		if ($board_config['lang_select_enable'] || $board_config['lang_click_enable'])
+		{
+			$session_lang_save = phpBB3::request_var('session_lang_save', false);
+			if (isset($session_lang_save) && $session_lang_save && $this->data['session_lang'])
+			{
+				$sql = 'UPDATE ' . USERS_TABLE . "
+					SET user_lang = '" . $this->data['session_lang'] . "'
+					WHERE user_id = " . $this->data['user_id'];
+				$db->sql_query($sql);
+			}
 
+			$session_lang_reset = phpBB3::request_var('session_lang_reset', false);
+			if (isset($session_lang_reset) && $session_lang_reset)
+			{
+				$session_lang = '';
+			}
+			else
+			{
+				$session_lang = phpBB3::request_var('session_lang', '');
+			}
+
+			if ((isset($session_lang) && $session_lang) || $session_lang_reset)
+			{
+				$sql = 'UPDATE ' . SESSIONS_TABLE . "
+					SET session_lang = '" . $session_lang . "'
+					WHERE session_id = '" . $this->session_id . "'";
+				$db->sql_query($sql);
+			}
+			elseif (isset($this->data['session_lang']) && $this->data['session_lang'])
+			{
+				$session_lang = $this->data['session_lang'];
+			}
+		}
+
+		if (($board_config['lang_select_enable'] || $board_config['lang_click_enable']) && isset($session_lang) && $session_lang)
+		{
+			$this->data['user_lang'] = $session_lang;
+			$this->lang_name = (file_exists($this->lang_path . $this->data['user_lang'] . "/common.$phpEx")) ? $this->data['user_lang'] : basename($this->encode_lang($this->lang['default_lang']));
+
+			if ($this->data['user_id'] != ANONYMOUS)
+			{
+				$this->date_format = $this->data['user_dateformat'];
+				$this->timezone = $this->data['user_timezone'] * 3600;
+				$this->dst = $this->data['user_dst'] * 3600;
+			}
+			else
+			{
+				$this->date_format = $board_config['default_dateformat'];
+				$this->timezone = $board_config['board_timezone'] * 3600;
+				$this->dst = $board_config['board_dst'] * 3600;
+			}
+		}		
+		*/
 		$lang_set = !$lang_set ? (defined('IN_ADMIN') ? 'acp/common' : 'common') : $lang_set;
 
 		if ($this->data['session_logged_in'])
 		{
-			$this->lang_name = (file_exists($phpbb_root_path . 'language/' . $this->encode_lang($this->lang['user_lang']) . "/common.$phpEx")) ? $this->encode_lang($this->lang['user_lang']) : ((file_exists($phpbb_root_path . 'language/' . $this->encode_lang($this->lang['default_lang']) . "/common.$phpEx")) ? $this->encode_lang($this->lang['default_lang']) : 'en');
+			$this->lang_name = (file_exists($phpbb_root_path . 'language/' . $this->encode_lang($this->data['user_lang']) . "/common.$phpEx")) ? $this->encode_lang($this->data['user_lang']) : ((file_exists($phpbb_root_path . 'language/' . $this->encode_lang($this->lang['default_lang']) . "/common.$phpEx")) ? $this->encode_lang($this->lang['default_lang']) : 'en');
 			$this->lang_path = $phpbb_root_path . 'language/' . $this->lang_name . '/';
 
 			$this->date_format = $this->data['user_dateformat'];
@@ -1307,28 +1485,92 @@ class session
 			$this->date_format = $board_config['default_dateformat'];
 			$this->timezone = $board_config['board_timezone'] * 3600;
 			$this->dst = $board_config['board_dst'] * 3600;
-		}
-		
-
-		if (empty($lang['USER_LANG']))
-		{		
-			if ((@include $this->lang_path . "common.$phpEx") === false)
+			
+			/**
+			* If a guest user is surfing, we try to guess his/her language first by obtaining the browser language
+			* If re-enabled we need to make sure only those languages installed are checked
+			* Commented out so we do not loose the code.
+			* language checking added 2008-08-15 by Martin Truckenbrodt
+			**/
+			if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']))
 			{
-				//this will fix the path for anonymouse users
-				if ((@include $phpbb_root_path . $this->lang_path . "common.$phpEx") === false)
+				$lang_iso_xx_yy = array();
+				$lang_iso_xx = array();
+				$accept_lang_xx_yy = array();
+				$accept_lang_xx = array();
+
+				$sql = 'SELECT lang_iso FROM ' . LANG_TABLE;
+				$result = $db->sql_query($sql, 3600);
+
+				while ($row = $db->sql_fetchrow($result))
 				{
-					die('Language file ' . $this->lang_path . "common.$phpEx" . ' couldn\'t be opened.');
+					if (file_exists($phpbb_root_path . 'language/' . $row['lang_iso'] . "/common.$phpEx"))
+					{
+						$lang_iso_xx_yy[] = $row['lang_iso'];
+						if (strlen($row['lang_iso']) > 4)
+						{
+							$lang_iso_xx[$row['lang_iso']] = substr($row['lang_iso'], 0, 2);
+						}
+					}
 				}
+				$accept_lang_ary = explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
+
+				foreach ($accept_lang_ary as $accept_lang)
+				{
+					// Set correct format ... guess full xx_yy form
+					$accept_lang_xx_yy = basename(substr($accept_lang, 0, 2) . '_' . strtolower(substr($accept_lang, 3, 2)));
+					// Set correct format ... guess only xx form
+					$accept_lang_xx = basename(substr($accept_lang, 0, 2));
+
+					// browser xx-YY == board xx_yy and
+					// browser xx == board xx
+					if (in_array($accept_lang_xx_yy, $lang_iso_xx_yy))
+					{
+						$this->lang_name = $board_config['default_lang'] = $accept_lang_xx_yy;
+						break;
+					}
+					// browser xx-YY => xx == board xx
+					else if (in_array($accept_lang_xx, $lang_iso_xx_yy))
+					{
+						$this->lang_name = $board_config['default_lang'] = $accept_lang_xx;
+						break;
+					}
+					// browser xx == board xx_yy => xx
+					else if (in_array($accept_lang_xx, $lang_iso_xx) && $lang_iso_xx != '')
+					{
+						$this->lang_name = $board_config['default_lang'] = array_search($accept_lang_xx, $lang_iso_xx);
+						break;
+					}
+					// board default language
+					else
+					{
+						$this->lang_name = (file_exists($phpbb_root_path . 'language/' . $this->encode_lang($this->lang['default_lang']) . "/common.$phpEx")) ? $this->encode_lang($this->lang['default_lang']) : 'en';
+					}
+				}
+				$this->data['user_lang'] = $this->lang_name;
 			}
-			$this->lang = &$lang;
+			/*			
+			*/			
 		}
 		
+		/* We include common language file here to not load it every time a custom language file is included
+		$lang = &$this->lang;
+		*/
+		$include_result = (defined('DEBUG_EXTRA')) ?  "" : "@"; // Do not suppress error if in DEBUG_EXTRA mode
+		if (("$include_result".include $this->lang_path . "common.$phpEx") === false)
+		{
+			//this will fix the path for anonymouse users
+			if ((@include $phpbb_root_path . $this->lang_path . "common.$phpEx") === false)
+			{
+				die('Language file ' . $this->lang_path . "common.$phpEx" . ' couldn\'t be opened.');
+			}
+		}
+
 		//
 		// We include common language file here to not load it every time a custom language file is included
 		//
-		$lang = &$this->lang;
-		
 		$this->add_lang($lang_set);
+
 		unset($lang_set);
 	}
 
@@ -1339,97 +1581,236 @@ class session
 	function setup_style()
 	{
 		global $db, $template, $board_config, $userdata, $phpbb_auth, $phpEx, $phpbb_root_path, $mx_root_path, $mx_cache;
-		global $mx_request_vars, $portal_config, $mx_backend, $phpBB3; //added for mxp
+		global $mx_request_vars, $portal_config, $board_config, $mx_backend; //added for mxp
 
 		if (!empty($_GET['style']) && $phpbb_auth->acl_get('a_styles'))
 		{
 			global $SID, $_EXTRA_URL;
-
-			$style = $phpBB3->request_var('style', 0);
+			$style = phpBB3::request_var('style', 0);
+			// BEGIN Styles_Demo MOD for phpBB Block
+			$style_value = '';			
 			$SID .= '&amp;style=' . $style;
 			$_EXTRA_URL = array('style=' . $style);
 		}
 		else
 		{
-			$style = $this->style;
-			// Set up style
-			$style = ($style) ? $style : ((!$board_config['override_user_style'] && $this->data['user_id'] != ANONYMOUS) ? $this->data['user_style'] : $this->phpbb_style['style_id']);
+			$style = $this->style; // From main style init. Should be correct and valid.
+			$style_value = $this->style_name;
+			// BEGIN Styles_Demo MOD for phpBB Block
+			/* */
+			if(!$board_config['override_user_style'] && ($this->data['user_id'] != ANONYMOUS))
+			{
+				// Set up style
+				$user_style = $this->data['user_style'] ? $this->data['user_style'] : $this->phpbb_style['style_id'];
+				//If user have other style in mxp then the one from phpBB not to have forum page and modules graphics will be messaed up
+				//Anonymouse users should see all block graphic corect
+				//Query phpBB style_id corepondent to mxp themes_id
+				$sql = "SELECT s.style_id, s.style_name
+					FROM " . MX_THEMES_TABLE . " AS m, " . STYLES_TABLE . " AS s, " . STYLES_TEMPLATE_TABLE . " AS t
+					WHERE m.themes_id = " . (int) $user_style . "
+						AND t.template_path = m.template_name
+						AND t.template_id = s.template_id";
+				if ($row = $db->sql_fetchrow($db->sql_query($sql)))
+				{
+					$style = $row['style_id']; //User style
+					$style_value = $row['style_name']; //User style name
+				}
+				else
+				{
+					$style = $this->data['user_style'] ? $this->data['user_style'] : $board_config['default_style'];
+				}				
+			}
+			else
+			{
+				$default_style = $portal_config['default_style'];
+				//If user have other style in mxp then the one from phpBB not to have forum page and modules graphics will be messaed up
+				//Anonymouse users should see all block graphic corect
+				//Query phpBB style_id corepondent to mxp themes_id
+				$sql = "SELECT s.style_id, s.style_name
+					FROM " . MX_THEMES_TABLE . " AS m, " . STYLES_TABLE . " AS s, " . STYLES_TEMPLATE_TABLE . " AS t
+					WHERE m.themes_id = " . (int) $default_style . "
+						AND t.template_path = m.template_name
+						AND t.template_id = s.template_id";
+				if ($row = $db->sql_fetchrow($db->sql_query($sql)))
+				{
+					$style = $row['style_id']; //User style
+					$style_value = $row['style_name']; //User style name
+				}
+				else
+				{
+					$style = $this->data['user_style'] ? $this->data['user_style'] : $board_config['default_style'];
+				}
+			}
+			/* */
+			// Set up style Temp code should be removed after bugtraking
+			//$style = ($style) ? $style : ((!$board_config['override_user_style'] && $this->data['user_id'] != ANONYMOUS) ? $this->data['user_style'] : $this->phpbb_style['style_id']);
 		}
-
-		$sql = 'SELECT s.style_id, t.template_storedb, t.template_path, t.template_id, t.bbcode_bitfield, c.theme_path, c.theme_name, c.theme_storedb, c.theme_id, i.imageset_path, i.imageset_id, i.imageset_name
-			FROM ' . STYLES_TABLE . ' s, ' . STYLES_TEMPLATE_TABLE . ' t, ' . STYLES_THEME_TABLE . ' c, ' . STYLES_IMAGESET_TABLE . " i
-			WHERE s.style_id = $style
-				AND t.template_id = s.template_id
-				AND c.theme_id = s.theme_id
-				AND i.imageset_id = s.imageset_id";
-
-		if ( !($result = $db->sql_query($sql, 3600)) )
+		
+		if (isset($_GET['demostyle']))
 		{
-			mx_message_die(CRITICAL_ERROR, "Could not query database for imageset_id info style_id [$style]", "", __LINE__, __FILE__, $sql);
+			$style_value = phpBB3::request_var('demostyle', '');
+			if (intval($style_value) == 0)
+			{
+				//Query phpBB style_id corepondent to mxp style_name
+				//Any Demo Style here should work also for portal and forums
+				//Any Demo Style Name should be supported using same guild lines for portal as for forums for e.g. with spaces etc.				
+				$sql = "SELECT s.style_id, s.style_name
+						FROM " . MX_THEMES_TABLE . " AS m, " . STYLES_TABLE . " AS s, " . STYLES_TEMPLATE_TABLE . " AS t
+					WHERE s.style_active = 1 AND s.style_name = '$style_value'
+						AND s.style_name = m.style_name
+						AND t.template_id = s.template_id";	
+				if(!$row = @$db->sql_fetchrow(@$db->sql_query($sql)))
+				{
+					die('Could not find style name '. $style_value . '!');
+				}
+				else
+				{
+					$style_value = $row['style_id'];
+				}
+			}
+			else
+			{		
+				//Query phpBB style_id corepondent to mxp themes_id
+				//Any Demo Style here should work also for portal and forums
+				//Any Demo Style Name should be supported using same guild lines for portal as for forums for e.g. with spaces etc.				
+				$sql = "SELECT s.style_id, s.style_name
+					FROM " . MX_THEMES_TABLE . " AS m, " . STYLES_TABLE . " AS s, " . STYLES_TEMPLATE_TABLE . " AS t
+					WHERE m.themes_id = " . (int) $style_value . "
+						AND s.style_name = m.style_name
+						AND t.template_id = s.template_id";	
+				if(!$row = $db->sql_fetchrow($db->sql_query($sql)))
+				{
+					die('style_id ' . $style_value . ' not found');
+				}
+			}
+			$this->set_cookie('change_style', $style_value, time() + 31536000);
 		}
-		$this->theme = $db->sql_fetchrow($result);
+		elseif (isset($_COOKIE[$board_config['cookie_name'] . '_change_style']))
+		{
+			$style_value = $_COOKIE[$board_config['cookie_name'] . '_change_style'];
+		}
+		
+		//Change the value before query
+		if (!empty($style_value))
+		{
+			$style = $style_value;
+		}
+		
+		//We should never get this, temp fix for  GoogleBot-2.1 crawler
+		//Remove this Deguging Code after solved
+		if ((intval($style) == 0) && empty($style_value))
+		{
+			$style_value = 'prosilver';
+		}
+		$phpbb_style = $style;
+		$phpbb_style_value = $style_value;
+		
+		// END Styles_Demo MOD 
+		if (isset($style_value))  
+		{
+			//Query phpBB style_name
+			$sql = "SELECT s.style_id, s.style_name, t.template_storedb, t.template_path, t.template_id, t.bbcode_bitfield, c.theme_path, c.theme_name, c.theme_storedb, c.theme_id, i.imageset_path, i.imageset_id, i.imageset_name
+				FROM " . STYLES_TABLE . " AS s, " . STYLES_TEMPLATE_TABLE . " AS t, " . STYLES_THEME_TABLE . " AS c, " . STYLES_IMAGESET_TABLE . " i
+				WHERE s.style_active = 1 AND s.style_name = '$style_value'
+					AND t.template_id = s.template_id
+					AND c.theme_id = s.theme_id
+					AND i.imageset_id = s.imageset_id";					
+			if(($result = $db->sql_query($sql)) && ($row = $db->sql_fetchrow($result)))
+			{
+				$style = $row['style_id'];
+				$style_value = $row['style_name'];
+			}
+			else
+			{
+				mx_message_die(CRITICAL_ERROR, "Could not query database for phpbb_styles info style_name [$style]", "", __LINE__, __FILE__, $sql);
+			}
+		}		
+		elseif (intval($style) !== 0)
+		{
+			//Query phpBB style_id get from main style init. Should be correct and valid.
+			$sql = "SELECT s.style_id, s.style_name, t.template_storedb, t.template_path, t.template_id, t.bbcode_bitfield, c.theme_path, c.theme_name, c.theme_storedb, c.theme_id, i.imageset_path, i.imageset_id, i.imageset_name
+				FROM " . MX_THEMES_TABLE . " AS m, " . STYLES_TABLE . " AS s, " . STYLES_TEMPLATE_TABLE . " AS t, " . STYLES_THEME_TABLE . " AS c, " . STYLES_IMAGESET_TABLE . " i
+				WHERE s.style_id = " . (int) $style . "
+					AND s.style_name = m.style_name				
+					AND t.template_id = s.template_id
+					AND c.theme_id = s.theme_id
+					AND i.imageset_id = s.imageset_id";			
+			if(($result = $db->sql_query($sql)) && ($row = $db->sql_fetchrow($result)))
+			{
+				$style = $row['style_id'];
+				$style_value = $row['style_name'];
+				// MXP themes_id = $row['themes_id']				
+			}
+			else
+			{
+				mx_message_die(CRITICAL_ERROR, "Could not query database for phpbb_styles info style_id [$style]", "", __LINE__, __FILE__, $sql);
+			}			
+		}
+		
+		$this->theme = is_array($this->theme) ? array_merge($this->theme, $row) : $row;
 		$db->sql_freeresult($result);
-
+		
 		// User has wrong style
 		if (!$this->theme && $style == $this->data['user_style'])
 		{
 			$style = $this->data['user_style'] = $board_config['default_style'];
-
+			
 			$sql = 'UPDATE ' . USERS_TABLE . "
 				SET user_style = $style
 				WHERE user_id = {$this->data['user_id']}";
 			$db->sql_query($sql);
-
-			$sql = 'SELECT s.style_id, t.template_storedb, t.template_path, t.template_id, t.bbcode_bitfield, c.theme_path, c.theme_name, c.theme_storedb, c.theme_id, i.imageset_path, i.imageset_id, i.imageset_name
+			
+			$sql = 'SELECT s.style_id, s.style_name, t.template_storedb, t.template_path, t.template_id, t.bbcode_bitfield, c.theme_path, c.theme_name, c.theme_storedb, c.theme_id, i.imageset_path, i.imageset_id, i.imageset_name
 				FROM ' . STYLES_TABLE . ' s, ' . STYLES_TEMPLATE_TABLE . ' t, ' . STYLES_THEME_TABLE . ' c, ' . STYLES_IMAGESET_TABLE . " i
 				WHERE s.style_id = $style
 					AND t.template_id = s.template_id
 					AND c.theme_id = s.theme_id
 					AND i.imageset_id = s.imageset_id";
 			$result = $db->sql_query($sql, 3600);
-			$this->theme = $db->sql_fetchrow($result);
+			$this->theme = is_array($this->theme) ? array_merge($this->theme, $db->sql_fetchrow($result)) : $db->sql_fetchrow($result);
 			$db->sql_freeresult($result);
+			$style = $this->theme['style_id'];
+			$style_value = $this->theme['style_name'];						
 		}
-
+		
 		if (!$this->theme)
 		{
 			trigger_error('Could not get style data', E_USER_ERROR);
 		}
-
+		
 		// Now parse the cfg file and cache it
 		$parsed_items = $mx_backend->obtain_cfg_items($this->theme);
-
+		
 		// We are only interested in the theme configuration for now
 		$parsed_items = $parsed_items['theme'];
-
+		
 		$check_for = array(
 			'parse_css_file'	=> (int) 0,
 			'pagination_sep'	=> (string) ', '
 		);
-
+		
 		foreach ($check_for as $key => $default_value)
 		{
 			$this->theme[$key] = (isset($parsed_items[$key])) ? $parsed_items[$key] : $default_value;
 			settype($this->theme[$key], gettype($default_value));
-
+			
 			if (is_string($default_value))
 			{
 				$this->theme[$key] = htmlspecialchars($this->theme[$key]);
 			}
 		}
-
+		
 		// If the style author specified the theme needs to be cached
 		// (because of the used paths and variables) than make sure it is the case.
 		// For example, if the theme uses language-specific images it needs to be stored in db.
 		if (!$this->theme['theme_storedb'] && $this->theme['parse_css_file'])
 		{
 			$this->theme['theme_storedb'] = 1;
-
+			
 			$stylesheet = file_get_contents("{$phpbb_root_path}styles/{$this->theme['theme_path']}/theme/stylesheet.css");
 			// Match CSS imports
 			$matches = array();
-			preg_match_all('/@import url\(["\'](.*)["\']\);/i', $stylesheet, $matches);
-
+			preg_match_all('/@import url\(["\'](.*)["\']\);/i', $stylesheet, $matches);	
 			if (sizeof($matches))
 			{
 				$content = '';
@@ -1447,27 +1828,27 @@ class session
 				}
 				unset($content);
 			}
-
-			$stylesheet = str_replace('./', 'styles/' . $this->theme['theme_path'] . '/theme/', $stylesheet);
-
+			
+			$stylesheet = str_replace('./', 'styles/' . $this->theme['theme_path'] . '/theme/', $stylesheet); 
+			
 			$sql_ary = array(
 				'theme_data'	=> $stylesheet,
 				'theme_mtime'	=> time(),
 				'theme_storedb'	=> 1
 			);
-
+			
 			$sql = 'UPDATE ' . STYLES_THEME_TABLE . '
 				SET ' . $db->sql_build_array('UPDATE', $sql_ary) . '
 				WHERE theme_id = ' . $this->theme['theme_id'];
 			$db->sql_query($sql);
-
+			
 			unset($sql_ary);
 		}
-
+		
 		$template->set_template();
-
-		$this->img_lang = (file_exists($phpbb_root_path . 'styles/' . $this->theme['imageset_path'] . '/imageset/' . $this->lang_name)) ? $this->lang_name : $board_config['default_lang'];
-
+		
+		$this->img_lang = (file_exists($phpbb_root_path . 'styles/' . $this->theme['imageset_path'] . '/imageset/' . $this->lang_name)) ? $this->lang_name : $this->encode_lang($board_config['default_lang']);
+		
 		$sql = 'SELECT image_name, image_filename, image_lang, image_height, image_width
 			FROM ' . STYLES_IMAGESET_DATA_TABLE . '
 			WHERE imageset_id = ' . $this->theme['imageset_id'] . "
@@ -1486,24 +1867,23 @@ class session
 			$this->img_array[$row['image_name']] = $row;
 		}
 		$db->sql_freeresult($result);
-
 		// there were no localised images, try to refresh the localised imageset for the user's language
 		if (!$localised_images)
 		{
 			// Attention: this code ignores the image definition list from acp_styles and just takes everything
 			// that the config file contains
 			$sql_ary = array();
-
+			
 			$db->sql_transaction('begin');
-
+			
 			$sql = 'DELETE FROM ' . STYLES_IMAGESET_DATA_TABLE . '
 				WHERE imageset_id = ' . $this->theme['imageset_id'] . '
 					AND image_lang = \'' . $db->sql_escape($this->img_lang) . '\'';
 			$result = $db->sql_query($sql);
-
+			
 			if (@file_exists("{$phpbb_root_path}styles/{$this->theme['imageset_path']}/imageset/{$this->img_lang}/imageset.cfg"))
 			{
-				$cfg_data_imageset_data = $phpBB3->parse_cfg_file("{$phpbb_root_path}styles/{$this->theme['imageset_path']}/imageset/{$this->img_lang}/imageset.cfg");
+				$cfg_data_imageset_data = phpBB3::parse_cfg_file("{$phpbb_root_path}styles/{$this->theme['imageset_path']}/imageset/{$this->img_lang}/imageset.cfg");
 				foreach ($cfg_data_imageset_data as $image_name => $value)
 				{
 					if (strpos($value, '*') !== false)
@@ -1523,7 +1903,7 @@ class session
 						$image_filename = $value;
 						$image_height = $image_width = 0;
 					}
-
+					
 					if (strpos($image_name, 'img_') === 0 && $image_filename)
 					{
 						$image_name = substr($image_name, 4);
@@ -1538,13 +1918,13 @@ class session
 					}
 				}
 			}
-
+			
 			if (sizeof($sql_ary))
 			{
 				$db->sql_multi_insert(STYLES_IMAGESET_DATA_TABLE, $sql_ary);
 				$db->sql_transaction('commit');
 				$mx_cache->destroy('sql', STYLES_IMAGESET_DATA_TABLE);
-
+				
 				mx_add_log('admin', 'LOG_IMAGESET_LANG_REFRESHED', $this->theme['imageset_name'], $this->img_lang);
 			}
 			else
@@ -1553,13 +1933,11 @@ class session
 				mx_add_log('admin', 'LOG_IMAGESET_LANG_MISSING', $this->theme['imageset_name'], $this->img_lang);
 			}
 		}
-
 		// If this function got called from the error handler we are finished here.
 		if (defined('IN_ERROR_HANDLER'))
 		{
 			return;
 		}
-
 		// Disable board if the install/ directory is still present
 		// For the brave development army we do not care about this, else we need to comment out this everytime we develop locally
 		if (!defined('DEBUG_EXTRA') && !defined('ADMIN_START') && !defined('IN_INSTALL') && !defined('IN_LOGIN') && file_exists($phpbb_root_path . 'install'))
@@ -1571,20 +1949,26 @@ class session
 			}
 			else
 			{
-				$message = (!empty($board_config['board_disable_msg'])) ? $board_config['board_disable_msg'] : 'BOARD_DISABLE';
+				$message = (!empty($portal_config['disabled_message'])) ? $portal_config['disabled_message'] : 'BOARD_DISABLE';
 			}
 			trigger_error($message);
 		}
-
-		// Is board disabled and user not an admin or moderator?
-		if ($board_config['board_disable'] && !defined('IN_LOGIN') && !$phpbb_auth->acl_gets('a_', 'm_') && !$phpbb_auth->acl_getf_global('m_'))
+		// Is portal disabled and user not an admin or moderator?
+		if (($portal_config['portal_status'] == '0') && !defined('IN_LOGIN') && !$phpbb_auth->acl_gets('a_', 'm_') && !$phpbb_auth->acl_getf_global('m_'))
 		{
-			header('HTTP/1.1 503 Service Unavailable');
-
-			$message = (!empty($board_config['board_disable_msg'])) ? $board_config['board_disable_msg'] : 'BOARD_DISABLE';
+			@header('HTTP/1.1 503 Service Unavailable');			
+			// Is board disabled and user not an admin or moderator?		
+			if($board_config['board_disable_mess_st'])
+			{
+				$message_st = $board_config['board_disable_message'];
+			}
+			else
+			{
+				$message_st = (!empty($lang['Board_disabled'])) ? $lang['Board_disabled'] : 'BOARD_DISABLE';
+			}						
+			$message = (!empty($portal_config['disabled_message'])) ? $portal_config['disabled_message'] : $message_st;
 			trigger_error($message);
-		}
-
+		}		
 		// Is load exceeded?
 		if ($board_config['limit_load'] && $this->load !== false)
 		{
@@ -1592,15 +1976,14 @@ class session
 			{
 				// Set board disabled to true to let the admins/mods get the proper notification
 				$board_config['board_disable'] = '1';
-
+				$portal_config['portal_status'] = '0';
 				if (!$phpbb_auth->acl_gets('a_', 'm_') && !$phpbb_auth->acl_getf_global('m_'))
 				{
-					header('HTTP/1.1 503 Service Unavailable');
+					@header('HTTP/1.1 503 Service Unavailable');
 					trigger_error('BOARD_UNAVAILABLE');
 				}
 			}
 		}
-
 		if (isset($this->data['session_viewonline']))
 		{
 			// Make sure the user is able to hide his session
@@ -1628,9 +2011,7 @@ class session
 					$this->data['session_viewonline'] = 0;
 				}
 			}
-		}
-
-
+		}		
 		// Does the user need to change their password? If so, redirect to the
 		// ucp profile reg_details page ... of course do not redirect if we're already in the ucp
 		if (!defined('IN_ADMIN') && !defined('ADMIN_START') && $board_config['chg_passforce'] && $this->data['is_registered'] && $phpbb_auth->acl_get('u_chgpasswd') && $this->data['user_passchg'] < time() - ($board_config['chg_passforce'] * 86400))
@@ -1642,7 +2023,7 @@ class session
 		}
 		return;
 	}
-
+	
 	/**
 	* Add Language Items - use_db and use_help are assigned where needed (only use them to force inclusion)
 	*
@@ -1695,7 +2076,7 @@ class session
 			$this->set_lang($this->lang, $this->help, $lang_set, $use_db, $use_help);
 		}
 	}
-
+	
 	/**
 	* Set language entry (called by add_lang)
 	* @access private
@@ -1747,82 +2128,109 @@ class session
 		// We include common language file here to not load it every time a custom language file is included
 		$this->lang = &$lang;
 	}
-
+	
 	/**
 	* Format user date
+	*
+	* @param int $gmepoch unix timestamp
+	* @param string $format date format in date() notation. | used to indicate relative dates, for example |d m Y|, h:i is translated to Today, h:i.
+	* @param bool $forcedate force non-relative date format.
+	*
+	* @return mixed translated date
 	*/
 	function format_date($gmepoch, $format = false, $forcedate = false)
 	{
 		static $midnight;
-		global $lang;
+		static $date_cache;
 
-		$this->lang = $lang;
-
-		$lang_dates = $this->lang['datetime'];
 		$format = (!$format) ? $this->date_format : $format;
+		$now = time();
+		$delta = $now - $gmepoch;
 
-		// Short representation of month in format
-		if ((strpos($format, '\M') === false && strpos($format, 'M') !== false) || (strpos($format, '\r') === false && strpos($format, 'r') !== false))
+		if (!isset($date_cache[$format]))
 		{
-			$lang_dates['May'] = $lang_dates['May_short'];
+			// Is the user requesting a friendly date format (i.e. 'Today 12:42')?
+			$date_cache[$format] = array(
+				'is_short'		=> strpos($format, '|'),
+				'format_short'	=> substr($format, 0, strpos($format, '|')) . '||' . substr(strrchr($format, '|'), 1),
+				'format_long'	=> str_replace('|', '', $format),
+				// Filter out values that are not strings (e.g. arrays) for strtr().
+				'lang'			=> array_filter($this->lang['datetime'], 'is_string'),
+			);
+
+			// Short representation of month in format? Some languages use different terms for the long and short format of May
+			if ((strpos($format, '\M') === false && strpos($format, 'M') !== false) || (strpos($format, '\r') === false && strpos($format, 'r') !== false))
+			{
+				$date_cache[$format]['lang']['May'] = $this->lang['datetime']['May_short'];
+			}
 		}
 
-		unset($lang_dates['May_short']);
+		// Zone offset
+		$zone_offset = $this->timezone + $this->dst;
+
+		// Show date <= 1 hour ago as 'xx min ago' but not greater than 60 seconds in the future
+		// A small tolerence is given for times in the future but in the same minute are displayed as '< than a minute ago'
+		if ($delta <= 3600 && $delta > -60 && ($delta >= -5 || (($now / 60) % 60) == (($gmepoch / 60) % 60)) && $date_cache[$format]['is_short'] !== false && !$forcedate && isset($this->lang['datetime']['AGO']))
+		{
+			return $this->lang(array('datetime', 'AGO'), max(0, (int) floor($delta / 60)));
+		}
 
 		if (!$midnight)
 		{
-			list($d, $m, $y) = explode(' ', gmdate('j n Y', time() + $this->timezone + $this->dst));
-			$midnight = gmmktime(0, 0, 0, $m, $d, $y) - $this->timezone - $this->dst;
+			list($d, $m, $y) = explode(' ', gmdate('j n Y', time() + $zone_offset));
+			$midnight = gmmktime(0, 0, 0, $m, $d, $y) - $zone_offset;
 		}
 
-		if (strpos($format, '|') === false || ($gmepoch < $midnight - 86400 && !$forcedate) || ($gmepoch > $midnight + 172800 && !$forcedate))
+		if ($date_cache[$format]['is_short'] !== false && !$forcedate && !($gmepoch < $midnight - 86400 || $gmepoch > $midnight + 172800))
 		{
-			return strtr(@gmdate(str_replace('|', '', $format), $gmepoch + $this->timezone + $this->dst), $lang_dates);
+			$day = false;
+
+			if ($gmepoch > $midnight + 86400)
+			{
+				$day = 'TOMORROW';
+			}
+			else if ($gmepoch > $midnight)
+			{
+				$day = 'TODAY';
+			}
+			else if ($gmepoch > $midnight - 86400)
+			{
+				$day = 'YESTERDAY';
+			}
+
+			if ($day !== false)
+			{
+				return str_replace('||', $this->lang['datetime'][$day], strtr(@gmdate($date_cache[$format]['format_short'], $gmepoch + $zone_offset), $date_cache[$format]['lang']));
+			}
 		}
 
-		if ($gmepoch > $midnight + 86400 && !$forcedate)
-		{
-			$format = substr($format, 0, strpos($format, '|')) . '||' . substr(strrchr($format, '|'), 1);
-			return str_replace('||', $this->lang['datetime']['TOMORROW'], strtr(@gmdate($format, $gmepoch + $this->timezone + $this->dst), $lang_dates));
-		}
-		else if ($gmepoch > $midnight && !$forcedate)
-		{
-			$format = substr($format, 0, strpos($format, '|')) . '||' . substr(strrchr($format, '|'), 1);
-			return str_replace('||', $this->lang['datetime']['TODAY'], strtr(@gmdate($format, $gmepoch + $this->timezone + $this->dst), $lang_dates));
-		}
-		else if ($gmepoch > $midnight - 86400 && !$forcedate)
-		{
-			$format = substr($format, 0, strpos($format, '|')) . '||' . substr(strrchr($format, '|'), 1);
-			return str_replace('||', $this->lang['datetime']['YESTERDAY'], strtr(@gmdate($format, $gmepoch + $this->timezone + $this->dst), $lang_dates));
-		}
-
-		return strtr(@gmdate(str_replace('|', '', $format), $gmepoch + $this->timezone + $this->dst), $lang_dates);
+		return strtr(@gmdate($date_cache[$format]['format_long'], $gmepoch + $zone_offset), $date_cache[$format]['lang']);
 	}
-
+	
 	/**
 	* Get language id currently used by the user
 	**/
 	function get_iso_lang_id()
 	{
 		global $board_config, $db;
-
+		
 		if (!empty($this->lang_id))
 		{
 			return $this->lang_id;
 		}
-
+		
 		if (!$this->lang_name)
 		{
 			$this->lang_name = $board_config['default_lang'];
 		}
-
+		
 		$sql = 'SELECT lang_id
 			FROM ' . LANG_TABLE . "
 			WHERE lang_iso = '" . $db->sql_escape($this->lang_name) . "'";
 		$result = $db->sql_query($sql);
 		$this->lang_id = (int) $db->sql_fetchfield('lang_id');
 		$db->sql_freeresult($result);
-
+		
 		return $this->lang_id;
 	}
 
@@ -1844,9 +2252,213 @@ class session
 		$result = $db->sql_query_limit($sql, 1);
 		$this->profile_fields = (!($row = $db->sql_fetchrow($result))) ? array() : $row;
 		$db->sql_freeresult($result);
+	}
+	
+	/**
+	 * Gets the user's info
+	 *
+	 * Will take the users email, username or member id and return their data
+	 *
+	 * @param  int || string $username the user's email address username or member id
+	 * @return array $results containing the user info || bool false
+	 * @since  0.1.2
+	 */
+	function load_user($user, $force_str = false)
+	{
+		if (!is_numeric($user) || $force_str)
+		{
+			$user = phpBB2::phpbb_clean_username($user);
+		}
+		else
+		{
+			$user = intval($user);
+		}	
+		
+	    //$this->data = array();
+		
+	    // we'll try id || email, then username
+	    if (is_numeric($user))
+		{
+	        // number is most likely a member id
+	        $this->data = get_user_by_id($user);
+	    } 
+		else 
+		{
+	        // the email can't be purely numeric
+	        $this->data = get_user_by_email($user);
+	    }
+		
+	    if (empty($this->data))
+		{
+	        $this->data = get_user_by_username($user);
+	    }
+		/*
+	    if (empty($this->data)) 
+		{
+	        return false;
+	    } 
+		else
+		{
+	        return $this->data;
+	    }
+		*/
+	}
+
+	/**
+	* Load user helper
+	*
+	* @param array $user_ids
+	*/
+	function load_users(array $user_ids)
+	{
+		$user_ids[] = ANONYMOUS;
+		
+		// Make user_ids unique and convert to integer.
+		$user_ids = array_map('intval', array_unique($user_ids));
+		
+		// Do not load users we already have in $this->users
+		$user_ids = array_diff($user_ids, array_keys($this->users));
+		
+		if (sizeof($user_ids))
+		{
+			$sql = 'SELECT *
+				FROM ' . USERS_TABLE . '
+				WHERE ' . $db->sql_in_set('user_id', $user_ids);
+			$result = $db->sql_query($sql);
+			
+			while ($row = $db->sql_fetchrow($result))
+			{
+				$this->users[$row['user_id']] = $row;
+			}
+			$db->sql_freeresult($result);
+		}
+	}	
+	
+	/**
+	 * Gets the user's info from their email address
+	 *
+	 * Will take the users email address and return an array containing all the
+	 * user's information in the db. Will return false on failure
+	 *
+	 * @param  string $email the user's email address
+	 * @return array $results containing the user info || bool false
+	 * @since  0.1.0
+	 */
+	function get_user_by_email($email_address = '')
+	{
+		global $db;
+		if ('' == $email_address || !is_string($email_address) || 2 > count(explode('@', $email_address))) 
+		{
+			return false;
+		}
+		$sql = $db->sql_build_query('SELECT', '
+			SELECT * FROM ' . USERS_TABLE . '
+				WHERE email_address = {string:email_address}',
+				array('email_address' => $email_address, ));
+		$result = $db->sql_query_limit($sql, 1);
+		$return = $db->sql_fetchrow($result);
+		if (!$return)
+		{
+			$db->sql_freeresult($result);
+			//trigger_error($mx_user->lang['NO_USER'] . adm_back_link($this->u_action), E_USER_WARNING);
+		}
+		if (empty($return)) 
+		{
+			return false;
+		} 
+		else
+		{
+		    // return all the results.
+		    return $return;
+		}
+	}
+
+	/**
+	 * Gets the user's info from their member id
+	 *
+	 * Will take the users member id and return an array containing all the
+	 * user's information in the db. Will return false on failure
+	 *
+	 * @param  int $id the user's member id
+	 * @return array $results containing the user info || bool false
+	 * @since  0.1.2
+	 */
+	function get_user_by_id($user_id = '')
+	{
+		global $db;
+		if ('' == $user_id || !is_numeric($user_id))
+		{
+			return false;
+		} 
+		else
+		{
+			$id = intval($user_id);
+			if (0 == $user_id) 
+			{
+				return false;
+			}
+		}
+		$sql = $db->sql_build_query('SELECT', '
+			SELECT * FROM ' . USERS_TABLE . '
+				WHERE user_id = {int:user_id}',
+				array('user_id' => $user_id, ));
+		$result = $db->sql_query_limit($sql, 1);
+		$return = $db->sql_fetchrow($result);
+		if (!$return)
+		{
+			$db->sql_freeresult($result);
+			//trigger_error($mx_user->lang['NO_USER'] . adm_back_link($this->u_action), E_USER_WARNING);
+		}
+		if (empty($return)) 
+		{
+			return false;
+		} 
+		else
+		{
+		    // return all the results.
+		    return $return;
+		}
+	}	
+	
+	/**
+	 * Gets the user's info from their member name (username)
+	 *
+	 * Will take the users member name and return an array containing all the
+	 * user's information in the db. Will return false on failure
+	 *
+	 * @param  string $username the user's member name
+	 * @return array $results containing the user info || bool false
+	 * @since  0.1.0
+	 */
+	function get_user_by_name($user_name = '')
+	{
+	    global $db;
+		if ('' == $user_name || !is_string($user_name))
+		{
+	        return false;
+	    }	
+		$sql = $db->sql_build_query('SELECT', '
+			SELECT * FROM ' . USERS_TABLE . '
+				WHERE user_name = {string:user_name}',
+				array('user_name' => $user_name, ));
+		$result = $db->sql_query_limit($sql, 1);
+		$return = $db->sql_fetchrow($result);
+		if (!$return)
+		{
+			$db->sql_freeresult($result);
+			//trigger_error($mx_user->lang['NO_USER'] . adm_back_link($this->u_action), E_USER_WARNING);
+		}
+		if (empty($return)) 
+		{
+			return false;
+		} 
+		else
+		{
+		    // return all the results.
+		    return $return;
+		}
 	}		
 
-	
 	/**
 	* Specify/Get images
 	*/
@@ -1866,7 +2478,7 @@ class session
 				return $img_data;
 			}
 
-			$img_data['src'] = 'styles/' . $this->theme['imageset_path'] . '/imageset/' . ($this->img_array[$img]['image_lang'] ? $this->img_array[$img]['image_lang'] .'/' : '') . $this->img_array[$img]['image_filename'];
+			$img_data['src'] = PHPBB_URL . 'styles/' . $this->theme['imageset_path'] . '/imageset/' . ($this->img_array[$img]['image_lang'] ? $this->img_array[$img]['image_lang'] .'/' : '') . $this->img_array[$img]['image_filename'];
 			$img_data['width'] = $this->img_array[$img]['image_width'];
 			$img_data['height'] = $this->img_array[$img]['image_height'];
 		}
@@ -1915,13 +2527,13 @@ class session
 				return $img_data;
 			}
 
-			$img_data['src'] = $phpbb_root_path . 'styles/' . $this->theme['imageset_path'] . '/imageset/' . ($this->img_array[$img]['image_lang'] ? $this->img_array[$img]['image_lang'] .'/' : '') . $this->img_array[$img]['image_filename'];
+			$img_data['src'] = PHPBB_URL . 'styles/' . $this->theme['imageset_path'] . '/imageset/' . ($this->img_array[$img]['image_lang'] ? $this->img_array[$img]['image_lang'] .'/' : '') . $this->img_array[$img]['image_filename'];
 			$img_data['width'] = $this->img_array[$img]['image_width'];
 			$img_data['height'] = $this->img_array[$img]['image_height'];
 		}
 
 		$alt = (!empty($this->lang[$alt])) ? $this->lang[$alt] : $alt;
-
+		//die($img_data);
 		switch ($type)
 		{
 			case 'src':

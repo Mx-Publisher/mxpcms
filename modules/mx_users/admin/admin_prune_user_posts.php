@@ -2,14 +2,12 @@
 /**
 *
 * @package MX-Publisher Module - mx_users
-* @version $Id: admin_prune_user_posts.php,v 1.5 2008/09/30 07:04:54 orynider Exp $
+* @version $Id: admin_prune_user_posts.php,v 1.9 2013/06/28 15:39:39 orynider Exp $
 * @copyright (c) 2002-2008 [Adam Alkins (http://www.rasadam.com), Jon Ohlsson] MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
-
-define( 'IN_PORTAL', true );
 
 if ( !empty( $setmodules ) )
 {
@@ -20,7 +18,7 @@ if ( !empty( $setmodules ) )
 	}
 	return;
 }
-
+@define('IN_PORTAL', 1);
 $mx_root_path = './../../../';
 $module_root_path = "./../";
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
@@ -436,7 +434,7 @@ else
 			if( preg_match('/^([0-9]{1,2}|[0-2][0-9]{0,2})(\.([0-9]{1,2}|[0-2][0-9]{0,2})){3}$/', $prune_ip) )
 			{
 				// Encode the ip into hexademicals
-				$ip = $phpBB2->encode_ip($prune_ip);
+				$ip = phpBB2::encode_ip($prune_ip);
 
 				// Because we will be deleting based on IP's, we will store the encoded IP alone
 				$users[]['user_ip'] = $ip;
@@ -459,17 +457,17 @@ else
 					// xxx.xxx.xxx.*
 					case 4:
 						// We will encode the ip into hexademical quads
-						$users[]['user_ip'] = $phpBB2->encode_ip($ip_split[0].".".$ip_split[1].".".$ip_split[2].".255");
+						$users[]['user_ip'] = phpBB2::encode_ip($ip_split[0].".".$ip_split[1].".".$ip_split[2].".255");
 						break;
 					// xxx.xxx.*
 					case 3:
 						// We will encode the ip into hexademical quads again..
-						$users[]['user_ip'] = $phpBB2->encode_ip($ip_split[0].".".$ip_split[1].".255.255");
+						$users[]['user_ip'] = phpBB2::encode_ip($ip_split[0].".".$ip_split[1].".255.255");
 						break;
 					// xxx.*
 					case 2:
 						// We will encode the ip into hexademical quads again again....
-						$users[]['user_ip'] = $phpBB2->encode_ip($ip_split[0].".255.255.255");
+						$users[]['user_ip'] = phpBB2::encode_ip($ip_split[0].".255.255.255");
 						break;
 				}
 			}
@@ -493,7 +491,7 @@ else
 				for( $i = $start_range[3]; $i <= $end_range[3]; $i++ )
 				{
 					// let's put it in the big array..
-					$users[]['user_ip'] = $phpBB2->encode_ip($start_range[0].".".$start_range[1].".".$start_range[2].".".$i);
+					$users[]['user_ip'] = phpBB2::encode_ip($start_range[0].".".$start_range[1].".".$start_range[2].".".$i);
 				}
 			}
 			// This is not a valid IP based on what we want..

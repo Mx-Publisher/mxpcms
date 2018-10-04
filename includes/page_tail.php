@@ -2,10 +2,10 @@
 /**
 *
 * @package page_tail
-* @version $Id: page_tail.php,v 1.42 2008/10/04 07:04:25 orynider Exp $
+* @version $Id: page_tail.php,v 1.46 2013/06/28 15:32:38 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 * @internal
 *
 */
@@ -47,10 +47,10 @@ if (!empty($mx_page->last_updated))
 {
 	$editor_name_tmp = mx_get_userdata($mx_page->last_updated_by);
 	$editor_name = $editor_name_tmp['username'];
-	$edit_time = $phpBB2->create_date( $board_config['default_dateformat'], $mx_page->last_updated, $board_config['board_timezone'] );
+	$edit_time = phpBB2::create_date( $board_config['default_dateformat'], $mx_page->last_updated, $board_config['board_timezone'] );
 
 	$template->assign_block_vars('page_last_updated', array(
-		'L_PAGE_UPDATED'	=> $lang['Page_updated_date'],
+		'L_PAGE_UPDATED'	=> isset($lang['Page_updated_date']) ? $lang['Page_updated_date'] : 'Page Updated',
 		'NAME' 		=> $userdata['user_level'] == ADMIN ? $lang['Page_updated_by'] . $editor_name : '',
 		'TIME' 		=> $edit_time,
 	));
@@ -59,13 +59,11 @@ if (!empty($mx_page->last_updated))
 $mxbb_footer_text = $lang['mx_about_title'];
 $mxbb_footer_text_url = PORTAL_URL . 'index.' . $phpEx . '?sid=' . $userdata['session_id'] . '&mx_copy=true';
 
-//
 // Generate debug stats
 // - from Olympus
+$debug_output = '<div align="center"><span class="copyright">';
 if (defined('DEBUG') && $userdata['user_level'] == ADMIN)
 {
-	$debug_output = '<div align="center"><span class="copyright">';
-
 	$mtime = explode(' ', microtime());
 	$totaltime = $mtime[0] + $mtime[1] - $mx_starttime;
 
@@ -74,7 +72,7 @@ if (defined('DEBUG') && $userdata['user_level'] == ADMIN)
 		$db->sql_report('display');
 	}
 
-	$debug_output .= sprintf('Time : %.3fs | ' . $db->sql_num_queries() . ' Queries | GZIP : ' .  (($board_config['gzip_compress']) ? 'On' : 'Off' ) . ' | Load : '  . (($user->load) ? $user->load : 'N/A'), $totaltime);
+	$debug_output .= sprintf('Time : %.3fs | ' . @$db->sql_num_queries() . ' Queries | GZIP : ' .  (($board_config['gzip_compress']) ? 'On' : 'Off' ) . ' | Load : '  . (($mx_user->load) ? $mx_user->load : 'N/A'), $totaltime);
 
 	if (defined('DEBUG_EXTRA'))
 	{
@@ -88,17 +86,15 @@ if (defined('DEBUG') && $userdata['user_level'] == ADMIN)
 					$debug_output .= ' | Memory Usage: ' . $memory_usage;
 			}
 		}
-
 		$debug_output .= ' | <a href="' . (($_SERVER['REQUEST_URI']) ? htmlspecialchars($_SERVER['REQUEST_URI']) : "index.$phpEx$SID") . ((strpos($_SERVER['REQUEST_URI'], '?') !== false) ? '&amp;' : '?') . 'explain=1">Explain</a>';
 	}
-	$debug_output .= '</span></div>';
 }
-
+$debug_output .= '</span></div>';
 //
 // Generate additional footer code (defined by modules)
 //
 $mx_addional_footer_text = '';
-if ( count($mx_page->mxbb_footer_addup) > 0 )
+if (isset($mx_page->mxbb_footer_addup) && (count($mx_page->mxbb_footer_addup) > 0))
 {
 	foreach($mx_page->mxbb_footer_addup as $key => $mx_footer_text)
 	{

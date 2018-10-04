@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: lang_main.php,v 1.41 2008/06/18 11:37:47 orynider Exp $
+* @version $Id: lang_main.php,v 1.42 2013/06/28 15:34:31 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -127,7 +127,7 @@ $lang['mx_copy_translation_title'] = 'About the translation';
 // This is optional, if you would like a _SHORT_ message output
 // along with our copyright message indicating you are the translator
 // please add it here.
-//$lang['TRANSLATION_INFO_MXBB'] = 'English Language by <a href="http://www.mx-publisher.com" target="_blank">MX-Publisher Development Team</a>';
+//$lang['TRANSLATION_INFO_MXBB'] = 'English Language by <a href="http://mxpcms.sourceforge.net/" target="_blank">MX-Publisher Development Team</a>';
 
 //
 // Installation
