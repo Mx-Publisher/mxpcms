@@ -2,7 +2,7 @@
 /**
 *
 * @package Constants
-* @version $Id: mx_constants.php,v 1.29 2008/06/03 20:04:13 jonohlsson Exp $
+* @version $Id: mx_constants.php,v 1.30 2008/09/24 17:01:11 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -102,6 +102,12 @@ define('MX_MATCH_TABLE' , $mx_table_prefix . 'wordmatch');
 define('MX_WORD_TABLE' , $mx_table_prefix . 'wordlist');
 define('MX_SEARCH_TABLE' , $mx_table_prefix . 'search_results');
 /**#@-*/
+
+// Error codes removed in phpBB3 does we need them here
+@define('GENERAL_MESSAGE', 200);
+@define('GENERAL_ERROR', 202);
+@define('CRITICAL_MESSAGE', 203);
+@define('CRITICAL_ERROR', 204);
 
 /**
  * Sick and tired of these variables getting lost...

@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Installation
-* @version $Id: functions_install.php,v 1.16 2008/09/08 00:54:05 orynider Exp $
+* @version $Id: functions_install.php,v 1.20 2008/09/30 07:04:45 orynider Exp $
 * @copyright (c) 2006 phpBB Group
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
@@ -16,9 +16,9 @@
 */
 function page_header_install($title, $instruction_text = '')
 {
-	global $template, $lang, $mx_root_path, $mx_portal_name, $mx_portal_version;
+	global $template, $lang, $mx_root_path, $mx_portal_name, $mx_portal_version, $tplEx;
 
-	$template->set_filenames(array('header' => 'mx_install_header.tpl'));
+	$template->set_filenames(array('header' => 'mx_install_header.'.$tplEx));
 	$template->assign_vars(array(
 		'L_PORTAL_NAME'			=> $mx_portal_name,
 		'L_PORTAL_VERSION'		=> $mx_portal_version,
@@ -31,7 +31,7 @@ function page_header_install($title, $instruction_text = '')
 
 function page_footer_install($show_phpinfo = true)
 {
-	global $db, $template, $lang;
+	global $db, $template, $lang, $tplEx;
 
 	$install_moreinfo = sprintf($lang['Install_moreinfo'],
 		'<a href="'.U_RELEASE_NOTES.'" target="_blank">', '</a>',
@@ -41,7 +41,7 @@ function page_footer_install($show_phpinfo = true)
 		'<a href="'.U_TERMS_OF_USE.'" target="_blank">', '</a>'
 	);
 
-	$template->set_filenames(array('footer' => 'mx_install_footer.tpl'));
+	$template->set_filenames(array('footer' => 'mx_install_footer.'.$tplEx));
 	$template->assign_vars(array(
 		'L_INSTALLER_NAME'		=> INSTALLER_NAME,
 		'L_INSTALLER_VERSION'	=> INSTALLER_VERSION,
@@ -84,6 +84,16 @@ function get_available_dbms($dbms = false, $return_unavailable = false, $only_20
 //			'AVAILABLE'		=> true,
 //			'2.0.x'			=> false,
 //		),
+		'mysql6' => array(
+			'LABEL'			=> 'MySQL 6.x',
+			'SCHEMA'		=> 'mysql_61',
+			'MODULE'		=> 'mysqli',
+			'DELIM'			=> ';',
+			'COMMENTS'		=> 'remove_remarks',
+			'DRIVER'		=> 'mysqli',
+			'AVAILABLE'		=> true,
+			'2.0.x'			=> true,
+		),
 		'mysqli'	=> array(
 			'LABEL'			=> 'MySQL with MySQLi Extension',
 			'SCHEMA'		=> 'mysql_41',
@@ -113,7 +123,7 @@ function get_available_dbms($dbms = false, $return_unavailable = false, $only_20
 			'DRIVER'		=> 'mysql',
 			'AVAILABLE'		=> true,
 			'2.0.x'			=> true,
-		),
+		),		
 //		'mssql'		=> array(
 //			'LABEL'			=> 'MS SQL Server 2000+',
 //			'SCHEMA'		=> 'mssql',
@@ -304,12 +314,22 @@ function get_tables($db)
 */
 function connect_check_db($error_connect, &$error, $dbms, $table_prefix, $dbhost, $dbuser, $dbpasswd, $dbname, $dbport, $prefix_may_exist = false, $load_dbal = true, $unicode_check = true)
 {
-	global $phpbb_root_path, $phpEx, $config, $lang;
+	global $phpbb_root_path, $phpEx, $config, $lang; $mx_php_version;
 
 	if ($load_dbal)
 	{
 		// Include the DB layer
-		require_once($mx_root_path . 'includes/db/' . $dbms['DRIVER'] . '.' . $phpEx);
+		// If we are on PHP < 5.0.0 we need to force include or we get a blank page
+		if (version_compare(PHP_VERSION, '5.0.0', '<')) 
+		{
+			global $mx_php_version;
+		
+			$dbms = 'mysqli' ? 'mysql4' : $dbms; //this version of php does not have mysqli extension and my crash the installer if finds a forum using this
+		
+			print("This version of php is not supported, returned: " . PHP_VERSION . "<br />Please upgrade at least to $mx_php_version.<br />");
+		
+		}
+		require_once($mx_root_path . 'includes/db/' . $dbms . '.' . $phpEx); // Load dbal and initiate class		
 	}
 
 	// Instantiate it and set return on error true
@@ -846,6 +866,12 @@ function get_phpbb_info($config)
 	{
 		install_die(GENERAL_ERROR, 'Configuration file ' . $config . ' couldn\'t be opened.');
 	}
+	
+	// If we are on PHP < 5.0.0 we need to force include or we get a blank page
+	if (version_compare(PHP_VERSION, '5.0.0', '<')) 
+	{		
+		$dbms = str_replace('mysqli', 'mysql4', $dbms); //this version of php does not have mysqli extension and my crash the installer if finds a forum using this		
+	}	
 
 	return array(
 		'dbms'			=> $dbms,
@@ -853,8 +879,9 @@ function get_phpbb_info($config)
 		'dbname'		=> $dbname,
 		'dbuser'		=> $dbuser,
 		'dbpasswd'		=> $dbpasswd,
-		'table_prefix'		=> $table_prefix,
-		'acm_type'		=> ( !empty($acm_type) ? $acm_type : '' ),
+		'table_prefix'	=> $table_prefix,
+		'acm_type'		=> $acm_type ? $acm_type : '',
+		'status'		=> defined('PHPBB_INSTALLED') ? true : false,		
 	);
 }
 
@@ -865,7 +892,7 @@ function get_mxbb_info($config)
 	{
 		install_die(GENERAL_ERROR, 'Configuration file ' . $config . ' couldn\'t be opened.');
 	}
-
+	
 	return array(
 		'dbms'			=> $dbms,
 		'dbhost'		=> $dbhost,
@@ -873,6 +900,7 @@ function get_mxbb_info($config)
 		'dbuser'		=> $dbuser,
 		'dbpasswd'		=> $dbpasswd,
 		'mx_table_prefix'		=> $mx_table_prefix,
+		'status'		=> (defined('MX_INSTALLED') && (MX_INSTALLED === true)) ? true : false,
 	);
 }
 
@@ -911,7 +939,7 @@ function get_phpbb_url($table_prefix, $portal_backend)
 function open_phpbb_db(&$db, &$phpbb_info)
 {
 	global $mx_root_path, $phpEx;
-
+	
 	if( !defined('BEGIN_TRANSACTION') )
 	{
 		define('BEGIN_TRANSACTION', 1);
@@ -924,19 +952,33 @@ function open_phpbb_db(&$db, &$phpbb_info)
 	$dbname = $phpbb_info['dbname'];
 
 	$dbms = $phpbb_info['dbms'];
-
-	require_once($mx_root_path . 'includes/db/' . $dbms . '.' . $phpEx); // Load dbal and initiate class
-
-
+	
+	// If we are on PHP < 5.0.0 we need to force include or we get a blank page
+	if (version_compare(PHP_VERSION, '5.0.0', '<')) 
+	{		
+		$dbms = str_replace('mysqli', 'mysql4', $dbms); //this version of php does not have mysqli extension and my crash the installer if finds a forum using this		
+	}
+	
+	// Load dbal and initiate class
+	//Apache 2.0.x and php < 5.2.5 combination will crash here this is fixed by upgrading to php 5.2.6 or Apache 2.2.x
+	require_once($mx_root_path . 'includes/db/' . $dbms . '.' . $phpEx);
+	
 	if(!$db->db_connect_id)
 	{
 		// Connect to DB
 		@define('SQL_LAYER', $dbms);
-		$sql_db = 'dbal_' . $dbms;		
+		$sql_db = 'dbal_' . $dbms;
+			
 		$db	= new $sql_db();
+			
+		if(!is_object($db))
+		{
+			print("Could not load class " . $db . '<br />');
+		}
+
 		if(!$db->sql_connect($dbhost, $dbuser, $dbpasswd, $dbname, false))
 		{
-			print_r("Could not connect to all databases");
+			print("Could not connect to all databases");
 		}
 	}	
 	
@@ -974,7 +1016,7 @@ function get_relative_path($dir_a, $dir_b)
 */
 function show_phpinfo()
 {
-	global $template, $mx_root_path, $phpEx;
+	global $template, $mx_root_path, $phpEx, $tplEx;
 
 	//
 	// Capture the phpInfo output
@@ -1017,7 +1059,7 @@ function show_phpinfo()
 	include_once($mx_root_path . "install/includes/template.$phpEx");
 	$template = new Template($mx_root_path . 'install/templates');
 	page_header_install('phpInfo()');
-	$template->set_filenames(array('phpinfo' => 'mx_install_phpinfo.tpl'));
+	$template->set_filenames(array('phpinfo' => 'mx_install_phpinfo.'.$tplEx));
 	$template->assign_vars(array('PHPINFO' => $body_part));
 	$template->pparse('phpinfo');
 	page_footer_install(false);

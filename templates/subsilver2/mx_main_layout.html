@@ -1,4 +1,4 @@
-<table border="0" cellspacing="10" cellpadding="0" width="100%" class="mx_body_table">
+<table border="0" cellspacing="2" cellpadding="0" width="100%" class="mx_body_table">
 
 	<tr valign="top">
 		<!-- BEGIN layout_column -->
@@ -20,50 +20,44 @@
 							  <tr>
 								   <td>
 
+							  						<table width="100%" cellpadding="0" cellspacing="0" border="0" class="forumline" style="border-bottom: 0; padding:0px 0px 0px 0px;">
 							  						<!-- BEGIN block_header -->
-							  						<table width="100%" cellpadding="0" cellspacing="0" border="0" class="forumline" style="border-bottom:none; padding:1px 1px 0px 1px;">
 							  							<tr>
 							  								<td>
-										  						<table width="100%" cellpadding="0" cellspacing="0" border="0">
+										  						<table width="100%" cellpadding="0" cellspacing="0" style="border:none; padding:0px 0px 0px 0px;">
 										  							<tr>
-							  						<!-- END block_header -->
+																	<!-- END block_header -->
 
 											 							<!-- BEGIN show_title -->
-																		<th class="thCornerL" align="left" width="100%">
+																		<th align="left" style="background-color: #75507b; overflow: auto; width: 80%; height: 20px;">
 																			&nbsp;{layout_column.blocks.show_title.L_TITLE}&nbsp;
 																		</th>
 																		<!-- END show_title -->
 
 																		<!-- BEGIN edit -->
 
-																		<th class="thTop" align="right" width="1">
-																			<div class="editCP_switch" style="display: {layout_column.blocks.edit.EDITCP_SHOW};">
+																		<th align="right" class="editCP_switch" style="display: {layout_column.blocks.edit.EDITCP_SHOW};">
 																			<form action="{layout_column.blocks.edit.EDIT_ACTION}" method="post" class="mx_editform">
-																				<table width="100%" cellpadding="0" cellspacing="0" border="0">
+																				<div>
 
-													  									<tr>
+													  									<dl>
+																							<dt  align="right">
 														  									<!-- BEGIN hidden_block -->
-																							<td align="right">
-																								<span class="gensmall"><i>{layout_column.blocks.edit.hidden_block.HIDDEN_BLOCK}</i></span>
-																							</td>
-																							<!-- END hidden_block -->
-																							<td align="right">
+																								<i>{layout_column.blocks.edit.hidden_block.HIDDEN_BLOCK}</i>
+																							<!-- END hidden_block -->																							
 														  										{layout_column.blocks.edit.EDIT_IMG}
-																								{layout_column.blocks.edit.S_HIDDEN_FORM_FIELDS}
-														  									</td>
-													  									</tr>
+																								{layout_column.blocks.edit.S_HIDDEN_FORM_FIELDS}																							
+																							</dt>
+													  									</dl>
 
-																				</table>
+																				</div>
 																			</form>
-																			</div>
 																		</th>
 
 																		<!-- END edit -->
 
 											 							<!-- BEGIN show_title -->
-																		<th class="thCornerR" align="right" width="1">
-
-																		</th>
+																		<th align="right" style="overflow: auto; width: 1%; height: 20px;"></th>
 																		<!-- END show_title -->
 
 													<!-- BEGIN block_header -->
@@ -74,16 +68,13 @@
 													</table>
 													<!-- END block_header -->
 
-													<div id="block_{layout_column.blocks.BLOCK_ID}">
-													<table width="100%" cellpadding="0" cellspacing="0" border="0">
-														<tr>
-															<td>
+													<div id="block_{layout_column.blocks.BLOCK_ID}" style="width: 100%; border:none; padding:0px 0px 0px 0px;">
+														<dl>
+															<dt>
 																{layout_column.blocks.BLOCK}
-															</td>
-														</tr>
-													</table>
+															</dt>
+														</dl>
 													</div>
-
 								    </td>
 							   </tr>
 						  </table>

@@ -2,7 +2,7 @@
 /**
 *
 * @package DBal
-* @version $Id: dbal.php,v 1.10 2008/02/16 22:15:56 jonohlsson Exp $
+* @version $Id: dbal.php,v 1.13 2008/10/04 17:30:23 orynider Exp $
 * @copyright (c) 2005 phpBB Group
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU Public License

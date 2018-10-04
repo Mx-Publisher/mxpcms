@@ -2,7 +2,7 @@
 /**
 *
 * @package page_tail
-* @version $Id: page_tail.php,v 1.40 2008/07/11 22:00:17 jonohlsson Exp $
+* @version $Id: page_tail.php,v 1.42 2008/10/04 07:04:25 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -47,7 +47,7 @@ if (!empty($mx_page->last_updated))
 {
 	$editor_name_tmp = mx_get_userdata($mx_page->last_updated_by);
 	$editor_name = $editor_name_tmp['username'];
-	$edit_time = phpBB2::create_date( $board_config['default_dateformat'], $mx_page->last_updated, $board_config['board_timezone'] );
+	$edit_time = $phpBB2->create_date( $board_config['default_dateformat'], $mx_page->last_updated, $board_config['board_timezone'] );
 
 	$template->assign_block_vars('page_last_updated', array(
 		'L_PAGE_UPDATED'	=> $lang['Page_updated_date'],

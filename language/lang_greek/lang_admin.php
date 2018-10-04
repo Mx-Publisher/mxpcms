@@ -133,7 +133,7 @@ $lang['Mx_mod_rewrite'] = 'Χρησιμοποίησε mod_rewrite';
 $lang['Mx_mod_rewrite_explain'] = 'Εάν χρησιμοποιείτε κεντρικό υπολογιστή Apache και έχετε ενεργοποιήσει mod_rewrite, μπορείτε να ξαναγράψετε URLS παραδείγματος χάριν, μπορείτε να ξαναγράψετε τις σελίδες όπως \'page=x\' με τις πιό διαισθητικές εναλλακτικές λύσεις. Παρακαλώ διαβάστε το σχετικό έγγραφο της μονάδας mx_mod_rewrite.';
 $lang['Portal_Overall_header'] = 'Φάκελλος στην κεφαλή (Προεπιλογή)';
 $lang['Portal_Overall_header_explain'] = '- Αυτή είναι η προεπιλογή της template overall_header file, π.χ. overall_header.tpl.';
-$lang['Portal_Overall_footer'] = 'Overall Footer File (Προεπιλογή)';
+$lang['Portal_Overall_footer'] = 'Γενικό αρχείο υποσημείωσης (Προεπιλογή)';
 $lang['Portal_Overall_footer_explain'] = '- Αυτή είναι η προεπιλογή της template overall_footer file, π.χ. overall_footer.tpl.';
 $lang['Portal_Main_layout'] = 'Βασική Διάταξη αρχείου (Προεπιλογή)';
 $lang['Portal_Main_layout_explain'] = '- Αυτή είναι η προεπιλογή της template main_layout file, e.g. mx_main_layout.tpl.';
@@ -148,9 +148,9 @@ $lang['Portal_status'] = 'Ενεργό portal';
 $lang['Portal_status_explain'] = 'Διακόπτης, όταν ανακατασκευάζετε τις ιστοσελίδες σας. Μόνο οι Διαχειριστές είναι σε θέση να δουν τις σελίδες και να κάνουν πλοήγηση. Όταν τίθεται εκτός λειτουργίας, εμφανίζετε το κατωτέρω μήνυμα.';
 $lang['Disabled_message'] = 'Απενεργοποιημένα μηνύματα Portal';
 $lang['Portal_Backend'] = 'MX-Publisher User/Session backend';
-$lang['Portal_Backend_explain'] = 'Επιλέξτε internal, phpBB2 ή phpBB3 sessions και χρήστες';
+$lang['Portal_Backend_explain'] = 'Επιλέξτε internal, phpBB2 ή phpBB3 συνοδία και χρήστες';
 $lang['Portal_Backend_path'] = 'Σχετικό path για phpBB [όχι-internal]';
-$lang['Portal_Backend_path_explain'] = 'Εαν χρησιμοποιείται non-internal sessions and users, εισάγεται το σχετικό path του phpbb, πχ \'phpBB2/\' ή \'../phpBB2/\'. Σημείωση: οι κάθετοι είναι σημαντικές.';
+$lang['Portal_Backend_path_explain'] = 'Εαν χρησιμοποιείται non-internal συνοδία και χρήστες, εισάγεται το σχετικό path του phpbb, πχ \'phpBB2/\' ή \'../phpBB2/\'. Σημείωση: οι κάθετοι είναι σημαντικές.';
 $lang['Portal_Backend_submit'] = 'Αλλαγή και επικύρωση Backend';
 $lang['Portal_config_valid'] = 'Τρέχουσα Θέση Backend: ';
 $lang['Portal_config_valid_true'] = '<b><font color="green">Έγκυρο</font></b>';
@@ -323,19 +323,19 @@ $lang['Override_page_style_explain'] = ' ';
 $lang['Page_header'] = 'Αρχείο σελίδων κεφαλής <br /> - i.e. overall_header.tpl (προεπιλογή), overall_noheader.tpl (καμία επιγραφή) ή προσαρμοσμένο από τον χρήστη.<br />Για να χρησιμοποιήσετε την προεπιλογή, αφήστε το κενό.';
 $lang['Page_footer'] = 'Αρχείο υποσημείωσης σελίδων <br /> - i.e. overall_footer.tpl (προεπιλογή) ή προσαρμοσμένο από τον χρήστη.<br />Για να χρησιμοποιήσετε την προεπιλογή, αφήστε το κενό.';
 $lang['Page_main_layout'] = 'Κύριο αρχείο διάταξης σελίδων <br /> - i.e. mx_main_layout.tpl (προεπιλογή) ή προσαρμοσμένο από τον χρήστη.<br />Για να χρησιμοποιήσετε την προεπιλογή, αφήστε το κενό.';
-$lang['Page_Navigation_block'] = 'Block της πλοήγησης στην αρχή της Σελίδας';
+$lang['Page_Navigation_block'] = 'Block πλοήγησης στην αρχή της Σελίδας';
 $lang['Page_Navigation_block_explain'] = '- Αυτό είναι ένα block πλοήγησης στην κεφαλή, υπό τον όρο ότι έχετε επιλέξει ένα γενικό αρχείο επιγραφών που υποστηρίζει τη σελίδα πλοήγησης.<br />Για να χρησιμοποιήσετε την προεπιλογή, αφήστε το αδιάτακτο.';
-$lang['Auth_Page'] = 'ʼδειες';
+$lang['Auth_Page'] = 'Άδειες';
 $lang['Select_sort_method'] = 'Επιλέξτε την μέθοδο τακτοποίησης';
 $lang['Order'] = 'Εντολή';
 $lang['Sort'] = 'Τύπος';
 $lang['Page_sort_title'] = 'Τίτλος Σελίδας';
 $lang['Page_sort_desc'] = 'Περιγραφή Σελίδας';
 $lang['Page_sort_created'] = 'Η Σελίδα Δημιουργήθηκε';
-$lang['Sort_Ascending'] = 'ASC';
-$lang['Sort_Descending'] = 'DESC';
+$lang['Sort_Ascending'] = 'ΑΥΞ';
+$lang['Sort_Descending'] = 'ΦΘΙΝ';
 $lang['Return_to_page'] = 'Επιστροφή Portal Page';
-$lang['Auth_Page_group'] = '-> ΙΔΙΩΤΙΚΟ Group';
+$lang['Auth_Page_group'] = '-> ΙΔΙΩΤΙΚΗ Ομάδα';
 $lang['Page_desc'] = 'Περιγραφή';
 $lang['Page_parent'] = 'Γονική Σελίδα';
 $lang['Add_Page'] = 'Προσθέστε Νέα Σελίδα';
@@ -364,10 +364,10 @@ $lang['Column_Size'] = 'Μέγεθος της κολόνας';
 $lang['Column_name'] = 'Όνομα Κολόνας';
 $lang['Column_delete'] = 'Διαγραφή Κολόνας';
 $lang['Page_updated'] = 'Σελίδα και πληροφορίες κολόνων ενημερωθήκαν επιτυχώς';
-$lang['Create_column'] = 'Προσθέστε νέα Κολόνας';
-$lang['Delete_page_column'] = 'Διαγραφή της Σελίδας κολόνα';
-$lang['Delete_page_column_explain'] = 'Αυτό θα διαγράψει τη στήλη σελίδων. Προσοχή: Η εκτέλεση  δεν μπορεί να αναστραφεί!';
-$lang['Click_page_column_delete_yes'] = 'Πατήστε %sΕδώ%s να διαγράψετε την σελίδα κολόνα';
+$lang['Create_column'] = 'Προσθέστε νέα Κολόνα';
+$lang['Delete_page_column'] = 'Διαγραφή κολόνας της Σελίδας ';
+$lang['Delete_page_column_explain'] = 'Αυτό θα διαγράψει τη κολόνα της σελίδας. Προσοχή: Η εκτέλεση  δεν μπορεί να αναστραφεί!';
+$lang['Click_page_column_delete_yes'] = 'Πατήστε %sΕδώ%s να διαγράψετε την κολόνα της σελίδας ';
 
 //
 // Page templates
@@ -422,23 +422,23 @@ $lang['Meta_Keywords'] = 'Λέξεις κλειδιά';
 $lang['Meta_Keywords_explain'] = '(κόμμα  χωρίζει τον κατάλογο)';
 $lang['Meta_Description'] = 'Περιγραφή';
 $lang['Meta_Language'] = 'Κωδικός Γλώσσας';
-$lang['Meta_Rating'] = 'Rating';
+$lang['Meta_Rating'] = 'Αξιολόγηση';
 $lang['Meta_Robots'] = 'Robots';
 $lang['Meta_Pragma'] = 'Pragma no-cache';
-$lang['Meta_Bookmark_icon'] = 'Bookmark Icon';
+$lang['Meta_Bookmark_icon'] = 'Εικόνα Bookmark';
 $lang['Meta_Bookmark_explain'] = '(σχετική θέση)';
 $lang['Meta_HTITLE'] = 'Πρόσθετες τοποθετήσεις επιγραφών';
-$lang['Meta_data_updated'] = 'Meta data file (mx_meta.inc) has been updated!<br />Πατήστε %sΕδώ%s Να επιστρέψετε στην Διαχείριση των Meta Tags.';
+$lang['Meta_data_updated'] = 'Meta data αρχείο (mx_meta.inc) έχει ενημερωθεί!<br />Πατήστε %sΕδώ%s Να επιστρέψετε στην Διαχείριση των Meta Tags.';
 $lang['Meta_data_ioerror'] = 'Ανίκανο να ανοίξει mx_meta.inc. Σιγουρευτείτε ότι το αρχείο είναι εγγραφόμενο (chmod 777).';
 
 //
 // Portal permissons
 //
-$lang['Mx_Block_Auth_Title'] = 'Ιδιωτικές ʼδειες Block' ;
+$lang['Mx_Block_Auth_Title'] = 'Ιδιωτικές Άδειες Block' ;
 $lang['Mx_Block_Auth_Explain'] = 'Εδώ μπορείτε να διαμορφώσετε τις Ιδιωτικές ʼδειες Block';
-$lang['Mx_Page_Auth_Title'] = 'Σελίδα Ιδιωτικών ʼδειών' ;
+$lang['Mx_Page_Auth_Title'] = 'Σελίδα Ιδιωτικών Άδειών' ;
 $lang['Mx_Page_Auth_Explain'] = 'Εδώ διαμορφώνετε τις ρυθμίσεις των Ιδιωτικών Αδειών Block';
-$lang['Block_Auth_successfully'] = 'Η ʼδεια των Block ενημερώθεικε επιτυχώς';
+$lang['Block_Auth_successfully'] = 'Η Άδεια των Block ενημερώθεικε επιτυχώς';
 $lang['Click_return_block_auth'] = 'Πατήστε %sΕδώ%s να επιστρέψετε στις Ιδιωτικές ʼδειες Block';
 $lang['Page_Auth_successfully'] = 'Η Σελίδα Ιδιωτικών Αδειών ενημερώθεικε επιτυχώς';
 $lang['Click_return_page_auth'] = 'Πατήστε %sΕδώ%s να επιστρέψετε στις Ιδιωτικές ʼδειες Block';
@@ -472,7 +472,7 @@ $lang['space_between'] = 'Διάστημα μεταξύ των Blocks';
 // Sitelog
 //
 $lang['log_filter_date'] = 'Φίλτρα ανά ώρα';
-$lang['log_filter_date_explain'] = '- Show logs from last week, month, year...';
+$lang['log_filter_date_explain'] = '- Παρουσιάστε τις εισόδους ανά τελευταία εβδομάδα, μήνα, έτος...';
 $lang['numOfEvents'] = 'Αριθμός';
 $lang['numOfEvents_explain'] = '- Αριθμός γεγονότων προς παρουσίαση';
 
@@ -510,7 +510,7 @@ $lang['menu_display_mode_explain '] = 'Οριζόντια ή Κάθετη προ
 //$lang['menu_page_sync'] = 'Highlight current?';
 //$lang['menu_page_sync_explain'] = 'Highlight current Navigation Menu entry...';
 $lang['menu_custom_tpl']				= "Αρχείο template";
-$lang['menu_custom_tpl_explain ']		= "Eg mx_menu_custom.tpl";
+$lang['menu_custom_tpl_explain ']		= "Πχ mx_menu_custom.tpl";
 
 //
 // Version Checker

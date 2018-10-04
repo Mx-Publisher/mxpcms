@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Installation
-* @version $Id: mx_install.php,v 1.106 2008/09/08 01:06:15 orynider Exp $
+* @version $Id: mx_install.php,v 1.113 2008/09/30 07:04:45 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -32,7 +32,8 @@ define('INSTALL_READONLY', true);
 // Set MX-Publisher version here !
 //
 $mx_portal_name 	= 'MX-Publisher Modular System';
-$mx_portal_version 	= '3.0.0-b2';
+$mx_portal_version 	= '3.0.0-b3';
+$mx_php_version		= '5.1.2';
 $mx_portal_copy 	= '<b>MX-Publisher Modular System!</b> <br /><br/> MX-Publisher is a fully modular system, portal and CMS, featuring dynamic pages, blocks, and themes, by means of a powerful yet flexible AdminCP. It is the classical phpBB portal add-on, improved and enhanced for every phpBB version released since 2001 (originally named MX-Publisher). <br /><br />Authors: The MX-Publisher Development Team. <br />Please visit <a href="http://www.mx-publisher.com/">www.mx-publisher.com</a> for further information.';
 
 //
@@ -66,6 +67,7 @@ define('IN_PHPBB', true);
 define('INSTALLING', true);
 $mx_root_path = '../';
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
+$tplEx = @file_exists($mx_root_path.'install/templates/mx_install_header.html') ? 'html' : 'tpl';
 //
 // FYI:
 // The following code related to PHP Global Variables is based on
@@ -73,8 +75,8 @@ $phpEx = substr(strrchr(__FILE__, '.'), 1);
 //
 @ini_set( 'display_errors', '1' );
 error_reporting(E_ALL ^ E_NOTICE);
-error_reporting  (E_ERROR | E_WARNING | E_PARSE); // This will NOT report uninitialized variables
-include($mx_root_path . "modules/mx_shared/ErrorHandler/prepend.$phpEx"); // For nice error output
+//error_reporting  (E_ERROR | E_WARNING | E_PARSE); // This will NOT report uninitialized variables
+//include($mx_root_path . "modules/mx_shared/ErrorHandler/prepend.$phpEx"); // For nice error output
 
 // ================================================================================
 // The following code is based on common.php from phpBB
@@ -151,8 +153,10 @@ function deregister_globals()
 
 	unset($input);
 }
+
+
 // If we are on PHP >= 6.0.0 we do not need some code
-if (phpversion() >= '6.0.0-dev')
+if (version_compare(phpversion(), "5.9.9", ">="))
 {
 	/**
 	* @ignore
@@ -246,69 +250,71 @@ if (@ini_get('register_globals') == '1' || strtolower(@ini_get('register_globals
 // this is a security precaution to prevent someone
 // trying to break out of a SQL statement.
 //
-if( !get_magic_quotes_gpc() )
+if (version_compare(phpversion(), "5.9.9", "<="))
 {
-	if( is_array($_GET) )
+	if( !get_magic_quotes_gpc() )
 	{
-		while( list($k, $v) = each($_GET) )
+		if( is_array($_GET) )
 		{
-			if( is_array($_GET[$k]) )
+			while( list($k, $v) = each($_GET) )
 			{
-				while( list($k2, $v2) = each($_GET[$k]) )
+				if( is_array($_GET[$k]) )
 				{
-					$_GET[$k][$k2] = addslashes($v2);
+					while( list($k2, $v2) = each($_GET[$k]) )
+					{
+						$_GET[$k][$k2] = addslashes($v2);
+					}
+					@reset($_GET[$k]);
 				}
-				@reset($_GET[$k]);
+				else
+				{
+					$_GET[$k] = addslashes($v);
+				}
 			}
-			else
-			{
-				$_GET[$k] = addslashes($v);
-			}
+			@reset($_GET);
 		}
-		@reset($_GET);
-	}
 
-	if( is_array($_POST) )
-	{
-		while( list($k, $v) = each($_POST) )
+		if( is_array($_POST) )
 		{
-			if( is_array($_POST[$k]) )
+			while( list($k, $v) = each($_POST) )
 			{
-				while( list($k2, $v2) = each($_POST[$k]) )
+				if( is_array($_POST[$k]) )
 				{
-					$_POST[$k][$k2] = addslashes($v2);
+					while( list($k2, $v2) = each($_POST[$k]) )
+					{
+						$_POST[$k][$k2] = addslashes($v2);
+					}
+					@reset($_POST[$k]);
 				}
-				@reset($_POST[$k]);
+				else
+				{
+					$_POST[$k] = addslashes($v);
+				}
 			}
-			else
-			{
-				$_POST[$k] = addslashes($v);
-			}
+			@reset($_POST);
 		}
-		@reset($_POST);
-	}
 
-	if( is_array($HTTP_COOKIE_VARS) )
-	{
-		while( list($k, $v) = each($HTTP_COOKIE_VARS) )
+		if( is_array($HTTP_COOKIE_VARS) )
 		{
-			if( is_array($HTTP_COOKIE_VARS[$k]) )
+			while( list($k, $v) = each($HTTP_COOKIE_VARS) )
 			{
-				while( list($k2, $v2) = each($HTTP_COOKIE_VARS[$k]) )
+				if( is_array($HTTP_COOKIE_VARS[$k]) )
 				{
-					$HTTP_COOKIE_VARS[$k][$k2] = addslashes($v2);
+					while( list($k2, $v2) = each($HTTP_COOKIE_VARS[$k]) )
+					{
+						$HTTP_COOKIE_VARS[$k][$k2] = addslashes($v2);
+					}
+					@reset($HTTP_COOKIE_VARS[$k]);
 				}
-				@reset($HTTP_COOKIE_VARS[$k]);
+				else
+				{
+					$HTTP_COOKIE_VARS[$k] = addslashes($v);
+				}
 			}
-			else
-			{
-				$HTTP_COOKIE_VARS[$k] = addslashes($v);
-			}
+			@reset($HTTP_COOKIE_VARS);
 		}
-		@reset($HTTP_COOKIE_VARS);
 	}
 }
-
 
 //
 // End Of Global Vars Initialization
@@ -345,6 +351,13 @@ $available_dbms = array(
 		'DELIM_BASIC'	=> ';',
 		'COMMENTS'		=> 'mx_remove_remarks'
 	),
+	'mysql6' => array(
+		'LABEL'			=> 'MySQL 6.x',
+		'SCHEMA'		=> 'mysql_61',
+		'DELIM'			=> ';',
+		'DELIM_BASIC'	=> ';',
+		'COMMENTS'		=> 'mx_remove_remarks'
+	),	
 	'postgres' => array(
 		'LABEL'			=> 'PostgreSQL 7.x',
 		'SCHEMA'		=> 'postgres',
@@ -455,7 +468,7 @@ if( empty($language) )
 		include_once($mx_root_path . "install/includes/template.$phpEx");
 		$template = new Template($mx_root_path . 'install/templates');
 		page_header_install($lang['Welcome_install'], $lang['Choose_lang_explain']);
-		$template->set_filenames(array('language' => 'mx_install_language.tpl'));
+		$template->set_filenames(array('language' => 'mx_install_language.'.$tplEx));
 		$template->assign_vars(array(
 			'L_INITIAL_CONFIGURATION'	=> $lang['Install_settings'],
 			'S_FORM_ACTION'				=> "mx_install.$phpEx",
@@ -588,12 +601,12 @@ if($confirm)
 
 				case 'phpbb2':
 
-					$tplEx = 'tpl';
+					//$tplEx = 'tpl';
 					break;
 
 				case 'phpbb3':
 
-					$tplEx = 'html';
+					//$tplEx = 'html';
 					break;
 			}			
 			
@@ -642,7 +655,7 @@ if($confirm)
 			//
 			// Create fresh config.php
 			//
-			if( !defined('MX_INSTALLED') )
+			if( !defined('MX_INSTALLED') || (MX_INSTALLED === false) )
 			{
 				$process_msgs[] = $lang['Writing_config'] . ' ...<br />';
 
@@ -674,7 +687,7 @@ if($confirm)
 					include_once($mx_root_path . "install/includes/template.$phpEx");
 					$template = new Template($mx_root_path . 'install/templates');
 					page_header_install($lang['Welcome_install'], $instruction_text);
-					$template->set_filenames(array('button' => 'mx_install_button.tpl'));
+					$template->set_filenames(array('button' => 'mx_install_button.'.$tplEx));
 					$template->assign_vars(array(
 						'S_FORM_ACTION'			=> "mx_install.$phpEx",
 						'S_HIDDEN_FIELDS'		=> $s_hidden_fields,
@@ -702,7 +715,7 @@ if($confirm)
 			//
 			// Update config.php (if upgrading from 2.8.x)
 			//
-			if( defined('MX_INSTALLED') && defined('PHPBB_INSTALLED'))
+			if( defined('MX_INSTALLED') && defined('PHPBB_INSTALLED') )
 			{
 				$upgrade_mode = 'from28x';
 
@@ -736,7 +749,7 @@ if($confirm)
 					include_once($mx_root_path . "install/includes/template.$phpEx");
 					$template = new Template($mx_root_path . 'install/templates');
 					page_header_install($lang['Welcome_install'], $instruction_text);
-					$template->set_filenames(array('button' => 'mx_install_button.tpl'));
+					$template->set_filenames(array('button' => 'mx_install_button.'.$tplEx));
 					$template->assign_vars(array(
 						'S_FORM_ACTION'			=> "mx_install.$phpEx",
 						'S_HIDDEN_FIELDS'		=> $s_hidden_fields,
@@ -770,7 +783,7 @@ if($confirm)
 			$current_template_path = $mx_root_path . 'install/templates/';
 			include($mx_root_path . "includes/mx_constants.$phpEx");
 		}
-		if( !defined('MX_INSTALLED') )
+		if( !defined('MX_INSTALLED') || (MX_INSTALLED === false) )
 		{
 			install_die('<b>'.$lang['Critical_Error'].':</b><br /><br />'.$lang['Error_loading_config']);
 		}
@@ -987,7 +1000,7 @@ if($confirm)
 		include_once($mx_root_path . "install/includes/template.$phpEx");
 		$template = new Template($mx_root_path . 'install/templates');
 		page_header_install($install_title, $message);
-		$template->set_filenames(array('button' => 'mx_install_button.tpl'));
+		$template->set_filenames(array('button' => 'mx_install_button.'.$tplEx));
 
 		$action_label = $install_mode == 'upgrade' ? $lang['Go_to_admincp'] : $mx_portal_name;
 		$action_url = $install_mode == 'upgrade' ? $mx_root_path . "admin/index.$phpEx" : $mx_root_path . "index.$phpEx";
@@ -1021,7 +1034,7 @@ if( @file_exists($mx_root_path . "config.$phpEx") )
 	include($mx_root_path . "config.$phpEx");
 }
 
-if( defined('MX_INSTALLED') )
+if( defined('MX_INSTALLED') && (MX_INSTALLED === true) )
 {
 	//
 	// Upgrade Instructions ----------------------------------------
@@ -1029,7 +1042,7 @@ if( defined('MX_INSTALLED') )
 	$install_mode = 'upgrade';
 	$upgrade_mode = defined('PHPBB_INSTALLED') ? 'from28x' : '';
 	page_header_install($lang['Welcome_install'], $lang['Upgrade_Instruction']);
-	$template->set_filenames(array('button' => 'mx_install_button.tpl'));
+	$template->set_filenames(array('button' => 'mx_install_button.'.$tplEx));
 
 	$s_hidden_fields = '<input type="hidden" name="install_mode" value="' . $install_mode . '" />'.
 		'<input type="hidden" name="confirm" value="1" />'.
@@ -1053,7 +1066,7 @@ if( defined('MX_INSTALLED') )
 //
 $install_mode = 'install';
 page_header_install($lang['Welcome_install'], $lang['Install_Instruction']);
-$template->set_filenames(array('body' => 'mx_install_body.tpl'));
+$template->set_filenames(array('body' => 'mx_install_body.'.$tplEx));
 
 //
 // Get the current document root.
@@ -1132,7 +1145,6 @@ else
 	//
 }
 
-
 //
 // Get the MX-Publisher base dir (computed from the phpbb search path), for example /mx/, /portal/ or /
 //
@@ -1186,9 +1198,13 @@ $select_phpbb_path = '<select name="select_phpbb_path" onchange="check_phpbb_pat
 //
 if (file_exists($mx_root_path . "config.$phpEx"))
 {
-	print("Warning: Existing mxp configuration file was found, If you continue the database will be reinstalled!");
-	
 	$mx_info = get_mxbb_info($mx_root_path . "config.$phpEx");
+
+	if ($mx_info['mx_table_prefix'])
+	{	
+		$status = $mx_info['status'] ? 'valid' : 'invalid'; 
+		print("Warning: Existing mxp configuration file was found with " . $status . " status, <br /> If you continue with same db table prefix the schema will be reinstalled!");
+	}
 }
 
 //
@@ -1220,7 +1236,7 @@ for($i = 0; $i < $files_cnt; $i++)
 	// Get the phpBB base dir (computed from the document root), for example /phpBB/, /forum/ or /...
 	//
 	$phpbb_base_path = '/' . (!$files_ary[$i] ? '' : $files_ary[$i] . '/');
-
+	
 	//
 	// Get the relative path from MX-Publisher to this phpBB installation
 	//
@@ -1270,11 +1286,11 @@ for($i = 0; $i < $files_cnt; $i++)
 	{
 		continue;
 	}
-	
+
 	//
 	// Try to Connect to this phpBB Database
 	//
-	if( !open_phpbb_db($db, $phpbb_info) )
+	if(!open_phpbb_db($db, $phpbb_info))
 	{
 		$phpbb_failed = true;
 		continue;

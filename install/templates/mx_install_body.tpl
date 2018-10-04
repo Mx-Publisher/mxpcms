@@ -91,7 +91,7 @@ window.onload = check_phpbb_path;
 	</tr>
 	<tr>
 		<td class="row1" align="right"><span class="gen">{L_PORTAL_URL}:&nbsp;</span></td>
-		<td class="row2"><input type="text" size="80" name="portal_url" value="{PORTAL_URL}"{READONLY} /></td>
+		<td class="row2"><input type="text" size="80" name="portal_url" value="{PORTAL_URL}" /></td>
 	</tr>
 
 	<tr><td colspan="2"><div id="phpbb" style="display:none;" class="genmed"><table width="100%" cellpadding="2" cellspacing="1" border="0">
@@ -170,15 +170,15 @@ window.onload = check_phpbb_path;
 	</tr>
 	<tr>
 		<td class="row1" align="right"><span class="gen">{L_DB_NAME}:&nbsp;</span></td>
-		<td class="row2"><input type="text" name="dbname_mxbb" value="" /></td>
+		<td class="row2"><input type="text" name="dbname_mxbb" value="{DB_NAME}" /></td>
 	</tr>
 	<tr>
 		<td class="row1" align="right"><span class="gen">{L_DB_USER}:&nbsp;</span></td>
-		<td class="row2"><input type="text" name="dbuser_mxbb" value="" /></td>
+		<td class="row2"><input type="text" name="dbuser_mxbb" value="{DB_USER}" /></td>
 	</tr>
 	<tr>
 		<td class="row1" align="right"><span class="gen">{L_DB_PASSWORD}:&nbsp;</span></td>
-		<td class="row2"><input type="password" name="dbpasswd_mxbb" value="" /></td>
+		<td class="row2"><input type="password" name="dbpasswd_mxbb" value="{DB_PASSWD}" /></td>
 	</tr>
 	<tr>
 		<td class="row1" align="right"><span class="gen">{L_MXP_ADMINNAME}:&nbsp;</span></td>

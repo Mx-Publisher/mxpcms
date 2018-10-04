@@ -6,7 +6,7 @@
     copyright            : (C) 2001 The phpBB Group
     email                : support@phpbb.com
 
-    $Id: emailer.php,v 1.1 2007/09/09 16:51:51 jonohlsson Exp $
+    $Id: emailer.php,v 1.3 2008/10/04 07:04:25 orynider Exp $
 
 ***************************************************************************/
 
@@ -102,11 +102,11 @@ class emailer
 		{
 			$tpl_file = $phpbb_root_path . 'language/lang_' . $template_lang . '/email/' . $template_file . '.tpl';
 
-			if (!@file_exists(@phpBB2::phpbb_realpath($tpl_file)))
+			if (!@file_exists(@$phpBB2->phpbb_realpath($tpl_file)))
 			{
 				$tpl_file = $phpbb_root_path . 'language/lang_' . $board_config['default_lang'] . '/email/' . $template_file . '.tpl';
 
-				if (!@file_exists(@phpBB2::phpbb_realpath($tpl_file)))
+				if (!@file_exists(@$phpBB2->phpbb_realpath($tpl_file)))
 				{
 					mx_message_die(GENERAL_ERROR, 'Could not find email template file :: ' . $template_file, '', __LINE__, __FILE__);
 				}
@@ -357,7 +357,7 @@ class emailer
 	//
 	function encode_file($sourcefile)
 	{
-		if (is_readable(phpBB2::phpbb_realpath($sourcefile)))
+		if (is_readable($phpBB2->phpbb_realpath($sourcefile)))
 		{
 			$fd = fopen($sourcefile, "r");
 			$contents = fread($fd, filesize($sourcefile));

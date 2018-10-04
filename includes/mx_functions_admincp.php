@@ -2,7 +2,7 @@
 /**
 *
 * @package AdminCP
-* @version $Id: mx_functions_admincp.php,v 1.60 2008/08/27 05:17:35 orynider Exp $
+* @version $Id: mx_functions_admincp.php,v 1.61 2008/10/04 07:04:25 orynider Exp $
 * @copyright (c) 2002-2006 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -12,6 +12,11 @@
 if ( !defined( 'IN_PORTAL' ) )
 {
 	die( "Hacking attempt" );
+}
+
+if( !function_exists('sync') )
+{
+	include_once($mx_root_path . 'includes/shared/phpbb2/includes/functions_admin.' . $phpEx);
 }
 
 /**#@+

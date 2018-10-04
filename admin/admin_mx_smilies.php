@@ -6,7 +6,7 @@
 *     copyright            : (C) 2001 The phpBB Group
 *     email                : support@phpbb.com
 *
-*     $Id: admin_mx_smilies.php,v 1.19 2008/06/19 08:56:53 orynider Exp $
+*     $Id: admin_mx_smilies.php,v 1.21 2008/10/04 07:04:24 orynider Exp $
 *
 ****************************************************************************/
 
@@ -124,7 +124,7 @@ $dir = @opendir($smiley_root_path . $board_config['smilies_path']);
 
 while($file = @readdir($dir))
 {
-	if( !@is_dir(phpBB2::phpbb_realpath($smiley_root_path . $board_config['smilies_path'] . '/' . $file)) )
+	if( !@is_dir($phpBB2->phpbb_realpath($smiley_root_path . $board_config['smilies_path'] . '/' . $file)) )
 	{
 		$img_size = @getimagesize($smiley_root_path . $board_config['smilies_path'] . '/' . $file);
 
@@ -621,7 +621,7 @@ else if ( $mode != "" )
 			//
 			$smile_code = $mx_request_vars->post('smile_code');
 			$smile_url = $mx_request_vars->post('smile_url', MX_TYPE_NO_TAGS);
-			$smile_url = phpBB2::phpbb_ltrim(basename($smile_url), "'");
+			$smile_url = $phpBB2->phpbb_ltrim(basename($smile_url), "'");
 			$smile_emotion = $mx_request_vars->post('smile_emotion', MX_TYPE_NO_HTML);
 			$smile_id = $mx_request_vars->post('smile_id', MX_TYPE_INT, 0);
 			$smile_code = trim($smile_code);
@@ -695,7 +695,7 @@ else if ( $mode != "" )
 			//
 			$smile_code = $mx_request_vars->post('smile_code');
 			$smile_url = $mx_request_vars->post('smile_url');
-			$smile_url = phpBB2::phpbb_ltrim(basename($smile_url), "'");
+			$smile_url = $phpBB2->phpbb_ltrim(basename($smile_url), "'");
 			$smile_emotion = $mx_request_vars->post('smile_emotion', MX_TYPE_NO_HTML);
 			$smile_code = trim($smile_code);
 			$smile_url = trim($smile_url);

@@ -13,13 +13,15 @@ define('ERROR_HANDLER_ROOT', dirname(__FILE__));
 * @access public
 * @package ErrorHandler
 */
-class ErrorHandler {
+class ErrorHandler 
+{
 
     /**
     * Constructor
     * @access public
     */
-    function ErrorHandler() {
+    function ErrorHandler() 
+	{
         @ini_set('docref_root', null);
         @ini_set('docref_ext', null);
     }
@@ -32,18 +34,23 @@ class ErrorHandler {
     * @return void
     * @access public
     */
-    function raiseError($errNo, $errMsg, $file, $line) {
+    function raiseError($errNo, $errMsg, $file, $line) 
+	{
     	global $mx_user;
 
-        if (! ($errNo & error_reporting())) {
+        if ( !($errNo & error_reporting())) 
+		{
             return;
         }
 
-        while (ob_get_level()) {
+        while (ob_get_level()) 
+		{
             ob_end_clean();
         }
-
-        $errType = array (
+		
+		// figure out the error level 
+		$errType = array(
+			0    => "Unknown PHP Error",		
             1    => "Php Error",
             2    => "Php Warning",
             4    => "Parsing Error",
@@ -54,20 +61,24 @@ class ErrorHandler {
             128  => "Compile Warning",
             256  => "Php User Error",
             512  => "Php User Warning",
-            1024 => "Php User Notice"
+            1024 => "Php User Notice",
+			2048 => 'PHP Strict',			
         );
-
+		
         $info = array();
 
-        if (($errNo & E_USER_ERROR) && is_array($arr = @unserialize($errMsg))) {
-            foreach ($arr as $k => $v) {
+        if (($errNo & E_USER_ERROR) && is_array($arr = @unserialize($errMsg))) 
+		{
+            foreach ($arr as $k => $v) 
+			{
                 $info[$k] = $v;
             }
         }
 
         $trace = array();
 
-        if (function_exists('debug_backtrace')) {
+        if (function_exists('debug_backtrace')) 
+		{
             $trace = debug_backtrace();
             array_shift($trace);
         }

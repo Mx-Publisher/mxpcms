@@ -2,7 +2,7 @@
 /**
 *
 * @package phpBB3
-* @version $Id: functions.php,v 1.21 2008/07/10 23:02:06 jonohlsson Exp $
+* @version $Id: functions.php,v 1.23 2008/10/04 07:04:25 orynider Exp $
 * @copyright (c) 2005 phpBB Group
 * @license http://opensource.org/licenses/gpl-license.php GNU Public License
 *
@@ -29,818 +29,821 @@ if (!defined('IN_PORTAL'))
 //
 class phpBB3_top
 {
-
-
-/**
-* set_var
-*
-* Set variable, used by {@link request_var the request_var function}
-*
-* @access private
-*/
-function set_var(&$result, $var, $type, $multibyte = false)
-{
-	settype($var, $type);
-	$result = $var;
-
-	if ($type == 'string')
+	function __construct() 
+	{ 
+	  return;	
+	}
+	
+	/**
+	* set_var
+	*
+	* Set variable, used by {@link request_var the request_var function}
+	*
+	* @access private
+	*/
+	function set_var(&$result, $var, $type, $multibyte = false)
 	{
-		$result = trim(htmlspecialchars(str_replace(array("\r\n", "\r"), array("\n", "\n"), $result), ENT_COMPAT, 'UTF-8'));
+		settype($var, $type);
+		$result = $var;
 
-		if (!empty($result))
+		if ($type == 'string')
 		{
-			// Make sure multibyte characters are wellformed
-			if ($multibyte)
+			$result = trim(htmlspecialchars(str_replace(array("\r\n", "\r"), array("\n", "\n"), $result), ENT_COMPAT, 'UTF-8'));
+
+			if (!empty($result))
 			{
-				if (!preg_match('/^./u', $result))
+				// Make sure multibyte characters are wellformed
+				if ($multibyte)
 				{
-					$result = '';
+					if (!preg_match('/^./u', $result))
+					{
+						$result = '';
+					}
+				}
+				else
+				{
+					// no multibyte, allow only ASCII (0-127)
+					$result = preg_replace('/[\x80-\xFF]/', '?', $result);
 				}
 			}
-			else
+
+			$result = (STRIP) ? stripslashes($result) : $result;
+		}
+	}
+
+	/**
+	* request_var
+	*
+	* Used to get passed variable
+	*/
+	function request_var($var_name, $default, $multibyte = false, $cookie = false)
+	{
+		if (!$cookie && isset($_COOKIE[$var_name]))
+		{
+			if (!isset($_GET[$var_name]) && !isset($_POST[$var_name]))
 			{
-				// no multibyte, allow only ASCII (0-127)
-				$result = preg_replace('/[\x80-\xFF]/', '?', $result);
+				return (is_array($default)) ? array() : $default;
 			}
+			$_REQUEST[$var_name] = isset($_POST[$var_name]) ? $_POST[$var_name] : $_GET[$var_name];
 		}
 
-		$result = (STRIP) ? stripslashes($result) : $result;
-	}
-}
-
-/**
-* request_var
-*
-* Used to get passed variable
-*/
-function request_var($var_name, $default, $multibyte = false, $cookie = false)
-{
-	if (!$cookie && isset($_COOKIE[$var_name]))
-	{
-		if (!isset($_GET[$var_name]) && !isset($_POST[$var_name]))
+		if (!isset($_REQUEST[$var_name]) || (is_array($_REQUEST[$var_name]) && !is_array($default)) || (is_array($default) && !is_array($_REQUEST[$var_name])))
 		{
 			return (is_array($default)) ? array() : $default;
 		}
-		$_REQUEST[$var_name] = isset($_POST[$var_name]) ? $_POST[$var_name] : $_GET[$var_name];
-	}
 
-	if (!isset($_REQUEST[$var_name]) || (is_array($_REQUEST[$var_name]) && !is_array($default)) || (is_array($default) && !is_array($_REQUEST[$var_name])))
-	{
-		return (is_array($default)) ? array() : $default;
-	}
-
-	$var = $_REQUEST[$var_name];
-	if (!is_array($default))
-	{
-		$type = gettype($default);
-	}
-	else
-	{
-		list($key_type, $type) = each($default);
-		$type = gettype($type);
-		$key_type = gettype($key_type);
-		if ($type == 'array')
+		$var = $_REQUEST[$var_name];
+		if (!is_array($default))
 		{
-			reset($default);
-			$default = current($default);
-			list($sub_key_type, $sub_type) = each($default);
-			$sub_type = gettype($sub_type);
-			$sub_type = ($sub_type == 'array') ? 'NULL' : $sub_type;
-			$sub_key_type = gettype($sub_key_type);
+			$type = gettype($default);
 		}
-	}
-
-	if (is_array($var))
-	{
-		$_var = $var;
-		$var = array();
-
-		foreach ($_var as $k => $v)
+		else
 		{
-			self::set_var($k, $k, $key_type);
-			if ($type == 'array' && is_array($v))
+			list($key_type, $type) = each($default);
+			$type = gettype($type);
+			$key_type = gettype($key_type);
+			if ($type == 'array')
 			{
-				foreach ($v as $_k => $_v)
+				reset($default);
+				$default = current($default);
+				list($sub_key_type, $sub_type) = each($default);
+				$sub_type = gettype($sub_type);
+				$sub_type = ($sub_type == 'array') ? 'NULL' : $sub_type;
+				$sub_key_type = gettype($sub_key_type);
+			}
+		}
+
+		if (is_array($var))
+		{
+			$_var = $var;
+			$var = array();
+
+			foreach ($_var as $k => $v)
+			{
+				phpBB3::set_var($k, $k, $key_type);
+				if ($type == 'array' && is_array($v))
 				{
-					if (is_array($_v))
+					foreach ($v as $_k => $_v)
 					{
-						$_v = null;
+						if (is_array($_v))
+						{
+							$_v = null;
+						}
+						phpBB3::set_var($_k, $_k, $sub_key_type);
+						phpBB3::set_var($var[$k][$_k], $_v, $sub_type, $multibyte);
 					}
-					self::set_var($_k, $_k, $sub_key_type);
-					self::set_var($var[$k][$_k], $_v, $sub_type, $multibyte);
 				}
-			}
-			else
-			{
-				if ($type == 'array' || is_array($v))
+				else
 				{
-					$v = null;
+					if ($type == 'array' || is_array($v))
+					{
+						$v = null;
+					}
+					phpBB3::set_var($var[$k], $v, $type, $multibyte);
 				}
-				self::set_var($var[$k], $v, $type, $multibyte);
 			}
 		}
+		else
+		{
+			phpBB3::set_var($var, $var, $type, $multibyte);
+		}
+
+		return $var;
 	}
-	else
+
+	/**
+	* Set config value. Creates missing config entry.
+	*/
+	function set_config($board_config_name, $board_config_value, $is_dynamic = false)
 	{
-		self::set_var($var, $var, $type, $multibyte);
-	}
+		global $db, $mx_cache, $board_config;
 
-	return $var;
-}
-
-/**
-* Set config value. Creates missing config entry.
-*/
-function set_config($board_config_name, $board_config_value, $is_dynamic = false)
-{
-	global $db, $mx_cache, $board_config;
-
-	$sql = 'UPDATE ' . CONFIG_TABLE . "
-		SET config_value = '" . $db->sql_escape($board_config_value) . "'
-		WHERE config_name = '" . $db->sql_escape($board_config_name) . "'";
-	$db->sql_query($sql);
-
-	if (!$db->sql_affectedrows() && !isset($board_config[$board_config_name]))
-	{
-		$sql = 'INSERT INTO ' . CONFIG_TABLE . ' ' . $db->sql_build_array('INSERT', array(
-			'config_name'	=> $board_config_name,
-			'config_value'	=> $board_config_value,
-			'is_dynamic'	=> ($is_dynamic) ? 1 : 0));
+		$sql = 'UPDATE ' . CONFIG_TABLE . "
+			SET config_value = '" . $db->sql_escape($board_config_value) . "'
+			WHERE config_name = '" . $db->sql_escape($board_config_name) . "'";
 		$db->sql_query($sql);
-	}
 
-	$board_config[$board_config_name] = $board_config_value;
-
-	if (!$is_dynamic)
-	{
-		$mx_cache->destroy('config');
-	}
-}
-
-/**
-* Generates an alphanumeric random string of given length
-*/
-function gen_rand_string($num_chars = 8)
-{
-	$rand_str = self::unique_id();
-	$rand_str = str_replace('0', 'Z', strtoupper(base_convert($rand_str, 16, 35)));
-
-	return substr($rand_str, 0, $num_chars);
-}
-
-/**
-* Return unique id
-* @param string $extra additional entropy
-*/
-function unique_id($extra = 'c')
-{
-	static $dss_seeded = false;
-	global $board_config;
-
-	$val = $board_config['rand_seed'] . microtime();
-	$val = md5($val);
-	$board_config['rand_seed'] = md5($board_config['rand_seed'] . $val . $extra);
-
-	if ($dss_seeded !== true && ($board_config['rand_seed_last_update'] < time() - rand(1,10)))
-	{
-		self::set_config('rand_seed', $board_config['rand_seed'], true);
-		self::set_config('rand_seed_last_update', time(), true);
-		$dss_seeded = true;
-	}
-
-	return substr($val, 4, 16);
-}
-
-/**
-* Return formatted string for filesizes
-*/
-function get_formatted_filesize($bytes, $add_size_lang = true)
-{
-	global $user;
-
-	if ($bytes >= pow(2, 20))
-	{
-		return ($add_size_lang) ? round($bytes / 1024 / 1024, 2) . ' ' . $user->lang['MIB'] : round($bytes / 1024 / 1024, 2);
-	}
-
-	if ($bytes >= pow(2, 10))
-	{
-		return ($add_size_lang) ? round($bytes / 1024, 2) . ' ' . $user->lang['KIB'] : round($bytes / 1024, 2);
-	}
-
-	return ($add_size_lang) ? ($bytes) . ' ' . $user->lang['BYTES'] : ($bytes);
-}
-
-/**
-* Determine whether we are approaching the maximum execution time. Should be called once
-* at the beginning of the script in which it's used.
-* @return	bool	Either true if the maximum execution time is nearly reached, or false
-*					if some time is still left.
-*/
-function still_on_time($extra_time = 15)
-{
-	static $max_execution_time, $start_time;
-
-	$time = explode(' ', microtime());
-	$current_time = $time[0] + $time[1];
-
-	if (empty($max_execution_time))
-	{
-		$max_execution_time = (function_exists('ini_get')) ? (int) @ini_get('max_execution_time') : (int) @get_cfg_var('max_execution_time');
-
-		// If zero, then set to something higher to not let the user catch the ten seconds barrier.
-		if ($max_execution_time === 0)
+		if (!$db->sql_affectedrows() && !isset($board_config[$board_config_name]))
 		{
-			$max_execution_time = 50 + $extra_time;
+			$sql = 'INSERT INTO ' . CONFIG_TABLE . ' ' . $db->sql_build_array('INSERT', array(
+				'config_name'	=> $board_config_name,
+				'config_value'	=> $board_config_value,
+				'is_dynamic'	=> ($is_dynamic) ? 1 : 0));
+			$db->sql_query($sql);
 		}
 
-		$max_execution_time = min(max(10, ($max_execution_time - $extra_time)), 50);
+		$board_config[$board_config_name] = $board_config_value;
 
-		// For debugging purposes
-		// $max_execution_time = 10;
-
-		global $starttime;
-		$start_time = (empty($starttime)) ? $current_time : $starttime;
+		if (!$is_dynamic)
+		{
+			$mx_cache->destroy('config');
+		}
 	}
 
-	return (ceil($current_time - $start_time) < $max_execution_time) ? true : false;
-}
-
-/**
-*
-* @version Version 0.1 / $Id: functions.php,v 1.21 2008/07/10 23:02:06 jonohlsson Exp $
-*
-* Portable PHP password hashing framework.
-*
-* Written by Solar Designer <solar at openwall.com> in 2004-2006 and placed in
-* the public domain.
-*
-* There's absolutely no warranty.
-*
-* The homepage URL for this framework is:
-*
-*	http://www.openwall.com/phpass/
-*
-* Please be sure to update the Version line if you edit this file in any way.
-* It is suggested that you leave the main version number intact, but indicate
-* your project name (after the slash) and add your own revision information.
-*
-* Please do not change the "private" password hashing method implemented in
-* here, thereby making your hashes incompatible.  However, if you must, please
-* change the hash type identifier (the "$P$") to something different.
-*
-* Obviously, since this code is in the public domain, the above are not
-* requirements (there can be none), but merely suggestions.
-*
-*
-* Hash the password
-*/
-function phpbb_hash($password)
-{
-	$itoa64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-
-	$random_state = self::unique_id();
-	$random = '';
-	$count = 6;
-
-	if (($fh = @fopen('/dev/urandom', 'rb')))
+	/**
+	* Generates an alphanumeric random string of given length
+	*/
+	function gen_rand_string($num_chars = 8)
 	{
-		$random = fread($fh, $count);
-		fclose($fh);
+		$rand_str = phpBB3::unique_id();
+		$rand_str = str_replace('0', 'Z', strtoupper(base_convert($rand_str, 16, 35)));
+
+		return substr($rand_str, 0, $num_chars);
 	}
 
-	if (strlen($random) < $count)
+	/**
+	* Return unique id
+	* @param string $extra additional entropy
+	*/
+	function unique_id($extra = 'c')
 	{
+		static $dss_seeded = false;
+		global $board_config;
+
+		$val = $board_config['rand_seed'] . microtime();
+		$val = md5($val);
+		$board_config['rand_seed'] = md5($board_config['rand_seed'] . $val . $extra);
+
+		if ($dss_seeded !== true && ($board_config['rand_seed_last_update'] < time() - rand(1,10)))
+		{
+			phpBB3::set_config('rand_seed', $board_config['rand_seed'], true);
+			phpBB3::set_config('rand_seed_last_update', time(), true);
+			$dss_seeded = true;
+		}
+
+		return substr($val, 4, 16);
+	}
+
+	/**
+	* Return formatted string for filesizes
+	*/
+	function get_formatted_filesize($bytes, $add_size_lang = true)
+	{
+		global $user;
+
+		if ($bytes >= pow(2, 20))
+		{
+			return ($add_size_lang) ? round($bytes / 1024 / 1024, 2) . ' ' . $user->lang['MIB'] : round($bytes / 1024 / 1024, 2);
+		}
+
+		if ($bytes >= pow(2, 10))
+		{
+			return ($add_size_lang) ? round($bytes / 1024, 2) . ' ' . $user->lang['KIB'] : round($bytes / 1024, 2);
+		}
+
+		return ($add_size_lang) ? ($bytes) . ' ' . $user->lang['BYTES'] : ($bytes);
+	}
+
+	/**
+	* Determine whether we are approaching the maximum execution time. Should be called once
+	* at the beginning of the script in which it's used.
+	* @return	bool	Either true if the maximum execution time is nearly reached, or false
+	*					if some time is still left.
+	*/
+	function still_on_time($extra_time = 15)
+	{
+		static $max_execution_time, $start_time;
+
+		$time = explode(' ', microtime());
+		$current_time = $time[0] + $time[1];
+
+		if (empty($max_execution_time))
+		{
+			$max_execution_time = (function_exists('ini_get')) ? (int) @ini_get('max_execution_time') : (int) @get_cfg_var('max_execution_time');
+
+			// If zero, then set to something higher to not let the user catch the ten seconds barrier.
+			if ($max_execution_time === 0)
+			{
+				$max_execution_time = 50 + $extra_time;
+			}
+
+			$max_execution_time = min(max(10, ($max_execution_time - $extra_time)), 50);
+
+			// For debugging purposes
+			// $max_execution_time = 10;
+
+			global $starttime;
+			$start_time = (empty($starttime)) ? $current_time : $starttime;
+		}
+
+		return (ceil($current_time - $start_time) < $max_execution_time) ? true : false;
+	}
+
+	/**
+	*
+	* @version Version 0.1 / $Id: functions.php,v 1.23 2008/10/04 07:04:25 orynider Exp $
+	*
+	* Portable PHP password hashing framework.
+	*
+	* Written by Solar Designer <solar at openwall.com> in 2004-2006 and placed in
+	* the public domain.
+	*
+	* There's absolutely no warranty.
+	*
+	* The homepage URL for this framework is:
+	*
+	*	http://www.openwall.com/phpass/
+	*
+	* Please be sure to update the Version line if you edit this file in any way.
+	* It is suggested that you leave the main version number intact, but indicate
+	* your project name (after the slash) and add your own revision information.
+	*
+	* Please do not change the "private" password hashing method implemented in
+	* here, thereby making your hashes incompatible.  However, if you must, please
+	* change the hash type identifier (the "$P$") to something different.
+	*
+	* Obviously, since this code is in the public domain, the above are not
+	* requirements (there can be none), but merely suggestions.
+	*
+	*
+	* Hash the password
+	*/
+	function phpbb_hash($password)
+	{
+		$itoa64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+
+		$random_state = phpBB3::unique_id();
 		$random = '';
+		$count = 6;
 
-		for ($i = 0; $i < $count; $i += 16)
+		if (($fh = @fopen('/dev/urandom', 'rb')))
 		{
-			$random_state = md5(self::unique_id() . $random_state);
-			$random .= pack('H*', md5($random_state));
-		}
-		$random = substr($random, 0, $count);
-	}
-
-	$hash = self::_hash_crypt_private($password, self::_hash_gensalt_private($random, $itoa64), $itoa64);
-
-	if (strlen($hash) == 34)
-	{
-		return $hash;
-	}
-
-	return md5($password);
-}
-
-/**
-* Check for correct password
-*/
-function phpbb_check_hash($password, $hash)
-{
-	$itoa64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-	if (strlen($hash) == 34)
-	{
-		return (self::_hash_crypt_private($password, $hash, $itoa64) === $hash) ? true : false;
-	}
-
-	return (md5($password) === $hash) ? true : false;
-}
-
-/**
-* Generate salt for hash generation
-*/
-function _hash_gensalt_private($input, &$itoa64, $iteration_count_log2 = 6)
-{
-	if ($iteration_count_log2 < 4 || $iteration_count_log2 > 31)
-	{
-		$iteration_count_log2 = 8;
-	}
-
-	$output = '$H$';
-	$output .= $itoa64[min($iteration_count_log2 + ((PHP_VERSION >= 5) ? 5 : 3), 30)];
-	$output .= self::_hash_encode64($input, 6, $itoa64);
-
-	return $output;
-}
-
-/**
-* Encode hash
-*/
-function _hash_encode64($input, $count, &$itoa64)
-{
-	$output = '';
-	$i = 0;
-
-	do
-	{
-		$value = ord($input[$i++]);
-		$output .= $itoa64[$value & 0x3f];
-
-		if ($i < $count)
-		{
-			$value |= ord($input[$i]) << 8;
+			$random = fread($fh, $count);
+			fclose($fh);
 		}
 
-		$output .= $itoa64[($value >> 6) & 0x3f];
-
-		if ($i++ >= $count)
+		if (strlen($random) < $count)
 		{
-			break;
+			$random = '';
+
+			for ($i = 0; $i < $count; $i += 16)
+			{
+				$random_state = md5($this->unique_id() . $random_state);
+				$random .= pack('H*', md5($random_state));
+			}
+			$random = substr($random, 0, $count);
 		}
 
-		if ($i < $count)
+		$hash = phpBB3::_hash_crypt_private($password, phpBB3::_hash_gensalt_private($random, $itoa64), $itoa64);
+
+		if (strlen($hash) == 34)
 		{
-			$value |= ord($input[$i]) << 16;
+			return $hash;
 		}
 
-		$output .= $itoa64[($value >> 12) & 0x3f];
+		return md5($password);
+	}
 
-		if ($i++ >= $count)
+	/**
+	* Check for correct password
+	*/
+	function phpbb_check_hash($password, $hash)
+	{
+		$itoa64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+		if (strlen($hash) == 34)
 		{
-			break;
+			return (phpBB3::_hash_crypt_private($password, $hash, $itoa64) === $hash) ? true : false;
 		}
 
-		$output .= $itoa64[($value >> 18) & 0x3f];
-	}
-	while ($i < $count);
-
-	return $output;
-}
-
-/**
-* The crypt function/replacement
-*/
-function _hash_crypt_private($password, $setting, &$itoa64)
-{
-	$output = '*';
-
-	// Check for correct hash
-	if (substr($setting, 0, 3) != '$H$')
-	{
-		return $output;
+		return (md5($password) === $hash) ? true : false;
 	}
 
-	$count_log2 = strpos($itoa64, $setting[3]);
-
-	if ($count_log2 < 7 || $count_log2 > 30)
+	/**
+	* Generate salt for hash generation
+	*/
+	function _hash_gensalt_private($input, &$itoa64, $iteration_count_log2 = 6)
 	{
-		return $output;
-	}
+		if ($iteration_count_log2 < 4 || $iteration_count_log2 > 31)
+		{
+			$iteration_count_log2 = 8;
+		}
 
-	$count = 1 << $count_log2;
-	$salt = substr($setting, 4, 8);
+		$output = '$H$';
+		$output .= $itoa64[min($iteration_count_log2 + ((PHP_VERSION >= 5) ? 5 : 3), 30)];
+		$output .= phpBB3::_hash_encode64($input, 6, $itoa64);
 
-	if (strlen($salt) != 8)
-	{
 		return $output;
 	}
 
 	/**
-	* We're kind of forced to use MD5 here since it's the only
-	* cryptographic primitive available in all versions of PHP
-	* currently in use.  To implement our own low-level crypto
-	* in PHP would result in much worse performance and
-	* consequently in lower iteration counts and hashes that are
-	* quicker to crack (by non-PHP code).
+	* Encode hash
 	*/
-	if (PHP_VERSION >= 5)
+	function _hash_encode64($input, $count, &$itoa64)
 	{
-		$hash = md5($salt . $password, true);
+		$output = '';
+		$i = 0;
+
 		do
 		{
-			$hash = md5($hash . $password, true);
-		}
-		while (--$count);
-	}
-	else
-	{
-		$hash = pack('H*', md5($salt . $password));
-		do
-		{
-			$hash = pack('H*', md5($hash . $password));
-		}
-		while (--$count);
-	}
+			$value = ord($input[$i++]);
+			$output .= $itoa64[$value & 0x3f];
 
-	$output = substr($setting, 0, 12);
-	$output .= self::_hash_encode64($hash, 16, $itoa64);
-
-	return $output;
-}
-
-/**
-* Generate sort selection fields
-*/
-function gen_sort_selects(&$limit_days, &$sort_by_text, &$sort_days, &$sort_key, &$sort_dir, &$s_limit_days, &$s_sort_key, &$s_sort_dir, &$u_sort_param)
-{
-	global $user;
-
-	$sort_dir_text = array('a' => $user->lang['ASCENDING'], 'd' => $user->lang['DESCENDING']);
-
-	// Check if the key is selectable. If not, we reset to the first key found.
-	// This ensures the values are always valid.
-	if (!isset($limit_days[$sort_days]))
-	{
-		@reset($limit_days);
-		$sort_days = key($limit_days);
-	}
-
-	if (!isset($sort_by_text[$sort_key]))
-	{
-		@reset($sort_by_text);
-		$sort_key = key($sort_by_text);
-	}
-
-	if (!isset($sort_dir_text[$sort_dir]))
-	{
-		@reset($sort_dir_text);
-		$sort_dir = key($sort_dir_text);
-	}
-
-	$s_limit_days = '<select name="st">';
-	foreach ($limit_days as $day => $text)
-	{
-		$selected = ($sort_days == $day) ? ' selected="selected"' : '';
-		$s_limit_days .= '<option value="' . $day . '"' . $selected . '>' . $text . '</option>';
-	}
-	$s_limit_days .= '</select>';
-
-	$s_sort_key = '<select name="sk">';
-	foreach ($sort_by_text as $key => $text)
-	{
-		$selected = ($sort_key == $key) ? ' selected="selected"' : '';
-		$s_sort_key .= '<option value="' . $key . '"' . $selected . '>' . $text . '</option>';
-	}
-	$s_sort_key .= '</select>';
-
-	$s_sort_dir = '<select name="sd">';
-	foreach ($sort_dir_text as $key => $value)
-	{
-		$selected = ($sort_dir == $key) ? ' selected="selected"' : '';
-		$s_sort_dir .= '<option value="' . $key . '"' . $selected . '>' . $value . '</option>';
-	}
-	$s_sort_dir .= '</select>';
-
-	$u_sort_param = "st=$sort_days&amp;sk=$sort_key&amp;sd=$sort_dir";
-
-	return;
-}
-
-/**
-* Generate Jumpbox
-*/
-function make_jumpbox($action, $forum_id = false, $select_all = false, $acl_list = false)
-{
-	global $board_config, $phpbb_auth, $template, $user, $db;
-
-	if (!$board_config['load_jumpbox'])
-	{
-		return;
-	}
-
-	$sql = 'SELECT forum_id, forum_name, parent_id, forum_type, left_id, right_id
-		FROM ' . FORUMS_TABLE . '
-		ORDER BY left_id ASC';
-	$result = $db->sql_query($sql, 600);
-
-	$right = $padding = 0;
-	$padding_store = array('0' => 0);
-	$display_jumpbox = false;
-	$iteration = 0;
-
-	// Sometimes it could happen that forums will be displayed here not be displayed within the index page
-	// This is the result of forums not displayed at index, having list permissions and a parent of a forum with no permissions.
-	// If this happens, the padding could be "broken"
-
-	while ($row = $db->sql_fetchrow($result))
-	{
-		if ($row['left_id'] < $right)
-		{
-			$padding++;
-			$padding_store[$row['parent_id']] = $padding;
-		}
-		else if ($row['left_id'] > $right + 1)
-		{
-			// Ok, if the $padding_store for this parent is empty there is something wrong. For now we will skip over it.
-			// @todo digging deep to find out "how" this can happen.
-			$padding = (isset($padding_store[$row['parent_id']])) ? $padding_store[$row['parent_id']] : $padding;
-		}
-
-		$right = $row['right_id'];
-
-		if ($row['forum_type'] == FORUM_CAT && ($row['left_id'] + 1 == $row['right_id']))
-		{
-			// Non-postable forum with no subforums, don't display
-			continue;
-		}
-
-		if (!$phpbb_auth->acl_get('f_list', $row['forum_id']))
-		{
-			// if the user does not have permissions to list this forum skip
-			continue;
-		}
-
-		if ($acl_list && !$phpbb_auth->acl_gets($acl_list, $row['forum_id']))
-		{
-			continue;
-		}
-
-		if (!$display_jumpbox)
-		{
-			$template->assign_block_vars('jumpbox_forums', array(
-				'FORUM_ID'		=> ($select_all) ? 0 : -1,
-				'FORUM_NAME'	=> ($select_all) ? $user->lang['ALL_FORUMS'] : $user->lang['SELECT_FORUM'],
-				'S_FORUM_COUNT'	=> $iteration)
-			);
-
-			$iteration++;
-			$display_jumpbox = true;
-		}
-
-		$template->assign_block_vars('jumpbox_forums', array(
-			'FORUM_ID'		=> $row['forum_id'],
-			'FORUM_NAME'	=> $row['forum_name'],
-			'SELECTED'		=> ($row['forum_id'] == $forum_id) ? ' selected="selected"' : '',
-			'S_FORUM_COUNT'	=> $iteration,
-			'S_IS_CAT'		=> ($row['forum_type'] == FORUM_CAT) ? true : false,
-			'S_IS_LINK'		=> ($row['forum_type'] == FORUM_LINK) ? true : false,
-			'S_IS_POST'		=> ($row['forum_type'] == FORUM_POST) ? true : false)
-		);
-
-		for ($i = 0; $i < $padding; $i++)
-		{
-			$template->assign_block_vars('jumpbox_forums.level', array());
-		}
-		$iteration++;
-	}
-	$db->sql_freeresult($result);
-	unset($padding_store);
-
-	$template->assign_vars(array(
-		'S_DISPLAY_JUMPBOX'	=> $display_jumpbox,
-		'S_JUMPBOX_ACTION'	=> $action)
-	);
-
-	return;
-}
-
-/**
-* Add a secret token to the form (requires the S_FORM_TOKEN template variable)
-* @param string  $form_name The name of the form; has to match the name used in check_form_key, otherwise no restrictions apply
-*/
-function add_form_key($form_name)
-{
-	global $board_config, $template, $user, $mx_acp;
-	$now = time();
-	$token_sid = ($user->data['user_id'] == ANONYMOUS && !empty($board_config['form_token_sid_guests'])) ? $user->session_id : '';
-	$token = sha1($now . $user->data['user_form_salt'] . $form_name . $token_sid);
-
-	$s_fields = build_hidden_fields(array(
-			'creation_time' => $now,
-			'form_token'	=> $token,
-	));
-	$template->assign_var( 'S_FORM_TOKEN', $s_fields );
-}
-
-/**
- * Check the form key. Required for all altering actions not secured by confirm_box
- *
- * @param string $form_name The name of the form; has to match the name used in add_form_key, otherwise no restrictions apply
- * @param int $timespan The maximum acceptable age for a submitted form in seconds. Defaults to the config setting.
- * @param string $return_page The address for the return link
- * @param bool $trigger If true, the function will triger an error when encountering an invalid form
- * @param int $minimum_time The minimum acceptable age for a submitted form in seconds
- */
-function check_form_key( $form_name, $timespan = false, $return_page = '', $trigger = false, $minimum_time = false )
-{
-	global $board_config, $user;
-	if ( $timespan === false )
-	{
-		// we enforce a minimum value of half a minute here.
-		$timespan = ( $board_config['form_token_lifetime'] == -1 ) ? -1 : max( 30, $board_config['form_token_lifetime'] );
-	}
-	if ( $minimum_time === false )
-	{
-		$minimum_time = ( int ) $board_config['form_token_mintime'];
-	}
-
-	if ( isset( $_POST['creation_time'] ) && isset( $_POST['form_token'] ) )
-	{
-		$creation_time = abs( phpBB3::request_var( 'creation_time', 0 ) );
-		$token = phpBB3::request_var( 'form_token', '' );
-
-		$diff = ( time() - $creation_time );
-
-		if ( ( $diff >= $minimum_time ) && ( ( $diff <= $timespan ) || $timespan == -1 ) )
-		{
-			$token_sid = ( $user->data['user_id'] == ANONYMOUS && !empty( $board_config['form_token_sid_guests'] ) ) ? $user->session_id : '';
-
-			$key = sha1( $creation_time . $user->data['user_form_salt'] . $form_name . $token_sid );
-			if ( $key === $token )
+			if ($i < $count)
 			{
-				return true;
-			}
-		}
-	}
-	if ( $trigger )
-	{
-		trigger_error( $user->lang['FORM_INVALID'] . $return_page );
-	}
-	print '<pre>';
-	print_r( $_POST );
-	die( 'here' );
-	return false;
-}
-
-/**
- * Add or edit a group. If we're editing a group we only update user
- * parameters such as rank, etc. if they are changed
- */
-function group_create( &$group_id, $type, $name, $desc, $group_attributes, $allow_desc_bbcode = false, $allow_desc_urls = false, $allow_desc_smilies = false )
-{
-	global $phpbb_root_path, $board_config, $db, $user, $file_upload;
-
-	$error = array();
-	$attribute_ary = array( 'group_colour' => 'string',
-		'group_rank' => 'int',
-		'group_avatar' => 'string',
-		'group_avatar_type' => 'int',
-		'group_avatar_width' => 'int',
-		'group_avatar_height' => 'int',
-
-		'group_receive_pm' => 'int',
-		'group_legend' => 'int',
-		'group_message_limit' => 'int',
-
-		'group_founder_manage' => 'int',
-		);
-	// Those are group-only attributes
-	$group_only_ary = array( 'group_receive_pm', 'group_legend', 'group_message_limit', 'group_founder_manage' );
-	// Check data. Limit group name length.
-	if ( !utf8_strlen( $name ) || utf8_strlen( $name ) > 60 )
-	{
-		$error[] = ( !utf8_strlen( $name ) ) ? $user->lang['GROUP_ERR_USERNAME'] : $user->lang['GROUP_ERR_USER_LONG'];
-	}
-
-	$err = group_validate_groupname( $group_id, $name );
-	if ( !empty( $err ) )
-	{
-		$error[] = $user->lang[$err];
-	}
-
-	if ( !in_array( $type, array( GROUP_OPEN, GROUP_CLOSED, GROUP_HIDDEN, GROUP_SPECIAL, GROUP_FREE ) ) )
-	{
-		$error[] = $user->lang['GROUP_ERR_TYPE'];
-	}
-
-	if ( !sizeof( $error ) )
-	{
-		$user_ary = array();
-		$sql_ary = array( 'group_name' => ( string ) $name,
-			'group_desc' => ( string ) $desc,
-			'group_desc_uid' => '',
-			'group_desc_bitfield' => '',
-			'group_type' => ( int ) $type,
-			);
-		// Parse description
-		if ( $desc )
-		{
-			phpBB3::generate_text_for_storage( $sql_ary['group_desc'], $sql_ary['group_desc_uid'], $sql_ary['group_desc_bitfield'], $sql_ary['group_desc_options'], $allow_desc_bbcode, $allow_desc_urls, $allow_desc_smilies );
-		}
-
-		if ( sizeof( $group_attributes ) )
-		{
-			foreach ( $attribute_ary as $attribute => $_type )
-			{
-				if ( isset( $group_attributes[$attribute] ) )
-				{
-					settype( $group_attributes[$attribute], $_type );
-					$sql_ary[$attribute] = $group_attributes[$attribute];
-				}
-			}
-		}
-		// Setting the log message before we set the group id (if group gets added)
-		$log = ( $group_id ) ? 'LOG_GROUP_UPDATED' : 'LOG_GROUP_CREATED';
-
-		$query = '';
-
-		if ( $group_id )
-		{
-			$sql = 'SELECT user_id
-			FROM ' . USERS_TABLE . '
-			WHERE group_id = ' . $group_id;
-			$result = $db->sql_query( $sql );
-
-			while ( $row = $db->sql_fetchrow( $result ) )
-			{
-				$user_ary[] = $row['user_id'];
-			}
-			$db->sql_freeresult( $result );
-
-			if ( isset( $sql_ary['group_avatar'] ) && !$sql_ary['group_avatar'] )
-			{
-				remove_default_avatar( $group_id, $user_ary );
-			}
-			if ( isset( $sql_ary['group_rank'] ) && !$sql_ary['group_rank'] )
-			{
-				remove_default_rank( $group_id, $user_ary );
+				$value |= ord($input[$i]) << 8;
 			}
 
-			$sql = 'UPDATE ' . GROUPS_TABLE . '
-			SET ' . $db->sql_build_array( 'UPDATE', $sql_ary ) . "
-			WHERE group_id = $group_id";
-			$db->sql_query( $sql );
-			// Since we may update the name too, we need to do this on other tables too...
-			$sql = 'UPDATE ' . MODERATOR_CACHE_TABLE . "
-			SET group_name = '" . $db->sql_escape( $sql_ary['group_name'] ) . "'
-			WHERE group_id = $group_id";
-			$db->sql_query( $sql );
+			$output .= $itoa64[($value >> 6) & 0x3f];
+
+			if ($i++ >= $count)
+			{
+				break;
+			}
+
+			if ($i < $count)
+			{
+				$value |= ord($input[$i]) << 16;
+			}
+
+			$output .= $itoa64[($value >> 12) & 0x3f];
+
+			if ($i++ >= $count)
+			{
+				break;
+			}
+
+			$output .= $itoa64[($value >> 18) & 0x3f];
+		}
+		while ($i < $count);
+
+		return $output;
+	}
+
+	/**
+	* The crypt function/replacement
+	*/
+	function _hash_crypt_private($password, $setting, &$itoa64)
+	{
+		$output = '*';
+
+		// Check for correct hash
+		if (substr($setting, 0, 3) != '$H$')
+		{
+			return $output;
+		}
+
+		$count_log2 = strpos($itoa64, $setting[3]);
+
+		if ($count_log2 < 7 || $count_log2 > 30)
+		{
+			return $output;
+		}
+
+		$count = 1 << $count_log2;
+		$salt = substr($setting, 4, 8);
+
+		if (strlen($salt) != 8)
+		{
+			return $output;
+		}
+
+		/**
+		* We're kind of forced to use MD5 here since it's the only
+		* cryptographic primitive available in all versions of PHP
+		* currently in use.  To implement our own low-level crypto
+		* in PHP would result in much worse performance and
+		* consequently in lower iteration counts and hashes that are
+		* quicker to crack (by non-PHP code).
+		*/
+		if (PHP_VERSION >= 5)
+		{
+			$hash = md5($salt . $password, true);
+			do
+			{
+				$hash = md5($hash . $password, true);
+			}
+			while (--$count);
 		}
 		else
 		{
-			$sql = 'INSERT INTO ' . GROUPS_TABLE . ' ' . $db->sql_build_array( 'INSERT', $sql_ary );
-			$db->sql_query( $sql );
-		}
-
-		if ( !$group_id )
-		{
-			$group_id = $db->sql_nextid();
-			if ( isset( $sql_ary['group_avatar_type'] ) && $sql_ary['group_avatar_type'] == AVATAR_UPLOAD )
+			$hash = pack('H*', md5($salt . $password));
+			do
 			{
-				group_correct_avatar( $group_id, $sql_ary['group_avatar'] );
+				$hash = pack('H*', md5($hash . $password));
 			}
+			while (--$count);
 		}
-		// Set user attributes
-		$sql_ary = array();
-		if ( sizeof( $group_attributes ) )
-		{
-			foreach ( $attribute_ary as $attribute => $_type )
-			{
-				if ( isset( $group_attributes[$attribute] ) && !in_array( $attribute, $group_only_ary ) )
-				{
-					// If we are about to set an avatar, we will not overwrite user avatars if no group avatar is set...
-					if ( strpos( $attribute, 'group_avatar' ) === 0 && !$group_attributes[$attribute] )
-					{
-						continue;
-					}
 
-					$sql_ary[$attribute] = $group_attributes[$attribute];
+		$output = substr($setting, 0, 12);
+		$output .= phpBB3::_hash_encode64($hash, 16, $itoa64);
+
+		return $output;
+	}
+
+	/**
+	* Generate sort selection fields
+	*/
+	function gen_sort_selects(&$limit_days, &$sort_by_text, &$sort_days, &$sort_key, &$sort_dir, &$s_limit_days, &$s_sort_key, &$s_sort_dir, &$u_sort_param)
+	{
+		global $user;
+
+		$sort_dir_text = array('a' => $user->lang['ASCENDING'], 'd' => $user->lang['DESCENDING']);
+
+		// Check if the key is selectable. If not, we reset to the first key found.
+		// This ensures the values are always valid.
+		if (!isset($limit_days[$sort_days]))
+		{
+			@reset($limit_days);
+			$sort_days = key($limit_days);
+		}
+
+		if (!isset($sort_by_text[$sort_key]))
+		{
+			@reset($sort_by_text);
+			$sort_key = key($sort_by_text);
+		}
+
+		if (!isset($sort_dir_text[$sort_dir]))
+		{
+			@reset($sort_dir_text);
+			$sort_dir = key($sort_dir_text);
+		}
+
+		$s_limit_days = '<select name="st">';
+		foreach ($limit_days as $day => $text)
+		{
+			$selected = ($sort_days == $day) ? ' selected="selected"' : '';
+			$s_limit_days .= '<option value="' . $day . '"' . $selected . '>' . $text . '</option>';
+		}
+		$s_limit_days .= '</select>';
+
+		$s_sort_key = '<select name="sk">';
+		foreach ($sort_by_text as $key => $text)
+		{
+			$selected = ($sort_key == $key) ? ' selected="selected"' : '';
+			$s_sort_key .= '<option value="' . $key . '"' . $selected . '>' . $text . '</option>';
+		}
+		$s_sort_key .= '</select>';
+
+		$s_sort_dir = '<select name="sd">';
+		foreach ($sort_dir_text as $key => $value)
+		{
+			$selected = ($sort_dir == $key) ? ' selected="selected"' : '';
+			$s_sort_dir .= '<option value="' . $key . '"' . $selected . '>' . $value . '</option>';
+		}
+		$s_sort_dir .= '</select>';
+
+		$u_sort_param = "st=$sort_days&amp;sk=$sort_key&amp;sd=$sort_dir";
+
+		return;
+	}
+
+	/**
+	* Generate Jumpbox
+	*/
+	function make_jumpbox($action, $forum_id = false, $select_all = false, $acl_list = false)
+	{
+		global $board_config, $phpbb_auth, $template, $user, $db;
+
+		if (!$board_config['load_jumpbox'])
+		{
+			return;
+		}
+
+		$sql = 'SELECT forum_id, forum_name, parent_id, forum_type, left_id, right_id
+			FROM ' . FORUMS_TABLE . '
+			ORDER BY left_id ASC';
+		$result = $db->sql_query($sql, 600);
+
+		$right = $padding = 0;
+		$padding_store = array('0' => 0);
+		$display_jumpbox = false;
+		$iteration = 0;
+
+		// Sometimes it could happen that forums will be displayed here not be displayed within the index page
+		// This is the result of forums not displayed at index, having list permissions and a parent of a forum with no permissions.
+		// If this happens, the padding could be "broken"
+
+		while ($row = $db->sql_fetchrow($result))
+		{
+			if ($row['left_id'] < $right)
+			{
+				$padding++;
+				$padding_store[$row['parent_id']] = $padding;
+			}
+			else if ($row['left_id'] > $right + 1)
+			{
+				// Ok, if the $padding_store for this parent is empty there is something wrong. For now we will skip over it.
+				// @todo digging deep to find out "how" this can happen.
+				$padding = (isset($padding_store[$row['parent_id']])) ? $padding_store[$row['parent_id']] : $padding;
+			}
+
+			$right = $row['right_id'];
+
+			if ($row['forum_type'] == FORUM_CAT && ($row['left_id'] + 1 == $row['right_id']))
+			{
+				// Non-postable forum with no subforums, don't display
+				continue;
+			}
+
+			if (!$phpbb_auth->acl_get('f_list', $row['forum_id']))
+			{
+				// if the user does not have permissions to list this forum skip
+				continue;
+			}
+
+			if ($acl_list && !$phpbb_auth->acl_gets($acl_list, $row['forum_id']))
+			{
+				continue;
+			}
+
+			if (!$display_jumpbox)
+			{
+				$template->assign_block_vars('jumpbox_forums', array(
+					'FORUM_ID'		=> ($select_all) ? 0 : -1,
+					'FORUM_NAME'	=> ($select_all) ? $user->lang['ALL_FORUMS'] : $user->lang['SELECT_FORUM'],
+					'S_FORUM_COUNT'	=> $iteration)
+				);
+
+				$iteration++;
+				$display_jumpbox = true;
+			}
+
+			$template->assign_block_vars('jumpbox_forums', array(
+				'FORUM_ID'		=> $row['forum_id'],
+				'FORUM_NAME'	=> $row['forum_name'],
+				'SELECTED'		=> ($row['forum_id'] == $forum_id) ? ' selected="selected"' : '',
+				'S_FORUM_COUNT'	=> $iteration,
+				'S_IS_CAT'		=> ($row['forum_type'] == FORUM_CAT) ? true : false,
+				'S_IS_LINK'		=> ($row['forum_type'] == FORUM_LINK) ? true : false,
+				'S_IS_POST'		=> ($row['forum_type'] == FORUM_POST) ? true : false)
+			);
+
+			for ($i = 0; $i < $padding; $i++)
+			{
+				$template->assign_block_vars('jumpbox_forums.level', array());
+			}
+			$iteration++;
+		}
+		$db->sql_freeresult($result);
+		unset($padding_store);
+
+		$template->assign_vars(array(
+			'S_DISPLAY_JUMPBOX'	=> $display_jumpbox,
+			'S_JUMPBOX_ACTION'	=> $action)
+		);
+
+		return;
+	}
+
+	/**
+	* Add a secret token to the form (requires the S_FORM_TOKEN template variable)
+	* @param string  $form_name The name of the form; has to match the name used in check_form_key, otherwise no restrictions apply
+	*/
+	function add_form_key($form_name)
+	{
+		global $board_config, $template, $user, $mx_acp;
+		$now = time();
+		$token_sid = ($user->data['user_id'] == ANONYMOUS && !empty($board_config['form_token_sid_guests'])) ? $user->session_id : '';
+		$token = sha1($now . $user->data['user_form_salt'] . $form_name . $token_sid);
+
+		$s_fields = build_hidden_fields(array(
+				'creation_time' => $now,
+				'form_token'	=> $token,
+		));
+		$template->assign_var( 'S_FORM_TOKEN', $s_fields );
+	}
+
+	/**
+	 * Check the form key. Required for all altering actions not secured by confirm_box
+	 *
+	 * @param string $form_name The name of the form; has to match the name used in add_form_key, otherwise no restrictions apply
+	 * @param int $timespan The maximum acceptable age for a submitted form in seconds. Defaults to the config setting.
+	 * @param string $return_page The address for the return link
+	 * @param bool $trigger If true, the function will triger an error when encountering an invalid form
+	 * @param int $minimum_time The minimum acceptable age for a submitted form in seconds
+	 */
+	function check_form_key( $form_name, $timespan = false, $return_page = '', $trigger = false, $minimum_time = false )
+	{
+		global $board_config, $user;
+		if ( $timespan === false )
+		{
+			// we enforce a minimum value of half a minute here.
+			$timespan = ( $board_config['form_token_lifetime'] == -1 ) ? -1 : max( 30, $board_config['form_token_lifetime'] );
+		}
+		if ( $minimum_time === false )
+		{
+			$minimum_time = ( int ) $board_config['form_token_mintime'];
+		}
+
+		if ( isset( $_POST['creation_time'] ) && isset( $_POST['form_token'] ) )
+		{
+			$creation_time = abs( phpBB3::request_var( 'creation_time', 0 ) );
+			$token = phpBB3::request_var( 'form_token', '' );
+
+			$diff = ( time() - $creation_time );
+
+			if ( ( $diff >= $minimum_time ) && ( ( $diff <= $timespan ) || $timespan == -1 ) )
+			{
+				$token_sid = ( $user->data['user_id'] == ANONYMOUS && !empty( $board_config['form_token_sid_guests'] ) ) ? $user->session_id : '';
+
+				$key = sha1( $creation_time . $user->data['user_form_salt'] . $form_name . $token_sid );
+				if ( $key === $token )
+				{
+					return true;
 				}
 			}
 		}
-
-		if ( sizeof( $sql_ary ) && sizeof( $user_ary ) )
+		if ( $trigger )
 		{
-			group_set_user_default( $group_id, $user_ary, $sql_ary );
+			trigger_error( $user->lang['FORM_INVALID'] . $return_page );
 		}
-
-		$name = ( $type == GROUP_SPECIAL ) ? $user->lang['G_' . $name] : $name;
-		//add_log( 'admin', $log, $name );
-
-		//group_update_listings( $group_id );
+		print '<pre>';
+		print_r( $_POST );
+		die( 'here' );
+		return false;
 	}
 
-	return ( sizeof( $error ) ) ? $error : false;
-}
+	/**
+	 * Add or edit a group. If we're editing a group we only update user
+	 * parameters such as rank, etc. if they are changed
+	 */
+	function group_create( &$group_id, $type, $name, $desc, $group_attributes, $allow_desc_bbcode = false, $allow_desc_urls = false, $allow_desc_smilies = false )
+	{
+		global $phpbb_root_path, $board_config, $db, $user, $file_upload;
+
+		$error = array();
+		$attribute_ary = array( 'group_colour' => 'string',
+			'group_rank' => 'int',
+			'group_avatar' => 'string',
+			'group_avatar_type' => 'int',
+			'group_avatar_width' => 'int',
+			'group_avatar_height' => 'int',
+
+			'group_receive_pm' => 'int',
+			'group_legend' => 'int',
+			'group_message_limit' => 'int',
+
+			'group_founder_manage' => 'int',
+			);
+		// Those are group-only attributes
+		$group_only_ary = array( 'group_receive_pm', 'group_legend', 'group_message_limit', 'group_founder_manage' );
+		// Check data. Limit group name length.
+		if ( !utf8_strlen( $name ) || utf8_strlen( $name ) > 60 )
+		{
+			$error[] = ( !utf8_strlen( $name ) ) ? $user->lang['GROUP_ERR_USERNAME'] : $user->lang['GROUP_ERR_USER_LONG'];
+		}
+
+		$err = group_validate_groupname( $group_id, $name );
+		if ( !empty( $err ) )
+		{
+			$error[] = $user->lang[$err];
+		}
+
+		if ( !in_array( $type, array( GROUP_OPEN, GROUP_CLOSED, GROUP_HIDDEN, GROUP_SPECIAL, GROUP_FREE ) ) )
+		{
+			$error[] = $user->lang['GROUP_ERR_TYPE'];
+		}
+
+		if ( !sizeof( $error ) )
+		{
+			$user_ary = array();
+			$sql_ary = array( 'group_name' => ( string ) $name,
+				'group_desc' => ( string ) $desc,
+				'group_desc_uid' => '',
+				'group_desc_bitfield' => '',
+				'group_type' => ( int ) $type,
+				);
+			// Parse description
+			if ( $desc )
+			{
+				phpBB3::generate_text_for_storage( $sql_ary['group_desc'], $sql_ary['group_desc_uid'], $sql_ary['group_desc_bitfield'], $sql_ary['group_desc_options'], $allow_desc_bbcode, $allow_desc_urls, $allow_desc_smilies );
+			}
+
+			if ( sizeof( $group_attributes ) )
+			{
+				foreach ( $attribute_ary as $attribute => $_type )
+				{
+					if ( isset( $group_attributes[$attribute] ) )
+					{
+						settype( $group_attributes[$attribute], $_type );
+						$sql_ary[$attribute] = $group_attributes[$attribute];
+					}
+				}
+			}
+			// Setting the log message before we set the group id (if group gets added)
+			$log = ( $group_id ) ? 'LOG_GROUP_UPDATED' : 'LOG_GROUP_CREATED';
+
+			$query = '';
+
+			if ( $group_id )
+			{
+				$sql = 'SELECT user_id
+				FROM ' . USERS_TABLE . '
+				WHERE group_id = ' . $group_id;
+				$result = $db->sql_query( $sql );
+
+				while ( $row = $db->sql_fetchrow( $result ) )
+				{
+					$user_ary[] = $row['user_id'];
+				}
+				$db->sql_freeresult( $result );
+
+				if ( isset( $sql_ary['group_avatar'] ) && !$sql_ary['group_avatar'] )
+				{
+					remove_default_avatar( $group_id, $user_ary );
+				}
+				if ( isset( $sql_ary['group_rank'] ) && !$sql_ary['group_rank'] )
+				{
+					remove_default_rank( $group_id, $user_ary );
+				}
+
+				$sql = 'UPDATE ' . GROUPS_TABLE . '
+				SET ' . $db->sql_build_array( 'UPDATE', $sql_ary ) . "
+				WHERE group_id = $group_id";
+				$db->sql_query( $sql );
+				// Since we may update the name too, we need to do this on other tables too...
+				$sql = 'UPDATE ' . MODERATOR_CACHE_TABLE . "
+				SET group_name = '" . $db->sql_escape( $sql_ary['group_name'] ) . "'
+				WHERE group_id = $group_id";
+				$db->sql_query( $sql );
+			}
+			else
+			{
+				$sql = 'INSERT INTO ' . GROUPS_TABLE . ' ' . $db->sql_build_array( 'INSERT', $sql_ary );
+				$db->sql_query( $sql );
+			}
+
+			if ( !$group_id )
+			{
+				$group_id = $db->sql_nextid();
+				if ( isset( $sql_ary['group_avatar_type'] ) && $sql_ary['group_avatar_type'] == AVATAR_UPLOAD )
+				{
+					group_correct_avatar( $group_id, $sql_ary['group_avatar'] );
+				}
+			}
+			// Set user attributes
+			$sql_ary = array();
+			if ( sizeof( $group_attributes ) )
+			{
+				foreach ( $attribute_ary as $attribute => $_type )
+				{
+					if ( isset( $group_attributes[$attribute] ) && !in_array( $attribute, $group_only_ary ) )
+					{
+						// If we are about to set an avatar, we will not overwrite user avatars if no group avatar is set...
+						if ( strpos( $attribute, 'group_avatar' ) === 0 && !$group_attributes[$attribute] )
+						{
+							continue;
+						}
+
+						$sql_ary[$attribute] = $group_attributes[$attribute];
+					}
+				}
+			}
+
+			if ( sizeof( $sql_ary ) && sizeof( $user_ary ) )
+			{
+				group_set_user_default( $group_id, $user_ary, $sql_ary );
+			}
+
+			$name = ( $type == GROUP_SPECIAL ) ? $user->lang['G_' . $name] : $name;
+			//add_log( 'admin', $log, $name );
+
+			//group_update_listings( $group_id );
+		}
+
+		return ( sizeof( $error ) ) ? $error : false;
+	}
 
 }
 // Compatibility functions
@@ -1206,7 +1209,7 @@ function tz_select($default = '', $truncate = false)
 	{
 		if ($truncate)
 		{
-			$zone_trunc = phpbb3::truncate_string($zone, 50, false, '...');
+			$zone_trunc = phpBB3::truncate_string($zone, 50, false, '...');
 		}
 		else
 		{
@@ -2173,6 +2176,7 @@ function generate_board_url($without_script_path = false)
 function redirect($url, $return = false)
 {
 	global $db, $mx_cache, $board_config, $mx_user, $phpbb_root_path;
+	global $phpBB2, $mx_root_path; 
 
 	if (empty($user->lang))
 	{
@@ -2193,7 +2197,7 @@ function redirect($url, $return = false)
 	if ($url_parts === false)
 	{
 		// Malformed url, redirect to current page...
-		$url = self::generate_board_url() . '/' . $mx_user->page['page'];
+		$url = phpBB3::generate_board_url() . '/' . $mx_user->page['page'];
 	}
 	else if (!empty($url_parts['scheme']) && !empty($url_parts['host']))
 	{
@@ -2202,7 +2206,7 @@ function redirect($url, $return = false)
 	else if ($url[0] == '/')
 	{
 		// Absolute uri, prepend direct url...
-		$url = self::generate_board_url(true) . $url;
+		$url = phpBB3::generate_board_url(true) . $url;
 	}
 	else
 	{
@@ -2222,18 +2226,18 @@ function redirect($url, $return = false)
 
 			if ($user->page['page_dir'])
 			{
-				$url = self::generate_board_url() . '/' . $user->page['page_dir'] . '/' . $url;
+				$url = phpBB3::generate_board_url() . '/' . $user->page['page_dir'] . '/' . $url;
 			}
 			else
 			{
-				$url = self::generate_board_url() . '/' . $url;
+				$url = phpBB3::generate_board_url() . '/' . $url;
 			}
 		}
 		else
 		{
 			// Used ./ before, but $phpbb_root_path is working better with urls within another root path
-			$root_dirs = explode('/', str_replace('\\', '/', phpBB2::phpbb_realpath($phpbb_root_path)));
-			$page_dirs = explode('/', str_replace('\\', '/', phpBB2::phpbb_realpath($pathinfo['dirname'])));
+			$root_dirs = explode('/', str_replace('\\', '/', $phpBB2->phpbb_realpath($phpbb_root_path)));
+			$page_dirs = explode('/', str_replace('\\', '/', $phpBB2->phpbb_realpath($pathinfo['dirname'])));
 			$intersection = array_intersect_assoc($root_dirs, $page_dirs);
 
 			$root_dirs = array_diff_assoc($root_dirs, $intersection);
@@ -2262,7 +2266,7 @@ function redirect($url, $return = false)
 			}
 
 			$url = $dir . '/' . $url;
-			$url = self::generate_board_url() . '/' . $url;
+			$url = phpBB3::generate_board_url() . '/' . $url;
 		}
 	}
 
@@ -2404,7 +2408,7 @@ function meta_refresh($time, $url)
 {
 	global $template;
 
-	$url = self::redirect($url, true);
+	$url = phpBB3::redirect($url, true);
 
 	// For XHTML compatibility we change back & to &amp;
 	$template->assign_vars(array(
@@ -2446,9 +2450,9 @@ function confirm_box($check, $title = '', $hidden = '', $html_body = 'confirm_bo
 
 	if ($check && $confirm)
 	{
-		$user_id = self::request_var('user_id', 0);
-		$session_id = self::request_var('sess', '');
-		$confirm_key = self::request_var('confirm_key', '');
+		$user_id = phpBB3::request_var('user_id', 0);
+		$session_id = phpBB3::request_var('sess', '');
+		$confirm_key = phpBB3::request_var('confirm_key', '');
 
 		if ($user_id != $user->data['user_id'] || $session_id != $user->session_id || !$confirm_key || !$user->data['user_last_confirm_key'] || $confirm_key != $user->data['user_last_confirm_key'])
 		{
@@ -2490,7 +2494,7 @@ function confirm_box($check, $title = '', $hidden = '', $html_body = 'confirm_bo
 	);
 
 	// If activation key already exist, we better do not re-use the key (something very strange is going on...)
-	if (self::request_var('confirm_key', ''))
+	if ($this->request_var('confirm_key', ''))
 	{
 		// This should not occur, therefore we cancel the operation to safe the user
 		return false;
@@ -2498,7 +2502,7 @@ function confirm_box($check, $title = '', $hidden = '', $html_body = 'confirm_bo
 
 	// re-add sid / transform & to &amp; for user->page (user->page is always using &)
 	$use_page = ($u_action) ? $phpbb_root_path . $u_action : $phpbb_root_path . str_replace('&', '&amp;', $user->page['page']);
-	$u_action = self::reapply_sid($use_page);
+	$u_action = phpBB3::reapply_sid($use_page);
 	$u_action .= ((strpos($u_action, '?') === false) ? '?' : '&amp;') . 'confirm_key=' . $confirm_key;
 
 	$template->assign_vars(array(
@@ -2553,8 +2557,8 @@ function login_box($redirect = '', $l_explain = '', $l_success = '', $admin = fa
 
 	if (isset($_POST['login']))
 	{
-		$username	= self::request_var('username', '', true);
-		$password	= self::request_var('password', '', true);
+		$username	= phpBB3::request_var('username', '', true);
+		$password	= phpBB3::request_var('password', '', true);
 		$autologin	= (!empty($_POST['autologin'])) ? true : false;
 		$viewonline = (!empty($_POST['viewonline'])) ? 0 : 1;
 		$admin 		= ($admin) ? 1 : 0;
@@ -2599,7 +2603,7 @@ function login_box($redirect = '', $l_explain = '', $l_success = '', $admin = fa
 		// The result parameter is always an array, holding the relevant information...
 		if ($result['status'] == LOGIN_SUCCESS)
 		{
-			$redirect = self::request_var('redirect', "{$phpbb_root_path}index.$phpEx");
+			$redirect = phpBB3::request_var('redirect', "{$phpbb_root_path}index.$phpEx");
 			$message = ($l_success) ? $l_success : $user->lang['LOGIN_REDIRECT'];
 			$l_redirect = ($admin) ? $user->lang['PROCEED_TO_ACP'] : (($redirect === "{$phpbb_root_path}index.$phpEx" || $redirect === "index.$phpEx") ? $user->lang['RETURN_INDEX'] : $user->lang['RETURN_PAGE']);
 
@@ -2735,7 +2739,7 @@ function login_forum_box($forum_data)
 {
 	global $db, $board_config, $user, $template, $phpEx;
 
-	$password = self::request_var('password', '', true);
+	$password = phpBB3::request_var('password', '', true);
 
 	$sql = 'SELECT forum_id
 		FROM ' . FORUMS_ACCESS_TABLE . '
@@ -3219,7 +3223,7 @@ function make_clickable($text, $server_url = false, $class = 'postlink')
 {
 	if ($server_url === false)
 	{
-		$server_url = self::generate_board_url();
+		$server_url = phpBB3::generate_board_url();
 	}
 
 	static $magic_url_match;
@@ -3419,7 +3423,7 @@ function parse_attachments($forum_id, &$message, &$attachments, &$update_count, 
 		$size_lang = ($filesize >= 1048576) ? $user->lang['MB'] : ( ($filesize >= 1024) ? $user->lang['KB'] : $user->lang['BYTES'] );
 		$filesize = ($filesize >= 1048576) ? round((round($filesize / 1048576 * 100) / 100), 2) : (($filesize >= 1024) ? round((round($filesize / 1024 * 100) / 100), 2) : $filesize);
 
-		$comment = str_replace("\n", '<br />', self::censor_text($attachment['attach_comment']));
+		$comment = str_replace("\n", '<br />', phpBB3::censor_text($attachment['attach_comment']));
 
 		$block_array += array(
 			'UPLOAD_ICON'		=> $upload_icon,
@@ -3528,7 +3532,7 @@ function parse_attachments($forum_id, &$message, &$attachments, &$update_count, 
 					// $download_link = $filename;
 
 					$block_array += array(
-						'U_FORUM'		=> self::generate_board_url(),
+						'U_FORUM'		=> phpBB3::generate_board_url(),
 						'ATTACH_ID'		=> $attachment['attach_id'],
 						'S_WM_FILE'		=> true,
 					);
@@ -3545,7 +3549,7 @@ function parse_attachments($forum_id, &$message, &$attachments, &$update_count, 
 					$block_array += array(
 						'S_RM_FILE'			=> ($display_cat == ATTACHMENT_CATEGORY_RM) ? true : false,
 						'S_QUICKTIME_FILE'	=> ($display_cat == ATTACHMENT_CATEGORY_QUICKTIME) ? true : false,
-						'U_FORUM'			=> self::generate_board_url(),
+						'U_FORUM'			=> phpBB3::generate_board_url(),
 						'ATTACH_ID'			=> $attachment['attach_id'],
 					);
 
@@ -3811,11 +3815,11 @@ function add_log()
 */
 function get_backtrace()
 {
-	global $phpbb_root_path;
+	global $phpbb_root_path, $phpBB2;
 
 	$output = '<div style="font-family: monospace;">';
 	$backtrace = debug_backtrace();
-	$path = phpBB2::phpbb_realpath($phpbb_root_path);
+	$path = $phpBB2->phpbb_realpath($phpbb_root_path);
 
 	foreach ($backtrace as $number => $trace)
 	{
@@ -4157,8 +4161,8 @@ function msg_handler($errno, $msg_text, $errfile, $errline)
 			if (strpos($errfile, 'cache') === false && strpos($errfile, 'template.') === false)
 			{
 				// remove complete path to installation, with the risk of changing backslashes meant to be there
-				$errfile = str_replace(array(phpBB2::phpbb_realpath($phpbb_root_path), '\\'), array('', '/'), $errfile);
-				$msg_text = str_replace(array(phpBB2::phpbb_realpath($phpbb_root_path), '\\'), array('', '/'), $msg_text);
+				$errfile = str_replace(array($phpBB2->phpbb_realpath($phpbb_root_path), '\\'), array('', '/'), $errfile);
+				$msg_text = str_replace(array($phpBB2->phpbb_realpath($phpbb_root_path), '\\'), array('', '/'), $msg_text);
 
 				echo '<b>[phpBB Debug] PHP Notice</b>: in file <b>' . $errfile . '</b> on line <b>' . $errline . '</b>: <b>' . $msg_text . '</b><br />' . "\n";
 			}
@@ -4353,7 +4357,7 @@ function page_header($page_title = '', $display_online_list = true)
 
 		if (!empty($_REQUEST['f']))
 		{
-			$f = self::request_var('f', 0);
+			$f = phpBB3::request_var('f', 0);
 
 			$reading_sql = ' AND s.session_page ' . $db->sql_like_expression("{$db->any_char}_f_={$f}x{$db->any_char}");
 		}
@@ -4472,8 +4476,8 @@ function page_header($page_title = '', $display_online_list = true)
 
 		if ($total_online_users > $board_config['record_online_users'])
 		{
-			self::set_config('record_online_users', $total_online_users, true);
-			self::set_config('record_online_date', time(), true);
+			phpBB3::set_config('record_online_users', $total_online_users, true);
+			phpBB3::set_config('record_online_date', time(), true);
 		}
 
 		// Build online listing
@@ -4747,7 +4751,7 @@ function page_footer($run_cron = true)
 
 	$template->display('body');
 
-	self::garbage_collection();
+	phpBB3::garbage_collection();
 
 	exit;
 }

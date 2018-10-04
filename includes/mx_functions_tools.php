@@ -2,7 +2,7 @@
 /**
 *
 * @package Tools
-* @version $Id: mx_functions_tools.php,v 1.40 2008/07/15 22:02:45 jonohlsson Exp $
+* @version $Id: mx_functions_tools.php,v 1.45 2008/10/04 07:04:25 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -66,7 +66,7 @@ class mx_text
 	 */
 	function init($html_on = false, $bbcode_on = true, $smilies_on = false, $links_on = true, $images_on = true)
 	{
-		global $theme, $mx_cache;
+		global $theme, $mx_cache, $phpBB2;
 
 		//
 		// Toggles
@@ -103,7 +103,7 @@ class mx_text
 			unset($words);
 
 			$this->highlight = urlencode($_GET['highlight']);
-			$this->highlight_match = phpBB2::phpbb_rtrim($this->highlight_match, "\\");
+			$this->highlight_match = $phpBB2->phpbb_rtrim($this->highlight_match, "\\");
 		}
 
 		//
@@ -326,14 +326,14 @@ class mx_text
 	 */
 	function encode_username($username)
 	{
-		global $board_config, $userdata, $lang, $phpEx, $phpbb_root_path;
+		global $board_config, $userdata, $lang, $phpEx, $phpbb_root_path,$phpBB2;
 
 		//
 		// Check username
 		//
 		if (!empty($username))
 		{
-			$username = phpBB2::phpbb_clean_username($username);
+			$username = $phpBB2->phpbb_clean_username($username);
 
 			if (!$userdata['session_logged_in'] || ($userdata['session_logged_in'] && $username != $userdata['username']))
 			{
@@ -1624,12 +1624,12 @@ define('MX_DELETED_NOTIFICATION'			, 14);
 //
 if( !function_exists('prepare_message') )
 {
-	mx_cache::load_file('functions_post', 'phpbb2');
+	include_once($mx_root_path . 'includes/shared/phpbb2/includes/functions_post.' . $phpEx);
 }
 
 if( !function_exists('add_search_words') )
 {
-	mx_cache::load_file('functions_search', 'phpbb2');
+	include_once($mx_root_path . 'includes/shared/phpbb2/includes/functions_search.' . $phpEx);
 }
 
 /**
@@ -2267,7 +2267,7 @@ class module_cache
 		}
 
 		global $phpEx;
-		$file = '<?php $this->vars=' . $this->format_array( $this->vars ) . ";\n\$this->vars_ts=" . $this->format_array( $this->vars_ts ) . ' ?>';
+		$file = '<?php $this->vars=' . @$this->format_array( $this->vars ) . ";\n\$this->vars_ts=" . @$this->format_array( $this->vars_ts ) . ' ?>';
 
 		if ( $fp = @fopen( $this->cache_dir . 'data_global.' . $phpEx, 'wb' ) )
 		{
@@ -3124,7 +3124,7 @@ class phpbb_posts
 	    $bbcode_on = 1,
 	    $smilies_on = 1)
 	{
-		global $db, $phpbb_root_path, $phpEx, $board_config, $user_ip, $portal_config, $lang, $userdata;
+		global $db, $phpbb_root_path, $phpEx, $board_config, $user_ip, $portal_config, $lang, $userdata, $phpBB2;
 
 		//
 		// initialise some variables
@@ -3137,10 +3137,13 @@ class phpbb_posts
 	    $error_die_function = ($error_die_function == '') ? "mx_message_die" : $error_die_function;
 	    $current_time = ($current_time == 0) ? time() : $current_time;
 
+		//phpBB2 topic_title can have max 60 chars
 	    $subject = addslashes(trim($subject));
-
+		$subject = substr($subject, 0, 60);
+		$subject = mx_censor_text($subject);
+		
 	    $username = addslashes(unprepare_message(trim($user_name)));
-	    $username = phpBB2::phpbb_clean_username( $username );
+	    $username = $phpBB2->phpbb_clean_username( $username );
 
 	    //
 	    // We always require the forum_id
@@ -3769,7 +3772,7 @@ class mx_comments extends phpbb_posts
 	 */
 	function display_internal_comments()
 	{
-		global $template, $lang, $board_config, $phpEx, $db, $userdata, $images, $mx_user;
+		global $template, $lang, $board_config, $phpEx, $db, $userdata, $images, $mx_user, $phpBB2;
 		global $mx_root_path, $module_root_path, $phpbb_root_path, $is_block, $phpEx, $mx_request_vars, $portal_config;
 
 		//
@@ -3821,7 +3824,7 @@ class mx_comments extends phpbb_posts
 
 		while ( $this->comments_row = $db->sql_fetchrow( $result ) )
 		{
-			$time = phpBB2::create_date( $board_config['default_dateformat'], $this->comments_row['comments_time'], $board_config['board_timezone'] );
+			$time = $phpBB2->create_date( $board_config['default_dateformat'], $this->comments_row['comments_time'], $board_config['board_timezone'] );
 
 			//
 			// Decode comment for display
@@ -3962,7 +3965,7 @@ class mx_comments extends phpbb_posts
 		}
 
 		$num_of_replies = intval( $this->total_comments );
-		//$pagination = phpBB2::generate_pagination( $this->u_pagination($page_num), $num_of_replies, $this->pagination_num, $this->start ) . '&nbsp;';
+		//$pagination = $phpBB2->generate_pagination( $this->u_pagination($page_num), $num_of_replies, $this->pagination_num, $this->start ) . '&nbsp;';
 		$pagination = mx_generate_pagination( $this->u_pagination($page_num), $num_of_replies, $this->pagination_num, $this->start, true, true, true, false ) . '&nbsp;';
 		if ($num_of_replies > 0)
 		{
@@ -3982,7 +3985,7 @@ class mx_comments extends phpbb_posts
 	 */
 	function display_phpbb_comments( )
 	{
-		global $template, $lang, $board_config, $phpEx, $db, $userdata, $images, $mx_user;
+		global $template, $lang, $board_config, $phpEx, $db, $userdata, $images, $mx_user, $phpBB2;
 		global $mx_root_path, $module_root_path, $phpbb_root_path, $is_block, $phpEx, $mx_request_vars, $portal_config;
 
 		if ( !isset($this->topic_id) || $this->topic_id < 0 )
@@ -4046,10 +4049,10 @@ class mx_comments extends phpbb_posts
 		{
 			$poster_id = $this->comments_row['user_id'];
 			$poster = ( $poster_id == ANONYMOUS ) ? $lang['Guest'] : $this->comments_row['username'];
-			$time = phpBB2::create_date( $board_config['default_dateformat'], $this->comments_row['post_time'], $board_config['board_timezone'] );
+			$time = $phpBB2->create_date( $board_config['default_dateformat'], $this->comments_row['post_time'], $board_config['board_timezone'] );
 			$poster_posts = ( $this->comments_row['user_id'] != ANONYMOUS ) ? $lang['Posts'] . ': ' . $this->comments_row['user_posts'] : '';
 			$poster_from = ( $this->comments_row['user_from'] && $this->comments_row['user_id'] != ANONYMOUS ) ? $lang['Location'] . ': ' . $this->comments_row['user_from'] : '';
-			$poster_joined = ( $this->comments_row['user_id'] != ANONYMOUS ) ? $lang['Joined'] . ': ' . phpBB2::create_date( $lang['DATE_FORMAT'], $this->comments_row['user_regdate'], $board_config['board_timezone'] ) : '';
+			$poster_joined = ( $this->comments_row['user_id'] != ANONYMOUS ) ? $lang['Joined'] . ': ' . $phpBB2->create_date( $lang['DATE_FORMAT'], $this->comments_row['user_regdate'], $board_config['board_timezone'] ) : '';
 
 			//
 			// Handle anon users posting with usernames
@@ -4100,7 +4103,7 @@ class mx_comments extends phpbb_posts
 			{
 				$l_edit_time_total = ( $this->comments_row['post_edit_count'] == 1 ) ? $lang['Edited_time_total'] : $lang['Edited_times_total'];
 
-				$l_edited_by = '<br /><br />' . sprintf( $l_edit_time_total, $poster, phpBB2::create_date( $board_config['default_dateformat'], $this->comments_row['post_edit_time'], $board_config['board_timezone'] ), $this->comments_row['post_edit_count'] );
+				$l_edited_by = '<br /><br />' . sprintf( $l_edit_time_total, $poster, $phpBB2->create_date( $board_config['default_dateformat'], $this->comments_row['post_edit_time'], $board_config['board_timezone'] ), $this->comments_row['post_edit_count'] );
 			}
 			else
 			{
@@ -4205,7 +4208,7 @@ class mx_comments extends phpbb_posts
 		}
 
 		$num_of_replies = intval( $this->total_comments );
-		$pagination = phpBB2::generate_pagination( $this->u_pagination($page_num), $num_of_replies, $this->pagination_num, $this->start ) . '&nbsp;';
+		$pagination = $phpBB2->generate_pagination( $this->u_pagination($page_num), $num_of_replies, $this->pagination_num, $this->start ) . '&nbsp;';
 
 		if ($num_of_replies > 0)
 		{
@@ -4283,22 +4286,46 @@ class mx_comments extends phpbb_posts
 
 		$this->total_comments = ( $row = $db->sql_fetchrow($result) ) ? intval($row['number']) : 0;
 
+		
 		//
 		// Go ahead and pull all data for this topic
-		//
-		$sql = "SELECT u.username, u.user_id, u.user_posts, u.user_from, u.user_website, u.user_email, u.user_icq, u.user_aim, u.user_yim, u.user_regdate, u.user_msnm, u.user_viewemail, u.user_rank, u.user_sig, u.user_sig_bbcode_uid, u.user_avatar, u.user_avatar_type, u.user_allowavatar, u.user_allowsmile, p.*,  pt.post_text, pt.post_subject, pt.bbcode_uid
-			FROM " . POSTS_TABLE . " p, " . USERS_TABLE . " u, " . POSTS_TEXT_TABLE . " pt
-			WHERE p.topic_id = '" . $this->topic_id . "'
-				AND pt.post_id = p.post_id
-				AND u.user_id = p.poster_id
-				ORDER BY p.post_id DESC";
-
-		if ( $this->start > -1 && $this->pagination_num > 0 )
+		//		
+		switch (PORTAL_BACKEND)
 		{
-			$sql .= " LIMIT $this->start, $this->pagination_num ";
-		}
+			case 'internal':
 
-		if ( !( $result = $db->sql_query( $sql ) ) )
+			case 'phpbb2':
+
+				$sql = "SELECT u.username, u.user_id, u.user_posts, u.user_from, u.user_website, u.user_email, u.user_icq, u.user_aim, u.user_yim, u.user_regdate, u.user_msnm, u.user_viewemail, u.user_rank, u.user_sig, u.user_sig_bbcode_uid, u.user_avatar, u.user_avatar_type, u.user_allowavatar, u.user_allowsmile, p.*,  pt.post_text, pt.post_subject, pt.bbcode_uid
+					FROM " . POSTS_TABLE . " p, " . USERS_TABLE . " u, " . POSTS_TEXT_TABLE . " pt
+					WHERE p.topic_id = '" . $this->topic_id . "'
+						AND pt.post_id = p.post_id
+						AND u.user_id = p.poster_id
+						ORDER BY p.post_id DESC";
+				break;
+
+			case 'phpbb3':
+
+				$sql = "SELECT u.*, p.*,  pt.post_text, pt.post_subject, pt.bbcode_uid
+					FROM " . POSTS_TABLE . " p, " . USERS_TABLE . " u, " . POSTS_TABLE . " pt
+					WHERE p.topic_id = '" . $this->topic_id . "'
+						AND pt.post_id = p.post_id
+						AND u.user_id = p.poster_id
+						ORDER BY p.post_id DESC";
+			break;
+		}		
+		
+
+		if ($this->start > -1 && $this->pagination_num > 0)
+		{
+			$result = $db->sql_query_limit($sql, $this->start, $this->pagination_num);
+		}
+		else
+		{
+			$result = $db->sql_query_limit($sql, $this->start, $this->pagination_num);
+		}		
+
+		if (!$result)
 		{
 			mx_message_die( GENERAL_ERROR, "Could not obtain post/user information.", '', __LINE__, __FILE__, $sql );
 		}

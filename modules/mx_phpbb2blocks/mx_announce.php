@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Module - mx_phpbb2blocks
-* @version $Id: mx_announce.php,v 1.10 2008/07/13 19:31:27 jonohlsson Exp $
+* @version $Id: mx_announce.php,v 1.11 2008/09/30 07:04:51 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -142,7 +142,7 @@ for( $i = 0; $i < $total_posts; $i++ )
 {
 	$poster_id = $postrow[$i]['user_id'];
 	$poster = ( $poster_id == ANONYMOUS ) ? $lang['Guest'] : $postrow[$i]['username'];
-	$post_date = phpBB2::create_date($board_config['default_dateformat'], $postrow[$i]['post_time'], $board_config['board_timezone']);
+	$post_date = $phpBB2->create_date($board_config['default_dateformat'], $postrow[$i]['post_time'], $board_config['board_timezone']);
 
 	$title = $postrow[$i]['topic_title'];
 	$bbcode_uid = $postrow[$i]['bbcode_uid'];
@@ -302,8 +302,8 @@ for( $i = 0; $i < $total_posts; $i++ )
 
 	$replies = $postrow[$i]['topic_replies'];
 	$views = $postrow[$i]['topic_views'];
-	$first_post_time = phpBB2::create_date($board_config['default_dateformat'], $postrow[$i]['topic_time'], $board_config['board_timezone']);
-	$last_post_time = phpBB2::create_date($board_config['default_dateformat'], $postrow[$i]['last_post_time'], $board_config['board_timezone']);
+	$first_post_time = $phpBB2->create_date($board_config['default_dateformat'], $postrow[$i]['topic_time'], $board_config['board_timezone']);
+	$last_post_time = $phpBB2->create_date($board_config['default_dateformat'], $postrow[$i]['last_post_time'], $board_config['board_timezone']);
 
 	$last_post_author = ( $postrow[$i]['id2'] == ANONYMOUS ) ? ( ( $postrow[$i]['post_username2'] != '' ) ? $postrow[$i]['post_username2'] . ' ' : $lang['Guest'] . ' ' ) : '<a href="' . mx_append_sid(PHPBB_URL . "profile.$phpEx?mode=viewprofile&amp;" . POST_USERS_URL . '=' . $postrow[$i]['id2']) . '">' . $postrow[$i]['user2'] . '</a>';
 	$last_post_img = '<a href="' . mx_append_sid(PHPBB_URL . "viewtopic.$phpEx?" . POST_POST_URL . '=' . $postrow[$i]['topic_last_post_id']) . '#' . $postrow[$i]['topic_last_post_id'] . '"><img src="' . $images['mx_icon_latest_reply'] . '" alt="' . $lang['View_latest_post'] . '" title="' . $lang['View_latest_post'] . '" border="0" /></a>';

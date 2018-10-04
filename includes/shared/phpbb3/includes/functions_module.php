@@ -3,7 +3,7 @@
  *
  * @package MX-Publisher phpBB3
  * @subpackage Admin
- * @version $Id: functions_module.php,v 1.20 2008/07/10 23:02:07 jonohlsson Exp $
+ * @version $Id: functions_module.php,v 1.22 2008/10/04 07:04:25 orynider Exp $
  * @copyright (c) 2005 phpBB Group
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
  *
@@ -360,10 +360,10 @@ class p_master
 		$icat = false;
 		$this->active_module = false;
 
-		if (phpBB3::request_var('icat', ''))
+		if ($phpBB3->request_var('icat', ''))
 		{
 			$icat = $id;
-			$id = phpBB3::request_var('icat', '');
+			$id = $phpBB3->request_var('icat', '');
 		}
 
 		$category = false;
@@ -436,8 +436,8 @@ class p_master
 			$mx_acp->template->assign_var( \'L_\' . $key, $value);
 		}
 			$mx_acp->template->assign_vars',
-			'#(' . $FUNCTION_REPLACE . ')\(#si' => 'phpBB3::\1(',
-			"#'(" . $FUNCTION_REPLACE . ")'#si" => "'phpBB3::\\1'"
+			'#(' . $FUNCTION_REPLACE . ')\(#si' => '$phpBB3->\1(',
+			"#'(" . $FUNCTION_REPLACE . ")'#si" => "'$phpBB3->\\1'"
 		);
 
 
@@ -447,10 +447,10 @@ class p_master
 		$modulecode = str_replace('$board_config_', '$config_', $modulecode);
 		$modulecode = str_replace('auth_admin', 'phpbb_auth_admin', $modulecode);
 		$modulecode = str_replace('include_once($phpbb_root_path . \'includes/acp/auth.\' . $phpEx);', 'mx_cache::load_file(\'acp/auth\', \'phpbb3\');', $modulecode);
-		$modulecode = str_replace('function phpBB3::', 'function phpbb3_', $modulecode);
+		$modulecode = str_replace('function $phpBB3->', 'function phpbb3_', $modulecode);
 
-		$modulecode = preg_replace( '/function ([^(]*)?phpBB3::([^(]*)\(/si', 'function \1\2(', $modulecode);
-		$modulecode = str_replace('$this->phpBB3::', '$this->', $modulecode);
+		$modulecode = preg_replace( '/function ([^(]*)?$phpBB3->([^(]*)\(/si', 'function \1\2(', $modulecode);
+		$modulecode = str_replace('$this->$phpBB3->', '$this->', $modulecode);
 		$includes_cnt = preg_match_all( '#(include|require)(_once)?\(([^)]*)\);#si', $modulecode, $includes_match);
 		$modulecode = preg_replace( '#(include|require)(_once)?\(([^)]*)\);#si', '// MXP INCLUDE CODE \0', $modulecode);
 
@@ -499,7 +499,7 @@ class p_master
 		global $mx_root_path, $phpbb_root_path, $phpbb_admin_path, $phpEx, $mx_user;
 
 		$module_path = $phpbb_root_path . 'includes/' . $this->p_class;
-		$icat = phpBB3::request_var('icat', '');
+		$icat = $phpBB3->request_var('icat', '');
 
 		if ($this->active_module === false)
 		{

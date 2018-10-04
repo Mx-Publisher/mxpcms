@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Module - mx_users
-* @version $Id: admin_prune_users.php,v 1.3 2008/02/09 21:14:27 joasch Exp $
+* @version $Id: admin_prune_users.php,v 1.4 2008/09/30 07:04:54 orynider Exp $
 * @copyright (c) 2002-2008 [Omar Ramadan, Jon Ohlsson] MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -233,8 +233,8 @@ else
 		{
 			$user_id = $inactive_users[$i]['user_id'];
 			$username = $inactive_users[$i]['username'];
-			$user_lastvisit = ( !$inactive_users[$i]['user_lastvisit'] ) ? $lang['Never'] : phpBB2::create_date($board_config['default_dateformat'], $inactive_users[$i]['user_lastvisit'], $board_config['board_timezone']);
-			$user_regdate = ( !$inactive_users[$i]['user_regdate'] ) ? $lang['Never'] : phpBB2::create_date($board_config['default_dateformat'], $inactive_users[$i]['user_regdate'], $board_config['board_timezone']);
+			$user_lastvisit = ( !$inactive_users[$i]['user_lastvisit'] ) ? $lang['Never'] : $phpBB2->create_date($board_config['default_dateformat'], $inactive_users[$i]['user_lastvisit'], $board_config['board_timezone']);
+			$user_regdate = ( !$inactive_users[$i]['user_regdate'] ) ? $lang['Never'] : $phpBB2->create_date($board_config['default_dateformat'], $inactive_users[$i]['user_regdate'], $board_config['board_timezone']);
 			$user_active = ( !$inactive_users[$i]['user_active'] ) ? $lang['No'] : $lang['Yes'];
 			$user_posts = $inactive_users[$i]['user_posts'];
 

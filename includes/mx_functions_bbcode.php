@@ -2,7 +2,7 @@
 /**
 *
 * @package Functions_phpBB
-* @version $Id: mx_functions_bbcode.php,v 1.13 2008/08/23 15:48:13 orynider Exp $
+* @version $Id: mx_functions_bbcode.php,v 1.16 2008/10/04 07:04:25 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -25,6 +25,7 @@ define("BBCODE_UID_LEN", 10);
 // that stuff once.
 
 $bbcode_tpl = null;
+$bbcode_uid = null;
 
 // Need to initialize the random numbers only ONCE
 mt_srand( (double) microtime() * 1000000);
@@ -32,6 +33,12 @@ mt_srand( (double) microtime() * 1000000);
 
 class bbcode_base
 {
+
+	function bbcode()
+	{
+		$this->bbcode_uid = $this->make_bbcode_uid();
+	}
+
 	/**
 	 * Loads bbcode templates from the bbcode.tpl file of the current template set.
 	 * Creates an array, keys are bbcode names like "b_open" or "url", values
@@ -206,7 +213,9 @@ class bbcode_base
 		// [i] and [/i] for italicizing text.
 		$text = str_replace("[i:$uid]", $bbcode_tpl['i_open'], $text);
 		$text = str_replace("[/i:$uid]", $bbcode_tpl['i_close'], $text);
-
+		
+		//$text = str_replace('url:' . $uid, 'url', $text);
+		
 		// Patterns and replacements for URL and email tags..
 		$patterns = array();
 		$replacements = array();
@@ -263,9 +272,12 @@ class bbcode_base
 
 		$text = preg_replace($patterns, $replacements, $text);
 
+		// Remove the uid from tags that have not been transformed into HTML
+		//$text = str_replace(':' . $uid, '', $text);
+
 		// Remove our padding from the string..
 		$text = substr($text, 1);
-
+		
 		return $text;
 
 	} // bbencode_second_pass()
@@ -287,8 +299,12 @@ class bbcode_base
 	{
 		global $mx_backend;
 		// Unique ID for this message..
-
+		
 		$uid = $mx_backend->dss_rand();
+		
+		// BBCode UID length fix
+		@define('BBCODE_UID_LEN', (PORTAL_BACKEND == 'phpbb3') ? 8 : 10);		
+		
 		$uid = substr($uid, 0, BBCODE_UID_LEN);
 
 		return $uid;
@@ -339,7 +355,8 @@ class bbcode_base
 		$text = preg_replace("#\[img\]((http|ftp|https|ftps)://)([^ \?&=\#\"\n\r\t<]*?(\.(jpg|jpeg|gif|png)))\[/img\]#sie", "'[img:$uid]\\1' . str_replace(' ', '%20', '\\3') . '[/img:$uid]'", $text);
 
 		//Start more bbcode
-
+		$text = str_replace('url:' . $uid, 'url', $text);
+		
 		// [stream]Sound URL[/stream] code..
 		$text = preg_replace("#\[stream\](.*?)\[/stream\]#si", "[stream:$uid]\\1[/stream:$uid]", $text);
 
@@ -826,5 +843,55 @@ class bbcode_base
 		$board_config['smilies_path'] = $smilies_path;
 		return $message;
 	}
+
+	//
+	// This function will prepare a posted message for
+	// entry into the database.
+	//
+	function prepare_message($message, $html_on, $bbcode_on, $smile_on, $bbcode_uid = 0)
+	{
+		global $board_config, $html_entities_match, $html_entities_replace;
+
+		//
+		// Clean up the message
+		//
+		$message = trim($message);
+
+		if ($html_on)
+		{
+			// If HTML is on, we try to make it safe
+			// This approach is quite agressive and anything that does not look like a valid tag
+			// is going to get converted to HTML entities
+			$message = stripslashes($message);
+			$html_match = '#<[^\w<]*(\w+)((?:"[^"]*"|\'[^\']*\'|[^<>\'"])+)?>#';
+			$matches = array();
+
+			$message_split = preg_split($html_match, $message);
+			preg_match_all($html_match, $message, $matches);
+
+			$message = '';
+
+			foreach ($message_split as $part)
+			{
+				$tag = array(array_shift($matches[0]), array_shift($matches[1]), array_shift($matches[2]));
+				$message .= preg_replace($html_entities_match, $html_entities_replace, $part) . clean_html($tag);
+			}
+
+			$message = addslashes($message);
+			$message = str_replace('&quot;', '\&quot;', $message);
+		}
+		else
+		{
+			$message = preg_replace($html_entities_match, $html_entities_replace, $message);
+		}
+
+		if($bbcode_on && $bbcode_uid != '')
+		{
+			$message = $this->bbencode_first_pass($message, $bbcode_uid);
+		}
+
+		return $message;
+	}
+
 }
 ?>

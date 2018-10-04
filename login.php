@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: login.php,v 1.31 2008/07/15 22:02:44 jonohlsson Exp $
+* @version $Id: login.php,v 1.32 2008/09/30 07:04:35 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -54,7 +54,6 @@ else
 
 if($mx_request_vars->is_request('login') || $mx_request_vars->is_request('logout') )
 {
-
 	switch (PORTAL_BACKEND)
 	{
 		case 'internal':
@@ -82,7 +81,7 @@ else
 		include($mx_root_path . 'includes/page_header.'.$phpEx);
 
 		$layouttemplate->set_filenames(array(
-			'body' => 'login_body.tpl')
+			"login_body" => "login_body.$tplEx")
 		);
 
 		$forward_page = '';
@@ -137,18 +136,19 @@ else
 		);
 
 		ob_start();
-		$layouttemplate->pparse('body');
+		$layouttemplate->pparse('login_body');		
 		$phpbb_output = ob_get_contents();
 		ob_end_clean();
 		$phpbb_output = str_replace('"templates/'.$theme['template_name'], '"' . $phpbb_root_path . 'templates/'.$theme['template_name'], $phpbb_output);
 		echo($phpbb_output);
 		unset($phpbb_output);
 
-		include($mx_root_path . 'includes/page_tail.'.$phpEx);
+		include($mx_root_path . 'includes/page_tail.'.$phpEx);	
 	}
 	else
 	{
 		mx_redirect(mx_append_sid("index.$phpEx", false));
 	}
 }
+
 ?>

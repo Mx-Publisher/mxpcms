@@ -12,8 +12,11 @@ CREATE TABLE mx_table_themes (
 );
 
 # -- Themes
-INSERT INTO mx_table_themes (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (1, 'mxSilver', 'mxSilver', 'mxSilver.css', 'internal');
-INSERT INTO mx_table_themes (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (2, 'subSilver', 'subSilver', 'subSilver.css', 'phpbb2');
-INSERT INTO mx_table_themes (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (3, 'subsilver2', 'subsilver2', 'subsilver2.css', 'phpbb3');
-INSERT INTO mx_table_themes (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (4, 'prosilver', 'prosilver', 'prosilver.css', 'phpbb3');
+INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (1, 'mx_prosilver', 'mx_prosilver', 'mx_prosilver.css', 'internal');
+INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (2, 'mxBase1', 'mxBase1', 'mxBase1.css', 'internal');
+INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (3, 'mxBase2', 'mxBase2', 'mxBase2.css', 'internal');
+INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (4, 'mxSilver', 'mxSilver', 'mxSilver.css', 'internal');
+INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (5, 'subSilver', 'subSilver', 'subSilver.css', 'phpbb2');
+INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (6, 'subsilver2', 'subsilver2', 'subsilver2.css', 'phpbb3');
+INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (7, 'prosilver', 'prosilver', 'prosilver.css', 'phpbb3');
 

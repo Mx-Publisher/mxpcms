@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: common.php,v 1.101 2008/07/20 01:33:47 orynider Exp $
+* @version $Id: common.php,v 1.107 2008/10/04 07:04:24 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -20,6 +20,7 @@ if ( !defined('IN_PORTAL') )
 define('IN_PHPBB', 1);
 define('PHPBB_INSTALLED', true);
 
+
 //
 // Reset stats
 //
@@ -29,11 +30,11 @@ $mx_starttime = $mx_starttime[1] + $mx_starttime[0];
 //
 // DEBUG AND ERROR HANDLING
 //
-//define( 'DEBUG', 1 ); // [Admin Option] Show Footer debug stats - Actually set in phpBB/includes/constants.php
-//define( 'DEBUG_EXTRA', 1 ); // [Admin Option] Show memory usage. Show link to full SQL debug report in footer. Beware, this makes the page slow to load. For debugging only.
-//error_reporting(E_ALL & ~E_NOTICE);
+define('DEBUG', true); // [Admin Option] Show Footer debug stats - Actually set in phpBB/includes/constants.php
+define('DEBUG_EXTRA', true); // [Admin Option] Show memory usage. Show link to full SQL debug report in footer. Beware, this makes the page slow to load. For debugging only.
 @ini_set( 'display_errors', '1' );
 error_reporting  (E_ERROR | E_WARNING | E_PARSE); // This will NOT report uninitialized variables
+//error_reporting(E_ALL & ~E_NOTICE); //Default error reporting in PHP 5.2+
 include($mx_root_path . 'modules/mx_shared/ErrorHandler/prepend.' . $phpEx); // For nice error output
 
 // ================================================================================
@@ -189,11 +190,20 @@ $gen_simple_header = FALSE;
 //
 // Redirect for fresh MX-Publisher install
 //
-if( !defined('MX_INSTALLED') )
+if( !defined('MX_INSTALLED') || (MX_INSTALLED === false) )
 {
 	header('Location: ' . $mx_root_path . 'install/mx_install.' . $phpEx);
 	exit;
 }
+
+include_once($mx_root_path . 'includes/shared/phpbb2/includes/functions.' . $phpEx);
+include_once($mx_root_path . 'includes/shared/phpbb3/includes/functions.' . $phpEx);
+
+//
+// Instantiate Dummy phpBB Classes
+//
+$phpBB2 = new phpBB2();
+$phpBB3 = new phpBB3();
 
 //
 // MX-Publisher CORE Includes
@@ -217,6 +227,12 @@ $mx_cache = new mx_cache();
 // Set $portal_config, $phpbb_root_path, $tplEx, $table_prefix & PORTAL_BACKEND
 //
 $mx_cache->load_backend();
+
+//Temp fix for timezone
+if (@function_exists('date_default_timezone_set') && @function_exists('date_default_timezone_get'))
+{
+	@date_default_timezone_set(@date_default_timezone_get());
+}
 
 //
 // MX-Publisher Includes - doing the rest
@@ -251,7 +267,7 @@ $mx_block = new mx_block();
 // Obtain and encode users IP
 //
 $client_ip = ( !empty($_SERVER['REMOTE_ADDR']) ) ? $_SERVER['REMOTE_ADDR'] : ( ( !empty($_ENV['REMOTE_ADDR']) ) ? $_ENV['REMOTE_ADDR'] : getenv('REMOTE_ADDR') );
-$user_ip = phpBB2::encode_ip($client_ip);
+$user_ip = $phpBB2->encode_ip($client_ip);
 
 //
 // Define some general backend definitions
@@ -263,6 +279,7 @@ $mx_backend->setup_backend();
 // Instantiate the mx_bbcode class
 //
 $mx_bbcode = new mx_bbcode();
+
 
 //
 // Remove install and contrib folders

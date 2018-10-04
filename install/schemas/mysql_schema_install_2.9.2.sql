@@ -587,7 +587,7 @@ CREATE TABLE `mx_table_portal` (
   `mod_rewrite` smallint(2) unsigned NOT NULL default '0',
 
   `cookie_domain` varchar(255) NOT NULL default '',
-  `cookie_name` varchar(255) NOT NULL default 'mxbb29x',
+  `cookie_name` varchar(255) NOT NULL default 'mxbb30x',
   `cookie_path` varchar(255) NOT NULL default '/',
   `cookie_secure` smallint(2) unsigned NOT NULL default '0',
   `session_length` varchar(255) NOT NULL default '3600',
@@ -801,12 +801,14 @@ CREATE TABLE mx_table_themes (
 );
 
 # -- Themes
-INSERT INTO mx_table_themes (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (1, 'mxBase1', 'mxBase1', 'mxBase1.css', 'internal');
-INSERT INTO mx_table_themes (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (2, 'mxBase2', 'mxBase2', 'mxBase2.css', 'internal');
-INSERT INTO mx_table_themes (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (3, 'mxSilver', 'mxSilver', 'mxSilver.css', 'internal');
-INSERT INTO mx_table_themes (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (4, 'subSilver', 'subSilver', 'subSilver.css', 'phpbb2');
-INSERT INTO mx_table_themes (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (5, 'subsilver2', 'subsilver2', 'subsilver2.css', 'phpbb3');
-INSERT INTO mx_table_themes (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (6, 'prosilver', 'prosilver', 'prosilver.css', 'phpbb3');
+INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (1, 'mx_prosilver', 'mx_prosilver', 'mx_prosilver.css', 'internal');
+INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (2, 'mxBase1', 'mxBase1', 'mxBase1.css', 'internal');
+INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (3, 'mxBase2', 'mxBase2', 'mxBase2.css', 'internal');
+INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (4, 'mxSilver', 'mxSilver', 'mxSilver.css', 'internal');
+INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (5, 'subSilver', 'subSilver', 'subSilver.css', 'phpbb2');
+INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (6, 'subsilver2', 'subsilver2', 'subsilver2.css', 'phpbb3');
+INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (7, 'prosilver', 'prosilver', 'prosilver.css', 'phpbb3');
+
 
 # --------------------------------------------------------
 #

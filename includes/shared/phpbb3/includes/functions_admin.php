@@ -2,7 +2,7 @@
 /**
 *
 * @package acp
-* @version $Id: functions_admin.php,v 1.4 2008/06/15 21:01:41 jonohlsson Exp $
+* @version $Id: functions_admin.php,v 1.6 2008/10/04 07:04:25 orynider Exp $
 * @copyright (c) 2005 phpBB Group
 * @license http://opensource.org/licenses/gpl-license.php GNU Public License
 *
@@ -2447,11 +2447,11 @@ function view_log($mode, &$log, &$log_count, $limit = 0, $offset = 0, $forum_id 
 				// If within the admin panel we do not censor text out
 				if (defined('IN_ADMIN'))
 				{
-					$log[$i]['action'] = phpBB3::bbcode_nl2br($log[$i]['action']);
+					$log[$i]['action'] = $phpBB3->bbcode_nl2br($log[$i]['action']);
 				}
 				else
 				{
-					$log[$i]['action'] = phpBB3::bbcode_nl2br(censor_text($log[$i]['action']));
+					$log[$i]['action'] = $phpBB3->bbcode_nl2br(censor_text($log[$i]['action']));
 				}
 			}
 			else

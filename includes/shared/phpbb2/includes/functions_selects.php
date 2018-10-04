@@ -6,7 +6,7 @@
  *   copyright            : (C) 2001 The phpBB Group
  *   email                : support@phpbb.com
  *
- *   $Id: functions_selects.php,v 1.1 2007/09/09 16:51:51 jonohlsson Exp $
+ *   $Id: functions_selects.php,v 1.3 2008/10/04 07:04:25 orynider Exp $
  *
  *
  ***************************************************************************/
@@ -33,7 +33,7 @@ function language_select($default, $select_name = "language", $dirname="language
 	$lang = array();
 	while ( $file = readdir($dir) )
 	{
-		if (preg_match('#^lang_#i', $file) && !is_file(@phpBB2::phpbb_realpath($phpbb_root_path . $dirname . '/' . $file)) && !is_link(@phpBB2::phpbb_realpath($phpbb_root_path . $dirname . '/' . $file)))
+		if (preg_match('#^lang_#i', $file) && !is_file(@$phpBB2->phpbb_realpath($phpbb_root_path . $dirname . '/' . $file)) && !is_link(@$phpBB2->phpbb_realpath($phpbb_root_path . $dirname . '/' . $file)))
 		{
 			$filename = trim(str_replace("lang_", "", $file));
 			$displayname = preg_replace("/^(.*?)_(.*)$/", "\\1 [ \\2 ]", $filename);

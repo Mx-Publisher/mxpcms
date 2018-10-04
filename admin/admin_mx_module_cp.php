@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: admin_mx_module_cp.php,v 1.23 2008/02/11 11:13:16 joasch Exp $
+* @version $Id: admin_mx_module_cp.php,v 1.25 2008/10/04 07:04:24 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -888,7 +888,7 @@ for( $module_count = 0; $module_count < $total_modules + 1; $module_count++ )
 			$editor_name = $editor_name_tmp['username'];
 
 			$block_time = !$new_block ? $block_rows[$block_count]['block_time'] : time();
-			$edit_time = phpBB2::create_date( $board_config['default_dateformat'], $block_time, $board_config['board_timezone'] );
+			$edit_time = $phpBB2->create_date( $board_config['default_dateformat'], $block_time, $board_config['board_timezone'] );
 
 			if ($new_block)
 			{

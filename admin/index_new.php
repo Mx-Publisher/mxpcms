@@ -2,7 +2,7 @@
 /**
  *
  * @package mx-Publisher Core
- * @version $Id: index_new.php,v 1.15 2008/07/10 23:17:13 jonohlsson Exp $
+ * @version $Id: index_new.php,v 1.16 2008/09/30 07:04:34 orynider Exp $
  * @copyright (c) 2002-2006 mxBB Project Team
  * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
  * @link http://www.mxbb.net
@@ -560,7 +560,7 @@ class mx_acp
 					'get_userdata', 'phpbb_clean_username', phpbb_realpath
 					);
 				$preg_array = array_merge( $preg_array, array( // #
-						'#(' . implode( '|', $functions_ary ) . ')\(#si' => 'phpBB2::\1(',
+						'#(' . implode( '|', $functions_ary ) . ')\(#si' => '$phpBB2->\1(',
 						) );
 				// REPLACE FUNCTIONS that ARE ALLREADY DECLARED
 				$func_cnt = preg_match_all( "#\nfunction ([^(]*)\\(#si", $script, $func_match );
@@ -576,7 +576,7 @@ class mx_acp
 				}
 
 				$script = preg_replace( array_keys( $preg_array ), $preg_array, $script );
-				$script = str_replace( 'phpBB2::phpBB2::', 'PHPBB2::', $script );
+				$script = str_replace( '$phpBB2->$phpBB2->', '$phpBB2->', $script );
 				break;
 			case OLYMPUS_BACKEND:
 				$script = $this->phpbb3_hook->prepare_action_script( $this->panel );
@@ -806,7 +806,7 @@ class mx_acp
 			'S_JUMPBOX_ACTION' => mx_append_sid( '../viewforum.' . $phpEx ),
 			'S_CURRENT_TIME' =>
 			( OLYMPUS_BACKEND == PORTAL_BACKEND )?
-			sprintf( $lang['Current_time'], phpBB2::create_date( $board_config['default_dateformat'], time(), $board_config['board_timezone'] ) ):
+			sprintf( $lang['Current_time'], $phpBB2->create_date( $board_config['default_dateformat'], time(), $board_config['board_timezone'] ) ):
 			sprintf( $lang['Current_time'], create_date( $board_config['default_dateformat'], time(), $board_config['board_timezone'] ) ),
 
 			'S_CONTENT_DIRECTION' => $lang['DIRECTION'],
@@ -839,9 +839,9 @@ error_reporting( E_ALL ^ E_NOTICE );
 ini_set( 'display_errors', '1' );
 $i = 1;
 // VERSION mx v2.8
-// $script = str_replace( 'phpBB2::', '', $script);
+// $script = str_replace( '$phpBB2->', '', $script);
 // VERSION mxP v2.9
-$script = str_replace( 'mx_phpBB2::', 'phpBB2::', $script );
+$script = str_replace( 'mx_$phpBB2->', '$phpBB2->', $script );
 
 $cache_file_name = cache_file( $script, 'PANEL');
 

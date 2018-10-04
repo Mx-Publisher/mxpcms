@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Module - mx_phpbb3blocks
-* @version $Id: mx_last_msg.php,v 1.3 2008/07/20 23:34:14 orynider Exp $
+* @version $Id: mx_last_msg.php,v 1.5 2008/10/04 07:04:38 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -386,7 +386,7 @@ for( $row_count = 0; $row_count < count($postrow); $row_count++ )
 
 	if ($display_date == "TRUE")
 	{
-		//$message_date = phpBB2::create_date($board_config['default_dateformat'], $postrow[$row_count]['post_time'], $board_config['board_timezone']);
+		//$message_date = $phpBB2->create_date($board_config['default_dateformat'], $postrow[$row_count]['post_time'], $board_config['board_timezone']);
 		$message_date = $mx_user->format_date($postrow[$row_count]['post_time']);
 		$topic_date = $mx_user->format_date($postrow[$row_count]['topic_time']);
 		$last_message_date = $mx_user->format_date($postrow[$row_count]['topic_last_post_time']);

@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: page_header.php,v 1.61 2008/09/07 20:57:33 orynider Exp $
+* @version $Id: page_header.php,v 1.63 2008/10/04 07:04:25 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -190,8 +190,8 @@ $layouttemplate->assign_vars(array(
 	'SITENAME' => $board_config['sitename'],
 	'SITE_DESCRIPTION' => $board_config['site_desc'],
 	'PAGE_TITLE' => $mx_page->page_title,
-	'CURRENT_TIME' => sprintf($lang['Current_time'], phpBB2::create_date($board_config['default_dateformat'], time(), $board_config['board_timezone'])),
-	'RECORD_USERS' => sprintf($lang['Record_online_users'], $board_config['record_online_users'], phpBB2::create_date($board_config['default_dateformat'], $board_config['record_online_date'], $board_config['board_timezone'])),
+	'CURRENT_TIME' => sprintf($lang['Current_time'], $phpBB2->create_date($board_config['default_dateformat'], time(), $board_config['board_timezone'])),
+	'RECORD_USERS' => sprintf($lang['Record_online_users'], $board_config['record_online_users'], $phpBB2->create_date($board_config['default_dateformat'], $board_config['record_online_date'], $board_config['board_timezone'])),
 
 	'L_USERNAME' => $lang['Username'],
 	'L_PASSWORD' => $lang['Password'],
@@ -366,7 +366,7 @@ if ($mx_page->auth_view || $mx_page->auth_mod)
 		// Include block file and cache output
 		//
 		ob_start();
-		include($module_root_path . $mx_block->block_file);
+		@include($module_root_path . $mx_block->block_file);
 		$overall_navigation_menu = ob_get_contents();
 		ob_end_clean();
 

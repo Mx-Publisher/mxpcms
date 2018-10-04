@@ -1,19 +1,19 @@
 <?php
 // Romanian phpBB online community - Versiune actualizata pentru PhpBB 2.0.20
 /***************************************************************************
- *                            lang_admin.php [românã]
+ *                            lang_admin.php [romÃ¢nÄƒ]
  *                              -------------------
  *     begin                : Sep 7 2002
  *     last update          : Jun 11, 2005
  *     language version     : 8.0
  *     copyright            : Romanian phpBB online community
  *     website              : http://www.phpbb.ro
- *     copyright 1          : (C) Daniel Tãnasie
+ *     copyright 1          : (C) Daniel TÄƒnasie
  *     email     1          : danielt@phpbb.ro
  *     copyright 2          : (C) Bogdan Toma
  *     email     2          : bogdan@phpbb.ro
  *
- *     $Id: lang_admin.php,v 1.3 2008/07/30 13:47:57 orynider Exp $
+ *     $Id: lang_admin.php,v 1.4 2008/10/04 07:04:25 orynider Exp $
  *
  ****************************************************************************/
 
@@ -38,63 +38,63 @@
 
 $lang['ENCODING'] = 'iso-8859-2';
 $lang['DIRECTION'] = 'ltr';
-$lang['LEFT'] = 'stânga';
+$lang['LEFT'] = 'stÃ¢nga';
 $lang['RIGHT'] = 'dreapta';
 $lang['DATE_FORMAT'] =  'd/M/Y'; // This should be changed to the default date format for your language, php date() format
 
-$lang['General'] = 'Administrare generalã';
+$lang['General'] = 'Administrare generalÄƒ';
 $lang['Users'] = 'Administrare utilizatori';
 $lang['Groups'] = 'Administrare grupuri';
 $lang['Forums'] = 'Administrare forumuri';
 $lang['Styles'] = 'Administrare stiluri';
 
-$lang['Configuration'] = 'Configurare generalã';
+$lang['Configuration'] = 'Configurare generalÄƒ';
 $lang['Permissions'] = 'Permisiuni';
 $lang['Manage'] = 'Management';
 $lang['Disallow'] = 'Dezactivare nume';
-$lang['Prune'] = 'Curãşire';
-$lang['Mass_Email'] = 'Expediere mesaje în bloc';
+$lang['Prune'] = 'CurÄƒÅ£ire';
+$lang['Mass_Email'] = 'Expediere mesaje Ã®n bloc';
 $lang['Ranks'] = 'Ranguri';
-$lang['Smilies'] = 'Zâmbete';
-$lang['Ban_Management'] = 'Control restricşii';
+$lang['Smilies'] = 'ZÃ¢mbete';
+$lang['Ban_Management'] = 'Control restricÅ£ii';
 $lang['Word_Censor'] = 'Cuvinte cenzurate';
-$lang['Export'] = 'Exportã';
-$lang['Create_new'] = 'Creeazã';
-$lang['Add_new'] = 'Adaugã';
-$lang['Backup_DB'] = 'Salveazã baza de date';
-$lang['Restore_DB'] = 'Restaureazã baza de date';
+$lang['Export'] = 'ExportÄƒ';
+$lang['Create_new'] = 'CreeazÄƒ';
+$lang['Add_new'] = 'AdaugÄƒ';
+$lang['Backup_DB'] = 'SalveazÄƒ baza de date';
+$lang['Restore_DB'] = 'RestaureazÄƒ baza de date';
 
 
 //
 // Index
 //
 $lang['Admin'] = 'Administrare';
-$lang['Not_admin'] = 'Nu sunteşi autorizat sã administraşi acest forum';
-$lang['Welcome_phpBB'] = 'Bine aşi venit la centrul de control al forumului phpBB';
-$lang['Admin_intro'] = 'Vã mulşumim pentru cã aşi ales phpBB ca soluşie pentru forumul dumneavoastrã. Acest ecran vã oferã o privire de ansamblu a diverselor statistici ale forumului dumneavoastrã. Puteşi reveni la aceastã paginã folosind legãtura <i>Pagina de start a administratorului</i> din partea stângã. Pentru a reveni la pagina de start a forumului dumneavoastrã, apãsaşi pe logo-ul phpBB-ului aflat, de asemenea, în partea stângã. Celelalte legãturi din partea stângã vã permit sã controlaşi orice aspect al forumului, fiecare ecran va avea instrucşiuni care dau explicaşii despre cum se folosesc instrumentele.';
+$lang['Not_admin'] = 'Nu sunteÅ£i autorizat sÄƒ administraÅ£i acest forum';
+$lang['Welcome_phpBB'] = 'Bine aÅ£i venit la centrul de control al forumului phpBB';
+$lang['Admin_intro'] = 'VÄƒ mulÅ£umim pentru cÄƒ aÅ£i ales phpBB ca soluÅ£ie pentru forumul dumneavoastrÄƒ. Acest ecran vÄƒ oferÄƒ o privire de ansamblu a diverselor statistici ale forumului dumneavoastrÄƒ. PuteÅ£i reveni la aceastÄƒ paginÄƒ folosind legÄƒtura <i>Pagina de start a administratorului</i> din partea stÃ¢ngÄƒ. Pentru a reveni la pagina de start a forumului dumneavoastrÄƒ, apÄƒsaÅ£i pe logo-ul phpBB-ului aflat, de asemenea, Ã®n partea stÃ¢ngÄƒ. Celelalte legÄƒturi din partea stÃ¢ngÄƒ vÄƒ permit sÄƒ controlaÅ£i orice aspect al forumului, fiecare ecran va avea instrucÅ£iuni care dau explicaÅ£ii despre cum se folosesc instrumentele.';
 $lang['Main_index'] = 'Pagina de start a forumului';
 $lang['Forum_stats'] = 'Statisticile forumului';
 $lang['Admin_Index'] = 'Pagina de start a administratorului';
 $lang['Preview_forum'] = 'Previzualizare forum';
 
-$lang['Click_return_admin_index'] = 'Apãsaşi %saici%s pentru a reveni la secşiunea Pagina de start a administratorului';
+$lang['Click_return_admin_index'] = 'ApÄƒsaÅ£i %saici%s pentru a reveni la secÅ£iunea Pagina de start a administratorului';
 
 $lang['Statistic'] = 'Statistica';
 $lang['Value'] = 'Valoarea';
-$lang['Number_posts'] = 'Numãrul mesajelor scrise';
+$lang['Number_posts'] = 'NumÄƒrul mesajelor scrise';
 $lang['Posts_per_day'] = 'Mesaje scrise pe zi';
-$lang['Number_topics'] = 'Numãrul subiectelor';
+$lang['Number_topics'] = 'NumÄƒrul subiectelor';
 $lang['Topics_per_day'] = 'Subiecte pe zi';
-$lang['Number_users'] = 'Numãrul utilizatorilor';
+$lang['Number_users'] = 'NumÄƒrul utilizatorilor';
 $lang['Users_per_day'] = 'Utilizatori pe zi';
-$lang['Board_started'] = 'Data lansãrii forumului';
+$lang['Board_started'] = 'Data lansÄƒrii forumului';
 $lang['Avatar_dir_size'] = 'Dimensiunea directorului cu imagini asociate (Avatar)';
 $lang['Database_size'] = 'Dimensiunea bazei de date';
 $lang['Gzip_compression'] ='Compresia Gzip';
-$lang['Not_available'] = 'Nu este disponibil(ã)';
+$lang['Not_available'] = 'Nu este disponibil(Äƒ)';
 
-$lang['ON'] = 'Activã'; // This is for GZip compression
-$lang['OFF'] = 'Inactivã';
+$lang['ON'] = 'ActivÄƒ'; // This is for GZip compression
+$lang['OFF'] = 'InactivÄƒ';
 
 
 //
@@ -104,45 +104,45 @@ $lang['Database_Utilities'] = 'Instrumentele bazei de date';
 
 $lang['Restore'] = 'Restaurare';
 $lang['Backup'] = 'Salvare (Backup)';
-$lang['Restore_explain'] = 'Aceasta va efectua o restaurare completã a tuturor tabelelor phpBB dintr-in fiºier salvat. Dacã serverul dumneavoastrã suportã, puteşi publica un fiºier text compresat cu gzip ºi aceasta va fi decomprimat automat. <b>ATENŞIE:</b> Aceastã procedurã va rescrie orice informaşie deja existentã. Procesul de restaurare poate dura un timp îndelungat; vã rugãm nu pãrãsişi aceastã paginã pânã când restaurarea nu se terminã.';
-$lang['Backup_explain'] = 'Aici puteşi face copii de rezervã ale tuturor datelor ce şin de phpBB. Dacã aveşi ºi tabele adişionale în aceeaºi bazã de date cu phpBB-ul pe care dorişi sã le pãstraşi, vã rugãm sã introduceşi numele lor separate prin virgulã în cãsuşa <i>Tabele Suplimentare</i> de mai jos. Dacã serverul dumneavoastrã suportã, puteşi comprima fiºierul cu gzip pentru a reduce dimensiunea sa înainte de a efectua operaşiunea de descãrcare.';
+$lang['Restore_explain'] = 'Aceasta va efectua o restaurare completÄƒ a tuturor tabelelor phpBB dintr-in fiÅŸier salvat. DacÄƒ serverul dumneavoastrÄƒ suportÄƒ, puteÅ£i publica un fiÅŸier text compresat cu gzip ÅŸi aceasta va fi decomprimat automat. <b>ATENÅ¢IE:</b> AceastÄƒ procedurÄƒ va rescrie orice informaÅ£ie deja existentÄƒ. Procesul de restaurare poate dura un timp Ã®ndelungat; vÄƒ rugÄƒm nu pÄƒrÄƒsiÅ£i aceastÄƒ paginÄƒ pÃ¢nÄƒ cÃ¢nd restaurarea nu se terminÄƒ.';
+$lang['Backup_explain'] = 'Aici puteÅ£i face copii de rezervÄƒ ale tuturor datelor ce Å£in de phpBB. DacÄƒ aveÅ£i ÅŸi tabele adiÅ£ionale Ã®n aceeaÅŸi bazÄƒ de date cu phpBB-ul pe care doriÅ£i sÄƒ le pÄƒstraÅ£i, vÄƒ rugÄƒm sÄƒ introduceÅ£i numele lor separate prin virgulÄƒ Ã®n cÄƒsuÅ£a <i>Tabele Suplimentare</i> de mai jos. DacÄƒ serverul dumneavoastrÄƒ suportÄƒ, puteÅ£i comprima fiÅŸierul cu gzip pentru a reduce dimensiunea sa Ã®nainte de a efectua operaÅ£iunea de descÄƒrcare.';
 
-$lang['Backup_options'] = 'Opşiunile de salvare (backup)';
-$lang['Start_backup'] = 'Porneºte operaşiunea de salvare (backup)';
-$lang['Full_backup'] = 'Salvare (Backup) totalã';
-$lang['Structure_backup'] = 'Salveazã (copie de siguranşã) doar structura';
-$lang['Data_backup'] = 'Salveazã (copie de siguranşã) doar datele';
+$lang['Backup_options'] = 'OpÅ£iunile de salvare (backup)';
+$lang['Start_backup'] = 'PorneÅŸte operaÅ£iunea de salvare (backup)';
+$lang['Full_backup'] = 'Salvare (Backup) totalÄƒ';
+$lang['Structure_backup'] = 'SalveazÄƒ (copie de siguranÅ£Äƒ) doar structura';
+$lang['Data_backup'] = 'SalveazÄƒ (copie de siguranÅ£Äƒ) doar datele';
 $lang['Additional_tables'] = 'Tabele suplimentare';
-$lang['Gzip_compress'] = 'Fiºier comprimat cu Gzip';
-$lang['Select_file'] = 'Selectaşi un fiºier';
-$lang['Start_Restore'] = 'Porneºte operaşiunea de restaurare';
+$lang['Gzip_compress'] = 'FiÅŸier comprimat cu Gzip';
+$lang['Select_file'] = 'SelectaÅ£i un fiÅŸier';
+$lang['Start_Restore'] = 'PorneÅŸte operaÅ£iunea de restaurare';
 
-$lang['Restore_success'] = 'Baza de date a fost restauratã cu succes.<br /><br />Forumul dumneavoastrã ar trebui sã revinã la starea lui înainte ca salvarea sã se fi realizat.';
-$lang['Backup_download'] = 'Operaşiunea de descãrcare va începe în curând; vã rugãm sã aºteptaşi pânã aceasta va începe';
-$lang['Backups_not_supported'] = 'Scuzaşi, dar efectuarea salvãrii (backup-ului) nu este în prezent realizabilã pentru sistemul dumneavoastrã de baze de date';
+$lang['Restore_success'] = 'Baza de date a fost restauratÄƒ cu succes.<br /><br />Forumul dumneavoastrÄƒ ar trebui sÄƒ revinÄƒ la starea lui Ã®nainte ca salvarea sÄƒ se fi realizat.';
+$lang['Backup_download'] = 'OperaÅ£iunea de descÄƒrcare va Ã®ncepe Ã®n curÃ¢nd; vÄƒ rugÄƒm sÄƒ aÅŸteptaÅ£i pÃ¢nÄƒ aceasta va Ã®ncepe';
+$lang['Backups_not_supported'] = 'ScuzaÅ£i, dar efectuarea salvÄƒrii (backup-ului) nu este Ã®n prezent realizabilÄƒ pentru sistemul dumneavoastrÄƒ de baze de date';
 
-$lang['Restore_Error_uploading'] = 'Eroare la publicarea fiºierului de salvare (backup)';
-$lang['Restore_Error_filename'] = 'Problemã cu numele fiºierului; vã rugãm, încercaşi cu un alt fiºier';
-$lang['Restore_Error_decompress'] = 'Nu pot decomprima un fiºier gzip; vã rugãm, publicaşi o versiune text întreg (plain text)';
-$lang['Restore_Error_no_file'] = 'Nici un fiºier nu a fost publicat/încãrcat';
+$lang['Restore_Error_uploading'] = 'Eroare la publicarea fiÅŸierului de salvare (backup)';
+$lang['Restore_Error_filename'] = 'ProblemÄƒ cu numele fiÅŸierului; vÄƒ rugÄƒm, Ã®ncercaÅ£i cu un alt fiÅŸier';
+$lang['Restore_Error_decompress'] = 'Nu pot decomprima un fiÅŸier gzip; vÄƒ rugÄƒm, publicaÅ£i o versiune text Ã®ntreg (plain text)';
+$lang['Restore_Error_no_file'] = 'Nici un fiÅŸier nu a fost publicat/Ã®ncÄƒrcat';
 
 
 //
 // Auth pages
 //
-$lang['Select_a_User'] = 'Selectaşi un utilizator';
-$lang['Select_a_Group'] = 'Selectaşi un grup';
-$lang['Select_a_Forum'] = 'Selectaşi un forum';
+$lang['Select_a_User'] = 'SelectaÅ£i un utilizator';
+$lang['Select_a_Group'] = 'SelectaÅ£i un grup';
+$lang['Select_a_Forum'] = 'SelectaÅ£i un forum';
 $lang['Auth_Control_User'] = 'Controlul permisiunilor utilizatorului';
 $lang['Auth_Control_Group'] = 'Controlul permisiunilor grupului';
 $lang['Auth_Control_Forum'] = 'Controlul permisiunilor forumului';
-$lang['Look_up_User'] = 'Selecteazã utilizatorul';
-$lang['Look_up_Group'] = 'Selecteazã grupul';
-$lang['Look_up_Forum'] = 'Selecteazã forumul';
+$lang['Look_up_User'] = 'SelecteazÄƒ utilizatorul';
+$lang['Look_up_Group'] = 'SelecteazÄƒ grupul';
+$lang['Look_up_Forum'] = 'SelecteazÄƒ forumul';
 
-$lang['Group_auth_explain'] = 'Aici puteşi modifica permisiunile ºi starea moderatorului asociat la fiecare grup de utilizatori. Nu uitaşi când schimbaşi permisiunile grupului cã permisiunile individuale ale utilizatorului pot sã permitã accesul utilizatorului la forumuri, etc. Veşi fi atenşionat dacã va apãrea aceastã situaşie.';
-$lang['User_auth_explain'] = 'Aici puteşi modifica permisiunile ºi starea moderatorului asociat la fiecare utilizator individual. Nu uitaşi când schimbaşi permisiunile utilizatorului cã permisiunile individuale ale grupului pot sã permitã accesul utilizatorului la forumuri, etc. Veşi fi atenşionat dacã va apãrea aceastã situaşie.';
-$lang['Forum_auth_explain'] = 'Aici puteşi modifica nivelurile de autorizare ale fiecãrui forum. Pentru a realiza acest lucru aveşi la dispozişie atât o metodã simplã cât ºi una avansatã, metoda avansatã oferind un control mai mare al fiecãriei operaşii din forum. Amintişi-vã cã schimbarea nivelului de permisiuni ale forumurilor va afecta modul de realizare(finalizare) al diverselor operaşiuni solicitate de cãtre utilizatori.';
+$lang['Group_auth_explain'] = 'Aici puteÅ£i modifica permisiunile ÅŸi starea moderatorului asociat la fiecare grup de utilizatori. Nu uitaÅ£i cÃ¢nd schimbaÅ£i permisiunile grupului cÄƒ permisiunile individuale ale utilizatorului pot sÄƒ permitÄƒ accesul utilizatorului la forumuri, etc. VeÅ£i fi atenÅ£ionat dacÄƒ va apÄƒrea aceastÄƒ situaÅ£ie.';
+$lang['User_auth_explain'] = 'Aici puteÅ£i modifica permisiunile ÅŸi starea moderatorului asociat la fiecare utilizator individual. Nu uitaÅ£i cÃ¢nd schimbaÅ£i permisiunile utilizatorului cÄƒ permisiunile individuale ale grupului pot sÄƒ permitÄƒ accesul utilizatorului la forumuri, etc. VeÅ£i fi atenÅ£ionat dacÄƒ va apÄƒrea aceastÄƒ situaÅ£ie.';
+$lang['Forum_auth_explain'] = 'Aici puteÅ£i modifica nivelurile de autorizare ale fiecÄƒrui forum. Pentru a realiza acest lucru aveÅ£i la dispoziÅ£ie atÃ¢t o metodÄƒ simplÄƒ cÃ¢t ÅŸi una avansatÄƒ, metoda avansatÄƒ oferind un control mai mare al fiecÄƒriei operaÅ£ii din forum. AmintiÅ£i-vÄƒ cÄƒ schimbarea nivelului de permisiuni ale forumurilor va afecta modul de realizare(finalizare) al diverselor operaÅ£iuni solicitate de cÄƒtre utilizatori.';
 
 $lang['Simple_mode'] = 'Modul simplu';
 $lang['Advanced_mode'] = 'Modul avansat';
@@ -154,22 +154,22 @@ $lang['Is_Moderator'] = 'este moderator';
 $lang['Not_Moderator'] = 'nu este moderator';
 
 $lang['Conflict_warning'] = 'Avertizare - Conflict de autorizare';
-$lang['Conflict_access_userauth'] = 'Acest utilizator are încã drepturi de acces la acest forum datorate apartenenşei acestuia la grup. Puteşi sã modificaşi permisiunile grupului sau sã înlãturaşi acest utilizator din grup pentru a nu mai avea depturi de acces. Grupurile care dau drepturi (ºi forumurile implicate) sunt afiºate mai jos.';
-$lang['Conflict_mod_userauth'] = 'Acest utilizator are încã drepturi de moderator la acest forum datorate apartenenşei acestuia la grup. Puteşi sã modificaşi permisiunile grupului sau sã înlãturaşi acest utilizator din grup pentru a nu mai avea depturi de moderator. Grupurile care dau drepturi (ºi forumurile implicate) sunt afiºate mai jos.';
+$lang['Conflict_access_userauth'] = 'Acest utilizator are Ã®ncÄƒ drepturi de acces la acest forum datorate apartenenÅ£ei acestuia la grup. PuteÅ£i sÄƒ modificaÅ£i permisiunile grupului sau sÄƒ Ã®nlÄƒturaÅ£i acest utilizator din grup pentru a nu mai avea depturi de acces. Grupurile care dau drepturi (ÅŸi forumurile implicate) sunt afiÅŸate mai jos.';
+$lang['Conflict_mod_userauth'] = 'Acest utilizator are Ã®ncÄƒ drepturi de moderator la acest forum datorate apartenenÅ£ei acestuia la grup. PuteÅ£i sÄƒ modificaÅ£i permisiunile grupului sau sÄƒ Ã®nlÄƒturaÅ£i acest utilizator din grup pentru a nu mai avea depturi de moderator. Grupurile care dau drepturi (ÅŸi forumurile implicate) sunt afiÅŸate mai jos.';
 
-$lang['Conflict_access_groupauth'] = 'Utilizatorul(i) urmãtor(i) are(au) încã drepturi de acces la acest forum datorate setãrilor lui(lor) de permisiuni. Puteşi sã modificaşi permisiunile utilizatorului pentru a nu mai avea drepturi de acces. Utilizatorii care dau drepturi (ºi forumurile implicate) sunt afiºaşi mai jos.';
-$lang['Conflict_mod_groupauth'] = 'Utilizatorul(i) urmãtor(i) are(au) încã drepturi de acces la acest forum datorate setãrilor lui(lor) de permisiuni. Puteşi sã modificaşi permisiunile utilizatorului pentru a nu mai avea drepturi de moderator. Utilizatorii care dau drepturi (ºi forumurile implicate) sunt afiºaşi mai jos.';
+$lang['Conflict_access_groupauth'] = 'Utilizatorul(i) urmÄƒtor(i) are(au) Ã®ncÄƒ drepturi de acces la acest forum datorate setÄƒrilor lui(lor) de permisiuni. PuteÅ£i sÄƒ modificaÅ£i permisiunile utilizatorului pentru a nu mai avea drepturi de acces. Utilizatorii care dau drepturi (ÅŸi forumurile implicate) sunt afiÅŸaÅ£i mai jos.';
+$lang['Conflict_mod_groupauth'] = 'Utilizatorul(i) urmÄƒtor(i) are(au) Ã®ncÄƒ drepturi de acces la acest forum datorate setÄƒrilor lui(lor) de permisiuni. PuteÅ£i sÄƒ modificaÅ£i permisiunile utilizatorului pentru a nu mai avea drepturi de moderator. Utilizatorii care dau drepturi (ÅŸi forumurile implicate) sunt afiÅŸaÅ£i mai jos.';
 
 $lang['Public'] = 'Public';
 $lang['Private'] = 'Privat';
-$lang['Registered'] = 'Înregistrat';
+$lang['Registered'] = 'Ãnregistrat';
 $lang['Administrators'] = 'Administratori';
 $lang['Hidden'] = 'Ascuns';
 
 // These are displayed in the drop down boxes for advanced
 // mode forum auth, try and keep them short!
-$lang['Forum_ALL'] = 'TOŞI';
-$lang['Forum_REG'] = 'ÎNREG';
+$lang['Forum_ALL'] = 'TOÅ¢I';
+$lang['Forum_REG'] = 'ÃNREG';
 $lang['Forum_PRIVATE'] = 'PRIVAT';
 $lang['Forum_MOD'] = 'MOD';
 $lang['Forum_ADMIN'] = 'ADMIN';
@@ -177,404 +177,404 @@ $lang['Forum_ADMIN'] = 'ADMIN';
 $lang['View'] = 'Vizualizare';
 $lang['Read'] = 'Citire';
 $lang['Post'] = 'Scriere';
-$lang['Reply'] = 'Rãspunde';
-$lang['Edit'] = 'Modificã';
-$lang['Delete'] = 'ªterge';
+$lang['Reply'] = 'RÄƒspunde';
+$lang['Edit'] = 'ModificÄƒ';
+$lang['Delete'] = 'Återge';
 $lang['Sticky'] = 'Important';
-$lang['Announce'] = 'Anunş';
+$lang['Announce'] = 'AnunÅ£';
 $lang['Vote'] = 'Vot';
 $lang['Pollcreate'] = 'Creare sondaj';
 
 $lang['Permissions'] = 'Permisiuni';
-$lang['Simple_Permission'] = 'Permisiune simplã';
+$lang['Simple_Permission'] = 'Permisiune simplÄƒ';
 
 $lang['User_Level'] = 'Nivelul utilizatorului';
 $lang['Auth_User'] = 'Utilizator';
 $lang['Auth_Admin'] = 'Administrator';
 $lang['Group_memberships'] = 'Membru al grupurilor';
-$lang['Usergroup_members'] = 'Acest grup conşine urmãtorii membrii';
+$lang['Usergroup_members'] = 'Acest grup conÅ£ine urmÄƒtorii membrii';
 
 $lang['Forum_auth_updated'] = 'Permisiunile forumului au fost actualizate';
 $lang['User_auth_updated'] = 'Permisiunile utilizatorului au fost actualizate';
 $lang['Group_auth_updated'] = 'Permisiunile grupului au fost actualizate';
 
 $lang['Auth_updated'] = 'Permisiunile au fost actualizate';
-$lang['Click_return_userauth'] = 'Apãsaşi %saici%s pentru a reveni la secşiunea Controlul permisiunilor utilizatorului';
-$lang['Click_return_groupauth'] = 'Apãsaşi %saici%s pentru a reveni la secşiunea Controlul permisiunilor grupului';
-$lang['Click_return_forumauth'] = 'Apãsaşi %saici%s pentru a reveni la secşiunea Controlul permisiunilor forumului';
+$lang['Click_return_userauth'] = 'ApÄƒsaÅ£i %saici%s pentru a reveni la secÅ£iunea Controlul permisiunilor utilizatorului';
+$lang['Click_return_groupauth'] = 'ApÄƒsaÅ£i %saici%s pentru a reveni la secÅ£iunea Controlul permisiunilor grupului';
+$lang['Click_return_forumauth'] = 'ApÄƒsaÅ£i %saici%s pentru a reveni la secÅ£iunea Controlul permisiunilor forumului';
 
 
 //
 // Banning
 //
-$lang['Ban_control'] = 'Controlul interdicşiilor';
-$lang['Ban_explain'] = 'Aici puteşi sã controlaşi interdicşiile utilizatorilor. Puteşi obşine acest lucru interzicând una sau mai multe din elementele caracteristice unui utilizator: denumire utilizator, mulşimea adreselor IP sau numele host-urilor. Aceste metode împiedicã un utilizator sã nu ajungã în pagina de început a forumului. Pentru a împiedica un utilizator sã se înregistreze sub un alt nume de utilizator puteşi specifica o adresã de mail interzisã. Reşineşi cã o singurã adresã de mail interzisã nu-l va împiedeca pe utilizatorul în cauzã sã intre sau sã scrie în forumul dumneavoastrã; ar trebui sã folosişi prima din cele douã metode.';
-$lang['Ban_explain_warn'] = 'Reşineşi cã introducerea unei mulşimi de adrese IP înseamnã cã toate adresele dintre începutul ºi sfârºitul mulşimii au fost adãugate la lista interzisã. Pentru a reduce numãrul de adrese adãugate la baza de date se pot folosi <i>wildcard</i>-urile unde este cazul. Dacã chiar trebuie sã introduceşi o plajã de valori, încercaşi sã o pãstraşi cât mai micã sau mai bine reşineşi doar adresele specifice.';
+$lang['Ban_control'] = 'Controlul interdicÅ£iilor';
+$lang['Ban_explain'] = 'Aici puteÅ£i sÄƒ controlaÅ£i interdicÅ£iile utilizatorilor. PuteÅ£i obÅ£ine acest lucru interzicÃ¢nd una sau mai multe din elementele caracteristice unui utilizator: denumire utilizator, mulÅ£imea adreselor IP sau numele host-urilor. Aceste metode Ã®mpiedicÄƒ un utilizator sÄƒ nu ajungÄƒ Ã®n pagina de Ã®nceput a forumului. Pentru a Ã®mpiedica un utilizator sÄƒ se Ã®nregistreze sub un alt nume de utilizator puteÅ£i specifica o adresÄƒ de mail interzisÄƒ. ReÅ£ineÅ£i cÄƒ o singurÄƒ adresÄƒ de mail interzisÄƒ nu-l va Ã®mpiedeca pe utilizatorul Ã®n cauzÄƒ sÄƒ intre sau sÄƒ scrie Ã®n forumul dumneavoastrÄƒ; ar trebui sÄƒ folosiÅ£i prima din cele douÄƒ metode.';
+$lang['Ban_explain_warn'] = 'ReÅ£ineÅ£i cÄƒ introducerea unei mulÅ£imi de adrese IP Ã®nseamnÄƒ cÄƒ toate adresele dintre Ã®nceputul ÅŸi sfÃ¢rÅŸitul mulÅ£imii au fost adÄƒugate la lista interzisÄƒ. Pentru a reduce numÄƒrul de adrese adÄƒugate la baza de date se pot folosi <i>wildcard</i>-urile unde este cazul. DacÄƒ chiar trebuie sÄƒ introduceÅ£i o plajÄƒ de valori, Ã®ncercaÅ£i sÄƒ o pÄƒstraÅ£i cÃ¢t mai micÄƒ sau mai bine reÅ£ineÅ£i doar adresele specifice.';
 
-$lang['Select_username'] = 'Selectaşi un nume de utilizator';
-$lang['Select_ip'] = 'Selectaşi un IP';
-$lang['Select_email'] = 'Selectaşi o adresã de email';
+$lang['Select_username'] = 'SelectaÅ£i un nume de utilizator';
+$lang['Select_ip'] = 'SelectaÅ£i un IP';
+$lang['Select_email'] = 'SelectaÅ£i o adresÄƒ de email';
 
-$lang['Ban_username'] = 'Interziceşi unul sau mai mulşi utilizatori';
-$lang['Ban_username_explain'] = 'Puteşi interzice mai mulşi utilizatori într-un singur pas folosind combinaşii potrivite ale mouse-ului (în browser) ºi tastaturii calculatorului dumneavoastrã';
+$lang['Ban_username'] = 'InterziceÅ£i unul sau mai mulÅ£i utilizatori';
+$lang['Ban_username_explain'] = 'PuteÅ£i interzice mai mulÅ£i utilizatori Ã®ntr-un singur pas folosind combinaÅ£ii potrivite ale mouse-ului (Ã®n browser) ÅŸi tastaturii calculatorului dumneavoastrÄƒ';
 
-$lang['Ban_IP'] = 'Interziceşi una sau mai multe adrese IP sau nume de host-uri';
+$lang['Ban_IP'] = 'InterziceÅ£i una sau mai multe adrese IP sau nume de host-uri';
 $lang['IP_hostname'] = 'Adrese IP sau nume de host-uri';
-$lang['Ban_IP_explain'] = 'Pentru a specifica mai multe IP-uri diferite sau nume de host-uri trebuie sã le separaşi prin virgulã. Pentru a specifica o mulşime de adrese IP, separaşi începutul ºi sfârºitul mulşimii cu o liniuşã de unire (-); ca sã specificaşi caracterul <i>wildcard</i> folosişi *';
+$lang['Ban_IP_explain'] = 'Pentru a specifica mai multe IP-uri diferite sau nume de host-uri trebuie sÄƒ le separaÅ£i prin virgulÄƒ. Pentru a specifica o mulÅ£ime de adrese IP, separaÅ£i Ã®nceputul ÅŸi sfÃ¢rÅŸitul mulÅ£imii cu o liniuÅ£Äƒ de unire (-); ca sÄƒ specificaÅ£i caracterul <i>wildcard</i> folosiÅ£i *';
 
-$lang['Ban_email'] = 'Interziceşi una sau mai multe adrese de email';
-$lang['Ban_email_explain'] = 'Pentru a specifica mai multe adrese de email folosişi separatorul virgulã. Ca sã specificaşi un utilizator cu ajutorul <i>wildcard</i>-ului folosişi *, de exemplu *@hotmail.com';
+$lang['Ban_email'] = 'InterziceÅ£i una sau mai multe adrese de email';
+$lang['Ban_email_explain'] = 'Pentru a specifica mai multe adrese de email folosiÅ£i separatorul virgulÄƒ. Ca sÄƒ specificaÅ£i un utilizator cu ajutorul <i>wildcard</i>-ului folosiÅ£i *, de exemplu *@hotmail.com';
 
 $lang['Unban_username'] = 'Deblocarea utilizatorilor';
-$lang['Unban_username_explain'] = 'Puteşi sã deblocaşi mai mulşi utilizatori într-un singur pas folosind combinaşii potrivite ale mouse-ului (în browser) ºi tastaturii calculatorului dumneavoastrã';
+$lang['Unban_username_explain'] = 'PuteÅ£i sÄƒ deblocaÅ£i mai mulÅ£i utilizatori Ã®ntr-un singur pas folosind combinaÅ£ii potrivite ale mouse-ului (Ã®n browser) ÅŸi tastaturii calculatorului dumneavoastrÄƒ';
 
 $lang['Unban_IP'] = 'Deblocarea adreselor IP';
-$lang['Unban_IP_explain'] = 'Puteşi sã deblocaşi mai multe adrese IP într-un singur pas folosind combinaşii potrivite ale mouse-ului (în browser) ºi tastaturii calculatorului dumneavoastrã';
+$lang['Unban_IP_explain'] = 'PuteÅ£i sÄƒ deblocaÅ£i mai multe adrese IP Ã®ntr-un singur pas folosind combinaÅ£ii potrivite ale mouse-ului (Ã®n browser) ÅŸi tastaturii calculatorului dumneavoastrÄƒ';
 
 $lang['Unban_email'] = 'Deblocarea adreselor email';
-$lang['Unban_email_explain'] = 'Puteşi sã deblocaşi mai multe adrese email într-un singur pas folosind combinaşii potrivite ale mouse-ului (în browser) ºi tastaturii calculatorului dumneavoastrã';
+$lang['Unban_email_explain'] = 'PuteÅ£i sÄƒ deblocaÅ£i mai multe adrese email Ã®ntr-un singur pas folosind combinaÅ£ii potrivite ale mouse-ului (Ã®n browser) ÅŸi tastaturii calculatorului dumneavoastrÄƒ';
 
 $lang['No_banned_users'] = 'Nu este nici un utilizator interzis';
-$lang['No_banned_ip'] = 'Nu este nici o adresã IP interzisã';
-$lang['No_banned_email'] = 'Nu este nici o adresã de email interzisã';
+$lang['No_banned_ip'] = 'Nu este nici o adresÄƒ IP interzisÄƒ';
+$lang['No_banned_email'] = 'Nu este nici o adresÄƒ de email interzisÄƒ';
 
-$lang['Ban_update_sucessful'] = 'Lista restricşiilor a fost actualizatã cu succes';
-$lang['Click_return_banadmin'] = 'Apãsaşi %saici%s pentru a reveni la secşiunea Control Restricşii';
+$lang['Ban_update_sucessful'] = 'Lista restricÅ£iilor a fost actualizatÄƒ cu succes';
+$lang['Click_return_banadmin'] = 'ApÄƒsaÅ£i %saici%s pentru a reveni la secÅ£iunea Control RestricÅ£ii';
 
 
 //
 // Configuration
 //
-$lang['General_Config'] = 'Configurare generalã';
-$lang['Config_explain'] = 'Formularul de mai jos vã permite sã personalizaşi toate opşiunile generale ale forumului. Pentru configurarea utilizatorilor ºi forumurilor folosişi legãturile specifice aflate în partea stângã.';
+$lang['General_Config'] = 'Configurare generalÄƒ';
+$lang['Config_explain'] = 'Formularul de mai jos vÄƒ permite sÄƒ personalizaÅ£i toate opÅ£iunile generale ale forumului. Pentru configurarea utilizatorilor ÅŸi forumurilor folosiÅ£i legÄƒturile specifice aflate Ã®n partea stÃ¢ngÄƒ.';
 
-$lang['Click_return_config'] = 'Apãsaşi %saici%s pentru a reveni la secşiunea Configurare generalã';
+$lang['Click_return_config'] = 'ApÄƒsaÅ£i %saici%s pentru a reveni la secÅ£iunea Configurare generalÄƒ';
 
-$lang['General_settings'] = 'Setãrile generale ale forumului';
+$lang['General_settings'] = 'SetÄƒrile generale ale forumului';
 $lang['Server_name'] = 'Numele domeniului';
-$lang['Server_name_explain'] = 'Numele domeniului acestui forum ruleazã din';
+$lang['Server_name_explain'] = 'Numele domeniului acestui forum ruleazÄƒ din';
 $lang['Script_path'] = 'Calea script-ului';
 $lang['Script_path_explain'] = 'Calea unde phpBB2 este localizat relativ la numele domeniului';
 $lang['Server_port'] = 'Port-ul serverului';
-$lang['Server_port_explain'] = 'Port-ul pe care serverul dumneavoastrã ruleazã este de obicei 80 (numai dacã nu a fost schimbat)';
+$lang['Server_port_explain'] = 'Port-ul pe care serverul dumneavoastrÄƒ ruleazÄƒ este de obicei 80 (numai dacÄƒ nu a fost schimbat)';
 $lang['Site_name'] = 'Numele site-ului';
 $lang['Site_desc'] = 'Descrierea site-ului';
 $lang['Board_disable'] = 'Forum dezactivat';
-$lang['Board_disable_explain'] = 'Aceastã acşiune va face forumul indisponibil utilizatorilor. Nu închideşi sesiunea curentã când dezactivaşi forumul, altfel nu veşi mai fi capabil sã vã autentificaşi din nou!';
-$lang['Acct_activation'] = 'Validarea contului activatã de';
+$lang['Board_disable_explain'] = 'AceastÄƒ acÅ£iune va face forumul indisponibil utilizatorilor. Nu Ã®nchideÅ£i sesiunea curentÄƒ cÃ¢nd dezactivaÅ£i forumul, altfel nu veÅ£i mai fi capabil sÄƒ vÄƒ autentificaÅ£i din nou!';
+$lang['Acct_activation'] = 'Validarea contului activatÄƒ de';
 $lang['Acc_None'] = 'Nimeni'; // These three entries are the type of activation
 $lang['Acc_User'] = 'Utilizator';
 $lang['Acc_Admin'] = 'Administrator';
 
-$lang['Abilities_settings'] = 'Configurãrile de bazã ale utilizatorilor ºi forumurilor';
-$lang['Max_poll_options'] = 'Numãrul maxim al opşiunilor chestionarului';
+$lang['Abilities_settings'] = 'ConfigurÄƒrile de bazÄƒ ale utilizatorilor ÅŸi forumurilor';
+$lang['Max_poll_options'] = 'NumÄƒrul maxim al opÅ£iunilor chestionarului';
 $lang['Flood_Interval'] = 'Interval de flood';
-$lang['Flood_Interval_explain'] = 'Numãrul de secunde pe care un utilzator trebuie sã-l aºtepte între publicãri';
+$lang['Flood_Interval_explain'] = 'NumÄƒrul de secunde pe care un utilzator trebuie sÄƒ-l aÅŸtepte Ã®ntre publicÄƒri';
 $lang['Board_email_form'] = 'Trimite mesaj la utilizator via forum';
-$lang['Board_email_form_explain'] = 'Utilizatorii pot trimit mesaje unii la alşi prin acest forum';
-$lang['Topics_per_page'] = 'Subiecte pe paginã';
-$lang['Posts_per_page'] = 'Mesaje pe paginã';
+$lang['Board_email_form_explain'] = 'Utilizatorii pot trimit mesaje unii la alÅ£i prin acest forum';
+$lang['Topics_per_page'] = 'Subiecte pe paginÄƒ';
+$lang['Posts_per_page'] = 'Mesaje pe paginÄƒ';
 $lang['Hot_threshold'] = 'Mesaje pentru statutul popular';
 $lang['Default_style'] = 'Stilul standard';
 $lang['Override_style'] = 'Suprascrie stilul utilizatorului';
-$lang['Override_style_explain'] = 'Înlocuirea sitului utilizatorilor cu cel standard';
+$lang['Override_style_explain'] = 'Ãnlocuirea sitului utilizatorilor cu cel standard';
 $lang['Default_language'] = 'Limba standard';
 $lang['Date_format'] = 'Formatul datei';
 $lang['System_timezone'] = 'Timpul zonal al sistemului';
 $lang['Enable_gzip'] = 'Activare compresie GZip';
-$lang['Enable_prune'] = 'Activare curãşire forum';
+$lang['Enable_prune'] = 'Activare curÄƒÅ£ire forum';
 $lang['Allow_HTML'] = 'Permite HTML';
 $lang['Allow_BBCode'] = 'Permite cod BB';
 $lang['Allowed_tags'] = 'Permite balize (tag-uri) HTML';
-$lang['Allowed_tags_explain'] = 'Separã balizele (tag-urile) cu virgule';
-$lang['Allow_smilies'] = 'Permite zâmbete';
-$lang['Smilies_path'] = 'Calea unde se pãstreazã zâmbetele';
-$lang['Smilies_path_explain'] = 'Calea aflatã în directorul dumneavoastrã phpBB , de exemplu. imagini/zâmbete';
-$lang['Allow_sig'] = 'Permite semnãturi';
-$lang['Max_sig_length'] = 'Lungimea maximã a semnãturii';
-$lang['Max_sig_length_explain'] = 'Numãrul maxim de caractere aflate în semnãtura utilizatorului';
+$lang['Allowed_tags_explain'] = 'SeparÄƒ balizele (tag-urile) cu virgule';
+$lang['Allow_smilies'] = 'Permite zÃ¢mbete';
+$lang['Smilies_path'] = 'Calea unde se pÄƒstreazÄƒ zÃ¢mbetele';
+$lang['Smilies_path_explain'] = 'Calea aflatÄƒ Ã®n directorul dumneavoastrÄƒ phpBB , de exemplu. imagini/zÃ¢mbete';
+$lang['Allow_sig'] = 'Permite semnÄƒturi';
+$lang['Max_sig_length'] = 'Lungimea maximÄƒ a semnÄƒturii';
+$lang['Max_sig_length_explain'] = 'NumÄƒrul maxim de caractere aflate Ã®n semnÄƒtura utilizatorului';
 $lang['Allow_name_change'] = 'Permite schimbarea numelui de utilizator';
 
-$lang['Avatar_settings'] = 'Configurãri pentru imagini asociate (Avatar)';
+$lang['Avatar_settings'] = 'ConfigurÄƒri pentru imagini asociate (Avatar)';
 $lang['Allow_local'] = 'Permite galerie de imagini asociate';
-$lang['Allow_remote'] = 'Permite imagini asociate la distanşã';
-$lang['Allow_remote_explain'] = 'Imaginile asociate sunt specificate cu o legãturã la alt site web';
-$lang['Allow_upload'] = 'Permite încãrcarea imaginii asociate';
-$lang['Max_filesize'] = 'Dimensiunea maximã a fiºierului ce conşine imaginea asociatã';
-$lang['Max_filesize_explain'] = 'Pentru fiºierele ce conşin imaginile asociate încãrcate';
-$lang['Max_avatar_size'] = 'Dimensiunea maximã a imaginii asociate';
-$lang['Max_avatar_size_explain'] = '(Înãlşime x Lãşime în pixeli)';
-$lang['Avatar_storage_path'] = 'Calea de pãstrare a imaginilor asociate';
-$lang['Avatar_storage_path_explain'] = 'Calea aflatã în directorul dumneavoastrã phpBB, de exemplu. imagini/avatar';
-$lang['Avatar_gallery_path'] = 'Calea de pãstrare a galeriilor cu imagini asociate';
-$lang['Avatar_gallery_path_explain'] = 'Calea aflatã în directorul dumneavoastrã phpBB, de exemplu. imagini/avatar/galerie';
+$lang['Allow_remote'] = 'Permite imagini asociate la distanÅ£Äƒ';
+$lang['Allow_remote_explain'] = 'Imaginile asociate sunt specificate cu o legÄƒturÄƒ la alt site web';
+$lang['Allow_upload'] = 'Permite Ã®ncÄƒrcarea imaginii asociate';
+$lang['Max_filesize'] = 'Dimensiunea maximÄƒ a fiÅŸierului ce conÅ£ine imaginea asociatÄƒ';
+$lang['Max_filesize_explain'] = 'Pentru fiÅŸierele ce conÅ£in imaginile asociate Ã®ncÄƒrcate';
+$lang['Max_avatar_size'] = 'Dimensiunea maximÄƒ a imaginii asociate';
+$lang['Max_avatar_size_explain'] = '(ÃnÄƒlÅ£ime x LÄƒÅ£ime Ã®n pixeli)';
+$lang['Avatar_storage_path'] = 'Calea de pÄƒstrare a imaginilor asociate';
+$lang['Avatar_storage_path_explain'] = 'Calea aflatÄƒ Ã®n directorul dumneavoastrÄƒ phpBB, de exemplu. imagini/avatar';
+$lang['Avatar_gallery_path'] = 'Calea de pÄƒstrare a galeriilor cu imagini asociate';
+$lang['Avatar_gallery_path_explain'] = 'Calea aflatÄƒ Ã®n directorul dumneavoastrÄƒ phpBB, de exemplu. imagini/avatar/galerie';
 
-$lang['COPPA_settings'] = 'Configurãrile COPPA';
-$lang['COPPA_fax'] = 'Numãrul de fax';
-$lang['COPPA_mail'] = 'Adresa poºtalã COPPA';
-$lang['COPPA_mail_explain'] = 'Aceasta este adresa poºtalã unde pãrinşii vor trimite formularele de înregistrare COPPA';
+$lang['COPPA_settings'] = 'ConfigurÄƒrile COPPA';
+$lang['COPPA_fax'] = 'NumÄƒrul de fax';
+$lang['COPPA_mail'] = 'Adresa poÅŸtalÄƒ COPPA';
+$lang['COPPA_mail_explain'] = 'Aceasta este adresa poÅŸtalÄƒ unde pÄƒrinÅ£ii vor trimite formularele de Ã®nregistrare COPPA';
 
-$lang['Email_settings'] = 'Configurãrile de email';
+$lang['Email_settings'] = 'ConfigurÄƒrile de email';
 $lang['Admin_email'] = 'Adresa de email a administratorului';
-$lang['Email_sig'] = 'Semnãtura din email';
-$lang['Email_sig_explain'] = 'Acest text va fi ataºat la toate mesajele pe care forumul le trimite';
-$lang['Use_SMTP'] = 'Folosişi serverul SMTP pentru email';
-$lang['Use_SMTP_explain'] = 'Specificaşi da dacã dorişi sau aveşi nevoie sã trimiteşi mesaje printr-un alt server în loc sã folosişi funcşia localã de mesagerie';
+$lang['Email_sig'] = 'SemnÄƒtura din email';
+$lang['Email_sig_explain'] = 'Acest text va fi ataÅŸat la toate mesajele pe care forumul le trimite';
+$lang['Use_SMTP'] = 'FolosiÅ£i serverul SMTP pentru email';
+$lang['Use_SMTP_explain'] = 'SpecificaÅ£i da dacÄƒ doriÅ£i sau aveÅ£i nevoie sÄƒ trimiteÅ£i mesaje printr-un alt server Ã®n loc sÄƒ folosiÅ£i funcÅ£ia localÄƒ de mesagerie';
 $lang['SMTP_server'] = 'Adresa serverului SMTP';
 $lang['SMTP_username'] = 'Numele de utilizator SMTP';
-$lang['SMTP_username_explain'] = 'Introduceşi numele de utilizator doar dacã serverul dumneavoastrã SMTP necesitã aceastã specificare';
+$lang['SMTP_username_explain'] = 'IntroduceÅ£i numele de utilizator doar dacÄƒ serverul dumneavoastrÄƒ SMTP necesitÄƒ aceastÄƒ specificare';
 $lang['SMTP_password'] = 'Parola SMTP';
-$lang['SMTP_password_explain'] = 'Introduceşi parola doar dacã serverul dumneavoastrã SMTP necesitã aceastã specificare';
+$lang['SMTP_password_explain'] = 'IntroduceÅ£i parola doar dacÄƒ serverul dumneavoastrÄƒ SMTP necesitÄƒ aceastÄƒ specificare';
 
-$lang['Disable_privmsg'] = 'Mesagerie privatã';
-$lang['Inbox_limits'] = 'Numãrul maxim al mesajelor în Cutia cu mesaje (Inbox)';
-$lang['Sentbox_limits'] = 'Numãrul maxim al mesajelor în Cutia cu mesaje trimise (Sentbox)';
-$lang['Savebox_limits'] = 'Numãrul maxim al mesajelor în Cutia cu mesaje salvate (Savebox)';
+$lang['Disable_privmsg'] = 'Mesagerie privatÄƒ';
+$lang['Inbox_limits'] = 'NumÄƒrul maxim al mesajelor Ã®n Cutia cu mesaje (Inbox)';
+$lang['Sentbox_limits'] = 'NumÄƒrul maxim al mesajelor Ã®n Cutia cu mesaje trimise (Sentbox)';
+$lang['Savebox_limits'] = 'NumÄƒrul maxim al mesajelor Ã®n Cutia cu mesaje salvate (Savebox)';
 
-$lang['Cookie_settings'] = 'Configurãrile pentru cookie';
-$lang['Cookie_settings_explain'] = 'Aceste detalii definesc cum sunt cookie-urile trimise cãtre browser-ele utilizatorilor. În cele mai multe cazuri valorile standard pentru setãrile cookie-urilor ar trebui sã fie suficiente dar dacã trebuie sã le schimbaşi aveşi mare grijã, setãrile incorecte pot împiedica utilizatorii sã se autentifice';
+$lang['Cookie_settings'] = 'ConfigurÄƒrile pentru cookie';
+$lang['Cookie_settings_explain'] = 'Aceste detalii definesc cum sunt cookie-urile trimise cÄƒtre browser-ele utilizatorilor. Ãn cele mai multe cazuri valorile standard pentru setÄƒrile cookie-urilor ar trebui sÄƒ fie suficiente dar dacÄƒ trebuie sÄƒ le schimbaÅ£i aveÅ£i mare grijÄƒ, setÄƒrile incorecte pot Ã®mpiedica utilizatorii sÄƒ se autentifice';
 $lang['Cookie_domain'] = 'Domeniul pentru cookie';
 $lang['Cookie_name'] = 'Numele pentru cookie';
 $lang['Cookie_path'] = 'Calea pentru cookie';
 $lang['Cookie_secure'] = 'Securizare cookie';
-$lang['Cookie_secure_explain'] = 'Dacã serverul dumneavoastrã ruleazã via SSL, selectaşi <i>Activat</i> altfel selectaşi <i>Dezactivat</i>';
+$lang['Cookie_secure_explain'] = 'DacÄƒ serverul dumneavoastrÄƒ ruleazÄƒ via SSL, selectaÅ£i <i>Activat</i> altfel selectaÅ£i <i>Dezactivat</i>';
 $lang['Session_length'] = 'Durata sesiunii [ secunde ]';
 
 
 // Visual Confirmation
-$lang['Visual_confirm'] = 'Activeazã Confirmarea Vizualã';
-$lang['Visual_confirm_explain'] = 'Necesitã introducerea unui cod vizual definit ca o imagine la înregistrare.';
+$lang['Visual_confirm'] = 'ActiveazÄƒ Confirmarea VizualÄƒ';
+$lang['Visual_confirm_explain'] = 'NecesitÄƒ introducerea unui cod vizual definit ca o imagine la Ã®nregistrare.';
 
 // Autologin Keys - added 2.0.18
-$lang['Allow_autologin'] = 'Permite autentificãri automate';
-$lang['Allow_autologin_explain'] = 'Determinã dacã utilizatorii au voie sã selecteze sã fie autentificaşi automat când viziteazã forumul.';
-$lang['Autologin_time'] = 'Expirarea cheii de autentificare automatã.';
-$lang['Autologin_time_explain'] = 'Câte zile este validã o cheie de autentificare automatã dacã utilizatorul nu viziteazã forumul. Seteazã 0 pentru a dezactiva expirarea.';
+$lang['Allow_autologin'] = 'Permite autentificÄƒri automate';
+$lang['Allow_autologin_explain'] = 'DeterminÄƒ dacÄƒ utilizatorii au voie sÄƒ selecteze sÄƒ fie autentificaÅ£i automat cÃ¢nd viziteazÄƒ forumul.';
+$lang['Autologin_time'] = 'Expirarea cheii de autentificare automatÄƒ.';
+$lang['Autologin_time_explain'] = 'CÃ¢te zile este validÄƒ o cheie de autentificare automatÄƒ dacÄƒ utilizatorul nu viziteazÄƒ forumul. SeteazÄƒ 0 pentru a dezactiva expirarea.';
 
 // Intervalul limita pentru cautari - adaugat la 2.0.20
-$lang['Search_Flood_Interval'] = 'Intervalul limitã pentru cãutãri';
-$lang['Search_Flood_Interval_explain'] = 'Numãrul de secunde pe care un utilizator trebuie sã-l aºtepte între cãutari'; 
+$lang['Search_Flood_Interval'] = 'Intervalul limitÄƒ pentru cÄƒutÄƒri';
+$lang['Search_Flood_Interval_explain'] = 'NumÄƒrul de secunde pe care un utilizator trebuie sÄƒ-l aÅŸtepte Ã®ntre cÄƒutari'; 
 
 //
 // Forum Management
 //
 $lang['Forum_admin'] = 'Administrare forumuri';
-$lang['Forum_admin_explain'] = 'În aceastã secşiune puteşi adãuga, ºterge, modifica, reordona ºi resincroniza categoriile ºi forumurile.';
+$lang['Forum_admin_explain'] = 'Ãn aceastÄƒ secÅ£iune puteÅ£i adÄƒuga, ÅŸterge, modifica, reordona ÅŸi resincroniza categoriile ÅŸi forumurile.';
 $lang['Edit_forum'] = 'Modificare forum';
-$lang['Create_forum'] = 'Creazã un forum nou';
-$lang['Create_category'] = 'Creazã o categorie nouã';
-$lang['Remove'] = 'ªterge';
-$lang['Action'] = 'Acşiune';
-$lang['Update_order'] = 'Actualizeazã ordinea';
-$lang['Config_updated'] = 'Configurãrile la forum au fost actualizate cu succes';
-$lang['Edit'] = 'Modificã';
-$lang['Delete'] = 'ªterge';
-$lang['Move_up'] = 'Mutã mai sus';
-$lang['Move_down'] = 'Mutã mai jos';
+$lang['Create_forum'] = 'CreazÄƒ un forum nou';
+$lang['Create_category'] = 'CreazÄƒ o categorie nouÄƒ';
+$lang['Remove'] = 'Återge';
+$lang['Action'] = 'AcÅ£iune';
+$lang['Update_order'] = 'ActualizeazÄƒ ordinea';
+$lang['Config_updated'] = 'ConfigurÄƒrile la forum au fost actualizate cu succes';
+$lang['Edit'] = 'ModificÄƒ';
+$lang['Delete'] = 'Återge';
+$lang['Move_up'] = 'MutÄƒ mai sus';
+$lang['Move_down'] = 'MutÄƒ mai jos';
 $lang['Resync'] = 'Resincronizare';
 $lang['No_mode'] = 'Nici un mod nu a fost specificat';
-$lang['Forum_edit_delete_explain'] = 'Formularul de mai jos vã permite sã personalizaşi toate opşiunile generale ale forumului. Pentru configurarea utilizatorilor ºi forumurilor folosişi legãturile specifice aflate în partea stângã.';
+$lang['Forum_edit_delete_explain'] = 'Formularul de mai jos vÄƒ permite sÄƒ personalizaÅ£i toate opÅ£iunile generale ale forumului. Pentru configurarea utilizatorilor ÅŸi forumurilor folosiÅ£i legÄƒturile specifice aflate Ã®n partea stÃ¢ngÄƒ.';
 
-$lang['Move_contents'] = 'Mutã tot conşinutul';
-$lang['Forum_delete'] = 'ªtergere forum';
-$lang['Forum_delete_explain'] = 'Formularul de mai jos vã permite sã ºtergeşi un forum (sau o categorie) ºi sã decideşi unde dorişi sã plasaşi toate subiectele (sau forumurile) pe care le conşine.';
+$lang['Move_contents'] = 'MutÄƒ tot conÅ£inutul';
+$lang['Forum_delete'] = 'Återgere forum';
+$lang['Forum_delete_explain'] = 'Formularul de mai jos vÄƒ permite sÄƒ ÅŸtergeÅ£i un forum (sau o categorie) ÅŸi sÄƒ decideÅ£i unde doriÅ£i sÄƒ plasaÅ£i toate subiectele (sau forumurile) pe care le conÅ£ine.';
 
-$lang['Status_locked'] = 'Închis';
+$lang['Status_locked'] = 'Ãnchis';
 $lang['Status_unlocked'] = 'Deschis';
-$lang['Forum_settings'] = 'Configurãrile generale ale forumului';
+$lang['Forum_settings'] = 'ConfigurÄƒrile generale ale forumului';
 $lang['Forum_name'] = 'Numele forumului';
 $lang['Forum_desc'] = 'Descriere';
 $lang['Forum_status'] = 'Starea forumului';
-$lang['Forum_pruning'] = 'Autocurãşare';
+$lang['Forum_pruning'] = 'AutocurÄƒÅ£are';
 
 $lang['Forum_postcount'] = 'Count user\'s posts';
 
-$lang['prune_freq'] = 'Verificã vârsta subiectelor la fiecare';
-$lang['prune_days'] = 'ªterge subiectele la care nu s-au scris rãspunsuri de';
-$lang['Set_prune_data'] = 'Aşi selectat opşiunea autocurãşire pentru acest forum dar nu aşi specificat o frecvenşã sau un numãr de zile al intervalului pentru acest proces. Vã rugãm revenişi ºi specificaşi aceste valori';
+$lang['prune_freq'] = 'VerificÄƒ vÃ¢rsta subiectelor la fiecare';
+$lang['prune_days'] = 'Återge subiectele la care nu s-au scris rÄƒspunsuri de';
+$lang['Set_prune_data'] = 'AÅ£i selectat opÅ£iunea autocurÄƒÅ£ire pentru acest forum dar nu aÅ£i specificat o frecvenÅ£Äƒ sau un numÄƒr de zile al intervalului pentru acest proces. VÄƒ rugÄƒm reveniÅ£i ÅŸi specificaÅ£i aceste valori';
 
-$lang['Move_and_Delete'] = 'Mutã ºi ºterge';
+$lang['Move_and_Delete'] = 'MutÄƒ ÅŸi ÅŸterge';
 
-$lang['Delete_all_posts'] = 'ªterge toate mesajele';
+$lang['Delete_all_posts'] = 'Återge toate mesajele';
 $lang['Nowhere_to_move'] = 'Nu muta mesajele';
 
 $lang['Edit_Category'] = 'Modificare categorie';
-$lang['Edit_Category_explain'] = 'Puteşi folosi acest forumlar pentru a modifica numele categoriilor.';
+$lang['Edit_Category_explain'] = 'PuteÅ£i folosi acest forumlar pentru a modifica numele categoriilor.';
 
-$lang['Forums_updated'] = 'Informaşiile despre forumuri ºi categorii au fost actualizate cu succes';
+$lang['Forums_updated'] = 'InformaÅ£iile despre forumuri ÅŸi categorii au fost actualizate cu succes';
 
-$lang['Must_delete_forums'] = 'Trebuie sã ºtergeşi toate forumurile înainte ca sã ºtergeşi aceastã categorie';
+$lang['Must_delete_forums'] = 'Trebuie sÄƒ ÅŸtergeÅ£i toate forumurile Ã®nainte ca sÄƒ ÅŸtergeÅ£i aceastÄƒ categorie';
 
-$lang['Click_return_forumadmin'] = 'Apãsaşi %saici%s pentru a reveni la secşiunea Administrare forumuri';
+$lang['Click_return_forumadmin'] = 'ApÄƒsaÅ£i %saici%s pentru a reveni la secÅ£iunea Administrare forumuri';
 
 
 //
 // Smiley Management
 //
-$lang['smiley_title'] = 'Administrare zâmbete';
-$lang['smile_desc'] = 'Din aceastã paginã puteşi adãuga, ºterge ºi modifica zâmbetele sau emoşiile asociate pe care utilizatorii dumneavoastrã le pot folosi când scriu mesaje sau când trimit mesaje private.';
+$lang['smiley_title'] = 'Administrare zÃ¢mbete';
+$lang['smile_desc'] = 'Din aceastÄƒ paginÄƒ puteÅ£i adÄƒuga, ÅŸterge ÅŸi modifica zÃ¢mbetele sau emoÅ£iile asociate pe care utilizatorii dumneavoastrÄƒ le pot folosi cÃ¢nd scriu mesaje sau cÃ¢nd trimit mesaje private.';
 
-$lang['smiley_config'] = 'Configurare zâmbete';
-$lang['smiley_code'] = 'Cod zâmbet';
-$lang['smiley_url'] = 'Fiºierul imagine al zâmbetului';
-$lang['smiley_emot'] = 'Emoşia asociatã';
-$lang['smile_add'] = 'Adãugaşi un zâmbet nou';
-$lang['Smile'] = 'Zâmbet';
-$lang['Emotion'] = 'Emoşia asociatã';
+$lang['smiley_config'] = 'Configurare zÃ¢mbete';
+$lang['smiley_code'] = 'Cod zÃ¢mbet';
+$lang['smiley_url'] = 'FiÅŸierul imagine al zÃ¢mbetului';
+$lang['smiley_emot'] = 'EmoÅ£ia asociatÄƒ';
+$lang['smile_add'] = 'AdÄƒugaÅ£i un zÃ¢mbet nou';
+$lang['Smile'] = 'ZÃ¢mbet';
+$lang['Emotion'] = 'EmoÅ£ia asociatÄƒ';
 
-$lang['Select_pak'] = 'Selectaşi un fiºier de tip Pack (.pak)';
-$lang['replace_existing'] = 'Înlocuişi zâmbetele existente';
-$lang['keep_existing'] = 'Pãstraşi zâmbetele existente';
-$lang['smiley_import_inst'] = 'Ar trebui sã decomprimaşi pachetul cu iconişe ºi sã încãrcaşi toate fiºierele în directorul cu zâmbete specificat la instalare. Apoi selectaşi informaşiile corecte în acest formular ca sã importaşi pachetul cu zâmbete.';
-$lang['smiley_import'] = 'Importaşi zâmbetele';
-$lang['choose_smile_pak'] = 'Selectaşi un fiºier pachet cu zâmbete de tip .pak';
-$lang['import'] = 'Importaşi zâmbete';
-$lang['smile_conflicts'] = 'Ce ar trebui sã fie fãcut în caz de conflicte';
-$lang['del_existing_smileys'] = 'ªtergeşi zâmbetele existente înainte de import';
-$lang['import_smile_pack'] = 'Importaşi pachetul cu zâmbete';
-$lang['export_smile_pack'] = 'Creaşi pachetul cu zâmbete';
-$lang['export_smiles'] = 'Ca sã creaşi un pachet cu zâmbete din zâmbetele instalate, apãsaşi %saici%s ca sã descãrcaşi fiºierul cu zâmbete .pak. Numişi acest fiºier cum dorişi dar asiguraşi-vã cã aşi pãstrat fiºierului extensia .pak. Apoi creaşi un fieºier arhivat conşinând toate imaginile zâmbete ale dumneavoastrã plus acest fiºier .pak.';
+$lang['Select_pak'] = 'SelectaÅ£i un fiÅŸier de tip Pack (.pak)';
+$lang['replace_existing'] = 'ÃnlocuiÅ£i zÃ¢mbetele existente';
+$lang['keep_existing'] = 'PÄƒstraÅ£i zÃ¢mbetele existente';
+$lang['smiley_import_inst'] = 'Ar trebui sÄƒ decomprimaÅ£i pachetul cu iconiÅ£e ÅŸi sÄƒ Ã®ncÄƒrcaÅ£i toate fiÅŸierele Ã®n directorul cu zÃ¢mbete specificat la instalare. Apoi selectaÅ£i informaÅ£iile corecte Ã®n acest formular ca sÄƒ importaÅ£i pachetul cu zÃ¢mbete.';
+$lang['smiley_import'] = 'ImportaÅ£i zÃ¢mbetele';
+$lang['choose_smile_pak'] = 'SelectaÅ£i un fiÅŸier pachet cu zÃ¢mbete de tip .pak';
+$lang['import'] = 'ImportaÅ£i zÃ¢mbete';
+$lang['smile_conflicts'] = 'Ce ar trebui sÄƒ fie fÄƒcut Ã®n caz de conflicte';
+$lang['del_existing_smileys'] = 'ÅtergeÅ£i zÃ¢mbetele existente Ã®nainte de import';
+$lang['import_smile_pack'] = 'ImportaÅ£i pachetul cu zÃ¢mbete';
+$lang['export_smile_pack'] = 'CreaÅ£i pachetul cu zÃ¢mbete';
+$lang['export_smiles'] = 'Ca sÄƒ creaÅ£i un pachet cu zÃ¢mbete din zÃ¢mbetele instalate, apÄƒsaÅ£i %saici%s ca sÄƒ descÄƒrcaÅ£i fiÅŸierul cu zÃ¢mbete .pak. NumiÅ£i acest fiÅŸier cum doriÅ£i dar asiguraÅ£i-vÄƒ cÄƒ aÅ£i pÄƒstrat fiÅŸierului extensia .pak. Apoi creaÅ£i un fieÅŸier arhivat conÅ£inÃ¢nd toate imaginile zÃ¢mbete ale dumneavoastrÄƒ plus acest fiÅŸier .pak.';
 
-$lang['smiley_add_success'] = 'Zâmbetul a fost adãugat cu succes';
-$lang['smiley_edit_success'] = 'Zâmbetul a fost actualizat cu succes';
-$lang['smiley_import_success'] = 'Pachetul cu zâmbete a fost importat cu succes!';
-$lang['smiley_del_success'] = 'Zâmbetul a fost ºters cu succes';
-$lang['Click_return_smileadmin'] = 'Apãsaşi %saici%s pentru a reveni la secşiunea Administrare zâmbete';
+$lang['smiley_add_success'] = 'ZÃ¢mbetul a fost adÄƒugat cu succes';
+$lang['smiley_edit_success'] = 'ZÃ¢mbetul a fost actualizat cu succes';
+$lang['smiley_import_success'] = 'Pachetul cu zÃ¢mbete a fost importat cu succes!';
+$lang['smiley_del_success'] = 'ZÃ¢mbetul a fost ÅŸters cu succes';
+$lang['Click_return_smileadmin'] = 'ApÄƒsaÅ£i %saici%s pentru a reveni la secÅ£iunea Administrare zÃ¢mbete';
 
-$lang['Confirm_delete_smiley'] = 'Sunteşi sigur cã dorişi sã ºtergeşi acest zâmbet ?';
+$lang['Confirm_delete_smiley'] = 'SunteÅ£i sigur cÄƒ doriÅ£i sÄƒ ÅŸtergeÅ£i acest zÃ¢mbet ?';
 
 //
 // User Management
 //
 $lang['User_admin'] = 'Administrare utilizatori';
-$lang['User_admin_explain'] = 'Aici puteşi schimba informaşiile despre utilizatorii dumneavoastrã ºi opşiunile specifice. Ca sã modificaşi drepturile utilizatorilor, folosişi drepturile din sistem ale utilizatorilor ºi grupurilor.';
+$lang['User_admin_explain'] = 'Aici puteÅ£i schimba informaÅ£iile despre utilizatorii dumneavoastrÄƒ ÅŸi opÅ£iunile specifice. Ca sÄƒ modificaÅ£i drepturile utilizatorilor, folosiÅ£i drepturile din sistem ale utilizatorilor ÅŸi grupurilor.';
 
-$lang['Look_up_user'] = 'Selecteazã utilizatorul';
+$lang['Look_up_user'] = 'SelecteazÄƒ utilizatorul';
 
 $lang['Admin_user_fail'] = 'Nu se poate actualiza profilul utilizatorului.';
 $lang['Admin_user_updated'] = 'Profilul utilizatorului a fost actualizat cu succes.';
-$lang['Click_return_useradmin'] = 'Apãsaşi %saici%s pentru a reveni la secşiunea Administrare utilizatori';
+$lang['Click_return_useradmin'] = 'ApÄƒsaÅ£i %saici%s pentru a reveni la secÅ£iunea Administrare utilizatori';
 
-$lang['User_delete'] = 'ªtergeşi acest utilizator';
-$lang['User_delete_explain'] = 'Apãsaşi aici pentru a ºterge acest utilizator, aceastã operaşie este ireversibilã.';
-$lang['User_deleted'] = 'Utilizatorul a fost ºters cu succes.';
+$lang['User_delete'] = 'ÅtergeÅ£i acest utilizator';
+$lang['User_delete_explain'] = 'ApÄƒsaÅ£i aici pentru a ÅŸterge acest utilizator, aceastÄƒ operaÅ£ie este ireversibilÄƒ.';
+$lang['User_deleted'] = 'Utilizatorul a fost ÅŸters cu succes.';
 
 $lang['User_status'] = 'Utilizatorul este activ';
 $lang['User_allowpm'] = 'Poate trimite mesaje private';
 $lang['User_allowavatar'] = 'Poate folosi imagini asociate';
 
-$lang['Admin_avatar_explain'] = 'Aici puteşi vizualiza ºi ºterge imaginea asociatã a utilizatorului.';
+$lang['Admin_avatar_explain'] = 'Aici puteÅ£i vizualiza ÅŸi ÅŸterge imaginea asociatÄƒ a utilizatorului.';
 
-$lang['User_special'] = 'Câmpuri speciale doar pentru administrator';
-$lang['User_special_explain'] = 'Aceste câmpuri nu pot fi modificate de cãtre utilizatori. Aici puteşi sã specificaşi stadiul lor ºi alte opşiuni care nu sunt oferite utilizatorilor.';
+$lang['User_special'] = 'CÃ¢mpuri speciale doar pentru administrator';
+$lang['User_special_explain'] = 'Aceste cÃ¢mpuri nu pot fi modificate de cÄƒtre utilizatori. Aici puteÅ£i sÄƒ specificaÅ£i stadiul lor ÅŸi alte opÅ£iuni care nu sunt oferite utilizatorilor.';
 
 
 //
 // Group Management
 //
 $lang['Group_administration'] = 'Administrarea grupurilor';
-$lang['Group_admin_explain'] = 'Din aceastã secşiune puteşi administra toate grupurile cu utilizatori ale dumneavoastrã, puteşi ºterge, crea ºi modifica grupurile existente. Puteşi alege moderatorii, schimba în deschis/închis statutul grupului ºi specifica numele ºi descrierea grupului';
-$lang['Error_updating_groups'] = 'A fost o eroare în timpul actualizãrii grupurilor';
+$lang['Group_admin_explain'] = 'Din aceastÄƒ secÅ£iune puteÅ£i administra toate grupurile cu utilizatori ale dumneavoastrÄƒ, puteÅ£i ÅŸterge, crea ÅŸi modifica grupurile existente. PuteÅ£i alege moderatorii, schimba Ã®n deschis/Ã®nchis statutul grupului ÅŸi specifica numele ÅŸi descrierea grupului';
+$lang['Error_updating_groups'] = 'A fost o eroare Ã®n timpul actualizÄƒrii grupurilor';
 $lang['Updated_group'] = 'Grupul a fost actualizat cu succes';
 $lang['Added_new_group'] = 'Noul grup a fost creat cu succes';
-$lang['Deleted_group'] = 'Grupul a fost ºters cu succes';
-$lang['New_group'] = 'Creazã un grup nou';
-$lang['Edit_group'] = 'Modificã grupul';
+$lang['Deleted_group'] = 'Grupul a fost ÅŸters cu succes';
+$lang['New_group'] = 'CreazÄƒ un grup nou';
+$lang['Edit_group'] = 'ModificÄƒ grupul';
 $lang['group_name'] = 'Numele grupului';
 $lang['group_description'] = 'Descrierea grupului';
 $lang['group_moderator'] = 'Moderatorul grupului';
 $lang['group_status'] = 'Statutul grupului';
 $lang['group_open'] = 'Grup deschis';
-$lang['group_closed'] = 'Grup închis';
+$lang['group_closed'] = 'Grup Ã®nchis';
 $lang['group_hidden'] = 'Grup ascuns';
-$lang['group_delete'] = 'ªterg grupul';
-$lang['group_delete_check'] = 'Vreau sã ºterg acest grup';
-$lang['submit_group_changes'] = 'Efectueazã modificãrile';
-$lang['reset_group_changes'] = 'Reseteazã modificãrile';
-$lang['No_group_name'] = 'Trebuie sã specificaşi un nume pentru acest grup';
-$lang['No_group_moderator'] = 'Trebuie sã specificaşi un moderator pentru acest grup';
-$lang['No_group_mode'] = 'Trebuie sã specificaşi un mod (deschis/închis) pentru acest grup';
-$lang['No_group_action'] = 'Nici o acşiune nu a fost specificatã';
-$lang['delete_group_moderator'] = 'Dorişi sã ºtergeşi moderatorul vechi al grupului?';
-$lang['delete_moderator_explain'] = 'Dacã schimbaşi moderatorul grupului, bifaşi aceastã cãsuşã ca sã ºtergeşi vechiul moderator al grupului din grup. Altfel, nu o bifaşi ºi utilizatorul va deveni un membru normal al grupului.';
-$lang['Click_return_groupsadmin'] = 'Apãsaşi %saici%s pentru a reveni la secşiunea Administrarea grupurilor.';
-$lang['Select_group'] = 'Selecteazã un grup';
-$lang['Look_up_group'] = 'Selecteazã grupul';
+$lang['group_delete'] = 'Återg grupul';
+$lang['group_delete_check'] = 'Vreau sÄƒ ÅŸterg acest grup';
+$lang['submit_group_changes'] = 'EfectueazÄƒ modificÄƒrile';
+$lang['reset_group_changes'] = 'ReseteazÄƒ modificÄƒrile';
+$lang['No_group_name'] = 'Trebuie sÄƒ specificaÅ£i un nume pentru acest grup';
+$lang['No_group_moderator'] = 'Trebuie sÄƒ specificaÅ£i un moderator pentru acest grup';
+$lang['No_group_mode'] = 'Trebuie sÄƒ specificaÅ£i un mod (deschis/Ã®nchis) pentru acest grup';
+$lang['No_group_action'] = 'Nici o acÅ£iune nu a fost specificatÄƒ';
+$lang['delete_group_moderator'] = 'DoriÅ£i sÄƒ ÅŸtergeÅ£i moderatorul vechi al grupului?';
+$lang['delete_moderator_explain'] = 'DacÄƒ schimbaÅ£i moderatorul grupului, bifaÅ£i aceastÄƒ cÄƒsuÅ£Äƒ ca sÄƒ ÅŸtergeÅ£i vechiul moderator al grupului din grup. Altfel, nu o bifaÅ£i ÅŸi utilizatorul va deveni un membru normal al grupului.';
+$lang['Click_return_groupsadmin'] = 'ApÄƒsaÅ£i %saici%s pentru a reveni la secÅ£iunea Administrarea grupurilor.';
+$lang['Select_group'] = 'SelecteazÄƒ un grup';
+$lang['Look_up_group'] = 'SelecteazÄƒ grupul';
 
 
 //
 // Prune Administration
 //
-$lang['Forum_Prune'] = 'Curãşirea forumurilor';
-$lang['Forum_Prune_explain'] = 'Aceastã acşiune va ºterge orice subiect care nu a fost completat într-un numãr de zile egal cu cel pe care l-aşi specificat. Dacã nu aşi introdus un numãr atunci toate subiectele vor fi ºterse. Nu vor fi ºterse subiecte în care sondajele încã ruleazã ºi nici anunşurile. Aceste subiecte trebuie sã le ºtergeşi manual.';
-$lang['Do_Prune'] = 'Efectueazã curãşirea';
+$lang['Forum_Prune'] = 'CurÄƒÅ£irea forumurilor';
+$lang['Forum_Prune_explain'] = 'AceastÄƒ acÅ£iune va ÅŸterge orice subiect care nu a fost completat Ã®ntr-un numÄƒr de zile egal cu cel pe care l-aÅ£i specificat. DacÄƒ nu aÅ£i introdus un numÄƒr atunci toate subiectele vor fi ÅŸterse. Nu vor fi ÅŸterse subiecte Ã®n care sondajele Ã®ncÄƒ ruleazÄƒ ÅŸi nici anunÅ£urile. Aceste subiecte trebuie sÄƒ le ÅŸtergeÅ£i manual.';
+$lang['Do_Prune'] = 'EfectueazÄƒ curÄƒÅ£irea';
 $lang['All_Forums'] = 'Toate forumurile';
-$lang['Prune_topics_not_posted'] = 'Curãşirea subiectelor fãrã rãspunsuri în multe zile';
-$lang['Topics_pruned'] = 'Subiecte curãşite';
-$lang['Posts_pruned'] = 'Mesaje curãşite';
-$lang['Prune_success'] = 'Curãşirea mesajelor s-a efectuat cu succes';
+$lang['Prune_topics_not_posted'] = 'CurÄƒÅ£irea subiectelor fÄƒrÄƒ rÄƒspunsuri Ã®n multe zile';
+$lang['Topics_pruned'] = 'Subiecte curÄƒÅ£ite';
+$lang['Posts_pruned'] = 'Mesaje curÄƒÅ£ite';
+$lang['Prune_success'] = 'CurÄƒÅ£irea mesajelor s-a efectuat cu succes';
 
 
 //
 // Word censor
 //
 $lang['Words_title'] = 'Administrarea cuvintelor cenzurate';
-$lang['Words_explain'] = 'Din aceastã secşiune puteşi adãuga, modifica ºi ºterge cuvinte care vor fi automat cenzurate în forumurile dumneavoastrã. În plus, persoanelor nu le va fi permis sã se înregistreze cu nume de utilizator ce conşin aceste cuvinte. Wildcard-urile (*) sunt acceptate în câmpul pentru cuvinte, de exemplu *test* se va potrivi cu detestabil, test* se va potrivi cu testare, *test se va potrivi cu detest.';
-$lang['Word'] = 'Cuvânt';
-$lang['Edit_word_censor'] = 'Modific cuvântul cenzurat';
-$lang['Replacement'] = 'Înlocuire';
-$lang['Add_new_word'] = 'Adaugã un cuvânt nou';
-$lang['Update_word'] = 'Actualizeazã cuvântul cenzurat';
+$lang['Words_explain'] = 'Din aceastÄƒ secÅ£iune puteÅ£i adÄƒuga, modifica ÅŸi ÅŸterge cuvinte care vor fi automat cenzurate Ã®n forumurile dumneavoastrÄƒ. Ãn plus, persoanelor nu le va fi permis sÄƒ se Ã®nregistreze cu nume de utilizator ce conÅ£in aceste cuvinte. Wildcard-urile (*) sunt acceptate Ã®n cÃ¢mpul pentru cuvinte, de exemplu *test* se va potrivi cu detestabil, test* se va potrivi cu testare, *test se va potrivi cu detest.';
+$lang['Word'] = 'CuvÃ¢nt';
+$lang['Edit_word_censor'] = 'Modific cuvÃ¢ntul cenzurat';
+$lang['Replacement'] = 'Ãnlocuire';
+$lang['Add_new_word'] = 'AdaugÄƒ un cuvÃ¢nt nou';
+$lang['Update_word'] = 'ActualizeazÄƒ cuvÃ¢ntul cenzurat';
 
-$lang['Must_enter_word'] = 'Trebuie sã introduceşi un cuvânt ºi înlocuirile acestuia';
-$lang['No_word_selected'] = 'Nici un cuvânt nu a fost selectat pentru modificare';
+$lang['Must_enter_word'] = 'Trebuie sÄƒ introduceÅ£i un cuvÃ¢nt ÅŸi Ã®nlocuirile acestuia';
+$lang['No_word_selected'] = 'Nici un cuvÃ¢nt nu a fost selectat pentru modificare';
 
-$lang['Word_updated'] = 'Cuvântul cenzurat selectat a fost actualizat cu succes';
-$lang['Word_added'] = 'Cuvântul cenzurat a fost adãugat cu succes';
-$lang['Word_removed'] = 'Cuvântul cenzurat selectat a fost ºters cu succes';
+$lang['Word_updated'] = 'CuvÃ¢ntul cenzurat selectat a fost actualizat cu succes';
+$lang['Word_added'] = 'CuvÃ¢ntul cenzurat a fost adÄƒugat cu succes';
+$lang['Word_removed'] = 'CuvÃ¢ntul cenzurat selectat a fost ÅŸters cu succes';
 
-$lang['Click_return_wordadmin'] = 'Apãsaşi %saici%s pentru a reveni la secşiunea Administrarea cuvintelor cenzurate';
+$lang['Click_return_wordadmin'] = 'ApÄƒsaÅ£i %saici%s pentru a reveni la secÅ£iunea Administrarea cuvintelor cenzurate';
 
-$lang['Confirm_delete_word'] = 'Sunteşi sigur cã dorişi sã ºtergeşi acest acest cuvânt cenzurat ?';
+$lang['Confirm_delete_word'] = 'SunteÅ£i sigur cÄƒ doriÅ£i sÄƒ ÅŸtergeÅ£i acest acest cuvÃ¢nt cenzurat ?';
 
 
 //
 // Mass Email
 //
-$lang['Mass_email_explain'] = 'Aici puteşi trimite un email la toşi utilizatorii dumneavoastrã sau la utilizatorii dintr-un grup specific. Pentru a realiza acest lucru, un email va fi trimis la adresa de email a administratorulu cu toşi destinatarii specificaşi în câmpul BCC. Dacã trimiteşi email la un grup mare de oameni, vã rugãm sã fişi atent dupã trimitere ºi nu vã oprişi la jumãtatea paginii. Este normal ca pentru o corespondenşã masivã sã fie nevoie de un timp mai lung astfel cã veşi fi notificat când acşiunea s-a terminat';
+$lang['Mass_email_explain'] = 'Aici puteÅ£i trimite un email la toÅ£i utilizatorii dumneavoastrÄƒ sau la utilizatorii dintr-un grup specific. Pentru a realiza acest lucru, un email va fi trimis la adresa de email a administratorulu cu toÅ£i destinatarii specificaÅ£i Ã®n cÃ¢mpul BCC. DacÄƒ trimiteÅ£i email la un grup mare de oameni, vÄƒ rugÄƒm sÄƒ fiÅ£i atent dupÄƒ trimitere ÅŸi nu vÄƒ opriÅ£i la jumÄƒtatea paginii. Este normal ca pentru o corespondenÅ£Äƒ masivÄƒ sÄƒ fie nevoie de un timp mai lung astfel cÄƒ veÅ£i fi notificat cÃ¢nd acÅ£iunea s-a terminat';
 $lang['Compose'] = 'Compune';
 
 $lang['Recipients'] = 'Destinatari';
-$lang['All_users'] = 'Toşi utilizatorii';
+$lang['All_users'] = 'ToÅ£i utilizatorii';
 
-$lang['Email_successfull'] = 'Mesajul dumneavoastrã a fost trimis';
-$lang['Click_return_massemail'] = 'Apãsaşi %saici%s pentru a reveni la secşiunea Corespondenşã masivã';
+$lang['Email_successfull'] = 'Mesajul dumneavoastrÄƒ a fost trimis';
+$lang['Click_return_massemail'] = 'ApÄƒsaÅ£i %saici%s pentru a reveni la secÅ£iunea CorespondenÅ£Äƒ masivÄƒ';
 
 
 //
 // Ranks admin
 //
 $lang['Ranks_title'] = 'Administrarea rangurilor';
-$lang['Ranks_explain'] = 'Folosind acest formular puteşi adãuga, modifica, vizualiza ºi ºterge ranguri. De asemenea, puteşi crea ranguri personalizate care pot fi aplicate unui utilizator via facilitãşii date de managementul utilizatorilor';
+$lang['Ranks_explain'] = 'Folosind acest formular puteÅ£i adÄƒuga, modifica, vizualiza ÅŸi ÅŸterge ranguri. De asemenea, puteÅ£i crea ranguri personalizate care pot fi aplicate unui utilizator via facilitÄƒÅ£ii date de managementul utilizatorilor';
 
-$lang['Add_new_rank'] = 'Adaugã un rang nou';
+$lang['Add_new_rank'] = 'AdaugÄƒ un rang nou';
 
 $lang['Rank_title'] = 'Titlul rangului';
-$lang['Rank_special'] = 'Seteazã ca rang special';
-$lang['Rank_minimum'] = 'Numãr minim de mesaje';
-$lang['Rank_maximum'] = 'Numãr maxim de mesaje';
+$lang['Rank_special'] = 'SeteazÄƒ ca rang special';
+$lang['Rank_minimum'] = 'NumÄƒr minim de mesaje';
+$lang['Rank_maximum'] = 'NumÄƒr maxim de mesaje';
 $lang['Rank_image'] = 'Imaginea rangului (relativ la calea phpBB2-ului)';
-$lang['Rank_image_explain'] = 'Aceasta este folositã pentru a defini o imagine micã asociatã cu rangul';
+$lang['Rank_image_explain'] = 'Aceasta este folositÄƒ pentru a defini o imagine micÄƒ asociatÄƒ cu rangul';
 
-$lang['Must_select_rank'] = 'Trebuie sã selectaşi un rang';
+$lang['Must_select_rank'] = 'Trebuie sÄƒ selectaÅ£i un rang';
 $lang['No_assigned_rank'] = 'Nici un rang special nu a fost repartizat';
 
 $lang['Rank_updated'] = 'Rangul a fost actualizat cu succes';
-$lang['Rank_added'] = 'Rangul a fost adãugat cu succes';
-$lang['Rank_removed'] = 'Rangul a fost ºters cu succes';
-$lang['No_update_ranks'] = 'Rangul a fost ºters cu succes, conturile utilizatorilor care folosesc acest rang nu au fost actualizate. Trebuie sã resetaşi manual rangul pentru aceste conturi';
+$lang['Rank_added'] = 'Rangul a fost adÄƒugat cu succes';
+$lang['Rank_removed'] = 'Rangul a fost ÅŸters cu succes';
+$lang['No_update_ranks'] = 'Rangul a fost ÅŸters cu succes, conturile utilizatorilor care folosesc acest rang nu au fost actualizate. Trebuie sÄƒ resetaÅ£i manual rangul pentru aceste conturi';
 
-$lang['Click_return_rankadmin'] = 'Apãsaşi %saici%s pentru a reveni la secşiunea Administrarea rangurilor';
+$lang['Click_return_rankadmin'] = 'ApÄƒsaÅ£i %saici%s pentru a reveni la secÅ£iunea Administrarea rangurilor';
 
 $lang['Confirm_delete_rank'] = 'Sunteti sigur ca doriti sa stergeti acest rang ?';
 
@@ -582,86 +582,86 @@ $lang['Confirm_delete_rank'] = 'Sunteti sigur ca doriti sa stergeti acest rang ?
 // Disallow Username Admin
 //
 $lang['Disallow_control'] = 'Administrarea numelor de utilizator nepremise';
-$lang['Disallow_explain'] = 'Aici puteşi controla numele de utilizator care nu sunt permise sã fie folosite. Numele de utilizator care nu sunt permise pot conşine caracterul *. Reşineşi cã nu aveşi posibilitatea sã specificaşi orice nume de utilizator care a fost deja înregistrat; trebuie mai întâi sã ºtergeşi acel nume ºi apoi sã-l interziceşi';
+$lang['Disallow_explain'] = 'Aici puteÅ£i controla numele de utilizator care nu sunt permise sÄƒ fie folosite. Numele de utilizator care nu sunt permise pot conÅ£ine caracterul *. ReÅ£ineÅ£i cÄƒ nu aveÅ£i posibilitatea sÄƒ specificaÅ£i orice nume de utilizator care a fost deja Ã®nregistrat; trebuie mai Ã®ntÃ¢i sÄƒ ÅŸtergeÅ£i acel nume ÅŸi apoi sÄƒ-l interziceÅ£i';
 
-$lang['Delete_disallow'] = 'ªterge';
-$lang['Delete_disallow_title'] = 'ªterge un nume de utilizator nepermis';
-$lang['Delete_disallow_explain'] = 'Puteşi ºterge un nume de utilizator nepermis selectând numele de utilizator din aceastã listã ºi apãsând butonul <i>ªterge</i>';
+$lang['Delete_disallow'] = 'Återge';
+$lang['Delete_disallow_title'] = 'Återge un nume de utilizator nepermis';
+$lang['Delete_disallow_explain'] = 'PuteÅ£i ÅŸterge un nume de utilizator nepermis selectÃ¢nd numele de utilizator din aceastÄƒ listÄƒ ÅŸi apÄƒsÃ¢nd butonul <i>Återge</i>';
 
-$lang['Add_disallow'] = 'Adaugã';
-$lang['Add_disallow_title'] = 'Adaugã un nume de utilizator nepermis';
-$lang['Add_disallow_explain'] = 'Puteşi interzice un nume de utilizator folosind caracterul wildcard * care se potriveºte la orice caracter';
+$lang['Add_disallow'] = 'AdaugÄƒ';
+$lang['Add_disallow_title'] = 'AdaugÄƒ un nume de utilizator nepermis';
+$lang['Add_disallow_explain'] = 'PuteÅ£i interzice un nume de utilizator folosind caracterul wildcard * care se potriveÅŸte la orice caracter';
 
 $lang['No_disallowed'] = 'Nici un nume de utilizator nu a fost interzis';
 
-$lang['Disallowed_deleted'] = 'Numele de utilizator nepermis a fost ºters cu succes';
-$lang['Disallow_successful'] = 'Numele de utilizator nepermis a fost adãugat cu succes';
-$lang['Disallowed_already'] = 'Numele pe care l-aşi introdus nu poate fi interzis. Ori existã deja în listã, existã în lista cuvintelor cenzurate sau existã un nume de utilizator similar';
+$lang['Disallowed_deleted'] = 'Numele de utilizator nepermis a fost ÅŸters cu succes';
+$lang['Disallow_successful'] = 'Numele de utilizator nepermis a fost adÄƒugat cu succes';
+$lang['Disallowed_already'] = 'Numele pe care l-aÅ£i introdus nu poate fi interzis. Ori existÄƒ deja Ã®n listÄƒ, existÄƒ Ã®n lista cuvintelor cenzurate sau existÄƒ un nume de utilizator similar';
 
-$lang['Click_return_disallowadmin'] = 'Apãsaşi %saici%s pentru a reveni la secşiunea Administrarea numelor de utilizator nepremise';
+$lang['Click_return_disallowadmin'] = 'ApÄƒsaÅ£i %saici%s pentru a reveni la secÅ£iunea Administrarea numelor de utilizator nepremise';
 
 
 //
 // Styles Admin
 //
 $lang['Styles_admin'] = 'Administrarea stilurilor';
-$lang['Styles_explain'] = 'Folosind aceastã facilitate puteşi adãuga, ºterge ºi administra stilurile (ºabloanele ºi temele) disponibile utilizatorilor dumneavoastrã';
-$lang['Styles_addnew_explain'] = 'Lista urmãtoare conşine toate temele care sunt disponibile pentru ºabloanele pe care le aveşi. Elementele din aceastã listã nu au fost instalate în baza de date a phpBB-ului. Ca sã instalaşi o temã apãsaşi pe legãtura <i>Instaleazã</i> de lângã denumirea temei';
+$lang['Styles_explain'] = 'Folosind aceastÄƒ facilitate puteÅ£i adÄƒuga, ÅŸterge ÅŸi administra stilurile (ÅŸabloanele ÅŸi temele) disponibile utilizatorilor dumneavoastrÄƒ';
+$lang['Styles_addnew_explain'] = 'Lista urmÄƒtoare conÅ£ine toate temele care sunt disponibile pentru ÅŸabloanele pe care le aveÅ£i. Elementele din aceastÄƒ listÄƒ nu au fost instalate Ã®n baza de date a phpBB-ului. Ca sÄƒ instalaÅ£i o temÄƒ apÄƒsaÅ£i pe legÄƒtura <i>InstaleazÄƒ</i> de lÃ¢ngÄƒ denumirea temei';
 
-$lang['Select_template'] = 'Selectaşi un ºablon';
+$lang['Select_template'] = 'SelectaÅ£i un ÅŸablon';
 
 $lang['Style'] = 'Stilul';
-$lang['Template'] = 'ªablonul';
-$lang['Install'] = 'Instaleazã';
-$lang['Download'] = 'Descarcã';
+$lang['Template'] = 'Åablonul';
+$lang['Install'] = 'InstaleazÄƒ';
+$lang['Download'] = 'DescarcÄƒ';
 
-$lang['Edit_theme'] = 'Modificã tema';
-$lang['Edit_theme_explain'] = 'În formularul de mai jos puteşi modifica configurãrile pentru tema selectatã';
+$lang['Edit_theme'] = 'ModificÄƒ tema';
+$lang['Edit_theme_explain'] = 'Ãn formularul de mai jos puteÅ£i modifica configurÄƒrile pentru tema selectatÄƒ';
 
-$lang['Create_theme'] = 'Creazã temã';
-$lang['Create_theme_explain'] = 'Folosişi formularul de mai jos ca sã creaşi o temã nouã pentru un ºablon selectat. Când introduceşi culori (pentru care trebuie sã folosişi notaşie hexazecimalã) nu trebuie sã includeşi inişiala #, de exemplu CCCCCC este validã, #CCCCCC nu este validã';
+$lang['Create_theme'] = 'CreazÄƒ temÄƒ';
+$lang['Create_theme_explain'] = 'FolosiÅ£i formularul de mai jos ca sÄƒ creaÅ£i o temÄƒ nouÄƒ pentru un ÅŸablon selectat. CÃ¢nd introduceÅ£i culori (pentru care trebuie sÄƒ folosiÅ£i notaÅ£ie hexazecimalÄƒ) nu trebuie sÄƒ includeÅ£i iniÅ£iala #, de exemplu CCCCCC este validÄƒ, #CCCCCC nu este validÄƒ';
 
-$lang['Export_themes'] = 'Exportã teme';
-$lang['Export_explain'] = 'În aceastã secşiune puteşi exporta teme dintr-un ºablon selectat. Selectaşi ºablonul din lista de mai jos ºi programul va crea un fiºier de configurare a temei ºi încercaşi sã-l salvaşi în directorul ºablonului selectat. Dacã fiºierul nu poate fi salvat vi se va da posibilitatea sã-l descãrcaşi. Pentru ca programul sã salveze fiºierul trebuie sã daşi drepturi de scriere pentru serverul web pe directorul ºablonului selectat. Pentru mai multe informaşii consultaşi pagina 2 din ghidul utilizatorilor phpBB.';
+$lang['Export_themes'] = 'ExportÄƒ teme';
+$lang['Export_explain'] = 'Ãn aceastÄƒ secÅ£iune puteÅ£i exporta teme dintr-un ÅŸablon selectat. SelectaÅ£i ÅŸablonul din lista de mai jos ÅŸi programul va crea un fiÅŸier de configurare a temei ÅŸi Ã®ncercaÅ£i sÄƒ-l salvaÅ£i Ã®n directorul ÅŸablonului selectat. DacÄƒ fiÅŸierul nu poate fi salvat vi se va da posibilitatea sÄƒ-l descÄƒrcaÅ£i. Pentru ca programul sÄƒ salveze fiÅŸierul trebuie sÄƒ daÅ£i drepturi de scriere pentru serverul web pe directorul ÅŸablonului selectat. Pentru mai multe informaÅ£ii consultaÅ£i pagina 2 din ghidul utilizatorilor phpBB.';
 
-$lang['Theme_installed'] = 'Tema selectatã a fost instalatã cu succes';
-$lang['Style_removed'] = 'Stilul selectat a fost ºters din baza de date. Pentru a ºterge definitiv acest stil din sistem, trebuie sã-l ºtergeşi din directorul dumneavoastrã cu ºabloane.';
-$lang['Theme_info_saved'] = 'Informaşiile temei pentru ºablonul curent au fost salvate. Acum trebuie sã specificaşi permisiunile în fiºierul theme_info.cfg (ºi dacã se poate directorul ºablonului selectat) la acces doar de citire';
-$lang['Theme_updated'] = 'Tema selectatã a fost actualizatã. Acum ar trebui sã exportaşi setãrile temei noi';
-$lang['Theme_created'] = 'Temã a fost creatã. Acum ar trebui sã exportaşi tema în fiºierul de configurare al temei pentru pãstrarea în siguranşã a acesteia sau s-o folosişi altundeva';
+$lang['Theme_installed'] = 'Tema selectatÄƒ a fost instalatÄƒ cu succes';
+$lang['Style_removed'] = 'Stilul selectat a fost ÅŸters din baza de date. Pentru a ÅŸterge definitiv acest stil din sistem, trebuie sÄƒ-l ÅŸtergeÅ£i din directorul dumneavoastrÄƒ cu ÅŸabloane.';
+$lang['Theme_info_saved'] = 'InformaÅ£iile temei pentru ÅŸablonul curent au fost salvate. Acum trebuie sÄƒ specificaÅ£i permisiunile Ã®n fiÅŸierul theme_info.cfg (ÅŸi dacÄƒ se poate directorul ÅŸablonului selectat) la acces doar de citire';
+$lang['Theme_updated'] = 'Tema selectatÄƒ a fost actualizatÄƒ. Acum ar trebui sÄƒ exportaÅ£i setÄƒrile temei noi';
+$lang['Theme_created'] = 'TemÄƒ a fost creatÄƒ. Acum ar trebui sÄƒ exportaÅ£i tema Ã®n fiÅŸierul de configurare al temei pentru pÄƒstrarea Ã®n siguranÅ£Äƒ a acesteia sau s-o folosiÅ£i altundeva';
 
-$lang['Confirm_delete_style'] = 'Sunteşi sigur cã dorişi sã ºtergeşi acest stil?';
+$lang['Confirm_delete_style'] = 'SunteÅ£i sigur cÄƒ doriÅ£i sÄƒ ÅŸtergeÅ£i acest stil?';
 
-$lang['Download_theme_cfg'] = 'Procedura de export nu poate scrie fiºierul cu informaşiile temei. Apãsaşi butonul de mai jos ca sã descãrcaşi acest fiºier. Odatã ce l-aşi descãrcat puteşi sã-l transferaşi în directorul care conşine fiºierele cu ºabloane. Puteşi împacheta fiºierele pentru distribuşie sau sã le folosişi unde dorişi';
-$lang['No_themes'] = 'ªablonul pe care l-aşi selectat nu are teme ataºate. Ca sã creaşi o temã nouã apãsaşi legãtura <i>Creazã temã</i> din partea stângã';
-$lang['No_template_dir'] = 'Nu se poate deschide directorul cu ºabloane. Acesta ori nu poate fi citit de cãtre serverul web ori nu existã';
-$lang['Cannot_remove_style'] = 'Nu puteşi ºterge stilul selectat în timp ce este acesta este stilul standard pentru forum. Schimbaşi stilul standard ºi încercaşi din nou.';
-$lang['Style_exists'] = 'Numele stilului pe care l-aşi selectat existã deja, vã rugãm revenişi ºi alegeşi un nume diferit.';
+$lang['Download_theme_cfg'] = 'Procedura de export nu poate scrie fiÅŸierul cu informaÅ£iile temei. ApÄƒsaÅ£i butonul de mai jos ca sÄƒ descÄƒrcaÅ£i acest fiÅŸier. OdatÄƒ ce l-aÅ£i descÄƒrcat puteÅ£i sÄƒ-l transferaÅ£i Ã®n directorul care conÅ£ine fiÅŸierele cu ÅŸabloane. PuteÅ£i Ã®mpacheta fiÅŸierele pentru distribuÅ£ie sau sÄƒ le folosiÅ£i unde doriÅ£i';
+$lang['No_themes'] = 'Åablonul pe care l-aÅ£i selectat nu are teme ataÅŸate. Ca sÄƒ creaÅ£i o temÄƒ nouÄƒ apÄƒsaÅ£i legÄƒtura <i>CreazÄƒ temÄƒ</i> din partea stÃ¢ngÄƒ';
+$lang['No_template_dir'] = 'Nu se poate deschide directorul cu ÅŸabloane. Acesta ori nu poate fi citit de cÄƒtre serverul web ori nu existÄƒ';
+$lang['Cannot_remove_style'] = 'Nu puteÅ£i ÅŸterge stilul selectat Ã®n timp ce este acesta este stilul standard pentru forum. SchimbaÅ£i stilul standard ÅŸi Ã®ncercaÅ£i din nou.';
+$lang['Style_exists'] = 'Numele stilului pe care l-aÅ£i selectat existÄƒ deja, vÄƒ rugÄƒm reveniÅ£i ÅŸi alegeÅ£i un nume diferit.';
 
-$lang['Click_return_styleadmin'] = 'Apãsaşi %saici%s ca sã revenişi la secşiunea Administrarea stilurilor';
+$lang['Click_return_styleadmin'] = 'ApÄƒsaÅ£i %saici%s ca sÄƒ reveniÅ£i la secÅ£iunea Administrarea stilurilor';
 
-$lang['Theme_settings'] = 'Configurãrile temei';
+$lang['Theme_settings'] = 'ConfigurÄƒrile temei';
 $lang['Theme_element'] = 'Elementul temei';
 $lang['Simple_name'] = 'Numele simplu';
 $lang['Value'] = 'Valoarea';
-$lang['Save_Settings'] = 'Salveazã configurãrile';
+$lang['Save_Settings'] = 'SalveazÄƒ configurÄƒrile';
 
 $lang['Stylesheet'] = 'Stilul CSS';
-$lang['Stylesheet_explain'] = 'Numele fiºierului pentru stilul CSS folosit în aceastã temã.';
+$lang['Stylesheet_explain'] = 'Numele fiÅŸierului pentru stilul CSS folosit Ã®n aceastÄƒ temÄƒ.';
 $lang['Background_image'] = 'Imaginea fundalului';
 $lang['Background_color'] = 'Culoarea fundalului';
 $lang['Theme_name'] = 'Numele temei';
-$lang['Link_color'] = 'Culoarea legãturii';
+$lang['Link_color'] = 'Culoarea legÄƒturii';
 $lang['Text_color'] = 'Culoarea textului';
-$lang['VLink_color'] = 'Culoarea legãturii vizitate';
-$lang['ALink_color'] = 'Culoarea legãturii active';
-$lang['HLink_color'] = 'Culoarea legãturii acoperite';
-$lang['Tr_color1'] = 'Culoarea 1 a rândului din tabel';
-$lang['Tr_color2'] = 'Culoarea 2 a rândului din tabel';
-$lang['Tr_color3'] = 'Culoarea 3 a rândului din tabel';
-$lang['Tr_class1'] = 'Clasa 1 a rândului din tabel';
-$lang['Tr_class2'] = 'Clasa 2 a rândului din tabel';
-$lang['Tr_class3'] = 'Clasa 3 a rândului din tabel';
+$lang['VLink_color'] = 'Culoarea legÄƒturii vizitate';
+$lang['ALink_color'] = 'Culoarea legÄƒturii active';
+$lang['HLink_color'] = 'Culoarea legÄƒturii acoperite';
+$lang['Tr_color1'] = 'Culoarea 1 a rÃ¢ndului din tabel';
+$lang['Tr_color2'] = 'Culoarea 2 a rÃ¢ndului din tabel';
+$lang['Tr_color3'] = 'Culoarea 3 a rÃ¢ndului din tabel';
+$lang['Tr_class1'] = 'Clasa 1 a rÃ¢ndului din tabel';
+$lang['Tr_class2'] = 'Clasa 2 a rÃ¢ndului din tabel';
+$lang['Tr_class3'] = 'Clasa 3 a rÃ¢ndului din tabel';
 $lang['Th_color1'] = 'Culoarea 1 a antetului din tabel';
 $lang['Th_color2'] = 'Culoarea 2 a antetului din tabel';
 $lang['Th_color3'] = 'Culoarea 3 a antetului din tabel';
@@ -674,9 +674,9 @@ $lang['Td_color3'] = 'Culoarea 3 a celulei din tabel';
 $lang['Td_class1'] = 'Clasa 1 a celulei din tabel';
 $lang['Td_class2'] = 'Clasa 2 a celulei din tabel';
 $lang['Td_class3'] = 'Clasa 3 a celulei din tabel';
-$lang['fontface1'] = 'Fontul de faşã 1';
-$lang['fontface2'] = 'Fontul de faşã 2';
-$lang['fontface3'] = 'Fontul de faşã 3';
+$lang['fontface1'] = 'Fontul de faÅ£Äƒ 1';
+$lang['fontface2'] = 'Fontul de faÅ£Äƒ 2';
+$lang['fontface3'] = 'Fontul de faÅ£Äƒ 3';
 $lang['fontsize1'] = 'Dimensiunea 1 a fontului';
 $lang['fontsize2'] = 'Dimensiunea 2 a fontului';
 $lang['fontsize3'] = 'Dimensiunea 3 a fontului';
@@ -693,83 +693,83 @@ $lang['img_pm_size'] = 'Dimensiunea statutului de mesaj privat [px]';
 //
 // Install Process
 //
-$lang['Welcome_install'] = 'Bine aşi venit la procedura de instalare a forumului phpBB2';
-$lang['Initial_config'] = 'Configuraşia de bazã';
-$lang['DB_config'] = 'Configuraşia bazei de date';
-$lang['Admin_config'] = 'Configuraşia administratorului';
-$lang['continue_upgrade'] = 'Odatã ce aşi descãrcat fiºierul dumneavoastrã de configurare pe calculatorul local puteşi folosi butonul <i>Continuã actualizarea</i> de mai jos ca sã treceşi la urmãtorul pas din actualizare. Vã rugãm aºteptaşi sã se încarce fiºierul de configurare pânã ce actualizarea  este completã.';
-$lang['upgrade_submit'] = 'Continuã actualizarea';
+$lang['Welcome_install'] = 'Bine aÅ£i venit la procedura de instalare a forumului phpBB2';
+$lang['Initial_config'] = 'ConfiguraÅ£ia de bazÄƒ';
+$lang['DB_config'] = 'ConfiguraÅ£ia bazei de date';
+$lang['Admin_config'] = 'ConfiguraÅ£ia administratorului';
+$lang['continue_upgrade'] = 'OdatÄƒ ce aÅ£i descÄƒrcat fiÅŸierul dumneavoastrÄƒ de configurare pe calculatorul local puteÅ£i folosi butonul <i>ContinuÄƒ actualizarea</i> de mai jos ca sÄƒ treceÅ£i la urmÄƒtorul pas din actualizare. VÄƒ rugÄƒm aÅŸteptaÅ£i sÄƒ se Ã®ncarce fiÅŸierul de configurare pÃ¢nÄƒ ce actualizarea  este completÄƒ.';
+$lang['upgrade_submit'] = 'ContinuÄƒ actualizarea';
 
-$lang['Installer_Error'] = 'O eroare a apãrut în timpul instalãrii';
-$lang['Previous_Install'] = 'O instalare anterioarã a fost detectatã';
-$lang['Install_db_error'] = 'O eroare a apãrut în timpul actualizãrii bazei de date';
+$lang['Installer_Error'] = 'O eroare a apÄƒrut Ã®n timpul instalÄƒrii';
+$lang['Previous_Install'] = 'O instalare anterioarÄƒ a fost detectatÄƒ';
+$lang['Install_db_error'] = 'O eroare a apÄƒrut Ã®n timpul actualizÄƒrii bazei de date';
 
-$lang['Re_install'] = 'Instalarea anterioarã este încã activã. <br /><br />Dacã dorişi sã reinstalaşi phpBB2-ul ar trebui sã apãsaşi pe butonul Da de mai jos. Vã rugãm sã aveşi grijã ca sã nu distrugeşi toate datele existente, nici o copie de siguranşã nu va fi fãcutã! Numele de utilizator ºi parola administratorului pe care le-aşi folosit sã vã autentificaşi în forum vor fi recreate dupã reinstalare, nici o altã setare nu va fi pãstratã. <br /><br />Gândişi-vã atent înainte de a apãsa butonul <i>Porneºte instalarea</i>!';
+$lang['Re_install'] = 'Instalarea anterioarÄƒ este Ã®ncÄƒ activÄƒ. <br /><br />DacÄƒ doriÅ£i sÄƒ reinstalaÅ£i phpBB2-ul ar trebui sÄƒ apÄƒsaÅ£i pe butonul Da de mai jos. VÄƒ rugÄƒm sÄƒ aveÅ£i grijÄƒ ca sÄƒ nu distrugeÅ£i toate datele existente, nici o copie de siguranÅ£Äƒ nu va fi fÄƒcutÄƒ! Numele de utilizator ÅŸi parola administratorului pe care le-aÅ£i folosit sÄƒ vÄƒ autentificaÅ£i Ã®n forum vor fi recreate dupÄƒ reinstalare, nici o altÄƒ setare nu va fi pÄƒstratÄƒ. <br /><br />GÃ¢ndiÅ£i-vÄƒ atent Ã®nainte de a apÄƒsa butonul <i>PorneÅŸte instalarea</i>!';
 
-$lang['Inst_Step_0'] = 'Vã mulşumim cã aşi ales phpBB2. Pentru a completa aceastã instalare vã rugãm sã completaşi detaliile de mai jos. Reşineşi cã baza de date pe care o folosişi trebuie sã existe deja. Dacã instalaşi într-o bazã de date care foloseºte ODBC, de exemplu MS Access ar trebui mai întâi sã creaşi un DSN pentru aceasta înainte de a continua.';
+$lang['Inst_Step_0'] = 'VÄƒ mulÅ£umim cÄƒ aÅ£i ales phpBB2. Pentru a completa aceastÄƒ instalare vÄƒ rugÄƒm sÄƒ completaÅ£i detaliile de mai jos. ReÅ£ineÅ£i cÄƒ baza de date pe care o folosiÅ£i trebuie sÄƒ existe deja. DacÄƒ instalaÅ£i Ã®ntr-o bazÄƒ de date care foloseÅŸte ODBC, de exemplu MS Access ar trebui mai Ã®ntÃ¢i sÄƒ creaÅ£i un DSN pentru aceasta Ã®nainte de a continua.';
 
-$lang['Start_Install'] = 'Porneºte instalarea';
-$lang['Finish_Install'] = 'Terminã instalarea';
+$lang['Start_Install'] = 'PorneÅŸte instalarea';
+$lang['Finish_Install'] = 'TerminÄƒ instalarea';
 
 $lang['Default_lang'] = 'Limba standard pentru forum';
-$lang['DB_Host'] = 'Numele serverului gazdã pentru baza de date / DSN';
-$lang['DB_Name'] = 'Numele bazei dumneavoastrã de date';
+$lang['DB_Host'] = 'Numele serverului gazdÄƒ pentru baza de date / DSN';
+$lang['DB_Name'] = 'Numele bazei dumneavoastrÄƒ de date';
 $lang['DB_Username'] = 'Numele de utilizator al bazei de date';
 $lang['DB_Password'] = 'Parola de utilizator al bazei de date';
-$lang['Database'] = 'Baza dumneavoastrã de date';
-$lang['Install_lang'] = 'Alegeşi limba pentru instalare';
+$lang['Database'] = 'Baza dumneavoastrÄƒ de date';
+$lang['Install_lang'] = 'AlegeÅ£i limba pentru instalare';
 $lang['dbms'] = 'Tipul bazei de date';
 $lang['Table_Prefix'] = 'Prefixul pentru tabelele din baza de date';
 $lang['Admin_Username'] = 'Numele de utilizator al administratorului';
 $lang['Admin_Password'] = 'Parola administratorului';
-$lang['Admin_Password_confirm'] = 'Parola administratorului [ Confirmaşi ]';
+$lang['Admin_Password_confirm'] = 'Parola administratorului [ ConfirmaÅ£i ]';
 
-$lang['Inst_Step_2'] = 'Numele de utilizator pentru administrator a fost creat. Acum instalarea de bazã este completã. Va apãrea un ecran care vã va permite sã administraşi noua dumneavoastrã instalare. Asiguraşi-vã cã aşi verificat detaliile secşiunii Configurare generalã ºi aşi efectuat orice schimbare necesarã. Vã mulşumim cã aşi ales phpBB2.';
+$lang['Inst_Step_2'] = 'Numele de utilizator pentru administrator a fost creat. Acum instalarea de bazÄƒ este completÄƒ. Va apÄƒrea un ecran care vÄƒ va permite sÄƒ administraÅ£i noua dumneavoastrÄƒ instalare. AsiguraÅ£i-vÄƒ cÄƒ aÅ£i verificat detaliile secÅ£iunii Configurare generalÄƒ ÅŸi aÅ£i efectuat orice schimbare necesarÄƒ. VÄƒ mulÅ£umim cÄƒ aÅ£i ales phpBB2.';
 
-$lang['Unwriteable_config'] = 'Fiºierul dumneavoastrã de configurare în acest moment este protejat la scriere. O copie a fiºierului de configurare va fi descãrcatã când apãsaşi butonul de mai jos. At trebui sã încãrcaşi acest fiºier în acelaºi director ca ºi phpBB2. Odatã ce aceastã operaşiune este terminatã ar trebui sã vã autentificaşi folosind numele de utilizator ºi parola administratorului pe care le-aşi specificat în formularul anterior ºi sã vizitaşi centrul de control al administratorului (o legãturã va apãrea la capãtul fiecãrei pagini odatã ce v-aşi autentificat) ca sã verificaşi configuraşia generalã. Vã mulşumim cã aşi ales phpBB2.';
-$lang['Download_config'] = 'Descarcã fiºierul de configurare';
+$lang['Unwriteable_config'] = 'FiÅŸierul dumneavoastrÄƒ de configurare Ã®n acest moment este protejat la scriere. O copie a fiÅŸierului de configurare va fi descÄƒrcatÄƒ cÃ¢nd apÄƒsaÅ£i butonul de mai jos. At trebui sÄƒ Ã®ncÄƒrcaÅ£i acest fiÅŸier Ã®n acelaÅŸi director ca ÅŸi phpBB2. OdatÄƒ ce aceastÄƒ operaÅ£iune este terminatÄƒ ar trebui sÄƒ vÄƒ autentificaÅ£i folosind numele de utilizator ÅŸi parola administratorului pe care le-aÅ£i specificat Ã®n formularul anterior ÅŸi sÄƒ vizitaÅ£i centrul de control al administratorului (o legÄƒturÄƒ va apÄƒrea la capÄƒtul fiecÄƒrei pagini odatÄƒ ce v-aÅ£i autentificat) ca sÄƒ verificaÅ£i configuraÅ£ia generalÄƒ. VÄƒ mulÅ£umim cÄƒ aÅ£i ales phpBB2.';
+$lang['Download_config'] = 'DescarcÄƒ fiÅŸierul de configurare';
 
-$lang['ftp_choose'] = 'Alegeşi metoda de descãrcare';
-$lang['ftp_option'] = '<br />Întrucât extensiile FTP sunt activate în aceastã versiune a PHP-ului, aveşi posibilitatea de a încerca sã plasaşi prin ftp fiºierul de configurare la locul lui.';
-$lang['ftp_instructs'] = 'Aşi ales sã transmiteşi fiºierul automat prin ftp în contul care conşine phpBB2-ul. Vã rugãm introduceşi informaşiile cerute mai jos ca sã facilitaşi aceast proces. Calea unde este situat FTP-ul trebuie sã fie calea exactã via ftp la instalarea phpBB2-ului dumneavoastrã ca ºi cum aşi transmite folosind un client normal de ftp.';
-$lang['ftp_info'] = 'Introduceşi informaşiile dumneavoastrã despre FTP';
-$lang['Attempt_ftp'] = 'Încercare de a transfera la locul specificat fiºierul de configurare prin ftp';
-$lang['Send_file'] = 'Trimite doar fiºierul la mine ºi eu voi îl voi trimite manual prin ftp';
+$lang['ftp_choose'] = 'AlegeÅ£i metoda de descÄƒrcare';
+$lang['ftp_option'] = '<br />ÃntrucÃ¢t extensiile FTP sunt activate Ã®n aceastÄƒ versiune a PHP-ului, aveÅ£i posibilitatea de a Ã®ncerca sÄƒ plasaÅ£i prin ftp fiÅŸierul de configurare la locul lui.';
+$lang['ftp_instructs'] = 'AÅ£i ales sÄƒ transmiteÅ£i fiÅŸierul automat prin ftp Ã®n contul care conÅ£ine phpBB2-ul. VÄƒ rugÄƒm introduceÅ£i informaÅ£iile cerute mai jos ca sÄƒ facilitaÅ£i aceast proces. Calea unde este situat FTP-ul trebuie sÄƒ fie calea exactÄƒ via ftp la instalarea phpBB2-ului dumneavoastrÄƒ ca ÅŸi cum aÅ£i transmite folosind un client normal de ftp.';
+$lang['ftp_info'] = 'IntroduceÅ£i informaÅ£iile dumneavoastrÄƒ despre FTP';
+$lang['Attempt_ftp'] = 'Ãncercare de a transfera la locul specificat fiÅŸierul de configurare prin ftp';
+$lang['Send_file'] = 'Trimite doar fiÅŸierul la mine ÅŸi eu voi Ã®l voi trimite manual prin ftp';
 $lang['ftp_path'] = 'Calea FTP la phpBB2';
-$lang['ftp_username'] = 'Numele dumneavoastrã de utilizator pentru FTP';
-$lang['ftp_password'] = 'Parola dumneavoastrã de utilizator pentru FTP';
-$lang['Transfer_config'] = 'Porneºte transferul';
-$lang['NoFTP_config'] = 'Încercarea de a transfera la locul specificat fiºierul de configurare prin ftp a eºuat. Vã rugãm sã descãrcaşi fiºierul de configurare ºi sã-l transmiteşi manual prin ftp la locul specificat.';
+$lang['ftp_username'] = 'Numele dumneavoastrÄƒ de utilizator pentru FTP';
+$lang['ftp_password'] = 'Parola dumneavoastrÄƒ de utilizator pentru FTP';
+$lang['Transfer_config'] = 'PorneÅŸte transferul';
+$lang['NoFTP_config'] = 'Ãncercarea de a transfera la locul specificat fiÅŸierul de configurare prin ftp a eÅŸuat. VÄƒ rugÄƒm sÄƒ descÄƒrcaÅ£i fiÅŸierul de configurare ÅŸi sÄƒ-l transmiteÅ£i manual prin ftp la locul specificat.';
 
-$lang['Install'] = 'Instaleazã';
-$lang['Upgrade'] = 'Actualizeazã';
+$lang['Install'] = 'InstaleazÄƒ';
+$lang['Upgrade'] = 'ActualizeazÄƒ';
 
 
-$lang['Install_Method'] = 'Alegeşi metoda de instalare';
+$lang['Install_Method'] = 'AlegeÅ£i metoda de instalare';
 
-$lang['Install_No_Ext'] = 'Configurarea php-ului pe serverul dumneavoastrã nu suportã tipul de bazã de date pe care l-aşi ales';
+$lang['Install_No_Ext'] = 'Configurarea php-ului pe serverul dumneavoastrÄƒ nu suportÄƒ tipul de bazÄƒ de date pe care l-aÅ£i ales';
 
-$lang['Install_No_PCRE'] = 'phpBB2 necesitã modulul de expresii regulate compatibil Perl pentru php pe care configuraşia dumneavoastrã de php se pare cã nu-l suportã!';
+$lang['Install_No_PCRE'] = 'phpBB2 necesitÄƒ modulul de expresii regulate compatibil Perl pentru php pe care configuraÅ£ia dumneavoastrÄƒ de php se pare cÄƒ nu-l suportÄƒ!';
 
 //
 // Version Check
 //
-$lang['Version_up_to_date'] = 'Forumul dumneavoastrã foloseºte ultima versiune phpBB. Nu sunt actualizãri disponibile pentru versiunea dumneavoastrã.';
-$lang['Version_not_up_to_date'] = 'Forumul dumneavoastrã pare sã <b>nu</b> fie actualizat. Noile versiuni sunt disponibile la adresa <a href="http://www.phpbb.com/downloads.php" target="_new">http://www.phpbb.com/downloads.php</a>.';
-$lang['Latest_version_info'] = 'Cea mai nouã versiune este <b>phpBB %s</b>.';
-$lang['Current_version_info'] = 'Folosişi <b>phpBB %s</b>.';
-$lang['Connect_socket_error'] = 'Nu am putut deschide conexiunea cu serverul phpBB, eroarea raportatã este:<br />%s';
-$lang['Socket_functions_disabled'] = 'Nu am putut folosi funcşiile socket.';
-$lang['Mailing_list_subscribe_reminder'] = 'Pentru cele mai noi informaşii despre phpBB, <a href="http://www.phpbb.com/support/" target="_new">vã puteşi înscrie la serviciul de ºtiri</a>.';
-$lang['Version_information'] = 'Informaşii despre versiuni';
+$lang['Version_up_to_date'] = 'Forumul dumneavoastrÄƒ foloseÅŸte ultima versiune phpBB. Nu sunt actualizÄƒri disponibile pentru versiunea dumneavoastrÄƒ.';
+$lang['Version_not_up_to_date'] = 'Forumul dumneavoastrÄƒ pare sÄƒ <b>nu</b> fie actualizat. Noile versiuni sunt disponibile la adresa <a href="http://www.phpbb.com/downloads.php" target="_new">http://www.phpbb.com/downloads.php</a>.';
+$lang['Latest_version_info'] = 'Cea mai nouÄƒ versiune este <b>phpBB %s</b>.';
+$lang['Current_version_info'] = 'FolosiÅ£i <b>phpBB %s</b>.';
+$lang['Connect_socket_error'] = 'Nu am putut deschide conexiunea cu serverul phpBB, eroarea raportatÄƒ este:<br />%s';
+$lang['Socket_functions_disabled'] = 'Nu am putut folosi funcÅ£iile socket.';
+$lang['Mailing_list_subscribe_reminder'] = 'Pentru cele mai noi informaÅ£ii despre phpBB, <a href="http://www.phpbb.com/support/" target="_new">vÄƒ puteÅ£i Ã®nscrie la serviciul de ÅŸtiri</a>.';
+$lang['Version_information'] = 'InformaÅ£ii despre versiuni';
 
 //
 // Login attempts configuration
 //
-$lang['Max_login_attempts'] = 'Permite încercãri de autentificare';
-$lang['Max_login_attempts_explain'] = 'Numãrul de încercãri de autentificare permise.';
-$lang['Login_reset_time'] = 'Timpul necesar reautentificãrii';
-$lang['Login_reset_time_explain'] = 'Numãrul de minute pe care un user trebuie sã-l aºtepte pentru a i se permite sã se autentifice din nou, dupã depãºirea numãrului de încercãri de autentificare permise.';
+$lang['Max_login_attempts'] = 'Permite Ã®ncercÄƒri de autentificare';
+$lang['Max_login_attempts_explain'] = 'NumÄƒrul de Ã®ncercÄƒri de autentificare permise.';
+$lang['Login_reset_time'] = 'Timpul necesar reautentificÄƒrii';
+$lang['Login_reset_time_explain'] = 'NumÄƒrul de minute pe care un user trebuie sÄƒ-l aÅŸtepte pentru a i se permite sÄƒ se autentifice din nou, dupÄƒ depÄƒÅŸirea numÄƒrului de Ã®ncercÄƒri de autentificare permise.';
 
 // Start add - Bin Mod
 $lang['Bin_forum'] = 'Bin forum';

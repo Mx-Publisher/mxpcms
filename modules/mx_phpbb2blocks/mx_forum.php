@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Module - mx_phpbb2blocks
-* @version $Id: mx_forum.php,v 1.8 2008/02/09 19:47:17 joasch Exp $
+* @version $Id: mx_forum.php,v 1.9 2008/09/30 07:04:51 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -72,9 +72,9 @@ $tracking_forums = ( isset($_COOKIE[$board_config['cookie_name'] . '_f']) ) ? un
 // removing them
 //
 /*
-$total_posts = phpBB2::get_db_stat('postcount');
-$total_users = phpBB2::get_db_stat('usercount');
-$newest_userdata = phpBB2::get_db_stat('newestuser');
+$total_posts = $phpBB2->get_db_stat('postcount');
+$total_users = $phpBB2->get_db_stat('usercount');
+$newest_userdata = $phpBB2->get_db_stat('newestuser');
 $newest_user = $newest_userdata['username'];
 $newest_uid = $newest_userdata['user_id'];
 
@@ -412,7 +412,7 @@ if( ( $total_categories = count($category_rows) ) )
 
 							if ( $forum_data[$j]['forum_last_post_id'] )
 							{
-								$last_post_time = phpBB2::create_date($board_config['default_dateformat'], $forum_data[$j]['post_time'], $board_config['board_timezone']);
+								$last_post_time = $phpBB2->create_date($board_config['default_dateformat'], $forum_data[$j]['post_time'], $board_config['board_timezone']);
 
 								$last_post = $last_post_time . '<br />';
 

@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: login.php,v 1.5 2008/07/10 20:46:36 jonohlsson Exp $
+* @version $Id: login.php,v 1.7 2008/10/04 07:04:25 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -16,7 +16,7 @@ if ( !defined('IN_PORTAL') )
 
 if ($mx_request_vars->is_request('login') && (!$userdata['session_logged_in'] || $mx_request_vars->is_post('admin')) )
 {
-	$username = $mx_request_vars->is_post('username') ? phpBB2::phpbb_clean_username($mx_request_vars->post('username', MX_TYPE_NO_TAGS)) : '';
+	$username = $mx_request_vars->is_post('username') ? $phpBB2->phpbb_clean_username($mx_request_vars->post('username', MX_TYPE_NO_TAGS)) : '';
 	$password = $mx_request_vars->post('password', MX_TYPE_NO_TAGS);
 
 	$sql = "SELECT user_id, username, user_password, user_active, user_level, user_login_tries, user_last_login_try

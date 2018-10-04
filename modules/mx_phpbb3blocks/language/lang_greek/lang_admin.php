@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Module - mx_phpbb2blocks
-* @version $Id: lang_admin.php,v 1.1 2008/09/07 18:53:57 orynider Exp $
+* @version $Id: lang_admin.php,v 1.2 2008/10/04 07:04:38 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -64,6 +64,7 @@ $lang['announce_display_sticky']	= "Προβολή Sticky(ies) σε αυτό τ�
 $lang['announce_display_normal']	= "Προβολή Κανονικού Μηνύματος(ων) σε αυτό το Block";
 $lang['announce_display_global']	= "Προβολή Γενικής Ανακοίνωσης σε αυτό το Block";
 $lang['announce_forum']				= "Πληροφορίες Forums";
+$lang['announce_truncate']			= "Truncate Announce Length";
 $lang['announce_forum_explain']		= "- Μπορείτε να κάνετε πολλαπλές επιλογές. Παραδείγματος χάριν, κρατήστε πατημένο το κουμπί  CTRL στο πληκτρολόγιο σας πατώντας τις πρόσθετες επιλογές.<br />* Εάν δεν επιλέξετε, όλα τα εξουσιοδοτημένα forums θα είναι ορατά";
 
 //

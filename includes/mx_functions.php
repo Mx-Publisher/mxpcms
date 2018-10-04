@@ -2,7 +2,7 @@
 /**
 *
 * @package Functions
-* @version $Id: mx_functions.php,v 1.92 2008/08/28 05:05:20 orynider Exp $
+* @version $Id: mx_functions.php,v 1.96 2008/10/04 18:01:29 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -35,7 +35,7 @@ if (!defined('IN_PORTAL'))
 function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = '', $err_file = '', $sql = '')
 {
 	global $db, $layouttemplate, $template, $board_config, $theme, $lang, $phpEx, $phpbb_root_path, $nav_links, $gen_simple_header, $images, $mx_root_path, $module_root_path;
-	global $userdata, $user_ip, $session_length, $mx_backend;
+	global $userdata, $user_ip, $session_length, $mx_backend, $phpBB2;
 	global $mx_starttime, $mx_page, $mx_block, $mx_user, $mx_request_vars, $mx_cache, $tplEx;
 
 	static $msg_history;
@@ -756,11 +756,11 @@ function mx_generate_pagination($base_url, $num_items, $per_page, $start_item, $
  */
 function mx_get_userdata($user, $force_str = false)
 {
-	global $db;
+	global $db, $phpBB2;
 
 	if (!is_numeric($user) || $force_str)
 	{
-		$user = phpBB2::phpbb_clean_username($user);
+		$user = $phpBB2->phpbb_clean_username($user);
 	}
 	else
 	{
@@ -794,13 +794,13 @@ function mx_get_userdata($user, $force_str = false)
 function mx_language_select($default, $select_name = "language", $dirname="language")
 {
 	global $phpEx, $mx_root_path;
-
+	global $phpBB2;
 	$dir = opendir($mx_root_path . $dirname);
 
 	$lang = array();
 	while ( $file = readdir($dir) )
 	{
-		if (preg_match('#^lang_#i', $file) && !is_file(@phpBB2::phpbb_realpath($mx_root_path . $dirname . '/' . $file)) && !is_link(@phpBB2::phpbb_realpath($mx_root_path . $dirname . '/' . $file)))
+		if (preg_match('#^lang_#i', $file) && !is_file(@$phpBB2->phpbb_realpath($mx_root_path . $dirname . '/' . $file)) && !is_link(@$phpBB2->phpbb_realpath($mx_root_path . $dirname . '/' . $file)))
 		{
 			$filename = trim(str_replace("lang_", "", $file));
 			$displayname = preg_replace("/^(.*?)_(.*)$/", "\\1 [ \\2 ]", $filename);
@@ -1045,6 +1045,28 @@ function mx_get_viewonline_info($session_page)
 }
 
 /**
+* Censoring
+*/
+function mx_censor_text($text)
+{
+	static $censors;
+	global $mx_cache;
+
+	if (!isset($censors) || !is_array($censors))
+	{
+		// obtain_word_list is taking care of the users censor option and the board-wide option
+		$censors = $mx_cache->obtain_word_list();
+	}
+
+	if (sizeof($censors))
+	{
+		return preg_replace($censors['match'], $censors['replace'], $text);
+	}
+
+	return $text;
+}
+
+/**
 * For display of custom parsed text on user-facing pages
 * Expects $text to be the value directly from the database (stored value)
 */
@@ -1057,7 +1079,7 @@ function mx_generate_text_for_display($text, $uid, $bitfield, $flags)
 		return '';
 	}
 
-	$text = phpbb3::censor_text($text);
+	$text = mx_censor_text($text);
 
 	// Parse bbcode if bbcode uid stored and bbcode enabled
 	if ($uid && ($flags & OPTION_FLAG_BBCODE))

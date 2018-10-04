@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: index_jon.php,v 1.2 2008/07/10 23:17:13 jonohlsson Exp $
+* @version $Id: index_jon.php,v 1.3 2008/09/30 07:04:34 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -532,7 +532,7 @@ class mx_acp
 					'get_userdata', 'phpbb_clean_username', phpbb_realpath
 					);
 				$preg_array = array_merge( $preg_array, array( // #
-						'#(' . implode( '|', $functions_ary ) . ')\(#si' => 'phpBB2::\1(',
+						'#(' . implode( '|', $functions_ary ) . ')\(#si' => '$phpBB2->\1(',
 						) );
 				// REPLACE FUNCTIONS that ARE ALLREADY DECLARED
 				$func_cnt = preg_match_all( "#\nfunction ([^(]*)\\(#si", $script, $func_match );
@@ -548,7 +548,7 @@ class mx_acp
 				}
 
 				$script = preg_replace( array_keys( $preg_array ), $preg_array, $script );
-				$script = str_replace( 'phpBB2::phpBB2::', 'PHPBB2::', $script );
+				$script = str_replace( '$phpBB2->$phpBB2->', '$phpBB2->', $script );
 				break;
 			case OLYMPUS_CATEGORY:
 				$script = $this->phpbb3_hook->prepare_action_script( $this->panel );
@@ -782,7 +782,7 @@ class mx_acp
 			'S_JUMPBOX_ACTION' => mx_append_sid( '../viewforum.' . $phpEx ),
 			'S_CURRENT_TIME' =>
 			( PORTAL_BACKEND == 'phpbb3' )?
-			sprintf( $lang['Current_time'], phpBB2::create_date( $board_config['default_dateformat'], time(), $board_config['board_timezone'] ) ):
+			sprintf( $lang['Current_time'], $phpBB2->create_date( $board_config['default_dateformat'], time(), $board_config['board_timezone'] ) ):
 			sprintf( $lang['Current_time'], create_date( $board_config['default_dateformat'], time(), $board_config['board_timezone'] ) ),
 
 			'S_CONTENT_DIRECTION' => $lang['DIRECTION'],
@@ -813,9 +813,9 @@ $script = $mx_acp->prepare_action_script();
 $i = 1;
 
 // VERSION mx v2.8
-// $script = str_replace( 'phpBB2::', '', $script);
+// $script = str_replace( '$phpBB2->', '', $script);
 // VERSION mxP v2.9
-//$script = str_replace( 'mx_phpBB2::', 'phpBB2::', $script );
+//$script = str_replace( 'mx_$phpBB2->', '$phpBB2->', $script );
 
 switch ( 0 )
 {

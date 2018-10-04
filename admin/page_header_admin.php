@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: page_header_admin.php,v 1.27 2008/09/08 01:32:53 orynider Exp $
+* @version $Id: page_header_admin.php,v 1.29 2008/10/04 07:04:24 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -79,7 +79,7 @@ $template->assign_vars(array(
 	'S_TIMEZONE' => sprintf($lang['All_times'], $l_timezone),
 	'S_LOGIN_ACTION' => mx_append_sid('../login.'.$phpEx),
 	'S_JUMPBOX_ACTION' => mx_append_sid('../viewforum.'.$phpEx),
-	'S_CURRENT_TIME' => sprintf($lang['Current_time'], phpBB2::create_date($board_config['default_dateformat'], time(), $board_config['board_timezone'])),
+	'S_CURRENT_TIME' => sprintf($lang['Current_time'], $phpBB2->create_date($board_config['default_dateformat'], time(), $board_config['board_timezone'])),
 	'S_CONTENT_DIRECTION' => $lang['DIRECTION'],
 	'S_CONTENT_ENCODING' => $lang['ENCODING'],
 	'S_CONTENT_DIR_LEFT' => $lang['LEFT'],

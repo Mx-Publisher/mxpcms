@@ -2,7 +2,7 @@
 /**
 *
 * @package Core
-* @version $Id: mx_functions_core.php,v 1.103 2008/09/02 21:24:15 orynider Exp $
+* @version $Id: mx_functions_core.php,v 1.107 2008/10/04 07:04:25 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -80,7 +80,6 @@ class mx_cache extends cache
 		// Load backend
 		//
 		include_once($mx_root_path . 'includes/sessions/'.$portal_config['portal_backend'].'/core.' . $phpEx);
-
 		//
 		// Instantiate the mx_backend class
 		//
@@ -2060,7 +2059,7 @@ class mx_block extends mx_block_parameter
 			$is_admin = ( $userdata['user_level'] == ADMIN && $userdata['session_logged_in'] ) ? TRUE : 0;
 			$editor_name_tmp = mx_get_userdata($this->editor_id);
 			$editor_name = $editor_name_tmp['username'];
-			$edit_time = phpBB2::create_date( $board_config['default_dateformat'], $this->block_time, $board_config['board_timezone'] );
+			$edit_time = $phpBB2->create_date( $board_config['default_dateformat'], $this->block_time, $board_config['board_timezone'] );
 
 			$layouttemplate->assign_block_vars('layout_column.blocks.block_stats', array(
 				'L_BLOCK_UPDATED'	=> $lang['Block_updated_date'],
@@ -2488,10 +2487,10 @@ class mx_block_parameter
 							break;
 						case 'BBText':
 							$bbcode_uid = $parameter_opt = $mx_bbcode->make_bbcode_uid();
-							$parameter_value = prepare_message($parameter_value, true, true, true, $bbcode_uid);
+							$parameter_value = $mx_bbcode->prepare_message($parameter_value, true, true, true, $bbcode_uid);
 							break;
 						case 'Html':
-							$parameter_value = prepare_message($parameter_value, true, false, false);
+							$parameter_value = $mx_bbcode->prepare_message($parameter_value, true, false, false);
 							break;
 						case 'Number':
 							$parameter_value = intval($parameter_value);
@@ -3300,7 +3299,7 @@ class mx_page
 		global $db;
 
 		$page_nav = array();
-		$this->core_nav( $this->page_rowset[$cat_id]['page_parent'], &$page_nav );
+		$this->core_nav($this->page_rowset[$cat_id]['page_parent'], $page_nav);
 
 		$sql = 'UPDATE ' . PAGE_TABLE . "
 			SET parents_data = ''
@@ -3329,7 +3328,7 @@ class mx_page
 	{
 		if ( !empty( $this->page_rowset[$parent_id] ) )
 		{
-			$this->core_nav( $this->page_rowset[$parent_id]['page_parent'], &$page_nav );
+			$this->core_nav($this->page_rowset[$parent_id]['page_parent'], $page_nav);
 			$page_nav[$parent_id] = $this->page_rowset[$parent_id]['page_name'];
 		}
 		return;
@@ -3522,7 +3521,7 @@ class mx_page
 		if ( $this->page_rowset[$page_id]['parents_data'] == '' )
 		{
 			$page_nav = array();
-			$this->core_nav( $this->page_rowset[$page_id]['page_parent'], &$page_nav );
+			$this->core_nav($this->page_rowset[$page_id]['page_parent'], $page_nav);
 
 			$sql = 'UPDATE ' . PAGE_TABLE . "
 				SET parents_data = '" . addslashes( serialize( $page_nav ) ) . "'

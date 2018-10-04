@@ -29,7 +29,7 @@
 $lang['Page_Not_Authorised'] = 'Συγνώμη, αλλά δεν έχετε πρόσβαση σε αυτήν την σελίδα.';
 $lang['Execution_Stats'] = 'Σελίδα παράγεται σε %s queries - Χρόνος παραγωγής: %s δευτερόλεπτα';
 $lang['Redirect_login'] = 'Πατήστε %εδώ%s για είσοδο.';
-$lang['Show_admin_options'] = 'Παρουσιάση/αποκρύψη επιλογές Admin σελίδων: ';
+$lang['Show_admin_options'] = 'Παρουσιάση/αποκρύψη επιλογές Διαχ. σελίδων: ';
 $lang['Block_updated_date'] = 'Ενημερώθηκε ';
 $lang['Block_updated_by'] = 'από ';
 $lang['Page_updated_date'] = 'Αυτλη η σελίδα έχει ενημερωθεί ';
@@ -123,16 +123,16 @@ $lang['Mx_new_search'] = 'Νέα Αναζήτηση';
 //
 // Copyrights page
 //
-$lang['mx_about_title'] = 'Σχετικά MX-Publisher';
-$lang['mx_copy_title'] = 'MX-Publisher Πληροφορίες';
-$lang['mx_copy_modules_title'] = 'Εγκαταστημένες MX-Publisher Μονάδες';
+$lang['mx_about_title'] = 'Σχετικά με το MX-Publisher';
+$lang['mx_copy_title'] = 'Πληροφορίες για το MX-Publisher';
+$lang['mx_copy_modules_title'] = 'Εγκαταστημένες Μονάδες MX-Publisher';
 $lang['mx_copy_template_title'] = 'Σχετικά με το Στυλ';
 $lang['mx_copy_translation_title'] = 'Σχετικά με την μετάφραση';
 
 // This is optional, if you would like a _SHORT_ message output
 // along with our copyright message indicating you are the translator
 // please add it here.
-$lang['TRANSLATION_INFO_MXBB'] = 'Greek Language by <a href="http://www.mx-publisher.com/" target="_blank">georges</a>';
+$lang['TRANSLATION_INFO_MXBB'] = 'Greek Language by <a href="http://www.mx-publisher.com/index.php?page=2&phpbb_script=profile&mode=viewprofile&u=8128" target="_blank">georges</a>';
 
 //
 // Installation

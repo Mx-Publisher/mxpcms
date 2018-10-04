@@ -6,7 +6,7 @@
  *   copyright            : (C) 2001 The phpBB Group
  *   email                : support@phpbb.com
  *
- *   $Id: admin_groupcp.php,v 1.5 2008/06/14 19:17:56 jonohlsson Exp $
+ *   $Id: admin_groupcp.php,v 1.6 2008/09/30 07:04:54 orynider Exp $
  *
  *
  ***************************************************************************/
@@ -54,7 +54,7 @@ function mx_generate_user_info(&$row, $date_format, $group_mod, &$from, &$posts,
 	global $lang, $images, $board_config, $phpEx;
 
 	$from = ( !empty($row['user_from']) ) ? $row['user_from'] : '&nbsp;';
-	$joined = phpBB2::create_date($date_format, $row['user_regdate'], $board_config['board_timezone']);
+	$joined = $phpBB2->create_date($date_format, $row['user_regdate'], $board_config['board_timezone']);
 	$posts = ( $row['user_posts'] ) ? $row['user_posts'] : 0;
 
 	/*
@@ -491,7 +491,7 @@ else if ( $group_id )
 
 			if ($mx_request_vars->is_post('add'))
 			{
-				$username = $mx_request_vars->is_post('username') ? phpBB2::phpbb_clean_username($mx_request_vars->post('username', MX_TYPE_NO_TAGS)) : '';
+				$username = $mx_request_vars->is_post('username') ? $phpBB2->phpbb_clean_username($mx_request_vars->post('username', MX_TYPE_NO_TAGS)) : '';
 
 				$sql = "SELECT *
 					FROM " . USERS_TABLE . "
@@ -1082,7 +1082,7 @@ else if ( $group_id )
 	$current_page = ( !$members_count ) ? 1 : ceil( $members_count / $board_config['topics_per_page'] );
 
 	$template->assign_vars(array(
-		'PAGINATION' => phpBB2::generate_pagination("admin_groupcp.$phpEx?" . POST_GROUPS_URL . "=$group_id", $members_count, $board_config['topics_per_page'], $start),
+		'PAGINATION' => $phpBB2->generate_pagination("admin_groupcp.$phpEx?" . POST_GROUPS_URL . "=$group_id", $members_count, $board_config['topics_per_page'], $start),
 		'PAGE_NUMBER' => sprintf($lang['Page_of'], ( floor( $start / $board_config['topics_per_page'] ) + 1 ), $current_page ),
 
 		'L_GOTO_PAGE' => $lang['Goto_page'])

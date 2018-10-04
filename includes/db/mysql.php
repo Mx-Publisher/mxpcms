@@ -2,7 +2,7 @@
 /**
 *
 * @package DBal
-* @version $Id: mysql.php,v 1.19 2008/08/19 02:46:22 orynider Exp $
+* @version $Id: mysql.php,v 1.22 2008/10/04 17:30:23 orynider Exp $
 * @copyright (c) 2005 phpBB Group
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU Public License
@@ -51,14 +51,14 @@ class dbal_mysql extends dbal
 		$this->sql_layer = 'mysql4';
 
 		$this->db_connect_id = ($this->persistency) ? @mysql_pconnect($this->server, $this->user, $sqlpassword, $new_link) : @mysql_connect($this->server, $this->user, $sqlpassword, $new_link);
-
+		
 		if ($this->db_connect_id && $this->dbname != '')
 		{
 			if (@mysql_select_db($this->dbname, $this->db_connect_id))
 			{
 				// Determine what version we are using and if it natively supports UNICODE
 				$this->mysql_version = mysql_get_server_info($this->db_connect_id);
-
+				
 				if (version_compare($this->mysql_version, '4.1.3', '>='))
 				{
 					if (UTF_STATUS === 'phpbb3')
@@ -99,8 +99,7 @@ class dbal_mysql extends dbal
 				return $this->db_connect_id;
 			}
 		}
-
-		return $this->sql_error('');
+		return $this->sql_error();
 	}
 
 

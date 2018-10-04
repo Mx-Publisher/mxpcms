@@ -2,7 +2,7 @@
 /**
 *
 * @package Style
-* @version $Id: mx_functions_style.php,v 1.93 2008/09/06 17:46:40 orynider Exp $
+* @version $Id: mx_functions_style.php,v 1.97 2008/10/04 21:13:14 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -572,14 +572,14 @@ class mx_user extends mx_session
 	{
 		global $userdata, $board_config, $portal_config, $theme, $images;
 		global $template, $lang, $phpEx, $phpbb_root_path, $mx_root_path, $db;
-		global $nav_links;
+		global $nav_links, $phpBB2;
 
 		//
 		// Clean up and ensure we are using mxp internal lang format
 		//
 		$board_config['phpbb_lang'] = $board_config['default_lang']; // Handy switch
-		$this->lang['default_lang'] = phpBB2::phpbb_ltrim(basename(phpBB2::phpbb_rtrim($this->decode_lang($board_config['default_lang']))), "'");
-		$this->data['user_lang'] = phpBB2::phpbb_ltrim(basename(phpBB2::phpbb_rtrim($this->decode_lang($this->data['user_lang']))), "'");
+		$this->lang['default_lang'] = $phpBB2->phpbb_ltrim(basename($phpBB2->phpbb_rtrim($this->decode_lang($board_config['default_lang']))), "'");
+		$this->data['user_lang'] = $phpBB2->phpbb_ltrim(basename($phpBB2->phpbb_rtrim($this->decode_lang($this->data['user_lang']))), "'");
 
 		if ( $this->data['session_logged_in'] )
 		{
@@ -602,14 +602,14 @@ class mx_user extends mx_session
 		//
 		// Now, $this->lang['default_lang'] is populated, but do we have a mathing MX-Publisher lang file installed?
 		//
-		if ( !file_exists(@phpBB2::phpbb_realpath($mx_root_path . 'language/lang_' . $this->lang['default_lang'] . '/lang_main.'.$phpEx)) )
+		if ( !file_exists(@$phpBB2->phpbb_realpath($mx_root_path . 'language/lang_' . $this->lang['default_lang'] . '/lang_main.'.$phpEx)) )
 		{
 			//
 			// If not, try english (desperate try)
 			//
 			$this->lang['default_lang'] = 'english';
 
-			if ( !file_exists(@phpBB2::phpbb_realpath($mx_root_path . 'language/lang_' . $this->lang['default_lang'] . '/lang_main.'.$phpEx)) )
+			if ( !file_exists(@$phpBB2->phpbb_realpath($mx_root_path . 'language/lang_' . $this->lang['default_lang'] . '/lang_main.'.$phpEx)) )
 			{
 				mx_message_die(CRITICAL_ERROR, 'Could not locate valid language pack: ' . $mx_root_path . 'language/lang_' . $this->lang['default_lang'] . '/lang_main.'.$phpEx);
 			}
@@ -736,7 +736,7 @@ class mx_user extends mx_session
 		global $userdata, $board_config, $portal_config, $theme, $images;
 		global $template, $lang, $phpEx, $phpbb_root_path, $mx_root_path, $db;
 		global $mx_page, $mx_request_vars;
-
+		
 		//
 		// Build Portal style
 		//
@@ -796,7 +796,7 @@ class mx_user extends mx_session
 
 		$style = $mx_request_vars->post('default_style', MX_TYPE_INT, $init_style);
 		$theme = $this->_setup_style($style);
-
+		
 		return;
 	}
 
@@ -810,7 +810,7 @@ class mx_user extends mx_session
 	function _setup_style($style)
 	{
 		global $db, $board_config, $portal_config, $template, $phpbb_root_path, $mx_root_path, $theme;
-
+ 
 		//
 		// Get Style data.
 		//
@@ -858,31 +858,42 @@ class mx_user extends mx_session
 						AND themes_id = " . (int) $style;
 				break;
 				case 'phpbb2':
-					$sql = "SELECT bbt.*
+					$sql = "SELECT mxt.*, bbt.*
 						FROM " . MX_THEMES_TABLE . " mxt, " . THEMES_TABLE . " bbt
 						WHERE mxt.style_name = bbt.template_name
 						AND mxt.portal_backend = '" . PORTAL_BACKEND . "'
 						AND bbt.themes_id = " . (int) $style;
 				break;				
 				case 'phpbb3':
-				$sql = "SELECT bbt.*, stt.*
-						FROM " . MX_THEMES_TABLE . " mxt, " . STYLES_TABLE . " bbt, " . STYLES_TEMPLATE_TABLE . " stt
-						WHERE mxt.template_name = stt.template_path
-						AND bbt.style_id = stt.template_id
-						AND mxt.portal_backend = '" . PORTAL_BACKEND . "'				
-						AND stt.template_path = " . (int) $style;			
+					//Try standard style name
+					$sql = "SELECT  mxt . *, stt . * , bbt . *
+							FROM " . MX_THEMES_TABLE . " AS mxt, " . STYLES_TEMPLATE_TABLE . " AS stt, " . STYLES_TABLE . " AS bbt			
+							WHERE mxt.themes_id = " . (int) $style . "
+							AND mxt.portal_backend = '" . PORTAL_BACKEND . "'						
+							AND stt.template_id = bbt.template_id
+							AND bbt.style_name = mxt.template_name";
+					//If not standard style name or with spaces try someting else		
+					if ( !$db->sql_fetchrow($db->sql_query($sql) ) )
+					{
+						$sql = "SELECT  mxt . *, stt . * , bbt . *
+								FROM " . MX_THEMES_TABLE . " AS mxt, " . STYLES_TEMPLATE_TABLE . " AS stt, " . STYLES_TABLE . " AS bbt			
+								WHERE mxt.themes_id = " . (int) $style . "
+								AND mxt.portal_backend = '" . PORTAL_BACKEND . "'						
+								AND stt.template_id = bbt.template_id
+								AND stt.template_path = mxt.template_name";	
+					}					
 				break;
 			}
 
-			if ( !($result = $db->sql_query($sql, 120)) )
+			if ( !($result = $db->sql_query($sql)) )
 			{
 				mx_message_die(CRITICAL_ERROR, "Could not query database for theme info", '', __LINE__, __FILE__, $sql);
 			}
 
 			if ( !($row = $db->sql_fetchrow($result)) )
-			{				
+			{	
 				$style = $portal_config['default_style'];
-
+				
 				switch (PORTAL_BACKEND)
 				{
 					case 'internal':
@@ -890,22 +901,33 @@ class mx_user extends mx_session
 							FROM " . MX_THEMES_TABLE . "
 							WHERE portal_backend = '" . PORTAL_BACKEND . "'
 							AND themes_id = " . (int) $style;
-						break;
+					break;
 					case 'phpbb2':
 						$sql = "SELECT bbt.*
 							FROM " . MX_THEMES_TABLE . " mxt, " . THEMES_TABLE . " bbt
 							WHERE mxt.style_name = bbt.style_name
 							AND mxt.portal_backend = '" . PORTAL_BACKEND . "'
 							AND mxt.themes_id = " . (int) $style;
-						break;
+					break;
 					case 'phpbb3':
-						$sql = "SELECT bbt.*, stt.*
-							FROM " . MX_THEMES_TABLE . " mxt, " . STYLES_TABLE . " bbt, " . STYLES_TEMPLATE_TABLE . " stt
-							WHERE mxt.template_name = stt.template_path
-							AND bbt.style_id = stt.template_id
-							AND mxt.portal_backend = '" . PORTAL_BACKEND . "'				
-							AND mxt.themes_id = " . (int) $style;
-						break;
+						//Try standard style name
+						$sql = "SELECT  mxt . *, stt . * , bbt . *
+								FROM " . MX_THEMES_TABLE . " AS mxt, " . STYLES_TEMPLATE_TABLE . " AS stt, " . STYLES_TABLE . " AS bbt			
+								WHERE mxt.themes_id = " . (int) $style . "
+								AND mxt.portal_backend = '" . PORTAL_BACKEND . "'						
+								AND stt.template_id = bbt.template_id
+								AND bbt.style_name = mxt.template_name";
+						//If not standard style name or with spaces try someting else		
+						if ( !$db->sql_fetchrow($db->sql_query($sql) ) )
+						{
+							$sql = "SELECT  mxt . *, stt . * , bbt . *
+									FROM " . MX_THEMES_TABLE . " AS mxt, " . STYLES_TEMPLATE_TABLE . " AS stt, " . STYLES_TABLE . " AS bbt			
+									WHERE mxt.themes_id = " . (int) $style . "
+									AND mxt.portal_backend = '" . PORTAL_BACKEND . "'						
+									AND stt.template_id = bbt.template_id
+									AND stt.template_path = mxt.template_name";	
+						}
+					break;
 				}
 
 				if ( !($result = $db->sql_query($sql, 120)) )
@@ -929,10 +951,9 @@ class mx_user extends mx_session
 								FROM ' . THEMES_TABLE;
 							break;
 						case 'phpbb3':
-							$sql = "SELECT bbt.*, stt.*
+							$sql = "SELECT mxt.*, bbt.*, stt.*
 									FROM " . MX_THEMES_TABLE . " mxt, " . STYLES_TABLE . " bbt, " . STYLES_TEMPLATE_TABLE . " stt
-									WHERE mxt.template_name = stt.template_path
-									AND bbt.style_id = stt.template_id";
+									WHERE mxt.template_name = stt.template_path";
 							break;
 					}
 

@@ -62,7 +62,7 @@ DROP TABLE IF EXISTS `mx_table_block_system_parameter`;
 CREATE TABLE `mx_table_block_system_parameter` (
   `block_id` smallint(5) unsigned NOT NULL default '0',
   `parameter_id` smallint(5) unsigned NOT NULL default '0',
-  `parameter_value` text,
+  `parameter_value` mediumtext,
   `parameter_opt` text,
   `sub_id` int(255) unsigned NOT NULL default '0',
   PRIMARY KEY  (`block_id`,`parameter_id`,`sub_id`)
@@ -462,7 +462,7 @@ CREATE TABLE `mx_table_portal` (
   `mx_use_cache` smallint(2) unsigned NOT NULL DEFAULT '1',
   `mod_rewrite` smallint(2) unsigned NOT NULL DEFAULT '0',
   `cookie_domain` varchar(255) NOT NULL DEFAULT '',
-  `cookie_name` varchar(255) NOT NULL DEFAULT 'mxbb29x',
+  `cookie_name` varchar(255) NOT NULL DEFAULT 'mxbb30x',
   `cookie_path` varchar(255) NOT NULL DEFAULT '/',
   `cookie_secure` smallint(2) unsigned NOT NULL DEFAULT '0',
   `session_length` varchar(255) NOT NULL DEFAULT '3600',
@@ -625,30 +625,30 @@ CREATE TABLE `mx_table_sessions_keys` (
 # Table structure for table 'mx_table_users'
 #
 DROP TABLE IF EXISTS `mx_table_users`;
-CREATE TABLE `mx_table_users` (
+CREATE TABLE IF NOT EXISTS `mx_table_users` (
    user_id mediumint(8) NOT NULL,
-   user_active tinyint(1) DEFAULT '1',
-   username varchar(25) NOT NULL,
-   user_password varchar(32) NOT NULL,
-   user_session_time int(11) DEFAULT '0' NOT NULL,
-   user_session_page smallint(5) DEFAULT '0' NOT NULL,
-   user_lastvisit int(11) DEFAULT '0' NOT NULL,
-   user_regdate int(11) DEFAULT '0' NOT NULL,
-   user_level tinyint(4) DEFAULT '0',
-   user_login_tries smallint(5) UNSIGNED DEFAULT '0' NOT NULL,
-   user_last_login_try int(11) DEFAULT '0' NOT NULL,
-   user_email varchar(255),
+   user_active tinyint(1) default '1',
+   username varchar(25) collate utf8_bin NOT NULL,
+   user_password varchar(32) collate utf8_bin NOT NULL,
+   user_session_time int(11) NOT NULL default '0',
+   user_session_page smallint(5) NOT NULL default '0',
+   user_lastvisit int(11) NOT NULL default '0',
+   user_regdate int(11) NOT NULL default '0',
+   user_level tinyint(4) default '0',
+   user_login_tries smallint(5) unsigned NOT NULL default '0',
+   user_last_login_try int(11) NOT NULL default '0',
+   user_email varchar(255) collate utf8_bin default NULL,
    PRIMARY KEY (user_id),
    KEY user_session_time (user_session_time)
-) CHARACTER SET `utf8` COLLATE `utf8_bin`;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 
 
 # -- Users
-INSERT INTO `mx_table_users` (user_id, username, user_level, user_regdate, user_password, user_email, user_active) VALUES ( -1, 'Anonymous', 0, 0, '', '', 0);
+INSERT INTO `mx_table_users` (user_id, user_active, username, user_password, user_session_time, user_session_page, user_lastvisit, user_regdate, user_level, user_login_tries, user_last_login_try, user_email) VALUES('-1', '0', 'Anonymous', '', '0', '0', '0', '1221460256', '0', '0', '0', '');
 
 # -- username: admin    password: admin (change this or remove it once everything is working!)
-INSERT INTO `mx_table_users` (user_id, username, user_level, user_regdate, user_password, user_email, user_active) VALUES ( 2, 'Admin', 1, 0, '21232f297a57a5a743894a0e4a801fc3', 'admin@yourdomain.com', 1);
+INSERT INTO `mx_table_users` (user_id, user_active, username, user_password, user_session_time, user_session_page, user_lastvisit, user_regdate, user_level, user_login_tries, user_last_login_try, user_email) VALUES('2', '1', 'Admin', '21232f297a57a5a743894a0e4a801fc3', '1223142439', '0', '1221524623', '1221460256', '1', '0', '0', 'admin@localhost');
 
 # -- Groups
 INSERT INTO `mx_table_groups` (group_id, group_name, group_description, group_single_user) VALUES (1, 'Anonymous', 'Personal User', 1);
@@ -677,12 +677,13 @@ CREATE TABLE `mx_table_themes` (
 
 
 
-INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (1, 'mxBase1', 'mxBase1', 'mxBase1.css', 'internal');
-INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (2, 'mxBase2', 'mxBase2', 'mxBase2.css', 'internal');
-INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (3, 'mxSilver', 'mxSilver', 'mxSilver.css', 'internal');
-INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (4, 'subSilver', 'subSilver', 'subSilver.css', 'phpbb2');
-INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (5, 'subsilver2', 'subsilver2', 'subsilver2.css', 'phpbb3');
-INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (6, 'prosilver', 'prosilver', 'prosilver.css', 'phpbb3');
+INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (1, 'mx_prosilver', 'mx_prosilver', 'mx_prosilver.css', 'internal');
+INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (2, 'mxBase1', 'mxBase1', 'mxBase1.css', 'internal');
+INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (3, 'mxBase2', 'mxBase2', 'mxBase2.css', 'internal');
+INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (4, 'mxSilver', 'mxSilver', 'mxSilver.css', 'internal');
+INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (5, 'subSilver', 'subSilver', 'subSilver.css', 'phpbb2');
+INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (6, 'subsilver2', 'subsilver2', 'subsilver2.css', 'phpbb3');
+INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (7, 'prosilver', 'prosilver', 'prosilver.css', 'phpbb3');
 
 
 

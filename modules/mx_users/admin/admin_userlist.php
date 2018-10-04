@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Module - mx_users
-* @version $Id: admin_userlist.php,v 1.3 2008/02/09 12:51:07 joasch Exp $
+* @version $Id: admin_userlist.php,v 1.4 2008/09/30 07:04:55 orynider Exp $
 * @copyright (c) 2002-2008 [wGEric, Jon Ohlsson] MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -952,8 +952,8 @@ switch( $mode )
 				'I_RANK' => $rank_image,
 				'I_AVATAR' => $avatar_img,
 
-				'JOINED' => phpBB2::create_date('d M Y', $row['user_regdate'], $board_config['board_timezone']),
-				'LAST_ACTIVITY' => ( !empty($row['user_session_time']) ) ? phpBB2::create_date('d M Y', $row['user_session_time'], $board_config['board_timezone']) : $lang['Never'],
+				'JOINED' => $phpBB2->create_date('d M Y', $row['user_regdate'], $board_config['board_timezone']),
+				'LAST_ACTIVITY' => ( !empty($row['user_session_time']) ) ? $phpBB2->create_date('d M Y', $row['user_session_time'], $board_config['board_timezone']) : $lang['Never'],
 
 				'POSTS' => ( $row['user_posts'] ) ? $row['user_posts'] : 0,
 				'U_SEARCH' => mx_append_sid($phpbb_root_path . 'search.'.$phpEx.'?search_author=' . urlencode(strip_tags($row['username'])) . '&amp;showresults=posts'),
@@ -1046,7 +1046,7 @@ switch( $mode )
 		{
 			$total_members = $total['total'];
 
-			$pagination = phpBB2::generate_pagination($module_root_path . "admin/admin_userlist.$phpEx?sort=$sort&amp;order=$sort_order&amp;show=$show" . ( ( isset($alphanum) ) ? "&amp;alphanum=$alphanum" : '' ), $total_members, $show, $start);
+			$pagination = $phpBB2->generate_pagination($module_root_path . "admin/admin_userlist.$phpEx?sort=$sort&amp;order=$sort_order&amp;show=$show" . ( ( isset($alphanum) ) ? "&amp;alphanum=$alphanum" : '' ), $total_members, $show, $start);
 		}
 
 		$template->assign_vars(array(

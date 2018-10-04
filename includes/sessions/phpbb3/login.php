@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: login.php,v 1.5 2008/02/09 12:41:11 joasch Exp $
+* @version $Id: login.php,v 1.7 2008/10/04 07:04:25 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -16,7 +16,7 @@ if ( !defined('IN_PORTAL') )
 
 if($mx_request_vars->is_request('login') && ($userdata['user_id'] == ANONYMOUS || $mx_request_vars->is_post('admin')) )
 {
-	$username = $mx_request_vars->is_post('username') ? phpBB2::phpbb_clean_username($mx_request_vars->post('username', MX_TYPE_NO_TAGS)) : '';
+	$username = $mx_request_vars->is_post('username') ? $phpBB2->phpbb_clean_username($mx_request_vars->post('username', MX_TYPE_NO_TAGS)) : '';
 	$password = $mx_request_vars->post('password', MX_TYPE_NO_TAGS);
 
 	$sql = "SELECT *
@@ -62,7 +62,7 @@ if($mx_request_vars->is_request('login') && ($userdata['user_id'] == ANONYMOUS |
 				$password_old_format = (!STRIP) ? addslashes($password_old_format) : $password_old_format;
 				$password_new_format = '';
 
-				phpBB3::set_var($password_new_format, stripslashes($password_old_format), 'string');
+				$phpBB3->set_var($password_new_format, stripslashes($password_old_format), 'string');
 
 				//mx_message_die(CRITICAL_ERROR, "Couldn't start session : login", $password_new_format, '');
 
@@ -77,7 +77,7 @@ if($mx_request_vars->is_request('login') && ($userdata['user_id'] == ANONYMOUS |
 					// cp1252 is phpBB2's default encoding, characters outside ASCII range might work when converted into that encoding
 					if (md5($password_old_format) == $row['user_password'] || md5(utf8_to_cp1252($password_old_format)) == $row['user_password'])
 					{
-						$hash = phpBB3::phpbb_hash($password_new_format);
+						$hash = $phpBB3->phpbb_hash($password_new_format);
 
 						// Update the password in the users table to the new format and remove user_pass_convert flag
 						$sql = 'UPDATE ' . USERS_TABLE . '
@@ -112,7 +112,7 @@ if($mx_request_vars->is_request('login') && ($userdata['user_id'] == ANONYMOUS |
 				$password_old_format = isset($_REQUEST['password']) ? $_REQUEST['password'] : $password;
 				$password_old_format = (!STRIP) ? addslashes($password_old_format) : $password_old_format;
 				$password_new_format = '';
-				phpBB3::set_var($password_new_format, stripslashes($password_old_format), 'string');
+				$phpBB3->set_var($password_new_format, stripslashes($password_old_format), 'string');
 				//mx_message_die(CRITICAL_ERROR, "Couldn't start session : login", $password_new_format, '');
 
 				if ($password_new_format == $password_old_format)
@@ -124,7 +124,7 @@ if($mx_request_vars->is_request('login') && ($userdata['user_id'] == ANONYMOUS |
 					}
 				
 					// cp1252 is phpBB2's default encoding, characters outside ASCII range might work when converted into that encoding
-					if (md5($password_old_format) == $row['user_password'] || md5($password) == $row['user_password'] || phpBB3::phpbb_check_hash($password, $row['user_password']))
+					if (md5($password_old_format) == $row['user_password'] || md5($password) == $row['user_password'] || $phpBB3->phpbb_check_hash($password, $row['user_password']))
 					{
 						$autologin = $mx_request_vars->is_post('autologin');
 						$admin = $mx_request_vars->is_post('admin');
@@ -174,7 +174,7 @@ if($mx_request_vars->is_request('login') && ($userdata['user_id'] == ANONYMOUS |
 					}
 				}
 				// Check password ...
-				if (!$row['user_pass_convert'] && phpBB3::phpbb_check_hash($password, $row['user_password']))
+				if (!$row['user_pass_convert'] && $phpBB3->phpbb_check_hash($password, $row['user_password']))
 				{
 					if ($row['user_login_attempts'] != 0)
 					{

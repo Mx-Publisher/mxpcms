@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Module - mx_phpbb2blocks
-* @version $Id: mx_statistics.php,v 1.7 2008/06/21 22:21:14 jonohlsson Exp $
+* @version $Id: mx_statistics.php,v 1.8 2008/09/30 07:04:52 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -163,7 +163,7 @@ $percentage = 0;
 $bar_percent = 0;
 
 $firstcount = $user_data[0]['user_posts'];
-$get_db_stats = phpBB2::get_db_stat( 'postcount' );
+$get_db_stats = $phpBB2->get_db_stat( 'postcount' );
 
 for( $i = 0; $i < $user_count; $i++ )
 {
@@ -247,10 +247,10 @@ for( $i = 0; $i < count($topic_data); $i++ )
 	// Get forum statistics
 	//
 	$total_posts = $get_db_stats; //Already queried above
-	$total_users = phpBB2::get_db_stat('usercount');
-	$total_topics = phpBB2::get_db_stat('topiccount');
+	$total_users = $phpBB2->get_db_stat('usercount');
+	$total_topics = $phpBB2->get_db_stat('topiccount');
 
-	$start_date = phpBB2::create_date($board_config['default_dateformat'], $board_config['board_startdate'], $board_config['board_timezone']);
+	$start_date = $phpBB2->create_date($board_config['default_dateformat'], $board_config['board_startdate'], $board_config['board_timezone']);
 
 	$boarddays = ( time() - $board_config['board_startdate'] ) / 86400;
 
@@ -405,7 +405,7 @@ for( $i = 0; $i < count($topic_data); $i++ )
 //
 // Newest user data
 //
-$newest_userdata = phpBB2::get_db_stat('newestuser');
+$newest_userdata = $phpBB2->get_db_stat('newestuser');
 $newest_user = $newest_userdata['username'];
 $newest_uid = $newest_userdata['user_id'];
 $sql = "SELECT user_regdate
@@ -431,12 +431,12 @@ if( !($result = $db->sql_query($sql)) )
 	mx_message_die(GENERAL_ERROR, "Couldn't retrieve configuration data", "", __LINE__, __FILE__, $sql);
 }
 $row = $db->sql_fetchrow($result);
-$most_users_date = ( $row['config_value'] > 0 ) ? phpBB2::create_date($board_config['default_dateformat'], $row['config_value'], $board_config['board_timezone']) : $lang['Not_available'];
+$most_users_date = ( $row['config_value'] > 0 ) ? $phpBB2->create_date($board_config['default_dateformat'], $row['config_value'], $board_config['board_timezone']) : $lang['Not_available'];
 $row = $db->sql_fetchrow($result);
 $most_users = ( $row['config_value'] > 0 ) ? $row['config_value'] : $lang['Not_available'];
 
 $statistic_array = array($lang['Number_posts'], $lang['Posts_per_day'], $lang['Number_topics'], $lang['Topics_per_day'], $lang['Number_users'], $lang['Users_per_day'], $lang['Board_started'], $lang['Board_Up_Days'], $lang['Database_size'], $lang['Avatar_dir_size'], $lang['Latest_Reg_User_Date'], $lang['Latest_Reg_User'], $lang['Most_Ever_Online_Date'], $lang['Most_Ever_Online'], $lang['Gzip_compression']);
-$value_array = array($total_posts, $posts_per_day, $total_topics, $topics_per_day, $total_users, $users_per_day, $start_date, sprintf('%.2f', $boarddays), $dbsize, $avatar_dir_size, phpBB2::create_date($board_config['default_dateformat'], $newest_user_date, $board_config['board_timezone']), sprintf('<a href="' . mx_append_sid(PHPBB_URL . "profile.$phpEx?mode=viewprofile&amp;" . POST_USERS_URL . "=$newest_uid") . '">' . $newest_user . '</a>'), $most_users_date, $most_users, ( $board_config['gzip_compress'] ) ? $lang['Enabled'] : $lang['Disabled']);
+$value_array = array($total_posts, $posts_per_day, $total_topics, $topics_per_day, $total_users, $users_per_day, $start_date, sprintf('%.2f', $boarddays), $dbsize, $avatar_dir_size, $phpBB2->create_date($board_config['default_dateformat'], $newest_user_date, $board_config['board_timezone']), sprintf('<a href="' . mx_append_sid(PHPBB_URL . "profile.$phpEx?mode=viewprofile&amp;" . POST_USERS_URL . "=$newest_uid") . '">' . $newest_user . '</a>'), $most_users_date, $most_users, ( $board_config['gzip_compress'] ) ? $lang['Enabled'] : $lang['Disabled']);
 
 //
 // Disk Usage, if Attachment Mod is installed

@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: admin_mx_portal.php,v 1.44 2008/08/10 20:25:26 orynider Exp $
+* @version $Id: admin_mx_portal.php,v 1.46 2008/10/04 07:04:24 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -107,8 +107,8 @@ if( !empty($mode) )
 	{
 		mx_message_die(GENERAL_ERROR, "Failed to update portal configuration ", "", __LINE__, __FILE__, $sql);
 	}
-
-	$message =	update_portal_backend($new['portal_backend']);
+	
+	$message = update_portal_backend($new['portal_backend']) ? "The CMS configuration file was upgraded ...<br /><br />" : update_portal_backend($new['portal_backend']);
 
 	$mx_cache->put('mxbb_config', $new);
 
@@ -117,7 +117,7 @@ if( !empty($mode) )
 	mx_message_die(GENERAL_MESSAGE, $message);
 }
 
-$template->set_filenames(array( 'admin_portal' => 'admin/admin_mx_portal.tpl') );
+$template->set_filenames(array( 'admin_portal' => 'admin/admin_mx_portal.'.$tplEx) );
 
 $navigation_block_list = get_list_formatted('block_list', $portal_config['navigation_block'], 'navigation_block', 'mx_menu_nav.' . $phpEx, false, 'mx_site_nav.' . $phpEx);
 

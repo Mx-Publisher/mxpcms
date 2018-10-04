@@ -2,7 +2,7 @@
 /**
  *
  * @package Functions_phpBB3
- * @version $Id: functions_hook.php,v 1.18 2008/07/10 23:02:07 jonohlsson Exp $
+ * @version $Id: functions_hook.php,v 1.20 2008/10/04 07:04:25 orynider Exp $
  * @copyright (c) 2002-2008 MX-Publisher Project Team
  * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
  * @link http://www.mx-publisher.com
@@ -164,7 +164,7 @@ class mx_phpbb3_admin
 			'#\'body\' => \$module#si' => '\'panel\' => $module',
 			'#([ \t\n])define#si' => '\1@define',
 			'#display\(\'body\'\);#si' => "display('panel');",
-			'#(garbage_collection|exit_handler)\(\);#si' => 'phpBB3::\1();',
+			'#(garbage_collection|exit_handler)\(\);#si' => '$phpBB3->\1();',
 			//'#\$template->#si' => '$mx_acp->template->',
 			'#adm_page_footer\(\);#si' => '$mx_acp->_template_assign_vars();$template->pparse(\'panel\');',
 			'#global #si' => 'global $mx_acp, ',

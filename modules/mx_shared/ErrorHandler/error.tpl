@@ -1,5 +1,5 @@
 <?php
-$showSourceUri = 'http://localhost/modules/ErrorHandler/showSource.php';
+$showSourceUri = 'http://localhost/modules/mx_shared/ErrorHandler/showSource.php';
 $showSourcePrev = 10;
 $showSourceNext = 10;
 ?>

@@ -2,7 +2,7 @@
 /**
 *
 * @package Auth
-* @version $Id: core.php,v 1.10 2008/08/29 03:53:50 orynider Exp $
+* @version $Id: core.php,v 1.13 2008/10/04 07:04:25 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -20,11 +20,6 @@ if ( !defined( 'IN_PORTAL' ) )
 //
 include_once($mx_root_path . 'includes/shared/phpbb2/includes/functions.' . $phpEx);
 include_once($mx_root_path . 'includes/shared/phpbb3/includes/functions.' . $phpEx);
-
-//
-// Now load some bbcodes, to be extended for this backend (see below)
-//
-include_once($mx_root_path . 'includes/mx_functions_bbcode.' . $phpEx); // BBCode associated functions
 
 /**
 * Backend specific tasks
@@ -271,7 +266,8 @@ class mx_backend
 	 */
 	function page_header($mode = false)
 	{
-		global $db, $mx_root_path, $phpbb_root_path, $userdata, $mx_user, $lang, $images, $phpEx, $board_config, $gen_simple_header, $layouttemplate, $mx_page;
+		global $db, $mx_root_path, $phpbb_root_path, $userdata, $mx_user, $lang, $images, $phpEx;
+		global $phpBB2, $board_config, $gen_simple_header, $layouttemplate, $mx_page;
 
 		switch ($mode)
 		{
@@ -290,7 +286,7 @@ class mx_backend
 					$l_login_logout = $lang['Login'];
 				}
 
-				$s_last_visit = ( $userdata['session_logged_in'] ) ? phpBB2::create_date($board_config['default_dateformat'], $userdata['user_lastvisit'], $board_config['board_timezone']) : '';
+				$s_last_visit = ( $userdata['session_logged_in'] ) ? $phpBB2->create_date($board_config['default_dateformat'], $userdata['user_lastvisit'], $board_config['board_timezone']) : '';
 
 				//
 				// Obtain number of new private messages
@@ -493,143 +489,73 @@ class mx_backend
 			ORDER BY group_name ASC";
 		return $sql;
 	}
-}
-
-/**
- * MXP BBcodes
- * @package MX-Publisher
- */
-class mx_bbcode extends bbcode_base
-{
-	var $smiley_path_url = '';
-	var $smiley_root_path =	'';
-
-	var $smiley_url = 'smile_url';
-	var $smiley_id = 'smilies_id';
-	var $emotion = 'emoticon';
-
-	function mx_bbcode()
-	{
-		global $phpbb_root_path;
-
-		$this->smiley_path_url = PHPBB_URL; //change this to PORTAL_URL when shared folder will be removed
-		$this->smiley_root_path =	$phpbb_root_path; //same here
-	}
-
+	
 	/**
-	 * Generate smilies.
-	 *
-	 * Hacking generate_smilies from phpbb/includes/functions_post(ing).php
-	 *
-	 * @param string $mode
-	 * @param integer $page_id
+	* Get username details for placing into templates.
 	*
-	* Fill smiley templates (or just the variables) with smilies, either in a window or inline
-	*/
-	function generate_smilies($mode, $forum_id)
+	* @param string $mode Can be profile (for getting an url to the profile), username (for obtaining the username), colour (for obtaining the user colour) or full (for obtaining a html string representing a coloured link to the users profile).
+	* @param int $user_id The users id
+	* @param string $username The users name
+	* @param string $username_colour The users colour
+	* @param string $guest_username optional parameter to specify the guest username. It will be used in favor of the GUEST language variable then.
+	* @param string $custom_profile_url optional parameter to specify a profile url. The user id get appended to this url as &amp;u={user_id}
+	*
+	* @return string A string consisting of what is wanted based on $mode.
+	*/	
+	function get_username_string($mode, $user_id, $username = false, $user_color = false, $guest_username = false, $custom_profile_url = false)
 	{
-		global $mx_page, $board_config, $template, $mx_root_path, $phpbb_root_path, $phpEx;
-		global $db, $lang, $images, $theme;
-		global $user_ip, $session_length, $starttime;
-		global $userdata, $phpbb_auth, $mx_user;
+		global $lang, $userdata;
+		
+		$lang['Guest'] = !$guest_username ? $lang['Guest'] : $guest_username;
+		
+		$this_userdata = mx_get_userdata($user_id, false);
+		$username = ($username) ? $username : $this_userdata['username'];			
 
-		$inline_columns = 4;
-		$inline_rows = 5;
-		$window_columns = 8;
-
-		if ($mode == 'window')
-		{
-			$mx_user->init($user_ip, PAGE_INDEX);
-
-			$gen_simple_header = TRUE;
-			$page_title = $lang['Emoticons'];
-
-			include($mx_root_path . 'includes/page_header.'.$phpEx);
-
-			$template->set_filenames(array(
-				'smiliesbody' => 'posting_smilies.tpl')
-			);
+		if ($this_userdata['user_level'] == ADMIN) 
+		{ 
+			$user_color = $theme['fontcolor3'];
+			$user_style = 'style="color:#' . $user_color . '; font-weight : bold;"';  
+		} 
+		else if ($this_userdata['user_level'] == MOD) 
+		{ 
+			$user_color = $theme['fontcolor2'];
+			$user_style = 'style="color:#' . $user_color . '; font-weight : bold;"';  
 		}
-
-		$sql = "SELECT emoticon, code, smile_url
-			FROM " . SMILIES_TABLE . "
-			ORDER BY smilies_id";
-		if ($result = $db->sql_query($sql))
-		{
-			$num_smilies = 0;
-			$rowset = array();
-			while ($row = $db->sql_fetchrow($result))
-			{
-				if (empty($rowset[$row['smile_url']]))
-				{
-					$rowset[$row['smile_url']]['code'] = str_replace("'", "\\'", str_replace('\\', '\\\\', $row['code']));
-					$rowset[$row['smile_url']]['emoticon'] = $row['emoticon'];
-					$num_smilies++;
-				}
-			}
-
-			if ($num_smilies)
-			{
-				$smilies_count = ($mode == 'inline') ? min(19, $num_smilies) : $num_smilies;
-				$smilies_split_row = ($mode == 'inline') ? $inline_columns - 1 : $window_columns - 1;
-
-				$s_colspan = 0;
-				$row = 0;
-				$col = 0;
-
-				while (list($smile_url, $data) = @each($rowset))
-				{
-					if (!$col)
-					{
-						$template->assign_block_vars('smilies_row', array());
-					}
-
-					$template->assign_block_vars('smilies_row.smilies_col', array(
-						'SMILEY_CODE' => $data['code'],
-						'SMILEY_IMG' => $this->smiley_path_url  . $board_config['smilies_path'] . '/' . $smile_url,
-						'SMILEY_DESC' => $data['emoticon'])
-					);
-
-					$s_colspan = max($s_colspan, $col + 1);
-
-					if ($col == $smilies_split_row)
-					{
-						if ($mode == 'inline' && $row == $inline_rows - 1)
-						{
-							break;
-						}
-						$col = 0;
-						$row++;
-					}
-					else
-					{
-						$col++;
-					}
-				}
-
-				if ($mode == 'inline' && $num_smilies > $inline_rows * $inline_columns)
-				{
-					$template->assign_block_vars('switch_smilies_extra', array());
-
-					$template->assign_vars(array(
-						'L_MORE_SMILIES' => $lang['More_emoticons'],
-						'U_MORE_SMILIES' => mx3_append_sid(PHPBB_URL . "posting.$phpEx", "mode=smilies"))
-					);
-				}
-
-				$template->assign_vars(array(
-					'L_EMOTICONS' => $lang['Emoticons'],
-					'L_CLOSE_WINDOW' => $lang['Close_window'],
-					'S_SMILIES_COLSPAN' => $s_colspan)
-				);
-			}
+		else 
+		{ 
+			$user_colour = $theme['fontcolor1'];
+			$topic_poster_style = 'style="font-weight : bold;"'; 
 		}
+				
+		$profile_url = '';
+				
+		$full_url = (($user_id == ANONYMOUS) || ($user_id == MUSIC_GUEST)) ? '<span ' . $topic_poster_style . '>' . $lang['Guest'] . '</span>' : '<span ' . $topic_poster_style . '>' . $username . '</span>';
 
-		if ($mode == 'window')
+		switch ($mode)
 		{
-			$template->pparse('smiliesbody');
-			include($mx_root_path . 'includes/page_tail.'.$phpEx);
-		}
-	}
+			case 'profile':
+				return $profile_url;
+			break;
+
+			case 'username':
+				return $username;
+			break;
+
+			case 'colour':
+				return $user_colour;
+			break;
+
+			case 'full':
+			default:
+				return $full_url;
+			break;
+		}	
+	}	
+	
 }
+
+//
+// Now load some bbcodes, to be extended for this backend (see below)
+//
+include_once($mx_root_path . 'includes/sessions/internal/bbcode.' . $phpEx); // BBCode associated functions
 ?>

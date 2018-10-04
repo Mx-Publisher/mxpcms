@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Module - mx_navmenu
-* @version $Id: mx_module_defs.php,v 1.37 2008/05/03 19:09:57 jonohlsson Exp $
+* @version $Id: mx_module_defs.php,v 1.39 2008/09/30 07:04:50 orynider Exp $
 * @copyright (c) 2002-2008 [Jon Ohlsson] MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -81,7 +81,7 @@ class mx_module_defs
 	// ===================================================
 	function display_panel_nav_menu( $parameter_data, $block_id )
 	{
-		global $template, $board_config, $db, $theme, $lang, $images, $mx_blockcp, $mx_root_path, $userdata, $mx_request_vars, $dynamic_block_id, $portalpage, $mx_cache, $phpEx;
+		global $template, $tplEx, $board_config, $db, $theme, $lang, $images, $mx_blockcp, $mx_root_path, $userdata, $mx_request_vars, $dynamic_block_id, $portalpage, $mx_cache, $phpEx;
 
 		//
 		// Includes
@@ -188,7 +188,7 @@ class mx_module_defs
 		// DO IT DO IT
 
 		$template->set_filenames(array(
-			'parameter' => 'admin/mx_module_parameters.tpl')
+			'parameter' => 'admin/mx_module_parameters.'.$tplEx)
 		);
 
 		$s_hidden_fields .= '<input type="hidden" name="block_id" value="' . $block_id . '" />';
@@ -288,7 +288,7 @@ class mx_module_defs
 			'S_SHOW_CAT' 			=> $show_cat_sel,
 			'U_PHPBB_ROOT_PATH' 	=> PHPBB_URL,
 			'TEMPLATE_ROOT_PATH' 	=> TEMPLATE_ROOT_PATH,
-			'U_PORTAL_ROOT_PATH'	=> PORTAL_URL, // DIV Templates. Images from root template folder. phpbb3::prosilver template
+			'U_PORTAL_ROOT_PATH'	=> PORTAL_URL, // DIV Templates. Images from root template folder. $phpBB3->prosilver template
 
 			'L_CREATE_MENU' 		=> $lang['Create_menu'],
 			'L_CREATE_CATEGORY' 	=> $lang['Create_category'],
@@ -701,7 +701,7 @@ class mx_module_defs
 	// ===================================================
 	function display_panel_site_menu( $parameter_data, $block_id )
 	{
-		global $template, $board_config, $db, $theme, $lang, $images, $mx_blockcp, $mx_root_path, $userdata, $mx_request_vars, $dynamic_block_id, $portalpage, $mx_cache, $phpEx;
+		global $template, $tplEx, $board_config, $db, $theme, $lang, $images, $mx_blockcp, $mx_root_path, $userdata, $mx_request_vars, $dynamic_block_id, $portalpage, $mx_cache, $phpEx;
 
 		$mx_page = new mx_page();
 		$mx_page->init('1');
@@ -790,7 +790,7 @@ class mx_module_defs
 		// DO IT DO IT
 
 		$template->set_filenames(array(
-			'parameter' => 'admin/mx_module_parameters_site.tpl')
+			'parameter' => 'admin/mx_module_parameters_site.'.$tplEx)
 		);
 
 		$s_hidden_fields .= '<input type="hidden" name="block_id" value="' . $block_id . '" />';

@@ -6,7 +6,7 @@
  *   copyright            : (C) 2001 The phpBB Group
  *   email                : support@phpbb.com
  *
- *   $Id: functions_validate.php,v 1.1 2007/09/09 16:51:51 jonohlsson Exp $
+ *   $Id: functions_validate.php,v 1.3 2008/10/04 07:04:25 orynider Exp $
  *
  *
  ***************************************************************************/
@@ -31,7 +31,7 @@ function validate_username($username)
 
 	// Remove doubled up spaces
 	$username = preg_replace('#\s+#', ' ', trim($username));
-	$username = phpBB2::phpbb_clean_username($username);
+	$username = $phpBB2->phpbb_clean_username($username);
 
 	$sql = "SELECT username
 		FROM " . USERS_TABLE . "

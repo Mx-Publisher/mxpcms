@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Module - mx_phpbb2blocks
-* @version $Id: lang_main.php,v 1.2 2008/02/04 16:53:57 joasch Exp $
+* @version $Id: lang_main.php,v 1.3 2008/10/04 07:04:38 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -54,6 +54,13 @@ $lang['Click_view_voted']       	= 'Click %sHere%s to view the results';
 // These Language Variables are only used if the Attachment Mod is installed
 //
 $lang['Disk_usage'] 				= 'Disk Usage';
+
+//Activity stats block
+$lang['USERS_24HOUR_TOTAL']     = '%d Users active over the last 24 hours';
+$lang['24HOUR_TOPICS']          = 'New Topics <strong>%d</strong>';
+$lang['24HOUR_POSTS']          	= 'New Posts <strong>%d</strong>';
+$lang['24HOUR_USERS']          	= 'New users <strong>%d</strong>';
+$lang['24HOUR_STATS']          	= 'Activity over the last 24 hours';
 
 //
 // That's all Folks!

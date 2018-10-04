@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Module - mx_phpbb3blocks
-* @version $Id: mx_announce.php,v 1.2 2008/07/13 19:31:27 jonohlsson Exp $
+* @version $Id: mx_announce.php,v 1.3 2008/10/04 07:04:38 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -18,26 +18,30 @@ if( !defined('IN_PORTAL') || !is_object($mx_block))
 // Include the constants file
 // ===================================================
 include_once($module_root_path . 'includes/phpbb3blocks_constants.' . $phpEx);
+include_once($mx_root_path . 'includes/mx_functions_tools.' . $phpEx); 
+$mx_text_formatting = new mx_text_formatting();
 
 //
 // Read Block Settings
 //
 $title = $mx_block->block_info['block_title'];
 
-$announce_nbr_display		= $mx_block->get_parameters( 'announce_nbr_display' );
-$announce_nbr_days			= $mx_block->get_parameters( 'announce_nbr_days' );
-$announce_display_global	= $mx_block->get_parameters( 'announce_display_global' );
-$announce_display			= $mx_block->get_parameters( 'announce_display' );
-$announce_display_sticky	= $mx_block->get_parameters( 'announce_display_sticky' );
-$announce_display_normal	= $mx_block->get_parameters( 'announce_display_normal' );
-$announce_img_global		= $mx_block->get_parameters( 'announce_img_global' );
-$announce_img				= $mx_block->get_parameters( 'announce_img' );
-$announce_img_sticky		= $mx_block->get_parameters( 'announce_img_sticky' );
-$announce_img_normal		= $mx_block->get_parameters( 'announce_img_normal' );
-$announce_forum				= $mx_block->get_parameters( 'announce_forum' );
+$announce_nbr_display		= $mx_block->get_parameters('announce_nbr_display');
+$announce_nbr_days			= $mx_block->get_parameters('announce_nbr_days');
+$announce_display_global	= $mx_block->get_parameters('announce_display_global');
+$announce_display			= $mx_block->get_parameters('announce_display');
+$announce_display_sticky	= $mx_block->get_parameters('announce_display_sticky');
+$announce_display_normal	= $mx_block->get_parameters('announce_display_normal');
+$announce_img_global		= $mx_block->get_parameters('announce_img_global');
+$announce_img				= $mx_block->get_parameters('announce_img');
+$announce_img_sticky		= $mx_block->get_parameters('announce_img_sticky');
+$announce_img_normal		= $mx_block->get_parameters('announce_img_normal');
+$announce_forum				= $mx_block->get_parameters('announce_forum');
+$announce_truncate			= $mx_block->get_parameters('announce_truncate');
 
 if ( empty($announce_nbr_display) ) $announce_nbr_display = 10;
 if ( empty($announce_nbr_days) ) $announce_nbr_days = 365;
+if ( empty($announce_truncate) ) $announce_truncate = 16777215;
 
 //
 // Start initial var setup
@@ -152,8 +156,14 @@ for( $i = 0; $i < $total_posts; $i++ )
 
 	$message = $postrow[$i]['post_text'];
 	$bbcode_uid = $postrow[$i]['bbcode_uid'];
-	$message = $mx_bbcode->decode($message, $bbcode_uid );
+	
+	$bbcode_bitfield = $postrow[$i]['bbcode_bitfield'];
+	
+	
+	$message = $mx_bbcode->decode($message, $bbcode_uid, true, $bbcode_bitfield);
+	$message = $mx_text_formatting->truncate_text($message, $announce_truncate, true); 
 
+	
 	$topic_title = ( count($orig_word) ) ? preg_replace($orig_word, $replacement_word, $postrow[$i]['topic_title']) : $postrow[$i]['topic_title'];
 	$replies = $postrow[$i]['topic_replies'];
 	$topic_type = $postrow[$i]['topic_type'];

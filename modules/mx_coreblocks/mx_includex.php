@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Module - mx_coreblocks
-* @version $Id: mx_includex.php,v 1.14 2008/02/09 12:48:51 joasch Exp $
+* @version $Id: mx_includex.php,v 1.15 2008/10/04 07:04:38 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -21,11 +21,11 @@ $title = $mx_block->block_info['block_title'];
 
 $iframe_mode = $mx_block->get_parameters( 'x_mode' );
 
-$x_mode = ( $iframe_mode == 'x_listen' && $mx_request_vars->get('x_mode', MX_TYPE_NO_TAGS, $iframe_mode) );
+$x_mode = ( ($iframe_mode == 'x_listen') ? $mx_request_vars->get('x_mode', MX_TYPE_NO_TAGS, $iframe_mode) : $iframe_mode );
 
-$x_1 = ( $iframe_mode == 'x_listen' && $mx_request_vars->get('x_1', MX_TYPE_NO_TAGS, $mx_block->get_parameters('x_1')));
-$x_2 = ( $iframe_mode == 'x_listen' && $mx_request_vars->get('x_2', MX_TYPE_NO_TAGS, $mx_block->get_parameters('x_2')));
-$x_3 = ( $iframe_mode == 'x_listen' && $mx_request_vars->get('x_3', MX_TYPE_NO_TAGS, $mx_block->get_parameters('x_3')));
+$x_1 = ( $iframe_mode == 'x_listen' ? $mx_request_vars->get('x_1', MX_TYPE_NO_TAGS, $mx_block->get_parameters('x_1')) : $mx_block->get_parameters( 'x_1' ));
+$x_2 = ( $iframe_mode == 'x_listen' ? $mx_request_vars->get('x_2', MX_TYPE_NO_TAGS, $mx_block->get_parameters('x_2')) : $mx_block->get_parameters( 'x_2' ));
+$x_3 = ( $iframe_mode == 'x_listen' ? $mx_request_vars->get('x_3', MX_TYPE_NO_TAGS, $mx_block->get_parameters('x_3')) : $mx_block->get_parameters( 'x_3' ));
 
 //
 // Start output of page

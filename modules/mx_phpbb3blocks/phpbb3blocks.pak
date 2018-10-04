@@ -12,6 +12,7 @@ parameter=+:2=+:4=+:announce_display_sticky=+:Boolean=+:TRUE=+:=+:0=+:0
 parameter=+:2=+:3=+:announce_display=+:Boolean=+:TRUE=+:=+:0=+:0
 parameter=+:2=+:2=+:announce_nbr_days=+:Number=+:14=+:=+:0=+:0
 parameter=+:2=+:11=+:announce_forum=+:Function=+:=+:get_list_multiple("{parameter_id}[]", FORUMS_TABLE, 'forum_id', 'forum_name', "{parameter_value}", TRUE)=+:0=+:0
+parameter=+:2=+:12=+:announce_truncate=+:Number=+:16777215=+:=+:0=+:0
 parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
 block=+:=+:Demo - phpBB Announcements=+:Demo block=+:2=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
 New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
@@ -34,9 +35,12 @@ New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
 function=+:53=+:52=+:phpBB Index=+:phpBB Index Block=+:mx_forum.php=+:
 parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
 block=+:=+:phpBB Index=+:Demo block=+:52=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
-function=+:0=+:0=+:0=+:endoflist=+:0=+:0
 New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
-function=+:30=+:41=+:Statistics=+:Site Statistics Function=+:mx_statistics.php=+:
+function=+:53=+:41=+:Statistics=+:Site Statistics Function=+:mx_statistics.php=+:
 parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
 block=+:=+:Demo - Statistics=+:Demo block=+:41=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:53=+:42=+:Activity Stats=+:Activity Stats Block=+:mx_activity_stats.php=+:
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Demo - Activity Stats=+:Demo block=+:42=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
 function=+:0=+:0=+:0=+:endoflist=+:0=+:0

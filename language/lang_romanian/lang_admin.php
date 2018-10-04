@@ -1,9 +1,9 @@
 <?php
 /**
 *
-* @package mxBB Portal Core
-* @version $Id: lang_admin.php,v 1.4 2008/06/25 19:32:28 orynider Exp $
-* @copyright (c) 2002-2006 mxBB Project Team
+* @package MXP Portal Core
+* @version $Id: lang_admin.php,v 1.7 2008/10/04 07:23:00 orynider Exp $
+* @copyright (c) 2002-2006 MXP Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 *
 */
@@ -21,7 +21,7 @@
 //
 setlocale(LC_ALL, "ro");
 
-$lang['mxBB_adminCP']			= 'mxBB-Portal Administraþie';	
+$lang['MXP_adminCP']			= 'Mx-Publisher Administraþie';	
 
 //
 // Left AdminCP Panel
@@ -52,8 +52,8 @@ $lang['4_2_Translate'] 			= 'Panou de Control Traduceri';
 //
 // Index
 //
-$lang['Welcome_mxBB'] 				= 'Bine aþi venit la panoul de control al portalului mxBB';
-$lang['Admin_intro_mxBB'] 			= 'Vã mulþumim pentru aþi ales mxBB-Portal ca soluþie pentru portalul/cms-ul dumneavoastrã ºi phpBB ca soluþie pentru forumul dumneavoastrã. Acest ecran vã oferã o privire de ansamblu a diverselor statistici ale site-ului dumneavoastrã. Puteþi reveni la aceastã paginã folosind legãtura <span style="text-decoration: underline;">Pagina de start a administratorului</span> din panel-ul stâng. Pentru a reveni la pagina de start a forumului dumneavoastrã, apãsaþi pe logo-ul phpBB-ului aflat, de asemenea, în panel-ul stâng. Celelalte legãturi din partea stângã vã permit sã controlaþi orice aspect al forumului, fiecare ecran va avea instrucþiuni care dau explicaþii despre cum se folosesc uneltele.';
+$lang['Welcome_mxBB'] 				= 'Bine aþi venit la panoul de control al MXP CMS';
+$lang['Admin_intro_mxBB'] 			= 'Vã mulþumim pentru aþi ales Mx-Publisher ca soluþie pentru portalul/cms-ul dumneavoastrã ºi phpBB ca soluþie pentru forumul dumneavoastrã. Acest ecran vã oferã o privire de ansamblu a diverselor statistici ale site-ului dumneavoastrã. Puteþi reveni la aceastã paginã folosind legãtura <span style="text-decoration: underline;">Pagina de start a administratorului</span> din panel-ul stâng. Pentru a reveni la pagina de start a forumului dumneavoastrã, apãsaþi pe logo-ul phpBB-ului aflat, de asemenea, în panel-ul stâng. Celelalte legãturi din partea stângã vã permit sã controlaþi orice aspect al forumului, fiecare ecran va avea instrucþiuni care dau explicaþii despre cum se folosesc uneltele.';
 
 //
 // General
@@ -116,19 +116,19 @@ $lang['Portal_General_config_info_explain'] = 'Postatã informaþii instalare din 
 $lang['Portal_Name']					= 'Nume Portal:';
 $lang['Portal_Description']				= 'Descriptie Portal:';
 $lang['Portal_PHPBB_Url']				= 'URL pt. instarea ta de forum phpBB:';
-$lang['Portal_Url']						= 'URL pentru mxBB-Portal:';
+$lang['Portal_Url']						= 'URL pentru Mx-Publisher:';
 $lang['Portal_Config_updated']			= 'Configuraþia Portalului Actualizatã cu Succes';
 $lang['Click_return_portal_config']		= 'Click %sAici%s pentru a te intoarce la Configurarea Portalului';
 $lang['PHPBB_info']						= 'Informatii phpBB';
 $lang['PHPBB_version']					= 'Versiunea phpBB:';
 $lang['PHPBB_script_path']				= 'phpBB Cale Script:';
 $lang['PHPBB_server_name']				= 'phpBB Domeniu (nume_server):';
-$lang['MX_Portal']						= 'mxBB-Portal';
-$lang['MX_Modules']						= 'mxBB-Module';
+$lang['MX_Portal']						= 'Mx-Publisher';
+$lang['MX_Modules']						= 'MXP-Module';
 $lang['Phpbb']							= 'phpBB';
 $lang['Top_phpbb_links']				= 'phpBB Stats în Header (valoare impicitã)<br /> - linkuri la postari noi/necitite etc';
-$lang['Portal_version']					= 'Versiune mxBB-Portal:';
-$lang['Mx_use_cache']					= 'Foloseºte mxBB Bloc Cache';
+$lang['Portal_version']					= 'Versiune Mx-Publisher:';
+$lang['Mx_use_cache']					= 'Foloseºte MXP Bloc Cache';
 $lang['Mx_use_cache_explain']			= 'Datele din Bloc este în fiºiere individuale cache/bloc_*.xml. Fiºierele Bloc cache sunt create când Blocurile sunt editate.';
 $lang['Mx_mod_rewrite'] 				= 'Foloseste mod_rewrite';
 $lang['Mx_mod_rewrite_explain'] 		= 'Daca eºti pe server Apache, ºi ai mod_rewrite activat, poþi rescrie url-urile ca \'page=x\' cu alternative mai intuitive. Citeºte pentru mai multe documentaþia pentru modulul mx_mod_rewrite.';
@@ -307,6 +307,104 @@ $lang['Click_return_blockCP_admin']		= 'Click %sAici%s pt. întoarcere la Panoul 
 $lang['Click_return_portalpage_admin']	= 'Click %sAici%s pt. întoarcere la Pagina Portalului';
 $lang['BlockCP_Config_updated']			= 'Blocul a fost Actualizat...';
 
+
+//
+// Pages Administration
+//
+$lang['Page_admin'] = 'Page Administration';
+$lang['Page_admin_explain'] = 'Use this form to add, delete and change the settings for Portal Pages and Page Templates.<br /><b>To use this panel, you need to have JavaScript and cookies enabled in your browser!</b>';
+$lang['Page_admin_edit'] = 'Page Edit';
+$lang['Page_admin_private'] = 'Advanced Page (PRIVATE) Permissions';
+$lang['Page_admin_settings'] = 'Page Settings';
+$lang['Page_admin_new_page'] = 'New Page Administration';
+$lang['Page'] = 'Page';
+$lang['Page_Id'] = 'Page ID';
+$lang['Page_icon'] = 'Page Icon <br /> - to be used in the adminCP only, eg. icon_home.gif (default)';
+$lang['Page_alt_icon'] = 'Alternative Page Icon <br /> - Full url (http://...) to custom page icon.';
+$lang['Default_page_style'] = 'Portal Style (default)<br />To use the default setting, leave this unset.';
+$lang['Override_page_style'] = 'Override user style';
+$lang['Override_page_style_explain'] = ' ';
+$lang['Page_header'] = 'Page header file <br /> - i.e. overall_header.tpl (default), overall_noheader.tpl (no header) or user custom header file.<br />To use the default setting, leave this blank.';
+$lang['Page_footer'] = 'Page footer file <br /> - i.e. overall_footer.tpl (default) or user custom footer file.<br />To use the default setting, leave this blank.';
+$lang['Page_main_layout'] = 'Page main layout file <br /> - i.e. mx_main_layout.tpl (default) or user custom header file.<br />To use the default setting, leave this blank.';
+$lang['Page_Navigation_block'] = 'Page header navigation block';
+$lang['Page_Navigation_block_explain'] = '- This is the page header navigation block, provided you\'ve chosen a overall header file which supports page navigation.<br />To use the default setting, leave this unset.';
+$lang['Auth_Page'] = 'Permissions';
+$lang['Select_sort_method'] = 'Select Sort Method';
+$lang['Order'] = 'Order';
+$lang['Sort'] = 'Sort';
+$lang['Width'] = 'Width';
+$lang['Height'] = 'Height';
+$lang['Page_sort_title'] = 'Page title';
+$lang['Page_sort_desc'] = 'Page description';
+$lang['Page_sort_created'] = 'Page created';
+$lang['Sort_Ascending'] = 'ASC';
+$lang['Sort_Descending'] = 'DESC';
+$lang['Return_to_page'] = 'Return to Portal Page';
+$lang['Auth_Page_group'] = '-> PRIVATE Group';
+$lang['Page_desc'] = 'Description';
+$lang['Page_parent'] = 'Parent Page';
+$lang['Add_Page'] = 'Add New Page';
+$lang['Page_Config_updated'] = 'Page Configuration Updated Successfully';
+$lang['Click_return_page_admin'] = 'Click %sHere%s to return to Page Administration';
+$lang['Remove_block'] = 'Remove Portal Block';
+$lang['Remove_block_explain'] = 'This will remove the block from this page. Beware: this operation cannot be undone!';
+$lang['Click_block_remove_yes'] = 'Click %sHere%s to remove the Block';
+$lang['Delete_page'] = 'Delete Page';
+$lang['Delete_page_explain'] = 'This will delete the Page. Beware: this operation cannot be undone!';
+$lang['Click_page_delete_yes'] = 'Click %sHere%s to delete the Page';
+
+$lang['Mx_IP_filter'] = 'IP Filter';
+$lang['Mx_IP_filter_explain'] = 'To restrict access to this page by IP, enter the valid IP adresses, with one IP address per line.<br>Example: 127.0.0.1 or 127.1.*.*';
+$lang['Mx_phpBB_stats'] = 'phpBB Statistics in Header';
+$lang['Mx_phpBB_stats_explain'] = '- Links to new, unread posts, etc.';
+$lang['Column_admin'] = 'Page Column Administration';
+$lang['Column_admin_explain'] = 'Administrate Page Columns';
+$lang['Column'] = 'Page Column';
+$lang['Columns'] = 'Page Columns';
+$lang['Column_block'] = 'Page Column Block';
+$lang['Column_blocks'] = 'Page Column Blocks';
+$lang['Edit_Column'] = 'Edit a Column';
+$lang['Edit_Column_explain'] = 'Use this form to modify a column';
+$lang['Column_Size'] = 'Size of the column';
+$lang['Column_name'] = 'Column Name';
+$lang['Column_delete'] = 'Delete a Column';
+$lang['Page_updated'] = 'Page and Column information updated successfully';
+$lang['Create_column'] = 'Add New Column';
+$lang['Delete_page_column'] = 'Delete Page Column';
+$lang['Delete_page_column_explain'] = 'This will delete the Page Column. Beware: this operation cannot be undone!';
+$lang['Click_page_column_delete_yes'] = 'Click %sHere%s to delete the Page Column';
+
+$lang['Add_Split_Block'] 			= 'Add Split Column Block';
+$lang['Add_Split_Block_explain'] 	= 'This block splits the column';
+$lang['Add_Dynamic_Block'] 			= 'Add Dynamic (Sub) Block';
+$lang['Add_Dynamic_Block_explain'] 	= 'This dynamic block defines subpages, set from the navigation menu';
+$lang['Add_Virtual_Block'] 			= 'Add Virtual (Page Blog) Block';
+$lang['Add_Virtual_Block_explain'] 	= 'This block turns the page into a virtual (blog) page';
+
+//
+// Page templates
+//
+$lang['Page_templates_admin'] = 'Page Templates Administration';
+$lang['Page_templates_admin_explain'] = 'Use this page to create, edit or delete Page Templates';
+$lang['Page_template'] = 'Page Template';
+$lang['Page_templates'] = 'Page Templates';
+$lang['Page_template_column'] = 'Page Template Column';
+$lang['Page_template_columns'] = 'Page Template Columns';
+$lang['Choose_page_template'] = 'Choose Page Template';
+$lang['Template_Config_updated'] = 'Template Configuration Updated';
+$lang['Add_Template'] = 'Add New Template';
+$lang['Template'] = 'Template';
+$lang['Template_name'] = 'Template Name';
+$lang['Page_template_delete'] = 'Delete Template';
+$lang['Delete_page_template'] = 'Delete Page Template';
+$lang['Delete_page_template_explain'] = 'This will delete the Page Template. Beware: this operation cannot be undone!';
+$lang['Click_page_template_delete_yes'] = 'Click %sHere%s to delete the Page Template';
+$lang['Delete_page_template_column'] = 'Delete Page Template';
+$lang['Delete_page_template_column_explain'] = 'This will delete the Page Template. Beware: this operation cannot be undone!';
+$lang['Click_page_template_column_delete_yes'] = 'Click %sHere%s to delete the Page Template';
+
+
 //
 // Pages Administration
 //
@@ -367,6 +465,14 @@ $lang['Delete_page_column']			= 'ªterge Coloana Paginii';
 $lang['Delete_page_column_explain']		= 'Acesta va ºterge Coloana Paginii. Atenþie, acestã operaþie nu este reversibilã!';
 $lang['Click_page_column_delete_yes']	= 'Click %sAici%s pt. a ºterge Colana Paginii';
 
+
+$lang['Add_Split_Block'] 			= 'Add Split Column Block';
+$lang['Add_Split_Block_explain'] 	= 'This block splits the column';
+$lang['Add_Dynamic_Block'] 			= 'Add Dynamic (Sub) Block';
+$lang['Add_Dynamic_Block_explain'] 	= 'This dynamic block defines subpages, set from the navigation menu';
+$lang['Add_Virtual_Block'] 			= 'Add Virtual (Page Blog) Block';
+$lang['Add_Virtual_Block_explain'] 	= 'This block turns the page into a virtual (blog) page';
+
 //
 // Page templates
 //
@@ -395,7 +501,7 @@ $lang['Click_page_template_column_delete_yes']	= 'Click %sAici%s pt. a ºterge Te
 $lang['Cache_dir_write_protect']	= 'Directorul tau cache este protejat la scriere. Nu s-a putut genera fiºierul cache';
 $lang['Cache_generate']				= 'Fiºierele cache au fost generate.';
 $lang['Cache_submit']				= 'Sã generez fiºierul cache?';
-$lang['Cache_explain']				= 'Cu acestã opþiune poþi sã generezi toate fiºierele XML (fiºiere cache) odatã pentru toate blocurile portalului. Aceste fiºiere permit reducerea numãrului de cereri ale bazei de date necesare ºi îmbunãtãþesc performanþa portalului. <br />Noteazã: mxBB cache trebuie activat (în Portal General Admin CP) petru ca aceste fiºiere sã fie folosite de sistem.<br>Mai Noteazã: fiºierele cache sunt create on the fly când sunt ºi blocurile de editare la fel.';
+$lang['Cache_explain']				= 'Cu acestã opþiune poþi sã generezi toate fiºierele XML (fiºiere cache) odatã pentru toate blocurile portalului. Aceste fiºiere permit reducerea numãrului de cereri ale bazei de date necesare ºi îmbunãtãþesc performanþa portalului. <br />Noteazã: MXP cache trebuie activat (în Portal General Admin CP) petru ca aceste fiºiere sã fie folosite de sistem.<br>Mai Noteazã: fiºierele cache sunt create on the fly când sunt ºi blocurile de editare la fel.';
 $lang['Generate_mx_cache']			= 'Genereazã Bloc Cache';
 
 //
@@ -533,11 +639,11 @@ $lang['menu_page_sync_explain']		= 'Luminezã intrare la Meniul de Nav. curent...
 //
 // Version Checker
 //
-$lang['mxBB_Version_up_to_date'] = 'Instalarea mxBB este la zi. Nu existã actualizãri pentru versiunea ta de mxBB.';
-$lang['mxBB_Version_outdated'] = 'Se pare ca instalarea ta mxBB <b>nu</b> este la zi. Actualizãri existã pentru versiunea ta de mxBB. Te rog vizitezã <a href="http://www.mx-publisher.com/index.php?page=4&action=file&file_id=2" target="_new">downloadare pachetul mxBB Core</a> pt. a obþine ultima versiune.';
-$lang['mxBB_Latest_version_info'] = 'Ultima veriune disponibilã este <b>mxBB %s</b>. ';
-$lang['mxBB_Current_version_info'] = 'Tu ai <b>mxBB %s</b>.';
-$lang['mxBB_Mailing_list_subscribe_reminder'] = 'Pentru ultimile informaþii de ºtiri ºi actualizãri pentru mxBB, de ce nu <a href="http://lists.sourceforge.net/lists/listinfo/mxbb-news" target="_new">înscriete la lista de mailuri</a>.';
+$lang['MXP_Version_up_to_date'] = 'Instalarea MXP este la zi. Nu existã actualizãri pentru versiunea ta de MXP.';
+$lang['MXP_Version_outdated'] = 'Se pare ca instalarea ta MXP <b>nu</b> este la zi. Actualizãri existã pentru versiunea ta de MXP. Te rog vizitezã <a href="http://www.mx-publisher.com/index.php?page=4&action=file&file_id=2" target="_new">downloadare pachetul MXP Core</a> pt. a obþine ultima versiune.';
+$lang['MXP_Latest_version_info'] = 'Ultima veriune disponibilã este <b>MXP %s</b>. ';
+$lang['MXP_Current_version_info'] = 'Tu ai <b>MXP %s</b>.';
+$lang['MXP_Mailing_list_subscribe_reminder'] = 'Pentru ultimile informaþii de ºtiri ºi actualizãri pentru MXP, de ce nu <a href="http://lists.sourceforge.net/lists/listinfo/MXP-news" target="_new">înscriete la lista de mailuri</a>.';
 
 $lang['Trans_title']				= 'Translate to your Language';
 $lang['Trans_description']			= 'Use Translate Control Panel to translate portal to your language';

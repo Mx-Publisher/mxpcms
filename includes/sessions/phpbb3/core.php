@@ -2,7 +2,7 @@
 /**
 *
 * @package Auth
-* @version $Id: core.php,v 1.12 2008/08/27 07:32:56 orynider Exp $
+* @version $Id: core.php,v 1.14 2008/10/04 07:04:25 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -20,11 +20,6 @@ if ( !defined( 'IN_PORTAL' ) )
 //
 include_once($mx_root_path . 'includes/shared/phpbb2/includes/functions.' . $phpEx);
 include_once($mx_root_path . 'includes/shared/phpbb3/includes/functions.' . $phpEx);
-
-//
-// Now load some bbcodes, to be extended for this backend (see below)
-//
-include_once($mx_root_path . 'includes/mx_functions_bbcode.' . $phpEx); // BBCode associated functions
 
 //
 // Finally, load some backend specific functions
@@ -200,7 +195,7 @@ class mx_backend
 		//
 		// Load phpbb config.php (to get table prefix)
 		//
-		@include_once($phpbb_root_path . 'config.' . $phpEx);
+		include_once($phpbb_root_path . 'config.' . $phpEx);
 
 		//
 		// Define backend template extension
@@ -716,7 +711,14 @@ class mx_backend
 			return $config;
 		}
 		else
-		{
+		{	
+			if (!defined('CONFIG_TABLE'))
+			{
+				global $table_prefix, $mx_root_path, $phpEx;
+				
+				include($mx_root_path . 'includes/sessions/phpbb3/constants.' . $phpEx);
+			}
+			
 			$sql = "SELECT *
 				FROM " . CONFIG_TABLE;
 
@@ -812,218 +814,112 @@ class mx_backend
 			ORDER BY group_name ASC";
 		return $sql;
 	}
-}
-
-/**
- * MXP BBcodes
- * @package MX-Publisher
- */
-class mx_bbcode extends bbcode_base
-{
-	var $smiley_path_url = '';
-	var $smiley_root_path =	'';
-
-	var $smiley_url = 'smiley_url';
-	var $smiley_id = 'smiley_id';
-	var $emotion = 'emotion';
-
-	function mx_bbcode()
-	{
-		global $board_config, $phpbb_root_path;
-
-		$this->smiley_path_url = PHPBB_URL; //change this to PORTAL_URL when shared folder will be removed
-		$this->smiley_root_path =	$phpbb_root_path; //same here
-		$board_config['smilies_path'] = str_replace("smiles", "smilies", $board_config['smilies_path']);
-	}
-
+	
 	/**
-	 * Generate smilies.
-	 *
-	 * Hacking generate_smilies from phpbb/includes/functions_post(ing).php
-	 *
-	 * @param string $mode
-	 * @param integer $page_id
+	* Get username details for placing into templates.
 	*
-	* Fill smiley templates (or just the variables) with smilies, either in a window or inline
+	* @param string $mode Can be profile (for getting an url to the profile), username (for obtaining the username), colour (for obtaining the user colour) or full (for obtaining a html string representing a coloured link to the users profile).
+	* @param int $user_id The users id
+	* @param string $username The users name
+	* @param string $username_colour The users colour
+	* @param string $guest_username optional parameter to specify the guest username. It will be used in favor of the GUEST language variable then.
+	* @param string $custom_profile_url optional parameter to specify a profile url. The user id get appended to this url as &amp;u={user_id}
+	*
+	* @return string A string consisting of what is wanted based on $mode.
 	*/
-	function generate_smilies($mode, $forum_id)
+	function get_username_string($mode, $user_id, $username = false, $username_colour = '', $guest_username = false, $custom_profile_url = false)
 	{
-		global $mx_page, $board_config, $template, $mx_root_path, $phpbb_root_path, $phpEx;
-		global $db, $lang, $images, $theme;
-		global $user_ip, $session_length, $starttime;
-		global $userdata, $phpbb_auth, $mx_user;
+		global $phpbb_root_path, $mx_root_path, $phpEx, $mx_user, $phpbb_auth;
 
-		$inline_columns = 4;
-		$inline_rows = 5;
-		$window_columns = 8;
+		$profile_url = '';
+		
+		//Added by OryNider
+		if (($username == false) || ($username_colour == false))
+		{ 
+			$this_userdata = mx_get_userdata($user_id, false);
+			$user_id = $this_userdata['user_id'];
+			$username = $this_userdata['username'];
+			$username_colour = $this_userdata['user_colour'];
+		}
+		//Added Ends
 
-		if ($mode == 'window')
+		$username_colour = ($username_colour) ? '#' . $username_colour : '';			
+
+		if ($guest_username === false)
 		{
-			$mx_user->init($user_ip, PAGE_INDEX);
+			$username = ($username) ? $username : $mx_user->lang['GUEST'];
+		}
+		else
+		{
+			$username = ($user_id && $user_id != ANONYMOUS) ? $username : ((!empty($guest_username)) ? $guest_username : $mx_user->lang['GUEST']);
+		}
 
-			$gen_simple_header = TRUE;
-			$page_title = $lang['Emoticons'];
-
-			if ($forum_id)
+		// Only show the link if not anonymous
+		if ($user_id && $user_id != ANONYMOUS)
+		{
+			// Do not show the link if the user is already logged in but do not have u_viewprofile permissions (relevant for bots mostly).
+			// For all others the link leads to a login page or the profile.
+			if ($mx_user->data['user_id'] != ANONYMOUS && !$phpbb_auth->acl_get('u_viewprofile'))
 			{
-				$sql = 'SELECT forum_style
-					FROM ' . FORUMS_TABLE . "
-					WHERE forum_id = $forum_id";
-				$result = $db->sql_query_limit($sql, 1);
-				$row = $db->sql_fetchrow($result);
-				$db->sql_freeresult($result);
-
-				$mx_user->setup('posting', (int) $row['forum_style']);
+				$profile_url = '';
 			}
 			else
 			{
-				$mx_user->setup('posting');
+				$profile_url = ($custom_profile_url !== false) ? $custom_profile_url : mx_append_sid("{$phpbb_root_path}memberlist.$phpEx", 'mode=viewprofile');
+				$profile_url .= '&amp;u=' . (int) $user_id;
 			}
-
-			include($mx_root_path . 'includes/page_header.'.$phpEx);
-
-			$template->set_filenames(array(
-				'smiliesbody' => 'posting_smilies.html')
-			);
+		}
+		else
+		{
+			$profile_url = '';
 		}
 
-		$display_link = false;
-		if ($mode == 'inline')
+		switch ($mode)
 		{
-			$sql = 'SELECT smiley_id
-				FROM ' . SMILIES_TABLE . '
-				WHERE display_on_posting = 0';
-			$result = $db->sql_query_limit($sql, 1, 0, 3600);
+			case 'profile':
+				return $profile_url;
+			break;
 
-			if ($row = $db->sql_fetchrow($result))
-			{
-				$display_link = true;
-			}
-			$db->sql_freeresult($result);
-		}
+			case 'username':
+				return $username;
+			break;
 
-		$last_url = '';
+			case 'colour':
+				return $username_colour;
+			break;
 
-		$sql = 'SELECT *
-			FROM ' . SMILIES_TABLE .
-			(($mode == 'inline') ? ' WHERE display_on_posting = 1 ' : '') . '
-			ORDER BY smiley_order';
+			case 'full':
+			default:
 
-		//phpBB2 code start
-		if ($result = $db->sql_query($sql))
-		{
-			$num_smilies = 0;
-			$rowset = array();
-			while ($row = $db->sql_fetchrow($result))
-			{
-				if (empty($rowset[$row['smiley_url']]))
+				$tpl = '';
+				if (!$profile_url && !$username_colour)
 				{
-					$rowset[$row['smiley_url']]['code'] = str_replace("'", "\\'", str_replace('\\', '\\\\', $row['code']));
-					$rowset[$row['smiley_url']]['emoticon'] = $row['emoticon'];
-					$num_smilies++;
+					$tpl = '{USERNAME}';
 				}
-			}
-
-			if ($num_smilies)
-			{
-				$smilies_count = ($mode == 'inline') ? min(19, $num_smilies) : $num_smilies;
-				$smilies_split_row = ($mode == 'inline') ? $inline_columns - 1 : $window_columns - 1;
-
-				$s_colspan = 0;
-				$row = 0;
-				$col = 0;
-
-				while (list($smile_url, $data) = @each($rowset))
+				else if (!$profile_url && $username_colour)
 				{
-					if (!$col)
-					{
-						$template->assign_block_vars('smilies_row', array());
-					}
-
-					$template->assign_block_vars('smilies_row.smilies_col', array(
-						'SMILEY_CODE' => $data['code'],
-						'SMILEY_IMG' => $this->smiley_path_url  . $board_config['smilies_path'] . '/' . $smile_url,
-						'SMILEY_DESC' => $data['emoticon'])
-					);
-
-					$s_colspan = max($s_colspan, $col + 1);
-
-					if ($col == $smilies_split_row)
-					{
-						if ($mode == 'inline' && $row == $inline_rows - 1)
-						{
-							break;
-						}
-						$col = 0;
-						$row++;
-					}
-					else
-					{
-						$col++;
-					}
+					$tpl = '<span style="color: {USERNAME_COLOUR};" class="username-coloured">{USERNAME}</span>';
+				}
+				else if ($profile_url && !$username_colour)
+				{
+					$tpl = '<a href="{PROFILE_URL}">{USERNAME}</a>';
+				}
+				else if ($profile_url && $username_colour)
+				{
+					$tpl = '<a href="{PROFILE_URL}" style="color: {USERNAME_COLOUR};" class="username-coloured">{USERNAME}</a>';
 				}
 
-				if ($mode == 'inline' && $num_smilies > $inline_rows * $inline_columns)
-				{
-					$template->assign_block_vars('switch_smilies_extra', array());
-
-					$template->assign_vars(array(
-						'L_MORE_SMILIES' => $lang['More_emoticons'],
-						'U_MORE_SMILIES' => mx3_append_sid(PHPBB_URL . "posting.$phpEx", "mode=smilies"))
-					);
-				}
-
-				$template->assign_vars(array(
-					'L_EMOTICONS' => $lang['Emoticons'],
-					'L_CLOSE_WINDOW' => $lang['Close_window'],
-					'S_SMILIES_COLSPAN' => $s_colspan)
-				);
-			}
+				return str_replace(array('{PROFILE_URL}', '{USERNAME_COLOUR}', '{USERNAME}'), array($profile_url, $username_colour, $username), $tpl);
+			break;
 		}
-
-		/*
-		$result = $db->sql_query($sql, 3600);
-
-		$smilies = array();
-		while ($row = $db->sql_fetchrow($result))
-		{
-			if (empty($smilies[$row['smiley_url']]))
-			{
-				$smilies[$row['smiley_url']] = $row;
-			}
-		}
-		$db->sql_freeresult($result);
-
-		if (sizeof($smilies))
-		{
-			foreach ($smilies as $row)
-			{
-				$template->assign_block_vars('smiley', array(
-					'SMILEY_CODE'	=> $row['code'],
-					'A_SMILEY_CODE'	=> addslashes($row['code']),
-					'SMILEY_IMG'	=> $this->smiley_root_path  . $board_config['smilies_path'] . '/' . $row['smiley_url'],
-					'SMILEY_WIDTH'	=> $row['smiley_width'],
-					'SMILEY_HEIGHT'	=> $row['smiley_height'],
-					'SMILEY_DESC'	=> $row['emotion'])
-				);
-			}
-		}
-
-		//What we do here with forum_id versus page_id ?
-		if ($mode == 'inline' && $display_link)
-		{
-			$template->assign_vars(array(
-				'S_SHOW_SMILEY_LINK' 	=> true,
-				'U_MORE_SMILIES' 		=> mx3_append_sid(PHPBB_URL . "posting.$phpEx", 'mode=smilies&amp;f=' . $forum_id))
-			);
-		}
-		*/
-
-		if ($mode == 'window')
-		{
-			$template->pparse('smiliesbody');
-			include($mx_root_path . 'includes/page_tail.'.$phpEx);
-		}
-	}
+	}	
+	
 }
+
+//
+// Now load some bbcodes, to be extended for this backend (see below)
+//
+include_once($mx_root_path . 'includes/sessions/phpbb3/bbcode.' . $phpEx); // BBCode associated functions
+
+
 ?>

@@ -2,7 +2,7 @@
 /**
 *
 * @package Style
-* @version $Id: session.php,v 1.30 2008/09/04 00:39:17 orynider Exp $
+* @version $Id: session.php,v 1.32 2008/10/04 07:04:25 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team & (C) 2005 The phpBB Group
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -128,6 +128,7 @@ class session
 	*/
 	function extract_current_page($root_path)
 	{
+		global $phpBB2;
 		$page_array = array();
 
 		// First of all, get the request uri...
@@ -164,8 +165,8 @@ class session
 		$page_name = urlencode(htmlspecialchars($page_name));
 
 		// current directory within the phpBB root (for example: adm)
-		$root_dirs = explode('/', str_replace('\\', '/', phpBB2::phpbb_realpath($root_path)));
-		$page_dirs = explode('/', str_replace('\\', '/', phpBB2::phpbb_realpath('./')));
+		$root_dirs = explode('/', str_replace('\\', '/', $phpBB2->phpbb_realpath($root_path)));
+		$page_dirs = explode('/', str_replace('\\', '/', $phpBB2->phpbb_realpath('./')));
 		$intersection = array_intersect_assoc($root_dirs, $page_dirs);
 
 		$root_dirs = array_diff_assoc($root_dirs, $intersection);
@@ -227,7 +228,7 @@ class session
 	*/
 	function session_begin($update_session_page = true)
 	{
-		global $phpEx, $SID, $_SID, $_EXTRA_URL, $db, $board_config, $phpbb_root_path;
+		global $phpEx, $SID, $_SID, $_EXTRA_URL, $db, $board_config, $phpbb_root_path, $phpBB3;
 
 		// Give us some basic information
 		$this->time_now				= time();
@@ -268,9 +269,9 @@ class session
 
 		if (isset($_COOKIE[$board_config['cookie_name'] . '_sid']) || isset($_COOKIE[$board_config['cookie_name'] . '_u']))
 		{
-			$this->cookie_data['u'] = phpBB3::request_var($board_config['cookie_name'] . '_u', 0, false, true);
-			$this->cookie_data['k'] = phpBB3::request_var($board_config['cookie_name'] . '_k', '', false, true);
-			$this->session_id 		= phpBB3::request_var($board_config['cookie_name'] . '_sid', '', false, true);
+			$this->cookie_data['u'] = $phpBB3->request_var($board_config['cookie_name'] . '_u', 0, false, true);
+			$this->cookie_data['k'] = $phpBB3->request_var($board_config['cookie_name'] . '_k', '', false, true);
+			$this->session_id 		= $phpBB3->request_var($board_config['cookie_name'] . '_sid', '', false, true);
 
 			// original code: $SID = (defined('NEED_SID')) ? 'sid=' . $this->session_id : 'sid=';
 			$SID = (defined('NEED_SID')) ? 'sid=' . $this->session_id : '';
@@ -278,14 +279,14 @@ class session
 
 			if (empty($this->session_id))
 			{
-				$this->session_id = $_SID = phpBB3::request_var('sid', '');
+				$this->session_id = $_SID = $phpBB3->request_var('sid', '');
 				$SID = 'sid=' . $this->session_id;
 				$this->cookie_data = array('u' => 0, 'k' => '');
 			}
 		}
 		else
 		{
-			$this->session_id = $_SID = phpBB3::request_var('sid', '');
+			$this->session_id = $_SID = $phpBB3->request_var('sid', '');
 			$SID = 'sid=' . $this->session_id;
 		}
 
@@ -416,7 +417,7 @@ class session
 					// Added logging temporarly to help debug bugs...
 					if (defined('DEBUG_EXTRA') && $this->data['user_id'] != ANONYMOUS)
 					{
-						add_log('critical', 'LOG_IP_BROWSER_FORWARDED_CHECK', $u_ip, $s_ip, $u_browser, $s_browser, htmlspecialchars($u_forwarded_for), htmlspecialchars($s_forwarded_for));
+						mx_add_log('critical', 'LOG_IP_BROWSER_FORWARDED_CHECK', $u_ip, $s_ip, $u_browser, $s_browser, htmlspecialchars($u_forwarded_for), htmlspecialchars($s_forwarded_for));
 					}
 				}
 			}
@@ -438,6 +439,7 @@ class session
 	function session_create($user_id = false, $set_admin = false, $persist_login = false, $viewonline = true)
 	{
 		global $SID, $_SID, $db, $board_config, $cache, $phpbb_root_path, $phpEx;
+		global $phpBB3;
 
 		$this->data = array();
 
@@ -710,7 +712,7 @@ class session
 			}
 		}
 
-		$this->session_id = $this->data['session_id'] = md5(phpBB3::unique_id());
+		$this->session_id = $this->data['session_id'] = md5($phpBB3->unique_id());
 
 		$sql_ary['session_id'] = (string) $this->session_id;
 		$sql_ary['session_page'] = (string) substr($this->page['page'], 0, 199);
@@ -1201,13 +1203,13 @@ class session
 	*/
 	function set_login_key($user_id = false, $key = false, $user_ip = false)
 	{
-		global $board_config, $db;
+		global $board_config, $db, $phpBB3;
 
 		$user_id = ($user_id === false) ? $this->data['user_id'] : $user_id;
 		$user_ip = ($user_ip === false) ? $this->ip : $user_ip;
 		$key = ($key === false) ? (($this->cookie_data['k']) ? $this->cookie_data['k'] : false) : $key;
 
-		$key_id = phpBB3::unique_id(hexdec(substr($this->session_id, 0, 8)));
+		$key_id = $phpBB3->unique_id(hexdec(substr($this->session_id, 0, 8)));
 
 		$sql_ary = array(
 			'key_id'		=> (string) md5($key_id),
@@ -1337,13 +1339,13 @@ class session
 	function setup_style()
 	{
 		global $db, $template, $board_config, $userdata, $phpbb_auth, $phpEx, $phpbb_root_path, $mx_root_path, $mx_cache;
-		global $mx_request_vars, $portal_config, $mx_backend; //added for mxp
+		global $mx_request_vars, $portal_config, $mx_backend, $phpBB3; //added for mxp
 
 		if (!empty($_GET['style']) && $phpbb_auth->acl_get('a_styles'))
 		{
 			global $SID, $_EXTRA_URL;
 
-			$style = phpBB3::request_var('style', 0);
+			$style = $phpBB3->request_var('style', 0);
 			$SID .= '&amp;style=' . $style;
 			$_EXTRA_URL = array('style=' . $style);
 		}
@@ -1501,7 +1503,7 @@ class session
 
 			if (@file_exists("{$phpbb_root_path}styles/{$this->theme['imageset_path']}/imageset/{$this->img_lang}/imageset.cfg"))
 			{
-				$cfg_data_imageset_data = phpBB3::parse_cfg_file("{$phpbb_root_path}styles/{$this->theme['imageset_path']}/imageset/{$this->img_lang}/imageset.cfg");
+				$cfg_data_imageset_data = $phpBB3->parse_cfg_file("{$phpbb_root_path}styles/{$this->theme['imageset_path']}/imageset/{$this->img_lang}/imageset.cfg");
 				foreach ($cfg_data_imageset_data as $image_name => $value)
 				{
 					if (strpos($value, '*') !== false)

@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Module - mx_coreblocks
-* @version $Id: mx_online.php,v 1.27 2008/08/27 13:43:10 orynider Exp $
+* @version $Id: mx_online.php,v 1.29 2008/10/04 07:04:38 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -268,9 +268,9 @@ $l_online_users = '';
 // If you don't use these stats on your index you may want to consider
 // removing them
 //
-$total_posts = phpBB2::get_db_stat('postcount');
-$total_users = phpBB2::get_db_stat('usercount');
-$newest_userdata = phpBB2::get_db_stat('newestuser');
+$total_posts = $phpBB2->get_db_stat('postcount');
+$total_users = $phpBB2->get_db_stat('usercount');
+$newest_userdata = $phpBB2->get_db_stat('newestuser');
 $newest_username = (PORTAL_BACKEND == 'phpbb3') ? $board_config['newest_username'] : $newest_userdata['username'];
 $newest_uid = (PORTAL_BACKEND == 'phpbb3') ? $board_config['newest_user_id'] : $newest_userdata['user_id'];
 
@@ -439,7 +439,7 @@ $template->assign_vars(array(
 	//
 	'TOTAL_USERS_ONLINE' => $l_online_users,
 	'LOGGED_IN_USER_LIST' => $online_userlist,
-	'RECORD_USERS' => sprintf($lang['Record_online_users'], $board_config['record_online_users'], phpBB2::create_date($board_config['default_dateformat'], $board_config['record_online_date'], $board_config['board_timezone'])),
+	'RECORD_USERS' => sprintf($lang['Record_online_users'], $board_config['record_online_users'], $phpBB2->create_date($board_config['default_dateformat'], $board_config['record_online_date'], $board_config['board_timezone'])),
 	'L_WHO_IS_ONLINE' => $lang['Who_is_Online'],
 	'ONLINE_LEGEND'		=> $legend,
 	'L_ONLINE_LEGEND'		=> !empty($mx_user->lang['LEGEND']) ? $mx_user->lang['LEGEND'] : 'Legend',

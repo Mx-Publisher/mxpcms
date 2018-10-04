@@ -26,7 +26,7 @@ CREATE TABLE `mx_table_block` (
   `block_time` varchar(255) NOT NULL DEFAULT '',
   `block_editor_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`block_id`)
-) TYPE=MyISAM;
+);
 
 
 
@@ -62,11 +62,11 @@ DROP TABLE IF EXISTS `mx_table_block_system_parameter`;
 CREATE TABLE `mx_table_block_system_parameter` (
   `block_id` smallint(5) unsigned NOT NULL default '0',
   `parameter_id` smallint(5) unsigned NOT NULL default '0',
-  `parameter_value` text,
+  `parameter_value` mediumtext,
   `parameter_opt` text,
   `sub_id` int(255) unsigned NOT NULL default '0',
   PRIMARY KEY  (`block_id`,`parameter_id`,`sub_id`)
-) TYPE=MyISAM;
+);
 
 
 
@@ -96,7 +96,7 @@ INSERT INTO `mx_table_block_system_parameter` VALUES("9", "56", "TRUE", "", "0")
 INSERT INTO `mx_table_block_system_parameter` VALUES("9", "54", "TRUE", "", "0");
 INSERT INTO `mx_table_block_system_parameter` VALUES("9", "57", "TRUE", "", "0");
 INSERT INTO `mx_table_block_system_parameter` VALUES("9", "55", "b,i,u,img", "", "0");
-INSERT INTO `mx_table_block_system_parameter` VALUES("10", "16", "<table width=\"100%\" cellpadding=\"2\" border=\"0\"><tbody><tr><td valign=\"top\" align=\"left\" class=\"row2\"><span class=\"genmed\"><strong>Mon</strong></span></td><td class=\"row2\"><span class=\"gensmall\"><!-- MÅNDAG -->Busy with <em>this and that</em></span></td></tr><tr><td valign=\"top\" align=\"left\" class=\"row1\"><span class=\"genmed\"><strong>Tue</strong></span></td><td class=\"row1\"><span class=\"gensmall\"><!-- TISDAG-->Not so busy</span></td></tr><tr><td valign=\"top\" align=\"left\" class=\"row2\"><span class=\"genmed\"><strong>Wen</strong></span></td><td class=\"row2\"><span class=\"gensmall\"><!-- ONSDAG-->Very busy</span></td></tr><tr><td valign=\"top\" align=\"left\" class=\"row1\"><span class=\"genmed\"><strong>Thu</strong></span></td><td class=\"row1\"><span class=\"gensmall\"><!-- TORSDAG-->Lazy</span></td></tr><tr><td valign=\"top\" align=\"left\" class=\"row2\"><span class=\"genmed\"><strong>Fri</strong></span></td><td class=\"row2\"><span class=\"gensmall\"><!-- FREDAG-->Resting...</span></td></tr></tbody></table><p>This basic table structure is a nice demonstration in which the wysiwyg editor comes in handy!</p><p>Try it out! <br />(to edit use the top right edit button)</p><p>Note: The wysiwyg editor is a 3rd party product (tinyMCE), and must be installed separately. Visit <a target=\"_blank\" href=\"http://www.moxiecode.com\">Moxiecode Systems AB</a> to get the software and place the \'tinymce\' folder in the root/modules/mx_shared directory. </p>", "0", "0");
+INSERT INTO `mx_table_block_system_parameter` VALUES("10", "16", "<table width=\"100%\" cellpadding=\"2\" border=\"0\"><tbody><tr><td valign=\"top\" align=\"left\" class=\"row2\"><span class=\"genmed\"><strong>Mon</strong></span></td><td class=\"row2\"><span class=\"gensmall\"><!-- MÄ¹NDAG -->Busy with <em>this and that</em></span></td></tr><tr><td valign=\"top\" align=\"left\" class=\"row1\"><span class=\"genmed\"><strong>Tue</strong></span></td><td class=\"row1\"><span class=\"gensmall\"><!-- TISDAG-->Not so busy</span></td></tr><tr><td valign=\"top\" align=\"left\" class=\"row2\"><span class=\"genmed\"><strong>Wen</strong></span></td><td class=\"row2\"><span class=\"gensmall\"><!-- ONSDAG-->Very busy</span></td></tr><tr><td valign=\"top\" align=\"left\" class=\"row1\"><span class=\"genmed\"><strong>Thu</strong></span></td><td class=\"row1\"><span class=\"gensmall\"><!-- TORSDAG-->Lazy</span></td></tr><tr><td valign=\"top\" align=\"left\" class=\"row2\"><span class=\"genmed\"><strong>Fri</strong></span></td><td class=\"row2\"><span class=\"gensmall\"><!-- FREDAG-->Resting...</span></td></tr></tbody></table><p>This basic table structure is a nice demonstration in which the wysiwyg editor comes in handy!</p><p>Try it out! <br />(to edit use the top right edit button)</p><p>Note: The wysiwyg editor is a 3rd party product (tinyMCE), and must be installed separately. Visit <a target=\"_blank\" href=\"http://www.moxiecode.com\">Moxiecode Systems AB</a> to get the software and place the \'tinymce\' folder in the root/modules/mx_shared directory. </p>", "0", "0");
 INSERT INTO `mx_table_block_system_parameter` VALUES("32", "63", "Vertical", "", "0");
 INSERT INTO `mx_table_block_system_parameter` VALUES("27", "70", "x_iframe", "", "0");
 INSERT INTO `mx_table_block_system_parameter` VALUES("27", "71", "/docs", "", "0");
@@ -121,7 +121,7 @@ CREATE TABLE `mx_table_column` (
   `page_id` smallint(5) NOT NULL DEFAULT '0',
   PRIMARY KEY (`column_id`),
    KEY cat_order (`column_order`)
-) TYPE=MyISAM;
+);
 
 
 
@@ -146,7 +146,7 @@ CREATE TABLE `mx_table_column_block` (
   `block_id` smallint(5) NOT NULL DEFAULT '0',
   `block_order` smallint(5) NOT NULL DEFAULT '0',
   PRIMARY KEY (`column_id`,`block_id`)
-) TYPE=MyISAM;
+);
 
 
 
@@ -175,7 +175,7 @@ CREATE TABLE `mx_table_column_templates` (
   `page_template_id` smallint(5) NOT NULL DEFAULT '0',
   PRIMARY KEY (`column_template_id`),
    KEY cat_order (`column_order`)
-) TYPE=MyISAM;
+);
 
 
 
@@ -205,7 +205,7 @@ CREATE TABLE `mx_table_function` (
   `function_admin` varchar(255),
   PRIMARY KEY (`function_id`),
    KEY module_id (`module_id`)
-) TYPE=MyISAM;
+);
 
 
 
@@ -246,7 +246,7 @@ CREATE TABLE `mx_table_menu_categories` (
   `cat_target` tinyint(2) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`cat_id`),
    KEY cat_order (`cat_order`)
-) TYPE=MyISAM;
+);
 
 
 
@@ -282,7 +282,7 @@ CREATE TABLE `mx_table_menu_nav` (
   `link_target` tinyint(2) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`menu_id`),
    KEY cat_id (`cat_id`)
-) TYPE=MyISAM;
+);
 
 
 
@@ -314,7 +314,7 @@ CREATE TABLE `mx_table_module` (
   `module_version` varchar(255),
   `module_copy` text,
   PRIMARY KEY (`module_id`)
-) TYPE=MyISAM;
+);
 
 
 
@@ -337,7 +337,7 @@ CREATE TABLE `mx_table_page` (
   `page_name` varchar(255),
   `page_desc` varchar(255),
   `page_parent` int(50) DEFAULT '0',
-  `parents_data` mediumblob NOT NULL,
+  `parents_data` mediumtext NOT NULL,
   `page_order` smallint(5) DEFAULT '0',
   `page_icon` varchar(255),
   `page_alt_icon` varchar(255),
@@ -357,7 +357,7 @@ CREATE TABLE `mx_table_page` (
   `ip_filter` varchar(255) NOT NULL DEFAULT '',
   `phpbb_stats` tinyint(2) NOT NULL DEFAULT '-1',
   PRIMARY KEY (`page_id`)
-) TYPE=MyISAM;
+);
 
 
 
@@ -378,7 +378,7 @@ CREATE TABLE `mx_table_page_templates` (
   `page_template_id` smallint(3) unsigned NOT NULL auto_increment,
   `template_name` varchar(255) NOT NULL default '',
   PRIMARY KEY  (`page_template_id`)
-) TYPE=MyISAM;
+);
 
 
 
@@ -406,7 +406,7 @@ CREATE TABLE `mx_table_parameter` (
   `parameter_auth` tinyint(2) NOT NULL DEFAULT '0',
   `parameter_order` smallint(5) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`parameter_id`)
-) TYPE=MyISAM;
+);
 
 
 
@@ -462,7 +462,7 @@ CREATE TABLE `mx_table_portal` (
   `mx_use_cache` smallint(2) unsigned NOT NULL DEFAULT '1',
   `mod_rewrite` smallint(2) unsigned NOT NULL DEFAULT '0',
   `cookie_domain` varchar(255) NOT NULL DEFAULT '',
-  `cookie_name` varchar(255) NOT NULL DEFAULT 'mxbb29x',
+  `cookie_name` varchar(255) NOT NULL DEFAULT 'mxbb30x',
   `cookie_path` varchar(255) NOT NULL DEFAULT '/',
   `cookie_secure` smallint(2) unsigned NOT NULL DEFAULT '0',
   `session_length` varchar(255) NOT NULL DEFAULT '3600',
@@ -500,7 +500,7 @@ CREATE TABLE `mx_table_portal` (
   `record_online_users` varchar(255) NOT NULL DEFAULT '0',
   `record_online_date` varchar(255) NOT NULL DEFAULT '0',
   PRIMARY KEY  (`portal_id`)
-) TYPE=MyISAM;
+);
 
 
 
@@ -514,7 +514,7 @@ CREATE TABLE `mx_table_search_results` (
   `search_array` text NOT NULL,
   PRIMARY KEY  (`search_id`),
   KEY `session_id` (`session_id`)
-) TYPE=MyISAM;
+);
 
 
 
@@ -528,7 +528,7 @@ CREATE TABLE `mx_table_wordlist` (
   `word_common` tinyint(1) unsigned NOT NULL default '0',
   PRIMARY KEY  (`word_text`),
   KEY `word_id` (`word_id`)
-) TYPE=MyISAM;
+);
 
 
 
@@ -542,7 +542,7 @@ CREATE TABLE `mx_table_wordmatch` (
   `title_match` tinyint(1) NOT NULL default '0',
   KEY `block_id` (`block_id`),
   KEY `word_id` (`word_id`)
-) TYPE=MyISAM;
+);
 
 
 
@@ -677,12 +677,15 @@ CREATE TABLE `mx_table_themes` (
 
 
 
-INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (1, 'mxBase1', 'mxBase1', 'mxBase1.css', 'internal');
-INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (2, 'mxBase2', 'mxBase2', 'mxBase2.css', 'internal');
-INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (3, 'mxSilver', 'mxSilver', 'mxSilver.css', 'internal');
-INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (4, 'subSilver', 'subSilver', 'subSilver.css', 'phpbb2');
-INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (5, 'subsilver2', 'subsilver2', 'subsilver2.css', 'phpbb3');
-INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (6, 'prosilver', 'prosilver', 'prosilver.css', 'phpbb3');
+INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (1, 'mx_prosilver', 'mx_prosilver', 'mx_prosilver.css', 'internal');
+INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (2, 'mxBase1', 'mxBase1', 'mxBase1.css', 'internal');
+INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (3, 'mxBase2', 'mxBase2', 'mxBase2.css', 'internal');
+INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (4, 'mxSilver', 'mxSilver', 'mxSilver.css', 'internal');
+INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (5, 'subSilver', 'subSilver', 'subSilver.css', 'phpbb2');
+INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (6, 'subsilver2', 'subsilver2', 'subsilver2.css', 'phpbb3');
+INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (7, 'prosilver', 'prosilver', 'prosilver.css', 'phpbb3');
+
+
 
 
 

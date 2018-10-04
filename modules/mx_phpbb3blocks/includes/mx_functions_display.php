@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Module - mx_phpbb2blocks
-* @version $Id: mx_functions_display.php,v 1.6 2008/09/07 02:32:55 orynider Exp $
+* @version $Id: mx_functions_display.php,v 1.8 2008/10/04 07:04:38 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -32,7 +32,7 @@ function mx_display_forums($root_data = '', $display_moderators = true, $return_
 {
 	global $db, $phpbb_auth, $mx_user, $template;
 	global $phpbb_root_path, $phpEx, $board_config;
-	global $mx_request_vars;
+	global $mx_request_vars, $phpBB3;
 
 	$forum_rows = $subforums = $forum_ids = $forum_ids_moderator = $forum_moderators = $active_forum_ary = array();
 	$parent_id = $visible_forums = 0;
@@ -427,7 +427,7 @@ function mx_display_forums($root_data = '', $display_moderators = true, $return_
 			'FORUM_FOLDER_IMG_SRC'	=> $mx_user->img($folder_image, $folder_alt, false, '', 'src'),
 			'FORUM_IMAGE'			=> ($row['forum_image']) ? '<img src="' . $phpbb_root_path . $row['forum_image'] . '" alt="' . $mx_user->lang[$folder_alt] . '" />' : '',
 			'FORUM_IMAGE_SRC'		=> ($row['forum_image']) ? $phpbb_root_path . $row['forum_image'] : '',
-			'LAST_POST_SUBJECT'		=> phpBB3::censor_text($last_post_subject),
+			'LAST_POST_SUBJECT'		=> $phpBB3->censor_text($last_post_subject),
 			'LAST_POST_TIME'		=> $last_post_time,
 			'LAST_POSTER'			=> mx_get_username_string('username', $row['forum_last_poster_id'], $row['forum_last_poster_name'], $row['forum_last_poster_colour']),
 			'LAST_POSTER_COLOUR'	=> mx_get_username_string('colour', $row['forum_last_poster_id'], $row['forum_last_poster_name'], $row['forum_last_poster_colour']),
@@ -887,7 +887,7 @@ function mx_display_reasons($reason_id = 0)
 function mx_display_user_activity(&$mx_userdata)
 {
 	global $phpbb_auth, $template, $db, $mx_user;
-	global $phpbb_root_path, $phpEx;
+	global $phpbb_root_path, $phpEx, $phpBB3;
 
 	// Do not display user activity for users having more than 5000 posts...
 	if ($mx_userdata['user_posts'] > 5000)
@@ -982,7 +982,7 @@ function mx_display_user_activity(&$mx_userdata)
 		'ACTIVE_FORUM'			=> $active_f_name,
 		'ACTIVE_FORUM_POSTS'	=> ($active_f_count == 1) ? sprintf($mx_user->lang['USER_POST'], 1) : sprintf($mx_user->lang['USER_POSTS'], $active_f_count),
 		'ACTIVE_FORUM_PCT'		=> sprintf($l_active_pct, $active_f_pct),
-		'ACTIVE_TOPIC'			=> phpBB3::censor_text($active_t_name),
+		'ACTIVE_TOPIC'			=> $phpBB3->censor_text($active_t_name),
 		'ACTIVE_TOPIC_POSTS'	=> ($active_t_count == 1) ? sprintf($mx_user->lang['USER_POST'], 1) : sprintf($mx_user->lang['USER_POSTS'], $active_t_count),
 		'ACTIVE_TOPIC_PCT'		=> sprintf($l_active_pct, $active_t_pct),
 		'U_ACTIVE_FORUM'		=> mx3_append_sid("{$phpbb_root_path}viewforum.$phpEx", 'f=' . $active_f_id),

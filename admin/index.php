@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: index.php,v 1.53 2008/08/30 22:09:10 orynider Exp $
+* @version $Id: index.php,v 1.55 2008/10/04 07:04:24 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -22,7 +22,7 @@ $mx_root_path = './../';
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
 $no_page_header = TRUE;
 
-require('./pagestart.' . $phpEx);
+require($mx_root_path.'admin/pagestart.' . $phpEx);
 
 // ------------------------------
 // DEBUG ONLY ;-)
@@ -88,7 +88,7 @@ function read_admin($dir_module)
 //
 if ($mx_request_vars->get('pane', MX_TYPE_NO_TAGS) == 'left' )
 {
-	include('./page_header_admin.'.$phpEx);
+	include($mx_root_path.'admin/page_header_admin.'.$phpEx);
 
 	$template->set_filenames(array(
 		'body' => 'admin/index_navigate.tpl')
@@ -412,11 +412,11 @@ elseif ($mx_request_vars->get('pane', MX_TYPE_NO_TAGS) == 'right' )
 			//
 			// Get forum statistics
 			//
-			$total_posts = phpBB2::get_db_stat('postcount');
-			$total_users = phpBB2::get_db_stat('usercount');
-			$total_topics = phpBB2::get_db_stat('topiccount');
+			$total_posts = $phpBB2->get_db_stat('postcount');
+			$total_users = $phpBB2->get_db_stat('usercount');
+			$total_topics = $phpBB2->get_db_stat('topiccount');
 
-			$start_date = phpBB2::create_date($board_config['default_dateformat'], $board_config['board_startdate'], $board_config['board_timezone']);
+			$start_date = $phpBB2->create_date($board_config['default_dateformat'], $board_config['board_startdate'], $board_config['board_timezone']);
 
 			$boarddays = ( time() - $board_config['board_startdate'] ) / 86400;
 
@@ -773,7 +773,7 @@ elseif ($mx_request_vars->get('pane', MX_TYPE_NO_TAGS) == 'right' )
 				{
 					case 'internal':
 					case 'phpbb2':
-						$reg_ip = phpBB2::decode_ip($onlinerow_reg[$i]['session_ip']);
+						$reg_ip = $phpBB2->decode_ip($onlinerow_reg[$i]['session_ip']);
 						break;
 
 					case 'phpbb3':
@@ -786,8 +786,8 @@ elseif ($mx_request_vars->get('pane', MX_TYPE_NO_TAGS) == 'right' )
 					"ROW_COLOR" => "#" . $row_color,
 					"ROW_CLASS" => $row_class,
 					"USERNAME" => $username,
-					"STARTED" => phpBB2::create_date($board_config['default_dateformat'], $onlinerow_reg[$i]['session_start'], $board_config['board_timezone']),
-					"LASTUPDATE" => phpBB2::create_date($board_config['default_dateformat'], $onlinerow_reg[$i]['user_session_time'], $board_config['board_timezone']),
+					"STARTED" => $phpBB2->create_date($board_config['default_dateformat'], $onlinerow_reg[$i]['session_start'], $board_config['board_timezone']),
+					"LASTUPDATE" => $phpBB2->create_date($board_config['default_dateformat'], $onlinerow_reg[$i]['user_session_time'], $board_config['board_timezone']),
 					"FORUM_LOCATION" => $location,
 					"IP_ADDRESS" => $reg_ip,
 
@@ -883,7 +883,7 @@ elseif ($mx_request_vars->get('pane', MX_TYPE_NO_TAGS) == 'right' )
 			{
 				case 'internal':
 				case 'phpbb2':
-					$guest_ip = phpBB2::decode_ip($onlinerow_guest[$i]['session_ip']);
+					$guest_ip = $phpBB2->decode_ip($onlinerow_guest[$i]['session_ip']);
 					break;
 
 				case 'phpbb3':
@@ -896,8 +896,8 @@ elseif ($mx_request_vars->get('pane', MX_TYPE_NO_TAGS) == 'right' )
 				"ROW_COLOR" => "#" . $row_color,
 				"ROW_CLASS" => $row_class,
 				"USERNAME" => $lang['Guest'],
-				"STARTED" => phpBB2::create_date($board_config['default_dateformat'], $onlinerow_guest[$i]['session_start'], $board_config['board_timezone']),
-				"LASTUPDATE" => phpBB2::create_date($board_config['default_dateformat'], $onlinerow_guest[$i]['session_time'], $board_config['board_timezone']),
+				"STARTED" => $phpBB2->create_date($board_config['default_dateformat'], $onlinerow_guest[$i]['session_start'], $board_config['board_timezone']),
+				"LASTUPDATE" => $phpBB2->create_date($board_config['default_dateformat'], $onlinerow_guest[$i]['session_time'], $board_config['board_timezone']),
 				"FORUM_LOCATION" => $location,
 				"IP_ADDRESS" => $guest_ip,
 

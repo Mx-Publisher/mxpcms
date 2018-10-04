@@ -6,7 +6,7 @@
  *   copyright            : (C) 2001 The phpBB Group
  *   email                : support@phpbb.com
  *
- *   $Id: functions_post.php,v 1.2 2008/07/15 22:04:18 jonohlsson Exp $
+ *   $Id: functions_post.php,v 1.5 2008/10/04 07:04:25 orynider Exp $
  *
  *
  ***************************************************************************/
@@ -37,7 +37,7 @@ $unhtml_specialchars_replace = array('>', '<', '"', '&');
 //
 function prepare_message($message, $html_on, $bbcode_on, $smile_on, $bbcode_uid = 0)
 {
-	global $board_config, $html_entities_match, $html_entities_replace;
+	global $board_config, $html_entities_match, $html_entities_replace, $mx_bbcode;
 
 	//
 	// Clean up the message
@@ -74,7 +74,7 @@ function prepare_message($message, $html_on, $bbcode_on, $smile_on, $bbcode_uid 
 
 	if($bbcode_on && $bbcode_uid != '')
 	{
-		$message = bbencode_first_pass($message, $bbcode_uid);
+		$message = $mx_bbcode->bbencode_first_pass($message, $bbcode_uid);
 	}
 
 	return $message;
@@ -632,7 +632,7 @@ function user_notification($mode, &$post_data, &$topic_title, &$forum_id, &$topi
 
 					$orig_word = array();
 					$replacement_word = array();
-					phpBB2::obtain_word_list($orig_word, $replacement_word);
+					$phpBB2->obtain_word_list($orig_word, $replacement_word);
 
 					$emailer->from($board_config['board_email']);
 					$emailer->replyto($board_config['board_email']);

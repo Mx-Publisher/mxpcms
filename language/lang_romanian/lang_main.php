@@ -2,22 +2,29 @@
 /**
 *
 * @package mxBB Portal Core
-* @version $Id: lang_main.php,v 1.2 2008/06/18 11:38:55 orynider Exp $
+* @version $Id: lang_main.php,v 1.4 2008/10/04 07:13:11 orynider Exp $
 * @copyright (c) 2002-2006 mxBB Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 *
 */
 
 //
-// The format of this file is:
+// The format of this file is ---> $lang['message'] = 'text';
 //
-// ---> $lang['message'] = 'text';
+// You should also try to set a locale and a character encoding (plus direction). The encoding and direction
+// will be sent to the template. The locale may or may not work, it's dependent on OS support and the syntax
+// varies ... give it your best guess!
 //
-// Specify your language character encoding... [optional]
-//
-// 
 
 setlocale(LC_ALL, 'ro');
+
+$lang['USER_LANG'] = 'ro';
+$lang['ENCODING'] = 'Windows-1250';
+$lang['DIRECTION'] = 'ltr';
+$lang['LEFT'] = 'left';
+$lang['RIGHT'] = 'right';
+$lang['DATE_FORMAT'] =  'd/M/Y'; // This should be changed to the default date format for your language, php date() format
+
 
 //
 // General

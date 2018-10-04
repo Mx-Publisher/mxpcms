@@ -2,7 +2,7 @@
 /**
 *
 * @package phpBB3
-* @version $Id: functions_posting.php,v 1.6 2008/09/07 02:16:48 orynider Exp $
+* @version $Id: functions_posting.php,v 1.8 2008/10/04 07:04:25 orynider Exp $
 * @copyright (c) 2005 phpBB Group
 * @license http://opensource.org/licenses/gpl-license.php GNU Public License
 *
@@ -1028,16 +1028,16 @@ function topic_review($topic_id, $forum_id, $mode = 'topic_review', $cur_post_id
 
 		$poster_id		= $row['user_id'];
 		$post_subject	= $row['post_subject'];
-		$message		= phpBB3::censor_text($row['post_text']);
+		$message		= $phpBB3->censor_text($row['post_text']);
 
 		$decoded_message = false;
 
 		if ($show_quote_button && $phpbb_auth->acl_get('f_reply', $forum_id))
 		{
 			$decoded_message = $message;
-			phpBB3::decode_message($decoded_message, $row['bbcode_uid']);
+			$phpBB3->decode_message($decoded_message, $row['bbcode_uid']);
 
-			$decoded_message = phpBB3::censor_text($decoded_message);
+			$decoded_message = $phpBB3->censor_text($decoded_message);
 			$decoded_message = str_replace("\n", "<br />", $decoded_message);
 		}
 
@@ -1048,7 +1048,7 @@ function topic_review($topic_id, $forum_id, $mode = 'topic_review', $cur_post_id
 
 		$message = str_replace("\n", '<br />', $message);
 
-		$message = phpBB3::smiley_text($message, !$row['enable_smilies']);
+		$message = $phpBB3->smiley_text($message, !$row['enable_smilies']);
 
 		if (!empty($attachments[$row['post_id']]))
 		{
@@ -1056,13 +1056,13 @@ function topic_review($topic_id, $forum_id, $mode = 'topic_review', $cur_post_id
 			parse_attachments($forum_id, $message, $attachments[$row['post_id']], $update_count);
 		}
 
-		$post_subject = phpBB3::censor_text($post_subject);
+		$post_subject = $phpBB3->censor_text($post_subject);
 
 		$template->assign_block_vars($mode . '_row', array(
-			'POST_AUTHOR_FULL'		=> phpBB3::get_username_string('full', $poster_id, $row['username'], $row['user_colour'], $row['post_username']),
-			'POST_AUTHOR_COLOUR'	=> phpBB3::get_username_string('colour', $poster_id, $row['username'], $row['user_colour'], $row['post_username']),
-			'POST_AUTHOR'			=> phpBB3::get_username_string('username', $poster_id, $row['username'], $row['user_colour'], $row['post_username']),
-			'U_POST_AUTHOR'			=> phpBB3::get_username_string('profile', $poster_id, $row['username'], $row['user_colour'], $row['post_username']),
+			'POST_AUTHOR_FULL'		=> $phpBB3->get_username_string('full', $poster_id, $row['username'], $row['user_colour'], $row['post_username']),
+			'POST_AUTHOR_COLOUR'	=> $phpBB3->get_username_string('colour', $poster_id, $row['username'], $row['user_colour'], $row['post_username']),
+			'POST_AUTHOR'			=> $phpBB3->get_username_string('username', $poster_id, $row['username'], $row['user_colour'], $row['post_username']),
+			'U_POST_AUTHOR'			=> $phpBB3->get_username_string('profile', $poster_id, $row['username'], $row['user_colour'], $row['post_username']),
 
 			'S_HAS_ATTACHMENTS'	=> (!empty($attachments[$row['post_id']])) ? true : false,
 
@@ -1074,7 +1074,7 @@ function topic_review($topic_id, $forum_id, $mode = 'topic_review', $cur_post_id
 			'POST_ID'			=> $row['post_id'],
 			'U_MINI_POST'		=> mx3_append_sid("{$phpbb_root_path}viewtopic.$phpEx", 'p=' . $row['post_id']) . '#p' . $row['post_id'],
 			'U_MCP_DETAILS'		=> ($phpbb_auth->acl_get('m_info', $forum_id)) ? mx3_append_sid("{$phpbb_root_path}mcp.$phpEx", 'i=main&amp;mode=post_details&amp;f=' . $forum_id . '&amp;p=' . $row['post_id'], true, $mx_user->session_id) : '',
-			'POSTER_QUOTE'		=> ($show_quote_button && $phpbb_auth->acl_get('f_reply', $forum_id)) ? addslashes(phpBB3::get_username_string('username', $poster_id, $row['username'], $row['user_colour'], $row['post_username'])) : '')
+			'POSTER_QUOTE'		=> ($show_quote_button && $phpbb_auth->acl_get('f_reply', $forum_id)) ? addslashes($phpBB3->get_username_string('username', $poster_id, $row['username'], $row['user_colour'], $row['post_username'])) : '')
 		);
 
 		// Display not already displayed Attachments for this post, we already parsed them. ;)
@@ -1120,7 +1120,7 @@ function user_notification($mode, $subject, $topic_title, $forum_name, $forum_id
 	}
 
 	$topic_title = ($topic_notification) ? $topic_title : $subject;
-	$topic_title = phpBB3::censor_text($topic_title);
+	$topic_title = $phpBB3->censor_text($topic_title);
 
 	// Get banned User ID's
 	$sql = 'SELECT ban_userid
@@ -2308,7 +2308,7 @@ function submit_post($mode, $subject, $mx_username, $topic_type, &$poll, &$data,
 	$db->sql_transaction('commit');
 
 	// Delete draft if post was loaded...
-	$draft_id = phpBB3::request_var('draft_loaded', 0);
+	$draft_id = $phpBB3->request_var('draft_loaded', 0);
 	if ($draft_id)
 	{
 		$sql = 'DELETE FROM ' . DRAFTS_TABLE . "

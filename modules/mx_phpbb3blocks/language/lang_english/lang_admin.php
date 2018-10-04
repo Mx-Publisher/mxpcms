@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Module - mx_phpbb2blocks
-* @version $Id: lang_admin.php,v 1.2 2008/02/04 16:53:57 joasch Exp $
+* @version $Id: lang_admin.php,v 1.3 2008/10/04 07:04:38 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -64,6 +64,7 @@ $lang['announce_display_sticky']	= "Display Sticky(ies) in this Block";
 $lang['announce_display_normal']	= "Display Normal message(s) in this Block";
 $lang['announce_display_global']	= "Display Global Announcements in this Block";
 $lang['announce_forum']				= "Source Forums";
+$lang['announce_truncate']			= "Truncate Announce Length";
 $lang['announce_forum_explain']		= "- You may make multiple selections. For example, hold down the CTRL button on your keyboard while clicking extra selections.<br />* If nothing is selected, all authorized forums will be visible";
 
 //
