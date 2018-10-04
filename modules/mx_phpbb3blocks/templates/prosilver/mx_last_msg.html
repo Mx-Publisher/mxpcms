@@ -1,0 +1,34 @@
+<div class="forabg block">
+	<div class="inner">
+	<!-- BEGIN no_row -->
+		<div class="blockbody bg2">{no_row.L_NO_ITEMS}</div>
+	<!-- END no_row -->
+
+	<div class="blockbody bg2" style="display:block;">
+	<dl> 
+	<dt>
+	<div>
+	<!-- BEGIN msg_row -->
+		<li class="row<!-- IF msg_row.S_ROW_COUNT is even --> bg1<!-- ELSE --> bg2<!-- ENDIF --><!-- IF msg_row.S_POST_ANNOUNCE --> announce<!-- ENDIF --><!-- IF msg_row.S_POST_STICKY --> sticky<!-- ENDIF --><!-- IF msg_row.S_TOPIC_REPORTED --> reported<!-- ENDIF -->">
+			<dl class="icon">
+				<div style="float:left">
+					<a href="{msg_row.U_LAST_MSG}"><img src="{msg_row.FOLDER_IMG}" alt="{msg_row.L_TOPIC_FOLDER_ALT}" title="{msg_row.LAST_MSG_ALT}" /></a> <a href="{msg_row.U_LAST_MSG}" class="topictitle">{msg_row.LAST_MSG}</a>
+					<br />
+					<span class="gensmall"><a href="{msg_row.U_FORUM}" title="{msg_row.FORUM_NAME_ALT}" class="gensmall">{msg_row.FORUM_NAME}</a></span>
+				</div>
+			</dl>
+			<dl style="text-align:right">
+				<span class="lastpost" nowrap="nowrap">{msg_row.LAST_MSG_DATE}
+				<br />{msg_row.TOPIC_AUTHOR_FULL} {msg_row.LAST_POSTER_FULL}</span>
+			</dl>
+		</li>
+	<!-- END msg_row -->
+		</div>
+	</dt>
+	</dl>
+	</div>
+
+	<div class="bg1">{PAGINATION}</div>
+	</div>
+	<span class="corners-bottom"><span></span></span>
+</div>

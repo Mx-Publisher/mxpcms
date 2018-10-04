@@ -1,0 +1,42 @@
+module=+:53=+:phpBB3 Blocks=+:modules/mx_phpbb3blocks/=+:MX-Publisher phpBB3 blocks=+:
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:53=+:2=+:phpBB Announcements=+:phpBB Announcements Block=+:mx_announce.php=+:
+parameter=+:2=+:1=+:announce_nbr_display=+:Number=+:1=+:=+:0=+:0
+parameter=+:2=+:10=+:announce_img_global=+:Text=+:thumb_globe.gif=+:=+:0=+:0
+parameter=+:2=+:6=+:announce_display_global=+:Boolean=+:TRUE=+:=+:0=+:0
+parameter=+:2=+:9=+:announce_img_normal=+:Text=+:thumb_globe.gif=+:=+:0=+:0
+parameter=+:2=+:8=+:announce_img_sticky=+:Text=+:thumb_globe.gif=+:=+:0=+:0
+parameter=+:2=+:7=+:announce_img=+:Text=+:thumb_globe.gif=+:=+:0=+:0
+parameter=+:2=+:5=+:announce_display_normal=+:Boolean=+:FALSE=+:=+:0=+:0
+parameter=+:2=+:4=+:announce_display_sticky=+:Boolean=+:TRUE=+:=+:0=+:0
+parameter=+:2=+:3=+:announce_display=+:Boolean=+:TRUE=+:=+:0=+:0
+parameter=+:2=+:2=+:announce_nbr_days=+:Number=+:14=+:=+:0=+:0
+parameter=+:2=+:11=+:announce_forum=+:Function=+:=+:get_list_multiple("{parameter_id}[]", FORUMS_TABLE, 'forum_id', 'forum_name', "{parameter_value}", TRUE)=+:0=+:0
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Demo - phpBB Announcements=+:Demo block=+:2=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:53=+:51=+:Last Posts=+:phpBB Last Posts Function=+:mx_last_msg.php=+:
+parameter=+:51=+:17=+:Last_Msg_Number_Title=+:Number=+:15=+:=+:0=+:0
+parameter=+:51=+:40=+:Last_Msg_Display_Icon_View=+:Boolean=+:TRUE=+:=+:0=+:0
+parameter=+:51=+:39=+:Last_Msg_Display_Author=+:Boolean=+:FALSE=+:=+:0=+:0
+parameter=+:51=+:38=+:Last_Msg_Display_Last_Author=+:Boolean=+:TRUE=+:=+:0=+:0
+parameter=+:51=+:37=+:Last_Msg_forum=+:Function=+:=+:get_list_multiple("{parameter_id}[]", FORUMS_TABLE, 'forum_id', 'forum_name', "{parameter_value}", TRUE)=+:0=+:0
+parameter=+:51=+:22=+:Last_Msg_Display_Forum=+:Boolean=+:TRUE=+:=+:0=+:0
+parameter=+:51=+:21=+:Last_Msg_Align=+:Values=+:left=+:=+:0=+:0
+parameter=+:51=+:20=+:Last_Msg_Target=+:Values=+:_blank=+:=+:0=+:0
+parameter=+:51=+:19=+:Last_Msg_Title_Length=+:Number=+:30=+:=+:0=+:0
+parameter=+:51=+:18=+:Last_Msg_Display_Date=+:Boolean=+:TRUE=+:=+:0=+:0
+parameter=+:51=+:41=+:Last_Msg_Auth_Read=+:Boolean=+:FALSE=+:=+:0=+:0
+parameter=+:51=+:95=+:msg_filter_date=+:Function=+:5=+:get_list_static("{parameter_id}[]",array("no limit", "1 day", "2 days", "3 days", "1 week", "2 weeks", "3 weeks", "1 month", "2 months", "3 months", "6 months", "1 year"),"{parameter_value}")=+:0=+:0
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Last Posts=+:Demo block=+:51=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:53=+:52=+:phpBB Index=+:phpBB Index Block=+:mx_forum.php=+:
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:phpBB Index=+:Demo block=+:52=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+function=+:0=+:0=+:0=+:endoflist=+:0=+:0
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:30=+:41=+:Statistics=+:Site Statistics Function=+:mx_statistics.php=+:
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Demo - Statistics=+:Demo block=+:41=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+function=+:0=+:0=+:0=+:endoflist=+:0=+:0

@@ -1,0 +1,24 @@
+module=+:20=+:Textblocks=+:modules/mx_textblocks/=+:MX-Publisher Textblocks=+:
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:20=+:24=+:TextBlock (phpBB)=+:BBcodes, html and smilies - phpBB style=+:mx_textblock_bbcode.php=+:
+parameter=+:24=+:15=+:Text=+:phpBBTextBlock=+:Insert your text here=+:=+:0=+:0
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Demo - TextBlock (phpBB)=+:Demo block=+:24=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:20=+:23=+:TextBlock (HTML/WYSIWYG)=+:User friendly textblocks=+:mx_textblock_html.php=+:
+parameter=+:23=+:16=+:Html=+:WysiwygTextBlock=+:Entre your Html code here=+:=+:0=+:0
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Demo - TextBlock (HTML/WYSIWYG)=+:Demo block=+:23=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:20=+:22=+:TextBlock (Customized)=+:Textblock, featuring block defined settings=+:mx_textblock_multi.php=+:
+parameter=+:22=+:50=+:Text=+:CustomizedTextBlock=+:Enter your block text here=+:=+:0=+:0
+parameter=+:22=+:51=+:text_style=+:Text=+:none=+:=+:1=+:0
+parameter=+:22=+:52=+:block_style=+:Boolean=+:TRUE=+:=+:1=+:0
+parameter=+:22=+:53=+:title_style=+:Boolean=+:TRUE=+:=+:1=+:0
+parameter=+:22=+:57=+:allow_smilies=+:Boolean=+:TRUE=+:=+:1=+:0
+parameter=+:22=+:54=+:allow_html=+:Boolean=+:TRUE=+:=+:1=+:0
+parameter=+:22=+:56=+:allow_bbcode=+:Boolean=+:TRUE=+:=+:1=+:0
+parameter=+:22=+:55=+:html_tags=+:Text=+:b,i,u=+:=+:1=+:0
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Demo - TextBlock (Customized)=+:Demo block=+:22=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+function=+:0=+:0=+:0=+:endoflist=+:0=+:0

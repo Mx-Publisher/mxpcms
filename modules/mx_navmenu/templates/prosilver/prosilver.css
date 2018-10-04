@@ -1,0 +1,117 @@
+@CHARSET "UTF-8";
+li.nav-button, li.nav-button-current {
+border-width: 1px;
+border-color: Transparent;
+border-style: solid solid none solid;
+padding-left: 5px;
+padding-right: 5px;
+margin: 1px;
+margin-bottom: 0px;
+border-bottom: none;
+}
+
+li.nav-button-current {
+background: #0076b1 none;
+border-color: white;
+border: none;
+margin: 0px;
+padding-top: 1px;
+padding-bottom: 1px;
+}
+
+li.nav-button-current A:link, li.nav-button-current A:visited, 
+li.nav-button-current A:hover {
+background-image: url("./../../../../templates/prosilver/theme/images/bg_list.gif");
+color: White;
+}
+
+li.nav-button-current A:active {
+background-image: url("./../../../../templates/prosilver/theme/images/bg_active.gif");
+color: Red;
+}
+
+ul.nav-menu {
+padding:0px;
+margin:0px;
+list-style-type: disc;
+}
+li.genmed, li.cattitle {
+padding-right: 3px;
+margin-right: 3px;
+border-right-style: none;
+border-right-width: 1px;
+border-right-color: Transparent;
+list-style-type : disc;
+padding-top: 0px;
+margin-top: 0px;
+list-style-type: disc;
+}
+li.cattitle {
+font-weight: bold;
+}
+
+/**********************\
+|* Overall navigation *|
+\**********************/
+li.mnu-ov, li.mnu-ov-current {
+	float:left;
+	list-style-image: none;
+	position:relative;
+	padding: 4px;
+	background: #12A3EB url("./../../../../templates/prosilver/theme/images/sitebar_bg.gif") repeat-x;
+	background-position: 0px -23px;
+	border: none;
+	margin: 0px;
+}
+li.button ul, li.button-current ul {
+/*	border: solid 1px black;*/
+	border: none;
+}
+li.mnu-ov A, li.mnu-ov-current A {
+	padding-left: 20px;
+	background-repeat: no-repeat;
+	font-size: 1.1em;
+	background-position: 0px 0px;
+}
+li.mnu-ov-current A {
+	background-position: 0px -30px;
+}
+li.mnu-ov A:hover, li.mnu-ov-current A:hover {
+	background-position: 0px -15px;
+}
+
+/*******************\
+|* Navigation menu *|
+\*******************/
+.topiclist dd.posts_portal {
+  float:left;
+  text-align:left;
+  font-size: 1.0em;
+  padding:6px 5px 6px 5px;
+}
+.topiclist li dl dd.posts_portal A.nav {
+  padding-bottom: 50px;
+  margin-bottom:10px;
+}
+
+.topiclist li dl dd.posts_portal span.mnu-nm, .topiclist li dl dd.posts_portal span.mnu-nm:hover,
+.topiclist li dl dd.posts_portal span.mnu-nm-current, .topiclist li dl dd.posts_portal span.mnu-nm-current:hover  {
+	background-repeat: no-repeat;
+	background-position: 0px 0px;
+	padding-left: 20px;
+	display:block;
+	clear:both;
+	margin-top:3px;
+	margin-bottom:3px;
+}
+.topiclist li dl dd.posts_portal span.mnu-nm-current {
+	background-position: 0px -30px;
+	font-weight: bold;
+}
+
+.topiclist li dl dd.posts_portal span.mnu-nm:hover, .topiclist li dl dd.posts_portal span.mnu-nm-current:hover  {
+	background-position: 0px -15px;
+}
+
+
+* html .nav-cat td { position: relative; } /* ie 5.0 fix */
