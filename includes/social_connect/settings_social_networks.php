@@ -8,7 +8,7 @@
 *
 */
 
-if (!defined('IN_ICYPHOENIX'))
+if (!defined('IN_PORTAL'))
 {
 	die('Hacking attempt');
 }

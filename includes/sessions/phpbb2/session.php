@@ -2483,9 +2483,11 @@ class session
 				$language_filename = $this->lang_path . (($use_help) ? 'help_' : '') . $lang_file . '.' . $phpEx;
 			}
 
-			//fix for mxp
+			//fix for mxp phpbb2 backend
 			if ((@include $language_filename) === false)
 			{
+				global $module_root_path;				
+				
 				//
 				//this will fix the path for shared language files
 				//				
@@ -2513,7 +2515,11 @@ class session
 				elseif ((@include $mx_root_path . $language_filename) !== false)
 				{
 					//continue;
-				}				
+				}	
+				elseif ((@include $module_root_path  . $language_filename) !== false)
+				{
+					//continue;
+				}					
 				elseif ((@include str_replace("phpbb3", "phpbb2", $language_filename)) !== false)
 				{
 					//continue;

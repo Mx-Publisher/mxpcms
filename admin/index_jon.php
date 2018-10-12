@@ -828,10 +828,10 @@ switch ( 0 )
 		eval( $script );
 		$panel_html = ob_get_contents();
 		ob_end_clean();
-		break;
+	break;
 	case 1:
 		$panel_html = preg_replace( array( "#\n#esi", "#\t#si" ), array( "sprintf('%4d', \$i++) . '\n'", '&nbsp;&nbsp;&nbsp;' ), str_replace( "\n", "<br/>\n", htmlentities( $script ) ) );
-		break;
+	break;
 	case 2:
 		ob_start();
 		eval( $script );
@@ -839,18 +839,18 @@ switch ( 0 )
 		ob_end_clean();
 		print_r( $HTTP_POST_VARS );
 		$panel_html .= preg_replace( array( "#\n#esi", "#\t#si" ), array( "sprintf('%4d', \$i++) . '\n'", '&nbsp;&nbsp;&nbsp;' ), str_replace( "\n", "<br/>\n", htmlentities( $script ) ) );
-		break;
+	break;
 	case 3:
 		ob_start();
 		eval( $script );
 		$panel_html = ob_get_contents();
 		ob_end_clean();
 		$panel_html = preg_replace( array( "#\n#esi", "#\t#si" ), array( "sprintf('%4d', \$i++) . '\n'", '&nbsp;&nbsp;&nbsp;' ), str_replace( "\n", "<br/>\n", htmlentities( $panel_html ) ) );;
-		break;
+	break;
 	case 4:
 		eval( $script );
 }
-
+//var_dump($panel_html);
 $mx_acp->assign_content_acp( $panel_html );
 $mx_acp->display();
 ?>

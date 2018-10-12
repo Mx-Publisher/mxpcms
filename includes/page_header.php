@@ -1002,10 +1002,10 @@ $layouttemplate->assign_vars(array(
 	
 	'U_SEND_PASSWORD' 			=> ($mx_user->data['user_email']) ? mx_append_sid("{$phpbb_root_path}profile.$phpEx?mode=sendpassword") : '',
 	
-	'S_VIEWTOPIC' 					=> mx_append_sid("viewtopic.$phpEx?" . "f=" . $forum_id . "&amp;t=" . $topic_id), 
+	'S_VIEWTOPIC' 						=> mx_append_sid("viewtopic.$phpEx?" . "f=" . $forum_id . "&amp;t=" . $topic_id), 
 	'S_VIEWFORUM' 					=> mx_append_sid("viewforum.$phpEx?" . POST_FORUM_URL . "=$forum_id"),
-	'S_IN_MCP' 						=> defined('IN_MCP') ? true : false,
-	'S_IN_PROFILE' 					=> defined('IN_PROFILE') ? true : false,
+	'S_IN_MCP' 							=> defined('IN_MCP') ? true : false,
+	'S_IN_PROFILE' 						=> defined('IN_PROFILE') ? true : false,
 	'S_IN_UCP' 							=> defined('IN_UCP') ? true : false,	
 	
 	'U_CONTACT_US'				=> ($mx_user->data['user_last_privmsg']) ? mx_append_sid("{$phpbb_root_path}memberlist.$phpEx?mode=contactadmin") : '',

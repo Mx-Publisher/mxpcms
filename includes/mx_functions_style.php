@@ -182,7 +182,7 @@ class mx_Template extends Template
 		}
 		
 		//
-		// Look for new template files at MX-Publisher-Module folder.........................................................................MX-Publisher-module
+		// Look for template files at MX-Publisher-Module template folder.........................................................................MX-Publisher-module
 		//
 		if (!empty($module_root_path))
 		{		
@@ -197,12 +197,41 @@ class mx_Template extends Template
 			
 			$this->debug_paths .= '<br>Module';
 			$fileSearch = array();
-			$fileSearch[] = $style_path  . '/template'; // First check current template
-			$fileSearch[] = $mx_user->cloned_template_name . '/template'; // Then check Cloned template
-			$fileSearch[] = $moduleDefault . '/template'; // Finally check Default template
+			$fileSearch[] = $style_path  . ''; // First check current template
+			$fileSearch[] = $mx_user->cloned_template_name . ''; // Then check Cloned template
+			$fileSearch[] = $moduleDefault . ''; // Finally check Default template
 			$fileSearch[] = './'; // Compatibility with primitive modules
 
 			$temppath = $this->doFileSearch($fileSearch, $filename2, $filename, 'templates/', $module_root_path);
+			if (!empty($this->module_template_path))
+			{
+				return $temppath;
+			}
+		}		
+		
+		//
+		// Look for new template files at MX-Publisher-Module adm/style folder.........................................................................MX-Publisher-module
+		//
+		if (!empty($module_root_path) && (defined('IN_ADMIN')))	
+		{		
+			if (isset($mx_block->module_root_path))
+			{		
+				$moduleDefault = !empty($mx_user->loaded_default_styles[$mx_block->module_root_path]) ? $mx_user->loaded_default_styles[$mx_block->module_root_path] : $mx_user->default_template_name;
+			}
+			else
+			{		
+				$moduleDefault = !empty($mx_user->loaded_default_styles[$module_root_path]) ? $mx_user->loaded_default_styles[$module_root_path] : $mx_user->default_template_name;
+			}			
+			
+			$this->debug_paths .= '<br>Module';
+			$fileSearch = array();
+			$fileSearch[] = ''; // First check default adm template			
+			$fileSearch[] = $style_path  . ''; // First check current template
+			$fileSearch[] = $mx_user->cloned_template_name . ''; // Then check Cloned template
+			$fileSearch[] = $moduleDefault . ''; // Finally check Default template
+			$fileSearch[] = './'; // Compatibility with primitive modules
+
+			$temppath = $this->doFileSearch($fileSearch, $filename2, $filename, 'adm/style/', $module_root_path, true);
 			if (!empty($this->module_template_path))
 			{
 				return $temppath;
@@ -917,6 +946,7 @@ class mx_user extends mx_session
 	var $lang_english_name = 'English';		
 	var $lang_local_name = 'English United Kingdom';	
 	var $language_list = array();
+	var $debug_paths;	
 	
 	/**** /
 	var	$cloned_template_name = 'subSilver';
@@ -3128,19 +3158,99 @@ class mx_user extends mx_session
 			//
 			$this->common_language_files_loaded = true;
 		}
-	}	
+	}
+	
+	/**
+	 * Returns language files list from an specific directory path
+	 */	
+	function get_lang_files($root_path, $language, $add_path = '', $dir_select = '')
+	{ 
+		/* root path at witch we add ie. extension path */  
+		$php_ext = $this->php_ext;
 		
+		//$path = $root_path . "language";	
+		$path = $root_path . "language/lang_" . $language;		
+		
+		$subdir_select = '';
+		
+		$lang_files = array();
+		$subdirs = glob($path . '/*' , GLOB_ONLYDIR);		
+	
+		/* */
+		foreach($subdirs as $subdir_id => $subdir_from)
+		{		
+			$subdir = $subdirs[$subdir_id];
+			if ($subdir == '.' || $subdir == '..' || $subdir == 'CVS')
+			{
+				continue;
+			}
+			$subdir_select = basename($subdir);			
+		}	
+		/* */		
+		
+		if (!is_dir($path . '/'))
+		{
+			//$dir = 'Resource id #53'.'Resource id #54'.'Resource id #55'.'Resource id #56'.'Resource id #57'.'Resource id #58';
+			//return array_merge(array('common.php' => 'common.php', 'info_acp_translator.php' => 'info_acp_translator.php', 'lang_admin.php' => 'lang_admin.php'),  array ('lang_admin.php' => 'lang_admin.php', 'lang_main.php' => 'lang_main.php', 'lang_meta.php' => 'lang_meta.php'));		
+		}
+		else
+		{
+			$dir = opendir($path);
+		}
+						
+		while($file = @readdir($dir))
+		{
+			if ( $file == '.' || $file == '..' || $file == 'CVS')
+			{
+				continue;
+			}
+			
+			if (is_dir($path . '/' . $file))
+			{
+				$sub_files = $this->get_lang_files($path, $language, $add_path . '/'. $file);
+				$lang_files = array_merge($lang_files, $sub_files);
+			}
+			else if( is_file($path . '/' . $file))
+			{
+				$lang_files[str_replace(".$php_ext", '', $file)] = $path . (!empty($path) ? '/' : '') . $file;
+			}
+		}
+		@closedir($dir);
+		
+		if (is_dir($subdir_select . '/') && is_array($subdirs))
+		{
+			$subdir = opendir($subdir_select);
+		}
+		
+		while($file = @readdir($subdir))
+		{
+			if ($file == '.' || $file == '..' || $file == 'CVS')
+			{
+				continue;
+			}
+			if(is_file($subdir_select_from . '/' . $file))
+			{
+				$sub_files[str_replace(".$php_ext", '', $file)] = $subdir_select_from . (!empty($subdir_select_from) ? '/' : '') . $file;
+				$lang_files = array_merge($lang_files, $sub_files);
+			}
+		}
+		@closedir($subdir);
+		
+		return $lang_files;
+	}		
+	
 	/**
 	 * Enter description here...
 	 *
 	 * @access private
 	 * @param unknown_type $lang_mode
 	 */
-	function _load_module_lang($lang_mode = MX_LANG_MAIN)
+	function _load_module_lang($lang_mode = MX_LANG_MAIN, $force = false, $use_help = false)
 	{
-		global $lang, $board_config, $mx_block, $phpEx, $mx_root_path;		
+		global $lang, $board_config, $mx_block, $phpEx;		
 		
-		$default_lang = ($this->lang['default_lang']) ? $this->decode_lang($this->lang['default_lang']) : $board_config['default_lang'];
+		$default_lang = ($this->default_language_name) ? $this->decode_lang($this->default_language_name) : (!empty($board_config['default_lang']) ? $board_config['default_lang'] : 'english');
+		$language = ($this->user_language_name) ? $this->user_language_name : $default_lang;		
 		
 		if ($mx_block->module_root_path == 'modules/mx_coreblocks/')	
 		{
@@ -3160,46 +3270,89 @@ class mx_user extends mx_session
 			$default_lang = 'english';
 		}
 		
-		if (!isset($this->loaded_langs[$mx_block->module_root_path]))
-		{			
-			if ($lang_mode == MX_LANG_MAIN || $lang_mode == MX_LANG_ALL)
+		if (!isset($this->loaded_langs[$mx_block->module_root_path]) || $force)
+		{					
+			if (!empty($this->module_lang_path[$mx_block->module_root_path]))
 			{
-				if (!empty($this->module_lang_path[$mx_block->module_root_path]))
-				{
-					$module_lang_path = $this->module_lang_path[$mx_block->module_root_path];
-				}
-				else
-				{
-					$module_lang_path = $mx_root_path . $mx_block->module_root_path;
-				}
+				$module_lang_path = $this->module_lang_path[$mx_block->module_root_path];
+			}
+			else
+			{
+				$module_lang_path = $mx_block->module_root_path;
+			}					
+			
+			if ($lang_mode == MX_LANG_ALL)
+			{
+				$lang_files = $this->get_lang_files($module_lang_path, $language);
 				
+				// -------------------------------------------------------------------------
+				// Read Module Languages Definition
+				// -------------------------------------------------------------------------
+				foreach ($lang_files as $lang_set => $filename)
+				{
+					if (!empty($filename) && ($filename !== './') && strpos($filename, $phpEx))
+					{
+						$this->debug_paths .= '<br>' . $filename;				
+							
+						if ((@include_once $filename) === false)
+						{	
+							print_r('Warning: Could not load module language file: ' . $this->debug_paths);						
+							
+							if ((@include $module_lang_path . "language/lang_" . $language . "/$lang_set.$phpEx") === false)
+							{
+								mx_message_die(CRITICAL_ERROR, 'Module admin language file ' . $module_lang_path . "language/lang_" . $language . "/$lang_set.$phpEx" . ' couldn\'t be opened.');
+							}
+						}
+					}				
+				}
+			}			
+			
+			if (($lang_mode == MX_LANG_MAIN ) && ($lang_mode != MX_LANG_ALL))
+			{	
 				// -------------------------------------------------------------------------
 				// Read Module Main Language Definition
 				// -------------------------------------------------------------------------				
-				if ((include $module_lang_path . "language/lang_" . $default_lang . "/lang_main.$phpEx") === false)
+				if ((include $module_lang_path . "language/lang_" . $language . "/lang_main.$phpEx") === false)
 				{
-					if ((@include $module_lang_path . "language/lang_english/lang_main.$phpEx") === false)
+					if ((@include $module_lang_path . "language/$default_lang/lang_main.$phpEx") === false)
 					{
-							mx_message_die(CRITICAL_ERROR, 'Module main language file ' . $mx_root_path . $module_lang_path . "language/lang_" . $default_lang . "/lang_main.$phpEx" . ' couldn\'t be opened.');
+							mx_message_die(CRITICAL_ERROR, 'Module main language file ' . $this->mx_root_path . $module_lang_path . "language/lang_" . $language . "/lang_main.$phpEx" . ' couldn\'t be opened.');
 					}
 				}
 			}
-
-			if ($lang_mode == MX_LANG_ADMIN || $lang_mode == MX_LANG_ALL)
+			
+			if (($lang_mode == MX_LANG_ADMIN) && ($lang_mode != MX_LANG_ALL))
 			{
 				// -------------------------------------------------------------------------
 				// Read Module Admin Language Definition
 				// -------------------------------------------------------------------------
-				if ((@include $module_lang_path . "language/lang_" . $default_lang . "/lang_admin.$phpEx") === false)
+				if ((@include $module_lang_path . "language/lang_" . $language . "/lang_admin.$phpEx") === false)
 				{
-					if ((@include $module_lang_path . "language/lang_english/lang_admin.$phpEx") === false)
+					if ((@include $module_lang_path . "language/$default_lang/lang_admin.$phpEx") === false)
 					{
-						mx_message_die(CRITICAL_ERROR, 'Module admin language file ' . $mx_root_path . $module_lang_path . "language/lang_" . $default_lang . "/lang_admin.$phpEx" . ' couldn\'t be opened.');
+						mx_message_die(CRITICAL_ERROR, 'Module admin language file ' . $this->mx_root_path . $module_lang_path . "language/lang_" . $language . "/lang_admin.$phpEx" . ' couldn\'t be opened.');
 					}
 				}
-			}
+			}				
+			
+			if (($lang_mode != MX_LANG_MAIN ) && ($lang_mode != MX_LANG_ADMIN) && ($lang_mode != MX_LANG_ALL))
+			{
+				$lang_set = $lang_mode;
+				
+				// -------------------------------------------------------------------------
+				// Read Module Languages Definition
+				// -------------------------------------------------------------------------
+				$filename = $module_lang_path . "language/lang_" . $language . "/$lang_set.$phpEx";
+				
+				$this->debug_paths .= '<br>' . $filename;				
+							
+				if ((@include_once $filename) === false)
+				{	
+					print_r('Warning: Could not load module language file: ' . $this->debug_paths);						
+				}													
+			}			
 			$this->loaded_langs[$mx_block->module_root_path] = '1';
-		}
+		}	
 	}
 	
 	/**
@@ -3336,7 +3489,7 @@ class mx_user extends mx_session
 	 * Extend User Style with module lang and images.
 	 *
 	 * Usage:
-	 * - $mx_user->extend(LANG, IMAGES)
+	 * - $mx_user->extend(MX_LANG_ALL, MX_IMAGES)
 	 *
 	 * Switches:
 	 * - LANG: MX_LANG_MAIN (default), MX_LANG_ADMIN, MX_LANG_ALL
@@ -3346,14 +3499,12 @@ class mx_user extends mx_session
 	 * @param unknown_type $lang_mode
 	 * @param unknown_type $image_mode
 	 */
-	function extend($lang_mode = MX_LANG_MAIN, $image_mode = MX_IMAGES, $module_root_path = '')
+	function extend($lang_mode = MX_LANG_MAIN, $image_mode = MX_IMAGES, $module_root_path = '', $force = false)
 	{
-		global $mx_root_path, $mx_block;
-		
+		global $mx_root_path, $mx_block;	
 		
 		if (defined('IN_ADMIN') && !empty($module_root_path) && (empty($mx_block->module_root_path) || ($mx_block->module_root_path == 'modules/mx_coreblocks/')))
-		{			
-			
+		{						
 			$mx_block->module_root_path = $module_root_path;
 		}			
 		
@@ -3366,7 +3517,7 @@ class mx_user extends mx_session
 		
 		if ($lang_mode != MX_LANG_NONE)
 		{									
-			$this->_load_module_lang($lang_mode);
+			$this->_load_module_lang($lang_mode, $force);
 		}
 
 		if ($image_mode != MX_IMAGES_NONE)
@@ -5672,6 +5823,7 @@ class mx_language extends mx_language_file_loader
 
 		return $this->lang_array($key, $args);
 	}
+	
 	/**
 	 * BC function for loading language files
 	 *

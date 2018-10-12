@@ -114,21 +114,63 @@ if( !is_object($mx_backend))
 
 $mx_backend->page_tail('generate_backend_version');
 
-$template->assign_vars(array(
-	'U_PORTAL_ROOT_PATH' 		=> PORTAL_URL,
-	'U_PHPBB_ROOT_PATH' 		=> PHPBB_URL,
-	'TEMPLATE_ROOT_PATH' 		=> TEMPLATE_ROOT_PATH,
+$template->assign_vars(array(	
+	'L_AJAX_ERROR_TITLE' 								=> $lang['AJAX_ERROR_TITLE'],
+	'L_AJAX_ERROR_TEXT_ABORT' 					=> $lang['AJAX_ERROR_TEXT_ABORT'],
+	'L_AJAX_ERROR_TEXT_TIMEOUT' 				=> $lang['AJAX_ERROR_TEXT_TIMEOUT'],
+	'L_AJAX_ERROR_TEXT_PARSERERROR' 		=> $lang['AJAX_ERROR_TEXT_PARSERERROR'],
+	'L_TIMEOUT_PROCESSING_REQ' 					=> $lang['TIMEOUT_PROCESSING_REQ'],	
+	
+	'ROOT_PATH'			=> $web_path,
+	'FULL_SITE_PATH'		=> $web_path,	
+	
+	'U_PORTAL_ROOT_PATH' 	=> PORTAL_URL,
+	'U_PHPBB_ROOT_PATH' 	=> PHPBB_URL,
+	'TEMPLATE_ROOT_PATH' 	=> TEMPLATE_ROOT_PATH,
+	'CMS_PAGE_HOME'				=> PORTAL_URL,
+	'BOARD_URL'						=> PORTAL_URL,
+	'PHPBB_VERSION'				=> PHPBB_VERSION,
+	'PHPBB_MAJOR'					=> $phpbb_major,
+	'S_COOKIE_NOTICE'			=> !empty($board_config['cookie_name']),
+	
+	'T_ASSETS_VERSION'				=> $phpbb_major,
+	'T_ASSETS_PATH'					=> "{$web_path}assets",	
+	'T_THEME_PATH'					=> "{$web_path}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme',
+	'T_TEMPLATE_PATH'				=> "{$web_path}templates/" . rawurlencode($theme['template_name']) . '',
+	'T_SUPER_TEMPLATE_PATH'	=> "{$web_path}templates/" . rawurlencode($theme['template_name']) . '/template',
+		
+	'T_IMAGES_PATH'					=> "{$web_path}images/",
+	'T_SMILIES_PATH'					=> "{$web_path}{$board_config['smilies_path']}/",
+	'T_AVATAR_GALLERY_PATH'	=> "{$web_path}{$board_config['avatar_gallery_path']}/",
+	
+	'T_ICONS_PATH'					=> !empty($board_config['icons_path']) ? "{$web_path}{$board_config['icons_path']}/" : $web_path.'/images/icons/',
+	'T_RANKS_PATH'				=> !empty($board_config['ranks_path']) ? "{$web_path}{$board_config['ranks_path']}/" : $web_path.'/images/ranks/',
+	'T_UPLOAD_PATH'				=> !empty($board_config['upload_path']) ? "{$web_path}{$board_config['upload_path']}/" : $web_path.'/cache/',	
+	
+	'T_STYLESHEET_LINK'				=> "{$web_path}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme/stylesheet.css',
+	'T_STYLESHEET_LANG_LINK'	=> "{$web_path}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme/images/lang_' . $default_lang . '/stylesheet.css',
+	'T_FONT_AWESOME_LINK'		=> "{$web_path}assets/css/font-awesome.min.css",
+		
+	'T_JQUERY_LINK'			=> !empty($board_config['allow_cdn']) && !empty($board_config['load_jquery_url']) ? $board_config['load_jquery_url'] : "{$web_path}assets/javascript/jquery.min.js?assets_version=" . $phpbb_major,
+	'S_ALLOW_CDN'				=> !empty($board_config['allow_cdn']),		
+	
+
+	'T_THEME_NAME'					=> rawurlencode($theme['template_name']),
+	'T_THEME_LANG_NAME'			=> $mx_user->data['user_lang'],
+	'T_TEMPLATE_NAME'				=> $theme['template_name'],
+	'T_SUPER_TEMPLATE_NAME'	=> rawurlencode($theme['template_name']),	
+	
 	'MXBB_EXTRA' 				=> $mxbb_footer_text,
-	'MXBB_EXTRA_URL' 			=> $mxbb_footer_text_url,
+	'MXBB_EXTRA_URL' 		=> $mxbb_footer_text_url,
 	'SITENAME'					=> $board_config['sitename'],
 	'POWERED_BY' 				=> $lang['Powered_by'],
 	'MX_VERSION' 				=> ($userdata['user_level'] == ADMIN && $userdata['user_id'] != ANONYMOUS) ? PORTAL_VERSION : '',
 	'ADMIN_LINK' 				=> ($userdata['user_level'] == ADMIN && $userdata['user_id'] != ANONYMOUS) ? '<a href="' . $u_acp . '?sid=' . $userdata['session_id'] . '">' . $l_acp . '</a><br />' : '',
-	'L_ACP' 					=> ($userdata['user_level'] == ADMIN && $userdata['user_id'] != ANONYMOUS) ? $l_acp : '',
-	'U_ACP' 					=> ($userdata['user_level'] == ADMIN && $userdata['user_id'] != ANONYMOUS) ? $u_acp : '',
+	'L_ACP' 						=> ($userdata['user_level'] == ADMIN && $userdata['user_id'] != ANONYMOUS) ? $l_acp : '',
+	'U_ACP' 						=> ($userdata['user_level'] == ADMIN && $userdata['user_id'] != ANONYMOUS) ? $u_acp : '',
 	'U_CONTACT_US'			=> ($mx_user->data['user_last_privmsg']) ? mx_append_sid("{$phpbb_root_path}memberlist.$phpEx?mode=contactadmin") : '',
 	
-	'U_TEAM'				=> ($mx_user->data['user_id'] != ANONYMOUS && (PORTAL_BACKEND !== 'internal') && $phpbb_auth->acl_get('u_viewprofile')) ?  mx_append_sid("{$phpbb_root_path}memberlist.$phpEx?mode=team") : '',
+	'U_TEAM'					=> ($mx_user->data['user_id'] != ANONYMOUS && (PORTAL_BACKEND !== 'internal') && $phpbb_auth->acl_get('u_viewprofile')) ?  mx_append_sid("{$phpbb_root_path}memberlist.$phpEx?mode=team") : '',
 	'U_TERMS_USE'			=> mx_append_sid("{$phpbb_root_path}profile.$phpEx?mode=terms"),
 	'U_PRIVACY'				=> mx_append_sid("{$phpbb_root_path}profile.$phpEx?mode=privacy"),
 		

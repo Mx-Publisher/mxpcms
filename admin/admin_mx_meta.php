@@ -24,17 +24,18 @@ $phpEx = substr(strrchr(__FILE__, '.'), 1);
 $no_page_header = TRUE;
 require('./pagestart.' . $phpEx);
 
-//
-// Load language file.
-//
-if( @file_exists($mx_root_path . 'language/lang_' . $board_config['default_lang'] . '/lang_meta.' . $phpEx) )
+/* START Include language file */
+$language = ($mx_user->user_language_name) ? $mx_user->user_language_name : (($board_config['default_lang']) ? $board_config['default_lang'] : 'english');
+
+if ((@include $mx_root_path . "language/lang_" . $language . "/lang_meta.$phpEx") === false)
 {
-	include($mx_root_path . 'language/lang_' . $board_config['default_lang'] . '/lang_meta.' . $phpEx);
-}
-else
-{
-	include($mx_root_path . 'language/lang_english/lang_meta.' . $phpEx);
-}
+	if ((@include $mx_root_path . "language/lang_english/lang_meta.$phpEx") === false)
+	{
+		mx_message_die(CRITICAL_ERROR, 'Language file ' . $mx_root_path . "language/lang_" . $language . "/lang_meta.$phpEx" . ' couldn\'t be opened.');
+	}
+	$language = 'english'; 
+} 
+/* ENDS Include language file */
 
 //
 // Main procedure

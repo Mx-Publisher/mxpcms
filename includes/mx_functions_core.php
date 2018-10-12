@@ -5422,6 +5422,50 @@ class mx_request_vars
 		}
 
 		return $var;
+	}
+
+	/**
+	* Check GET POST vars exists
+	*/
+	function check_http_var_exists($var_name, $empty_var = false)
+	{
+		if ($empty_var)
+		{
+			if (isset($_GET[$var_name]) || isset($_POST[$var_name]))
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			if (!empty($_GET[$var_name]) || !empty($_POST[$var_name]))
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		return false;
+	}
+
+	/**
+	* Check variable value against default array
+	*/
+	function check_var_value($var, $var_array, $var_default = false)
+	{
+		if (!is_array($var_array) || empty($var_array))
+		{
+			return $var;
+		}
+		$var_default = (($var_default === false) ? $var_array[0] : $var_default);
+		$var = in_array($var, $var_array) ? $var : $var_default;
+		return $var;
 	}	
 
 }	// class mx_request_vars

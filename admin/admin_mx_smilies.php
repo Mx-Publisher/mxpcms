@@ -29,7 +29,6 @@
 @define('IN_PORTAL', 1);
 $mx_root_path = './../';
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
-include_once($mx_root_path . 'common.' . $phpEx);
 
 // First we do the setmodules stuff for the admin cp.
 if( !empty($setmodules) )
@@ -40,9 +39,11 @@ if( !empty($setmodules) )
 	return;
 }
 $no_page_header = false;
+
 /*
 * Load default header
 */
+include_once('./pagestart.' . $phpEx);
 if ($mx_request_vars->is_get('export_pack'))
 {
 	if ($mx_request_vars->get('export_pack', MX_TYPE_NO_TAGS) == "send" )
@@ -52,8 +53,6 @@ if ($mx_request_vars->is_get('export_pack'))
 }
 
 $cancel = $mx_request_vars->is_post('cancel');
-
-require('./pagestart.' . $phpEx);
 
 // Load default header
 if ($no_page_header !== true)

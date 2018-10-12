@@ -242,6 +242,64 @@ class dbal_mysql extends dbal
 
 		return ($query_id) ? @mysql_num_rows($query_id) : false;
 	}
+	
+	/**
+	* Return fields num
+	* Not used within core code
+	*/		
+	function sql_numfields($query_id = 0)
+	{
+		if(!$query_id)
+		{
+			$query_id = $this->query_result;
+		}
+		if($query_id)
+		{
+			$result = @mysql_num_fields($query_id);
+			return $result;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	/**
+	* Return fields name(s)
+	* Not used within core code
+	*/		
+	function sql_fieldname($offset, $query_id = 0)
+	{
+		if(!$query_id)
+		{
+			$query_id = $this->query_result;
+		}
+		if($query_id)
+		{
+			$result = mysql_field_name($query_id, $offset);
+			return $result;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	function sql_fieldtype($offset, $query_id = 0)
+	{
+		if(!$query_id)
+		{
+			$query_id = $this->query_result;
+		}
+		if($query_id)
+		{
+			$result = @mysql_field_type($query_id, $offset);
+			return $result;
+		}
+		else
+		{
+			return false;
+		}
+	}
 
 	/**
 	* Return number of affected rows
@@ -371,6 +429,26 @@ class dbal_mysql extends dbal
 	}
 
 	/**
+	* return sql error array
+	* @private
+	*/
+	function _sql_error()
+	{
+		if (!$this->db_connect_id)
+		{
+			return array(
+				'message'	=> @mysql_error(),
+				'code'		=> @mysql_errno()
+			);
+		}
+
+		return array(
+			'message'	=> @mysql_error($this->db_connect_id),
+			'code'		=> @mysql_errno($this->db_connect_id)
+		);
+	}
+
+	/**
 	* Build LIKE expression
 	* @access private
 	*/
@@ -395,25 +473,6 @@ class dbal_mysql extends dbal
 		return $data;
 	}
 
-	/**
-	* return sql error array
-	* @private
-	*/
-	function _sql_error()
-	{
-		if (!$this->db_connect_id)
-		{
-			return array(
-				'message'	=> @mysql_error(),
-				'code'		=> @mysql_errno()
-			);
-		}
-
-		return array(
-			'message'	=> @mysql_error($this->db_connect_id),
-			'code'		=> @mysql_errno($this->db_connect_id)
-		);
-	}
 
 	/**
 	* Close sql connection
@@ -485,6 +544,39 @@ class dbal_mysql extends dbal
 		}
 	}
 
+	/**
+	* Cache clear function
+	*/
+	function clear_cache($cache_prefix = '', $cache_folder = SQL_CACHE_FOLDER, $files_per_step = 0)
+	{
+		global $phpEx;
+		
+		$cache_folder = (empty($cache_folder) ? SQL_CACHE_FOLDER : $cache_folder);
+
+		$cache_prefix = 'sql_' . $cache_prefix;
+		$cache_folder = (!empty($cache_folder) && @is_dir($cache_folder)) ? $cache_folder : SQL_CACHE_FOLDER;
+		$cache_folder = ((@is_dir($cache_folder)) ? $cache_folder : @phpbb_realpath($cache_folder));
+
+		$res = opendir($cache_folder);
+		if($res)
+		{
+			$files_counter = 0;
+			while(($file = readdir($res)) !== false)
+			{
+				if(!@is_dir($file) && (substr($file, 0, strlen($cache_prefix)) === $cache_prefix) && (substr($file, -(strlen($phpEx) + 1)) === '.' . $phpEx))
+				{
+					@unlink($cache_folder . $file);
+					$files_counter++;
+				}
+				if (($files_per_step > 0) && ($files_counter >= $files_per_step))
+				{
+					closedir($res);
+					return $files_per_step;
+				}
+			}
+		}
+		@closedir($res);
+	}	
 }
 
 } // if ... define

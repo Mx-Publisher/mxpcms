@@ -1,8 +1,8 @@
 <?php
 /**
  *
- * Lnaguage Tools Extension for the phpBB Forum Software package
- *
+ * Language Tools Extension for the phpBB Forum Software package
+* @version $Id$
 * @copyright (c) orynider <http://mxpcms.sourceforge.net>
 * @license GNU General Public License, version 2 (GPL-2.0)
  *
@@ -17,6 +17,8 @@ $admin_module_root_path = $module_root_path . 'admin/';
 //$mx_root_path = (defined('PHPBB_USE_BOARD_URL_PATH') && PHPBB_USE_BOARD_URL_PATH) ? generate_board_url() . '/' : $phpbb_root_path;
 //$module_root_path = $phpbb_root_path . 'ext/orynider/mx_translator/';
 //$admin_module_root_path = $module_root_path . 'acp/';
+
+@define('IN_PORTAL', 1);
 
 /* */
 if ( !empty( $setmodules))
@@ -33,8 +35,7 @@ if ( !empty( $setmodules))
 /**
 * mx_langtools ACP module
  */
-define('IN_PORTAL', 1);
-define('IN_ADMIN', 1); 
+@define('IN_ADMIN', 1); 
 $phpEx = substr( __FILE__, strrpos( __FILE__, '.') + 1);
 if (!defined('PHP_EXT')) define('PHP_EXT', $phpEx);
 $lang = array();
@@ -55,6 +56,7 @@ define('IN_AJAX', (isset($_GET['ajax']) && ($_GET['ajax'] == 1) && ($_SERVER['HT
 
 /* START Include language file */
 $language = ($mx_user->user_language_name) ? $mx_user->user_language_name : (($board_config['default_lang']) ? $board_config['default_lang'] : 'english');
+
 if ((@include $module_root_path . "language/lang_" . $language . "/info_acp_translator.$phpEx") === false)
 {
 	if ((@include $module_root_path . "language/lang_english/info_acp_translator.$phpEx") === false)

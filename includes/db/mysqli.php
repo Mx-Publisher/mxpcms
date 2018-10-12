@@ -89,7 +89,27 @@ class dbal_mysqli extends dbal
 	*/
 	function sql_server_info()
 	{
-		return 'MySQL(i) ' . @mysqli_get_server_info($this->db_connect_id);
+		global $mx_cache;
+
+		if (!$use_cache || empty($mx_cache) || ($this->sql_server_version = $mx_cache->get('mysqli_version')) === false)
+		{
+			$result = @mysqli_query($this->db_connect_id, 'SELECT VERSION() AS version');
+			if ($result)
+			{
+				$row = mysqli_fetch_assoc($result);
+				mysqli_free_result($result);
+
+				$this->sql_server_version = $row['version'];
+
+				if (!empty($mx_cache) && $use_cache)
+				{
+					$mx_cache->put('mysqli_version', $this->sql_server_version);
+				}
+			}
+		}
+
+		return ($raw) ? $this->sql_server_version : 'MySQL(i) ' . $this->sql_server_version;
+		//return 'MySQL(i) ' . @mysqli_get_server_info($this->db_connect_id);
 	}
 
 	/**
@@ -217,6 +237,70 @@ class dbal_mysqli extends dbal
 
 		return ($query_id) ? @mysqli_num_rows($query_id) : false;
 	}
+	
+	/**
+	* Return fields num
+	* Not used within core code
+	*/		
+	function sql_numfields($query_id = 0)
+	{
+		if(!$query_id)
+		{
+			$query_id = $this->query_result;
+		}
+		if($query_id)
+		{
+			$result = mysqli_num_fields($query_id);
+			return $result;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	/**
+	* Return fields names by orynider
+	* Not used within core code
+	*/	
+	function sql_fieldname($offset, $query_id = 0)
+	{
+		if(!$query_id)
+		{
+			$query_id = $this->query_result;
+		}
+		if($query_id)
+		{		
+			$fields_cnt = mysqli_num_fields($query_id);
+			// Get field information ($query_id, $offset);
+			$field = mysqli_fetch_fields($query_id);
+			$field_set = array();
+
+			$result = $field[$offset]->name;
+			return $result;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	function sql_fieldtype($offset, $query_id = 0)
+	{
+		if(!$query_id)
+		{
+			$query_id = $this->query_result;
+		}
+		if($query_id)
+		{
+			$result = mysqli_field_type($query_id, $offset);
+			return $result;
+		}
+		else
+		{
+			return false;
+		}
+	}
 
 	/**
 	* Return number of affected rows
@@ -323,6 +407,83 @@ class dbal_mysqli extends dbal
 
 		return @mysqli_free_result($query_id);
 	}
+	/**
+	* Escape string used in sql query
+	*/
+	function sql_escape($msg)
+	{
+		return @mysqli_real_escape_string($this->db_connect_id, $msg);
+	}
+
+	/**
+	* Gets the estimated number of rows in a specified table.
+	*
+	* @param string $table_name		Table name
+	*
+	* @return string				Number of rows in $table_name.
+	*								Prefixed with ~ if estimated (otherwise exact).
+	*
+	* @access public
+	*/
+	function get_estimated_row_count($table_name)
+	{
+		$table_status = $this->get_table_status($table_name);
+
+		if (isset($table_status['Engine']))
+		{
+			if ($table_status['Engine'] === 'MyISAM')
+			{
+				return $table_status['Rows'];
+			}
+			else if ($table_status['Engine'] === 'InnoDB' && $table_status['Rows'] > 100000)
+			{
+				return '~' . $table_status['Rows'];
+			}
+		}
+
+		return parent::get_row_count($table_name);
+	}
+
+	/**
+	* Gets the exact number of rows in a specified table.
+	*
+	* @param string $table_name		Table name
+	*
+	* @return string				Exact number of rows in $table_name.
+	*
+	* @access public
+	*/
+	function get_row_count($table_name)
+	{
+		$table_status = $this->get_table_status($table_name);
+
+		if (isset($table_status['Engine']) && $table_status['Engine'] === 'MyISAM')
+		{
+			return $table_status['Rows'];
+		}
+
+		return parent::get_row_count($table_name);
+	}
+
+	/**
+	* Gets some information about the specified table.
+	*
+	* @param string $table_name		Table name
+	*
+	* @return array
+	*
+	* @access protected
+	*/
+	function get_table_status($table_name)
+	{
+		$sql = "SHOW TABLE STATUS
+			LIKE '" . $this->sql_escape($table_name) . "'";
+		$result = $this->sql_query($sql);
+		$table_status = $this->sql_fetchrow($result);
+		$this->sql_freeresult($result);
+
+		return $table_status;
+	}
 
 	/**
 	* Build LIKE expression
@@ -349,29 +510,41 @@ class dbal_mysqli extends dbal
 		return $data;
 	}
 
-	/**
-	* Escape string used in sql query
-	*/
-	function sql_escape($msg)
-	{
-		return @mysqli_real_escape_string($this->db_connect_id, $msg);
-	}
 
 	/**
 	* return sql error array
-	* @private
+	* @access private
 	*/
 	function _sql_error()
 	{
-		return array(
-			'message'	=> @mysqli_error($this->db_connect_id),
-			'code'		=> @mysqli_errno($this->db_connect_id)
-		);
+		if ($this->db_connect_id)
+		{
+			$error = array(
+				'message'	=> @mysqli_error($this->db_connect_id),
+				'code'		=> @mysqli_errno($this->db_connect_id)
+			);
+		}
+		else if (function_exists('mysqli_connect_error'))
+		{
+			$error = array(
+				'message'	=> @mysqli_connect_error(),
+				'code'		=> @mysqli_connect_errno(),
+			);
+		}
+		else
+		{
+			$error = array(
+				'message'	=> $this->connect_error,
+				'code'		=> '',
+			);
+		}
+
+		return $error;
 	}
 
 	/**
 	* Close sql connection
-	* @private
+	* @access private
 	*/
 	function _sql_close()
 	{
@@ -380,10 +553,26 @@ class dbal_mysqli extends dbal
 
 	/**
 	* Build db-specific report
-	* @private
+	* @access private
 	*/
 	function _sql_report($mode, $query = '')
 	{
+		static $test_prof;
+
+		// current detection method, might just switch to see the existence of INFORMATION_SCHEMA.PROFILING
+		if ($test_prof === null)
+		{
+			$test_prof = false;
+			if (strpos(mysqli_get_server_info($this->db_connect_id), 'community') !== false)
+			{
+				$ver = mysqli_get_server_version($this->db_connect_id);
+				if ($ver >= 50037 && $ver < 50100)
+				{
+					$test_prof = true;
+				}
+			}
+		}
+
 		switch ($mode)
 		{
 			case 'start':
@@ -402,18 +591,62 @@ class dbal_mysqli extends dbal
 				{
 					$html_table = false;
 
+					// begin profiling
+					if ($test_prof)
+					{
+						@mysqli_query($this->db_connect_id, 'SET profiling = 1;');
+					}
+
 					if ($result = @mysqli_query($this->db_connect_id, "EXPLAIN $explain_query"))
 					{
 						while ($row = @mysqli_fetch_assoc($result))
 						{
 							$html_table = $this->sql_report('add_select_row', $query, $html_table, $row);
 						}
+						//mysqli_free_result($result);
 					}
 					@mysqli_free_result($result);
 
 					if ($html_table)
 					{
 						$this->html_hold .= '</table>';
+					}
+
+					if ($test_prof)
+					{
+						$html_table = false;
+
+						// get the last profile
+						if ($result = @mysqli_query($this->db_connect_id, 'SHOW PROFILE ALL;'))
+						{
+							$this->html_hold .= '<br />';
+							while ($row = mysqli_fetch_assoc($result))
+							{
+								// make <unknown> HTML safe
+								if (!empty($row['Source_function']))
+								{
+									$row['Source_function'] = str_replace(array('<', '>'), array('&lt;', '&gt;'), $row['Source_function']);
+								}
+
+								// remove unsupported features
+								foreach ($row as $key => $val)
+								{
+									if ($val === null)
+									{
+										unset($row[$key]);
+									}
+								}
+								$html_table = $this->sql_report('add_select_row', $query, $html_table, $row);
+							}
+							mysqli_free_result($result);
+						}
+
+						if ($html_table)
+						{
+							$this->html_hold .= '</table>';
+						}
+
+						@mysqli_query($this->db_connect_id, 'SET profiling = 0;');
 					}
 				}
 
@@ -424,11 +657,15 @@ class dbal_mysqli extends dbal
 				$endtime = $endtime[0] + $endtime[1];
 
 				$result = @mysqli_query($this->db_connect_id, $query);
-				while ($void = @mysqli_fetch_assoc($result))
+				if ($result)
 				{
-					// Take the time spent on parsing rows into account
+					while ($void = mysqli_fetch_assoc($result))
+					{
+						// Take the time spent on parsing rows into account
+					}
+					mysqli_free_result($result);
 				}
-				@mysqli_free_result($result);
+				//@mysqli_free_result($result);
 
 				$splittime = explode(' ', microtime());
 				$splittime = $splittime[0] + $splittime[1];
@@ -438,6 +675,40 @@ class dbal_mysqli extends dbal
 			break;
 		}
 	}
+	
+	/**
+	* Cache clear function
+	*/
+	function clear_cache($cache_prefix = '', $cache_folder = SQL_CACHE_FOLDER, $files_per_step = 0)
+	{
+		global $phpEx;
+		
+		$cache_folder = (empty($cache_folder) ? SQL_CACHE_FOLDER : $cache_folder);
+
+		$cache_prefix = 'sql_' . $cache_prefix;
+		$cache_folder = (!empty($cache_folder) && @is_dir($cache_folder)) ? $cache_folder : SQL_CACHE_FOLDER;
+		$cache_folder = ((@is_dir($cache_folder)) ? $cache_folder : @phpbb_realpath($cache_folder));
+
+		$res = opendir($cache_folder);
+		if($res)
+		{
+			$files_counter = 0;
+			while(($file = readdir($res)) !== false)
+			{
+				if(!@is_dir($file) && (substr($file, 0, strlen($cache_prefix)) === $cache_prefix) && (substr($file, -(strlen($phpEx) + 1)) === '.' . $phpEx))
+				{
+					@unlink($cache_folder . $file);
+					$files_counter++;
+				}
+				if (($files_per_step > 0) && ($files_counter >= $files_per_step))
+				{
+					closedir($res);
+					return $files_per_step;
+				}
+			}
+		}
+		@closedir($res);
+	}	
 }
 
 } // if ... define

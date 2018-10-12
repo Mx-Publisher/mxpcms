@@ -110,7 +110,7 @@ else
 			'<p>'.$main_desc.'</p>' .
 			'<form action="' . mx_append_sid(PORTAL_URL . "admin/admin_mx_chkobjs.$phpEx") . '" method="post"> ' .
 			$select_options .
-			' <input type="submit" name="submit" value="' . $lang[Submit].'" class="mainoption" /></form>',
+			' <input type="submit" name="submit" value="' . $lang['Submit'].'" class="mainoption" /></form>',
 			$main_title );
 	}
 
