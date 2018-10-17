@@ -29,29 +29,24 @@ if ( !empty( $setmodules ) )
 $mx_root_path = './../../../';
 $module_root_path = "./../";
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
+
+// **********************************************************************
+// Includes
+// **********************************************************************
 require( $mx_root_path . '/admin/pagestart.' . $phpEx );
 
 include_once( $mx_root_path . 'admin/page_header_admin.' . $phpEx );
 
-mx_cache::load_file('bbcode', 'phpbb2');
-mx_cache::load_file('functions_post', 'phpbb2');
-mx_cache::load_file('functions_selects', 'phpbb2');
-mx_cache::load_file('functions_validate', 'phpbb2');
+// Read language definition
+include($module_root_path . 'includes/users_constants.' . $phpEx);
+
+$mx_cache->load_file('bbcode', 'phpbb2');
+$mx_cache->load_file('functions_post', 'phpbb2');
+$mx_cache->load_file('functions_selects', 'phpbb2');
+$mx_cache->load_file('functions_validate', 'phpbb2');
 
 $html_entities_match = array('#<#', '#>#');
 $html_entities_replace = array('&lt;', '&gt;');
-
-// **********************************************************************
-// Read language definition
-// **********************************************************************
-if ( !file_exists( $module_root_path . 'language/lang_' . $board_config['default_lang'] . '/lang_admin.' . $phpEx ) )
-{
-	include( $module_root_path . 'language/lang_english/lang_admin.' . $phpEx );
-}
-else
-{
-	include( $module_root_path . 'language/lang_' . $board_config['default_lang'] . '/lang_admin.' . $phpEx );
-}
 
 //
 // Set mode
@@ -91,6 +86,8 @@ if ( $mode == 'edit' || $mode == 'add' || $mode == 'save' && $mx_request_vars->i
 			switch (PORTAL_BACKEND)
 			{
 				case 'internal':
+				case 'smf2':
+				case 'mybb':
 				case 'phpbb2':
 					$sql = "SELECT g.group_id
 						FROM " . USER_GROUP_TABLE . " ug, " . GROUPS_TABLE . " g
@@ -98,7 +95,11 @@ if ( $mode == 'edit' || $mode == 'add' || $mode == 'save' && $mx_request_vars->i
 							AND g.group_id = ug.group_id
 							AND g.group_single_user = 1";
 				break;
+				
 				case 'phpbb3':
+				case 'olympus':
+				case 'ascraeus':
+				case 'rhea':
 				default:
 					$sql = "SELECT g.group_id
 						FROM " . USER_GROUP_TABLE . " ug, " . GROUPS_TABLE . " g
@@ -268,12 +269,16 @@ if ( $mode == 'edit' || $mode == 'add' || $mode == 'save' && $mx_request_vars->i
 			mx_message_die(GENERAL_MESSAGE, $message);
 		}
 
-		$username = phpBB2::phpbb_clean_username($mx_request_vars->post('username', MX_TYPE_NO_TAGS));
+		$username = mx_clean_username($mx_request_vars->post('username', MX_TYPE_NO_TAGS));
 		$email = $mx_request_vars->post('email', MX_TYPE_NO_TAGS);
 
 		$password = $mx_request_vars->post('password', MX_TYPE_NO_TAGS);
 		$password_confirm = $mx_request_vars->post('password_confirm', MX_TYPE_NO_TAGS);
-
+		
+		// in phpBB2 passwords are used exactly as they were sent, with addslashes applied
+		$password_old_format = addslashes($password);
+		$password_new_format = $mx_request_vars->variable('password', '', true);
+		
 		$user_status = $mx_request_vars->post('user_status', MX_TYPE_INT, 0);
 		$user_admin = $mx_request_vars->post('user_admin', MX_TYPE_INT, 0);
 
@@ -359,12 +364,12 @@ if ( $mode == 'edit' || $mode == 'add' || $mode == 'save' && $mx_request_vars->i
 					FROM " . USERS_TABLE;
 				if ( !($result = $db->sql_query($sql)) )
 				{
-					message_die(GENERAL_ERROR, 'Could not obtain next user_id information', '', __LINE__, __FILE__, $sql);
+					mx_message_die(GENERAL_ERROR, 'Could not obtain next user_id information', '', __LINE__, __FILE__, $sql);
 				}
 
 				if ( !($row = $db->sql_fetchrow($result)) )
 				{
-					message_die(GENERAL_ERROR, 'Could not obtain next user_id information', '', __LINE__, __FILE__, $sql);
+					mx_message_die(GENERAL_ERROR, 'Could not obtain next user_id information', '', __LINE__, __FILE__, $sql);
 				}
 				$user_id = $row['total'] + 1;
 
@@ -374,9 +379,88 @@ if ( $mode == 'edit' || $mode == 'add' || $mode == 'save' && $mx_request_vars->i
 			}
 			else
 			{
-				$sql = "UPDATE " . USERS_TABLE . "
-					SET " . $username_sql . $passwd_sql . "user_email = $email_sql, user_active = $user_status, user_level = $user_admin" . "
-					WHERE user_id = $user_id";
+				
+				switch (PORTAL_BACKEND)
+				{
+					case 'internal':
+					case 'smf2':
+					case 'mybb':
+					case 'phpbb2':
+							@define('DELETED', -1);
+							@define('ANONYMOUS', -1);
+
+							@define('USER', 0);
+							@define('ADMIN', 1);
+							@define('MOD', 2);
+
+							// User related
+							@define('USER_ACTIVATION_NONE', 0);
+							@define('USER_ACTIVATION_SELF', 1);
+							@define('USER_ACTIVATION_ADMIN', 2);
+						
+						/* * /
+						$sql = "UPDATE " . USERS_TABLE . "
+							SET " . $username_sql . $passwd_sql . "user_email = $email_sql, user_active = $user_status, user_level = $user_admin" . "
+							WHERE user_id = $user_id";
+						/* */
+						
+						$sql_ary = array(
+							'username' => str_replace("\\'", "''", $username),
+							'user_password'		=> $password,
+							//'user_password'		=> $user_row['user_newpasswd'],
+							'user_newpasswd'	=> '',
+							'user_email' => $email_sql,
+							'user_active' => $user_status,
+							'user_level' => ($user_admin == 1) ? ADMIN : USER,
+							'user_login_tries' => 0,
+						);
+						
+					break;
+					
+					case 'phpbb3':
+					case 'olympus':
+					case 'ascraeus':
+					case 'rhea':
+						
+						@define('USER_ACTIVATION_NONE', 0);
+						@define('USER_ACTIVATION_SELF', 1);
+						@define('USER_ACTIVATION_ADMIN', 2);
+						@define('USER_ACTIVATION_DISABLE', 3);
+
+						@define('USER_NORMAL', 0);
+						@define('USER_INACTIVE', 1);
+						@define('USER_IGNORE', 2);
+						@define('USER_FOUNDER', 3);
+
+						@define('INACTIVE_REGISTER', 1);
+						@define('INACTIVE_PROFILE', 2);
+						@define('INACTIVE_MANUAL', 3);
+						@define('INACTIVE_REMIND', 4);
+						
+						$user_type = ($user_admin == 1) ? USER_FOUNDER : ( ($user_status = 1) ? USER_NORMAL : USER_INACTIVE);
+						
+						$sql_ary = array(
+							'username' => str_replace("\\'", "''", $username),
+							//'user_password'		=> $password,
+							'user_password'		=> $db->sql_escape(phpBB3::phpbb_hash($password)),
+							'user_newpasswd'	=> '',
+							'user_type' => $user_type,
+							'user_email' => $email_sql,
+							'user_login_attempts'	=> 0,
+						);
+					break;
+				}
+
+				$sql = 'UPDATE ' . USERS_TABLE . '
+					SET ' . $db->sql_build_array('UPDATE', $sql_ary) . '
+					WHERE user_id = ' . $user_id;
+				$db->sql_query($sql);
+				/* * /
+				$phpbb_log->add('user', $user->data['user_id'], $user->ip, 'LOG_USER_NEW_PASSWORD', false, array(
+					'reportee_id' => $user_row['user_id'],
+					$user_row['username']
+				));
+				/* */
 			}
 
 			if( $result = $db->sql_query($sql) )
@@ -410,7 +494,7 @@ if ( $mode == 'edit' || $mode == 'add' || $mode == 'save' && $mx_request_vars->i
 					// and change the current one (if applicable)
 					if ( !empty($passwd_sql) )
 					{
-						$mx_user->session_reset_keys($user_id, $user_ip);
+						//$mx_user->session_reset_keys($user_id, $user_ip);
 					}
 				}
 
@@ -444,7 +528,7 @@ if ( $mode == 'edit' || $mode == 'add' || $mode == 'save' && $mx_request_vars->i
 		}
 	}
 	//
-	// SHOW USER
+	// SHOW USER / NEW USER
 	//
 	else if ( !$mx_request_vars->post('submit') && $mode != 'save' )
 	{
@@ -471,8 +555,8 @@ if ( $mode == 'edit' || $mode == 'add' || $mode == 'save' && $mx_request_vars->i
 		else
 		{
 			$this_userdata['user_id'] = '' ;
-			$this_userdata['username'] = 'Enter' ;
-			$this_userdata['user_email'] = 'me@somewhere' ;
+			$this_userdata['username'] = '' ;
+			$this_userdata['user_email'] = 'me@' . $board_config['server_name'];
 			$this_userdata['user_active'] = '1' ;
 		}
 
@@ -484,10 +568,12 @@ if ( $mode == 'edit' || $mode == 'add' || $mode == 'save' && $mx_request_vars->i
 		$email = $this_userdata['user_email'];
 		$password = '';
 		$password_confirm = '';
-		$user_status = $this_userdata['user_active'];
-		$user_admin = $this_userdata['user_level'];
+		$user_status = isset($this_userdata['user_active']) ? $this_userdata['user_active'] : $this_userdata['user_type'];
+		$user_admin = isset($this_userdata['user_level']) ? $this_userdata['user_level'] : (isset($this_userdata['user_type']) ? $this_userdata['user_type'] : false);
+		$user_type = isset($this_userdata['user_type']) ? $this_userdata['user_type'] : (($user_admin == 1) ? USER_FOUNDER : ( ($user_status = 1) ? USER_NORMAL : USER_INACTIVE));
 	}
 
+	$coppa = ( ( !isset($_POST['coppa']) && !isset($_GET['coppa']) ) || $mode == "register") ? 0 : TRUE;
 
 	$s_hidden_fields = '<input type="hidden" name="mode" value="save" /><input type="hidden" name="agreed" value="true" /><input type="hidden" name="coppa" value="' . $coppa . '" />';
 	$s_hidden_fields .= '<input type="hidden" name="id" value="' . $user_id . '" />';

@@ -22,21 +22,17 @@ if ( !empty( $setmodules ) )
 $mx_root_path = './../../../';
 $module_root_path = "./../";
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
+
+
+// **********************************************************************
+// Includes
+// **********************************************************************
 require( $mx_root_path . '/admin/pagestart.' . $phpEx );
 
 include_once( $mx_root_path . 'admin/page_header_admin.' . $phpEx );
 
-// **********************************************************************
 // Read language definition
-// **********************************************************************
-if ( !file_exists( $module_root_path . 'language/lang_' . $board_config['default_lang'] . '/lang_admin.' . $phpEx ) )
-{
-	include( $module_root_path . 'language/lang_english/lang_admin.' . $phpEx );
-}
-else
-{
-	include( $module_root_path . 'language/lang_' . $board_config['default_lang'] . '/lang_admin.' . $phpEx );
-}
+include($module_root_path . 'includes/users_constants.' . $phpEx);
 
 $page_title = $lang['Prune_user_posts'];
 

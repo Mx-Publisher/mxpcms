@@ -75,7 +75,7 @@ if( !empty($mode) && !empty($action) )
 	$is_pak = false;
 	if (is_array($result_message))
 	{
-		$nav_module_id = $result_message['new_module_id'];
+		$nav_module_id = isset($result_message['new_module_id']) ? $result_message['new_module_id'] : false;
 		$is_pak = !empty($result_message['is_pak']);
 		$result_message = $result_message['text'];
 	}

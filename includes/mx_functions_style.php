@@ -880,12 +880,18 @@ class mx_Template extends Template
 | 	
 \** **/
 define('MX_LANG_MAIN'	, 10);
+define('SHARED2_LANG_MAIN'	, 12);
+define('SHARED3_LANG_MAIN'	, 13);
 define('MX_LANG_ADMIN'	, 20);
+define('SHARED2_LANG_ADMIN'	, 22);
+define('SHARED3_LANG_ADMIN'	, 23);
 define('MX_LANG_ALL'	, 30);
 define('MX_LANG_NONE'	, 40);
 define('MX_IMAGES'		, 50);
 define('MX_IMAGES_NONE'	, 60);
 define('MX_LANG_CUSTOM'	, 70);
+define('SHARED2_LANG_CUSTOM'	, 72);
+define('SHARED3_LANG_CUSTOM'	, 73);
 
 define('MX_BUTTON_IMAGE'	, 10);
 define('MX_BUTTON_TEXT'		, 20);
@@ -3017,11 +3023,12 @@ class mx_user extends mx_session
 			$phpbb_user_path = $phpbb3_shared_path . 'language/lang_' . $this->data['user_lang'] . '/' . $filename . '.' . $php_ext;
 			$phpbb_board_path = $phpbb3_shared_path . 'language/lang_' . $board_config['default_lang'] . '/' . $filename . '.' . $php_ext;
 			$phpbb_default_path = $phpbb3_shared_path . 'language/lang_english/' . $filename . '.' . $php_ext;				
-		}	
+		}
 		
-		if (file_exists($user_path))
+		if ((@include $user_path) === false)
 		{
-			include_once($user_path);
+			//continue;
+			//print_r('Language file ' . $user_path . ' couldn\'t be opened.');
 		}
 		else if ($require)
 		{
@@ -3046,12 +3053,12 @@ class mx_user extends mx_session
 				{
 					if ((@include $phpbb_default_path) === false)
 					{
-						continue;
+						//continue;
 					}
 				}			
 			}
 		}			
-	
+		
 		if (count($lang) == 0)
 		{
 			// If the language entry is an empty array, we just return the language key $this->lang = $this->lang;	
@@ -3114,17 +3121,18 @@ class mx_user extends mx_session
 						// Load vanilla phpBB2 AdminCP keys
 						$this->_load_lang($this->phpbb_root_path, 'lang_admin');
 						// Core MXP AdminCP 
-						$this->_load_lang($this->mx_root_path, 'lang_admin');						
-						//Load Shared phpBB3 AdminCP common language file							
-						$this->_load_lang($this->mx_root_path . 'includes/shared/phpbb3/', 'acp/common');						
+						$this->_load_lang($this->mx_root_path, 'lang_admin');
+						//Load Shared phpBB3 AdminCP common language file
+						$this->_load_lang($this->mx_root_path . 'includes/shared/phpbb3/', 'acp/common');
 					}					
 					// Load vanilla phpBB2 keys
 					$this->_load_lang($this->phpbb_root_path, 'lang_main');
 					// Core Main Translation after shared phpBB keys so we can overwrite some settings
-					$this->_load_lang($this->mx_root_path, 'lang_main');					
-					//Load Shared phpBB3 common language file										
-					$this->_load_lang($this->mx_root_path . 'includes/shared/phpbb3/', 'common');					
-				break;					
+					$this->_load_lang($this->mx_root_path, 'lang_main');
+					//Load Shared phpBB3 common language file
+					$this->_load_lang($this->mx_root_path . 'includes/shared/phpbb3/', 'common');
+				break;
+				
 				case 'phpbb3':
 				case 'olympus':
 				case 'ascraeus':
@@ -3132,7 +3140,7 @@ class mx_user extends mx_session
 				case 'proteus':
 					
 					//Load vanilla phpBB3 common language files for new modules if is possible				
-					$shared_lang_path = $this->mx_root_path . 'includes/shared/phpbb2/language/';					
+					$shared_lang_path = $this->mx_root_path . 'includes/shared/phpbb3/language/';					
 					
 					// AdminCP
 					if (defined('IN_ADMIN'))

@@ -37,19 +37,14 @@ if ( !empty( $setmodules ) )
 $mx_root_path = './../../../';
 $module_root_path = "./../";
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
-require( $mx_root_path . '/admin/pagestart.' . $phpEx );
 
 // **********************************************************************
-// Read language definition
+// Includes
 // **********************************************************************
-if ( !file_exists( $module_root_path . 'language/lang_' . $board_config['default_lang'] . '/lang_admin.' . $phpEx ) )
-{
-	include( $module_root_path . 'language/lang_english/lang_admin.' . $phpEx );
-}
-else
-{
-	include( $module_root_path . 'language/lang_' . $board_config['default_lang'] . '/lang_admin.' . $phpEx );
-}
+require($mx_root_path . '/admin/pagestart.' . $phpEx);
+// Read language definition
+include($module_root_path . 'includes/users_constants.' . $phpEx);
+
 
 $board_config['topics_per_page'] = isset($board_config['topics_per_page']) ? $board_config['topics_per_page'] : 15;
 

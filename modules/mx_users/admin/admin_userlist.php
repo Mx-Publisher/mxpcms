@@ -19,21 +19,16 @@ if ( !empty( $setmodules ) )
 $mx_root_path = './../../../';
 $module_root_path = "./../";
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
+
+// **********************************************************************
+// Includes
+// **********************************************************************
 require( $mx_root_path . '/admin/pagestart.' . $phpEx );
 
 include_once( $mx_root_path . 'admin/page_header_admin.' . $phpEx );
 
-// **********************************************************************
 // Read language definition
-// **********************************************************************
-if ( !file_exists( $module_root_path . 'language/lang_' . $board_config['default_lang'] . '/lang_admin.' . $phpEx ) )
-{
-	include( $module_root_path . 'language/lang_english/lang_admin.' . $phpEx );
-}
-else
-{
-	include( $module_root_path . 'language/lang_' . $board_config['default_lang'] . '/lang_admin.' . $phpEx );
-}
+include($module_root_path . 'includes/users_constants.' . $phpEx);
 
 //
 // Set mode
@@ -134,7 +129,7 @@ if ($mx_request_vars->is_request('alphanum'))
 }
 else
 {
-	$alpahnum = '';
+	$alphanum = '';
 	$alpha_where = '';
 }
 
@@ -733,7 +728,7 @@ switch( $mode )
 		$alpha_letters = range('A','Z');
 		$alpha_start = array($lang['All'], '#');
 		$alpha_range = array_merge($alpha_start, $alpha_letters);
-
+		$temp = '';
 		$i = 0;
 		while( $i < count($alpha_range) )
 		{
@@ -950,8 +945,8 @@ switch( $mode )
 				'I_RANK' => $rank_image,
 				'I_AVATAR' => $avatar_img,
 
-				'JOINED' => phpBB2::create_date('d M Y', $row['user_regdate'], $board_config['board_timezone']),
-				'LAST_ACTIVITY' => ( !empty($row['user_session_time']) ) ? phpBB2::create_date('d M Y', $row['user_session_time'], $board_config['board_timezone']) : $lang['Never'],
+				'JOINED' => mx_create_date('d M Y', $row['user_regdate'], $board_config['board_timezone']),
+				'LAST_ACTIVITY' => ( !empty($row['user_session_time']) ) ? mx_create_date('d M Y', $row['user_session_time'], $board_config['board_timezone']) : $lang['Never'],
 
 				'POSTS' => ( $row['user_posts'] ) ? $row['user_posts'] : 0,
 				'U_SEARCH' => mx_append_sid($phpbb_root_path . 'search.'.$phpEx.'?search_author=' . urlencode(strip_tags($row['username'])) . '&amp;showresults=posts'),
@@ -1044,7 +1039,7 @@ switch( $mode )
 		{
 			$total_members = $total['total'];
 
-			$pagination = phpBB2::generate_pagination($module_root_path . "admin/admin_userlist.$phpEx?sort=$sort&amp;order=$sort_order&amp;show=$show" . ( ( isset($alphanum) ) ? "&amp;alphanum=$alphanum" : '' ), $total_members, $show, $start);
+			$pagination = mx_generate_pagination($module_root_path . "admin/admin_userlist.$phpEx?sort=$sort&amp;order=$sort_order&amp;show=$show" . ( ( isset($alphanum) ) ? "&amp;alphanum=$alphanum" : '' ), $total_members, $show, $start);
 		}
 
 		$template->assign_vars(array(

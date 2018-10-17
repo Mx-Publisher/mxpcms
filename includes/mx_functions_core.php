@@ -268,7 +268,31 @@ class mx_cache extends cache
 			return ($portal_config);
 		}
 	}
-
+	
+	/**
+	 * Get extension_path
+	 *
+	 * @access public
+	 * @return unknown
+	 */
+	public function get_extension_path($module_name = '', $relative = false)
+	{
+		if (!$module_name)
+		{
+			global $module_root_path;
+		}
+		else
+		{
+			global $mx_root_path;
+			
+			$module_name = str_replace('.', '', $module_name);
+			$module_root_path = (($relative) ? $mx_root_path : '') . 'modules/' . $module_name;
+		}
+		
+		// Now, retun $module_root_path
+		return $module_root_path;
+	}
+	
 	/**
 	 * Load file.
 	 *
