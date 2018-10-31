@@ -23,7 +23,7 @@
 
 $lang['Home Page']              = "首頁";
 $lang['MX_home'] 				= "首頁";
-$lang['MX_forum'] 				= "論壇"
+$lang['MX_forum'] 				= "論壇";
 $lang['MX_navigation'] 			= 'Pages navigation, eg. forum navigation, like pafiledb navigation.';	
 $lang['Web Links']              = "聯結";
 $lang['Edit your Profile']      = "個人資料";   

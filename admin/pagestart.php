@@ -40,12 +40,12 @@ $mx_user->init($user_ip, PAGE_INDEX);
 
 if ( !$userdata['session_logged_in'] )
 {
-	mx_redirect(mx_append_sid("login.php?redirect=admin/index.$phpEx", true));
+	//mx_redirect(mx_append_sid("login.php?redirect=admin/index.$phpEx", true));
 }
 
 if ( !($userdata['user_level'] == ADMIN) )
 {
-	mx_message_die(GENERAL_MESSAGE, $lang['Not_admin']);
+	//mx_message_die(GENERAL_MESSAGE, $lang['Not_admin']);
 }
 
 // Ensure $mx_user->session_id is populated...
@@ -63,7 +63,7 @@ if ($mx_request_vars->get('sid', MX_TYPE_NO_TAGS) != $mx_user->session_id)
 
 if (!$userdata['session_admin'])
 {
-	mx_redirect(mx_append_sid("login.php?redirect=admin/index.$phpEx&admin=1", true));
+	//mx_redirect(mx_append_sid("login.php?redirect=admin/index.$phpEx&admin=1", true));
 }
 
 if( empty($no_page_header) )

@@ -1,4 +1,4 @@
-<script language="javascript" type="text/javascript">
+<script type="text/javascript">
 <!--
 
 /*************************************************************
@@ -257,7 +257,7 @@ function setActiveItem( obj){
 <!-- END catrow -->
 <!-- END module_phpbb -->
 	obj.style.fontWeight = 'bold';
-	obj.style.background = "url('{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}theme/images/arrow_right.gif') no-repeat 0px 7px;";
+	obj.style.background = "url('{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}theme/images/arrow_right.gif') no-repeat 0px 7px";
 	return true;
 }
 
@@ -272,18 +272,26 @@ function setActiveItem( obj){
 	font-size: 1.2em;
 	margin-top:15px;
 	padding-top:0px;
+	padding-left: 3px;
 	border-bottom-style: solid;
 	border-bottom-width: 1px;
-	border-bottom-color: ;
 	display: block;
 }
+#content {
+	padding-top: 0px;
+}
+#menu ul li.header {
+	margin-top: 3px;
+	margin-left: 4px;
+	padding-left: 2px;
+} 
 .activeItem {
 	font-weight: bold;
 	color: #000000;
 	padding-left: 4px;
 }
 </style>
-<img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}admin/images/mxbb_logo.gif" alt="" />
+<div style="margin: 0px auto;text-align:center"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}admin/images/mxbb_logo.gif" alt="" /></div>
 <div id="menu" style="">
 <ul>
 	<li class="header"><div>{L_ADMIN}<div></li>

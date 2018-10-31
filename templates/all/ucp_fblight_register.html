@@ -1,0 +1,209 @@
+<script type="text/javascript">
+// <![CDATA[
+	/**
+	* Change language
+	*/
+	function change_language(lang_iso)
+	{
+		document.forms['register'].change_lang.value = lang_iso;
+		document.forms['register'].submit.click();
+	}
+
+	<!-- IF CAPTCHA_TEMPLATE and S_CONFIRM_REFRESH -->
+	onload_functions.push('apply_onkeypress_event()');
+	<!-- ENDIF -->
+
+// ]]>
+jQuery('document').ready(function()
+{   
+    jQuery('#username').mouseleave(
+    function()
+    {
+        var userval = jQuery('#username').val();
+        if(userval <= 0)
+        {
+            jQuery('#username_error').html('<div style="padding:1px;" class="ui-state-error ui-corner-all"> Please enter a value!</div>');
+            jQuery('.ui-dialog-buttonpane').hide('blind');
+        }
+        else
+        {        
+            jQuery.post('./fb4phpbb_light/fb4phpbb_light_connect.php', {params: 'username_clean', value: userval},
+            function(data)
+            {
+                jQuery('#username_error').html(data);
+                if(data.length > 0 || jQuery('.ui-state-error').length > 0)
+                {
+                    jQuery('.ui-dialog-buttonpane').animate({height: "0px"}, 300);
+                    jQuery('.ui-dialog-buttonpane').css({display: 'none'});
+                }
+                else
+                {
+                    jQuery('#fb4phpbb_light_username').val(userval);
+                    jQuery('.ui-dialog-buttonpane').css({display: 'block'});
+                    jQuery('.ui-dialog-buttonpane').animate({height: "38px"}, 300);   
+                }            
+            });
+        }
+    });
+    jQuery('#username').mousedown(
+    function()
+    {
+        var userval = jQuery('#username').val();
+        if(userval <= 0)
+        {
+            jQuery('#username_error').html('<div style="padding:1px;" class="ui-state-error ui-corner-all"> Please enter a value!</div>');
+            jQuery('.ui-dialog-buttonpane').hide('blind');
+        }
+        else
+        {        
+            jQuery.post('./fb4phpbb_light/fb4phpbb_light_connect.php', {params: 'username_clean', value: userval},
+            function(data)
+            {
+                jQuery('#username_error').html(data);
+                if(data.length > 0 || jQuery('.ui-state-error').length > 0)
+                {
+                    jQuery('.ui-dialog-buttonpane').animate({height: "0px"}, 300);
+                    jQuery('.ui-dialog-buttonpane').css({display: 'none'});
+                }
+                else
+                {
+                    jQuery('#fb4phpbb_light_username').val(userval);                
+                    jQuery('.ui-dialog-buttonpane').css({display: 'block'});
+                    jQuery('.ui-dialog-buttonpane').animate({height: "38px"}, 300);   
+                }            
+            });
+        }
+    });
+    jQuery('#username').keyup(
+    function()
+    {
+        var userval = jQuery('#username').val();
+        if(userval <= 0)
+        {
+            jQuery('#username_error').html('<div style="padding:1px;" class="ui-state-error ui-corner-all"> Please enter a value!</div>');
+            jQuery('.ui-dialog-buttonpane').hide('blind');
+        }
+        else
+        {        
+            jQuery.post('./fb4phpbb_light/fb4phpbb_light_connect.php', {params: 'username_clean', value: userval},
+            function(data)
+            {
+                jQuery('#username_error').html(data);
+                if(data.length > 0 || jQuery('.ui-state-error').length > 0)
+                {
+                    jQuery('.ui-dialog-buttonpane').animate({height: "0px"}, 300);
+                    jQuery('.ui-dialog-buttonpane').css({display: 'none'});
+                }
+                else
+                {
+                    jQuery('#fb4phpbb_light_username').val(userval);                
+                    jQuery('.ui-dialog-buttonpane').css({display: 'block'});
+                    jQuery('.ui-dialog-buttonpane').animate({height: "38px"}, 300);   
+                }            
+            });
+        }
+    });
+});    
+</script>
+
+<form method="post" action="{S_UCP_ACTION}" id="register">
+
+<div class="panel">
+	<div class="inner"><span class="corners-top"><span></span></span>
+        <div id="fbinner">
+	<h2>{SITENAME} - {L_REGISTRATION}</h2>
+
+	<fieldset class="fields2">
+	<!-- IF ERROR --><dl><dd class="error">{ERROR}</dd></dl><!-- ENDIF -->
+	<!-- IF L_REG_COND -->
+		<dl><dd><strong>{L_REG_COND}</strong></dd></dl>
+	<!-- ENDIF -->
+				<dl>
+					<dd>
+						<strong>{L_FB_REG_COND}</strong>
+					</dd>
+				</dl>	
+				<dl>
+					<dt>
+						<label for="username">{L_USERNAME}:</label>
+						<br />
+						<span>{L_USERNAME_EXPLAIN}</span>
+					</dt>
+					<dd>
+						<input style="float:left;" type="text" tabindex="1" name="username" id="username" size="25" value="{FB4PHPBB_LIGHT_USERNAME}" class="inputbox autowidth username" title="{L_USERNAME}" /><span style="float:left;padding-left:5px;" id="username_error"></span>
+					</dd>
+				</dl>
+				<dl>
+					<dt>
+						<label for="email">{L_EMAIL_ADDRESS}:</label>
+					</dt>
+					<dd>
+						<input style="float:left;" type="text" disabled tabindex="2" name="email" id="email" size="25" maxlength="100" value="{FB4PHPBB_LIGHT_EMAIL}" class="inputbox autowidth email" title="{L_EMAIL_ADDRESS}" /><span style="float:left;padding-left:5px;" id="email_error"></span>
+					</dd>
+				</dl>
+				<dl>
+					<dt>
+						<label for="fbavatar">{L_LINK_REMOTE_AVATAR_FB}:</label>
+					</dt>
+					<dd>
+						<input type="checkbox" tabindex="4" name="fb4phpbb_light_avatar" id="fb4phpbb_light_avatar" value="true" title="{L_LINK_REMOTE_AVATAR_FB}" /><img src="https://graph.facebook.com/{FB4PHPBB_LIGHT_UID}/picture?type=normal" />
+					</dd>
+				</dl>
+	<hr />
+
+	<dl>
+		<dt><label for="lang">{L_LANGUAGE}:</label></dt>
+		<dd><select name="lang" id="lang" onchange="change_language(this.value); return false;" tabindex="6" title="{L_LANGUAGE}">{S_LANG_OPTIONS}</select></dd>
+	</dl>
+	<dl>
+		<dt><label for="tz">{L_TIMEZONE}:</label></dt>
+		<dd><select name="tz" id="tz" tabindex="7" class="autowidth">{S_TZ_OPTIONS}</select></dd>
+	</dl>
+
+	<!-- IF .profile_fields -->
+		<dl><dd><strong>{L_ITEMS_REQUIRED}</strong></dd></dl>
+
+	<!-- BEGIN profile_fields -->
+		<dl>
+			<dt><label<!-- IF profile_fields.FIELD_ID --> for="{profile_fields.FIELD_ID}"<!-- ENDIF -->>{profile_fields.LANG_NAME}:<!-- IF profile_fields.S_REQUIRED --> *<!-- ENDIF --></label>
+			<!-- IF profile_fields.LANG_EXPLAIN --><br /><span>{profile_fields.LANG_EXPLAIN}</span><!-- ENDIF -->
+			<!-- IF profile_fields.ERROR --><br /><span class="error">{profile_fields.ERROR}</span><!-- ENDIF --></dt>
+			<dd>{profile_fields.FIELD}</dd>
+		</dl>
+	<!-- END profile_fields -->
+	<!-- ENDIF -->
+
+	</fieldset>
+	<span class="corners-bottom"><span></span></span></div>
+</div>
+<!-- IF CAPTCHA_TEMPLATE -->
+	<!-- DEFINE $CAPTCHA_TAB_INDEX = 8 -->
+	<!-- INCLUDE {CAPTCHA_TEMPLATE} -->
+<!-- ENDIF -->
+
+<!-- IF S_COPPA -->
+
+
+<div class="panel">
+	<div class="inner"><span class="corners-top"><span></span></span>
+
+	<h4>{L_COPPA_COMPLIANCE}</h4>
+
+	<p>{L_COPPA_EXPLAIN}</p>
+	<span class="corners-bottom"><span></span></span></div>
+</div>
+<!-- ENDIF -->
+
+<div class="panel">
+	<div class="inner"><span class="corners-top"><span></span></span>
+
+	<fieldset class="submit-buttons">
+		<input type="hidden" name="fb4phpbb_light_username" id="fb4phpbb_light_username" value="{FB4PHPBB_LIGHT_USERNAME}" />
+        <input type="hidden" name="fb4phpbb_light_email" id="fb4phpbb_light_email"  value="{FB4PHPBB_LIGHT_EMAIL}"/>		
+		{S_HIDDEN_FIELDS}
+		{S_FORM_TOKEN}
+	</fieldset>
+</div>
+	<span class="corners-bottom"><span></span></span></div>
+</div>
+</form>

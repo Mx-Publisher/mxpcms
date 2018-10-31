@@ -62,6 +62,25 @@ if( class_exists('phpBB2'))
 {
 	$phpBB2 = new phpBB2();
 }
+
+$default_lang = ($mx_user->data['user_lang']) ? $mx_user->data['user_lang'] : $board_config['default_lang'];
+$server_name = !empty($board_config['server_name']) ? preg_replace('/^\/?(.*?)\/?$/', "\\1", trim($board_config['server_name'])) : 'localhost';
+$server_protocol = ($board_config['cookie_secure'] ) ? 'https://' : 'http://';
+$server_port = (($board_config['server_port']) && ($board_config['server_port'] <> 80)) ? ':' . trim($board_config['server_port']) . '/' : '/';
+$script_name_phpbb = preg_replace('/^\/?(.*?)\/?$/', "\\1", trim($board_config['script_path'])) . '/';		
+$server_url = $server_protocol . str_replace("//", "/", $server_name . $server_port . $server_name . '/'); //On some server the slash is not added and this trick will fix it	
+$corrected_url = PORTAL_URL;
+$board_url = PORTAL_URL;
+$web_path = (defined('PHPBB_USE_BOARD_URL_PATH') && PHPBB_USE_BOARD_URL_PATH) ? $board_url : $corrected_url;
+
+// Send a proper content-language to the output
+$user_lang = !empty($mx_user->lang['USER_LANG']) ? $mx_user->lang['USER_LANG'] : $mx_user->encode_lang($user->lang_name);
+
+if (!defined('TEMPLATE_ROOT_PATH'))
+{
+	define('TEMPLATE_ROOT_PATH', $phpbb_root_path.'templates/'.$theme['template_name'].'/');
+}
+
 if ( !isset($lang) )
 {
 	$lang = array();
@@ -76,7 +95,8 @@ $useragent = (isset($_SERVER['HTTP_USER_AGENT'])) ? $_SERVER['HTTP_USER_AGENT'] 
 $template_config_row = $mx_user->_load_template_config();
 $template->assign_vars(array(
 	'SITENAME' => $board_config['sitename'],
-	//'PAGE_TITLE' => $page_title,
+	'SITE_DESCRIPTION' => $board_config['site_desc'],
+	'PAGE_TITLE' => isset($page_title) ? $page_title : $lang['Admin'],
 
 	'L_ADMIN' => $lang['Admin'],
 	'L_INDEX' => sprintf($lang['Forum_Index'], $board_config['sitename']),
@@ -134,6 +154,20 @@ $template->assign_vars(array(
 	//'T_SPAN_CLASS3' => $mx_user->theme['span_class3'],
 
 	//+ MX-Publisher
+	'T_STYLESHEET_LINK'		=> "{$web_path}templates/" . rawurlencode($mx_user->theme['template_name'] ? $mx_user->theme['template_name'] : str_replace('.css', '', $mx_user->theme['head_stylesheet'])) . '/theme/stylesheet.css',
+	'T_STYLESHEET_LANG_LINK'=> "{$web_path}templates/" . rawurlencode($mx_user->theme['template_name'] ? $mx_user->theme['template_name'] : str_replace('.css', '', $mx_user->theme['head_stylesheet'])) . '/theme/images/lang_' . $default_lang . '/stylesheet.css',
+	'T_FONT_AWESOME_LINK'	=> "{$web_path}assets/css/font-awesome.min.css",
+	'T_FONT_IONIC_LINK'			=> "{$web_path}assets/css/ionicons.min.css",
+	'T_JQUERY_LINK'			=> "{$web_path}assets/javascript/jquery.min.js?assets_version=2.0.24",
+	'S_ALLOW_CDN'			=> true,	
+
+	'T_THEME_NAME'				=> rawurlencode($theme['template_name']),
+	'T_THEME_LANG_NAME'		=> $mx_user->data['user_lang'],
+	'T_TEMPLATE_NAME'			=> $mx_user->theme['template_name'],
+	'T_SUPER_TEMPLATE_NAME'	=> rawurlencode($mx_user->theme['template_name']),
+	'TEMPLATE_ROOT_PATH' => TEMPLATE_ROOT_PATH,
+	'U_PHPBB_ROOT_PATH' => PHPBB_URL,
+
 	'L_MX_ADMIN' => $lang['Mx-Publisher_adminCP'],
 	'U_PHPBB_ROOT_PATH' => PHPBB_URL,
 	'U_PORTAL_ROOT_PATH' => PORTAL_URL,

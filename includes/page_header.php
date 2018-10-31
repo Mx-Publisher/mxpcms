@@ -56,6 +56,10 @@ if ( $board_config['gzip_compress'] )
 	}
 }
 **********/
+
+// Redefine some MXP stylish userdata
+//$mx_user->data['session_logged_in'] = $mx_user->data['user_id'] != ANONYMOUS ? 1 : 0;
+
 $layouttemplate = isset($layouttemplate) ? $layouttemplate : "";
 // If MX-Publisher frame template is not set, instantiate it
 if (!is_object($layouttemplate))
@@ -105,7 +109,7 @@ $layouttemplate->set_filenames(array(
 //
 // Generate logged in/logged out status
 //
-if ( $mx_user->data['session_logged_in'] )
+if (  $mx_user->data['user_id'] != ANONYMOUS )
 {	
 	$u_login_logout = 'login.'.$phpEx.'?logout=true&amp;sid=' . $mx_user->data['session_id'];
 	$l_login_logout = $lang['Logout'] . ' [ ' . $mx_user->data['username'] . ' ]';
@@ -117,6 +121,24 @@ else
 }
 
 $s_last_visit = ( $mx_user->data['session_logged_in'] ) ? mx_create_date($board_config['default_dateformat'], $mx_user->data['user_lastvisit'], $board_config['board_timezone']) : '';
+
+switch (PORTAL_BACKEND)
+{
+	case 'internal':
+	case 'smf2':
+	case 'mybb':
+	case 'phpbb2':
+		$admin = ($mx_user->data['session_logged_in'] && $mx_user->data['user_level'] == ADMIN) ? true : false;
+	break;
+
+	case 'phpbb3':
+	case 'olympus':
+	case 'ascraeus':
+	case 'rhea':
+		global $phpbb_auth;
+		$admin = (($mx_user->data['user_id'] != ANONYMOUS) && $phpbb_auth->acl_get('a_')) ? true : false;
+	break;
+}
 
 // Generate logged in/logged out status
 if( !is_object($mx_backend))
@@ -209,7 +231,7 @@ if (defined('SHOW_ONLINE'))
 				switch (PORTAL_BACKEND)
 				{
 					case 'internal':
-					case 'smf2':					
+					case 'smf2':
 					case 'phpbb2':
 						if ( $row['user_level'] == ADMIN )
 						{
@@ -225,7 +247,7 @@ if (defined('SHOW_ONLINE'))
 					
 					case 'phpbb3':
 					case 'olympus':
-					default:					
+					default:
 						$style_color = ($row['user_colour']) ? ' style="color:#' . $row['user_colour'] . '" class="username-coloured"' : '';
 					break;
 				}
@@ -233,10 +255,10 @@ if (defined('SHOW_ONLINE'))
 				switch (PORTAL_BACKEND)
 				{
 					case 'internal':
-					case 'smf2':					
+					case 'smf2':
 						$mx_user_online_link = '<a href="' . PORTAL_URL . '"' . $style_color .'><i>' . $row['username'] . '</i></a>';
 						$logged_hidden_online++;
-					break;						
+					break;
 					case 'phpbb2':
 						$mx_user_online_link = '<a href="' . mx_append_sid(PHPBB_URL."profile.$phpEx?mode=viewprofile&amp;" . POST_USERS_URL . "=" . $row['user_id']) . '"' . $style_color .'><i>' . $row['username'] . '</i></a>';
 						$logged_hidden_online++;
@@ -258,7 +280,7 @@ if (defined('SHOW_ONLINE'))
 					break;
 				}
 				
-				if ( $row['user_allow_viewonline'] || $mx_user->data['user_level'] == ADMIN )
+				if ( $row['user_allow_viewonline'] || $admin )
 				{
 					$online_userlist .= ( $online_userlist != '' ) ? ', ' . $mx_user_online_link : $mx_user_online_link;
 				}
@@ -495,11 +517,6 @@ if ( ($mx_user->data['session_logged_in']) && (PORTAL_BACKEND !== 'internal') &&
 		break;
 		
 		case 'phpbb2':
-		case 'phpbb3':
-		case 'olympus':
-		case 'ascraeus':
-		case 'rhea':
-			
 			$pm_sql_user = "AND pm.privmsgs_to_userid = " . $mx_user->data['user_id'] . " 
 				AND ( pm.privmsgs_type = " . PRIVMSGS_READ_MAIL . " 
 					OR pm.privmsgs_type = " . PRIVMSGS_NEW_MAIL . " 
@@ -523,10 +540,38 @@ if ( ($mx_user->data['session_logged_in']) && (PORTAL_BACKEND !== 'internal') &&
 				$privmsg_id = $privmsg['privmsgs_id'];
 			}
 			else
-			{	
-				$privmsg_id = request_var(POST_POST_URL, $s_privmsg_new);	
+			{
+				$privmsg_id = $mx_request_vars->post(POST_POST_URL, MX_TYPE_NO_TAGS, $s_privmsg_new);
 			}
-			$db->sql_freeresult($result);			
+			$db->sql_freeresult($result);
+		break;
+		
+		case 'phpbb3':
+		case 'olympus':
+		case 'ascraeus':
+		case 'rhea':
+			
+			//
+			// Major query obtains the message ...
+			//
+			$sql = 'SELECT p.*, u.*
+				FROM ' . PRIVMSGS_TABLE . ' p, ' . USERS_TABLE . ' u
+				WHERE p.author_id <> u.user_id
+					AND u.user_id = ' . $mx_user->data['user_id'];
+			if ( !($result = $db->sql_query($sql)) )
+			{
+				mx_message_die(GENERAL_ERROR, 'Could not query private message post information', '', __LINE__, __FILE__, $sql);
+			}
+			if ( $privmsg = $db->sql_fetchrow($result) )
+			{
+				$notifications[] = $privmsg;
+				$privmsg_id = $privmsg['privmsgs_id'];
+			}
+			else
+			{
+				$privmsg_id = $mx_request_vars->post(POST_POST_URL, MX_TYPE_NO_TAGS, $s_privmsg_new);
+			}
+			$db->sql_freeresult($result);
 		break;
 	}	
 	
@@ -640,29 +685,29 @@ else
 		$template->assign_block_vars('notifications', array(
 			'NOTIFICATION_ID'	=> $notifications['notification_id'],
 
-			'USER_ID' 			=>  $notifications['user_id'], 
-			'ORDER_BY' 		=>  $notifications['order_by'], 
-			'ORDER_DIR' 		=>  $notifications['order_dir'], 
+			'USER_ID' 				=>  $notifications['user_id'], 
+			'ORDER_BY' 			=>  $notifications['order_by'], 
+			'ORDER_DIR' 			=>  $notifications['order_dir'], 
 			'ALL_UNREAD'	 	=>  $notifications['all_unread'],
-			'UNREAD_COUNT' =>  $notifications['unread_count'],
-			'LIMIT' 				=>  $notifications['limit'], 
+			'UNREAD_COUNT' 	=>  $notifications['unread_count'],
+			'LIMIT' 					=>  $notifications['limit'], 
 			'START' 				=>  $notifications['start'], 
-			'COUNT_UNREAD' =>  $notifications['count_unread'], 
+			'COUNT_UNREAD' 	=>  $notifications['count_unread'], 
 			'COUNT_TOTAL' 	=>  $notifications['count_total'], 			
 			
-			'STYLING'			=> 'notification-reported',
-			'AVATAR'			=> mx_get_user_avatar($mx_user->data),
+			'STYLING'					=> 'notification-reported',
+			'AVATAR'					=> mx_get_user_avatar($mx_user->data),
 			'FORMATTED_TITLE'	=> $mx_user->lang('NOTIFICATION', $mx_user->data['username'], false),
 			
-			'REFERENCE'		=> $mx_user->lang('NOTIFICATION_REFERENCE', mx_censor_text($l_privmsgs_text)),
+			'REFERENCE'			=> $mx_user->lang('NOTIFICATION_REFERENCE', mx_censor_text($l_privmsgs_text)),
 			'FORUM'				=> mx_append_sid('privmsg.'.$phpEx.'?folder=inbox'), //$this->get_forum(),
-			'REASON'			=> $notifications['REASON'], //$this->get_reason(),
-			'URL'					=> mx_append_sid('privmsg.'.$phpEx.'?folder=inbox'), //$this->get_url(),
+			'REASON'				=> $notifications['REASON'], //$this->get_reason(),
+			'URL'						=> mx_append_sid('privmsg.'.$phpEx.'?folder=inbox'), //$this->get_url(),
 			
 			'TIME'	   				=> $mx_user->format_date($notifications['notification_time']),
 			
-			'UNREAD'			=> $l_privmsgs_text_unread,
-			'U_MARK_READ'	=> (!$mx_user->data['user_unread_privmsg']) ? $u_mark_read : '',				
+			'UNREAD'				=> $l_privmsgs_text_unread,
+			'U_MARK_READ'		=> (!$mx_user->data['user_unread_privmsg']) ? $u_mark_read : '',
 		));		
 	//}
 }
@@ -815,7 +860,7 @@ $phpbb_major = $phpbb_version_parts[0] . '.' . $phpbb_version_parts[1];
 //
 // Show the overall footer.
 //
-$admin_link = ($mx_user->data['user_level'] == ADMIN) ? '<a href="admin/index.' . $phpEx . '?sid=' . $mx_user->data['session_id'] . '">' . $lang['Admin_panel'] . '</a><br /><br />' : '';
+$admin_link = (true == $admin) ? ('<a href="admin/index.' . $phpEx . '?sid=' . $mx_user->data['session_id'] . '">' . $lang['Admin_panel'] . '</a><br /><br />') : '';
 
 // Forum rules and subscription info
 $s_watching_forum = array(
@@ -836,23 +881,7 @@ if (empty($default_lang))
 $useragent = (isset($_SERVER['HTTP_USER_AGENT'])) ? $_SERVER['HTTP_USER_AGENT'] : getenv('HTTP_USER_AGENT');
 
 
-switch (PORTAL_BACKEND)
-{
-	case 'internal':
-	case 'smf2':
-	case 'mybb':
-	case 'phpbb2':
-		$admin = ($mx_user->data['session_logged_in'] && $mx_user->data['user_level'] == ADMIN) ? true : false;
-		break;
 
-	case 'phpbb3':
-	case 'olympus':
-	case 'ascraeus':
-	case 'rhea':
-		global $phpbb_auth;
-		$admin = (!$phpbb_auth->acl_get('a_') && $mx_user->data['user_id'] != ANONYMOUS) ? true : false;
-		break;
-}
 
 //
 // Grab MXP global variables, re-cache if necessary
@@ -863,7 +892,7 @@ if (empty($portal_config['portal_status']))
 	$portal_config = $mx_cache->obtain_mxbb_config(false);
 }
 
-$web_path = (!empty($portal_config['portal_url'])) ? PORTAL_URL : BOARD_URL;
+$web_path = PORTAL_URL;
 $https_path = str_replace("http://", "https://", $web_path);
 $web_path = str_replace("https://", "http://", $web_path);
 
@@ -874,51 +903,51 @@ $web_path = str_replace("https://", "http://", $web_path);
 $layouttemplate->assign_vars(array(
 	'SITENAME' 						=> $board_config['sitename'],
 	'SITE_DESCRIPTION' 			=> $board_config['site_desc'],
-	'PAGE_TITLE' 						=> $mx_page->page_title,
+	'PAGE_TITLE' 					=> $mx_page->page_title,
 	'LANG' 								=> $mx_user->img_lang,
 	'SCRIPT_NAME' 					=> str_replace('.' . $phpEx, '', basename(__FILE__)),	
-	'LAST_VISIT_DATE' 				=> sprintf($lang['You_last_visit'], $s_last_visit),
+	'LAST_VISIT_DATE' 			=> sprintf($lang['You_last_visit'], $s_last_visit),
 	'LAST_VISIT_YOU' 				=> $s_last_visit,	
 	'CURRENT_TIME' 				=> sprintf($lang['Current_time'], mx_create_date($board_config['default_dateformat'], time(), $board_config['board_timezone'])),
 	'TOTAL_USERS_ONLINE' 		=> $l_online_users,
 	'RECORD_USERS' 				=> $l_online_record,	
-	'LOGGED_IN_USER_LIST' 		=> $online_userlist,
+	'LOGGED_IN_USER_LIST' 	=> $online_userlist,
 	'RECORD_USERS' 				=> sprintf($lang['Record_online_users'], $board_config['record_online_users'], mx_create_date($board_config['default_dateformat'], $board_config['record_online_date'], $board_config['board_timezone'])),
 	
-	'CURRENT_USER_AVATAR'			=> mx_get_user_avatar($mx_user->data),
+	'CURRENT_USER_AVATAR'				=> mx_get_user_avatar($mx_user->data),
 	'CURRENT_USERNAME_SIMPLE'		=> mx_get_username_string('no_profile', $mx_user->data['user_id'], $mx_user->data['username'], $mx_user->data['user_colour']),
-	'CURRENT_USERNAME_FULL'		=> mx_get_username_string('full', $mx_user->data['user_id'], $mx_user->data['username'], $mx_user->data['user_colour']),				
+	'CURRENT_USERNAME_FULL'			=> mx_get_username_string('full', $mx_user->data['user_id'], $mx_user->data['username'], $mx_user->data['user_colour']),				
 	
 	'S_NOTIFICATIONS_DISPLAY'		=> true,	
-	'S_SHOW_COPPA'					=> false,
-	'S_REGISTRATION'					=> true,	
+	'S_SHOW_COPPA'						=> false,
+	'S_REGISTRATION'						=> true,	
 	
 	'UNREAD_NOTIFICATIONS_COUNT'	=> ($notifications !== false) ? $notifications['unread_count'] : '',
 	'NOTIFICATIONS_COUNT'				=> ($notifications !== false) ? $notifications['unread_count'] : '',
 	'U_VIEW_ALL_NOTIFICATIONS'			=> mx_append_sid("{$phpbb_root_path}profile.$phpEx?i=ucp_notifications"),
 	'U_MARK_ALL_NOTIFICATIONS'			=> mx_append_sid("{$phpbb_root_path}profile.$phpEx?i=ucp_notifications&amp;mode=notification_list&amp;mark=all&amp;token=" . $notification_mark_hash),
 	'U_NOTIFICATION_SETTINGS'				=> mx_append_sid("{$phpbb_root_path}profile.$phpEx?i=ucp_notifications&amp;mode=notification_options"),
-	'S_NOTIFICATIONS_DISPLAY'				=> $mx_user->data['user_active'],		
+	'S_NOTIFICATIONS_DISPLAY'				=> $mx_user->data['user_active'],	
 	
 	'loops'											=> '', // To get loops
 	
 	// 'L_CHANGE_FONT_SIZE'				=> '', 
-	'FONT_SIZE_CHANGE'						=> '- -- -', 	
+	'FONT_SIZE_CHANGE'						=> '- -- -', 
 	
 	'S_PLUPLOAD'							=> false,
-	'S_IN_SEARCH'							=> false,	
+	'S_IN_SEARCH'							=> false,
 	'S_DISPLAY_QUICK_LINKS'			=> true,
 	
-	'S_USER_NEW_PRIVMSG'				=> $mx_user->data['user_new_privmsg'],
+	'S_USER_NEW_PRIVMSG'					=> $mx_user->data['user_new_privmsg'],
 	'S_USER_UNREAD_PRIVMSG'			=> $mx_user->data['user_unread_privmsg'],
-	'S_USER_NEW'							=> ($mx_user->data['user_active'] == 0) ? true : false,
+	'S_USER_NEW'								=> ($mx_user->data['user_active'] == 0) ? true : false,
 
 	'RECORD_USERS' => sprintf($lang['Record_online_users'], $board_config['record_online_users'], mx_create_date($board_config['default_dateformat'], $board_config['record_online_date'], $board_config['board_timezone'])),
 	
 	'PRIVATE_MESSAGE_COUNT'				=> (!empty($mx_user->data['user_unread_privmsg'])) ? $mx_user->data['user_unread_privmsg'] : 0,
-	'PRIVATE_MESSAGE_INFO' 				=> $l_privmsgs_text,
+	'PRIVATE_MESSAGE_INFO' 					=> $l_privmsgs_text,
 	'PRIVATE_MESSAGE_INFO_UNREAD' 	=> $l_privmsgs_text_unread,
-	'PRIVATE_MESSAGE_NEW_FLAG' 		=> $s_privmsg_new,
+	'PRIVATE_MESSAGE_NEW_FLAG' 			=> $s_privmsg_new,
 
 	'PRIVMSG_IMG' => $icon_pm,
 
@@ -967,7 +996,7 @@ $layouttemplate->assign_vars(array(
 
 	'L_POST_BY_AUTHOR' 		=> $lang['Post_by_author'],
 	'L_POSTED_ON_DATE' 		=> $lang['Posted_on_date'],
-	'L_IN' 							=> $lang['In'],	
+	'L_IN' 								=> $lang['In'],	
 	
 	//navbar_footer
 	'U_WATCH_FORUM_LINK'	=> $s_watching_forum['link'],
@@ -994,9 +1023,9 @@ $layouttemplate->assign_vars(array(
 	'U_SEARCH' 						=> mx_append_sid('search.'.$phpEx),
 	'U_MEMBERLIST' 				=> mx_append_sid('memberlist.'.$phpEx),
 	'U_MODCP' 						=> mx_append_sid('modcp.'.$phpEx),
-	'U_MCP'								=> (((PORTAL_BACKEND !== 'internal') && ($phpbb_auth->acl_get('m_') || $phpbb_auth->acl_getf_global('m_'))) ? mx_append_sid("{$phpbb_root_path}modcp.$phpEx?i=main&amp;mode=front" . $mx_user->session_id) : ''),	
+	'U_MCP'							=> (((PORTAL_BACKEND !== 'internal') && ($phpbb_auth->acl_get('m_') || $phpbb_auth->acl_getf_global('m_'))) ? mx_append_sid("{$phpbb_root_path}modcp.$phpEx?i=main&amp;mode=front" . $mx_user->session_id) : ''),	
 	'U_FAQ' 							=> mx_append_sid('faq.'.$phpEx),
-	'U_VIEWONLINE' 					=> mx_append_sid('viewonline.'.$phpEx),
+	'U_VIEWONLINE' 				=> mx_append_sid('viewonline.'.$phpEx),
 	'U_LOGIN_LOGOUT' 			=> mx_append_sid($u_login_logout),
 	'U_GROUP_CP' 					=> mx_append_sid('groupcp.'.$phpEx),
 	
@@ -1194,9 +1223,9 @@ $layouttemplate->assign_vars(array(
 	'NAV_LINKS' => $nav_links_html,
 
 	// swithes for logged in users?
-	'USERNAME'			=> ($admin) ? $mx_user->data['username'] : '',	
-	'USER_LOGGED_IN' 	=> $mx_user->data['session_logged_in'],
-	'USER_LOGGED_OUT' 	=> !$mx_user->data['session_logged_in'],
+	'USERNAME'			=> ($admin) ? $mx_user->data['username'] : '',
+	'USER_LOGGED_IN' 	=> $mx_user->data['session_logged_in'], //$mx_user->data['user_id'] != ANONYMOUS
+	'USER_LOGGED_OUT' 	=> !$mx_user->data['session_logged_in'], //$mx_user->data['user_id'] == ANONYMOUS
 	
 	//This phpBB3 features are disbled for Admins in MXP3 for now and default vaues used
 	//To make use of this features Admins can login direct in forums
@@ -1212,15 +1241,15 @@ $layouttemplate->assign_vars(array(
 	// Additional css for gecko browsers
 	'GECKO' => strstr($useragent, 'Gecko'),
 	
-	'S_ENABLE_FEEDS'							=> false,
-	'S_ENABLE_FEFILES_OVERALL'			=> false,
-	'S_ENABLE_FEFILES_FORUMS'			=> false,
-	'S_ENABLE_FEFILES_TOPICS'			=> false,
+	'S_ENABLE_FEEDS'								=> false,
+	'S_ENABLE_FEFILES_OVERALL'				=> false,
+	'S_ENABLE_FEFILES_FORUMS'				=> false,
+	'S_ENABLE_FEFILES_TOPICS'				=> false,
 	'S_ENABLE_FEFILES_TOPICS_ACTIVE'	=> false,
-	'S_ENABLE_FEFILES_NEWS'				=> false,			
+	'S_ENABLE_FEFILES_NEWS'					=> false,
 			
 	'L_ACP' => $lang['Admin_panel'],
-	'U_ACP' => ($mx_user->data['user_level'] == ADMIN) ? "{$mx_root_path}admin/index.$phpEx?sid=" . $mx_user->session_id : $admin_link
+	'U_ACP' => (true == $admin) ? "{$mx_root_path}admin/index.$phpEx?sid=" . $mx_user->session_id : $admin_link
 
 ));
 

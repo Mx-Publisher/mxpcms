@@ -1086,12 +1086,14 @@ class mx_user extends mx_session
 	 */
 	function init($user_ip, $page_id, $init_style = true)
 	{
+		global $portal_config;
 		// Define basic constants
 		$this->page_id = $page_id;
 		$this->user_ip = $user_ip;
 
 		// Inititate User data
 		$this->_init_session($user_ip, $this->page_id);
+		
 		$this->_init_userprefs();
 
 		// Inititate User style
@@ -1147,8 +1149,8 @@ class mx_user extends mx_session
 		global $mx_cache, $mx_user, $userdata, $board_config, $portal_config, $theme, $images;
 		global $template, $lang, $phpEx, $phpbb_root_path, $mx_root_path, $db;
 		global $phpBB2, $phpBB3, $nav_links;
-		//Enable URL Language Detection		
-		$this->data = !empty($this->data['user_id']) ? $this->data : $this->session_pagestart($this->user_ip, $this->page_id);
+		//Enable URL Language Detection
+		//$this->data = !empty($this->data['user_id']) ? $this->data : $this->session_pagestart($this->user_ip, $this->page_id);
 		
 		/** /
 		if ( !empty($this->data['user_id']) )
@@ -1280,22 +1282,22 @@ class mx_user extends mx_session
 		// Language DataBase		
 		switch (PORTAL_BACKEND)
 		{
-			case 'internal':			
-			case 'phpbb2':		
-			case 'mybb':							
+			case 'internal':	
+			case 'phpbb2':
+			case 'mybb':
 					$sql_users = 'UPDATE ' . USERS_TABLE . "
 						SET user_lang = '" . $this->decode_lang($this->lang['default_lang']) . "'
 						WHERE user_lang = '" . $this->decode_lang($this->data['user_lang']) . "'";
 					$sql_config = "UPDATE " . PORTAL_TABLE . " SET
 						default_lang = '" . $this->decode_lang($this->lang['default_lang']) . "'
-						WHERE portal_id = '1'";						
+						WHERE portal_id = '1'";
 			break;
 		
 			case 'phpbb3':
 			case 'olympus':
 			case 'ascraeus':
 			case 'rhea':
-			case 'proteus':			
+			case 'proteus':	
 					
 					$sql_users = 'UPDATE ' . USERS_TABLE . "
 						SET user_lang = '" . $this->encode_lang($this->lang['default_lang']) . "'
@@ -1303,7 +1305,7 @@ class mx_user extends mx_session
 						
 					$sql_config = 'UPDATE ' . CONFIG_TABLE . "
 						SET config_value = '" . $this->encode_lang($this->lang['default_lang']) . "'
-						WHERE config_name = 'default_lang'";						
+						WHERE config_name = 'default_lang'";
 			break;
 			
 			
@@ -1315,7 +1317,7 @@ class mx_user extends mx_session
 					$sql_config = 'UPDATE ' . CONFIG_TABLE . "
 						SET value = '" . $this->decode_lang($this->lang['default_lang']) . "'
 						WHERE variable = 'userLanguage'";
-			break;				
+			break;
 		}
 		
 		// If we've had to change the value in any way then let's write it back to the database
@@ -1388,12 +1390,12 @@ class mx_user extends mx_session
 		
 		/** Sort of pointless here, since we have already included all main lang files **/
 		//this will fix the path for anonymouse users
-		if ((@include $mx_root_path . $this->lang_path . "lang_main.$phpEx") === false)
+		if (@include($mx_root_path . $this->lang_path . "lang_main.$phpEx") === false)
 		{
 			//this will fix the path for anonymouse users
 			echo('<br />');
 			echo(filesize($mx_root_path . $this->lang_path . "lang_main.$phpEx") . '');
-			echo('<br />');			
+			echo('<br />');
 			die('Language file <a class="textbutton" href="' . $mx_root_path . $this->lang_path . 'lang_main.' . $phpEx . '"><span>' . $mx_root_path . $this->lang_path . "lang_main.$phpEx" . '</span></a>' . ' couldn\'t be opened.');
 		}
 		//  include($phpbb_root_path . 'language/lang_' . $board_config['default_lang'] . '/lang_main.' . $phpEx);
@@ -1441,7 +1443,7 @@ class mx_user extends mx_session
 				{
 					mx_message_die(GENERAL_ERROR, 'Language file ' . $shared_lang_path . "lang_" . $this->lang_name . "/lang_admin.$phpEx" . ' couldn\'t be opened.');
 				}
-			}				
+			}
 		}
 		
 		// 

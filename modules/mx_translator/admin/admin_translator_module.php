@@ -1,14 +1,28 @@
 <?php
 /**
  *
- * Language Tools Extension for the phpBB Forum Software package
-* @version $Id$
+ * Lnaguage Tools Extension for the phpBB Forum Software package
+ *
 * @copyright (c) orynider <http://mxpcms.sourceforge.net>
 * @license GNU General Public License, version 2 (GPL-2.0)
  *
  */
 //namespace orynider\mx_translator\acp;
-$basename = basename( __FILE__);
+
+/* */
+if ( !empty( $setmodules))
+{
+	$basename = basename( __FILE__);	
+	
+	$module['Language_tools']['ACP_TRANSLATOR_CONFIG'] = mx_append_sid( 'modules/mx_translator/admin/' . $basename . '?mode=config');	
+	$module['Language_tools']['ACP_TRANSLATE_MX_PORTAL'] = mx_append_sid( 'modules/mx_translator/admin/' . $basename . '?s=MXP&mode=translate');
+	$module['Language_tools']['ACP_TRANSLATE_MX_MODULES'] = mx_append_sid( 'modules/mx_translator/admin/' . $basename . '?s=MODS&mode=translate');
+	$module['Language_tools']['ACP_TRANSLATE_PHPBB_LANG'] = mx_append_sid( 'modules/mx_translator/admin/' . $basename . '?s=PHPBB&mode=translate');
+	$module['Language_tools']['ACP_TRANSLATE_PHPBB_EXT'] = mx_append_sid( 'modules/mx_translator/admin/' . $basename . '?s=phpbb_ext&mode=translate');		
+	return;
+}
+/* */
+
 $mx_root_path = './../../../';
 $module_root_path = $mx_root_path . 'modules/mx_translator/';
 $admin_module_root_path = $module_root_path . 'admin/';
@@ -18,24 +32,11 @@ $admin_module_root_path = $module_root_path . 'admin/';
 //$module_root_path = $phpbb_root_path . 'ext/orynider/mx_translator/';
 //$admin_module_root_path = $module_root_path . 'acp/';
 
-@define('IN_PORTAL', 1);
-
-/* */
-if ( !empty( $setmodules))
-{	
-	$module['Language_tools']['ACP_TRANSLATOR_CONFIG'] = mx_append_sid( $admin_module_root_path . $basename . '?mode=config');	
-	$module['Language_tools']['ACP_TRANSLATE_MX_PORTAL'] = mx_append_sid( $admin_module_root_path . $basename . '?s=MXP&mode=translate');
-	$module['Language_tools']['ACP_TRANSLATE_MX_MODULES'] = mx_append_sid( $admin_module_root_path . $basename . '?s=MODS&mode=translate');
-	$module['Language_tools']['ACP_TRANSLATE_PHPBB_LANG'] = mx_append_sid( $admin_module_root_path . $basename . '?s=PHPBB&mode=translate');
-	$module['Language_tools']['ACP_TRANSLATE_PHPBB_EXT'] = mx_append_sid( $admin_module_root_path . $basename . '?s=phpbb_ext&mode=translate');		
-	return;
-}
-/* */
-
 /**
 * mx_langtools ACP module
  */
-@define('IN_ADMIN', 1); 
+define('IN_PORTAL', 1);
+define('IN_ADMIN', 1); 
 $phpEx = substr( __FILE__, strrpos( __FILE__, '.') + 1);
 if (!defined('PHP_EXT')) define('PHP_EXT', $phpEx);
 $lang = array();
@@ -56,7 +57,6 @@ define('IN_AJAX', (isset($_GET['ajax']) && ($_GET['ajax'] == 1) && ($_SERVER['HT
 
 /* START Include language file */
 $language = ($mx_user->user_language_name) ? $mx_user->user_language_name : (($board_config['default_lang']) ? $board_config['default_lang'] : 'english');
-
 if ((@include $module_root_path . "language/lang_" . $language . "/info_acp_translator.$phpEx") === false)
 {
 	if ((@include $module_root_path . "language/lang_english/info_acp_translator.$phpEx") === false)
@@ -131,7 +131,7 @@ function acp_translator_set_config($config_name, $config_value)
 function acp_translator_get_config($use_cache = true)
 {
 	global $db, $mx_cache, $translator_config, $mx_table_prefix;
-	global $board_config;
+	global $board_config;	
 	
 	$mx_table_prefix = !empty($mx_table_prefix) ? $mx_table_prefix : 'mx_';
 	define('TRANSLATOR_CONFIG_TABLE', $mx_table_prefix . "translator_config");
@@ -269,6 +269,7 @@ switch ($mode)
 			$template->set_filenames(array('body' => $tpl_name.'.html'));
 			$template->assign_block_vars('file_to_translate_select', array());
 			
+			$basename = basename( __FILE__);				
 			$s_action = $admin_module_root_path . $basename;
 			$params = $_SERVER['QUERY_STRING'];	
 			
@@ -338,18 +339,21 @@ switch ($mode)
 		{ // AJAX
 			$template->set_filenames( array('body' => 'selects.html'));			
 			$style = "width:100%;"; 
+			
 			if ($into == 'language')
 			{
 				$option_list = $mxp_translator->gen_select_list('html', 'language', $mxp_translator->language_into, $mxp_translator->language_from);
 				$name = 'language[into]';
 				$id = 'f_lang_into';
 			}
+			
 			if ($into == 'files')
 			{				
 				$option_list = $mxp_translator->gen_select_list('html', 'files', $mxp_translator->module_file);
 				$name = 'translate[file]';
 				$id = 'f_select_file';
 			}
+			
 			$template->assign_block_vars('ajax_select', array(
 				'NAME'		=> $name,
 				'ID'		=> $id,

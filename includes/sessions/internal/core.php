@@ -30,10 +30,12 @@ include_once($mx_root_path . 'includes/sessions/internal/functions.' . $phpEx);
 //
 // Load here Backend Permissions if this is required
 //
+include_once($mx_root_path . 'includes/sessions/internal/auth.' . $phpEx);
 
 //
 // Init the auth class if this is required
 //
+$phpbb_auth = new mx_auth_base();
 
 //
 // Instantiate Dummy Forum Specific Shared Classes
@@ -176,8 +178,8 @@ class mx_backend
 		
 		$server_url_phpbb = !empty($portal_config['portal_phpbb_url']) ? $server_url . $script_name_phpbb : $server_url_phpbb;				
 		$server_url_phpbb = (empty($portal_config['portal_phpbb_url']) || preg_match('@^(?:phpbb.com)?([^/]+)@i', $portal_config['portal_phpbb_url'])) ? $server_url_phpbb : $portal_config['portal_phpbb_url'];	
-		
-		define('PHPBB_URL', $server_url_phpbb);
+		//For internal backend we ignore portal_phpbb_url a.t.m.
+		define('PHPBB_URL', $server_url);
 		define('PORTAL_URL', $board_url);		
 		define('BOARD_URL', $server_url);	
 		
@@ -982,7 +984,7 @@ class mx_backend
 			{
 				if (!function_exists('mx_message_die'))
 				{
-					die("Couldnt query portal configuration, Allso this hosting or server is using a cache optimizer not compatible with MX-Publisher or just lost connection to database wile query.");
+					die("mx_bakend::obtain_portal_config(); Couldnt query portal configuration, Allso this hosting or server is using a cache optimizer not compatible with MX-Publisher or just lost connection to database wile query.");
 				}
 				else
 				{
@@ -1141,7 +1143,7 @@ class mx_backend
 			{
 				if (!function_exists('mx_message_die'))
 				{
-					die("Couldnt query config information, Allso this hosting or server is using a cache optimizer not compatible with MX-Publisher or just lost connection to database wile query.");
+					die("mx_backend::obtain_phpbb_config(); Couldnt query config information, Allso this hosting or server is using a cache optimizer not compatible with MX-Publisher or just lost connection to database wile query.");
 				}
 				else
 				{

@@ -1236,9 +1236,9 @@ class mx_admin
 	{
 		global $template, $lang, $db, $board_config, $theme, $phpEx, $mx_request_vars, $mx_cache, $mx_root_path, $mx_table_prefix, $table_prefix, $userdata;
 		global $controller_block;
-		$block_id = $id;
+		
 		$message_child = '';
-		$words_removed = false;
+		
 		switch ( $type )
 		{
 			case MX_MODULE_TYPE: // ????????
@@ -2751,10 +2751,7 @@ class mx_admin
 		//
 		for($i = 0; $i < count($fcontents) && !$pak_error; $i++)
 		{
-			global $mx_request_vars;
 			$module_data = explode($delimeter, trim(addslashes($fcontents[$i])));
-			$module_data[7] = isset($module_data[7]) ? $module_data[7] : $mx_request_vars->post('parameter_auth', MX_TYPE_INT, 0); 
-			$module_data[8] = isset($module_data[8]) ? $module_data[8] : $parameter_order; 
 			switch( $module_data[0] )
 			{
 				//
@@ -2794,17 +2791,16 @@ class mx_admin
 					$function_id = $module_data[2] > 0 ? $module_data[2] : $function_id;
 
 					$sql_add = "INSERT INTO " . FUNCTION_TABLE . " (module_id, function_id, function_name, function_desc, function_file, function_admin)
-						VALUES ('" . intval($module_data[1]) . "', '" . str_replace("\'", "''",$module_data[2]) . "', '" . str_replace("\'", "''",$module_data[3]) . "', '" . str_replace("\'", "''",$module_data[4]) . "', '" . str_replace("\'", "''",$module_data[5]) . "', '" . str_replace("\'", "''",$module_data[6]) . "' )";
-						
+						VALUES ( '$module_data[1]', '$module_data[2]', '$module_data[3]', '$module_data[4]', '$module_data[5]', '$module_data[6]' )";
+
 					$sql_update = "UPDATE " . FUNCTION_TABLE . "
-						SET module_id       	= '" . intval($module_data[1]) . "',
-							function_id     	= '" . str_replace("\'", "''",$module_data[2]) . "',
-							function_name     	= '" . str_replace("\'", "''",$module_data[3]) . "',
-							function_desc     	= '" . str_replace("\'", "''",$module_data[4]) . "',
-							function_file 	= '" . str_replace("\'", "''", $module_data[5]) . "',
-							function_admin 	= '" . str_replace("\'", "''",$module_data[6]) . "'
-						WHERE function_id  = '" . intval($module_data[2]) . "'";
-						
+						SET module_id     = '$module_data[1]',
+							function_name = '$module_data[3]',
+							function_desc = '$module_data[4]',
+							function_file = '$module_data[5]',
+							function_admin= '$module_data[6]'
+						WHERE function_id = '$module_data[2]'";
+
 					$sql_delete = "DELETE FROM " . FUNCTION_TABLE . " WHERE module_id = " . $module_data[1] . " AND function_id = " . $module_data[2];
 					break;
 
@@ -2816,8 +2812,6 @@ class mx_admin
 					$table = PARAMETER_TABLE;
 					$fldkey = 'parameter_id';
 					$key = $module_data[2];
-					
-					++$parameter_order;
 					$sql_add = "INSERT INTO " . PARAMETER_TABLE . " (function_id, parameter_id, parameter_name, parameter_type, parameter_default, parameter_function, parameter_auth, parameter_order)
 						VALUES ( '" . intval($module_data[1]) . "', '" . intval($module_data[2]) . "', '" . str_replace("\'", "''", $module_data[3]) . "', '" . str_replace("\'", "''",$module_data[4]) . "', '" . str_replace("\'", "''", $module_data[5]) . "', '" . str_replace("\'", "''", $module_data[6]) . "', '" . str_replace("\'", "''", $module_data[7]) . "', '" . str_replace("\'", "''", $module_data[8]) . "' ) ";
 
@@ -4206,7 +4200,7 @@ class mx_dynamic_select
  * @param unknown_type $main_install
  * @return unknown
  */
-function mx_do_install_upgrade(array $sql, $main_install = false)
+function mx_do_install_upgrade($sql = '', $main_install = false)
 {
 	global $table_prefix, $mx_table_prefix, $userdata, $phpEx, $template, $lang, $db, $board_config;
 
@@ -4214,7 +4208,7 @@ function mx_do_install_upgrade(array $sql, $main_install = false)
 	$n = 0;
 	$message = "<b>" . $lang['list_of_queries'] . "</b><br /><br />";
 
-	while (isset($sql[$n]))
+	while ( $sql[$n] )
 	{
 		if ( !$result = $db->sql_query( $sql[$n] ) )
 		{

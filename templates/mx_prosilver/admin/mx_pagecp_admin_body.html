@@ -305,7 +305,6 @@ window.onload = doOnLoadFunctions;
 		</fieldset>
 	</form>
 </div>
-
 <div style="clear:both">
 {RESULT_MESSAGE}
 </div>
@@ -345,69 +344,58 @@ function setActiveTab()
 setActiveTab();
 -->
 </script>
-<div class="panel bg3">
+<div class="acp">
+	<div class="panel bg3">
 	<span class="corners-top"><span></span></span>
-	<div style="clear:both"></div>
-	<div class="inner" style="padding:0.4em">
-	<!-- BEGIN no_pages -->
-	<div class="inner">{nopages.NONE}</div>
-	<!-- END no_pages -->
-	<!-- BEGIN pages -->
-	<div id="adminPage_{pages.PAGE_ID}" class="inner" style="display:{pages.VISIBLE};clear:both;">
-		<div style="float:right;height:40px;horizontal-align:center">
-			<!-- BEGIN is_page -->
-			<a href="{pages.U_PREVIEW}" target="_blank" title="{L_PREVIEW}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_preview.gif" align="absmiddle" /></a>
-			<a href="javascript:onMenuCatClick('{pages.PAGE_ID}','adminPageEdit_');" title="{L_EDIT}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_edit.gif" align="absmiddle" /></a>
-			<a href="javascript:onMenuCatClick('{pages.PAGE_ID}','adminPageSettings_');" title="{L_SETTING}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_edit_page.gif" align="absmiddle" /></a>
-			<a href="javascript:onMenuCatClick('{pages.PAGE_ID}','adminPagePrivate_');" title="{L_PERMISSIONS}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_permissions.gif" align="absmiddle" /></a>
-			<a href="javascript:onMenuCatClick('{pages.PAGE_ID}','adminPageDelete_');" title="{L_DELETE}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_delete.gif" align="absmiddle" /></a>
-			<!-- END is_page -->
-		</div>
-		<div style="float:left;height:40px;horizontal-align:center">
-			{pages.PAGE_ICON}
-			<strong>{pages.PAGE_TITLE}</strong>
-			<span class="explain">{pages.PAGE_DESC}</span>
-		</div>
-		<!-- BEGIN reload -->
-		<div style="clear:both;">
-			<a href="{pages.reload.U_PAGE_EDIT}">Reload nedded</a>
-		</div>
-		<!-- END reload -->
-		<div style="clear:both;"></div>
-		<!-- PAGE Delete -->
-		<div id="adminPageDelete_{pages.PAGE_ID}" style="clear:both;padding-top:0.1em;display:{pages.VISIBLE_DELETE};">
-			<fieldset>
-				<legend style="cursor:pointer;" onclick="onMenuCatClick('{pages.PAGE_ID}','adminPageDelete_');">
-					<img src="{IMG_URL_CONTRACT}" border="0" align="absmiddle" />
-					<img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_delete.gif" align="absmiddle" />
-					{L_DELETE}
-				</legend>
-				<p>
-					{pages.MESSAGE_DELETE}
-				</p>
-			</fieldset>
-		</div>
-		<!-- PAGE Delete -->
-		<!-- PAGE Private -->
-		<div id="adminPagePrivate_{pages.PAGE_ID}" style="clear:both;padding-top:0.1em;display:{pages.VISIBLE_PRIVATE};">
-			<form action="{S_ACTION}" method="post">
+	<div class="content">
+		<!-- BEGIN no_pages -->
+		<div>{nopages.NONE}</div>
+		<!-- END no_pages -->
+		<!-- BEGIN pages -->
+		<div id="adminPage_{pages.PAGE_ID}" class="clear" style="display:{pages.VISIBLE};">
+			<div class="header">
+				<!-- BEGIN is_page -->
+				<div class="buttons">
+					<a href="{pages.U_PREVIEW}" target="_blank" title="{L_PREVIEW}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_preview.gif" align="absmiddle" /></a>
+					<a href="javascript:onMenuCatClick('{pages.PAGE_ID}','adminPageEdit_');" title="{L_EDIT}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_edit.gif" align="absmiddle" /></a>
+					<a href="javascript:onMenuCatClick('{pages.PAGE_ID}','adminPageSettings_');" title="{L_SETTING}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_edit_page.gif" align="absmiddle" /></a>
+					<a href="javascript:onMenuCatClick('{pages.PAGE_ID}','adminPagePrivate_');" title="{L_PERMISSIONS}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_permissions.gif" align="absmiddle" /></a>
+					<a href="javascript:onMenuCatClick('{pages.PAGE_ID}','adminPageDelete_');" title="{L_DELETE}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_delete.gif" align="absmiddle" /></a>
+				</div>
+				<!-- END is_page -->
+				{pages.PAGE_ICON}
+				<span class="title"><strong>{pages.PAGE_TITLE}</strong></span>
+				<span class="explain">{pages.PAGE_DESC}</span>
+			</div>
+			<!-- BEGIN reload -->
+			<div class="settings">
+				<a href="{pages.reload.U_PAGE_EDIT}">{L_RELOAD}</a>
+			</div>
+			<!-- END reload -->
+			<!-- PAGE Delete -->
+			<div id="adminPageDelete_{pages.PAGE_ID}" class="settings" style="display:{pages.VISIBLE_DELETE};">
 				<fieldset>
-					<legend style="cursor:pointer;" onclick="onMenuCatClick('{pages.PAGE_ID}','adminPagePrivate_');">
-						<img src="{IMG_URL_CONTRACT}" border="0" align="absmiddle" />
-						{L_PERMISSIONS}
-					</legend>
-					<p>
+					<legend onclick="onMenuCatClick('{pages.PAGE_ID}','adminPageDelete_');">{L_DELETE}</legend>
+					<p>{pages.MESSAGE_DELETE}</p>
+				</fieldset>
+			</div>
+			<!-- PAGE Private -->
+			<div id="adminPagePrivate_{pages.PAGE_ID}" class="settings" style="display:{pages.VISIBLE_PRIVATE};">
+				<form action="{S_ACTION}" method="post">
+					<fieldset>
+						<legend onclick="onMenuCatClick('{pages.PAGE_ID}','adminPagePrivate_');">{L_PERMISSIONS}</legend>
 				      	<table border="0">
 				      		<thead>
 							<tr>
-								<th width="50%" align="center" height="20" nowrap="nowrap"><b>{L_GROUPS}</b></th>
-								<th width="25%" align="center" nowrap="nowrap"><b>{L_VIEW}</b></th>
-								<th width="24%" align="center" nowrap="nowrap"><b>{L_IS_MODERATOR}</b></th>
+								<th width="48%" align="center" height="20" nowrap="nowrap">{L_GROUPS}</th>
+								<th width="25%" align="center" nowrap="nowrap">{L_VIEW}</th>
+								<th width="24%" align="center" nowrap="nowrap">{L_IS_MODERATOR}</th>
+								<th width="40px" align="center" nowrap="nowrap">&nbsp;</th>
 							</tr>
 							</thead>
 							<tbody>
 							<tr>
-								<td align="center" colspan="3">
+								<td align="center" colspan="4">
 									<div style="overflow:auto; overflow-y:scroll; height:200px;">
 									<table width="100%" cellpadding="0" cellspacing="0" border="0" align="center">
 										<tbody>
@@ -429,367 +417,359 @@ setActiveTab();
 							</tr>
 							</tbody>
 						</table>
-					<p align="center">
-					{pages.S_HIDDEN_PRIVATE_FIELDS}
-					<input type="submit" name="submit" value="{pages.S_SUBMIT}" class="button2" />
-					</p>
-				</fieldset>
-			</form>
-		</div>
-		<!-- PAGE Private -->
-		<!-- PAGE Edit -->
-		<!-- BEGIN is_page -->
-		<div id="adminPageEdit_{pages.PAGE_ID}" style="display:{pages.VISIBLE_EDIT};clear:both;padding-top:0.1em">
-		<!-- END is_page -->
-			<form action="{S_ACTION}" method="post">
-				<fieldset>
-					<legend style="cursor:pointer" onclick="onMenuCatClick('{pages.PAGE_ID}','adminPageEdit_');">
-						<img src="{IMG_URL_CONTRACT}" border="0" align="absmiddle" />
-						<img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_edit.gif" align="absmiddle" />
-						{L_EDIT}
-					</legend>
-					<dl>
-						<dt><label for="page_name">{L_PAGE_TITLE}</label></dt>
-						<dd><input type="text" size="45" name="page_name" id="page_name" value="{pages.E_PAGE_TITLE}" /></dd>
-					</dl>
-					<dl>
-						<dt><label for="page_desc">{L_PAGE_DESC}</label></dt>
-						<dd><input type="text" size="45" name="page_desc" id="page_desc" value="{pages.E_PAGE_DESC}" /></dd>
-					</dl>
-					<dl>
-						<dt><label for="page_parent">{L_PAGE_PARENT}</label></dt>
-						<dd>
-							<select name="page_parent" id="page_parent">
-								{pages.E_PAGE_PARENT}
-							</select>
-						</dd>
-					</dl>
-					<dl>
-						<dt><label for="page_header">{L_PAGE_HEADER}</label></dt>
-						<dd><input type="text" size="45" name="page_header" id="page_header" value="{pages.E_PAGE_HEADER}" class="post" /></dd>
-					</dl>
-					<dl>
-						<dt><label for="page_footer">{L_PAGE_FOOTER}</label></dt>
-						<dd><input type="text" size="45" name="page_footer" id="page_footer" value="{pages.E_PAGE_FOOTER}" class="post" /></dd>
-					</dl>
-					<dl>
-						<dt><label for="style_select">{L_DEFAULT_STYLE}</label></dt>
-						<dd>{pages.STYLE_SELECT}</dd>
-					</dl>
-					<dl>
-						<dt><label for="AmxOrsA_{pages.PAGE_ID}">{L_OVERRIDE_STYLE}</label><br />
-						<span class="explain">{L_OVERRIDE_STYLE_EXPLAIN}</span></dt>
-						<dd>
-							<input type="radio" name="mx_override_user_style" id="AmxOrsA_{pages.PAGE_ID}" value="-1" class="radio" {pages.OVERRIDE_STYLE_DEFAULT} /> <label for="AmxOrsA_{pages.PAGE_ID}">{L_DEFAULT}</label>&nbsp;
-							<input type="radio" name="mx_override_user_style" id="BmxOrsB_{pages.PAGE_ID}" value="1" class="radio" {pages.OVERRIDE_STYLE_YES} /> <label for="BmxOrsB_{pages.PAGE_ID}">{L_YES}</label>&nbsp;
-							<input type="radio" name="mx_override_user_style" id="CmxOrsC_{pages.PAGE_ID}" value="0" class="radio" {pages.OVERRIDE_STYLE_NO} /> <label for="CmxOrsC_{pages.PAGE_ID}">{L_NO}</label>
-						</dd>
-					</dl>
-					<dl>
-						<dt><label for="page_main_layout">{L_PAGE_MAIN_LAYOUT}</label></dt>
-						<dd><input type="text" size="45" name="page_main_layout" id="page_main_layout" value="{pages.E_PAGE_MAIN_LAYOUT}" class="post" /></dd>
-					</dl>
-					<dl>
-						<dt><label for="navigation_block">{L_NAVIGATION_BLOCK}</label><br /><span class="explain">{L_NAVIGATION_BLOCK_EXPLAIN}</span></dt>
-						<dd>{pages.E_NAVIGATION_BLOCK}</dd>
-					</dl>
-					<dl>
-						<dt><label for="phpbb_stats_{pages.PAGE_ID}_0">{L_PHPBB_STATS}</label><br /><span class="explain">{L_PHPBB_STATS_EXPLAIN}</span></dt>
-						<dd>
-							<input type="radio" id="phpbb_stats_{pages.PAGE_ID}_0" name="phpbb_stats" value="-1" class="radio" {pages.S_PHPBB_STATS_DEFAULT} /> <label for="phpbb_stats_{pages.PAGE_ID}_0">{L_DEFAULT}</label>&nbsp;
-							<input type="radio" id="phpbb_stats_{pages.PAGE_ID}_1" name="phpbb_stats" value="1" class="radio" {pages.S_PHPBB_STATS_YES} /> <label for="phpbb_stats_{pages.PAGE_ID}_1">{L_YES}</label>&nbsp;
-							<input type="radio" id="phpbb_stats_{pages.PAGE_ID}_2" name="phpbb_stats" value="0" class="radio" {pages.S_PHPBB_STATS_NO} /> <label for="phpbb_stats_{pages.PAGE_ID}_2">{L_NO}</label>
-						</dd>
-					</dl>
-					<dl>
-						<dt><label for="ip_filter">{L_IP_FILTER}</label><br /><span class="explain">{L_IP_FILTER_EXPLAIN}</span></dt>
-						<dd><textarea rows="5" cols="50" wrap="virtual" name="ip_filter" id="ip_filter" class="post" />{pages.IP_FILTER}</textarea></dd>
-					</dl>
-					<!-- BEGIN template -->
-					<dl>
-						<dt><label>{pages.L_CHOOSE_PAGE_TEMPLATE}</label></dt>
-						<dd>{pages.S_TEMPLATE_LIST}</dd>
-					</dl>
-					<!-- END template -->
-					<dl>
-						<dt><label>{L_AUTH_TITLE}</label></dt>
-						<dd>
-						      <table border="0">
-						      	<thead>
-						    	<tr>
-						    	  <!-- BEGIN page_auth_titles -->
-						    	  <th>{pages.page_auth_titles.CELL_TITLE}</th>
-						    	  <!-- END page_auth_titles -->
-						    	</tr>
-						    	</thead>
-						    	<tbody>
-								<tr>
-								<!-- BEGIN page_auth_data -->
-						    	  <td align="center">{pages.page_auth_data.S_AUTH_LEVELS_SELECT}</td>
-						   	    <!-- END page_auth_data -->
-						    	</tr>
-						   	    </tbody>
-						      </table>
-						</dd>
-					</dl>
-					<dl>
-						<dt><label>{L_PAGE_ICON}</label></dt>
-						<dd style="background-image: url('{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}theme/images/bg_header.gif');">{pages.S_PAGE_ICON}</dd>
-					</dl>
-					<dl>
-						<dt><label for="page_alt_icon">{L_PAGE_ALT_ICON}</label></dt>
-						<dd><input type="text" size="65" name="page_alt_icon" id="page_alt_icon" value="{pages.S_PAGE_ALT_ICON}" class="post" /></dd>
-					</dl>
-					<p align="center">
-						{pages.S_HIDDEN_FIELDS}
-						<input type="submit" name="submit" value="{pages.S_SUBMIT}" class="button1" />
-					</p>
-				</fieldset>
-			</form>
-		<!-- BEGIN is_page -->
-		</div>
-		<!-- END is_page -->
-		<!-- PAGE Edit -->
-		<!-- PAGE Setting -->
-		<div id="adminPageSettings_{pages.PAGE_ID}" style="display:{pages.VISIBLE_SETTINGS};clear:both;margin:1.0em;padding:0.2em;">
-			<!-- BEGIN has_columns -->
-			<!-- dynamic_select -->
-			<div class="inner" style="margin:8px;">
-				<form name="DYNAMIC_LIST" method="post" action="{S_ACTION}" onsubmit="return checkForm(this)">
-					<div style="float:left;">
-						<strong>{L_MODULE}</strong><br/>
-							<select name="module_id" MULTIPLE size=5>
-								{DYNAMIC_MODULE_SELECT}
-							</select>
-					</div>
-					<div style="float:left;margin-left:15px;">
-						<strong>{L_FUNCTION}</strong><br />
-							<select name="function_id" MULTIPLE size=5>
-								<script LANGUAGE="JavaScript">makeModule.printOptions("function_id")</script>
-							</select>
-					</div>
-					<div style="float:left;margin-left:15px;">
-						<strong>{L_BLOCK}</strong><br />
-							<select name="block_id" MULTIPLE size=5>
-								<script LANGUAGE="JavaScript">makeModule.printOptions("block_id")</script>
-							</select>
-
-					</div>
-					<div style="float:left;margin-left:15px;">
-						<strong>{L_COLUMN}</strong><br/>
-						{RADIO_COLUMN_LIST}
-						<br/>
-						<input type="button" value="{L_RESET}" onClick="this.form.reset(); resetDynamicOptionLists(this.form);" class="button2"> &nbsp;
-						<input type="submit" value="{L_CREATE_BLOCK} &raquo; {L_COLUMN}" class="button2" />
-						{S_HIDDEN_DYN_FIELDS}
-					</div>
-				</form>
-			</div>
-			<div style="clear:both;">
-			</div>
-			<!-- dynamic_select -->
-			<!-- END has_columns -->
-			<!-- BEGIN columnrow -->
-			<div style="clear:both;border-top:solid 1px #CCCCCC;padding:3px;">
-				<!-- BEGIN is_columnrow -->
-				<div style="float:right;padding-bottom:0.2em;">
-					<a href="javascript:onMenuCatClick('{pages.PAGE_ID}_{pages.columnrow.COLUMN_ID}','adminColumnEdit_');" title="{L_EDIT}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_edit.gif" align="absmiddle"></a>
-					<a href="{pages.columnrow.U_COLUMN_MOVE_UP}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_up.gif" title="{pages.columnrow.L_MOVE_UP}" alt="{pages.columnrow.L_MOVE_UP}" align="absmiddle"/></a>
-					<a href="{pages.columnrow.U_COLUMN_MOVE_DOWN}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_down.gif" title="{pages.columnrow.L_MOVE_DOWN}" alt="{pages.columnrow.L_MOVE_DOWN}" align="absmiddle"/></a>
-					<a href="javascript:onMenuCatClick('{pages.PAGE_ID}_{pages.columnrow.COLUMN_ID}','adminColumnDelete_');" title="{pages.columnrow.L_DELETE}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_delete.gif" align="absmiddle"></a>
-				</div>
-				<!-- END is_columnrow -->
-				<div style="float:left;padding:bottom:0.2em;">
-					<span style="cursor:pointer;" onclick="onMenuCatClick('{pages.PAGE_ID}_{pages.columnrow.COLUMN_ID}','adminColumnEdit_');">
-						<img src="{IMG_ICON_PAGE_COLUMN}" border="0" align="absmiddle">
-					</span>
-					<a href="javascript:onMenuCatClick('{pages.PAGE_ID}_{pages.columnrow.COLUMN_ID}','adminColumnEdit_');"><b>{pages.columnrow.L_COLUMN}</b>: {pages.columnrow.COLUMN_TITLE}</a>
-				</div>
-			</div>
-
-			<!-- PAGE COLUMN Delete -->
-			<div id="adminColumnDelete_{pages.PAGE_ID}_{pages.columnrow.COLUMN_ID}" style="clear:both;padding-top:0.1em;display:{pages.columnrow.VISIBLE_DELETE};">
-				<fieldset>
-					<legend>{pages.columnrow.L_DELETE}</legend>
-					<p>
-						{pages.columnrow.MESSAGE_DELETE}
-					</p>
-				</fieldset>
-			</div>
-			<!-- PAGE COLUMN Delete -->
-			<!-- PAGE COLUMN Edit -->
-			<div id="adminColumnEdit_{pages.PAGE_ID}_{pages.columnrow.COLUMN_ID}" style="clear:both;padding-top:0.1em;display:{pages.columnrow.VISIBLE};">
-		  	<form action="{S_ACTION}" method="post">
-		  		<fieldset>
-		  			<legend style="cursor:pointer;" onclick="onMenuCatClick('{pages.PAGE_ID}_{pages.columnrow.COLUMN_ID}','adminColumnEdit_');">
-		  				<img src="{IMG_URL_CONTRACT}" border="0" align="absmiddle">
-		  				{pages.columnrow.L_TITLE}
-		  			</legend>
-		  			<dl>
-		  				<dt><label for="column_title_{pages.PAGE_ID}_{pages.columnrow.COLUMN_ID}">{pages.columnrow.L_COLUMN}</label></dt>
-		  				<dd><input type="text" size="25" name="column_title" id="column_title_{pages.PAGE_ID}_{pages.columnrow.COLUMN_ID}" value="{pages.columnrow.E_COLUMN_TITLE}" /></dd>
-		  			</dl>
-		  			<dl>
-		  				<dt><label for="column_size_{pages.PAGE_ID}_{pages.columnrow.COLUMN_ID}">{pages.columnrow.L_COLUMN_SIZE}</label></dt>
-		  				<dd><input type="text" maxlength="5" size="5" name="column_size" id="column_size_{pages.PAGE_ID}_{pages.columnrow.COLUMN_ID}" value="{pages.columnrow.E_COLUMN_SIZE}" /></dd>
-		  			</dl>
-		  			<p align="center">
-		  				{pages.columnrow.S_HIDDEN_FIELDS}
-		  				<input type="submit" name="submit" value="{pages.columnrow.S_SUBMIT}" class="button1" />
-		  			</p>
-		  		</fieldset>
-			</form>
-			</div>
-			<!-- PAGE COLUMN Edit -->
-			<!-- BEGIN blockrow -->
-			<div style="clear:both;margin-left:16px;border-top:solid 1px #CCCCCC;">
-				<div style="float:right;margin-right:20px;">
-					<a href="{pages.columnrow.blockrow.U_BLOCK_SETTING}" title="{pages.columnrow.blockrow.L_SETTING}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_edit.gif" align="absmiddle"></a>
-					<a href="{pages.columnrow.blockrow.U_BLOCK_MOVE_UP}" title="{L_MOVE_UP}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_up.gif" align="absmiddle"></a>
-					<a href="{pages.columnrow.blockrow.U_BLOCK_MOVE_DOWN}" title="{L_MOVE_DOWN}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_down.gif" align="absmiddle"></a>
-					<a href="{pages.columnrow.blockrow.U_BLOCK_RESYNC}" title="{L_RESYNC}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_sync.gif" align="absmiddle"></a>
-					<a href="{pages.columnrow.blockrow.U_BLOCK_DELETE}" title="{pages.columnrow.blockrow.L_REMOVE}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_delete.gif" align="absmiddle"></a>
-				</div>
-				<div style="float:left;padding-right:5px;">
-					<img src="{IMG_ICON_BLOCK}" border="0" align="absmiddle">
-				</div>
-				<div style="float:left">
-					{pages.columnrow.blockrow.BLOCK_TITLE}
-					<span class="explain">{pages.columnrow.blockrow.BLOCK_LAST_EDITED}
-					{pages.columnrow.blockrow.BLOCK_DESC}</span>
-				</div>
-			</div>
-			<!-- END blockrow -->
-			<!-- BEGIN add_block -->
-			<div style="clear:both;margin-left:16px;border-top:solid 1px #CCCCCC;">
-				<div style="float:left;margin:4px;">
-				<form method="post" action="{S_ACTION}">
-					{pages.columnrow.add_block.LIST_BLOCK}
-					{pages.columnrow.add_block.S_HIDDEN_FIELDS}
-					<input type="submit" class="button2"  name="submit" value="{pages.columnrow.add_block.S_SUBMIT}" />
-				</form>
-				</div>
-			</div>
-			<!-- END add_block -->
-			<!-- END columnrow -->
-		</div>
-
-		<!-- PAGE Setting -->
-	</div>
-	<!-- END pages -->
-	</div>
-	<div id="adminPage_Template" style="display:{VISIBLE};clear:both;margin:1.0em;">
-		<!-- BEGIN notemplates -->
-		<div>{nopages.NONE}</div>
-		<!-- END notemplates -->
-		<!-- BEGIN templates -->
-		<div style="clear:both;border-top:solid 1px #CCCCCC;padding-top:3px;padding-bottom:3px;">
-			<div style="clear:both;">
-			<!-- BEGIN delete -->
-				<div style="float:right;">
-					<a href="javascript:onMenuCatClick('{templates.TEMPLATE_ID}','adminTemplateDelete_');" title="{L_DELETE}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_delete.gif"></a>
-				</div>
-			<!-- END delete -->
-				<div  style="float:left;">
-					<span style="cursor:pointer;" onclick="onMenuCatClick('{templates.TEMPLATE_ID}','adminTemplateEdit_');">
-						<img name="adminTemplateEdit_image_{templates.TEMPLATE_ID}" src="{templates.IMG_URL}" border="0" align="absmiddle">
-					{templates.TEMPLATE_ICON}
-					</span>
-					<b>
-			<!-- BEGIN new_template -->
-					<a href="javascript:onMenuCatClick('{templates.TEMPLATE_ID}','adminTemplateEdit_');">{templates.TEMPLATE_TITLE}</a>
-			<!-- END new_template -->
-			<!-- BEGIN current_template -->
-					<a href="javascript:onMenuCatClick('{templates.TEMPLATE_ID}','adminTemplateEdit_');">{templates.TEMPLATE_TITLE}</a>
-			<!-- END current_template -->
-					</b>
-				</div>
-			</div>
-			<!-- TEMPLATE Delete -->
-			<div id="adminTemplateDelete_{templates.TEMPLATE_ID}" style="clear:both;padding-top:0.1em;display:{templates.VISIBLE_DELETE};">
-			<form>
-				<fieldset>
-					<legend>{L_DELETE}</legend>
-					<p>
-						{templates.MESSAGE_DELETE}
-					</p>
-				</fieldset>
-			</form>
-			</div>
-			<!-- TEMPLATE Delete -->
-			<div id="adminTemplateEdit_{templates.TEMPLATE_ID}" style="clear:both;padding-top:0.1em;display:{templates.VISIBLE};">
-			<!-- TEMPLATE Edit -->
-			<form action="{S_ACTION}" method="post">
-				<fieldset>
-					<legend>{L_EDIT}</legend>
-					<dl>
-						<dt><label for="template_name_{templates.TEMPLATE_ID}">{templates.L_TEMPLATE_NAME}</label></dt>
-						<dd><input type="text" size="45" name="template_name" id="template_name_{templates.TEMPLATE_ID}" value="{templates.E_TEMPLATE_TITLE}" /></dd>
-					</dl>
-					<p align="center">
-						{templates.S_HIDDEN_FIELDS}
-						<input type="submit" name="submit" value="{templates.S_SUBMIT}" class="button1" />
-					</p>
-				</fieldset>
-			</form>
-			<!-- TEMPLATE Edit -->
-			<!-- TEMPLATE Main Panel -->
-			<div id="adminTemplateEdit_{templates.TEMPLATE_ID}" style="dis play:{templates.VISIBLE};clear:both;padding-top:0.1em;margin:5px;margin-top:0px;">
-			<!-- BEGIN columnrow -->
-				<div style="clear:both;padding-top:5px;border-top:solid 1px #CCCCCC;margin-top:5px;">
-					<span style="float:right">
-						<a href="{templates.columnrow.U_COLUMN_MOVE_UP}" title="{templates.columnrow.L_MOVE_UP}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_up.gif" align="absmiddle"></a>
-						<a href="{templates.columnrow.U_COLUMN_MOVE_DOWN}" title="{templates.columnrow.L_MOVE_DOWN}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_down.gif" align="absmiddle"></a>
-						<a href="javascript:onMenuCatClick('{templates.TEMPLATE_ID}_{templates.columnrow.COLUMN_ID}','adminTemplateColumnDelete_');" title="{templates.columnrow.L_DELETE}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_delete.gif" align="absmiddle"></a>
-					</span>
-					<span style="float:left">
-						<span style="cursor:pointer;" onclick="onMenuCatClick('{templates.TEMPLATE_ID}_{templates.columnrow.COLUMN_ID}','adminTemplateColumnEdit_');">
-							<img name="adminTemplateColumnEdit_image_{templates.TEMPLATE_ID}_{templates.columnrow.COLUMN_ID}" src="{templates.columnrow.IMG_URL}" border="0" align="absmiddle">&nbsp;<img src="{IMG_ICON_PAGE_COLUMN}" border="0" align="absmiddle">
-						</span>
-						<a href="javascript:onMenuCatClick('{templates.TEMPLATE_ID}_{templates.columnrow.COLUMN_ID}','adminTemplateColumnEdit_');">
-							{templates.columnrow.L_COLUMN}:
-							<span class="explain">{templates.columnrow.COLUMN_TITLE}</span></a>
-						</span>
-					</span>
-				</div>
-				<!-- TEMPLATE COLUMNROW Delete -->
-				<div id="adminTemplateColumnDelete_{templates.TEMPLATE_ID}_{templates.columnrow.COLUMN_ID}" style="display:{templates.columnrow.VISIBLE_DELETE};clear:both;padding-top:0.1em;">
-					<form>
-					<fieldset>
-						<legend>{L_DELETE}</legend>
-						<p>{templates.columnrow.MESSAGE_DELETE}</p>
-					</fieldset>
-					</form>
-				</div>
-				<!-- TEMPLATE COLUMNROW Delete -->
-				<!-- TEMPLATE COLUMNROW Edit -->
-				<div id="adminTemplateColumnEdit_{templates.TEMPLATE_ID}_{templates.columnrow.COLUMN_ID}" style="display:{templates.columnrow.VISIBLE};clear:both;padding-top:0.1em;">
-				<form action="{S_ACTION}" method="post">
-					<fieldset>
-						<legend>{L_EDIT}</legend>
-						<dl>
-							<dt><label for="column_title_{templates.TEMPLATE_ID}_{templates.columnrow.COLUMN_ID}">{templates.columnrow.L_COLUMN_NAME}</label></dt>
-							<dd><input type="text" size="25" name="column_title" id="column_title_{templates.TEMPLATE_ID}_{templates.columnrow.COLUMN_ID}" value="{templates.columnrow.E_COLUMN_TITLE}" /></dd>
-						</dl>
-						<dl>
-							<dt><label for="column_size_{templates.TEMPLATE_ID}_{templates.columnrow.COLUMN_ID}">{templates.columnrow.L_COLUMN_SIZE}</label></dt>
-							<dd><input type="text" maxlength="5" size="5" name="column_size" id="column_size_{templates.TEMPLATE_ID}_{templates.columnrow.COLUMN_ID}" value="{templates.columnrow.E_COLUMN_SIZE}" /></dd>
-						</dl>
 						<p align="center">
-							{templates.columnrow.S_HIDDEN_FIELDS}
-							<input type="submit" name="submit" value="{templates.columnrow.S_SUBMIT}" class="button2" />
+						{pages.S_HIDDEN_PRIVATE_FIELDS}
+						<input type="submit" name="submit" value="{pages.S_SUBMIT}" class="button2" />
 						</p>
 					</fieldset>
 				</form>
+			</div>
+			<!-- PAGE Edit -->
+			<!-- BEGIN is_page -->
+			<div id="adminPageEdit_{pages.PAGE_ID}" class="settings" style="display:{pages.VISIBLE_EDIT};">
+			<!-- END is_page -->
+				<form action="{S_ACTION}" method="post">
+					<fieldset>
+						<legend style="cursor:pointer" onclick="onMenuCatClick('{pages.PAGE_ID}','adminPageEdit_');">{L_EDIT}</legend>
+						<dl>
+							<dt><label for="page_name">{L_PAGE_TITLE}</label></dt>
+							<dd><input type="text" size="45" name="page_name" id="page_name" value="{pages.E_PAGE_TITLE}" /></dd>
+						</dl>
+						<dl>
+							<dt><label for="page_desc">{L_PAGE_DESC}</label></dt>
+							<dd><input type="text" size="45" name="page_desc" id="page_desc" value="{pages.E_PAGE_DESC}" /></dd>
+						</dl>
+						<dl>
+							<dt><label for="page_parent">{L_PAGE_PARENT}</label></dt>
+							<dd>
+								<select name="page_parent" id="page_parent">
+									{pages.E_PAGE_PARENT}
+								</select>
+							</dd>
+						</dl>
+						<dl>
+							<dt><label for="page_header">{L_PAGE_HEADER}</label></dt>
+							<dd><input type="text" size="45" name="page_header" id="page_header" value="{pages.E_PAGE_HEADER}" class="post" /></dd>
+						</dl>
+						<dl>
+							<dt><label for="page_footer">{L_PAGE_FOOTER}</label></dt>
+							<dd><input type="text" size="45" name="page_footer" id="page_footer" value="{pages.E_PAGE_FOOTER}" class="post" /></dd>
+						</dl>
+						<dl>
+							<dt><label for="style_select">{L_DEFAULT_STYLE}</label></dt>
+							<dd>{pages.STYLE_SELECT}</dd>
+						</dl>
+						<dl>
+							<dt><label for="AmxOrsA_{pages.PAGE_ID}">{L_OVERRIDE_STYLE}</label><br />
+							<span class="explain">{L_OVERRIDE_STYLE_EXPLAIN}</span></dt>
+							<dd>
+								<input type="radio" name="mx_override_user_style" id="AmxOrsA_{pages.PAGE_ID}" value="-1" class="radio" {pages.OVERRIDE_STYLE_DEFAULT} /> <label for="AmxOrsA_{pages.PAGE_ID}">{L_DEFAULT}</label>&nbsp;
+								<input type="radio" name="mx_override_user_style" id="BmxOrsB_{pages.PAGE_ID}" value="1" class="radio" {pages.OVERRIDE_STYLE_YES} /> <label for="BmxOrsB_{pages.PAGE_ID}">{L_YES}</label>&nbsp;
+								<input type="radio" name="mx_override_user_style" id="CmxOrsC_{pages.PAGE_ID}" value="0" class="radio" {pages.OVERRIDE_STYLE_NO} /> <label for="CmxOrsC_{pages.PAGE_ID}">{L_NO}</label>
+							</dd>
+						</dl>
+						<dl>
+							<dt><label for="page_main_layout">{L_PAGE_MAIN_LAYOUT}</label></dt>
+							<dd><input type="text" size="45" name="page_main_layout" id="page_main_layout" value="{pages.E_PAGE_MAIN_LAYOUT}" class="post" /></dd>
+						</dl>
+						<dl>
+							<dt><label for="navigation_block">{L_NAVIGATION_BLOCK}</label><br /><span class="explain">{L_NAVIGATION_BLOCK_EXPLAIN}</span></dt>
+							<dd>{pages.E_NAVIGATION_BLOCK}</dd>
+						</dl>
+						<dl>
+							<dt><label for="phpbb_stats_{pages.PAGE_ID}_0">{L_PHPBB_STATS}</label><br /><span class="explain">{L_PHPBB_STATS_EXPLAIN}</span></dt>
+							<dd>
+								<input type="radio" id="phpbb_stats_{pages.PAGE_ID}_0" name="phpbb_stats" value="-1" class="radio" {pages.S_PHPBB_STATS_DEFAULT} /> <label for="phpbb_stats_{pages.PAGE_ID}_0">{L_DEFAULT}</label>&nbsp;
+								<input type="radio" id="phpbb_stats_{pages.PAGE_ID}_1" name="phpbb_stats" value="1" class="radio" {pages.S_PHPBB_STATS_YES} /> <label for="phpbb_stats_{pages.PAGE_ID}_1">{L_YES}</label>&nbsp;
+								<input type="radio" id="phpbb_stats_{pages.PAGE_ID}_2" name="phpbb_stats" value="0" class="radio" {pages.S_PHPBB_STATS_NO} /> <label for="phpbb_stats_{pages.PAGE_ID}_2">{L_NO}</label>
+							</dd>
+						</dl>
+						<dl>
+							<dt><label for="ip_filter">{L_IP_FILTER}</label><br /><span class="explain">{L_IP_FILTER_EXPLAIN}</span></dt>
+							<dd><textarea rows="5" cols="50" wrap="virtual" name="ip_filter" id="ip_filter" class="post" />{pages.IP_FILTER}</textarea></dd>
+						</dl>
+						<!-- BEGIN template -->
+						<dl>
+							<dt><label>{pages.L_CHOOSE_PAGE_TEMPLATE}</label></dt>
+							<dd>{pages.S_TEMPLATE_LIST}</dd>
+						</dl>
+						<!-- END template -->
+						<dl>
+							<dt><label>{L_AUTH_TITLE}</label></dt>
+							<dd>
+							      <table border="0">
+							      	<thead>
+							    	<tr>
+							    	  <!-- BEGIN page_auth_titles -->
+							    	  <th>{pages.page_auth_titles.CELL_TITLE}</th>
+							    	  <!-- END page_auth_titles -->
+							    	</tr>
+							    	</thead>
+							    	<tbody>
+									<tr>
+									<!-- BEGIN page_auth_data -->
+							    	  <td align="center">{pages.page_auth_data.S_AUTH_LEVELS_SELECT}</td>
+							   	    <!-- END page_auth_data -->
+							    	</tr>
+							   	    </tbody>
+							      </table>
+							</dd>
+						</dl>
+						<dl>
+							<dt><label>{L_PAGE_ICON}</label></dt>
+							<dd style="background-image: url('{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}theme/images/bg_header.gif');">{pages.S_PAGE_ICON}</dd>
+						</dl>
+						<dl>
+							<dt><label for="page_alt_icon">{L_PAGE_ALT_ICON}</label></dt>
+							<dd><input type="text" size="65" name="page_alt_icon" id="page_alt_icon" value="{pages.S_PAGE_ALT_ICON}" class="post" /></dd>
+						</dl>
+						<p align="center">
+							{pages.S_HIDDEN_FIELDS}
+							<input type="submit" name="submit" value="{pages.S_SUBMIT}" class="button1" />
+						</p>
+					</fieldset>
+				</form>
+			<!-- BEGIN is_page -->
+			</div>
+			<!-- END is_page -->
+			<!-- PAGE Setting -->
+			<div id="adminPageSettings_{pages.PAGE_ID}" class="settings" style="display:{pages.VISIBLE_SETTINGS};">
+				<!-- BEGIN has_columns -->
+				<!-- dynamic_select -->
+				<div class="inner" style="margin:8px;">
+					<form name="DYNAMIC_LIST" method="post" action="{S_ACTION}" onsubmit="return checkForm(this)">
+						<div style="float:left;">
+							<strong>{L_MODULE}</strong><br/>
+								<select name="module_id" MULTIPLE size=5>
+									{DYNAMIC_MODULE_SELECT}
+								</select>
+						</div>
+						<div style="float:left;margin-left:15px;">
+							<strong>{L_FUNCTION}</strong><br />
+								<select name="function_id" MULTIPLE size=5>
+									<script LANGUAGE="JavaScript">makeModule.printOptions("function_id")</script>
+								</select>
+						</div>
+						<div style="float:left;margin-left:15px;">
+							<strong>{L_BLOCK}</strong><br />
+								<select name="block_id" MULTIPLE size=5>
+									<script LANGUAGE="JavaScript">makeModule.printOptions("block_id")</script>
+								</select>
+	
+						</div>
+						<div style="float:left;margin-left:15px;">
+							<strong>{L_COLUMN}</strong><br/>
+							{RADIO_COLUMN_LIST}
+							<br/>
+							<input type="button" value="{L_RESET}" onClick="this.form.reset(); resetDynamicOptionLists(this.form);" class="button2"> &nbsp;
+							<input type="submit" value="{L_CREATE_BLOCK} &raquo; {L_COLUMN}" class="button2" />
+							{S_HIDDEN_DYN_FIELDS}
+						</div>
+					</form>
 				</div>
-				<!-- TEMPLATE COLUMNROW Edit -->
-			<!-- END columnrow -->
+				<!-- dynamic_select -->
+				<!-- END has_columns -->
+				<div style="clear:both">&nbsp;</div>
+				<!-- BEGIN columnrow -->
+				<div class="clear blockColapse">
+							<div class="header">
+								<!-- BEGIN is_columnrow -->
+								<div class="buttons">
+									<a href="javascript:onMenuCatClick('{pages.PAGE_ID}_{pages.columnrow.COLUMN_ID}','adminColumnEdit_');" title="{L_EDIT}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_edit.gif" align="absmiddle"></a>
+									<a href="{pages.columnrow.U_COLUMN_MOVE_UP}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_up.gif" title="{pages.columnrow.L_MOVE_UP}" alt="{pages.columnrow.L_MOVE_UP}" align="absmiddle"/></a>
+									<a href="{pages.columnrow.U_COLUMN_MOVE_DOWN}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_down.gif" title="{pages.columnrow.L_MOVE_DOWN}" alt="{pages.columnrow.L_MOVE_DOWN}" align="absmiddle"/></a>
+									<a href="javascript:onMenuCatClick('{pages.PAGE_ID}_{pages.columnrow.COLUMN_ID}','adminColumnDelete_');" title="{pages.columnrow.L_DELETE}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_delete.gif" align="absmiddle"></a>
+								</div>
+								<!-- END is_columnrow -->
+								<span class="title" onclick="onMenuCatClick('{pages.PAGE_ID}_{pages.columnrow.COLUMN_ID}','adminColumnEdit_');">
+									<img src="{IMG_ICON_PAGE_COLUMN}" /> <strong>{pages.columnrow.L_COLUMN}: {pages.columnrow.COLUMN_TITLE}</strong>
+								</span>
+							</div>
+							<!-- PAGE COLUMN Delete -->
+							<div id="adminColumnDelete_{pages.PAGE_ID}_{pages.columnrow.COLUMN_ID}" class="settings" style="display:{pages.columnrow.VISIBLE_DELETE};">
+								<fieldset>
+									<legend onclick="onMenuCatClick('{pages.PAGE_ID}_{pages.columnrow.COLUMN_ID}','adminColumnDelete_');">{pages.columnrow.L_DELETE}</legend>
+									<p>{pages.columnrow.MESSAGE_DELETE}</p>
+								</fieldset>
+							</div>
+							
+							<!-- PAGE COLUMN Edit -->
+							<div id="adminColumnEdit_{pages.PAGE_ID}_{pages.columnrow.COLUMN_ID}" style="clear:both;padding-top:0.1em;display:{pages.columnrow.VISIBLE};">
+							  	<form action="{S_ACTION}" method="post">
+							  		<fieldset>
+							  			<legend onclick="onMenuCatClick('{pages.PAGE_ID}_{pages.columnrow.COLUMN_ID}','adminColumnEdit_');">{pages.columnrow.L_TITLE}</legend>
+							  			<dl>
+							  				<dt><label for="column_title_{pages.PAGE_ID}_{pages.columnrow.COLUMN_ID}">{pages.columnrow.L_COLUMN}</label></dt>
+							  				<dd><input type="text" size="25" name="column_title" id="column_title_{pages.PAGE_ID}_{pages.columnrow.COLUMN_ID}" value="{pages.columnrow.E_COLUMN_TITLE}" /></dd>
+							  			</dl>
+							  			<dl>
+							  				<dt><label for="column_size_{pages.PAGE_ID}_{pages.columnrow.COLUMN_ID}">{pages.columnrow.L_COLUMN_SIZE}</label></dt>
+							  				<dd><input type="text" maxlength="5" size="5" name="column_size" id="column_size_{pages.PAGE_ID}_{pages.columnrow.COLUMN_ID}" value="{pages.columnrow.E_COLUMN_SIZE}" /></dd>
+							  			</dl>
+							  			<p align="center">
+							  				{pages.columnrow.S_HIDDEN_FIELDS}
+							  				<input type="submit" name="submit" value="{pages.columnrow.S_SUBMIT}" class="button1" />
+							  			</p>
+							  		</fieldset>
+								</form>
+							</div>
+							<!-- BEGIN is_columnrow -->
+							<div class="acp">
+								<div class="panel">
+									<span class="corners-top"><span></span></span>
+									<div class="content">
+							<!-- END is_columnrow -->
+									<!-- BEGIN blockrow -->
+										<div class="clear blockColapse">
+											<div class="header">
+												<div class="buttons">
+													<a href="{pages.columnrow.blockrow.U_BLOCK_SETTING}" title="{pages.columnrow.blockrow.L_SETTING}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_edit.gif" align="absmiddle"></a>
+													<a href="{pages.columnrow.blockrow.U_BLOCK_MOVE_UP}" title="{L_MOVE_UP}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_up.gif" align="absmiddle"></a>
+													<a href="{pages.columnrow.blockrow.U_BLOCK_MOVE_DOWN}" title="{L_MOVE_DOWN}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_down.gif" align="absmiddle"></a>
+													<a href="{pages.columnrow.blockrow.U_BLOCK_RESYNC}" title="{L_RESYNC}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_sync.gif" align="absmiddle"></a>
+													<a href="{pages.columnrow.blockrow.U_BLOCK_DELETE}" title="{pages.columnrow.blockrow.L_REMOVE}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_delete.gif" align="absmiddle"></a>
+												</div>
+												<span class="title">
+													<img src="{IMG_ICON_BLOCK}" />
+													{pages.columnrow.blockrow.BLOCK_TITLE}
+												</span>
+												<span class="explain">
+													{pages.columnrow.blockrow.BLOCK_LAST_EDITED}
+													{pages.columnrow.blockrow.BLOCK_DESC}
+												</span>
+											</div>
+										</div>
+									<!-- END blockrow -->
+									<!-- BEGIN add_block -->
+										<div class="clear blockColapse">
+											<form method="post" action="{S_ACTION}">
+												{pages.columnrow.add_block.LIST_BLOCK}
+												{pages.columnrow.add_block.S_HIDDEN_FIELDS}
+												<input type="submit" class="button2"  name="submit" value="{pages.columnrow.add_block.S_SUBMIT}" />
+											</form>
+										</div>
+									<!-- END add_block -->
+							<!-- BEGIN is_columnrow -->
+									</div>
+									<span class="corners-bottom"><span></span></span>
+								</div>
+							</div>
+							<!-- END is_columnrow -->
+				</div>
+				<!-- END columnrow -->
 			</div>
-			<!-- TEMPLATE Main Panel -->
-			</div>
+	
+			<!-- PAGE Setting -->
 		</div>
-		<div style="clear:both;padding-top:3px;"></div>
-		<!-- END templates -->
+		<!-- END pages -->
+		<div id="adminPage_Template" class="clear" style="display:{VISIBLE}">
+			<!-- BEGIN notemplates -->
+			<div>{nopages.NONE}</div>
+			<!-- END notemplates -->
+			<!-- BEGIN templates -->
+			<div class="clear blockColapse">
+				<div class="header">
+					<!-- BEGIN delete -->
+					<div class="buttons">
+						<a href="javascript:onMenuCatClick('{templates.TEMPLATE_ID}','adminTemplateDelete_');" title="{L_DELETE}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_delete.gif"></a>
+					</div>
+					<!-- END delete -->
+					<span class="title" onclick="onMenuCatClick('{templates.TEMPLATE_ID}','adminTemplateEdit_');">
+						<img name="adminTemplateEdit_image_{templates.TEMPLATE_ID}" src="{templates.IMG_URL}" />
+						{templates.TEMPLATE_ICON}
+						<strong>{templates.TEMPLATE_TITLE}</strong>
+					</span>
+					
+				</div>
+				<!-- BEGIN delete -->
+				<div id="adminTemplateDelete_{templates.TEMPLATE_ID}" class="settings" style="display:{templates.VISIBLE_DELETE};">
+				<form>
+					<fieldset>
+						<legend>{L_DELETE}</legend>
+						<p>{templates.MESSAGE_DELETE}</p>
+					</fieldset>
+				</form>
+				</div>
+				<!-- END delete -->
+				<div id="adminTemplateEdit_{templates.TEMPLATE_ID}" class="settings" style="display:{templates.VISIBLE};">
+					<form action="{S_ACTION}" method="post">
+						<fieldset>
+							<legend>{L_EDIT}</legend>
+							<dl>
+								<dt><label for="template_name_{templates.TEMPLATE_ID}">{templates.L_TEMPLATE_NAME}</label></dt>
+								<dd><input type="text" size="45" name="template_name" id="template_name_{templates.TEMPLATE_ID}" value="{templates.E_TEMPLATE_TITLE}" /></dd>
+							</dl>
+							<p align="center">
+								{templates.S_HIDDEN_FIELDS}
+								<input type="submit" name="submit" value="{templates.S_SUBMIT}" class="button1" />
+							</p>
+						</fieldset>
+					</form>
+				</div>
+				<!-- BEGIN delete -->
+				<div class="acp">
+					<div class="panel">
+						<span class="corners-top"><span></span></span>
+						<div class="content">
+				<!-- END delete -->
+						<!-- BEGIN columnrow -->
+						<div class="clear blockColapse">
+							<div class="header">
+								<div class="buttons">
+									<a href="{templates.columnrow.U_COLUMN_MOVE_UP}" title="{templates.columnrow.L_MOVE_UP}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_up.gif" align="absmiddle"></a>
+									<a href="{templates.columnrow.U_COLUMN_MOVE_DOWN}" title="{templates.columnrow.L_MOVE_DOWN}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_down.gif" align="absmiddle"></a>
+									<a href="javascript:onMenuCatClick('{templates.TEMPLATE_ID}_{templates.columnrow.COLUMN_ID}','adminTemplateColumnDelete_');" title="{templates.columnrow.L_DELETE}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_delete.gif" align="absmiddle"></a>
+								</div>
+								<span class="title" onclick="onMenuCatClick('{templates.TEMPLATE_ID}_{templates.columnrow.COLUMN_ID}','adminTemplateColumnEdit_');">
+									<img name="adminTemplateColumnEdit_image_{templates.TEMPLATE_ID}_{templates.columnrow.COLUMN_ID}" src="{templates.columnrow.IMG_URL}" />
+									{templates.columnrow.L_COLUMN}:
+								<span class="explain">
+								{templates.columnrow.COLUMN_TITLE}
+								</span>
+								</span>
+							</div>
+							<!-- TEMPLATE COLUMNROW Delete -->
+							<div id="adminTemplateColumnDelete_{templates.TEMPLATE_ID}_{templates.columnrow.COLUMN_ID}" class="settings" style="display:{templates.columnrow.VISIBLE_DELETE};">
+								<form>
+								<fieldset>
+									<legend>{L_DELETE}</legend>
+									<p>{templates.columnrow.MESSAGE_DELETE}</p>
+								</fieldset>
+								</form>
+							</div>
+							<!-- TEMPLATE COLUMNROW Edit -->
+							<div id="adminTemplateColumnEdit_{templates.TEMPLATE_ID}_{templates.columnrow.COLUMN_ID}" class="settings" style="display:{templates.columnrow.VISIBLE};">
+							<form action="{S_ACTION}" method="post">
+								<fieldset>
+									<legend>{L_EDIT}</legend>
+									<dl>
+										<dt><label for="column_title_{templates.TEMPLATE_ID}_{templates.columnrow.COLUMN_ID}">{templates.columnrow.L_COLUMN_NAME}</label></dt>
+										<dd><input type="text" size="25" name="column_title" id="column_title_{templates.TEMPLATE_ID}_{templates.columnrow.COLUMN_ID}" value="{templates.columnrow.E_COLUMN_TITLE}" /></dd>
+									</dl>
+									<dl>
+										<dt><label for="column_size_{templates.TEMPLATE_ID}_{templates.columnrow.COLUMN_ID}">{templates.columnrow.L_COLUMN_SIZE}</label></dt>
+										<dd><input type="text" maxlength="5" size="5" name="column_size" id="column_size_{templates.TEMPLATE_ID}_{templates.columnrow.COLUMN_ID}" value="{templates.columnrow.E_COLUMN_SIZE}" /></dd>
+									</dl>
+									<p align="center">
+										{templates.columnrow.S_HIDDEN_FIELDS}
+										<input type="submit" name="submit" value="{templates.columnrow.S_SUBMIT}" class="button2" />
+									</p>
+								</fieldset>
+							</form>
+							</div>
+						</div>
+						<!-- END columnrow -->
+				<!-- BEGIN delete -->
+						</div>
+						<span class="corners-bottom"><span></span></span>
+					</div>
+				</div>
+				<!-- END delete -->
+			</div>
+			<!-- END templates -->
+		</div>
 	</div>
 	<span class="corners-bottom"><span></span></span>
+	</div>
+	</div>
 </div>

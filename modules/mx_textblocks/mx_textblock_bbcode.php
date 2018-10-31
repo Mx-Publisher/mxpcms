@@ -53,11 +53,11 @@ $mx_text->init($html_on, $bbcode_on, $smilies_on);
 $title = $mx_text->display($title);
 $message = $mx_text->display($message, $mx_block->get_parameters( 'Text', MX_GET_PAR_OPTIONS ));
 
-//
+//print_r($message);
 // Start output of page
 //
 $template->set_filenames(array(
-	'body_block' => 'mx_textblock_bbcode.tpl')
+	'body_block' => 'mx_textblock_bbcode.'.$tplEx)
 );
 
 $template->assign_vars(array(

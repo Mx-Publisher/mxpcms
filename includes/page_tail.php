@@ -45,6 +45,11 @@ if( !is_object($phpBB2))
 	$phpBB2 = new phpBB2();
 }
 
+if( !is_object($phpbb_auth))
+{
+	$phpbb_auth = new phpbb_auth();
+}
+
 //
 // Page last updated (by)
 //

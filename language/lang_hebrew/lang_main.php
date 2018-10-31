@@ -4,7 +4,7 @@
  * 
  * @package language
  * @author FlorinCB
- * @version $Id: lang_main.php,v 1.1 2018/09/21 11:05:08 FlorinCB Exp $
+ * @version $Id: lang_main.php,v 1.2 2018/09/21 11:05:08 FlorinCB Exp $
  * @copyright (c) 2002-2008 [Jon Ohlsson] MX-Publisher Project Team
  * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
  * @link http://mxpcms.sourceforge.net/
@@ -20,7 +20,7 @@ if ( !isset($lang) )
 $lang = array_merge( $lang, array( // #
 	'USER_LANG'						=> 'he',
 	'ENCODING'						=> 'UTF-8',
-	'DIRECTION'						=> 'ltr',
+	'DIRECTION'						=> 'rtl',
 	'LEFT'							=> 'שמאלה',
 	'RIGHT'							=> 'ימין',
 	'DATE_FORMAT'						=> 'd/M/Y',
@@ -81,19 +81,14 @@ $lang = array_merge( $lang, array( // #
 	'Mx_search_pafiledb'				=> 'הורדות',
 	'Mx_search_google'				=> 'Google',
 	'Mx_new_search'					=> 'חיפוש חדש',
-	'mx_about_title'					=> 'MX-Publisher על ',
+	'mx_about_title'					=> 'MX-Publisher על',
 	'mx_copy_title'					=> 'MX-Publisher מידע על',
 	'mx_copy_modules_title'			=> 'MX-Publisher מותקן מודולים',
-	'mx_copy_template_title'		=> 'על הסגנון',
+	'mx_copy_template_title'			=> 'על הסגנון',
 	'mx_copy_translation_title'		=> 'על התרגום',
-	
-	// This is optional, if you would like a _SHORT_ message output
-	// along with our copyright message indicating you are the translator
-	// please add it here.	
-	'TRANSLATION_INFO_MXBB'			=> 'Hwbrew Language by <a href="http://mxpcms.sourceforge.net/" target="_blank">MX-Publisher Development Team</a>',
-
-	'Please_remove_install_contrib'	=> 'אנא וודא שמחקת את התקיות /install ו- contrib/ ',
-	));
+	'TRANSLATION_INFO_MXBB'			=> 'MX-Publisher Development Team</a>">Hebrew Language by <a href="http://mxpcms.sourceforge.net/" target="_blank">MX-Publisher Development Team</a>',
+	'Please_remove_install_contrib'	=> 'אנא וודא שמחקת את התקיות /install ו- contrib/',
+));
 
 //
 // That's all Folks!

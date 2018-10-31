@@ -39,9 +39,9 @@
 
 				// Define the bbCode tags
 				bbcode = new Array();
-				bbtags = new Array('[b]','[/b]','[i]','[/i]','[u]','[/u]','[quote]','[/quote]','[code]','[/code]','[list]','[/list]','[list=]','[/list]','[img]','[/img]','[url]','[/url]');
+				bbtags = new Array('[b]','[/b]','[i]','[/i]','[u]','[/u]','[fa]','[/fa]','[quote]','[/quote]','[code]','[/code]','[html]','[/html]','[list]','[/list]','[list=]','[/list]','[img]','[/img]','[url]','[/url]');
 				imageTag = false;
-
+				
 				// Shows the help messages in the helpline window
 				function helpline(help) {
 					document.post.helpbox.value = eval(help + "_help");
@@ -234,14 +234,14 @@
 				</script>
 				<!-- END switch_bbcodes -->
 
-				<!-- BEGIN tinyMCE2 -->
-				<script language="javascript" type="text/javascript" src="{tinyMCE.PATH}modules/mx_shared/tinymce/jscripts/tiny_mce/tiny_mce.js"></script>
+				<!-- BEGIN tinyMCE_admin -->
+				<script language="javascript" type="text/javascript" src="{U_PORTAL_ROOT_PATH}modules/mx_shared/tinymce/jscripts/tiny_mce/tiny_mce.js"></script>
 				<script language="javascript" type="text/javascript">
-				   tinyMCE.init({
+				   tinyMCE.init({ 
 				      	mode : "textareas",
 				      	theme : "advanced",
-						language : "{tinyMCE.LANG}",
-                        docs_language : "{tinyMCE.LANG}",
+						language : "{tinyMCE_admin.LANG}",
+                        docs_language : "{tinyMCE_admin.LANG}",
 				      	plugins : "table,advhr,advimage,advlink,emotions,insertdatetime,preview,zoom,flash,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable",
 						theme_advanced_buttons1_add_before : "newdocument,separator",
 						theme_advanced_buttons1_add : "fontselect,fontsizeselect",
@@ -252,15 +252,26 @@
 						theme_advanced_toolbar_location : "top",
 						theme_advanced_toolbar_align : "left",
 						theme_advanced_path_location : "bottom",
-				      	content_css : "{tinyMCE.TEMPLATE}",
-				      	relative_urls : false,
-				      	extended_valid_elements : "td[*],div[*],form[*],input[*]"
+				        // Example content CSS (should be your site CSS) 
+				      	content_css : "{tinyMCE_admin.TEMPLATE}",
+				      	
+						theme_advanced_styles : "Tiny Text=copyright;Small Text=gensmall;Normal Text=genmed;Big Text=gen;Code=code;Quote=quote",
+
+						table_styles : "Layout=forumline",
+						table_cell_styles : "Table cell 1=row1;Table cell 2=row2;Table cell 3=row3",
+						table_row_styles : "Table row 1=oddrow",
+						table_default_border : "0",
+
+				      	document_base_url : "{tinyMCE_admin.PATH}index.php",
+				      	relative_urls : "true",
+
+				      	extended_valid_elements : "a[*],img[*],table[*],tr[*],td[*],div[*],form[*],input[*]"
 				   });
 				</script>
-				<!-- END tinyMCE2 -->
+				<!-- END tinyMCE_admin -->
 				
 				<!-- BEGIN tinyMCE -->
-				<script type="text/javascript" src="{tinyMCE.PATH}modules/mx_shared/tinymce/jscripts/tiny_mce/tiny_mce.js"></script> 
+				<script type="text/javascript" src="{U_PORTAL_ROOT_PATH}modules/mx_shared/tinymce/jscripts/tiny_mce/tiny_mce.js"></script> 
 				<script type="text/javascript"> 
 				tinyMCE.init({ 
 				        // General options 
@@ -322,8 +333,14 @@
 				<div class="panel bg1" id="preview">
 					<div class="inner"><span class="corners-top"><span></span></span>
 					<div class="postbody">
-						<h2>{L_PREVIEW}</h2>
-						<div class="content">{TEXT}</div>
+						<table width="70%" border="0" cellspacing="0" cellpadding="1" class="table3">
+							<tr>
+								<th class="row3 cat" align="center" >&nbsp;{L_PREVIEW}&nbsp;</th>
+							</tr>
+							<tr>
+								<td  align="left" ><span class="genmed">{TEXT}</span></td>
+							</tr>
+						</table>
 					</div>
 					<span class="corners-bottom"><span></span></span></div>
 				</div>

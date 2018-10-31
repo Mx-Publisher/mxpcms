@@ -28,7 +28,7 @@ require('./pagestart.' . $phpEx);
 //
 $mode = '';
 
-if ($mx_request_vars->is_post('submit') )
+if ($mx_request_vars->is_post('submit') || $mx_request_vars->is_set_post('portal_backend'))
 {
 	$mode = 'submit';
 }
@@ -54,7 +54,7 @@ if( !empty($mode) )
 	$new['mx_use_cache'] 			= $mx_request_vars->post('mx_use_cache', MX_TYPE_INT, '1');
 	$new['mod_rewrite'] 			= $mx_request_vars->post('mod_rewrite', MX_TYPE_INT, '0');
 
-	$new['portal_backend'] 			= $mx_request_vars->post('portal_backend', MX_TYPE_NO_TAGS, 'internal');
+	$new['portal_backend'] 	= $mx_request_vars->post('portal_backend', MX_TYPE_NO_TAGS, 'internal');
 	$new['portal_backend_path'] 	= $mx_request_vars->post('portal_backend_path', MX_TYPE_NO_TAGS, '');
 
 	$new['cookie_domain'] 			= $mx_request_vars->post('cookie_domain', MX_TYPE_NO_TAGS, '');
@@ -92,7 +92,7 @@ if( !empty($mode) )
 	$new['smtp_host'] 				= $mx_request_vars->post('smtp_host', MX_TYPE_NO_TAGS, '0');
 	$new['smtp_username'] 			= $mx_request_vars->post('smtp_username', MX_TYPE_NO_TAGS, '0');
 	$new['smtp_password'] 			= $mx_request_vars->post('smtp_password', MX_TYPE_NO_TAGS, '0');
-
+	
 	$sql = "UPDATE  " . PORTAL_TABLE . " SET " . $db->sql_build_array('UPDATE', utf8_normalize_nfc($new));
 	
 	if( !($db->sql_query($sql)) )
@@ -260,7 +260,7 @@ $template->assign_vars(array(
 	"GZIP_YES" => ( $portal_config['gzip_compress'] ) ? "checked=\"checked\"" : "",
 	"GZIP_NO" => ( !$portal_config['gzip_compress'] ) ? "checked=\"checked\"" : "",
 
-	"PORTAL_PHPBB_URL" => $portal_config['portal_phpbb_url'],
+	"PORTAL_PHPBB_URL" => ((null !== PHPBB_URL) ? PHPBB_URL : ''),
 	"OVERALL_HEADER" => $portal_config['overall_header'],
 	
 	"OVERALL_FOOTER" => $portal_config['overall_footer'],
@@ -366,7 +366,7 @@ $template->assign_vars(array(
 	"L_OVERRIDE_STYLE" => $lang['Override_style'],
 	"L_OVERRIDE_STYLE_EXPLAIN" => $lang['Override_style_explain'],
 	
-	"STYLE_SELECT" => $style_select,	
+	"STYLE_SELECT" => $style_select,
 	"ADMIN_STYLE_SELECT" => $style_admin_select,
 
 	"OVERRIDE_STYLE_YES" => ( $portal_config['override_user_style'] ) ? "checked=\"checked\"" : "",
@@ -377,8 +377,6 @@ $template->assign_vars(array(
 	"S_MX_MOD_REWRITE_YES" => $mx_mod_rewrite_yes,
 	"S_MX_MOD_REWRITE_NO" => $mx_mod_rewrite_no,
 	"MX_MOD_REWRITE" => $portal_config['mod_rewrite'],
-	
-	
 
 	"L_OVERALL_HEADER" => $lang['Portal_Overall_header'] . "<br />" . $lang['Portal_Overall_header_explain'],
 	"OVERALL_HEADER" => $portal_config['overall_header'],

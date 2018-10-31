@@ -1,15 +1,19 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-"http://www.w3.org/TR/html4/loose.dtd">
-<html dir="{S_CONTENT_DIRECTION}">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" dir="{S_CONTENT_DIRECTION}" lang="{S_USER_LANG}" xml:lang="{S_USER_LANG}">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset={S_CONTENT_ENCODING}">
-<meta http-equiv="Content-Style-Type" content="text/css">
-<!-- IF SET_BASE --><base href="{U_PORTAL_ROOT_PATH}" ><!-- ENDIF -->
-
+<meta http-equiv="content-type" content="text/html; charset={S_CONTENT_ENCODING}" />
+<meta http-equiv="content-language" content="{S_USER_LANG}" />
+<meta http-equiv="content-style-type" content="text/css" />
+<meta http-equiv="imagetoolbar" content="no" />
+<meta name="resource-type" content="document" />
+<meta name="distribution" content="global" />
+<meta name="copyright" content="2000, 2002, 2005, 2007 phpBB Group" />
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
 {META}
 {NAV_LINKS}
-
-<title>{SITENAME} :: {PAGE_TITLE}</title>
+<title><!-- IF UNREAD_NOTIFICATIONS_COUNT -->({UNREAD_NOTIFICATIONS_COUNT}) <!-- ENDIF --><!-- IF not S_VIEWTOPIC and not S_VIEWFORUM -->{SITENAME} - <!-- ENDIF --><!-- IF S_IN_MCP -->{L_MCP} - <!-- ELSEIF S_IN_UCP -->{L_UCP} - <!-- ENDIF -->{PAGE_TITLE}<!-- IF S_VIEWTOPIC or S_VIEWFORUM --> - {SITENAME}<!-- ENDIF --></title>
 <!-- IF PHPBB -->
 <!-- First load standard template *.css definition, located in the the phpbb template folder -->
 <link rel="stylesheet" href="{U_PHPBB_ROOT_PATH}{TEMPLATE_ROOT_PATH}{T_PHPBB_STYLESHEET}" type="text/css" >
@@ -21,145 +25,556 @@
 <!-- Optionally, redefine some defintions for gecko browsers -->
 <link rel="stylesheet" href="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}{T_GECKO_STYLESHEET}" type="text/css" >
 <!-- ENDIF -->
-
-{MX_ADDITIONAL_CSS_FILES}
-{MX_ICON_CSS}
-
 <!-- IF ENABLE_PM_POPUP -->
-<script language="javascript" type="text/javascript"><!--
-	if( {PRIVATE_MESSAGE_NEW_FLAG} )
+<script language="Javascript" type="text/javascript">
+<!--
+	if ( {PRIVATE_MESSAGE_NEW_FLAG} )
 	{
-		window.open('{U_PRIVATEMSGS_POPUP}', '_phpbbprivmsg', 'HEIGHT=225,resizable=yes,WIDTH=400');
+		window.open('{U_PRIVATEMSGS_POPUP}', '_phpbbprivmsg', 'HEIGHT=225,resizable=yes,WIDTH=400');;
 	}
-// --></script>
+//-->
+</script>
+<!-- ENDIF -->
+<!-- IF U_CANONICAL -->
+	<link rel="canonical" href="{U_CANONICAL}" />
 <!-- ENDIF -->
 
-<script language="javascript" type="text/javascript"><!--
+<!-- IF S_ALLOW_CDN -->
+<script>
+	WebFontConfig = {
+		google: {
+			families: ['Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i&subset=cyrillic,cyrillic-ext,greek,greek-ext,latin-ext,vietnamese']
+		}
+	};
 
-function checkSearch()
+	(function(d) {
+		var wf = d.createElement('script'), s = d.scripts[0];
+		wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.5.18/webfont.js';
+		wf.async = true;
+		s.parentNode.insertBefore(wf, s);
+	})(document);
+</script>
+<!-- ENDIF -->
+
+<link href="{T_FONT_AWESOME_LINK}" rel="stylesheet" type="text/css" />
+<link href="{T_STYLESHEET_LINK}" rel="stylesheet" type="text/css" />
+<link href="{T_STYLESHEET_LANG_LINK}" rel="stylesheet" type="text/css" />
+
+<!-- IF S_CONTENT_DIRECTION eq 'rtl' -->
+	<link href="{T_THEME_PATH}/bidi.css?assets_version={T_ASSETS_VERSION}" rel="stylesheet" type="text/css" />
+<!-- ENDIF -->
+
+<!-- IF S_PLUPLOAD -->
+	<link href="{T_THEME_PATH}/plupload.css?assets_version={T_ASSETS_VERSION}" rel="stylesheet" type="text/css" />
+<!-- ENDIF -->
+
+<!-- IF S_COOKIE_NOTICE -->
+	<link href="{T_ASSETS_PATH}/cookieconsent/cookieconsent.min.css?assets_version={T_ASSETS_VERSION}" rel="stylesheet" type="text/css" />
+<!-- ENDIF -->
+
+<link href="{T_STYLESHEET_LINK}" rel="stylesheet" type="text/css" />
+
+<script type="text/javascript">
+// <![CDATA[
+<!-- IF S_USER_PM_POPUP -->
+	if ({S_NEW_PM})
+	{
+		popup('{UA_POPUP_PM}', 400, 225, '_phpbbprivmsg');
+	}
+<!-- ENDIF -->
+
+function popup(url, width, height, name)
 {
-	if (document.search_block.search_engine.value == 'google')
+	if (!name)
 	{
-		window.open('http://www.google.com/search?q=' + document.search_block.search_keywords.value, '_google', '');
-		return false;
+		name = '_popup';
 	}
-	else if (document.search_block.search_engine.value == 'site')
+
+	window.open(url.replace(/&amp;/g, '&'), name, 'height=' + height + ',resizable=yes,scrollbars=yes,width=' + width);
+	return false;
+}
+
+function jumpto()
+{
+	var page = prompt('{LA_JUMP_PAGE}:', '{ON_PAGE}');
+	var perpage = '{PER_PAGE}';
+	var base_url = '{A_BASE_URL}';
+
+	if (page !== null && !isNaN(page) && page > 0)
 	{
-		window.open('{U_SEARCH_SITE}&search_keywords=' + document.search_block.search_keywords.value, '_self', '');
-		return false;
-	}
-	else if (document.search_block.search_engine.value == 'kb')
-	{
-		window.open('{U_SEARCH_KB}&search_keywords=' + document.search_block.search_keywords.value, '_self', '');
-		return false;
-	}
-	else if (document.search_block.search_engine.value == 'pafiledb')
-	{
-		window.open('{U_SEARCH_PAFILEDB}&search_keywords=' + document.search_block.search_keywords.value, '_self', '');
-		return false;
-	}
-	else
-	{
-		return true;
+		document.location.href = base_url.replace(/&amp;/g, '&') + '&start=' + ((page - 1) * perpage);
 	}
 }
-// --></script>
+
+
+
+/**
+* Find a member
+*/
+function find_username(url)
+{
+	popup(url, 760, 570, '_usersearch');
+	return false;
+}
+
+/**
+* Mark/unmark checklist
+* id = ID of parent container, name = name prefix, state = state [true/false]
+*/
+function marklist(id, name, state)
+{
+	var parent = document.getElementById(id);
+	if (!parent)
+	{
+		eval('parent = document.' + id);
+	}
+
+	if (!parent)
+	{
+		return;
+	}
+
+	var rb = parent.getElementsByTagName('input');
+	
+	for (var r = 0; r < rb.length; r++)
+	{
+		if (rb[r].name.substr(0, name.length) == name)
+		{
+			rb[r].checked = state;
+		}
+	}
+}
+
+<!-- IF ._file -->
+
+	/**
+	* Play quicktime file by determining it's width/height
+	* from the displayed rectangle area
+	*
+	* Only defined if there is a file block present.
+	*/
+	function play_qt_file(obj)
+	{
+		var rectangle = obj.GetRectangle();
+
+		if (rectangle)
+		{
+			rectangle = rectangle.split(',')
+			var x1 = parseInt(rectangle[0]);
+			var x2 = parseInt(rectangle[2]);
+			var y1 = parseInt(rectangle[1]);
+			var y2 = parseInt(rectangle[3]);
+
+			var width = (x1 < 0) ? (x1 * -1) + x2 : x2 - x1;
+			var height = (y1 < 0) ? (y1 * -1) + y2 : y2 - y1;
+		}
+		else
+		{
+			var width = 200;
+			var height = 0;
+		}
+
+		obj.width = width;
+		obj.height = height + 16;
+
+		obj.SetControllerVisible(true);
+
+		obj.Play();
+	}
+<!-- ENDIF -->
+
+// ]]>
+</script>
+
+<!-- EVENT overall_header_head_append -->
+
+{$STYLESHEETS}
+
+<!-- EVENT overall_header_stylesheets_after -->
 
 <script language="javascript" type="text/javascript" src="{U_PORTAL_ROOT_PATH}modules/mx_shared/lib/Common.js"></script>
 <script language="javascript" type="text/javascript" src="{U_PORTAL_ROOT_PATH}modules/mx_shared/lib/Toggle.js"></script>
-{MX_ADDITIONAL_JS_FILES}
-{MX_ADDITIONAL_HEADER_TEXT}
-
 </head>
-<body>
 
-<a name="top"></a>
+<!-- EVENT overall_header_body_before -->
+<body id="phpbb" bgcolor="{T_BODY_BGCOLOR}" text="{T_BODY_TEXT}" link="{T_BODY_LINK}" vlink="{T_BODY_VLINK}" class="nojs notouch section-{SCRIPT_NAME} {S_CONTENT_DIRECTION} {BODY_CLASS}">
 
-<div id="container">
+<a name="top" class="anchor"></a>
 
-	<!-- Either Simple top image ...
-	<img src="{THEME_GRAPHICS}/header.jpg">
-	End -->
-
-	<!-- ...or put contents on background top image -->
-	<table border="0" cellspacing="0" cellpadding="0" width=100%>
-		<tr height="100">
-			<td background="{THEME_GRAPHICS}/top.jpg" width="750">
-				<table border=0 cellspacing=0 cellpadding=0 width="100%">
-					<tr height="80">
-						<td width="25%" align="left" valign="top">
-							<!--<a href="{U_INDEX}"><img src="{LOGO}" border="0" alt="{L_INDEX}" vspace="1"/></a>-->
-							<a href="{U_INDEX}"><img width="100" height="70" src="{THEME_GRAPHICS}spacer.gif" border=0 alt="{L_INDEX}" title="{L_INDEX}"></a>
+<div id="wrapheader">
+	
+<table width="100%" cellspacing="0" cellpadding="1" border="0" align="center" class="table1 main_table">
+	
+	<!-- EVENT overall_header_headerbar_before -->	
+	<thead>	
+	<tr class="bg1">		
+		<td class="bodyline"><a id="logo" class="imageset site_logo responsive-hide" href="{U_INDEX}"><!-- {SITE_LOGO_IMG}--></a>
+			
+			<div id="logodesc">
+				
+				<table width="100%" align="center" cellspacing="0" cellpadding="5" border="0" class="table1 main_table">
+					<tbody>
+					<tr class="bg1">
+						
+						<td class="table1 responsive-hide" style="text-align:center;" width="5%">&nbsp;&nbsp;</td>						
+						
+						<td class="table1 responsive-hide" align="center" valign="middle" width="15%">
+							<span class="responsive-hide">&nbsp;&nbsp;</span>
 						</td>
-						<td width="50%" align="center" valign="middle">
-							{PAGE_ICON}<span class="pagetitle">{PAGE_TITLE}</span>
-						</td>
-						<td width="25%" align="right" valign="top"><span class="sitetitle">&nbsp;</td>
+						
+						<td class="table1 responsive-hide" align="right" valign="middle" width="15%">
+							<span class="pagetitle">&nbsp;&nbsp;{PAGE_TITLE}</span>
+						</td>						
+						
+						<td class="table1" style="text-align:center;" valign="middle" width="60%">
+							<h1>{SITENAME}&nbsp;&nbsp;&nbsp;&nbsp;</h1>
+							<span class="gen">{SITE_DESCRIPTION}&nbsp;&nbsp;&nbsp;&nbsp;</span>						
+						</td>						
+						
+						<td class="table1 responsive-hide" align="center" valign="middle" width="5%">&nbsp;</td>					
+					
 					</tr>
-					<tr height="20">
-						<td width="100%" align="left" valign="top" colspan="3">
-							<img width="20" height="1" src="{THEME_GRAPHICS}spacer.gif" border=0>
-							<span class="sitetitle_desc">{SITE_DESCRIPTION}</span>
-						</td>
+
+
+
+
+					<!-- BEGIN switch_view -->
+					<tr>
+						<td align="left" valign="bottom" colspan="3" ><span class="gensmall">{CURRENT_TIME}</span></td>
 					</tr>
+					<tr>
+						<td align="left" valign="bottom" colspan="3" ><span class="nav"><a href="{U_INDEX}" class="nav">{L_INDEX}</a></span></td>
+					</tr>
+					<!-- END switch_view -->					
+					</tbody>
 				</table>
-			</td>
+			
+			</div>			
+			
+			
+			<!-- EVENT overall_header_searchbox_before -->
+			<!-- IF S_DISPLAY_SEARCH and not S_IN_SEARCH -->
+			<div id="search-box" class="search-box search-header right" role="search">
+					
+					<table width="100%" cellspacing="0" cellpadding="5" border="0" align="center" class="table1 main_table">
+					<tbody>						
+						<tr class="bg1">
+							
+							<td class="table1 responsive-hide" style="text-align:center;"></td>
+							
+							<td class="table1 responsive-hide" valign="top" align="left" width="5" height="5" >&nbsp;</td>
+							
+							<td class="table1" valign="top" align="right" width="100%" height="5" >
+				
+							<form action="{U_SEARCH}" method="get" id="search">
+							<fieldset>
+								<input name="search_keywords" id="keywords" type="text" maxlength="128" title="{L_SEARCH_KEYWORDS}" class="inputbox search tiny rightside responsive-search" value="{L_SEARCH}..." onclick="if(this.value=='{L_SEARCH}...')this.value='';" onblur="if(this.value=='')this.value='{L_SEARCH}...';" placeholder="{L_SEARCH_MINI}" /> 
+								<button class="button button-search" type="submit" title="{L_SEARCH}">
+									<i class="icon fa-search fa-fw" aria-hidden="true"></i><span class="sr-only">{L_SEARCH}</span>
+								</button>								
+								<a href="{U_SEARCH}" class="button button-search-end" title="{L_SEARCH_ADV}">
+									<i class="icon fa-cog fa-fw" aria-hidden="true"></i><span class="sr-only">{L_SEARCH_ADV}</span>
+								</a>
+								{S_SEARCH_HIDDEN_FIELDS}
+							</fieldset>
+							</form>
+							
+							</td>
+							
+							<td class="table1 responsive-hide" valign="top" align="left" width="5" height="5" >
+								<span class="responsive-hide">&nbsp;&nbsp;</span>
+							</td>
+							
+							<td class="table1 responsive-hide" align="center" valign="middle" width="5%">&nbsp;</td>						
+						
+						</tr>
+					
+					</tbody>					
+					</table>
+			</div>
+			<!-- ENDIF -->
+			<!-- EVENT overall_header_searchbox_after -->	
+		
+		
+		</td>
+	</tr>
+	</thead>	
+		
+	<!-- EVENT overall_header_navbar_before -->		
+	<tbody>
+	<div id="page-header" role="navigation">
+					<tr>
+						<td class="row2" align="center" valign="middle" colspan="3">
+							{OVERALL_NAVIGATION}
+						</td>
+					</tr>
+					<!-- BEGIN editcp -->
+					<tr>
+						<td class="row2" align="center" valign="middle" colspan="3">
+							<div class="editCP_switch" style="display: {editcp.EDITCP_SHOW};">
+								<form action="{editcp.EDIT_ACTION}" method="post" class="mx_editform">
+									<table width="100%" cellpadding="0" cellspacing="0" border="0">
+										<tr>
+											<td align="right">
+												{editcp.EDIT_IMG}
+												{editcp.S_HIDDEN_FORM_FIELDS}
+											</td>
+										</tr>
+									</table>
+								</form>
+							</div>
+						</td>
+					</tr>
+					<!-- END editcp -->					
+	<tr id="nav-main" class="nav-main linklist bg2" role="menubar">
+				
+		<td class="genmed" style="width: 5%; text-align: center;">	
+							
+		<!-- EVENT overall_header_navigation_prepend -->				
+		<table id="nav-main" class="table1 nav-main linklist" cellspacing="6" cellpadding="2" border="0" role="menubar">
+		<div class="navbar-top" role="navigation">
+		<thead>
+			<div class="inner">						
+					<ul id="nav-main" class="nav-main linklist" role="menubar">						
+					<tr class="bg2"> 
+						<td id="quick-links" class="quick-links dropdown-container responsive-menu<!-- IF not S_DISPLAY_QUICK_LINKS and not S_DISPLAY_SEARCH --> hidden<!-- ENDIF -->" data-skip-responsive="true" role="menuitem">
+						
+						<span class="mainmenu dropdown-trigger">
+							<a href="#" class="dropdown-trigger">
+								<i class="icon fa-bars fa-fw" aria-hidden="true">
+								<!-- img src="{T_THEME_PATH}/images/nav_forum.gif"  border="0" alt="{L_QUICK_LINKS}" hspace="3" /-->
+								</i>
+							</a>
+						</span>						
+														
+						<div class="dropdown">
+							<div class="pointer"><div class="pointer-inner"></div></div>
+							<ul class="dropdown-contents" role="menu">
+								<!-- EVENT navbar_header_quick_links_before -->
+
+								<!-- IF not S_IS_BOT and (S_DISPLAY_MEMBERLIST or U_TEAM) -->
+									<li class="separator"></li>
+									<!-- IF U_TEAM -->
+										<li>
+											<a href="{U_TEAM}" role="menuitem">
+												<i class="icon fa-shield fa-fw" aria-hidden="true"></i><span>{L_THE_TEAM}</span>
+											</a>
+										</li>
+									<!-- ENDIF -->
+								<!-- ENDIF -->
+								<li class="separator"></li>
+
+								<!-- EVENT navbar_header_quick_links_after -->
+							</ul>
+						</div>
+								
+						</td>
+						
+						<!-- IF U_ACP -->
+						<td data-last-responsive="true" class="table1 responsive-hide" height="15" align="center" valign="top">
+							<span class="mainmenu">							
+							<a href="{U_ACP}" title="{L_ACP}" role="menuitem" class="table1" height="15" align="center" valign="top">
+								<img src="{T_THEME_PATH}/images/nav_settings.gif" aria-hidden="true" border="0" alt="{L_ACP_SHORT}" hspace="3" />
+							</a>
+							</span>						
+						</td>
+						<!-- ENDIF -->
+						<!-- IF U_MCP -->
+						<td data-last-responsive="true" class="table1 responsive-hide" height="15" align="center" valign="top">
+							<span class="mainmenu">							
+							<a href="{U_MCP}" title="{L_MCP}" role="menuitem" class="mainmenu">
+								<img src="{T_THEME_PATH}/images/nav_groups.gif" aria-hidden="true" border="0" alt="{L_MCP_SHORT}" hspace="3" />								
+							</a>
+							</span>						
+						</td>
+						<!-- ENDIF -->						
+												
+						<!-- IF not S_IS_BOT -->						
+						<td data-last-responsive="true" class="table1 responsive-hide" height="15" align="center" valign="top">
+							<span class="mainmenu">
+							<a href="{U_LOGIN_LOGOUT}" title="{L_LOGIN_LOGOUT}" class="mainmenu" role="menuitem">
+								<img src="{T_THEME_PATH}/images/nav_login.gif" border="0" alt="{L_LOGIN_LOGOUT}" hspace="3" />
+							</a>							
+							</span>
+						</td>
+						<!-- ENDIF -->
+						<!-- IF not S_REGISTERED_USER -->
+						<td data-last-responsive="true" class="table1 responsive-hide" height="15" align="center" valign="top">
+							<span class="mainmenu">							
+							<a href="{U_REGISTER}" title="{L_REGISTER}" class="mainmenu" role="menuitem">
+								<img src="{T_THEME_PATH}/images/nav_register.gif" border="0" alt="{L_REGISTER}" hspace="3" />
+							</a>
+							</span>
+						</td>
+						&nbsp;
+						<!-- ENDIF -->
+	<!-- IF S_REGISTERED_USER -->
+						<td data-last-responsive="true" class="forumtitle genmed" height="15" align="center" valign="top">	
+		<!-- EVENT navbar_header_user_profile_prepend -->
+		<div id="username_logged_in" class="rightside <!-- IF CURRENT_USER_AVATAR --> no-bulletin<!-- ENDIF -->" data-skip-responsive="true">
+			<!-- EVENT navbar_header_username_prepend -->
+			<div class="header-profile dropdown-container">
+				<a href="{U_PROFILE}" class="header-avatar dropdown-trigger"><!-- IF CURRENT_USER_AVATAR -->{CURRENT_USER_AVATAR} <!-- ENDIF --> {CURRENT_USERNAME_SIMPLE}</a>
+				<div class="dropdown">
+					<div class="pointer"><div class="pointer-inner"></div></div>
+					<ul class="dropdown-contents" role="menu">
+						<!-- IF U_RESTORE_PERMISSIONS -->
+							<li>
+								<a href="{U_RESTORE_PERMISSIONS}">
+									<i class="icon fa-refresh fa-fw" aria-hidden="true"></i><span>{L_RESTORE_PERMISSIONS}</span>
+								</a>
+							</li>
+						<!-- ENDIF -->
+
+					<!-- EVENT navbar_header_profile_list_before -->
+						<li class="separator"></li>
+									
+
+									
+
+						<!-- EVENT navbar_header_profile_list_after -->
+
+						<li class="separator"></li>
+						<li>
+							<a href="{U_LOGIN_LOGOUT}" title="{L_LOGIN_LOGOUT}" accesskey="x" role="menuitem">
+								<i class="icon fa-power-off fa-fw" aria-hidden="true"></i><span>{L_LOGIN_LOGOUT}</span>
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<!-- EVENT navbar_header_username_append -->
+		</div>
+
+	<!-- ELSE -->
+
+		<!-- EVENT navbar_header_logged_out_content -->
+						</td>		
+	<!-- ENDIF -->							
+					</tr>
+					</ul>
+			</div>					
+					</thead>
+		</div>					
+					<tbody>				
+					<tr class="bg2">
+						<td data-last-responsive="true" class="table1 genmed" height="15" align="center" valign="top">
+							<span class="mainmenu">
+								<a href="#" title="{L_QUICK_LINKS}" class="mainmenu">
+								<span>{L_QUICK_LINKS} </span>
+								</a>
+							</span>
+						</td>											
+						
+						<!-- IF U_ACP -->
+						<td data-last-responsive="true" class="table1 forumtitle responsive-hide" height="15" align="center" valign="top">
+							<span class="mainmenu">							
+								<a href="{U_ACP}" title="{L_ACP}" role="menuitem">
+								<span>{L_ACP_SHORT} </span>
+								</a>
+							</span>						
+						</td>
+						<!-- ENDIF -->
+						<!-- IF U_MCP -->
+						<td data-last-responsive="true" class="table1 forumtitle responsive-hide" height="15" align="center" valign="top">
+							<span class="mainmenu">							
+								<a href="{U_MCP}" title="{L_MCP}" role="menuitem">
+								<span>{L_MCP_SHORT} </span>
+								</a>
+							</span>						
+						</td>
+						<!-- ENDIF -->						
+			
+						
+						<!-- IF not S_IS_BOT -->
+						
+						<!-- ENDIF -->						
+						
+						<!-- IF not S_IS_BOT -->						
+						<td data-last-responsive="true" class="forumtitle genmed responsive-hide" height="15" align="center" valign="top">
+							<span class="mainmenu">
+								<a href="{U_LOGIN_LOGOUT}" title="{L_LOGIN_LOGOUT}" class="mainmenu">
+								<span>{L_LOGIN_LOGOUT}&nbsp; </span>
+								</a>
+							</span>
+						</td>
+						<!-- ENDIF -->
+						
+						<!-- IF not S_REGISTERED_USER -->
+						<td data-last-responsive="true" class="forumtitle genmed responsive-hide" height="15" align="center" valign="top">
+						<span class="mainmenu">						
+							<a href="{U_REGISTER}" title="{L_REGISTER}" class="mainmenu">
+							<span>{L_REGISTER} </span>
+							</a>
+						</span>
+						</td>
+						<!-- ENDIF -->
+	
+						<!-- IF S_REGISTERED_USER -->
+						<td data-last-responsive="true" class="forumtitle genmed" height="15" align="center" valign="top">	
+
+
+						<!-- EVENT navbar_header_user_profile_append -->						
+						
+						</td>		
+						<!-- ENDIF -->						
+
+						</tr>
+					<tr class="bg2"> 					
+						<td data-last-responsive="true" class="forumtitle genmed" align="{S_CONTENT_FLOW_END}">					
+						<!-- IF S_BOARD_DISABLED and S_USER_LOGGED_IN --> &nbsp;<span style="color: red;">{L_BOARD_DISABLED}</span><!-- ENDIF -->							
+						</td>	
+					</tr>					
+					</tbody>
+					
+				</table>
+			<!-- EVENT overall_header_navigation_append -->					
+				
+		</td>	
+	</tr>
+	
+	</div>	
+	</tbody>
+	<!-- EVENT overall_header_navbar_after -->	
+</table>								
+
+	<div id="datebar">
+		<table width="100%" cellspacing="0">
+		<tr>
+			<td class="gensmall"><!-- IF S_USER_LOGGED_IN -->{LAST_VISIT_DATE}<!-- ENDIF --></td>
+			<td class="gensmall" align="{S_CONTENT_FLOW_END}">{CURRENT_TIME}<br /></td>
 		</tr>
-	</table>
-	<!-- End -->
-
-	<div id="header">
-	  	<div class="globalNav">
-	  		<!-- Either Template Based Navigation Menu...
-	  		<span class="genmed"><a href="{U_INDEX}" class="genmed"><img src="{NAV_IMAGES_HOME}" class="mx_icon" border="0" alt="" hspace="1" align="middle" /></a></span><span class="genmed"><a href="{U_INDEX}" class="genmed">{L_HOME}</a></span>
-	  		| <span class="genmed"><a href="{U_INDEX_FORUM}" class="genmed"><img src="{NAV_IMAGES_FORUM}" class="mx_icon" border="0" alt="" hspace="1" align="middle" /></a></span><span class="genmed"><a href="{U_INDEX_FORUM}" class="genmed">{L_FORUM}</a></span>
-			<!-- IF USER_LOGGED_IN -->
-	  		| <span class="genmed"><a href="{U_PROFILE}" class="genmed"><img src="{NAV_IMAGES_PROFILE}" class="mx_icon" border="0" alt="" hspace="1" align="middle" /></a></span><span class="genmed"><a href="{U_PROFILE}" class="genmed">{L_PROFILE}</a></span>
-			<!-- ENDIF -->
-	  		| <span class="genmed"><a href="{U_SEARCH}" class="genmed"><img src="{NAV_IMAGES_SEARCH}" class="mx_icon" border="0" alt="" hspace="1" align="middle" /></a></span><span class="genmed"><a href="{U_SEARCH}" class="genmed">{L_SEARCH}</a></span>
-	  		| <span class="genmed"><a href="{U_FAQ}" class="genmed"><img src="{NAV_IMAGES_FAQ}" class="mx_icon" border="0" alt="" hspace="1" align="middle" /></a></span><span class="genmed"><a href="{U_FAQ}" class="genmed">{L_FAQ}</a></span>
-	  		| <span class="genmed"><a href="{U_MEMBERLIST}" class="genmed"><img src="{NAV_IMAGES_MEMBERS}" class="mx_icon" border="0" alt="" hspace="1" align="middle" /></a></span><span class="genmed"><a href="{U_MEMBERLIST}" class="genmed">{L_MEMBERLIST}</a></span>
-	  		| <span class="genmed"><a href="{U_GROUP_CP}" class="genmed"><img src="{NAV_IMAGES_GROUPS}" class="mx_icon" border="0" alt="" hspace="1" align="middle" /></a></span><span class="genmed"><a href="{U_GROUP_CP}" class="genmed">{L_USERGROUPS}</a></span>
-			<!-- IF USER_LOGGED_IN -->
-	  		| <span class="genmed"><a href="{U_PRIVATEMSGS}" class="genmed"><img src="{NAV_IMAGES_PRIVMSG}" class="mx_icon" border="0" alt="" hspace="1" align="middle" /></a></span><span class="genmed"><a href="{U_PRIVATEMSGS}" class="genmed">{L_PRIVATEMSGS}</a></span>
-			<!-- ENDIF -->
-			End -->
-
-			<!-- ...or use Manual Navigation Menu
-			<span class="genmed"><a href="{U_INDEX}" class="genmed">{L_HOME}</a></span>
-			| <span class="genmed"><a href="{U_INDEX_FORUM}" class="genmed">{L_FORUM}</a></span>
-			End -->
-
-			<!-- ...or use Generated Navigation Menu -->
-			{OVERALL_NAVIGATION}
-			<!-- Generated Navigation Menu -->
-
-	  	</div>
+		</table>
 	</div>
 
-	<div id="subheader">
-		<div class="left">
-			<a href="{U_LOGIN_LOGOUT}" class="mainmenu"><img src="{NAV_IMAGES_LOGIN_LOGOUT}" class="mx_icon" border="0" alt="" hspace="1" align="middle" /></a><span class="genmed"><a href="{U_LOGIN_LOGOUT}" class="genmed">{L_LOGIN_LOGOUT}</a></span>
-			<!-- IF USER_LOGGED_OUT -->
-			<a href="{U_REGISTER}" class="mainmenu"><img src="{NAV_IMAGES_REGISTER}" class="mx_icon" border="0" alt="" hspace="1" align="middle" /></a><span class="genmed"><a href="{U_REGISTER}" class="genmed">{L_REGISTER}</a></span>
-			<!-- ENDIF -->
+</div>
+
+<!-- EVENT overall_header_body_content_before -->
+<div id="wrapcentre wrap" class="wrap">
+
+	<!-- IF S_DISPLAY_SEARCH -->
+	<p class="searchbar">
+		<span style="float: {S_CONTENT_FLOW_BEGIN};"><a href="{U_SEARCH_UNANSWERED}">{L_SEARCH_UNANSWERED}</a> | <a href="{U_SEARCH_ACTIVE_TOPICS}">{L_SEARCH_ACTIVE_TOPICS}</a></span>
+		<!-- IF S_USER_LOGGED_IN -->
+		<span style="float: {S_CONTENT_FLOW_END};"><a href="{U_SEARCH_NEW}">{L_SEARCH_NEW}</a> | <a href="{U_SEARCH_SELF}">{L_SEARCH_SELF}</a></span>
+		<!-- ENDIF -->
+	</p>
+	<!-- ENDIF -->
+
+	<br style="clear: both;" />
+
+	<!-- INCLUDE breadcrumbs.html -->
+
+	<!-- EVENT overall_header_page_body_before -->
+
+	<a id="start_here" class="anchor"></a>
+	<div id="page-body" class="page-body" role="main">
+		<!-- IF S_BOARD_DISABLED and S_USER_LOGGED_IN and (U_MCP or U_ACP) -->
+		<div id="information" class="rules">
+			<div class="inner">
+				<strong>{L_INFORMATION}{L_COLON}</strong> {L_BOARD_DISABLED}
+			</div>
 		</div>
-		<div class="right">
-			<form name="search_block" method="post" action="{U_SEARCH}" onsubmit="return checkSearch()">
-				<a href="{U_SEARCH}" class="gen"><span class="gen">{L_SEARCH}</span></a>:
-				<input class="post" type="text" name="search_keywords" size="15" value="...?"
-					onfocus="if(this.value=='...?'){this.value='';}"
-					onblur="if(this.value==''){this.value='...?';}">
-				<select class="post" name="search_engine">
-					{L_SEARCH_SITE}
-					<!-- {L_SEARCH_FORUM} -->
-					{L_SEARCH_KB}
-					{L_SEARCH_PAFILEDB}
-					{L_SEARCH_GOOGLE}
-				</select>
-				<input type="hidden" name="search_fields" value="all">
-				<input type="hidden" name="show_results" value="topics">
-				<input class="mainoption" type="submit" value="Search">
-			</form>
-		</div>
-	</div>
+		<!-- ENDIF -->
+
+		<!-- EVENT overall_header_content_before -->

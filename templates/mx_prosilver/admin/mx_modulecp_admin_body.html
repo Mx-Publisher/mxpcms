@@ -291,64 +291,57 @@ window.onload = doOnLoadMenuACP;
 <div class="rules">{nomodule.NONE}</div>
 <!-- END nomodule -->
 <p style="clear:both"></p>
+<div class="acp">
 <div class="panel">
 	<span class="corners-top"><span></span></span>
-	<div class="acp">
-	<div class="inner bg3" style="margin:1.0em;">
+	<div class="content">
 		<div >
 			{RESULT_MESSAGE}
 		</div>
 		<!-- BEGIN module -->
-		<div style="display:block;">
 			<!-- BEGIN reload -->
 			<div style="display:block;height:2.0em;">
 				<img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_sync.gif" align="absmiddle">
 				<a href="{module.reload.U_MODULE_EDIT}">{L_RELOAD} Reload needed</a>
 			</div>
 			<!-- END reload -->
-			<div style="clear:both;"><!-- Block Functions -->
-				<!-- BEGIN nofunction -->
-				<div class="rules">
-					{module.nofunction.NONE}
-				</div>
-				<!-- END nofunction -->
+			<!-- Block Functions -->
+			<!-- BEGIN nofunction -->
+			<div class="rules">
+				{module.nofunction.NONE}
+			</div>
+			<!-- END nofunction -->
 				<!-- BEGIN function -->
-				<div class="inner" style="display:block;clear:both;">
-					<div style="display:block;margin-top:5px;padding-bottom:6px;">
-						<div style="float:right;width:40%;text-align:right;">
+				<div class="clear blockColapse">
+					<div class="header">
+						<div class="buttons">
 							<!-- BEGIN is_function -->
-							<a href="javascript:onMenuCatClick('{module.function.FUNCTION_ID}','adminFunction_');" title="{L_EDIT}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_edit.gif" align="absmiddle"></a>
-							<a href="javascript:onMenuCatClick('{module.function.FUNCTION_ID}','adminParameter_');" title="{module.function.L_EDIT_PAR}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_parameter_edit.gif" align="absmiddle"></a>
-							<a href="javascript:onMenuCatClick('{module.function.FUNCTION_ID}','adminFunctionDelete_');" title="{module.function.L_DELETE}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_delete.gif" align="absmiddle"></a>
+							<a href="javascript:onMenuCatClick('{module.function.FUNCTION_ID}','adminFunction_');" title="{L_EDIT}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_edit.gif" /></a>
+							<a href="javascript:onMenuCatClick('{module.function.FUNCTION_ID}','adminParameter_');" title="{module.function.L_EDIT_PAR}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_parameter_edit.gif" /></a>
+							<a href="javascript:onMenuCatClick('{module.function.FUNCTION_ID}','adminFunctionDelete_');" title="{module.function.L_DELETE}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_delete.gif" /></a>
 							<!-- END is_function -->
 						</div>
-						<div style="float:left;">
+						<div>
 							<span style="cursor:pointer;" onclick="onMenuCatClick('{module.function.FUNCTION_ID}','{module.function.COOKIE_TAG}');">
-						 		<img name="{module.function.COOKIE_TAG}image_{module.function.FUNCTION_ID}" id="{module.function.COOKIE_TAG}image_{module.function.FUNCTION_ID}" src="{module.function.IMG_URL_FUNC}" border="0" align="middle">
-						 		<img src="{IMG_ICON_FUNCTION}" border="0" align="middle">
+						 		<img name="{module.function.COOKIE_TAG}image_{module.function.FUNCTION_ID}" id="{module.function.COOKIE_TAG}image_{module.function.FUNCTION_ID}" src="{module.function.IMG_URL_FUNC}" />
+						 		<img src="{IMG_ICON_FUNCTION}" />
 							</span>
 							<a href="javascript:onMenuCatClick('{module.function.FUNCTION_ID}','{module.function.COOKIE_TAG}');">{module.function.FUNCTION_TITLE}</a>
 							<span class="explain">{module.function.FUNCTION_DESC}</span>
 						</div>
 					</div>
 					<!-- FUNCTION Delete -->
-					<div id="adminFunctionDelete_{module.function.FUNCTION_ID}" style="clear:both;padding-top:0.1em;display:{module.function.VISIBLE_DELETE};">
+					<div id="adminFunctionDelete_{module.function.FUNCTION_ID}" class="settings" style="display:{module.function.VISIBLE_DELETE};">
 						<fieldset>
-							<legend style="cursor:pointer;cursor:hand;" onclick="onMenuCatClick('{module.function.FUNCTION_ID}','adminFunctionDelete_');">
-								<img src="{IMG_URL_CONTRACT}" border="0" align="absmiddle">
-								{L_DELETE}
-							</legend>
-							<p>
-								{module.function.MESSAGE_DELETE}
-							</p>
+							<legend onclick="onMenuCatClick('{module.function.FUNCTION_ID}','adminFunctionDelete_');">{L_DELETE}</legend>
+							<p>{module.function.MESSAGE_DELETE}</p>
 						</fieldset>
 					</div>
 					<!-- FUNCTION Settings -->
-					<div id="adminFunction_{module.function.FUNCTION_ID}" style="clear:both;padding-top:0.1em;display:{module.function.VISIBLE_FUNC};">
+					<div id="adminFunction_{module.function.FUNCTION_ID}" class="settings" style="display:{module.function.VISIBLE_FUNC};">
 						<form id="form_adminFunction_{module.function.FUNCTION_ID}" action="{S_ACTION}" method="post">
 							<fieldset>
-								<legend style="cursor:pointer;cursor:hand;" onclick="onMenuCatClick('{module.function.FUNCTION_ID}','adminFunction_');">
-									<img src="{IMG_URL_CONTRACT}" border="0" align="absmiddle">
+								<legend onclick="onMenuCatClick('{module.function.FUNCTION_ID}','adminFunction_');">
 									{module.function.L_TITLE}
 								</legend>
 								<dl>
@@ -377,254 +370,221 @@ window.onload = doOnLoadMenuACP;
 						</form>
 					</div>
 					<!-- FUNCTION PARAMETERS BEGIN -->
-					<div id="adminParameter_{module.function.FUNCTION_ID}" style="clear:both;margin-left:16px;padding-top:0.1em;padding-bottom:6px;display:{module.function.VISIBLE_PAR};">
-						<h3 style="margin-top:3px;">{module.function.L_TITLE_PAR}</h3>
-						<div style="display:block;clear:both;">
-							<div style="float:left;width:30%">
-								{module.function.parameter.L_PARAMETER_TITLE}
+					<div id="adminParameter_{module.function.FUNCTION_ID}" class="settings acp" style="display:{module.function.VISIBLE_PAR};">
+						<div class="panel">
+							<span class="corners-top"><span></span></span>
+							<div class="content bg2">
+								<h3 style="margin-top:3px;">{module.function.L_TITLE_PAR}</h3>
+								
+								<!-- BEGIN noparameter -->
+								<div>{module.function.noparameter.NONE}</div>
+								<!-- END noparameter -->
+								<!-- BEGIN parameter -->
+								<div class="clear blockColapse">
+									<div class="header">
+										<!-- BEGIN is_parameter -->
+										<div class="buttons">
+											<a href="javascript:onMenuCatClick('{module.function.parameter.PARAMETER_ID}','adminParEdit_');" title="{module.function.parameter.L_EDIT}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_edit.gif" /></a>
+											<a href="{module.function.parameter.U_MOVE_UP}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_up.gif" alt="{L_MOVE_UP}" title="{L_MOVE_UP}" /></a>
+											<a href="{module.function.parameter.U_MOVE_DOWN}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_down.gif" alt="{L_MOVE_DOWN}" title="{L_MOVE_DOWN}" /></a>
+											<a href="javascript:onMenuCatClick('{module.function.parameter.PARAMETER_ID}','adminParDelete_');"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_delete.gif" alt="{L_DELETE}" title="{L_DELETE}" /></a>
+										</div>
+										<!-- END is_parameter -->
+										<div class="title parName"><img src="{IMG_ICON_PARAMETER}" /> {module.function.parameter.PARAMETER_TITLE}</div>
+										<div class="parType">{module.function.parameter.PARAMETER_TYPE}</div>
+									</div>
+
+									<!-- FUNCTION PARAMETER Delete -->
+									<div id="adminParDelete_{module.function.parameter.PARAMETER_ID}" class="settings" style="display:{module.function.parameter.VISIBLE_DELETE};">
+										<fieldset>
+											<legend onclick="onMenuCatClick('{module.function.parameter.PARAMETER_ID}','adminParDelete_');">{L_DELETE}</legend>
+											<p>{module.function.parameter.MESSAGE_DELETE}</p>
+										</fieldset>
+									</div>
+									<!-- FUNCTION PARAMETER Edit -->
+									<div id="adminParEdit_{module.function.parameter.PARAMETER_ID}" class="settings" style="display:{module.function.parameter.VISIBLE};">
+										<form action="{S_ACTION}" method="post">
+										<fieldset>
+											<legend onclick="onMenuCatClick('{module.function.parameter.PARAMETER_ID}','adminParEdit_');">{module.function.parameter.L_EDIT}</legend>
+											<dl>
+												<dt><label for="parameter_name_{module.function.parameter.PARAMETER_ID}">{module.function.parameter.L_PARAMETER_TITLE}</label></dt>
+												<dd><input type="text" size="45" name="parameter_name" id="parameter_name_{module.function.parameter.PARAMETER_ID}" value="{module.function.parameter.E_PARAMETER_TITLE}" /></dd>
+											</dl>
+											<dl>
+												<dt><label>{module.function.parameter.L_PARAMETER_TYPE}</label></dt>
+												<dd>{module.function.parameter.E_PARAMETER_TYPE}</dd>
+											</dl>
+											<dl>
+												<dt><label for="parameter_auth_{module.function.parameter.PARAMETER_ID}_0">{module.function.parameter.L_PARAMETER_AUTH}</label></dt>
+												<dd><input type="radio" name="parameter_auth" id="parameter_auth_{module.function.parameter.PARAMETER_ID}_1" value="1" class="radio" {module.function.parameter.E_PARAMETER_AUTH_YES} /> <label for="parameter_auth_{module.function.parameter.PARAMETER_ID}_1">{L_YES}</label>&nbsp;
+												<input type="radio" name="parameter_auth" id="parameter_auth_{module.function.parameter.PARAMETER_ID}_0" value="0" class="radio" {module.function.parameter.E_PARAMETER_AUTH_NO} /> <label for="parameter_auth_{module.function.parameter.PARAMETER_ID}_0">{L_NO}</label></dd>
+											</dl>
+											<dl>
+												<dt><label for="parameter_default_{module.function.parameter.PARAMETER_ID}">{module.function.parameter.L_PARAMETER_DEFAULT}</label></dt>
+												<dd><input type="text" size="45" name="parameter_default" id="parameter_default_{module.function.parameter.PARAMETER_ID}" value="{module.function.parameter.E_PARAMETER_DEFAULT}"/></dd>
+											</dl>
+											<dl>
+												<dt><label for="parameter_function_{module.function.parameter.PARAMETER_ID}">{module.function.parameter.L_PARAMETER_FUNCTION}</label><br /><span class="explain">{module.function.parameter.L_PARAMETER_FUNCTION_EXPLAIN}</span></dt>
+												<dd><textarea rows="20" cols="100" wrap="virtual" name="parameter_function" id="parameter_function_{module.function.parameter.PARAMETER_ID}">{module.function.parameter.E_PARAMETER_FUNCTION}</textarea></dd>
+											</dl>
+											<p align="center">
+												{module.function.parameter.S_HIDDEN_FIELDS}
+												<input type="submit" name="submit" value="{module.function.parameter.S_SUBMIT}" class="button1" />
+											</p>
+										</fieldset>
+										</form>
+									</div>
+								</div>
+								<!-- END parameter -->								
 							</div>
-							<div style="float:left:width:15%;">
-								{module.function.parameter.L_PARAMETER_TYPE}
-							</div>
-							<div>&nbsp;</div>
+							<span class="corners-bottom"><span></span></span>
 						</div>
-						<!-- BEGIN noparameter -->
-						<div style="clear:both;display:block;border-bottom:solid 1px #CCCCCC;">{module.function.noparameter.NONE}</div>
-						<!-- END noparameter -->
-						<!-- BEGIN parameter -->
-						<div style="clear:both;display:block;padding-top:4px;padding-bottom:4px;
-						<!-- BEGIN is_parameter -->
-						border-bottom:solid 1px #CCCCCC;
-						<!-- END is_parameter -->
-						">
-							<div style="clear:both;display:block;">
-								<div style="float:right;margin-right:16px;">
-									<!-- BEGIN is_parameter -->
-									<a href="javascript:onMenuCatClick('{module.function.parameter.PARAMETER_ID}','adminParEdit_');" title="{module.function.parameter.L_EDIT}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_edit.gif" align="absmiddle"></a>
-									<a href="{module.function.parameter.U_MOVE_UP}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_up.gif" alt="{L_MOVE_UP}" title="{L_MOVE_UP}" align="absmiddle" /></a>
-									<a href="{module.function.parameter.U_MOVE_DOWN}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_down.gif" alt="{L_MOVE_DOWN}" title="{L_MOVE_DOWN}" align="absmiddle" /></a>
-									<a href="javascript:onMenuCatClick('{module.function.parameter.PARAMETER_ID}','adminParDelete_');"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_delete.gif" alt="{L_DELETE}" title="{L_DELETE}" align="absmiddle" /></a>
-									<!-- END is_parameter -->
-								</div>
-								<div style="display:block;float:left;width:30%;">
-									<img src="{IMG_ICON_PARAMETER}" border="0" align="absmiddle">
-									{module.function.parameter.PARAMETER_TITLE}
-								</div>
-								<div style="display:block;float:left:width:15%;">
-									{module.function.parameter.PARAMETER_TYPE}
-								</div>
-							</div>
-							<!-- FUNCTION PARAMETER Delete -->
-							<div id="adminParDelete_{module.function.parameter.PARAMETER_ID}" style="clear:both;display:{module.function.parameter.VISIBLE_DELETE};">
-								<fieldset>
-									<legend style="cursor:pointer;" onclick="onMenuCatClick('{module.function.parameter.PARAMETER_ID}','adminParDelete_');">
-										<img src="{IMG_URL_CONTRACT}" border="0" align="middle">
-										{L_DELETE}
-									</legend>
-									<p>
-									{module.function.parameter.MESSAGE_DELETE}
-									</p>
-								</fieldset>
-							</div>
-							<!-- FUNCTION PARAMETER Edit -->
-							<div id="adminParEdit_{module.function.parameter.PARAMETER_ID}" style="clear:both;display:{module.function.parameter.VISIBLE};">
-								<form action="{S_ACTION}" method="post">
-								<fieldset>
-									<legend style="cursor:pointer;" onclick="onMenuCatClick('{module.function.parameter.PARAMETER_ID}','adminParEdit_');">
-										<img src="{IMG_URL_CONTRACT}" border="0" align="middle">
-										{module.function.parameter.L_EDIT}
-									</legend>
-									<dl>
-										<dt><label for="parameter_name_{module.function.parameter.PARAMETER_ID}">{module.function.parameter.L_PARAMETER_TITLE}</label></dt>
-										<dd><input type="text" size="45" name="parameter_name" id="parameter_name_{module.function.parameter.PARAMETER_ID}" value="{module.function.parameter.E_PARAMETER_TITLE}" /></dd>
-									</dl>
-									<dl>
-										<dt><label>{module.function.parameter.L_PARAMETER_TYPE}</label></dt>
-										<dd>{module.function.parameter.E_PARAMETER_TYPE}</dd>
-									</dl>
-									<dl>
-										<dt><label for="parameter_auth_{module.function.parameter.PARAMETER_ID}_0">{module.function.parameter.L_PARAMETER_AUTH}</label></dt>
-										<dd><input type="radio" name="parameter_auth" id="parameter_auth_{module.function.parameter.PARAMETER_ID}_1" value="1" class="radio" {module.function.parameter.E_PARAMETER_AUTH_YES} /> <label for="parameter_auth_{module.function.parameter.PARAMETER_ID}_1">{L_YES}</label>&nbsp;
-										<input type="radio" name="parameter_auth" id="parameter_auth_{module.function.parameter.PARAMETER_ID}_0" value="0" class="radio" {module.function.parameter.E_PARAMETER_AUTH_NO} /> <label for="parameter_auth_{module.function.parameter.PARAMETER_ID}_0">{L_NO}</label></dd>
-									</dl>
-									<dl>
-										<dt><label for="parameter_default_{module.function.parameter.PARAMETER_ID}">{module.function.parameter.L_PARAMETER_DEFAULT}</label></dt>
-										<dd><input type="text" size="45" name="parameter_default" id="parameter_default_{module.function.parameter.PARAMETER_ID}" value="{module.function.parameter.E_PARAMETER_DEFAULT}"/></dd>
-									</dl>
-									<dl>
-										<dt><label for="parameter_function_{module.function.parameter.PARAMETER_ID}">{module.function.parameter.L_PARAMETER_FUNCTION}</label><br /><span class="explain">{module.function.parameter.L_PARAMETER_FUNCTION_EXPLAIN}</span></dt>
-										<dd><textarea rows="20" cols="100" wrap="virtual" name="parameter_function" id="parameter_function_{module.function.parameter.PARAMETER_ID}">{module.function.parameter.E_PARAMETER_FUNCTION}</textarea></dd>
-									</dl>
-									<p align="center">
-										{module.function.parameter.S_HIDDEN_FIELDS}
-										<input type="submit" name="submit" value="{module.function.parameter.S_SUBMIT}" class="button1" />
-									</p>
-								</fieldset>
-								</form>
-							</div>
-						</div>
-						<span style="clear:both"></span>
-						<!-- END parameter -->
 					</div>
 					<!-- FUNCTION PARAMETERS END -->
 					<!-- FUNCTION BLOCK BEGIN -->
-					<div id="adminBlock_{module.function.FUNCTION_ID}" style="clear:both;margin-left:16px;display:{module.function.VISIBLE_BLOCK};">
-						<!-- BEGIN noblock -->
-						<div style="display:block;border-bottom:solid 1px #CCCCCC;margin-bottom:3px;">{module.function.noblock.NONE}</div>
-						<!-- END noblock -->
-						<!-- BEGIN block -->
-						<div style="display:block;clear:both;padding-top:2px;">
-							<div style="display:block;clear:both;">
-								<div style="float:right;margin-right:16px;">
-									<!-- BEGIN is_block -->
-									[ <a href="{module.function.block.U_BLOCK_SETTINGS}">{module.function.block.L_SETTINGS}</a> ]
-									<!-- BEGIN include_block_edit -->
-									<a href="javascript:onMenuCatClick('{module.function.block.BLOCK_ID}','adminEdit_');" title="{module.function.block.L_EDIT}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_edit.gif" align="absmiddle" /></a>
-									<!-- END include_block_edit -->
-									<!-- BEGIN include_block_private -->
-									<a href="javascript:onMenuCatClick('{module.function.block.BLOCK_ID}','adminPrivate_');" title="{module.function.block.L_PERMISSIONS_ADV}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_permissions.gif" align="absmiddle"></a>
-									<!-- END include_block_private -->
-									<a href="javascript:onMenuCatClick('{module.function.block.BLOCK_ID}','adminBlockDelete_');" title="{module.function.block.L_DELETE}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_delete.gif" align="absmiddle"></a>
-									<!-- END is_block -->
-								</div>
-								<div style="float:left;">
-									<span style="cursor:pointer;" onclick="onMenuCatClick('{module.function.block.BLOCK_ID}','adminEdit_');">
-										<img src="{IMG_ICON_BLOCK}" border="0" align="absmiddle">
-									</span>
-									<a href="javascript:onMenuCatClick('{module.function.block.BLOCK_ID}','adminEdit_');">{module.function.block.BLOCK_TITLE}</a>
-									<span class="explain"><i>{module.function.block.BLOCK_LAST_EDITED}</i></span>
-									<span class="explain">{module.function.block.BLOCK_DESC}</span>
-								</div>
-							</div>
-							<!-- FUNCTION BLOCK Delete -->
-							<div id="adminBlockDelete_{module.function.block.BLOCK_ID}" style="clear:both;display:{module.function.block.VISIBLE_DELETE};">
-								<fieldset>
-									<legend style="cursor:pointer;cursor:hand;" onclick="onMenuCatClick('{module.function.block.BLOCK_ID}','adminBlockDelete_');">
-										<img src="{IMG_URL_CONTRACT}" border="0" align="middle">
-										{L_DELETE}
-									</legend>
-									<p>
-										{module.function.block.MESSAGE_DELETE}
-									</p>
-								</fieldset>
-							</div>
-							<!-- FUNCTION BLOCK QUICK Edit -->
-							<div id="adminEdit_{module.function.block.BLOCK_ID}" style="clear:both;display:{module.function.block.VISIBLE_EDIT};">
-								<form action="{S_ACTION}" method="post">
-								<fieldset>
-									<legend style="cursor:pointer;" onclick="onMenuCatClick('{module.function.block.BLOCK_ID}','adminEdit_');">
-										<img src="{IMG_URL_CONTRACT}" border="0" align="middle">
-										{module.function.block.L_TITLE}
-									</legend>
-									<dl>
-										<dt><label for="block_title_{module.function.block.BLOCK_ID}">{module.function.block.L_BLOCK_TITLE}</label></dt>
-										<dd><input type="text" size="65" name="block_title" id="block_title_{module.function.block.BLOCK_ID}" value="{module.function.block.E_BLOCK_TITLE}" /></dd>
-									</dl>
-									<dl>
-										<dt><label for="block_desc_{module.function.block.BLOCK_ID}">{module.function.block.L_BLOCK_DESC}</label></dt>
-										<dd><input type="text" size="65" name="block_desc" value="{module.function.block.E_BLOCK_DESC}" /></dd>
-									</dl>
-									<dl>
-										<dt><label for="show_title_{module.function.block.BLOCK_ID}_1">{module.function.block.L_SHOW_TITLE}</label><br />
-											<span class="explain">{module.function.block.L_SHOW_TITLE_EXPLAIN}</span></dt>
-										<dd><input type="radio" name="show_title" id="show_title_{module.function.block.BLOCK_ID}_1" value="1" class="radio" {module.function.block.S_SHOW_TITLE_YES} /> <label for="show_title_{module.function.block.BLOCK_ID}_1">{L_YES}</label>&nbsp;
-										<input type="radio" name="show_title" id="show_title_{module.function.block.BLOCK_ID}_0" value="0" class="radio" {module.function.block.S_SHOW_TITLE_NO} /> <label for="show_title_{module.function.block.BLOCK_ID}_0">{L_NO}</label></dd>
-									</dl>
-									<dl>
-										<dt><label for="show_stats_{module.function.block.BLOCK_ID}_1">{module.function.block.L_SHOW_STATS}</label><br />
-											<span class="explain">{module.function.block.L_SHOW_STATS_EXPLAIN}</span></dt>
-										<dd><input type="radio" name="show_stats" id="show_stats_{module.function.block.BLOCK_ID}_1" value="1" class="radio" {module.function.block.S_SHOW_STATS_YES} /> <label for="show_stats_{module.function.block.BLOCK_ID}_1">{L_YES}</label>&nbsp;
-										<input type="radio" name="show_stats" id="show_stats_{module.function.block.BLOCK_ID}_0" value="0" class="radio" {module.function.block.S_SHOW_STATS_NO} /> <label for="show_stats_{module.function.block.BLOCK_ID}_0">{L_NO}</label></dd>
-									</dl>
-									<dl>
-										<dt><label for="show_block_{module.function.block.BLOCK_ID}_1">{module.function.block.L_SHOW_BLOCK}</label><br /><span class="explain">{module.function.block.L_SHOW_BLOCK_EXPLAIN}</span></dt>
-										<dd><input type="radio" name="show_block" id="show_block_{module.function.block.BLOCK_ID}_1" value="1" class="radio" {module.function.block.S_SHOW_BLOCK_YES} /> <label for="show_block_{module.function.block.BLOCK_ID}_1">{L_YES}</label>&nbsp;
-										<input type="radio" name="show_block" id="show_block_{module.function.block.BLOCK_ID}_0" value="0" class="radio" {module.function.block.S_SHOW_BLOCK_NO} /> <label for="show_block_{module.function.block.BLOCK_ID}_0">{L_NO}</label></dd>
-									</dl>
-									<dl>
-										<dt><label>{module.function.block.L_AUTH_TITLE}</label><br /><span class="explain">{module.function.block.L_AUTH_TITLE_EXPLAIN}</span></dt>
-										<dd>
-										<table border="0">
-											<thead>
-											<tr>
-											   	<!-- BEGIN block_auth_titles -->
-												<th>{module.function.block.block_auth_titles.CELL_TITLE}</th>
-											    <!-- END block_auth_titles -->
-											</tr>
-											</thead>
-											<tbody>
-											<tr>
-											   	<!-- BEGIN block_auth_data -->
-												<td>
-													{module.function.block.block_auth_data.S_AUTH_LEVELS_SELECT}
-												</td>
-												<!-- END block_auth_data -->
-										    </tr>
-										    </tbody>
-										 </table>
-										</dd>
-									</dl>
-									<dl>
-										<dt><label>{module.function.block.L_COLUMN}</label></dt>
-										<dd>{module.function.block.S_COLUMN_LIST}</dd>
-									</dl>
-									<p align="center">
-										{module.function.block.S_HIDDEN_FIELDS}
-										<input type="submit" name="submit" value="{module.function.block.S_SUBMIT}" class="button1" />
-									</p>
-								</fieldset>
-							</form>
-							</div>
-							<!-- FUNCTION BLOCK Private Auth -->
-							<div id="adminPrivate_{module.function.block.BLOCK_ID}" style="clear:both;display:{module.function.block.VISIBLE_PRIVATE};">
-								<form action="{S_ACTION}" method="post">
-								<fieldset>
-									<legend style="cursor:pointer;" onclick="onMenuCatClick('{module.function.block.BLOCK_ID}','adminPrivate_');">
-										<img src="{IMG_URL_CONTRACT}" border="0" align="middle">
-										{module.function.block.L_TITLE}
-									</legend>
-									<table width="100%" cellpadding="0" cellspacing="0" border="0" align="center">
-									<tr>
-										<td width="40%" class="row3" align="center" height="25" nowrap="nowrap"><b>{L_GROUPS}</b></td>
-										<td width="20%" class="row3" align="center" nowrap="nowrap"><b>{L_VIEW}</b></td>
-										<td width="20%" class="row3" align="center" nowrap="nowrap"><b>{L_EDIT}</b></td>
-										<td width="20%" class="row3" align="center" nowrap="nowrap"><b>{L_IS_MODERATOR}</b></td>
-									</tr>
-									<tr>
-										<td class="row1" align="center" colspan="4">
-											<div style="overflow:auto; overflow-y:scroll; height:150px;">
+					<div id="adminBlock_{module.function.FUNCTION_ID}" class="settings acp" style="display:{module.function.VISIBLE_BLOCK};">
+						<div class="panel">
+							<span class="corners-top"><span></span></span>
+							<div class="content bg1">
+								<!-- BEGIN noblock -->
+								{module.function.noblock.NONE}
+								<!-- END noblock -->
+								<!-- BEGIN block -->
+								<div class="clear blockColapse">
+									<div class="header">
+										<!-- BEGIN is_block -->
+										<div class="buttons">
+											[ <a href="{module.function.block.U_BLOCK_SETTINGS}">{module.function.block.L_SETTINGS}</a> ]
+											<!-- BEGIN include_block_edit -->
+											<a href="javascript:onMenuCatClick('{module.function.block.BLOCK_ID}','adminEdit_');" title="{module.function.block.L_EDIT}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_edit.gif" align="absmiddle" /></a>
+											<!-- END include_block_edit -->
+											<!-- BEGIN include_block_private -->
+											<a href="javascript:onMenuCatClick('{module.function.block.BLOCK_ID}','adminPrivate_');" title="{module.function.block.L_PERMISSIONS_ADV}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_permissions.gif" align="absmiddle"></a>
+											<!-- END include_block_private -->
+											<a href="javascript:onMenuCatClick('{module.function.block.BLOCK_ID}','adminBlockDelete_');" title="{module.function.block.L_DELETE}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_delete.gif" align="absmiddle"></a>
+										</div>
+										<!-- END is_block -->
+										<span class="title" onclick="
+											<a href="javascript:onMenuCatClick('{module.function.block.BLOCK_ID}','adminEdit_');"><img src="{IMG_ICON_BLOCK}" /></a>
+											<a href="javascript:onMenuCatClick('{module.function.block.BLOCK_ID}','adminEdit_');">{module.function.block.BLOCK_TITLE}</a>
+										</span>
+										<span class="explain"><i>{module.function.block.BLOCK_LAST_EDITED}</i></span>
+										<span class="explain">{module.function.block.BLOCK_DESC}</span>
+									</div>
+									
+									<!-- FUNCTION BLOCK Delete -->
+									<div id="adminBlockDelete_{module.function.block.BLOCK_ID}" class="settings" style="display:{module.function.block.VISIBLE_DELETE};">
+										<fieldset>
+											<legend onclick="onMenuCatClick('{module.function.block.BLOCK_ID}','adminBlockDelete_');">{L_DELETE}</legend>
+											<p>{module.function.block.MESSAGE_DELETE}</p>
+										</fieldset>
+									</div>
+									<!-- FUNCTION BLOCK QUICK Edit -->
+									<div id="adminEdit_{module.function.block.BLOCK_ID}" class="settings" style="display:{module.function.block.VISIBLE_EDIT};">
+										<form action="{S_ACTION}" method="post">
+										<fieldset>
+											<legend style="cursor:pointer;" onclick="onMenuCatClick('{module.function.block.BLOCK_ID}','adminEdit_');">{module.function.block.L_TITLE}</legend>
+											<dl>
+												<dt><label for="block_title_{module.function.block.BLOCK_ID}">{module.function.block.L_BLOCK_TITLE}</label></dt>
+												<dd><input type="text" size="65" name="block_title" id="block_title_{module.function.block.BLOCK_ID}" value="{module.function.block.E_BLOCK_TITLE}" /></dd>
+											</dl>
+											<dl>
+												<dt><label for="block_desc_{module.function.block.BLOCK_ID}">{module.function.block.L_BLOCK_DESC}</label></dt>
+												<dd><input type="text" size="65" name="block_desc" value="{module.function.block.E_BLOCK_DESC}" /></dd>
+											</dl>
+											<dl>
+												<dt><label for="show_title_{module.function.block.BLOCK_ID}_1">{module.function.block.L_SHOW_TITLE}</label><br />
+													<span class="explain">{module.function.block.L_SHOW_TITLE_EXPLAIN}</span></dt>
+												<dd><input type="radio" name="show_title" id="show_title_{module.function.block.BLOCK_ID}_1" value="1" class="radio" {module.function.block.S_SHOW_TITLE_YES} /> <label for="show_title_{module.function.block.BLOCK_ID}_1">{L_YES}</label>&nbsp;
+												<input type="radio" name="show_title" id="show_title_{module.function.block.BLOCK_ID}_0" value="0" class="radio" {module.function.block.S_SHOW_TITLE_NO} /> <label for="show_title_{module.function.block.BLOCK_ID}_0">{L_NO}</label></dd>
+											</dl>
+											<dl>
+												<dt><label for="show_stats_{module.function.block.BLOCK_ID}_1">{module.function.block.L_SHOW_STATS}</label><br />
+													<span class="explain">{module.function.block.L_SHOW_STATS_EXPLAIN}</span></dt>
+												<dd><input type="radio" name="show_stats" id="show_stats_{module.function.block.BLOCK_ID}_1" value="1" class="radio" {module.function.block.S_SHOW_STATS_YES} /> <label for="show_stats_{module.function.block.BLOCK_ID}_1">{L_YES}</label>&nbsp;
+												<input type="radio" name="show_stats" id="show_stats_{module.function.block.BLOCK_ID}_0" value="0" class="radio" {module.function.block.S_SHOW_STATS_NO} /> <label for="show_stats_{module.function.block.BLOCK_ID}_0">{L_NO}</label></dd>
+											</dl>
+											<dl>
+												<dt><label for="show_block_{module.function.block.BLOCK_ID}_1">{module.function.block.L_SHOW_BLOCK}</label><br /><span class="explain">{module.function.block.L_SHOW_BLOCK_EXPLAIN}</span></dt>
+												<dd><input type="radio" name="show_block" id="show_block_{module.function.block.BLOCK_ID}_1" value="1" class="radio" {module.function.block.S_SHOW_BLOCK_YES} /> <label for="show_block_{module.function.block.BLOCK_ID}_1">{L_YES}</label>&nbsp;
+												<input type="radio" name="show_block" id="show_block_{module.function.block.BLOCK_ID}_0" value="0" class="radio" {module.function.block.S_SHOW_BLOCK_NO} /> <label for="show_block_{module.function.block.BLOCK_ID}_0">{L_NO}</label></dd>
+											</dl>
+											<dl>
+												<dt><label>{module.function.block.L_AUTH_TITLE}</label><br /><span class="explain">{module.function.block.L_AUTH_TITLE_EXPLAIN}</span></dt>
+												<dd>
+												<table border="0">
+													<thead>
+													<tr>
+													   	<!-- BEGIN block_auth_titles -->
+														<th>{module.function.block.block_auth_titles.CELL_TITLE}</th>
+													    <!-- END block_auth_titles -->
+													</tr>
+													</thead>
+													<tbody>
+													<tr>
+													   	<!-- BEGIN block_auth_data -->
+														<td>
+															{module.function.block.block_auth_data.S_AUTH_LEVELS_SELECT}
+														</td>
+														<!-- END block_auth_data -->
+												    </tr>
+												    </tbody>
+												 </table>
+												</dd>
+											</dl>
+											<dl>
+												<dt><label>{module.function.block.L_COLUMN}</label></dt>
+												<dd>{module.function.block.S_COLUMN_LIST}</dd>
+											</dl>
+											<p align="center">
+												{module.function.block.S_HIDDEN_FIELDS}
+												<input type="submit" name="submit" value="{module.function.block.S_SUBMIT}" class="button1" />
+											</p>
+										</fieldset>
+									</form>
+									</div>
+									<!-- FUNCTION BLOCK Private Auth -->
+									<div id="adminPrivate_{module.function.block.BLOCK_ID}" class="settings" style="display:{module.function.block.VISIBLE_PRIVATE};">
+										<form action="{S_ACTION}" method="post">
+										<fieldset>
+											<legend style="cursor:pointer;" onclick="onMenuCatClick('{module.function.block.BLOCK_ID}','adminPrivate_');">{module.function.block.L_TITLE}</legend>
 											<table width="100%" cellpadding="0" cellspacing="0" border="0" align="center">
-												<!-- BEGIN grouprows -->
-													{module.function.block.grouprows.GROUP_ROWS}
-												<!-- END grouprows -->
+											<tr>
+												<td width="40%" class="row3" align="center" height="25" nowrap="nowrap"><b>{L_GROUPS}</b></td>
+												<td width="20%" class="row3" align="center" nowrap="nowrap"><b>{L_VIEW}</b></td>
+												<td width="20%" class="row3" align="center" nowrap="nowrap"><b>{L_EDIT}</b></td>
+												<td width="20%" class="row3" align="center" nowrap="nowrap"><b>{L_IS_MODERATOR}</b></td>
+											</tr>
+											<tr>
+												<td class="row1" align="center" colspan="4">
+													<div style="overflow:auto; overflow-y:scroll; height:150px;">
+													<table width="100%" cellpadding="0" cellspacing="0" border="0" align="center">
+														<!-- BEGIN grouprows -->
+															{module.function.block.grouprows.GROUP_ROWS}
+														<!-- END grouprows -->
+													</table>
+													</div>
+												</td>
+											</tr>
 											</table>
-											</div>
-										</td>
-									</tr>
-									</table>
-									<p align="center">
-										{module.function.block.S_HIDDEN_PRIVATE_FIELDS}
-										<input type="submit" name="submit" value="{module.function.block.S_SUBMIT}" class="button1" />
-									</p>
-								</fieldset>
-								</form>
+											<p align="center">
+												{module.function.block.S_HIDDEN_PRIVATE_FIELDS}
+												<input type="submit" name="submit" value="{module.function.block.S_SUBMIT}" class="button1" />
+											</p>
+										</fieldset>
+										</form>
+									</div>
+								</div>
+								<!-- END block -->
 							</div>
-
+							<span class="corners-bottom"><span></span></span>
 						</div>
-						<!-- BEGIN is_block -->
-						<div style="clear:both;border-bottom:solid 1px #CCCCCC;padding:2px 0px 2px 0px"></div>
-						<!-- END is_block -->
-						<!-- END block -->
 					</div>
 					<!-- FUNCTION BLOCK END -->
 				</div>
-				<!-- BEGIN is_function -->
-				<div style="clear:both;border-bottom:solid 1px #CCCCCC;padding:2px 0px 2px 0px"></div>
-				<!-- END is_function -->
 				<!-- END function -->
-			</div>
-		</div>
 		<!-- END module -->
 	</div>
+	<span class="corners-bottom"><span></span></span>
 	</div>
 </div>

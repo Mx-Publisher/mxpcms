@@ -9,12 +9,48 @@
 *
 */
 
+if ( !defined('IN_PORTAL') )
+{
+	die("Hacking attempt");
+}
+
 /**
  * Modifications:
+ *		- replaced $config -> $board_config - by Jon
+ *		- replaced $cache = new mx_nothing(); to disable bots() - by Jon
+ *		- removed '?' in the returned $SID string - by Jon
+ *		- in function setup()
+ *			$auth -> $phpbb_auth - by OryNider
+ *			-new globals:  $mx_root_path, $mx_cache - by OryNider
+ *			$this->lang_name was redefined to use in
+ *			worst case the new $board_config['phpbb_lang']
+ *			wich was defined in mx_functions_style.php
+ *			before lang name is expanded - by OryNider
+ *			$template = new mx_Template(); - by OryNider
+ *			- before $this->add_lang($lang_set); the phpBB common language is included
+ *			if fails with $phpbb_root_path added
+ *		- in function set_lang()
+ *			- if empty $this->lang_path will be redefined
+ *			from $phpbb_root_path and new $board_config['phpbb_lang']
+ *			wich in this case are set as globals - by OryNider
+ *			(similar check has been added in the phpBB3 version too)
+ *		- added function images() to help redefining $images var
+ *		and indexes were is needed - by OryNider
+ */
+
+/**
+ * Disable bots
  *
  * Class wrapper
  * mx_dss_rand
  */
+class mx_nothing
+{
+	function obtain_bots()
+	{
+		return array();
+	}
+}
 
 /**
 * Session class
@@ -44,6 +80,7 @@ class session
 	var $dst;
 
 	var $lang_name;
+	var $lang_id = false;
 	var $lang_path;
 	var $img_lang;
 	var $img_array = array();
@@ -52,23 +89,22 @@ class session
 	 * Load sessions
 	 * @access public
 	 *
-	 */	
+	 */
 	function session()
 	{
 		global $mx_cache, $board_config, $db, $phpbb_root_path, $mx_root_path, $phpEx;
- 		
+ 	
 		$this->cache = $mx_cache;
 		$this->config = $board_config;
 		$this->db = $db;
 		$this->user = $this;
-		$this->service_providers = array('user_id'	=> 1, 'session_id'	=> 0, 'provider'	=> '', 'oauth_token' => '');		
+		$this->service_providers = array('user_id'	=> 1, 'session_id'	=> 0, 'provider'	=> '', 'oauth_token' => '');
 		$this->phpbb_root_path = $phpbb_root_path;	
-		$this->mx_root_path = $mx_root_path;			
+		$this->mx_root_path = $mx_root_path;
 		$this->php_ext = $phpEx;
-
-		
+	
 		$this->lang_path = $mx_root_path . 'language/';
-
+	
 	}
 	
 	/**
@@ -1013,7 +1049,7 @@ class session
 				// For logged in users, try the board default language next
 				// Just in case we do fallback on $board_config['phpbb_lang']  
 				// Since $board_config['default_lang'] has been overwiten in function $mx_user->_init_userprefs()				
-				$default_lang = phpbb_ltrim(basename(phpbb_rtrim($board_config['phpbb_lang'])), "'");			
+				$default_lang = ltrim(basename(rtrim($board_config['phpbb_lang'])), "'");
 			}
 			else
 			{

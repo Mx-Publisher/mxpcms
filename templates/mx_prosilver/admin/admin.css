@@ -17,7 +17,6 @@
 body, div, p, th, td, li, dd {
 	font-size: x-small;
 	voice-family: "\"}\"";
-	voice-family: inherit;
 	font-size: small
 }
 
@@ -163,14 +162,16 @@ a:active {
 }
 
 #content {
-	padding: 30px 10px 10px;
+	padding: 10px 10px;
 	position: relative;
 }
 
 #content h1 {
-	color: #115098;
+	/*color: #115098;*/
+	color: #536482;
 	line-height: 1.2em;
-	margin-bottom: 0;
+	border-bottom: 1px solid #536482;
+	margin-bottom: 5px;
 }
 
 #main {
@@ -285,11 +286,14 @@ a:active {
 
 /* Main Panel
 ---------------------------------------- */
-#acp {
+#acp, .acp {
 	margin: 4px 0;
 	padding: 3px 1px;
 	background-color: #FFFFFF;
 	border: 1px #999999 solid;
+}
+#acp .acp .content {
+	padding: 0px 5px;
 }
 
 .panel {
@@ -404,7 +408,7 @@ span.corners-bottom span {
 	padding: 3px 8px 3px 3px;
 }
 
-#menu li a:hover, #menu li a:hover span {
+#menu li a:hover, #menu li a:hover span, #menu li a:active, #menu li a:active span {
 	text-decoration: none;
 	background-color: #FFFFFF;
 	
@@ -629,7 +633,7 @@ fieldset {
 }
 
 fieldset p {
-	font-size: 0.85em;
+	/*font-size: 0.85em;*/
 }
 
 legend {
@@ -698,7 +702,7 @@ input.langvalue, textarea.langvalue {
 
 optgroup, select {
 	font-family: Verdana, Helvetica, Arial, sans-serif;
-	font-size: 0.85em;
+	font-size: 0.95em;
 	font-weight: normal;
 	font-style: normal;
 	cursor: pointer;
@@ -1589,3 +1593,54 @@ fieldset.permissions .permissions-switch {
 	margin: 0;
 	padding: 0;
 }
+
+	.buttons {
+		float:right;
+	}
+	
+	.buttons img {
+		cursor: pointer;
+	}
+	
+	#acp .acp .content {
+		padding: 0px 5px;
+	}
+	.blockColapse {
+		padding: 0px 10px 5px 0px;
+		margin-top: 5px;
+		border-bottom: 1px solid #999999;
+	}
+	
+	.blockColapse .colapse {
+		width: 16px;
+		float:left;
+		cursor:pointer;
+	}
+	
+	.blockColapse:last-child {
+		border-bottom-width: 0px; 
+	}
+	
+	.blockColapse .parName {
+		display: inline-block;
+		width: 30%;
+		float:left;
+	}
+	.blockColapse .parType {
+		font-style: italic;
+	}
+	
+	.blockColapse .header {
+	}
+	
+	.blockColapse .header .title {
+		cursor: pointer;
+	}
+	
+	.settings legend {
+		padding-left: 20px;
+		background: transparent url("/templates/prosilver/images/admin_icons/contract.gif") no-repeat 0 0;
+		cursor: pointer;
+	}
+
+	

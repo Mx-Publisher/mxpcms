@@ -350,14 +350,14 @@ if ( $mode == 'edit' || $mode == 'add' || $mode == 'save' && $mx_request_vars->i
 			$error = TRUE;
 			$error_msg .= ( ( isset($error_msg) ) ? '<br />' : '' ) . $lang['Password_mismatch'];
 		}
-
+		
 		//
 		// Update entry in DB
 		//
 		if( !$error )
 		{
 			$email_sql = "'" . str_replace("\'", "''", $email) . "'";
-
+			
 			if ($action == 'do_add')
 			{
 				$sql = "SELECT MAX(user_id) AS total
@@ -366,14 +366,13 @@ if ( $mode == 'edit' || $mode == 'add' || $mode == 'save' && $mx_request_vars->i
 				{
 					mx_message_die(GENERAL_ERROR, 'Could not obtain next user_id information', '', __LINE__, __FILE__, $sql);
 				}
-
+				
 				if ( !($row = $db->sql_fetchrow($result)) )
 				{
 					mx_message_die(GENERAL_ERROR, 'Could not obtain next user_id information', '', __LINE__, __FILE__, $sql);
 				}
 				$user_id = $row['total'] + 1;
-
-
+				
 				$sql = "INSERT INTO " . USERS_TABLE . " (user_id, username, user_password, user_email, user_active, user_regdate, user_level)
 					VALUES ($user_id, $username_sql_add, $passwd_sql_add, $email_sql, $user_status, '".time()."', $user_admin)";
 			}
@@ -405,14 +404,12 @@ if ( $mode == 'edit' || $mode == 'add' || $mode == 'save' && $mx_request_vars->i
 						/* */
 						
 						$sql_ary = array(
-							'username' => str_replace("\\'", "''", $username),
-							'user_password'		=> $password,
-							//'user_password'		=> $user_row['user_newpasswd'],
-							'user_newpasswd'	=> '',
-							'user_email' => $email_sql,
-							'user_active' => $user_status,
-							'user_level' => ($user_admin == 1) ? ADMIN : USER,
-							'user_login_tries' => 0,
+							'username' 				=> str_replace("\\'", "''", $username),
+							'user_password'		=> $password, //'user_newpasswd'	=> $user_row['user_newpasswd'],
+							'user_email' 			=> $email_sql,
+							'user_active' 			=> $user_status,
+							'user_level' 				=> ($user_admin == 1) ? ADMIN : USER,
+							'user_login_tries' 		=> 0,
 						);
 						
 					break;
@@ -440,12 +437,11 @@ if ( $mode == 'edit' || $mode == 'add' || $mode == 'save' && $mx_request_vars->i
 						$user_type = ($user_admin == 1) ? USER_FOUNDER : ( ($user_status = 1) ? USER_NORMAL : USER_INACTIVE);
 						
 						$sql_ary = array(
-							'username' => str_replace("\\'", "''", $username),
-							//'user_password'		=> $password,
+							'username' 				=> str_replace("\\'", "''", $username),
 							'user_password'		=> $db->sql_escape(phpBB3::phpbb_hash($password)),
-							'user_newpasswd'	=> '',
-							'user_type' => $user_type,
-							'user_email' => $email_sql,
+							'user_newpasswd'		=> '',
+							'user_type' 				=> $user_type,
+							'user_email' 			=> $email_sql,
 							'user_login_attempts'	=> 0,
 						);
 					break;

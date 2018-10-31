@@ -280,7 +280,8 @@ elseif ($mx_request_vars->get('pane', MX_TYPE_NO_TAGS) == 'right' )
 	$template->set_filenames(array(
 		"body" => "admin/index_body.".$tplEx)
 	);
-
+	$location = $lang['Forum_index'];
+	$location_url = "index.$phpEx?pane=right";
 	$template->assign_vars(array(
 		// MX Addon
 		'U_PHPBB_ROOT_PATH' => PHPBB_URL,
@@ -404,18 +405,22 @@ elseif ($mx_request_vars->get('pane', MX_TYPE_NO_TAGS) == 'right' )
 						break;
 					}
 				}
-
+				
+				$mx_user->theme['td_class1'] = isset($mx_user->theme['td_class1']) ? $mx_user->theme['td_class1'] : '';
+				$mx_user->theme['td_class2'] = isset($mx_user->theme['td_class2']) ? $mx_user->theme['td_class2'] : '';
+				$mx_user->theme['td_class3'] = isset($mx_user->theme['td_class3']) ? $mx_user->theme['td_class3'] : '';
+				
 				$row_color = ( $registered_users % 2 ) ? $mx_user->theme['td_color1'] : $mx_user->theme['td_color2'];
 				$row_class = ( $registered_users % 2 ) ? $mx_user->theme['td_class1'] : $mx_user->theme['td_class2'];
-
+				
 				$reg_ip = $mx_backend->decode_ip($onlinerow_reg[$i]['session_ip']);
-
+				
 				$template->assign_block_vars("reg_user_row", array(
 					"ROW_COLOR" => "#" . $row_color,
 					"ROW_CLASS" => $row_class,
 					"USERNAME" => $username,
-					"STARTED" => $phpBB2->create_date($board_config['default_dateformat'], $onlinerow_reg[$i]['session_start'], $board_config['board_timezone']),
-					"LASTUPDATE" => $phpBB2->create_date($board_config['default_dateformat'], $onlinerow_reg[$i]['user_session_time'], $board_config['board_timezone']),
+					"STARTED" => mx_create_date($board_config['default_dateformat'], $onlinerow_reg[$i]['session_start'], $board_config['board_timezone']),
+					"LASTUPDATE" => mx_create_date($board_config['default_dateformat'], $onlinerow_reg[$i]['user_session_time'], $board_config['board_timezone']),
 					"FORUM_LOCATION" => $location,
 					"IP_ADDRESS" => $reg_ip,
 

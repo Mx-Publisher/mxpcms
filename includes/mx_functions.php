@@ -1064,6 +1064,13 @@ function generate_portal_url($without_script_path = false)
 }
 //Form validation
 
+/**
+* Return mx_unique id
+*/
+function mx_unique_id()
+{
+	return bin2hex(random_bytes(8));
+}
 
 /**
 * Add a secret hash   for use in links/GET requests
@@ -1274,6 +1281,97 @@ function mx_generate_pagination($base_url, $num_items, $per_page, $start_item, $
 }
 
 /**
+ * This function is a wrapper for ltrim, as charlist is only supported in php >= 4.1.0
+ * added in phpBB 2.0.18
+ * added here for reference
+*/
+function mx_ltrim($str, $charlist = false)
+{
+	if ($charlist === false)
+	{
+		return ltrim($str);
+	}
+	
+	$php_version = explode('.', PHP_VERSION);
+
+	/**
+	* If we are on PHP >= 4.1 we do not need some code
+	*/
+	if ((int) $php_version[0] < 4 || ((int) $php_version[0] == 4 && (int) $php_version[1] < 1))
+	{
+		while ($str{0} == $charlist)
+		{
+			$str = substr($str, 1);
+		}
+	}
+	else
+	{
+		$str = ltrim($str, $charlist);
+	}
+
+	return $str;
+}
+
+/**
+ * This function is a wrapper for rtrim, as charlist is only supported in php >= 4.1.0
+ * added in phpBB 2.0.12 to fix a bug in PHP 4.3.10
+ * added here for reference 
+*/
+function mx_rtrim($str, $charlist = false)
+{
+	if ($charlist === false)
+	{
+		return rtrim($str);
+	}
+
+	$php_version = explode('.', PHP_VERSION);
+
+	/**
+	* If we are on PHP >= 4.1 we do not need some code
+	*/
+	if ((int) $php_version[0] < 4 || ((int) $php_version[0] == 4 && (int) $php_version[1] < 1))
+	{
+		while ($str{strlen($str)-1} == $charlist)
+		{
+			$str = substr($str, 0, strlen($str)-1);
+		}
+	}
+	else
+	{
+		$str = rtrim($str, $charlist);
+	}
+
+	return $str;
+}
+
+/**
+ * Cleans the username
+ *
+ * based on phpbb_clean_username() 
+ * added at phpBB 2.0.11 to properly format the username 
+ *
+ * @param string $username
+ * @return string
+ * @return string
+ */
+function mx_clean_username($username)
+{
+	$username = preg_replace('#(?<=href=")[\./]+?/(?=\w)#', PORTAL_URL . '/', $username);
+	
+	if (strpos($username, '---') !== false)
+	{
+		$username = str_replace('---', '–––', $username);
+		mx_clean_username($username);
+	}
+	
+	$username = substr(htmlspecialchars(str_replace("\'", "'", trim($username))), 0, 25);
+	$username = rtrim($username, "\\");
+	$username = str_replace("'", "\'", $username);
+
+	return $username;
+}
+
+/**
  * Get userdata
  *
  * Get Userdata, $mx_user can be username or user_id. If force_str is true, the username will be forced.
@@ -1285,11 +1383,11 @@ function mx_generate_pagination($base_url, $num_items, $per_page, $start_item, $
  */
 function mx_get_userdata($mxuser, $force_str = false)
 {
-	global $db, $phpBB2;
+	global $db;
 
 	if (!is_numeric($mxuser) || $force_str)
 	{
-		$mxuser = $phpBB2->phpbb_clean_username($mxuser);
+		$mxuser = mx_clean_username($mxuser);
 	}
 	else
 	{
@@ -1900,7 +1998,7 @@ function mx_get_exists($table, $idfield = '', $id = 0)
 {
 	global $db;
 
-	$sql = "SELECT COUNT(*) AS total FROM $table WHERE $idfield = '$id'";
+	$sql = "SELECT COUNT(*) AS total FROM '$table' WHERE $idfield = '$id'";
 	if( !($result = $db->sql_query($sql)) )
 	{
 		mx_message_die(GENERAL_ERROR, "Couldn't get block/Column information", '', __LINE__, __FILE__, $sql);
@@ -3437,13 +3535,77 @@ function mx_get_langcode()
 	}
 }
 
+function mx_get_db_stat($mode, $db_name = '')
+{
+	global $db, $dbname, $table_prefix, $mx_table_prefix;
+	
+	$db_name = !empty($db_name) ? $db_name : $dbname;
+	
+	switch($mode)
+	{
+		case 'usercount':
+			$sql = "SELECT COUNT(`user_id`) AS total
+				FROM `" . $db_name . "`.`" . str_replace($table_prefix, $mx_table_prefix, USERS_TABLE) . "`
+				WHERE user_id <> " . ANONYMOUS;
+		break;
+
+		case 'newestuser':
+			$sql = "SELECT `user_id`, `username`
+				FROM `" . $db_name . "`.`" . str_replace($table_prefix, $mx_table_prefix, USERS_TABLE) . "`
+				WHERE user_id <> " . ANONYMOUS . "
+				ORDER BY user_id DESC
+				LIMIT 1";
+		break;
+
+		case 'postcount':
+		case 'topiccount':
+			if ( ($db->sql_table_exists(($db_name . "." . FORUMS_TABLE))) )
+			{
+				$sql = "SELECT SUM(`forum_topics`) AS topic_total, SUM(`forum_posts`) AS post_total
+					FROM `" . $db_name . "`.`" . FORUMS_TABLE . "`";
+			}
+			else
+			{
+				$sql = "SELECT pg.page_id AS topic_total, blk.block_id AS post_total 
+						FROM `" . $db_name . "`.`" . PAGE_TABLE . "` pg, `" . $db_name . "`.`" . BLOCK_TABLE . "` blk 
+						WHERE block_time <> ''";
+			}
+		break;
+	}
+	
+	if (!($result = $db->sql_query($sql)))
+	{
+		return false;
+	}
+	
+	$row = $db->sql_fetchrow($result);
+	
+	switch ($mode)
+	{
+		case 'usercount':
+			return $row['total'];
+		break;
+		case 'newestuser':
+			return $row;
+		break;
+		case 'postcount':
+			return $row['post_total'];
+		break;
+		case 'topiccount':
+			return $row['topic_total'];
+		break;
+	}
+	
+	return false;
+}
+
 /**
  * update config.php values.
  *
  */
 function update_portal_backend($new_backend = PORTAL_BACKEND)
 {
-	global $mx_root_path, $lang, $phpEx, $portal_config;
+	global $mx_root_path, $lang, $phpEx, $portal_config, $mx_cache;
 
 	if( @file_exists($mx_root_path . "config.$phpEx") )
 	{
@@ -3466,7 +3628,7 @@ function update_portal_backend($new_backend = PORTAL_BACKEND)
 	*/
 
 	$new_backend = ($new_backend) ? $new_backend  : 'internal';
-
+	
 	switch ($new_backend)
 	{
 		case 'internal':
@@ -3518,9 +3680,9 @@ function update_portal_backend($new_backend = PORTAL_BACKEND)
 	$process_msgs[] = '<span style="color:pink;">'.str_replace("\n", "<br />\n", htmlspecialchars($board_config_data)).'</span>';
 
 	$message = '<hr />';
-	for( $i=0; $i < count($process_msgs); $i++ )
+	for ($i = 0; $i < count($process_msgs); $i++)
 	{
-		$message .= $process_msgs[$i] . ( $process_msgs[$i] == '<hr />' ? '' : '<br />' ) . "\n";
+		$message .= $process_msgs[$i] . ($process_msgs[$i] == '<hr />' ? '' : '<br />') . "\n";
 	}
 	$message .= '<hr />';
 
@@ -3559,6 +3721,30 @@ function mx_clean_string($text)
 	return trim($text);
 }
 
+/**
+ * The magic methods 
+ __construct(), 
+ __destruct(), 
+ __call(), 
+ __callStatic(), 
+ __get(), 
+ __set(), 
+ __isset(), 
+ __unset(), 
+ __sleep(), 
+ __wakeup(), 
+ __toString(), 
+ __invoke(), 
+ __set_state(), 
+ __clone(),
+ and 
+ __debugInfo() ; 
+ must always be public 
+ and can no longer be static. 
+ Method signatures are now enforced.
+ *
+ */
+ 
 /**
  * function mx_t
 * replacement for t()

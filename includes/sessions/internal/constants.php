@@ -132,9 +132,17 @@ if ( !defined('IN_PHPBB') )
 //@define('CONFIRM_TABLE', $table_prefix.'confirm');
 //@define('AUTH_ACCESS_TABLE', $table_prefix.'auth_access');
 //@define('BANLIST_TABLE', $table_prefix.'banlist');
+@define('BBCODES_TABLE', $mx_table_prefix . 'bbcodes');
+//define('BOOKMARK_TABLE', $table_prefix . 'bookmarks');
+@define('BOTS_TABLE', $mx_table_prefix . 'bots');
 //@define('CATEGORIES_TABLE', $table_prefix.'categories');
 //@define('CONFIG_TABLE', $table_prefix.'config');
-//@define('DISALLOW_TABLE', $table_prefix.'disallow');
+//@define('CONFIRM_TABLE', $table_prefix . 'confirm');
+//@define('DIGEST_SUBSCRIPTIONS_TABLE', $table_prefix . 'digest_subscriptions');
+//@define('DIGEST_SUBSCRIBED_FORUMS_TABLE', $table_prefix . 'digest_subscribed_forums');
+//@define('DISALLOW_TABLE', $table_prefix . 'disallow');
+//@define('DRAFTS_TABLE', $table_prefix . 'drafts');
+@define('FLAG_TABLE', $mx_table_prefix . 'flags');
 //@define('FORUMS_TABLE', $table_prefix.'forums');
 @define('GROUPS_TABLE', $mx_table_prefix.'groups');
 //@define('POSTS_TABLE', $table_prefix.'posts');

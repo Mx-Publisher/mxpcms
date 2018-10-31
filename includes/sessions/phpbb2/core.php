@@ -1222,7 +1222,7 @@ class mx_backend
 		// Load phpbb config.php (to get table prefix)
 		// If this fails MXP2 will not work
 		//		
-		if ((file_exists($phpbb_root_path . "config.$phpEx") === true))
+		if ((is_file($phpbb_root_path . "config.$phpEx") === true))
 		{					
 			$backend_info = $this->get_phpbb_info($phpbb_root_path . "config.$phpEx");			
 			

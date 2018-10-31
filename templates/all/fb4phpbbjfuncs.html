@@ -1,0 +1,127 @@
+<!-- IF HAS_JQUERY -->
+<script type="text/javascript" src="{T_SUPER_TEMPLATE_PATH}/jquery.min.js"></script>
+<!-- ENDIF -->
+<!-- IF HAS_JQUERY_UI -->
+<script type="text/javascript" src="{T_SUPER_TEMPLATE_PATH}/jquery-ui.min.js"></script>
+<!-- ENDIF -->
+
+<script>
+jQuery.noConflict();
+
+function ucpAjaxIfy(link){
+  jQuery('#ajaxUCP').fadeOut();
+  jQuery.post(link, { ajaxUCP: "yes" }, function(data){
+    jQuery('#ajaxUCP').html(data);
+    jQuery('#ajaxUCP').fadeIn();
+    }
+  );
+}
+
+function fbajaxify(fbinfo){
+  jQuery('#page-body').fadeOut();
+  jQuery('#page-body').html(fbinfo);
+  jQuery('#page-body').fadeIn();
+}
+
+function fbidajaxify(link, fbid, fbemail, fbat){
+  jQuery('#page-body').fadeOut();
+  jQuery.post(link, { ajax: "yes", id: fbid, email: fbemail, access_token: fbat }, function(data){
+    jQuery('#page-body').html(data);
+    jQuery('#page-body').fadeIn();
+    }
+  );
+}
+
+function redirect(link){
+  jQuery('#page-body').fadeOut();
+  jQuery.post(link, { ajax: "yes" }, function(data){
+    jQuery('#page-body').html(data);
+    jQuery('#page-body').fadeIn();
+    }
+  );
+}
+
+function ajaxify(link){
+  jQuery('#page-body').fadeOut();
+  jQuery.post(link, { ajax: "yes" }, function(data){
+    jQuery('#page-body').html(data);
+    jQuery('#page-body').fadeIn();
+    }
+  );
+}
+function ajaxThis(link, id){
+  jQuery.get(link, {ajax: 'yes'}, function(data){
+    jQuery('#' + id).html(data);
+    });
+}
+function formify_agree() {
+  jQuery('#page-body').fadeOut();
+  jQuery('#agreement').submit(function(event) {
+   /* stop form from submitting normally */
+    event.preventDefault(); 
+        
+    /* get some values from elements on the page: */
+    var newform = jQuery( this ),     
+        url = newform.attr( 'action' );
+
+    var postdata = jQuery('fieldset').find('input').serialize();      
+
+    /* Send the data using post and put the results in a div */
+    jQuery.post( url, postdata + '&ajax=yes&agreed=true',
+      function( data ) {
+
+          jQuery('#page-body').html(data);
+          jQuery('#page-body').fadeIn();
+      }
+    );
+  });
+}
+function registify_valid() {
+  jQuery('#page-body').fadeOut();
+  jQuery('#register').submit(function(event) {
+   /* stop form from submitting normally */
+    event.preventDefault();    
+    /* get some values from elements on the page: */
+    var newform = jQuery( this ),     
+        url = newform.attr( 'action' );
+
+    var postdata = jQuery('fieldset').find('input').serialize();       
+
+    /* Send the data using post and put the results in a div */
+    jQuery.post( url, postdata + '&ajax=yes&agreed=true&validate=yes',
+      function( data ) {
+
+          jQuery('#page-body').html(data);
+          jQuery('#page-body').fadeIn();
+      }
+    );
+  });
+}
+function formify_confirm() {
+  jQuery('#page-body').fadeOut();
+  jQuery('#confirm').submit(function(event) {
+   /* stop form from submitting normally */
+    event.preventDefault(); 
+        
+    /* get some values from elements on the page: */
+    var newform = jQuery( this ),     
+        url = newform.attr( 'action' );
+
+    var postdata = jQuery('fieldset').find('input').serialize();
+    postdata += '&ajax=yes';        
+
+    /* Send the data using post and put the results in a div */
+    jQuery.post( url, postdata,
+      function( data ) {
+
+          jQuery('#page-body').html(data);
+          jQuery('#page-body').fadeIn();
+      }
+    );
+  });
+} 
+           
+jQuery('document').ready(function()
+{   
+});
+</script>

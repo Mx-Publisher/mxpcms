@@ -13,6 +13,14 @@ if ( !defined('IN_PORTAL') )
 {
 	die("Hacking attempt");
 }
+if (!defined('E_DEPRECATED'))
+{
+	define('E_DEPRECATED', 8192);
+}
+if (!defined('E_STRICT'))
+{
+	define('E_STRICT', 2048);
+}
 
 /*
 * To be able to include phpBB functions/methods
@@ -36,6 +44,7 @@ define('INCLUDES', 'includes/'); //Main Includes folder
 error_reporting(E_ALL | E_NOTICE | E_STRICT);
 @session_cache_expire (1440);
 @set_time_limit (1500);
+// Report all errors, except notices and deprecation messages
 //include($mx_root_path . 'modules/mx_shared/ErrorHandler/prepend.' . $phpEx); // For nice error output
 
 // ================================================================================

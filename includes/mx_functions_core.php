@@ -77,17 +77,17 @@ class mx_cache extends cache
 		global $mx_root_path, $phpbb_root_path;
 		global $db, $portal_config;
 		global $mx_table_prefix, $table_prefix, $phpEx, $tplEx;
-		global $mx_backend, $phpbb_auth, $mx_bbcode;		
+		global $mx_backend, $phpbb_auth, $mx_bbcode;
 		
 		$this->path = ($mx_root_path) ? $mx_root_path : './';
 		$this->php_ext = $phpEx;
 		$this->cache_dir = $mx_root_path . 'cache/';
-		$this->backend = $mx_backend;		
-		$this->backend_path = $phpbb_root_path;		
+		$this->backend = $mx_backend;
+		$this->backend_path = $phpbb_root_path;
 		$this->db = $db;
-		$this->config = $portal_config; 		
-		$this->tpl_ext = $tplEx;		
-		$this->prefix = $mx_table_prefix;  			
+		$this->config = $portal_config; 
+		$this->tpl_ext = $tplEx;
+		$this->prefix = $mx_table_prefix;
 	}
 	
 	/**
@@ -97,14 +97,15 @@ class mx_cache extends cache
 	 * Set $portal_config, $phpbb_root_path, $tplEx, $table_prefix & PORTAL_BACKEND/$mx_backend
 	 *
 	 */
-	public function load_backend($portal_backend = false)
+	public function load_backend($portal_backend = 'internal')
 	{
-		global $portal_config, $mx_table_prefix, $table_prefix, $phpEx, $tplEx;
-		global $mx_backend, $phpbb_auth, $mx_bbcode;	
-
+		global $mx_table_prefix, $table_prefix, $phpEx, $tplEx, $mx_request_vars;
+		global $mx_backend, $phpbb_auth, $mx_bbcode, $portal_config;
+		
 		// Get MX-Publisher config settings
-		$portal_config = $this->obtain_mxbb_config();
-		//print_r($portal_config);
+		$this->portal_config = $portal_config = $this->obtain_mxbb_config();
+
+		//$portal_config['portal_backend_path'] = '../phpBBSeo/';
 		// Check some vars
 		if (!$portal_config['portal_version'])
 		{
@@ -117,31 +118,34 @@ class mx_cache extends cache
 		}
 		
 		// Overwrite Backend
-		$this->portal_config = $portal_config;
 		if (($portal_config['portal_backend']) && @file_exists($portal_config['portal_backend_path'] . "index.$phpEx"))
 		{
+			$this->backend = $portal_config['portal_backend'];
 			$this->backend_path = (!$portal_config['portal_backend_path']) ? $this->backend_path : $portal_config['portal_backend_path'];
-		}		
+		}
+		
 		if ($this->backend)
 		{
 			$portal_config['portal_backend'] = $this->backend;
 		}
+		
 		// No backend defined ? MXP-CMS not updated to v. 3 ?
 		if ((!$portal_config['portal_backend']) && @file_exists($this->backend_path . "profile.$phpEx"))
 		{
 			$portal_config['portal_backend'] = 'phpbb2';
-			$portal_config['portal_backend_path'] = $this->backend_path;			
+			$portal_config['portal_backend_path'] = $this->backend_path;
 		}
 		
 		// No backend defined ? Try Internal.		
 		if (!$portal_config['portal_backend'])
 		{
 			$portal_config['portal_backend'] = 'internal';
-			$portal_config['portal_backend_path'] = $this->backend_path;			
+			$portal_config['portal_backend_path'] = $this->backend_path;
 		}
+		
 		// Load backend
 		$mx_root_path = $this->path;
-		$phpbb_root_path = $this->backend_path; 			
+		$phpbb_root_path = $this->backend_path; 
 		require($this->path . 'includes/sessions/'.$portal_config['portal_backend'].'/core.'. $this->php_ext); 
 		
 		//Redirect to upgrade or redefine portal backend path
@@ -159,29 +163,32 @@ class mx_cache extends cache
 
 				// Behave as per HTTP/1.1 spec for others
 				header('Location: ' . $this->path . "install/mx_install.$phpEx");
-				exit;				
+				exit;
 			}
 			else
 			{
 				$portal_config['portal_backend_path'] = $this->path . 'includes/shared/phpbb2/';
-			}						
+			}
 		}
 		
 		// Instantiate the mx_backend class
 		$mx_backend = new mx_backend();
 		// Validate backend
-		if (!$mx_backend->validate_backend())
+		if (!$mx_backend->validate_backend($portal_config))
 		{
 			// If backend setup is bad, revert to standalone/internal. Thus we can access the adminCP ;)
 			define('PORTAL_BACKEND', 'internal');
 			$phpbb_root_path = $this->path . 'includes/shared/phpbb2/';
 			str_replace("//", "/", $phpbb_root_path);
 			$tplEx ='tpl';
+			
 		}
 		else
 		{
 			define('PORTAL_BACKEND', $portal_config['portal_backend']);
+			
 		}
+		
 		// Now, load backend specific constants
 		require($mx_root_path  . 'includes/sessions/'.PORTAL_BACKEND.'/constants.' . $phpEx);
 	}
@@ -208,9 +215,15 @@ class mx_cache extends cache
 
 			if ( !( $result = $db->sql_query( $sql ) ) )
 			{
-				mx_message_die( GENERAL_ERROR, 'Couldnt query config information', '', __LINE__, __FILE__, $sql );
+				if (!function_exists('mx_message_die'))
+				{
+					die("<br />mx_chache::obtain_phpbb_config() from ".CONFIG_TABLE.", Couldnt query config information. <br />Allso this hosting or server is using a cache optimizer not compatible with MX-Publisher or just lost connection to database wile query.");
+				}
+				else
+				{
+					mx_message_die( GENERAL_ERROR, 'Couldnt query config information', '', __LINE__, __FILE__, $sql );
+				}
 			}
-
 			while ( $row = $db->sql_fetchrow($result) )
 			{
 				$config[$row['config_name']] = $row['config_value'];
@@ -250,7 +263,7 @@ class mx_cache extends cache
 			{
 				if (!function_exists('mx_message_die'))
 				{
-					die("Couldnt query portal configuration, Allso this hosting or server is using a cache optimizer not compatible with MX-Publisher or just lost connection to database wile query.");
+					die("mx_cache::obtain_mxbb_config(); Couldnt query portal configuration, Allso this hosting or server is using a cache optimizer not compatible with MX-Publisher or just lost connection to database wile query.");
 				}
 				else
 				{
@@ -1030,11 +1043,18 @@ class mx_cache extends cache
 	* @param string $filename Filename to write
 	* @return mixed False if an error was encountered, otherwise the data type of the cached data
 	*/
-	public function _read($filename)
+	public function _read($filename, $cache_folder = '')
 	{
+		if (!empty($this->use_old_ip_cache))
+		{
+			return $this->_read_ip($filename, $cache_folder);
+		}
+
+		$cache_folder = ($cache_folder) ? $cache_folder : $this->cache_dir;
+		
 		global $phpEx;
 
-		$file = "{$this->cache_dir}$filename.$phpEx";
+		$file = "{$cache_folder}$filename.$phpEx";
 
 		$type = substr($filename, 0, strpos($filename, '_'));
 
@@ -1571,11 +1591,11 @@ class cache
 			}
 			else
 			{
-				fwrite($fp, "<?php\n\n/*\n$query\n*/\n\n\$temp[\$hash] = " . true . "; ?>");
+				@fwrite($fp, "<?php\n\n/*\n$query\n*/\n\n\$temp[\$hash] = " . true . "; ?>");
 				@flock($fp, LOCK_UN);
-				fclose($fp);
-			}						
-		}		
+				@fclose($fp);
+			}
+		}
 		
 		// store them in the right place
 		$lines = array();
@@ -1830,7 +1850,48 @@ class cache
 			$this->is_modified = true;
 		}
 	}
+	
+	/**
+	* Purge cache data
+	*/
+	function purge()
+	{
+		// Purge all cache files
+		foreach ($this->cache_dirs as $cache_folder)
+		{
+			$cache_folder = $this->validate_cache_folder($cache_folder, false, true);
+			$dir = @opendir($cache_folder);
 
+			if (!$dir)
+			{
+				return;
+			}
+
+			while (($entry = readdir($dir)) !== false)
+			{
+				if ((strpos($entry, 'sql_') !== 0) && (strpos($entry, 'data_') !== 0) && (strpos($entry, 'ctpl_') !== 0) && (strpos($entry, 'tpl_') !== 0))
+				{
+					continue;
+				}
+
+				$this->remove_file($entry, false, $cache_folder);
+			}
+			closedir($dir);
+		}
+
+		unset($this->vars);
+		unset($this->var_expires);
+		unset($this->sql_rowset);
+		unset($this->sql_row_pointer);
+
+		$this->vars = array();
+		$this->var_expires = array();
+		$this->sql_rowset = array();
+		$this->sql_row_pointer = array();
+
+		$this->is_modified = false;
+	}
+	
 	/**
 	 * Destroy.
 	 *
@@ -1890,6 +1951,269 @@ class cache
 			$this->save();
 		}
 	}
+
+	/**
+	* Destroy cache data files
+	*/
+	function destroy_datafiles($datafiles, $cache_folder = '', $prefix = 'data', $prefix_lookup = false)
+	{
+		$deleted = 0;
+		if (empty($datafiles))
+		{
+			return $deleted;
+		}
+
+		$cache_folder = $this->validate_cache_folder($cache_folder, false, true);
+		$datafiles = !is_array($datafiles) ? array($datafiles) : $datafiles;
+
+		if (!$prefix_lookup)
+		{
+			foreach ($datafiles as $datafile)
+			{
+				$file_deleted = $this->remove_file($prefix . $datafile . '.' . PHP_EXT, false, $cache_folder);
+				$deleted = $file_deleted ? $deleted++ : $deleted;
+			}
+		}
+		else
+		{
+			$dir = @opendir($cache_folder);
+
+			if (!$dir)
+			{
+				return;
+			}
+
+			while (($entry = readdir($dir)) !== false)
+			{
+				foreach ($datafiles as $datafile)
+				{
+					if ((strpos($entry, $prefix . $datafile) === 0) && (substr($entry, -(strlen(PHP_EXT) + 1)) === ('.' . PHP_EXT)))
+					{
+						$file_deleted = $this->remove_file($entry, false, $cache_folder);
+						$deleted = $file_deleted ? $deleted++ : $deleted;
+						break;
+					}
+				}
+			}
+		}
+
+		return $deleted;
+	}
+
+	/**
+	* Build query Hash
+	*/
+	function sql_query_hash($query = '')
+	{
+		return md5($query);
+	}
+
+	/**
+	* Fetch a field from the current row of a cached database result (database)
+	*/
+	function sql_fetchfield($query_id, $field)
+	{
+		if ($this->sql_row_pointer[$query_id] < sizeof($this->sql_rowset[$query_id]))
+		{
+			return (isset($this->sql_rowset[$query_id][$this->sql_row_pointer[$query_id]][$field])) ? $this->sql_rowset[$query_id][$this->sql_row_pointer[$query_id]++][$field] : false;
+		}
+
+		return false;
+	}
+
+	/**
+	* Seek a specific row in an a cached database result (database)
+	*/
+	function sql_rowseek($rownum, $query_id)
+	{
+		if ($rownum >= sizeof($this->sql_rowset[$query_id]))
+		{
+			return false;
+		}
+
+		$this->sql_row_pointer[$query_id] = $rownum;
+		return true;
+	}
+
+	/**
+	* Free memory used for a cached database result (database)
+	*/
+	function sql_freeresult($query_id)
+	{
+		if (!isset($this->sql_rowset[$query_id]))
+		{
+			return false;
+		}
+
+		unset($this->sql_rowset[$query_id]);
+		unset($this->sql_row_pointer[$query_id]);
+
+		return true;
+	}
+
+	/**
+	* Read cached data from a specified file
+	*
+	* @access private
+	* @param string $filename Filename to write
+	* @return mixed False if an error was encountered, otherwise the data type of the cached data
+	*/
+	function _read($filename, $cache_folder = '')
+	{
+		if (!empty($this->use_old_ip_cache))
+		{
+			return $this->_read_ip($filename, $cache_folder);
+		}
+
+		$cache_folder = $this->validate_cache_folder($cache_folder, false, false);
+		$file = $cache_folder . $filename . '.' . PHP_EXT;
+
+		$type = substr($filename, 0, strpos($filename, '_'));
+
+		if (!file_exists($file))
+		{
+			return false;
+		}
+
+		if (!($handle = @fopen($file, 'rb')))
+		{
+			return false;
+		}
+
+		// Skip the PHP header
+		fgets($handle);
+
+		if ($filename == 'data_global')
+		{
+			$this->vars = $this->var_expires = array();
+
+			$time = time();
+
+			while (($expires = (int) fgets($handle)) && !feof($handle))
+			{
+				// Number of bytes of data
+				$bytes = substr(fgets($handle), 0, -1);
+
+				if (!is_numeric($bytes) || ($bytes = (int) $bytes) === 0)
+				{
+					// We cannot process the file without a valid number of bytes so we discard it
+					fclose($handle);
+
+					$this->vars = $this->var_expires = array();
+					$this->is_modified = false;
+
+					$this->remove_file($file, false, $cache_folder);
+
+					return false;
+				}
+
+				if ($time >= $expires)
+				{
+					fseek($handle, $bytes, SEEK_CUR);
+
+					continue;
+				}
+
+				$var_name = substr(fgets($handle), 0, -1);
+
+				// Read the length of bytes that consists of data.
+				$data = fread($handle, $bytes - strlen($var_name));
+				$data = @unserialize($data);
+
+				// Don't use the data if it was invalid
+				if ($data !== false)
+				{
+					$this->vars[$var_name] = $data;
+					$this->var_expires[$var_name] = $expires;
+				}
+
+				// Absorb the LF
+				fgets($handle);
+			}
+
+			fclose($handle);
+
+			$this->is_modified = false;
+
+			return true;
+		}
+		else
+		{
+			$data = false;
+			$line = 0;
+
+			while (($buffer = fgets($handle)) && !feof($handle))
+			{
+				$buffer = substr($buffer, 0, -1); // Remove the LF
+
+				// $buffer is only used to read integers
+				// if it is non numeric we have an invalid
+				// cache file, which we will now remove.
+				if (!is_numeric($buffer))
+				{
+					break;
+				}
+
+				if ($line == 0)
+				{
+					$expires = (int) $buffer;
+
+					if (time() >= $expires)
+					{
+						break;
+					}
+
+					if ($type == 'sql')
+					{
+						// Skip the query
+						fgets($handle);
+					}
+				}
+				elseif ($line == 1)
+				{
+					$bytes = (int) $buffer;
+
+					// Never should have 0 bytes
+					if (!$bytes)
+					{
+						break;
+					}
+
+					// Grab the serialized data
+					$data = fread($handle, $bytes);
+
+					// Read 1 byte, to trigger EOF
+					fread($handle, 1);
+
+					if (!feof($handle))
+					{
+						// Somebody tampered with our data
+						$data = false;
+					}
+					break;
+				}
+				else
+				{
+					// Something went wrong
+					break;
+				}
+				$line++;
+			}
+			fclose($handle);
+
+			// unserialize if we got some data
+			$data = ($data !== false) ? @unserialize($data) : $data;
+
+			if ($data === false)
+			{
+				$this->remove_file($file, false, $cache_folder);
+				return false;
+			}
+
+			return $data;
+		}
+	}
+
 
 	/**
 	 * Obtain currently listed icons
@@ -5201,7 +5525,7 @@ class mx_request_vars
 	public function is_post($var)
 	{
 		// Note: _x and _y are used by (at least IE) to return the mouse position at onclick of INPUT TYPE="img" elements.	
-		return ($this->is_set_post($var) || $this->is_set_post($var.'_x') && $this->is_set_post($var.'_y')) ? 1 : 0;		
+		return ($this->is_set_post($var) || ($this->is_set_post($var.'_x') && $this->is_set_post($var.'_y'))) ? 1 : 0;
 	}
 
 	/**

@@ -26,6 +26,8 @@ if ( !defined( 'IN_PORTAL' ) )
 *
 * @return string A string consisting of what is wanted based on $mode.
 */
+if (!function_exists('mx_get_username_string'))
+{
 function mx_get_username_string($mode, $user_id, $username = false, $user_colour = false, $guest_username = false, $custom_profile_url = false)
 {
 	global $mx_user, $lang, $phpEx;
@@ -39,7 +41,7 @@ function mx_get_username_string($mode, $user_id, $username = false, $user_colour
 	
 	if ($this_userdata['user_level'] == ADMIN)
 	{
-		$user_colour = ($mx_user->theme['fontcolor3']) ? $mx_user->theme['fontcolor3'] : $user_colour;		
+		$user_colour = isset($mx_user->theme['fontcolor3']) ? $mx_user->theme['fontcolor3'] : $user_colour;		
 		$user_style = 'style="color:#' . $user_colour . '; font-weight : bold;"';
 	}
 	else if ($this_userdata['user_level'] == MOD)
@@ -87,5 +89,5 @@ function mx_get_username_string($mode, $user_id, $username = false, $user_colour
 		break;
 	}
 }
-
+}
 ?>

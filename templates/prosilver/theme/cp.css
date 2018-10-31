@@ -114,7 +114,7 @@ ul.cplist {
 	float: left;
 	font-size: 1em;
 	font-weight: bold;
-	line-height: 15px;
+	line-height: 1.4em;
 }
 
 .tabs .tab > a, .minitabs .tab > a {

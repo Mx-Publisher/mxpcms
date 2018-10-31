@@ -97,9 +97,9 @@ class session
 		$this->config = $board_config;
 		$this->db = $db;
 		$this->user = $this;
-		$this->service_providers = array('user_id'	=> 1, 'session_id'	=> 0, 'provider'	=> '', 'oauth_token' => '');		
-		$this->phpbb_root_path = $phpbb_root_path;	
-		$this->mx_root_path = $mx_root_path;			
+		$this->service_providers = array('user_id'	=> 1, 'session_id'	=> 0, 'provider'	=> '', 'oauth_token' => '');
+		$this->phpbb_root_path = $phpbb_root_path;
+		$this->mx_root_path = $mx_root_path;
 		$this->php_ext = $phpEx;
 
 		
@@ -122,7 +122,7 @@ class session
 		$this->session_begin();
 
 		// Redefine some MXP stylish userdata
-		$this->data['session_logged_in'] = $this->data['user_id'] != ANONYMOUS ? 1 : 0;
+		//$this->data['session_logged_in'] = $this->data['user_id'] != ANONYMOUS ? 1 : 0;
 
 		if ( $this->data['user_id'] == ANONYMOUS )
 		{
@@ -133,15 +133,23 @@ class session
 		{
 			case 3:
 				$this->data['user_level'] = 1;
-				break;
+				$this->data['user_active'] = 1;
+			break;
 			case 0:
-				$this->data['user_level'] = 2;
-				break;
+				$this->data['user_level'] = 0;
+				$this->data['user_active'] = 1;
+			break;
+			case 1:
+			case 2:
+				$this->data['user_level'] = 0;
+				$this->data['user_active'] = 0;
+			break;
 			default:
 				$this->data['user_level'] = 0;
-				break;
+				$this->data['user_active'] = 1;
+			break;
 		}
-
+		
 		$this->data['session_id'] = $this->session_id;
 		$this->data['user_session_page'] = $this->data['session_page'];
 	}
@@ -257,14 +265,14 @@ class session
 		global $phpEx, $SID, $_SID, $phpBB3, $_EXTRA_URL, $db, $board_config, $phpbb_root_path, $page_id;
 
 		// Give us some basic information
-		$this->time_now				= time();
-		$this->cookie_data			= array('u' => 0, 'k' => '');
+		$this->time_now					= time();
+		$this->cookie_data				= array('u' => 0, 'k' => '');
 		$this->update_session_page	= $update_session_page;
-		$this->browser				= (!empty($_SERVER['HTTP_USER_AGENT'])) ? htmlspecialchars((string) $_SERVER['HTTP_USER_AGENT']) : '';
-		$this->referer				= (!empty($_SERVER['HTTP_REFERER'])) ? htmlspecialchars((string) $_SERVER['HTTP_REFERER']) : '';		
-		$this->forwarded_for		= (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) ? (string) $_SERVER['HTTP_X_FORWARDED_FOR'] : '';
-		$this->host					= (!empty($_SERVER['HTTP_HOST'])) ? (string) $_SERVER['HTTP_HOST'] : 'localhost';
-		$this->page					= $this->extract_current_page($phpbb_root_path);
+		$this->browser					= (!empty($_SERVER['HTTP_USER_AGENT'])) ? htmlspecialchars((string) $_SERVER['HTTP_USER_AGENT']) : '';
+		$this->referer						= (!empty($_SERVER['HTTP_REFERER'])) ? htmlspecialchars((string) $_SERVER['HTTP_REFERER']) : '';		
+		$this->forwarded_for				= (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) ? (string) $_SERVER['HTTP_X_FORWARDED_FOR'] : '';
+		$this->host							= (!empty($_SERVER['HTTP_HOST'])) ? (string) $_SERVER['HTTP_HOST'] : 'localhost';
+		$this->page						= $this->extract_current_page($phpbb_root_path);
 
 		// if the forwarded for header shall be checked we have to validate its contents
 		if ($board_config['forwarded_for_check'])
@@ -499,11 +507,12 @@ class session
 								$this->leave_newly_registered();
 							}
 						}
-
+						// Redefine some MXP stylish userdata
+						$this->data['session_logged_in'] = $this->data['user_id'] != ANONYMOUS ? 1 : 0;
 						$this->data['is_registered'] = ($this->data['user_id'] != ANONYMOUS && ($this->data['user_type'] == USER_NORMAL || $this->data['user_type'] == USER_FOUNDER)) ? true : false;
 						$this->data['is_bot'] = (!$this->data['is_registered'] && $this->data['user_id'] != ANONYMOUS) ? true : false;
 						$this->data['user_lang'] = basename($this->data['user_lang']);
-
+						
 						return true;
 					}
 				}
@@ -1457,6 +1466,28 @@ class session
 		else
 		{
 		    $this->data['is_bot'] = false;
+		}
+		
+		switch ($this->data['user_type'])
+		{
+			case 3:
+				$this->data['user_level'] = 1;
+				$this->data['user_active'] = 1;
+			break;
+			case 0:
+				$this->data['user_level'] = 0;
+				$this->data['user_active'] = 1;
+			break;
+			case 1:
+			case 2:
+				$this->data['user_level'] = 0;
+				$this->data['user_active'] = 0;
+			break;
+			default:
+				global $phpbb_auth;
+				$this->data['user_level'] = $phpbb_auth->acl_get('a_') ? 1 : ($phpbb_auth->acl_get('m_') ? 2 : 0);
+				$this->data['user_active'] = 1;
+			break;
 		}
 		
 		$session_lang = '';

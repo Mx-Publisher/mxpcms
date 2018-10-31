@@ -9,9 +9,9 @@
 *
 */
 
-if ( !defined('IN_PORTAL') )
+if (!defined('IN_PHPBB'))
 {
-	die("Hacking attempt");
+	exit;
 }
 
 /**
@@ -1661,9 +1661,13 @@ function utf8_case_fold_nfkc($text, $option = 'full')
 	{
 		global $mx_root_path, $phpEx;
 		include($mx_root_path . 'includes/utf/utf_normalizer.' . $phpEx);
+		$utf_normalizer = new utf_normalizer();
 	}
-	
-	if( !is_object($utf_normalizer))
+	if (version_compare(PHP_VERSION, '5.4.0-dev', '>=') && !isset($utf_normalizer))
+	{
+		$utf_normalizer = new utf_normalizer();
+	}
+	elseif( !is_object($utf_normalizer))
 	{
 		$utf_normalizer = new utf_normalizer();
 	}
@@ -1785,7 +1789,12 @@ function utf8_normalize_nfc($strings)
 		include($mx_root_path . 'includes/utf/utf_normalizer.' . $phpEx);
 	}
 	
-	if( !isset($utf_normalizer))
+	if(!isset($utf_normalizer))
+	{
+		$utf_normalizer = new utf_normalizer();
+	}	
+	
+	if(!is_object($utf_normalizer))
 	{
 		$utf_normalizer = new utf_normalizer();
 	}

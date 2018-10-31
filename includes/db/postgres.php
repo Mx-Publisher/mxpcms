@@ -39,6 +39,8 @@ class dbal_postgres extends dbal
 
 	/**
 	* Connect to server
+	* downgraded for phpBB2 backend
+	* @access public
 	*/
 	function sql_connect($sqlserver, $sqluser, $sqlpassword, $database, $port = false, $persistency = false, $new_link = false)
 	{
@@ -120,6 +122,11 @@ class dbal_postgres extends dbal
 		}
 
 		return $this->sql_error('');
+	}
+	
+	function sql_connect_id()
+	{
+		return "SELECT pg_backend_pid()";
 	}
 
 	/**
@@ -262,7 +269,168 @@ class dbal_postgres extends dbal
 
 		return ($query_id) ? @pg_num_rows($query_id) : false;
 	}
+	
+	/**
+	* Return fields num
+	* Not used within core code
+	*/		
+	function sql_numfields($query_id = 0)
+	{
+		if(!$query_id)
+		{
+			$query_id = $this->query_result;
+		}
+		if($query_id)
+		{
+			$result = @pg_num_fields($query_id);
+			return $result;
+		}
+		else
+		{
+			return false;
+		}
+	}
 
+	/**
+	* Return fields name(s)
+	* Not used within core code
+	*/		
+	function sql_fieldname($offset, $query_id = 0)
+	{
+		if(!$query_id)
+		{
+			$query_id = $this->query_result;
+		}
+		if($query_id)
+		{
+			$result = pg_field_name($query_id, $offset);
+			return $result;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	/**
+	 * Check if a field type in a database.
+	 *
+	 * @param string $offset of sql array.
+	 * @param string $query_id from sql array.
+	 * @return field type.
+	 */
+	function sql_fieldtype($offset, $query_id = 0)
+	{
+		if(!$query_id)
+		{
+			$query_id = $this->query_result;
+		}
+		if($query_id)
+		{
+			$result = pg_field_type($query_id, $offset);
+			return $result;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	/**
+	 * Check if a field exists in a table.
+	 *
+	 * @param string $column for field name.
+	 * @param string $table_name for table name.
+	 * @return boolean true or false if not exists.
+	 */
+	function sql_fieldexists($column, $table_name)
+	{
+		$query = $this->sql_query("SELECT COUNT(column_name) as column_names FROM information_schema.columns WHERE table_name=$table_name AND column_name=$column");
+		$exists = $this->sql_numrows($query);
+		
+		if($exists > 0)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	/**
+	 * Gets a list of columns of a table.
+	 *
+	 * @param string $table_name	table name
+	 * @return array of columns names (all lower case)
+	 */
+	function sql_list_columns($table_name)
+	{
+		$columns = array();
+
+		$sql = "SELECT a.attname
+			FROM pg_class c, pg_attribute a
+			WHERE c.relname = '{$table_name}'
+				AND a.attnum > 0
+				AND a.attrelid = c.oid";
+		$result = $this->sql_query($sql);
+
+		while ($row = $this->sql_fetchrow($result))
+		{
+			$column = strtolower(current($row));
+			$columns[$column] = $column;
+		}
+		$this->sql_freeresult($result);
+
+		return $columns;
+	}
+	
+	/**
+	 * Check if a field exists in a table.
+	 *
+	 * @param string $column for field name.
+	 * @param string $table_name for table name.
+	 * @return boolean true or false if not exists.
+	 */
+	function sql_field_exists($column, $table_name)
+	{
+		$query = $this->sql_query("SELECT COUNT(column_name) as column_names FROM information_schema.columns WHERE table_name='{$table_name}' AND column_name='{$column}'");
+		$exists = $this->sql_fetch_field($query, "column_names");
+
+		if($exists > 0)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	
+	/**
+	 * Check if a table exists in a database.
+	 *
+	 * @param string $table_name The table name.
+	 * @return boolean true or false if not exists.
+	 */
+	function sql_table_exists($table_name)
+	{
+		// Execute on master server to ensure if we've just created a table that we get the correct result
+		$query = $this->sql_query("SELECT COUNT(table_name) as table_names FROM information_schema.tables WHERE table_schema = 'public' AND table_name='{$table_name}'");
+		$exists = $this->sql_fetch_field($query, 'table_names');
+		
+		if($exists > 0)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	
 	/**
 	* Return number of affected rows
 	*/
@@ -290,12 +458,35 @@ class dbal_postgres extends dbal
 
 		return ($query_id) ? @pg_fetch_assoc($query_id, NULL) : false;
 	}
-
+	
+	/**
+	 * Return a result array for a query.
+	 *
+	 * @param resource $query for the query_id.
+	 * @param int $resulttype for the type of array to return:
+	 * PGSQL_NUM, PGSQL_BOTH or PGSQL_ASSOC
+	 * @return array for the query of result. 
+	 */
+	function sql_fetch_array($query, $resulttype=PGSQL_ASSOC)
+	{
+		switch($resulttype)
+		{
+			case PGSQL_NUM:
+			case PGSQL_BOTH:
+			case PGSQL_BOTH:
+			break;
+			default:
+				$resulttype = PGSQL_ASSOC;
+			break;
+		}
+		return @pg_fetch_array($query, NULL, $resulttype);
+	}
+	
 	/**
 	* Fetch field
 	* if rownum is false, the current row is used, else it is pointing to the row (zero-based)
 	*/
-	function sql_fetchfield($field, $rownum = false, $query_id = false)
+	function sql_fetchfield($column, $rownum = false, $query_id = false)
 	{
 		if (!$query_id)
 		{
@@ -310,10 +501,31 @@ class dbal_postgres extends dbal
 			}
 
 			$row = $this->sql_fetchrow($query_id);
-			return isset($row[$field]) ? $row[$field] : false;
+			return isset($row[$column]) ? $row[$column] : false;
 		}
 
 		return false;
+	}
+	
+	/**
+	 * Return a specific field from a query.
+	 *
+	 * @param resource $query The query ID.
+	 * @param string $column The name of the field to return.
+	 * @param int|bool The number of the row to fetch it from.
+	 * @return string|bool|null As per http://php.net/manual/en/function.pg-fetch-result.php
+	 */
+	function sql_fetch_field($query, $column, $row=false)
+	{
+		if($row === false)
+		{
+			$array = $this->sql_fetch_array($query);
+			return $array[$column];
+		}
+		else
+		{
+			return @pg_fetch_result($query, $row, $column);
+		}
 	}
 
 	/**
@@ -473,6 +685,39 @@ class dbal_postgres extends dbal
 		}
 	}
 
+	/**
+	* Cache clear function
+	*/
+	function clear_cache($cache_prefix = '', $cache_folder = SQL_CACHE_FOLDER, $files_per_step = 0)
+	{
+		global $phpEx;
+		
+		$cache_folder = (empty($cache_folder) ? SQL_CACHE_FOLDER : $cache_folder);
+
+		$cache_prefix = 'sql_' . $cache_prefix;
+		$cache_folder = (!empty($cache_folder) && @is_dir($cache_folder)) ? $cache_folder : SQL_CACHE_FOLDER;
+		$cache_folder = ((@is_dir($cache_folder)) ? $cache_folder : @phpbb_realpath($cache_folder));
+
+		$res = opendir($cache_folder);
+		if($res)
+		{
+			$files_counter = 0;
+			while(($file = readdir($res)) !== false)
+			{
+				if(!@is_dir($file) && (substr($file, 0, strlen($cache_prefix)) === $cache_prefix) && (substr($file, -(strlen($phpEx) + 1)) === '.' . $phpEx))
+				{
+					@unlink($cache_folder . $file);
+					$files_counter++;
+				}
+				if (($files_per_step > 0) && ($files_counter >= $files_per_step))
+				{
+					closedir($res);
+					return $files_per_step;
+				}
+			}
+		}
+		@closedir($res);
+	}	
 }
 
 } // if ... defined
