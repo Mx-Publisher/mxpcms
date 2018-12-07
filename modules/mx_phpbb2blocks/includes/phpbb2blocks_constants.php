@@ -13,7 +13,17 @@ if ( PORTAL_BACKEND != 'phpbb2' )
 {
 	mx_message_die(GENERAL_MESSAGE, 'There are blocks on this page designed for MX-Publisher with phpBB2 backend, thus not compatible with current setup.');
 }
-
+/* START Include language file */
+$default_lang = $language = ($mx_user->user_language_name) ? $mx_user->user_language_name : (($board_config['default_lang']) ? $board_config['default_lang'] : 'english');
+/*  */
+if ((@include $mx_root_path . "includes/shared/phpbb2/language/lang_" . $language . "/lang_main.$phpEx") === false)
+{
+	if ((@include $mx_root_path . "includes/shared/phpbb2/language/lang_english/lang_main.$phpEx") === false)
+	{
+			mx_message_die(CRITICAL_ERROR, 'Language file ' . $mx_root_path . "includes/shared/phpbb2/language/lang_" . $language . "/lang_main.$phpEx" . ' couldn\'t be opened.');
+	}
+	$default_lang = $language = 'english'; 
+}
 // -------------------------------------------------------------------------
 // Footer Copyrights
 // -------------------------------------------------------------------------

@@ -4,6 +4,9 @@
 <!-- BEGIN olist_open --><ol type="{LIST_TYPE}"><!-- END olist_open -->
 <!-- BEGIN olist_close --></ol><!-- END olist_close -->
 
+<!-- BEGIN mlist_open --><ml style="list-style-type: {LIST_TYPE}"><!-- END olist_open -->
+<!-- BEGIN mlist_close --></ml><!-- END olist_close -->
+
 <!-- BEGIN listitem --><li><!-- END listitem -->
 
 <!-- BEGIN quote_username_open --></span>
@@ -97,6 +100,8 @@
 <!-- BEGIN float_close --></span><!-- END float_close -->				
 <!-- BEGIN fa_open --><i aria-hidden="true"><div class="icon fa-<!-- END fa_open -->
 <!-- BEGIN fa_close --> fa-fw"></div></i><!-- END fa_close -->
+<!-- BEGIN fa_logo_open --><i class="icon fa-<!-- END fa_logo_open -->
+<!-- BEGIN fa_logo_close --> fa-fw" aria-hidden="true" style="font-size: 60px;"></i><!-- END fa_logo_close -->
 <!-- BEGIN poet_open --><div tag='{POET}' style='display:none'><!-- END poet_open -->
 <!-- BEGIN poet_close --></div><script>doPoetry()</script><!-- END poet_close -->
 <!-- BEGIN flash --><!-- URL's used in the movie-->

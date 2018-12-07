@@ -1,13 +1,16 @@
 <link href="{U_PORTAL_ROOT_PATH}modules/mx_navmenu/templates/prosilver/prosilver.css" rel="stylesheet" type="text/css" media="screen" />
+
 <div class="navbar" role="navigation" style="clear:left;float:left">
 	<div class="inner">
 	<!-- EVENT navbar_header_quick_links_before -->									
 	
 	<ul id="nav-main" class="linklist bulletin" role="menubar">
 		<!-- BEGIN catrow -->
+		
 		<li id="c_{catrow.CAT_ID}" class="<!-- IF not catrow.CURRENT  -->button <!-- ELSE -->button{catrow.CURRENT}<!-- ENDIF -->" onmouseover="showMenuRows('{catrow.CAT_ID}');" onmouseout="hideMenuRows('{catrow.CAT_ID}')" type="submit" >
 				
 			<span>{catrow.CATEGORY}</span>
+			
 			<ul id="cat_{catrow.CAT_ID}" onmouseover="showMenuRows('{catrow.CAT_ID}');" style="display:none;position:absolute;background-color:#FFFFFF;margin:0px;padding:0px;position:absolute;z-index:160;"><!-- BEGIN menurow -->
 				<li class="button mnu-ov{catrow.menurow.CURRENT}">
 					<a href="{catrow.menurow.U_MENU_URL}" style="background-image: url({catrow.menurow.MENU_ICON})">
@@ -20,6 +23,7 @@
 	</ul>	
 	</div>
 </div>
+
 <script type="text/javascript">
 function getObj(obj)
 {

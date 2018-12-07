@@ -22,6 +22,16 @@
 */
 class session
 {
+	/** @var \phpbb\cache\driver\driver_interface */
+	protected $cache;
+
+	protected $language;
+	protected $request;
+	/** @var \phpbb\config\config */
+	protected $config;
+	/** @var \phpbb\db\driver\driver_interface */
+	protected $db; 
+	
 	var $cookie_data = array();
 	var $page = array();
 	var $data = array();
@@ -43,6 +53,28 @@ class session
 	var $timezone;
 	var $dst;
 
+	/**
+	 * @var string	ISO code of the default board language
+	 */
+	var $default_language;
+	var $default_language_name;
+	/**
+	 * @var string	ISO code of the User's language
+	 */
+	var $user_language;
+	var $user_language_name;
+	
+	var $lang_iso = 'en';	
+	var $lang_dir = 'lang_english';
+	
+	protected $common_language_files_loaded;
+	
+	var $img_lang_dir = 'en';
+	var $lang_english_name = 'English';	
+	var $lang_local_name = 'English United Kingdom';
+	var $language_list = array();
+	var $debug_paths;
+
 	var $lang_name;
 	var $lang_path;
 	var $img_lang;
@@ -56,18 +88,54 @@ class session
 	function session()
 	{
 		global $mx_cache, $board_config, $db, $phpbb_root_path, $mx_root_path, $phpEx;
- 		
-		$this->cache = $mx_cache;
-		$this->config = $board_config;
-		$this->db = $db;
-		$this->user = $this;
-		$this->service_providers = array('user_id'	=> 1, 'session_id'	=> 0, 'provider'	=> '', 'oauth_token' => '');		
-		$this->phpbb_root_path = $phpbb_root_path;	
-		$this->mx_root_path = $mx_root_path;			
-		$this->php_ext = $phpEx;
-
+		global $mx_request_vars, $template, $language;
 		
+		$this->cache				= $mx_cache;
+		$this->config				= $board_config;
+		$this->db                 	= $db;
+		$this->user               	= $this;
+		$this->service_providers = array('user_id' => 1, 'session_id' => 0, 'provider'	=> '', 'oauth_token' => '');
+		$this->phpbb_root_path = $phpbb_root_path;
+		$this->mx_root_path	= $mx_root_path;
+		$this->php_ext			= $phpEx;
+		$this->lang_path			= $mx_root_path . 'language/';
+		$this->request				= $mx_request_vars;
+		$this->template			= $template;
+		$this->language			= $language;
+
+		// Setup $this->db_tools
+		if (!class_exists('mx_db_tools') && !class_exists('tools'))
+		{
+			include_once($mx_root_path . 'includes/db/db_tools.' . $phpEx);
+		}
+		if (class_exists('mx_db_tools'))
+		{
+			$this->db_tools = new mx_db_tools($this->db);
+		}
+		elseif (class_exists('tools'))
+		{
+			$this->db_tools = new tools($this->db);
+		}
+		
+		$this->service_providers = array('user_id' => 1, 'session_id' => 0, 'provider' => '', 'oauth_token' => '');
+		$this->phpbb_root_path = $phpbb_root_path;
+		$this->php_ext = $phpEx;
+	
 		$this->lang_path = $mx_root_path . 'language/';
+		/*
+        $this->crawlers = new Crawlers();
+        $this->exclusions = new Exclusions();
+        $this->uaHttpHeaders = new Headers();
+
+        $this->compiledRegex = $this->compileRegex($this->crawlers->getAll());
+        $this->compiledExclusions = $this->compileRegex($this->exclusions->getAll());
+
+        $this->setHttpHeaders($headers);
+        $this->userAgent = $this->setUserAgent($userAgent);
+		*/
+		$this->lang_path = $phpbb_root_path . 'language/';
+		$this->load();
+		$this->setup();
 
 	}
 	
@@ -160,7 +228,7 @@ class session
 	// Adds/updates a new session to the database for the given userid.
 	// Returns the new session ID on success.
 	//
-	function session_begin($user_id, $user_ip, $page_id, $auto_create = 0, $enable_autologin = 0, $admin = 0)
+	function session_begin($user_id = 1, $user_ip = false, $page_id = 1, $auto_create = 0, $enable_autologin = 0, $admin = 0)
 	{
 		global $db, $board_config, $mx_backend;
 		global $mx_request_vars, $SID;
@@ -250,7 +318,21 @@ class session
 				$login = 1;
 			}
 		}
-
+		elseif ($mx_request_vars->is_request('login'))
+		{
+			die('Invalid user_id to login: '.ANONYMOUS);
+		}
+		else
+		{
+			// Bot user, if they have a SID in the Request URI we need to get rid of it otherwise they'll index this page with the SID, duplicate content oh my!
+			if (isset($_GET['sid']) && !empty($this->data['is_bot']))
+			{
+				send_status_line(301, 'Moved Permanently');
+				redirect(build_url(array('sid')));
+			}
+			$this->data['session_last_visit'] = $this->time_now;
+		}
+		
 		//
 		// At this point either $userdata should be populated or
 		// one of the below is true
@@ -282,7 +364,7 @@ class session
 		//
 		preg_match('/(..)(..)(..)(..)/', $user_ip, $user_ip_parts);
 
-		$sql = "SELECT ban_ip, ban_userid, ban_email
+		$sql = "SELECT *
 			FROM " . BANLIST_TABLE . "
 			WHERE ban_ip IN ('" . $user_ip_parts[1] . $user_ip_parts[2] . $user_ip_parts[3] . $user_ip_parts[4] . "', '" . $user_ip_parts[1] . $user_ip_parts[2] . $user_ip_parts[3] . "ff', '" . $user_ip_parts[1] . $user_ip_parts[2] . "ffff', '" . $user_ip_parts[1] . "ffffff')
 				OR ban_userid = $user_id";
@@ -377,11 +459,31 @@ class session
 			{
 				$sessiondata['autologinid'] = '';
 			}
-
-	//		$sessiondata['autologinid'] = (!$admin) ? (( $enable_autologin && $sessionmethod == SESSION_METHOD_COOKIE ) ? $auto_login_key : '') : $sessiondata['autologinid'];
+			
+			//		$sessiondata['autologinid'] = (!$admin) ? (( $enable_autologin && $sessionmethod == SESSION_METHOD_COOKIE ) ? $auto_login_key : '') : $sessiondata['autologinid'];
 			$sessiondata['userid'] = $user_id;
 		}
-
+		
+		if ( $userdata['user_id'] == ANONYMOUS )
+		{
+			$userdata['user_type'] = -1;
+		}
+		
+		if (($userdata['user_level'] = 1) && ($userdata['user_active'] = 1))
+		{
+			$userdata['user_type'] = 3;
+		}
+		
+		if (($userdata['user_level'] = 0) && ($userdata['user_active'] = 1))
+		{
+			$userdata['user_type'] = 0;
+		}
+		
+		if (($userdata['user_level'] = 0) && ($userdata['user_active'] = 0))
+		{
+			$userdata['user_type'] = 1; //or 2
+		}
+		
 		$userdata['session_id'] = $session_id;
 		$userdata['session_ip'] = $user_ip;
 		$userdata['session_user_id'] = $user_id;
@@ -944,8 +1046,9 @@ class session
 		if (empty($board_config['script_path']))
 		{
 			$board_config = $mx_cache->obtain_config(false);
-		}		
-				
+		}
+		
+		$board_config['avatar_gallery_path'] = isset($board_config['avatar_gallery_path']) ? $board_config['avatar_gallery_path'] : 'images/avatars'; 
 		$board_config['user_timezone'] = !empty($board_config['user_timezone']) ? $board_config['user_timezone'] : $board_config['board_timezone'];
 		$this->data['user_dst'] = !empty($this->data['user_dst']) ? $this->data['user_dst'] : $this->data['user_timezone'];
 		
@@ -1009,10 +1112,10 @@ class session
 			$default_lang = phpbb_ltrim(basename(phpbb_rtrim($board_config['default_lang'])), "'");
 		}
 		
-		// Shared phpBB2 lang files dir		
+		// Shared phpBB2 lang files dir
 		// Load vanilla phpBB2 lang files if is possible
 		$shared_lang_path = $mx_root_path . 'includes/shared/phpbb2/language/';
-		$lang_path = $phpbb_root_path . 'language/';		
+		$lang_path = $phpbb_root_path . 'language/';
 		
 		if (!file_exists(@phpbb_realpath($lang_path . 'lang_' . $default_lang . '/lang_main.'.$phpEx)) && !file_exists(@phpbb_realpath($shared_lang_path . 'lang_' . $default_lang . '/lang_main.'.$phpEx)))
 		{
@@ -1141,9 +1244,9 @@ class session
 		//
 		// Finishing setting language variables to ouput
 		//
-		$this->lang_iso = $lang_iso = $lang_entries['lang_iso'];		
+		$this->lang_iso = $lang_iso = $lang_entries['lang_iso'];
 		$this->lang_dir = $lang_dir = $lang_entries['lang_dir'];
-		$this->lang_english_name = $lang_english_name = $lang_entries['lang_english_name'];		
+		$this->lang_english_name = $lang_english_name = $lang_entries['lang_english_name'];
 		$this->lang_local_name = $lang_local_name = $lang_entries['lang_local_name'];
 		
 		//
@@ -3525,7 +3628,7 @@ class session
 	/**
 	* Specify/Get image name , extension
 	*/
-	function img_name_ext($img, $prefix = 'img_', $new_prefix = '', $type = 'filename')
+	function img_name_ext($img, $prefix = '', $new_prefix = '', $type = 'filename')
 	{	
 		if (strpos($img, '.') !== false)
 		{
@@ -3574,14 +3677,15 @@ class session
 	*/
 	function img($img, $alt = '', $width = false, $suffix = '', $type = '')
 	{
-		static $imgs;
-		global $phpbb_root_path, $root_path, $theme;
-		
+		static $imgs; //$this->module_root_path; //$this->root_path;
+				
+		$this->module_root_path = $this->ext_path = $this->ext_manager->get_extension_path('orynider/pafiledb', true);
+				
 		$title = '';
-
+		
 		if ($alt)
 		{
-			$alt = $this->lang($alt);
+			$alt = $this->user->lang($alt);
 			$title = ' title="' . $alt . '"';
 		}
 		
@@ -3591,8 +3695,8 @@ class session
 			$image_filename = $img;
 			$img_ext = substr(strrchr($image_filename, '.'), 1);
 			$img = basename($image_filename, '.' . $img_ext);
-			$this->img_array['image_filename'] = array(
-				'img_'.$img => $img . '.' . $img_ext,
+			$this->img_array[$img]['image_filename'] = array(
+				''.$img => $img . '.' . $img_ext,
 			);			
 			unset($img_name, $image_filename);
 		}
@@ -3600,7 +3704,7 @@ class session
 		if ($width !== false)
 		{
 			$this->img_array['image_width'] = array(
-				'img_'.$img => $width,
+				''.$img => $width,
 			);	
 		}		
 				
@@ -3613,9 +3717,9 @@ class session
 		//		
 		// - First try phpBB2 then phpBB3 template
 		//		
-		if ( file_exists($phpbb_root_path . $this->current_template_path . '/' . $this->template_name . '.cfg') )
+		if ( file_exists($this->phpbb_root_path . $this->current_template_path . '/' . $this->template_name . '.cfg') )
 		{
-			@include($phpbb_root_path . $this->current_template_path . '/' . $this->template_name . '.cfg'); 
+			@include($this->phpbb_root_path . $this->current_template_path . '/' . $this->template_name . '.cfg'); 
 			@define('TEMPLATE_CONFIG', true);
 			
 			//$img_keys = array_keys($images);
@@ -3630,7 +3734,7 @@ class session
 				if(empty($row['image_name']))
 				{
 					//print_r('Your style configuration file has a typo! ');
-					//print_r($phpbb_root_path . $this->current_template_path . '/' . $this->template_name . '.cfg ');			
+					//print_r($this->phpbb_root_path . $this->current_template_path . '/' . $this->template_name . '.cfg ');			
 					//print_r($row);
 					$row['image_name'] = 'spacer.gif';
 				}
@@ -3641,7 +3745,7 @@ class session
 				$this->img_array[$row['image_name']] = $row;				
 			}	
 		}		
-		else if ( is_file($phpbb_root_path . $current_template_path  . '/theme/stylesheet.css') )
+		else if ( file_exists($this->phpbb_root_path . $current_template_path  . '/theme/stylesheet.css') )
 		{		
 			@define('TEMPLATE_CONFIG', true);
 			$current_template_images = $current_template_path . "/theme/images";
@@ -3650,12 +3754,12 @@ class session
 		//
 		// Since we have no current Template Config file, try the cloned template instead
 		//
-		if ( is_file($phpbb_root_path . $this->cloned_current_template_path . '/' . $this->cloned_template_name . '.cfg') && !defined('TEMPLATE_CONFIG') )
+		if ( file_exists($this->phpbb_root_path . $this->cloned_current_template_path . '/' . $this->cloned_template_name . '.cfg') && !defined('TEMPLATE_CONFIG') )
 		{
 			$current_template_path = $this->cloned_current_template_path;
 			$template_name = $this->cloned_template_name;
 
-			@include($phpbb_root_path . $this->cloned_current_template_path . '/' . $this->cloned_template_name . '.cfg');
+			@include($this->phpbb_root_path . $this->cloned_current_template_path . '/' . $this->cloned_template_name . '.cfg');
 			
 			$rows = $this->image_rows($images);
 					
@@ -3666,7 +3770,7 @@ class session
 				if(empty($row['image_name']))
 				{
 					print_r('Your style configuration file has a typo! ');
-					print_r($phpbb_root_path . $this->current_template_path . '/' . $this->template_name . '.cfg ');			
+					print_r($this->phpbb_root_path . $this->current_template_path . '/' . $this->template_name . '.cfg ');			
 					print_r($row);
 				}
 				/** 
@@ -3680,12 +3784,12 @@ class session
 		//
 		// Last attempt, use default template intead
 		//
-		if ( file_exists($phpbb_root_path . $this->default_current_template_path . '/' . $this->default_template_name . '.cfg') && !defined('TEMPLATE_CONFIG') )
+		if ( file_exists($this->phpbb_root_path . $this->default_current_template_path . '/' . $this->default_template_name . '.cfg') && !defined('TEMPLATE_CONFIG') )
 		{
 			$current_template_path = $this->default_current_template_path;
 			$template_name = $this->default_template_name;
 
-			@include($phpbb_root_path . $this->default_current_template_path . '/' . $this->default_template_name . '.cfg');
+			@include($this->phpbb_root_path . $this->default_current_template_path . '/' . $this->default_template_name . '.cfg');
 			
 			$rows = $this->image_rows($images);
 					
@@ -3696,7 +3800,7 @@ class session
 				if(empty($row['image_name']))
 				{
 					print_r('Your style configuration file has a typo! ');
-					print_r($phpbb_root_path . $this->current_template_path . '/' . $this->template_name . '.cfg ');			
+					print_r($this->phpbb_root_path . $this->current_template_path . '/' . $this->template_name . '.cfg ');			
 					print_r($row);
 				}
 				/** 
@@ -3710,19 +3814,19 @@ class session
 		//		
 		// - First try phpBB2 then phpBB3 template lang images then old Olympus image sets
 		// default language		
-		if ( is_dir($phpbb_root_path . $current_template_path . '/images/lang_' . $this->default_language_name . '/') )
+		if ( file_exists($this->phpbb_root_path . $current_template_path . '/images/lang_' . $this->default_language_name . '/') )
 		{
 			$this->img_lang = $this->default_language_name;
 		}		
-		else if ( is_dir($phpbb_root_path . $current_template_path  . '/theme/images/lang_' . $this->default_language_name . '/') )
+		else if ( file_exists($this->phpbb_root_path . $current_template_path  . '/theme/images/lang_' . $this->default_language_name . '/') )
 		{		
 			$this->img_lang = $this->default_language_name;
 		}		
-		else if ( is_dir($phpbb_root_path . $current_template_path  . '/theme/images/' . $this->default_language . '/') )
+		else if ( file_exists($this->phpbb_root_path . $current_template_path  . '/theme/' . $this->default_language . '/') )
 		{		
 			$this->img_lang = $this->default_language;
 		}
-		else if ( is_dir($phpbb_root_path . $current_template_path  . '/theme/imageset/' . $this->default_language . '/') )
+		else if ( file_exists($this->phpbb_root_path . $current_template_path  . '/theme/imageset/' . $this->default_language . '/') )
 		{		
 			$this->img_lang = $this->default_language;
 		}		
@@ -3730,84 +3834,191 @@ class session
 		//		
 		// - First try phpBB2 then phpBB3 template lang images then old Olympus image sets
 		// user language		
-		if ( is_dir($phpbb_root_path . $current_template_path . '/images/lang_' . $this->user_language_name . '/') )
+		if ( file_exists($this->phpbb_root_path . $current_template_path . '/images/lang_' . $this->user_language_name . '/') )
 		{
 			$this->img_lang = $this->user_language_name;
 		}		
-		else if ( is_dir($phpbb_root_path . $current_template_path  . '/theme/images/lang_' . $this->user_language_name . '/') )
+		else if ( file_exists($this->phpbb_root_path . $current_template_path  . '/theme/images/lang_' . $this->user_language_name . '/') )
 		{		
 			$this->img_lang = $this->user_language_name;
 		}		
-		else if ( is_dir($phpbb_root_path . $current_template_path  . '/theme/images/' . $this->user_language . '/') )
+		else if ( file_exists($this->phpbb_root_path . $current_template_path  . '/theme/' . $this->user_language . '/') )
 		{		
 			$this->img_lang = $this->user_language;
 		}
-		else if ( is_dir($phpbb_root_path . $current_template_path  . '/theme/imageset/' . $this->user_language . '/') )
+		else if ( file_exists($this->phpbb_root_path . $current_template_path  . '/theme/imageset/' . $this->user_language . '/') )
 		{		
 			$this->img_lang = $this->user_language;
 		}
 		
-		if (empty($this->img_array))
+		/**
+		* group everything by the Core images IDs
+		*/
+		$img_rows = $this->image_rows($this->images);		
+		
+		/** /
+		$count = count($img_rows);	
+		for ($i = 0; $i < $count; ++$i)
 		{
+			if($img_row[$i]['image_name'] = $img)
+			{			
+				$this->img_data[$img]['image_id'] 		= $img_rows[$i]['image_id'];
+				$this->img_data[$img]['image_name']		= $img_rows[$i]['image_name'];
+				$this->img_data[$img]['image_filename']	= $img_rows[$i]['image_filename'];
+				$this->img_data[$img]['image_lang'] 		= $img_rows[$i]['image_lang']; 
+				$this->img_data[$img]['image_height'] 	= $img_rows[$i]['image_height']; 
+				$this->img_data[$img]['image_width'] 	= $img_rows[$i]['image_width']; 
+				$this->img_data[$img]['imageset_id'] 	= $img_rows[$i]['imageset_id']; 				
+			}
+			
+		}			
+		/**/
+		
+		foreach ($img_rows as $row)
+		{
+			$row['image_filename'] = rawurlencode($row['image_filename']);
+				
+			if(empty($row['image_name']))
+			{
+				//print_r('Your style configuration file has a typo! ');
+				//print_r($this->phpbb_root_path . $this->current_template_path . '/' . $this->template_name . '.cfg ');			
+				$row['image_name'] = 'spacer.gif';
+			}
 			/** 
-				* Now check for the correct existance of all of the images into
-				* each image of a prosilver based style. 
-				foreach ($rows as $row)
-				{
-					$row['image_filename'] = rawurlencode($row['image_filename']);
-					$this->img_array[$row['image_name']] = $row;				
-				}
+			* Now check for the correct existance of all of the images into
+			* each image of a prosilver based style. 
 			*/
-			trigger_error('NO_STYLE_DATA', E_USER_ERROR);
+			$this->img_data[$row['image_name']] = $row;			
 		}		
-					
-		$img_data = &$this->img_array['image_filename'][$img];
+			
+		$current_template_name = !isset($this->current_module_template_name) ? $this->template_name : $this->current_module_template_name;				
+		$current_template_path = !isset($this->current_module_images) ? $current_template_path : $this->module_root_path . $this->current_module_images;				
+			
+		if (isset($this->img_data[$img]['image_lang']) && !isset($this->current_module_images))
+		{
+			//		
+			// - First try phpBB2 then phpBB3 template lang images
+			//					
+			if ( file_exists($this->phpbb_root_path . $current_template_path . $current_template_name . '/images/' . $this->decode_lang($this->img_data[$img]['image_lang']) . '/') )
+			{
+				$current_template_images = $current_template_path . $current_template_name . '/images/' . $this->decode_lang($this->img_data[$img]['image_lang']);
+			}		
+			else if ( file_exists($this->phpbb_root_path . $current_template_path  . $current_template_name. '/theme/images/' . $this->img_data[$img]['image_lang'] . '/') )
+			{		
+				$current_template_images = $current_template_path . $current_template_name . '/theme/images/' . $this->img_data[$img]['image_lang'];
+			}
+			else if ( file_exists($this->phpbb_root_path . $current_template_path  . $current_template_name . '/theme/images/' . $this->encode_lang($this->lang_name) . '/') )
+			{		
+				$current_template_images = $current_template_path  . $current_template_name . '/theme/images/' . $this->encode_lang($this->lang_name);
+			}
+			else if ( file_exists($this->phpbb_root_path . $current_template_path  . $current_template_name . '/theme/imageset/' . $this->encode_lang($this->lang_name) . '/') )
+			{		
+				$current_template_images = $current_template_path  . $current_template_name . '/theme/imageset/' . $this->encode_lang($this->lang_name);
+			}				
+		}		
+		elseif (isset($this->img_data[$img]['image_lang']) && isset($this->current_module_images))
+		{			
+			//		
+			// - First try phpBB2 then phpBB3 template lang images
+			//		
+			if ( file_exists($this->phpbb_root_path . $this->module_root_path . $current_template_path . $current_template_name . '/images/' . $this->decode_lang($this->img_data[$img]['image_lang']) . '/') )
+			{
+				$current_template_images = $current_template_path . $current_template_name . '/images/' . $this->decode_lang($this->img_data[$img]['image_lang']);
+			}		
+			else if ( file_exists($this->phpbb_root_path . $this->module_root_path . $current_template_path  . $current_template_name . '/theme/images/' . $this->img_data[$img]['image_lang'] . '/') )
+			{		
+				$current_template_images = $current_template_path . $current_template_name . '/theme/images/' . $this->img_data[$img]['image_lang'];
+			}
+			else if ( file_exists($this->phpbb_root_path . $this->module_root_path . $current_template_path  . $current_template_name . '/theme/images/' . $this->encode_lang($this->lang_name) . '/') )
+			{		
+				$current_template_images = $current_template_path  . $current_template_name . '/theme/images/' . $this->encode_lang($this->lang_name);
+			}
+			else if ( file_exists($this->phpbb_root_path . $this->module_root_path . $current_template_path  . '/theme/imageset/' . $this->encode_lang($this->lang_name) . '/') )
+			{		
+				$current_template_images = $current_template_path  . $current_template_name . '/theme/imageset/' . $this->encode_lang($this->lang_name);
+			}				
+		}			
+		else
+		{					
+			//		
+			// - First try phpBB2 then phpBB3 template lang images then old Olympus image sets
+			// default language		
+			if ( file_exists($this->phpbb_root_path . $current_template_path . $current_template_name . '/images/lang_' . $this->default_language_name . '/') )
+			{
+				$this->img_lang = $this->default_language_name;
+			}		
+			else if ( file_exists($this->phpbb_root_path . $current_template_path  . $current_template_name . '/theme/images/lang_' . $this->default_language_name . '/') )
+			{		
+				$this->img_lang = $this->default_language_name;
+			}		
+			else if ( file_exists($this->phpbb_root_path . $current_template_path  . $current_template_name . '/theme/images/' . $this->default_language . '/') )
+			{		
+				$this->img_lang = $this->default_language;
+			}
+			else if ( file_exists($this->phpbb_root_path . $current_template_path  . $current_template_name . '/theme/imageset/' . $this->default_language . '/') )
+			{		
+				$this->img_lang = $this->default_language;
+			}		
+			
+			//		
+			// - First try phpBB2 then phpBB3 template lang images then old Olympus image sets
+			// user language		
+			if ( file_exists($this->phpbb_root_path . $current_template_path . $current_template_name . '/images/lang_' . $this->user_language_name . '/') )
+			{
+				$this->img_lang = $this->user_language_name;
+			}		
+			else if ( file_exists($this->phpbb_root_path . $current_template_path  . $current_template_name . '/theme/images/lang_' . $this->user_language_name . '/') )
+			{		
+				$this->img_lang = $this->user_language_name;
+			}		
+			else if ( file_exists($this->phpbb_root_path . $current_template_path  . $current_template_name . '/theme/images/' . $this->user_language . '/') )
+			{		
+				$this->img_lang = $this->user_language;
+			}
+			else if ( file_exists($this->phpbb_root_path . $current_template_path  . $current_template_name . '/theme/imageset/' . $this->user_language . '/') )
+			{		
+				$this->img_lang = $this->user_language;
+			}			
+		}		
 		
-		if (empty($img_data))
-		{		
-			if (!isset($this->img_array['image_filename']['img_'.$img]) && !isset($this->img_array['image_filename'][$img]))
-			{
-				// Do not fill the image to let designers decide what to do if the image is empty
-				$img_data = '';
-				return $img_data;
-			}
-			
-			if (isset($this->img_array['image_lang']['img_'.$img]) && isset($this->img_array['image_lang'][$img]))
-			{
-				//		
-				// - First try phpBB2 then phpBB3 template lang images
-				//		
-				if ( is_dir($phpbb_root_path . $current_template_path . '/images/' . $this->img_array['image_lang']['img_'.$img] . '/') )
-				{
-					$current_template_images = $current_template_path . '/images/' . $this->img_array['image_lang']['img_'.$img];
-				}		
-				else if ( is_dir($phpbb_root_path . $current_template_path  . '/theme/images/' . $this->img_array['image_lang']['img_'.$img] . '/') )
-				{		
-					$current_template_images = $current_template_path . '/theme/images/' . $this->img_array['image_lang']['img_'.$img];
-				}
-				else if ( is_dir($phpbb_root_path . $current_template_path  . '/theme/images/' . $this->encode_lang($this->lang_name) . '/') )
-				{		
-					$current_template_images = $current_template_path  . '/theme/images/' . $this->encode_lang($this->lang_name);
-				}
-				else if ( is_dir($phpbb_root_path . $current_template_path  . '/theme/imageset/' . $this->encode_lang($this->lang_name) . '/') )
-				{		
-					$current_template_images = $current_template_path  . '/theme/imageset/' . $this->encode_lang($this->lang_name);
-				}				
-			}
-			
-			$img_data['src'] = PHPBB_URL . $current_template_images  . '/' . (!empty($this->img_array['image_filename']['img_'.$img]) ? $this->img_array['image_filename']['img_'.$img] : $this->img_array['image_filename'][$img]);
-			$img_data['width'] = !empty($height) ? $height : (!empty($this->img_array['image_width']) ? (!empty($this->img_array['image_width']['img_'.$img]) ? $this->img_array['image_width']['img_'.$img] : (!empty($this->img_array['image_width'][$img]) ? $this->img_array['image_width'][$img] : 47)) : 47);
-			$img_data['height'] = !empty($height) ? $height : (!empty($this->img_array['image_height']) ? (!empty($this->img_array['image_width']['img_'.$img]) ? $this->img_array['image_height']['img_'.$img] : (!empty($this->img_array['image_height'][$img]) ? $this->img_array['image_height'][$img] : 47)) : 47);
+		$board_url = generate_board_url() . '/';
+		
+		if (isset($this->images[$img]))
+		{
+			$this->img_data[$img]['src'] = $this->images[$img];
+		}		
+		elseif (isset($this->img_data[$img]['image_filename']))
+		{
+			$this->img_data[$img]['src'] = PHPBB_URL . $current_template_images . '/' . $this->img_data[$img]['image_filename'];	
 		}
+		else
+		{
+			$lastrow = count($img_rows);
+			$this->img_data[$img]['image_id'] 		= $lastrow + 1;
+			$this->img_data[$img]['image_name']		= $img;
+			$this->img_data[$img]['image_filename']	= $img . '.' . (isset($img_ext) ? $img_ext : 'gif');
+			$this->img_data[$img]['image_lang'] 	= $this->img_lang; 
+			$this->img_data[$img]['image_height'] 	= ($width === false) ? '' : $width; 
+			$this->img_data[$img]['image_width'] 	= ($width === false) ? '' : $width; 
+			$this->img_data[$img]['imageset_id'] 	= $img_rows[$lastrow]['imageset_id']; 		
+			
+			$this->img_data[$img]['src'] = PHPBB_URL . $current_template_images . '/' . $this->img_data[$img]['image_filename'];								
+		}		
 		
+		$this->img_data[$img]['width'] = !empty($height) ? $height : (!empty($this->img_array[$img]['image_width']) ? (!empty($this->img_array[$img]['image_width']) ? $this->img_array[$img]['image_width'] : (!empty($this->img_array[$img]['image_width']) ? $this->img_array[$img]['image_width'] : 47)) : 47);
+		$this->img_data[$img]['height'] = !empty($height) ? $height : (!empty($this->img_array[$img]['image_height']) ? (!empty($this->img_array[$img]['image_width']) ? $this->img_array[$img]['image_height'] : (!empty($this->img_array[$img]['image_height']) ? $this->img_array[$img]['image_height'] : 47)) : 47);
+			
 		$alt = (!empty($this->lang[$alt])) ? $this->lang[$alt] : $alt;
 		
-		$use_width = ($width === false) ? $img_data['width'] : $width;
+		$use_width = ($width === false) ? $img_data[$img]['width'] : $width;
+		$use_height = ($width === false) ? $img_data[$img]['height'] : $width;
+		
+		$full_tag = '<img src="' . $this->img_data[$img]['src'] . '"' . (($use_width) ? ' width="' . $use_width . '"' : '') . (($use_height) ? ' height="' . $use_height . '"' : '') . ' alt="' . $alt . '" title="' . $alt . '" />';
 		
 		switch ($type)
 		{
 			case 'src':
-				return $img_data['src'];
+				return $this->img_data[$img]['src'];
 			break;
 
 			case 'width':
@@ -3815,7 +4026,7 @@ class session
 			break;
 
 			case 'height':
-				return $img_data['height'];
+				return $this->img_data[$img]['height'];
 			break;
 							
 			case 'filename':
@@ -3836,7 +4047,8 @@ class session
 			break;
 			
 			case 'full_tag':
-				return '<img src="' . $img_data['src'] . '"' . (($use_width) ? ' width="' . $use_width . '"' : '') . (($img_data['height']) ? ' height="' . $img_data['height'] . '"' : '') . ' alt="' . $alt . '" title="' . $alt . '" />';
+				
+				return $full_tag;
 			break;
 			
 			case 'html':			

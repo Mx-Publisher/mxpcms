@@ -2,49 +2,9 @@
 
 <p>{L_ADMIN_INTRO}</p>
 
-<!-- BEGIN mx_stats -->
-<table width="100%" cellpadding="4" cellspacing="1" border="0" class="forumline">
-	<tr>
-		<th width="25%" nowrap="nowrap" height="25" class="thCornerL">{L_STATISTIC}</th>
-		<th width="25%" height="25" class="thTop">{L_VALUE}</th>
-		<th width="25%" nowrap="nowrap" height="25" class="thTop">{L_STATISTIC}</th>
-		<th width="25%" height="25" class="thCornerR">{L_VALUE}</th>
-	</tr>
-	<tr>
-		<td class="row1" nowrap="nowrap">{L_NUMBER_POSTS}:</td>
-		<td class="row2"><b>{mx_stats.NUMBER_OF_POSTS}</b></td>
-		<td class="row1" nowrap="nowrap">{L_POSTS_PER_DAY}:</td>
-		<td class="row2"><b>{mx_stats.POSTS_PER_DAY}</b></td>
-	</tr>
-	<tr>
-		<td class="row1" nowrap="nowrap">{L_NUMBER_TOPICS}:</td>
-		<td class="row2"><b>{NUMBER_OF_TOPICS}</b></td>
-		<td class="row1" nowrap="nowrap">{L_TOPICS_PER_DAY}:</td>
-		<td class="row2"><b>{mx_stats.TOPICS_PER_DAY}</b></td>
-	</tr>
-	<tr>
-		<td class="row1" nowrap="nowrap">{L_NUMBER_USERS}:</td>
-		<td class="row2"><b>{mx_stats.NUMBER_OF_USERS}</b></td>
-		<td class="row1" nowrap="nowrap">{L_USERS_PER_DAY}:</td>
-		<td class="row2"><b>{mx_stats.USERS_PER_DAY}</b></td>
-	</tr>
-	<tr>
-		<td class="row1" nowrap="nowrap">{L_BOARD_STARTED}:</td>
-		<td class="row2"><b>{mx_stats.START_DATE}</b></td>
-		<td class="row1" nowrap="nowrap">{L_AVATAR_DIR_SIZE}:</td>
-		<td class="row2"><b>{mx_stats.AVATAR_DIR_SIZE}</b></td>
-	</tr>
-	<tr>
-		<td class="row1" nowrap="nowrap">{L_DB_SIZE}:</td>
-		<td class="row2"><b>{mx_stats.DB_SIZE}</b></td>
-		<td class="row1" nowrap="nowrap">{L_GZIP_COMPRESSION}:</td>
-		<td class="row2"><b>{mx_stats.GZIP_COMPRESSION}</b></td>
-	</tr>
-</table>
-<!-- END mx_stats -->
-
 <!-- BEGIN forum_stats -->
 <h1>{L_FORUM_STATS}</h1>
+
 <table width="100%" cellpadding="4" cellspacing="1" border="0" class="forumline">
 	<tr>
 		<th width="25%" nowrap="nowrap" height="25" class="thCornerL">{L_STATISTIC}</th>

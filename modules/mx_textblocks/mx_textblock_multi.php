@@ -44,7 +44,7 @@ $title_style = $mx_block->block_parameters['title_style'];
 /** Debug Block Configuration in MXP 2.7 **/
 $message = $mx_block->get_parameters('Text');
 /** **/
-
+print_r($message);
 $block_style = $mx_block->get_parameters( 'block_style' );
 $text_style = $mx_block->get_parameters( 'text_style' );
 $title_style = $mx_block->get_parameters( 'title_style' );

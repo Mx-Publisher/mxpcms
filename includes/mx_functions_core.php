@@ -62,8 +62,8 @@ class mx_cache extends cache
 	
 	protected $mx_root_path;
 	protected $mx_backend;
-	protected $phbb_root_path;	
-	protected $phpEx;		
+	protected $phbb_root_path;
+	protected $phpEx;
 	protected $db;
 	protected $portal_config;
 	
@@ -77,17 +77,17 @@ class mx_cache extends cache
 		global $mx_root_path, $phpbb_root_path;
 		global $db, $portal_config;
 		global $mx_table_prefix, $table_prefix, $phpEx, $tplEx;
-		global $mx_backend, $phpbb_auth, $mx_bbcode;
+		global $mx_backend, $phpbb_auth, $mx_bbcode;		
 		
 		$this->path = ($mx_root_path) ? $mx_root_path : './';
 		$this->php_ext = $phpEx;
 		$this->cache_dir = $mx_root_path . 'cache/';
-		$this->backend = $mx_backend;
-		$this->backend_path = $phpbb_root_path;
+		$this->backend = $mx_backend;		
+		$this->backend_path = $phpbb_root_path;		
 		$this->db = $db;
-		$this->config = $portal_config; 
-		$this->tpl_ext = $tplEx;
-		$this->prefix = $mx_table_prefix;
+		$this->config = $portal_config; 		
+		$this->tpl_ext = $tplEx;		
+		$this->prefix = $mx_table_prefix;  			
 	}
 	
 	/**
@@ -97,14 +97,14 @@ class mx_cache extends cache
 	 * Set $portal_config, $phpbb_root_path, $tplEx, $table_prefix & PORTAL_BACKEND/$mx_backend
 	 *
 	 */
-	public function load_backend($portal_backend = 'internal')
+	public function load_backend($portal_backend = false)
 	{
 		global $mx_table_prefix, $table_prefix, $phpEx, $tplEx, $mx_request_vars;
 		global $mx_backend, $phpbb_auth, $mx_bbcode, $portal_config;
-		
+
 		// Get MX-Publisher config settings
 		$this->portal_config = $portal_config = $this->obtain_mxbb_config();
-
+		//$portal_config['portal_backend'] = 'olympus';
 		//$portal_config['portal_backend_path'] = '../phpBBSeo/';
 		// Check some vars
 		if (!$portal_config['portal_version'])
@@ -118,6 +118,7 @@ class mx_cache extends cache
 		}
 		
 		// Overwrite Backend
+		//$this->portal_config = $portal_config;
 		if (($portal_config['portal_backend']) && @file_exists($portal_config['portal_backend_path'] . "index.$phpEx"))
 		{
 			$this->backend = $portal_config['portal_backend'];
@@ -181,12 +182,10 @@ class mx_cache extends cache
 			$phpbb_root_path = $this->path . 'includes/shared/phpbb2/';
 			str_replace("//", "/", $phpbb_root_path);
 			$tplEx ='tpl';
-			
 		}
 		else
 		{
 			define('PORTAL_BACKEND', $portal_config['portal_backend']);
-			
 		}
 		
 		// Now, load backend specific constants
@@ -217,6 +216,16 @@ class mx_cache extends cache
 			{
 				if (!function_exists('mx_message_die'))
 				{
+					/*
+					* Redirect for fresh MX-Publisher install
+					*/
+					if( !defined('MX_INSTALLED') || (MX_INSTALLED === false) )
+					{
+						global $mx_root_path, $phpEx;
+						header('Location: ' . $mx_root_path . 'install/mx_install.' . $phpEx);
+						exit;
+					}
+					
 					die("<br />mx_chache::obtain_phpbb_config() from ".CONFIG_TABLE.", Couldnt query config information. <br />Allso this hosting or server is using a cache optimizer not compatible with MX-Publisher or just lost connection to database wile query.");
 				}
 				else
@@ -395,7 +404,7 @@ class mx_cache extends cache
 					}
 					else
 					{
-						$this->_get_block_config( $id, $sub_id );
+						$this->_get_block_config($id, $sub_id);
 						$this->put( '_block_' . $id . '_' . $sub_id,  $this->block_config);
 					}
 				}
@@ -467,10 +476,29 @@ class mx_cache extends cache
 		{
 			$block_id = $row['block_id'];
 			
+			if (!isset($row['block_size']) && !$db->sql_field_exists('block_size', BLOCK_TABLE))
+			{
+				// Setup $this->db_tools
+				if (!class_exists('mx_db_tools'))
+				{
+					global $mx_root_path, $phpEx;
+					include($mx_root_path . 'includes/db/db_tools.' . $phpEx);
+				}
+				$this->db_tools = new mx_db_tools($db);
+				print('<p><span style="color: red;"></span></p><i><p>Refreshing the '. BLOCK_TABLE .' table!</p></i>');
+				$this->db_tools->sql_column_add(BLOCK_TABLE, 'block_size', array('column_type_sql' => 'varchar(30)', 'null' => 'NOT NULL', 'default' => '"100%"', 'after' => 'block_desc'), false);
+			}
+			
+			if (isset($row['block_size']) && empty($row['block_size']))
+			{
+				$row['block_size'] = '';
+			}
+			
 			$block_row = array(
 				"block_id" => $row['block_id'],
 				"block_title" => $row['block_title'],
 				"block_desc" => $row['block_desc'],
+				"block_size" => $row['block_size'],
 				"auth_view" => $row['auth_view'],
 				"auth_view_group" => $row['auth_view_group'],
 				"auth_edit" => $row['auth_edit'],
@@ -482,7 +510,7 @@ class mx_cache extends cache
 				"block_time" => $row['block_time'],
 				"block_editor_id" => $row['block_editor_id'],
 				"module_root_path" => $row['module_path'],
-				"module_name" => $row['module_name'],				
+				"module_name" => $row['module_name'],
 				"block_file" => $row['function_file'],
 				"block_edit_file" => $row['function_admin'],
 				"function_id" => $row['function_id']
@@ -507,8 +535,8 @@ class mx_cache extends cache
 				" . BLOCK_TABLE . " blk,
 				" . FUNCTION_TABLE . " fnc,
 				" . MODULE_TABLE . " mdl,
-				" . COLUMN_BLOCK_TABLE . " bct				
-			WHERE sys.parameter_id = par.parameter_id			
+				" . COLUMN_BLOCK_TABLE . " bct	
+			WHERE sys.parameter_id = par.parameter_id
 				AND sys.block_id 	= blk.block_id
 				AND blk.function_id = fnc.function_id
 				AND fnc.module_id   = mdl.module_id";
@@ -532,6 +560,7 @@ class mx_cache extends cache
 				"block_id" => $row['block_id'],
 				"block_title" => $row['block_title'],
 				"block_desc" => $row['block_desc'],
+				"block_size" => $row['block_size'],
 				"column_id" => $row['column_id'],
 				"auth_view" => $row['auth_view'],
 				"auth_view_group" => $row['auth_view_group'],
@@ -544,7 +573,7 @@ class mx_cache extends cache
 				"block_time" => $row['block_time'],
 				"block_editor_id" => $row['block_editor_id'],
 				"module_root_path" => $row['module_path'],
-				"module_name" => $row['module_name'],				
+				"module_name" => $row['module_name'],
 				"block_file" => $row['function_file'],
 				"block_edit_file" => $row['function_admin'],
 				"function_id" => $row['function_id']
@@ -560,7 +589,7 @@ class mx_cache extends cache
 				"parameter_default" => $row['parameter_default'],
 				"parameter_function" => $row['parameter_function'],
 				"parameter_opt" => $row['parameter_opt'],
-				"parameter_order" => $row['parameter_order']				
+				"parameter_order" => $row['parameter_order']
 			);
 			
 			if ( $next_block )
@@ -570,6 +599,7 @@ class mx_cache extends cache
 			}
 			
 			$temp_row['block_parameters'][$param_row['parameter_name']] = $param_row;
+			
 			//
 			// Compose the pages config array
 			//
@@ -615,6 +645,7 @@ class mx_cache extends cache
 				"block_id" => $row['block_id'],
 				"block_title" => $row['block_title'],
 				"block_desc" => $row['block_desc'],
+				"block_size" => $row['block_size'],
 				"auth_view" => $row['auth_view'],
 				"auth_view_group" => $row['auth_view_group'],
 				"auth_edit" => $row['auth_edit'],
@@ -626,7 +657,7 @@ class mx_cache extends cache
 				"block_time" => $row['block_time'],
 				"block_editor_id" => $row['block_editor_id'],
 				"module_root_path" => $row['module_path'],
-				"module_name" => $row['module_name'],				
+				"module_name" => $row['module_name'],
 				"block_file" => $row['function_file'],
 				"block_edit_file" => $row['function_admin'],
 				"function_id" => $row['function_id']
@@ -651,8 +682,8 @@ class mx_cache extends cache
 				" . BLOCK_TABLE . " blk,
 				" . FUNCTION_TABLE . " fnc,
 				" . MODULE_TABLE . " mdl,
-				" . COLUMN_BLOCK_TABLE . " bct				
-			WHERE sys.parameter_id = par.parameter_id			
+				" . COLUMN_BLOCK_TABLE . " bct	
+			WHERE sys.parameter_id = par.parameter_id
 				AND sys.block_id 	= blk.block_id
 				AND blk.function_id = fnc.function_id
 				AND fnc.module_id   = mdl.module_id";
@@ -676,6 +707,7 @@ class mx_cache extends cache
 				"block_id" => $row['block_id'],
 				"block_title" => $row['block_title'],
 				"block_desc" => $row['block_desc'],
+				"block_size" => $row['block_size'],
 				"column_id" => $row['column_id'],
 				"auth_view" => $row['auth_view'],
 				"auth_view_group" => $row['auth_view_group'],
@@ -688,7 +720,7 @@ class mx_cache extends cache
 				"block_time" => $row['block_time'],
 				"block_editor_id" => $row['block_editor_id'],
 				"module_root_path" => $row['module_path'],
-				"module_name" => $row['module_name'],				
+				"module_name" => $row['module_name'],
 				"block_file" => $row['function_file'],
 				"block_edit_file" => $row['function_admin'],
 				"function_id" => $row['function_id']
@@ -704,7 +736,7 @@ class mx_cache extends cache
 				"parameter_default" => $row['parameter_default'],
 				"parameter_function" => $row['parameter_function'],
 				"parameter_opt" => $row['parameter_opt'],
-				"parameter_order" => $row['parameter_order']				
+				"parameter_order" => $row['parameter_order']
 			);
 			
 			if ( $next_block )
@@ -725,20 +757,20 @@ class mx_cache extends cache
 		switch($config)
 		{
 			case 'block_info':
-				return $block_row;				
+				return $block_row;
 			break;
-			
+		
 			case 'block_parameters':
-				return $param_row;			
+				return $param_row;	
 			break;
-			
-			case 'block_config':			
+		
+			case 'block_config':
 				return $this->block_config;
 			break;
-						
+		
 			default:
 				return $this->block_config;
-			break;			
+			break;	
 		}
 	}
 	/**
@@ -781,7 +813,7 @@ class mx_cache extends cache
 						bct.column_id,
 						blk.block_id,
 						mdl.module_path,
-						mdl.module_name,						
+						mdl.module_name,
 						fnc.function_file
 	    		FROM " . COLUMN_BLOCK_TABLE . " bct,
 					" . BLOCK_TABLE . " blk,
@@ -885,7 +917,7 @@ class mx_cache extends cache
 
 		$portal_cache_time = time();
 
-		$sql = "UPDATE ".PORTAL_TABLE."
+		$sql = "UPDATE " . PORTAL_TABLE."
 			SET portal_recached = '$portal_cache_time'
 			WHERE portal_id = 1";
 
@@ -911,9 +943,9 @@ class mx_cache extends cache
 	 * @param unknown_type $force_query
 	 * @return unknown
 	 */
-	public function read( $id = '', $type = MX_CACHE_BLOCK_TYPE, $force_query = false )
+	public function read($id = '', $type = MX_CACHE_BLOCK_TYPE, $force_query = false)
 	{
-		if ( is_array( $id ) )
+		if (is_array($id))
 		{
 			$sub_id = $id['sub_id'];
 			$id = $id['id'];
@@ -923,9 +955,9 @@ class mx_cache extends cache
 			$sub_id = 0;
 		}
 
-		if ( $id > 0 )
+		if ($id > 0)
 		{
-			$this->_read_config( $id, $sub_id, $type, $force_query );
+			$this->_read_config($id, $sub_id, $type, $force_query);
 			return $type == MX_CACHE_BLOCK_TYPE ? $this->block_config : $this->pages_config;
 		}
 		else
@@ -943,7 +975,7 @@ class mx_cache extends cache
 	 * @param unknown_type $type
 	 * @param unknown_type $id
 	 */
-	public function update( $type = MX_CACHE_ALL, $id = '', $sub_id = 0 )
+	public function update($type = MX_CACHE_ALL, $id = '', $sub_id = 0)
 	{
 		global $mx_cache;
 
@@ -1488,16 +1520,16 @@ class cache
 			switch ($k[0])
 			{
 				case '@':
-				// Escaped only.
-				$args[$k] = htmlspecialchars($v, ENT_QUOTE, 'UTF-8');
+					// Escaped only.
+					$args[$k] = htmlspecialchars($v, ENT_QUOTE, 'UTF-8');
 				break;
 				case '%':
 				default:
-				// Escaped and placeholder.
-				$args[$k] = '<em class="placeholder">' . htmlspecialchars($v, ENT_QUOTE, 'UTF-8') . '</em>';
+					// Escaped and placeholder.
+					$args[$k] = '<em class="placeholder">' . htmlspecialchars($v, ENT_QUOTE, 'UTF-8') . '</em>';
 				break;
 				case '!':
-				// Pass-through.
+					// Pass-through.
 			}
 		}
 		return strtr($string, $args);
@@ -2289,6 +2321,23 @@ class cache
 		return $ranks;
 	}	
 
+	/*
+	* Get newest user
+	*/
+	function obtain_newest_user()
+	{
+		global $board_config;
+
+		if (($newest_user = $this->get('newest_user')) === false)
+		{
+			$newest_user = colorize_username($board_config['last_user_id']);
+
+			$this->put('newest_user', $newest_user);
+		}
+
+		return $newest_user;
+	}
+	
 	/**
 	* Obtain list of naughty words and build preg style replacement arrays for use by the
 	* calling script
@@ -2370,6 +2419,8 @@ class mx_block extends mx_block_parameter
 	var $block_id = 0;
 	var $block_title = '';
 	var $block_desc = '';
+	var $block_size = '';
+	var $block_sizes = '';
 	/**#@-*/
 
 	/**#@+
@@ -2393,7 +2444,7 @@ class mx_block extends mx_block_parameter
 	 */
 	var $module_root_path = 'modules/mx_coreblocks/';
 	var $php_ext = 'php7';
-	var $block_file = 'app.php5';
+	var $block_file = 'app.php7';
 	var $block_edit_file = '';
 	/**#@-*/
 
@@ -2465,9 +2516,12 @@ class mx_block extends mx_block_parameter
 		$this->block_parameters = isset($temp_row['block_parameters']) ? $temp_row['block_parameters'] : array();
 		unset($temp_row);
 
+		$this->block_info['block_size'] = !empty($this->block_info['block_size']) ? $this->block_info['block_size'] : '';
+		
 		$this->block_id = $this->block_info['block_id'];
 		$this->block_title = !empty($lang['blocktitle_' . $this->block_info['block_title']]) ? $lang['blocktitle_' . $this->block_info['block_title']] : $this->block_info['block_title'];
-		$this->block_desc = !empty($lang['blocktitle_' . $this->block_info['block_desc']]) ? $lang['blockdesc_' . $this->block_info['block_desc']] : $this->block_info['block_desc'];
+		$this->block_desc = !empty($lang['blockdesc_' . $this->block_info['block_desc']]) ? $lang['blockdesc_' . $this->block_info['block_desc']] : $this->block_info['block_desc'];
+		$this->block_sizes = !empty($this->block_info['block_size']) ? $this->block_info['block_size'] : '';
 
 		$this->show_block = $this->block_info['show_block'] == '1';
 		$this->show_title = $this->block_info['show_title'] == '1';
@@ -2516,6 +2570,7 @@ class mx_block extends mx_block_parameter
 		unset($this->virtual_id);
 		unset($this->block_title);
 		unset($this->block_desc);
+		unset($this->block_size);
 
 		unset($this->show_block);
 		unset($this->show_title);
@@ -2847,9 +2902,9 @@ class mx_block extends mx_block_parameter
 			$edit_time = $phpBB2->create_date( $board_config['default_dateformat'], $this->block_time, $board_config['board_timezone'] );
 
 			$layouttemplate->assign_block_vars('layout_column.blocks.block_stats', array(
-				'L_BLOCK_UPDATED'	=> $lang['Block_updated_date'],
-				'EDITOR_NAME'		=> $is_admin ? $lang['Block_updated_by'] . ' ' . $editor_name : '',
-				'EDIT_TIME'			=> $edit_time
+				'L_BLOCK_UPDATED'		=> $lang['Block_updated_date'],
+				'EDITOR_NAME'				=> $is_admin ? $lang['Block_updated_by'] . ' ' . $editor_name : '',
+				'EDIT_TIME'					=> $edit_time
 			));
 		}
 		else
@@ -2864,9 +2919,17 @@ class mx_block extends mx_block_parameter
 	 */
 	public function output_hidden_indicator()
 	{
-		global $layouttemplate, $lang, $images;
-
-		$hidden_img = '<img src="' . $images['mx_block_hidden'] . '" alt="' . $lang['Hidden_block_explain'] . '" title="' . $lang['Hidden_block_explain'] . '">';
+		global $mx_root_path, $layouttemplate, $lang, $images;
+		
+		if (mx_file_exists($images['mx_block_hidden']))
+		{
+			$hidden_img = '<img src="' . $images['mx_block_hidden'] . '" alt="' . $lang['Hidden_block_explain'] . '" title="' . $lang['Hidden_block_explain'] . '"></img>';
+		}
+		else
+		{
+			$hidden_img = '<i class="icon fa-stop-circle fa-fw" alt="' . $lang['Hidden_block_explain'] . '" title="' . $lang['Hidden_block_explain'] . '"></i>';
+		}
+		
 		$layouttemplate->assign_block_vars('layout_column.blocks.edit.hidden_block', array(
 			'HIDDEN_BLOCK'	=> $hidden_img
 		));
@@ -2878,9 +2941,10 @@ class mx_block extends mx_block_parameter
 	 */
 	public function output_title()
 	{
-		global $layouttemplate;
+		global $layouttemplate, $language, $mx_user;
 
 		$this_block_title = !$this->show_title  && $this->auth_mod ? '<i>(' . $this->block_title . ')</i>' : $this->block_title;
+		$this_block_title = ((mb_strlen($mx_user->lang(str_replace(' ', '_', $this_block_title))) !== 0) ? $mx_user->lang(str_replace(' ', '_', $this_block_title)) : $language->lang($this_block_title));
 		$layouttemplate->assign_block_vars('layout_column.blocks.show_title', array(
 			'L_TITLE'		=> $this_block_title
 		));
@@ -2892,7 +2956,7 @@ class mx_block extends mx_block_parameter
 	 */
 	public function output_cp_button($overall_header = false)
 	{
-		global $layouttemplate, $mx_user, $userdata, $mx_root_path, $mx_page, $lang, $block_size, $images, $phpEx;
+		global $layouttemplate, $mx_user, $userdata, $mx_root_path, $module_root_path, $mx_page, $lang, $block_size, $images, $phpEx;
 
 		//
 		// Define some hidden Edit Block parameters
@@ -2924,10 +2988,22 @@ class mx_block extends mx_block_parameter
 		// Compose buttons and info
 		//
 		$block_desc = !empty( $this->block_desc ) ? ' (' . $this->block_desc . ')' : '';
+		$block_sizes= !empty($this->block_sizes) ? $this->block_sizes : '';
 		$edit_url = mx_append_sid($mx_root_path . $edit_file . "?sid=" . $mx_user->data['session_id']);
-		$edit_img = '<input type="image" src="' . $block_edit_img . '" alt="' . $block_edit_alt . ' :: ' . $this->block_title . $block_desc . '" title="' . $block_edit_alt . ' :: ' . $this->block_title . $block_desc . '">';
-
-		$this->virtual_id = isset($this->virtual_id) ? $this->virtual_id : ''; //Virtual Id is Not Set ?		
+		
+		if (mx_file_exists($block_edit_img))
+		{
+			$edit_img = '<input type="image" src="' . $block_edit_img . '" alt="' . $block_edit_alt . ' :: ' . $this->block_title . $block_desc . '" title="' . $block_edit_alt . ' :: ' . $this->block_title . $block_desc . '">';
+		}
+		else
+		{
+			$edit_img = '<button class="button editCP_switch" type="submit" title="' . $this->block_title . $block_desc . '" style="font-size:9px;">
+			<i class="fa fa-star-o" style="float:top;vertical-align: 25%;whitespace: false;" aria-hidden="false"></i>
+			' . $block_edit_alt . '
+			</button>';
+		}
+		
+		$this->virtual_id = isset($this->virtual_id) ? $this->virtual_id : ''; //Virtual Id is Not Set ?
 		
 		$s_hidden_fields .= '<input type="hidden" name="block_id" value="' . $this->block_id . '" />';
 		$s_hidden_fields .= '<input type="hidden" name="dynamic_block" value="' . $this->dynamic_block_id . '" />';
@@ -2937,14 +3013,16 @@ class mx_block extends mx_block_parameter
 		// Output
 		//
 		$temp_array = array(
-			'BLOCK_SIZE'			=> (!empty($block_size) ? $block_size : '100%'),
-			'EDIT_ACTION'			=> $edit_url,
-			'EDIT_IMG'				=> $edit_img,
-			'EDIT_BLOCK_ALT'		=> $block_edit_alt, 
-			'EDIT_BLOCK_TITLE'		=> $this->block_title, 
-			'EDIT_BLOCK_DESC'		=> $block_desc,			
-			'EDIT_IMG_SRC'			=> $block_edit_img,			
-			'EDITCP_SHOW' 			=> $mx_page->editcp_show ? '' : 'none',
+			'BLOCK_SIZE'						=> (!empty($block_size) ? $block_size : '100%'),
+			'MODULE_ROOT_PATH'		=> $module_root_path,
+			'EDIT_ACTION'					=> $edit_url,
+			'EDIT_IMG'							=> $edit_img,
+			'EDIT_BLOCK_ALT'				=> $block_edit_alt, 
+			'EDIT_BLOCK_TITLE'			=> $this->block_title, 
+			'EDIT_BLOCK_DESC'			=> $block_desc,
+			'EDIT_BLOCK_SIZE'				=> $block_sizes,
+			'EDIT_IMG_SRC'					=> $block_edit_img,
+			'EDITCP_SHOW' 					=> $mx_page->editcp_show ? '' : 'none',
 			'S_HIDDEN_FORM_FIELDS'	=> $s_hidden_fields
 		);
 
@@ -3400,7 +3478,7 @@ class mx_block_parameter
 	 * @param unknown_type $block_id
 	 * @return unknown
 	 */
-	public function submit_parameters( $block_id = false )
+	public function submit_parameters($block_id = false)
 	{
 		global $mx_request_vars, $db, $mx_cache, $lang, $userdata, $mx_bbcode;
 		static $message, $return;
@@ -3556,7 +3634,7 @@ class mx_block_parameter
 						case 'Separator':
 							$this->display_edit_Separator( $block_id, $parameter_data['parameter_id'], $parameter_data );
 						break;
-							case 'Text':
+						case 'Text':
 							$this->display_edit_PlainTextField( $block_id, $parameter_data['parameter_id'], $parameter_data );
 						break;
 						case 'TextArea':
@@ -3927,9 +4005,9 @@ class mx_block_parameter
 			'PARAMETER_TITLE' 			=> ( !empty($lang[$parameter_data['parameter_name']]) ) ? $lang[$parameter_data['parameter_name']] : $parameter_data['parameter_name'],
 			'PARAMETER_TITLE_EXPLAIN' 	=> ( !empty($lang[$parameter_data['parameter_name']. "_explain"]) ) ? '<br />' . $lang[$parameter_data['parameter_name']. "_explain"] : '',
 
-				'FIELD_NAME' 			=> ( !empty($lang[$parameter_data['parameter_name']]) ) ? $lang[$parameter_data['parameter_name']] : $parameter_data['parameter_name'],
-				'FIELD_ID' 				=> $parameter_data['parameter_id'],
-				'FIELD_DESCRIPTION' 	=> ( !empty($lang["ParType_".$parameter_data['parameter_type']]) ) ? $lang["ParType_".$parameter_data['parameter_type']] : ''
+			'FIELD_NAME' 			=> ( !empty($lang[$parameter_data['parameter_name']]) ) ? $lang[$parameter_data['parameter_name']] : $parameter_data['parameter_name'],
+			'FIELD_ID' 				=> $parameter_data['parameter_id'],
+			'FIELD_DESCRIPTION' 	=> ( !empty($lang["ParType_".$parameter_data['parameter_type']]) ) ? $lang["ParType_".$parameter_data['parameter_type']] : ''
 		));
 		if ( !empty( $parameter_datas ) )
 		{
@@ -4010,8 +4088,8 @@ class mx_block_parameter
 		);
 
 		$template->assign_block_vars( 'checkbox', array(
-			'PARAMETER_TITLE' 			=> ( !empty($lang[$parameter_data['parameter_name']]) ) ? $lang[$parameter_data['parameter_name']] : $parameter_data['parameter_name'],
-			'PARAMETER_TITLE_EXPLAIN' 	=> ( !empty($lang[$parameter_data['parameter_name']. "_explain"]) ) ? '<br />' . $lang[$parameter_data['parameter_name']. "_explain"] : '',
+				'PARAMETER_TITLE' 			=> ( !empty($lang[$parameter_data['parameter_name']]) ) ? $lang[$parameter_data['parameter_name']] : $parameter_data['parameter_name'],
+				'PARAMETER_TITLE_EXPLAIN' 	=> ( !empty($lang[$parameter_data['parameter_name']. "_explain"]) ) ? '<br />' . $lang[$parameter_data['parameter_name']. "_explain"] : '',
 
 				'FIELD_NAME' 			=> ( !empty($lang[$parameter_data['parameter_name']]) ) ? $lang[$parameter_data['parameter_name']] : $parameter_data['parameter_name'],
 				'FIELD_ID' 				=> $parameter_data['parameter_id'],
@@ -4330,6 +4408,8 @@ class mx_page
 		// General
 		//
 		$this->page_title = !empty($lang['pagetitle_' . $this->info['page_name']]) ? $lang['pagetitle_' . $this->info['page_name']] : $this->info['page_name'];
+		$this->page_desc = !empty($lang['pagedesc_' . $this->info['page_desc']]) ? $lang['pagedesc_' . $this->info['page_desc']] : $this->info['page_desc'];
+		
 		$this->page_icon = $this->info['page_icon'];
 		$this->page_alt_icon = $this->info['page_alt_icon'];
 
@@ -4692,25 +4772,26 @@ class mx_page
 	 */
 	public function output_column( $column )
 	{
-		global $layouttemplate;
+		global $layouttemplate, $mx_block;
 
 		//
 		// Get column width
 		//
 
-		$block_size = $this->columns[$column]['column_size'];
+		$column_size = $this->columns[$column]['column_size'];
 
 		//
 		// Setup column css styles
 		//
-		$colclass = $this->_get_colclass( $column );
+		$colclass = $this->_get_colclass($column);
 
 		//
 		// Output
 		//
 		$layouttemplate->assign_block_vars('layout_column', array(
 			'COL_CLASS'		=> $colclass,
-			'BLOCK_SIZE'	=> $block_size
+			'BLOCK_SIZE'	=> $column_size,
+			'BLOCK_SIZES'	=> ($mx_block->block_sizes !== '100%') ? $mx_block->block_sizes : $column_size
 		));
 	}
 
@@ -4730,8 +4811,27 @@ class mx_page
 		$auth_label = array('auth_view');
 		$auth_fields = array('page_auth_view');
 		$auth_fields_groups = array('page_auth_view_group');
+		
+		switch (PORTAL_BACKEND)
+		{
+			case 'internal':
+			case 'smf2':
+			case 'mybb':
+			case 'phpbb2':
+				$is_admin = ($mx_user->data['session_logged_in'] && $mx_user->data['user_level'] == ADMIN) ? true : false;
+				$is_registred = $mx_user->data['session_logged_in'] ? true : false;
+			break;
 
-		$is_admin = ($userdata['user_level'] == ADMIN && $userdata['session_logged_in']) ? TRUE : 0;
+			case 'phpbb3':
+			case 'olympus':
+			case 'ascraeus':
+			case 'rhea':
+				global $phpbb_auth;
+				$is_admin = (($mx_user->data['user_id'] != ANONYMOUS) && $phpbb_auth->acl_get('a_')) ? true : false;
+				$is_registred = ($mx_user->data['user_id'] != ANONYMOUS) ? true : false;
+			break;
+		}
+
 		$auth_user['auth_mod'] = $is_admin;
 		
 		$auth_user = array();
@@ -4762,7 +4862,7 @@ class mx_page
 				case AUTH_ACL: // PRIVATE
 					$auth_user[$auth_label[$i]] = ($userdata['session_logged_in']) ? mx_is_group_member($group_data) || $is_admin : 0;
 					$auth_user[$auth_label[$i] . '_type'] = $lang['Auth_Users_granted_access'];
-					break;
+				break;
 
 				case AUTH_MOD:
 					$auth_user[$auth_label[$i]] = ($userdata['session_logged_in']) ? mx_is_group_member($moderator_data) || $is_admin : 0;
@@ -4780,7 +4880,7 @@ class mx_page
 			}
 		}
 		// Is user a moderator?
-		$auth_user['auth_mod'] = ($userdata['session_logged_in']) ? mx_is_group_member($moderator_data) || $is_admin : 0;
+		$auth_user['auth_mod'] = $is_registred ? mx_is_group_member($moderator_data) || $is_admin : 0;
 
 		return $auth_user;
 	}
@@ -5525,7 +5625,7 @@ class mx_request_vars
 	public function is_post($var)
 	{
 		// Note: _x and _y are used by (at least IE) to return the mouse position at onclick of INPUT TYPE="img" elements.	
-		return ($this->is_set_post($var) || ($this->is_set_post($var.'_x') && $this->is_set_post($var.'_y'))) ? 1 : 0;
+		return ($this->is_set_post($var) || $this->is_set_post($var.'_x') && $this->is_set_post($var.'_y')) ? 1 : 0;		
 	}
 
 	/**
@@ -5830,7 +5930,7 @@ class deactivated_super_global implements \ArrayAccess, \Countable, \IteratorAgg
 	private $name;
 
 	/**
-	* @var	\phpbb\request\request_interface::POST|GET|REQUEST|COOKIE	Super global constant.
+	* @var	\mxp\request\mx_request_vars::POST|GET|REQUEST|COOKIE	Super global constant.
 	*/
 	private $super_global;
 

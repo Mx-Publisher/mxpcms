@@ -1,0 +1,66 @@
+
+.headerbar {
+	background-color: #094F0E;
+	/* text-align: center; */
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	line-height: 85%;
+	background: #ffffff url(/templates/mxp/images/theme/bg.gif) top left repeat-x;
+	/*background: #f0f0f0;*/	
+	/**/background-image: -webkit-linear-gradient(top, #187E1F 0%, #094F0E 100%);/**/
+	/**/background-image: linear-gradient(to bottom, #AAC9AB 0%,#19451D 100%);/**/
+}
+
+.toplogo {
+	background-color: #094F0E;
+	/* text-align: center; */
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	line-height: 85%;
+	background: #ffffff url(/templates/prosilver/theme/images/top.gif) top left repeat-x;
+	/*background: #f0f0f0;*/	
+}
+
+.forabg, .forumbg {
+	background-color: #094F0E;
+	background-image: -webkit-linear-gradient(top, #529E57 0%, #094F0E 35px, #094F0E 100%);
+	background-image: linear-gradient(to bottom, #AAC9AB 0%,#094F0E 35px,#19451D 100%);
+}
+
+.pollbar1, .pollbar2, .pollbar3, .pollbar4 {
+	background-color: #0d386b;
+}
+.pollbar5 { background-color: #9cb6d7; }
+
+.button-search, 
+.button-search-end {	
+    border: 0.1em solid #7ba60d;
+}
+
+.pollbar5 { background-color: #187E1F; }
+
+.action-bar .coloredbutton {
+	border-color: #094F0E;
+	background-color: #094F0E;
+	background-image: -webkit-linear-gradient(top, #187E1F 0%, #094F0E 100%);
+	background-image: linear-gradient(to bottom, #529E57 0%,#446247 35px,#094F0E 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#187E1F', endColorstr='#094F0E',GradientType=0 );
+}
+.action-bar .coloredbutton:hover {
+	background-color: #094F0E;
+	background-image: -webkit-linear-gradient(top, #094F0E 0%, #187E1F 100%);
+	background-image: linear-gradient(to bottom, #094F0E 0%,#187E1F 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#094F0E', endColorstr='#187E1F',GradientType=0 );
+}
+
+.pagination li.active span {
+	background: #187E1F;
+	border-color: #187E1F;
+}
+
+.pagination li a:hover {
+	background: #9cb6d7;
+	border-color: #9cb6d7;
+}
+
+table.table1 td {
+    color: #e2e8f3;
+}

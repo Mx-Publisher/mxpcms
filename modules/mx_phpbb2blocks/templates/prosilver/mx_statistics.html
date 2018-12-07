@@ -7,31 +7,31 @@ h2.stats {
 	<div class="inner bg1">
 	<div class="blockbody">
 	<h2 class="stats">{L_ADMIN_STATISTICS}</h2>
-<table width="100%" class="blockcp">
-	<col class="row1" /><col class="row2"><col class="row1"/><col class="row2" />
+<table width="100%" class="table1 blockcp">
+	<col class="bg1" /><col class="bg2"><col class="bg1"/><col class="bg2" />
 	<thead>
 	<tr>
-		<th width="25%" align="center">{L_STATISTIC}</th>
-		<th width="25%" align="center">{L_VALUE}</th>
-		<th width="25%" align="center">{L_STATISTIC}</th>
-		<th width="25%" align="center">{L_VALUE}</th>
+		<th class="table1 title responsive-hide" width="25%" align="center">{L_STATISTIC}</th>
+		<th class="table1 title responsive-hide" width="25%" align="center">{L_VALUE}</th>
+		<th class="table1 title responsive-hide" width="25%" align="center">{L_STATISTIC}</th>
+		<th class="table1 title responsive-hide" width="25%" align="center">{L_VALUE}</th>
 
 	</tr>
 	</thead>
 	<tbody>
 		<!-- BEGIN adminrow -->
 		<tr>
-			<td class="row2" align="center"><span class="gen">{adminrow.STATISTIC}</span></td>
-			<td class="row1" align="center"><span class="gen">{adminrow.VALUE}</span></td>
-			<td class="row2" align="center"><span class="gen">{adminrow.STATISTIC2}</span></td>
-			<td class="row1" align="center"><span class="gen">{adminrow.VALUE2}</span></td>
+			<td class="bg2" align="center"><span class="postbody">{adminrow.STATISTIC}</span></td>
+			<td class="bg1" align="center"><span class="postbody">{adminrow.VALUE}</span></td>
+			<td class="bg2" align="center"><span class="postbody">{adminrow.STATISTIC2}</span></td>
+			<td class="bg1" align="center"><span class="postbody">{adminrow.VALUE2}</span></td>
 		</tr>
 		<!-- END adminrow -->
 	</tbody>
 </table>
 
 <h2 class="stats">{L_TOP_POSTERS}</h2>
-<table width="100%" class="blockcp">
+<table width="100%" class="table1 blockcp">
 <thead>
 <tr>
 	<th class="thCornerL" align="center" width="10%"><b>{L_RANK}</b></th>
@@ -44,10 +44,10 @@ h2.stats {
 <tbody>
 <!-- BEGIN users -->
 <tr>
-	<td class="{users.CLASS}" align="center"><span class="gen">{users.RANK}</span></td>
-	<td class="{users.CLASS}" align="center"><span class="gen"><a href="{users.URL}">{users.USERNAME}</a></span></td>
-	<td class="{users.CLASS}" align="center"><span class="gen">{users.POSTS}</span></td>
-	<td class="{users.CLASS}" align="center"><span class="gen">{users.PERCENTAGE}%</span></td>
+	<td class="{users.CLASS}" align="center"><span class="postbody">{users.RANK}</span></td>
+	<td class="{users.CLASS}" align="center"><span class="postbody"><a href="{users.URL}">{users.USERNAME}</a></span></td>
+	<td class="{users.CLASS}" align="center"><span class="postbody">{users.POSTS}</span></td>
+	<td class="{users.CLASS}" align="center"><span class="postbody">{users.PERCENTAGE}%</span></td>
 	<td class="{users.CLASS}" align="left">
 		<table cellspacing="0" cellpadding="0" border="0" align="left">
 			<tr>
@@ -71,7 +71,7 @@ h2.stats {
 </table>
 <div style="float:left;width:50%">
 <h2 class="stats">{L_MOST_VIEWED}</h2>
-<table width="100%" class="blockcp" style="margin-right:3px;">
+<table width="100%" class="table1 blockcp" style="margin-right:3px;">
 <thead>
 	<tr>
 		<th class="thCornerL" align="left" width="5%"><b>{L_RANK}</b></th>
@@ -82,9 +82,9 @@ h2.stats {
 <tbody>
 	<!-- BEGIN topicviews -->
 	<tr>
-		<td class="{topicviews.CLASS}" align="left"><span class="gen">{topicviews.RANK}</span></td>
-		<td class="{topicviews.CLASS}" align="center"><span class="gen">{topicviews.VIEWS}</span></td>
-		<td class="{topicviews.CLASS}" align="left"><span class="gen"><a href="{topicviews.URL}">{topicviews.TITLE}</a></span></td>
+		<td class="{topicviews.CLASS}" align="left"><span class="postbody">{topicviews.RANK}</span></td>
+		<td class="{topicviews.CLASS}" align="center"><span class="postbody">{topicviews.VIEWS}</span></td>
+		<td class="{topicviews.CLASS}" align="left"><span class="postbody"><a href="{topicviews.URL}">{topicviews.TITLE}</a></span></td>
 	</tr>
 	<!-- END topicviews -->
 </tbody>
@@ -92,7 +92,7 @@ h2.stats {
 </div>
 <div>
 <h2 class="stats">{L_MOST_ACTIVE}</h2>
-<table width="100%" class="blockcp" style="margin-left:3px;">
+<table width="100%" class="table1 blockcp" style="margin-left:3px;">
 	<thead>
 	<tr>
 		<th class="thCornerL" align="left" width="5%"><b>{L_RANK}</b></th>
@@ -103,9 +103,9 @@ h2.stats {
 	<tbody>
 	<!-- BEGIN topicreplies -->
 	<tr>
-		<td class="{topicreplies.CLASS}" align="left"><span class="gen">{topicreplies.RANK}</span></td>
-		<td class="{topicreplies.CLASS}" align="center"><span class="gen">{topicreplies.REPLIES}</span></td>
-		<td class="{topicreplies.CLASS}" align="left"><span class="gen"><a href="{topicreplies.URL}">{topicreplies.TITLE}</a></span></td>
+		<td class="{topicreplies.CLASS}" align="left"><span class="postbody">{topicreplies.RANK}</span></td>
+		<td class="{topicreplies.CLASS}" align="center"><span class="postbody">{topicreplies.REPLIES}</span></td>
+		<td class="{topicreplies.CLASS}" align="left"><span class="postbody"><a href="{topicreplies.URL}">{topicreplies.TITLE}</a></span></td>
 	</tr>
 	<!-- END topicreplies -->
 	</tbody>

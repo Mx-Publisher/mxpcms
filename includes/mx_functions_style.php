@@ -942,17 +942,17 @@ class mx_user extends mx_session
 	var $user_language;
 	var $user_language_name;
 	
-	var $lang;		
-	var $lang_iso = 'en';		
+	var $lang;
+	var $lang_iso = 'en';	
 	var $lang_dir = 'lang_english';
 	
 	protected $common_language_files_loaded;
 	
 	var $img_lang_dir = 'en';
-	var $lang_english_name = 'English';		
-	var $lang_local_name = 'English United Kingdom';	
+	var $lang_english_name = 'English';	
+	var $lang_local_name = 'English United Kingdom';
 	var $language_list = array();
-	var $debug_paths;	
+	var $debug_paths;
 	
 	/**** /
 	var	$cloned_template_name = 'subSilver';
@@ -968,7 +968,7 @@ class mx_user extends mx_session
 	var $block_border_graphics = '';
 	
 	var $parent_template_name = '';
-	var $parent_template_path = '';	
+	var $parent_template_path = '';
 	
 	var $cloned_template_name = '';
 	var $cloned_current_template_path = '';
@@ -979,21 +979,21 @@ class mx_user extends mx_session
 	var $default_current_template_path = '';
 
 	var $imageset_backend = PORTAL_BACKEND;
-	var $ext_imageset_backend = PORTAL_BACKEND;	
+	var $ext_imageset_backend = PORTAL_BACKEND;
 	
-	var $imageset_path = '/theme/images/';	
+	var $imageset_path = '/theme/images/';
 	var $img_array = array();
-	var $images;	
+	var $images;
 
-	var $style_name = '';	
+	var $style_name = '';
 	var $style_path = 'styles/';	
 	
 	var $cloned_style_phpbb_path = '';
 	var $current_style_phpbb_path = '';
 	
 	var $default_style_name = 'prosilver';
-	var $default_style2_name = 'subsilver2';	
-	var $default_style_phpbb_path = '';	
+	var $default_style2_name = 'subsilver2';
+	var $default_style_phpbb_path = '';
 	
 	var $default_module_style = '';
 	
@@ -1012,6 +1012,9 @@ class mx_user extends mx_session
 
 	/** @var \phpbb\cache\driver\driver_interface */
 	protected $cache;
+
+	protected $language;
+	protected $request;
 	/** @var \phpbb\config\config */
 	protected $config;
 	/** @var \phpbb\db\driver\driver_interface */
@@ -1086,14 +1089,12 @@ class mx_user extends mx_session
 	 */
 	function init($user_ip, $page_id, $init_style = true)
 	{
-		global $portal_config;
 		// Define basic constants
 		$this->page_id = $page_id;
 		$this->user_ip = $user_ip;
 
 		// Inititate User data
 		$this->_init_session($user_ip, $this->page_id);
-		
 		$this->_init_userprefs();
 
 		// Inititate User style
@@ -1282,22 +1283,22 @@ class mx_user extends mx_session
 		// Language DataBase		
 		switch (PORTAL_BACKEND)
 		{
-			case 'internal':	
-			case 'phpbb2':
-			case 'mybb':
+			case 'internal':			
+			case 'phpbb2':		
+			case 'mybb':							
 					$sql_users = 'UPDATE ' . USERS_TABLE . "
 						SET user_lang = '" . $this->decode_lang($this->lang['default_lang']) . "'
 						WHERE user_lang = '" . $this->decode_lang($this->data['user_lang']) . "'";
 					$sql_config = "UPDATE " . PORTAL_TABLE . " SET
 						default_lang = '" . $this->decode_lang($this->lang['default_lang']) . "'
-						WHERE portal_id = '1'";
+						WHERE portal_id = '1'";						
 			break;
 		
 			case 'phpbb3':
 			case 'olympus':
 			case 'ascraeus':
 			case 'rhea':
-			case 'proteus':	
+			case 'proteus':			
 					
 					$sql_users = 'UPDATE ' . USERS_TABLE . "
 						SET user_lang = '" . $this->encode_lang($this->lang['default_lang']) . "'
@@ -1305,7 +1306,7 @@ class mx_user extends mx_session
 						
 					$sql_config = 'UPDATE ' . CONFIG_TABLE . "
 						SET config_value = '" . $this->encode_lang($this->lang['default_lang']) . "'
-						WHERE config_name = 'default_lang'";
+						WHERE config_name = 'default_lang'";						
 			break;
 			
 			
@@ -1317,7 +1318,7 @@ class mx_user extends mx_session
 					$sql_config = 'UPDATE ' . CONFIG_TABLE . "
 						SET value = '" . $this->decode_lang($this->lang['default_lang']) . "'
 						WHERE variable = 'userLanguage'";
-			break;
+			break;				
 		}
 		
 		// If we've had to change the value in any way then let's write it back to the database
@@ -1390,12 +1391,12 @@ class mx_user extends mx_session
 		
 		/** Sort of pointless here, since we have already included all main lang files **/
 		//this will fix the path for anonymouse users
-		if (@include($mx_root_path . $this->lang_path . "lang_main.$phpEx") === false)
+		if ((@include $mx_root_path . $this->lang_path . "lang_main.$phpEx") === false)
 		{
 			//this will fix the path for anonymouse users
 			echo('<br />');
 			echo(filesize($mx_root_path . $this->lang_path . "lang_main.$phpEx") . '');
-			echo('<br />');
+			echo('<br />');			
 			die('Language file <a class="textbutton" href="' . $mx_root_path . $this->lang_path . 'lang_main.' . $phpEx . '"><span>' . $mx_root_path . $this->lang_path . "lang_main.$phpEx" . '</span></a>' . ' couldn\'t be opened.');
 		}
 		//  include($phpbb_root_path . 'language/lang_' . $board_config['default_lang'] . '/lang_main.' . $phpEx);
@@ -1443,7 +1444,7 @@ class mx_user extends mx_session
 				{
 					mx_message_die(GENERAL_ERROR, 'Language file ' . $shared_lang_path . "lang_" . $this->lang_name . "/lang_admin.$phpEx" . ' couldn\'t be opened.');
 				}
-			}
+			}				
 		}
 		
 		// 
@@ -1758,13 +1759,13 @@ class mx_user extends mx_session
 						$sql2 = "SELECT s.themes_id as style_id, mxt.themes_id, mxt.template_name as style_path
 							FROM " . MX_THEMES_TABLE . " mxt, " . THEMES_TABLE . " s
 								WHERE mxt.template_name = s.template_name
-								AND mxt.portal_backend = '" . PORTAL_BACKEND . "'";							
+								AND mxt.portal_backend = '" . PORTAL_BACKEND . "'";
 					break;
 					case 'phpbb3':
 					case 'olympus':
 					case 'ascraeus':
 					case 'rhea':
-					case 'proteus':					
+					case 'proteus':
 						$sql2 = "SELECT  mxt.themes_id, bbt.style_id, bbt.style_name
 							FROM " . MX_THEMES_TABLE . " AS mxt, " . STYLES_TEMPLATE_TABLE . " AS stt, " . STYLES_TABLE . " AS bbt
 							WHERE bbt.style_active = 1 
@@ -1772,18 +1773,18 @@ class mx_user extends mx_session
 								AND mxt.portal_backend = '" . 'phpbb3' . "'
 								AND stt.template_id = bbt.template_id";
 					break;
-				}				
+				}
 				
 				if(($result = $db->sql_query_limit($sql2, 1)) && ($row = $db->sql_fetchrow($result)))
 				{
 					$init_style = $row['themes_id']; //Portal Style Id
 				}
-				else				
+				else
 				{
 					die('style_id: ' . $init_style . ', no style with this id found ... ' . $sql);
 				}
 			}
-			
+				
 		}
 		
 		/*
@@ -1830,7 +1831,7 @@ class mx_user extends mx_session
 	{
 		global $db, $board_config, $portal_config, $template, $phpbb_root_path, $mx_root_path;
 		
-		global $mx_request_vars, $theme;				
+		global $mx_request_vars, $theme;
 		
 		//
 		// Set up style to output
@@ -2185,7 +2186,7 @@ class mx_user extends mx_session
 	function _load_template_config()
 	{
 		global $board_config, $images, $theme, $template, $phpbb_root_path, $mx_root_path;
-		
+
 		unset($GLOBALS['MX_TEMPLATE_CONFIG']);
 		$mx_template_config = false;
 		
@@ -2194,7 +2195,7 @@ class mx_user extends mx_session
 		$cloned_template_path = $cloned_template_path_d = $mx_root_path . $this->cloned_current_template_path;
 		$default_template_path = $default_template_path_d = $mx_root_path . $this->default_current_template_path;
 		$template_name = $template_name_d = $this->template_name;
-		
+	
 		/*
 		* Load phpBB3 images
 		**/
@@ -2221,7 +2222,7 @@ class mx_user extends mx_session
 		//
 		// Load mxBB Template configuration data
 		//
-		$template_config_filename = $mx_root_path . $this->current_template_path . '/' . $this->template_name . '.cfg';		
+		$template_config_filename = $mx_root_path . $this->current_template_path . '/' . $this->template_name . '.cfg';	
 		
 		/*
 		*fix for mxp
@@ -2238,7 +2239,7 @@ class mx_user extends mx_session
 			// Make default template -> current template
 			//
 			$this->template_name = $this->default_template_name;
-			$this->current_template_path = $this->default_current_template_path;			
+			$this->current_template_path = $this->default_current_template_path;	
 		}
 		$this->theme = (is_array($this->theme) && is_array($theme)) ? array_merge($this->theme, @$theme) : (is_array($theme) ? $theme: $this->theme);
 		
@@ -2974,10 +2975,10 @@ class mx_user extends mx_session
 				/**/
 				else if (@file_exists($phpbb_root_path . $this->style_path . $this->default_style_name . "/imageset" ))
 				{
-					$cfg_data_imageset_data = mx_parse_cfg_file("{$phpbb_root_path}styles/{$this->default_template_name}/imageset/{$this->img_lang}/imageset.cfg");
-							
-					$template_name = $this->default_template_name;
-					$default_style_name = $this->default_style_name;
+					$default_style_name = str_replace('_core', 'all', $this->default_template_name);
+					$template_name = $this->default_style_name;
+					
+					$cfg_data_imageset_data = mx_parse_cfg_file("{$phpbb_root_path}styles/{$template_name}/imageset/{$this->img_lang}/imageset.cfg");
 					
 					$default_style_phpbb_path = $this->default_style_phpbb_path = $this->style_path . $this->default_style_name; //new					
 					$current_template_phpbb_path = $default_style_phpbb_path . "/template";
@@ -4186,7 +4187,11 @@ class mx_user extends mx_session
 		switch($images['buttontype'][$key])
 		{
 			case MX_BUTTON_TEXT:
-				return '<a class="textbutton" href="'. $url .'"><span>' . $label . '</span></a>';
+				$return = '<button class="button textbutton" type="submit" title="{$label}" style="font-size:9px;">';
+				$return .= '<i class="fa fa-star-o" style="float:top;vertical-align: 25%;whitespace: false;" aria-hidden="false"></i>';
+				$return .=  '<a class="textbutton" href="'. $url .'"><span>' . $label . '</span></a>';
+				$return .= '</button>';
+				return $return;
 			break;
 
 			case MX_BUTTON_IMAGE:
@@ -4225,7 +4230,10 @@ class mx_user extends mx_session
 		switch($images['buttontype'][$key])
 		{
 			case MX_BUTTON_TEXT:
-				return '<a class="textbutton" href="'. $url .'"><span>' . $label . '</span></a>';
+				$return = '<button class="button textbutton" type="submit" title="{$label}" style="font-size:9px;">';
+				$return .= '<i class="fa fa-star-o" style="float:top;vertical-align: 25%;whitespace: false;" aria-hidden="false"></i>';
+				$return .=  '<a class="textbutton" href="'. $url .'"><span>' . $label . '</span></a>';
+				$return .= '</button>';
 			break;
 
 			case MX_BUTTON_IMAGE:
@@ -4251,6 +4259,16 @@ class mx_user extends mx_session
  */
 class mx_language_file_loader
 {
+	/**
+	 * Global fallback language
+	 *
+	 * ISO code of the language to fallback to when the specified language entries
+	 * cannot be found.
+	 *
+	 * @var string
+	 */
+	const FALLBACK_LANGUAGE = 'en';
+	
 	/**
 	 * @var string	Path to MXP root
 	 */
@@ -4292,6 +4310,63 @@ class mx_language_file_loader
 	}
 
 	/**
+	 * Function to set user's language to display.
+	 *
+	 * @param string	$user_lang_iso		ISO code of the User's language
+	 * @param bool		$reload				Whether or not to reload language files
+	 */
+	public function set_user_language($user_lang_iso, $reload = false)
+	{
+		$this->user_language = $user_lang_iso;
+
+		$this->set_fallback_array($reload);
+	}
+
+	/**
+	 * Function to set the board's default language to display.
+	 *
+	 * @param string	$default_lang_iso	ISO code of the board's default language
+	 * @param bool		$reload				Whether or not to reload language files
+	 */
+	public function set_default_language($default_lang_iso, $reload = false)
+	{
+		$this->default_language = $default_lang_iso;
+
+		$this->set_fallback_array($reload);
+	}
+
+	/**
+	 * Returns language fallback data
+	 *
+	 * @param bool	$reload	Whether or not to reload language files
+	 *
+	 * @return array
+	 */
+	protected function set_fallback_array($reload = false)
+	{
+		$fallback_array = array();
+
+		if ($this->user_language)
+		{
+			$fallback_array[] = $this->user_language;
+		}
+
+		if ($this->default_language)
+		{
+			$fallback_array[] = $this->default_language;
+		}
+
+		$fallback_array[] = self::FALLBACK_LANGUAGE;
+
+		$this->language_fallback = $fallback_array;
+
+		if ($reload)
+		{
+			$this->reload_language_files();
+		}
+	}
+
+	/**
 	 * Extension manager setter
 	 *
 	 * @param \phpbb\extension\manager	$extension_manager	Extension manager
@@ -4315,7 +4390,8 @@ class mx_language_file_loader
 		$locale = (array) $locale;
 
 		// Determine path to language directory
-		$path = $this->phpbb_root_path . 'language/';
+		//$path = array($this->phpbb_root_path . 'language/', $this->mx_root_path . '/includes/shared/phpbb2/language/', $this->mx_root_path . '/includes/shared/phpbb3/language/');
+		$path = $this->mx_root_path . '/includes/shared/phpbb3/language/';
 
 		$this->load_file($path, $component, $locale, $lang);
 	}
@@ -4372,37 +4448,78 @@ class mx_language_file_loader
 	 */
 	protected function load_file($path, $component, $locale, &$lang)
 	{
-		// This is BC stuff and not the best idea as it makes language fallback
-		// implementation quite hard like below.
-		if (strpos($this->phpbb_root_path . $component, $path) === 0)
+		if (!is_array($path))
 		{
-			// Filter out the path
-			$path_diff = str_replace($path, '', dirname($this->phpbb_root_path . $component));
-			$language_file = basename($component, '.' . $this->php_ext);
-			$component = '';
-
-			// This step is needed to resolve language/en/subdir style $component
-			// $path already points to the language base directory so we need to eliminate
-			// the first directory from the path (that should be the language directory)
-			$path_diff_parts = explode('/', $path_diff);
-
-			if (count($path_diff_parts) > 1)
+			// This is BC stuff and not the best idea as it makes language fallback
+			// implementation quite hard like below.
+			if (strpos($this->phpbb_root_path . $component, $path) === 0)
 			{
-				array_shift($path_diff_parts);
-				$component = implode('/', $path_diff_parts) . '/';
+				// Filter out the path
+				$path_diff = str_replace($path, '', dirname($this->phpbb_root_path . $component));
+				$language_file = basename($component, '.' . $this->php_ext);
+				$component = '';
+
+				// This step is needed to resolve language/en/subdir style $component
+				// $path already points to the language base directory so we need to eliminate
+				// the first directory from the path (that should be the language directory)
+				$path_diff_parts = explode('/', $path_diff);
+
+				if (count($path_diff_parts) > 1)
+				{
+					array_shift($path_diff_parts);
+					$component = implode('/', $path_diff_parts) . '/';
+				}
+
+				$component .= $language_file;
 			}
 
-			$component .= $language_file;
+			// Determine filename
+			$filename = $component . '.' . $this->php_ext;
+			
+			// Determine path to file
+			$file_path = $this->get_language_file_path($path, $filename, $locale);
+			
+			// Load language array
+			$this->load_language_file($file_path, $lang);
+		
 		}
+		else
+		{
+			foreach ($path as $file_path)
+			{
+				// This is BC stuff and not the best idea as it makes language fallback
+				// implementation quite hard like below.
+				if (strpos($this->phpbb_root_path . $component, $file_path) === 0)
+				{
+					// Filter out the path
+					$path_diff = str_replace($file_path, '', dirname($this->phpbb_root_path . $component));
+					$language_file = basename($component, '.' . $this->php_ext);
+					$component = '';
 
-		// Determine filename
-		$filename = $component . '.' . $this->php_ext;
-		
-		// Determine path to file
-		$file_path = $this->get_language_file_path($path, $filename, $locale);
-		
-		// Load language array
-		$this->load_language_file($file_path, $lang);
+					// This step is needed to resolve language/en/subdir style $component
+					// $path already points to the language base directory so we need to eliminate
+					// the first directory from the path (that should be the language directory)
+					$path_diff_parts = explode('/', $path_diff);
+
+					if (count($path_diff_parts) > 1)
+					{
+						array_shift($path_diff_parts);
+						$component = implode('/', $path_diff_parts) . '/';
+					}
+
+					$component .= $language_file;
+				}
+
+				// Determine filename
+				$filename = $component . '.' . $this->php_ext;
+				
+				// Determine path to file
+				$file_path = $this->get_language_file_path($file_path, $filename, $locale);
+				
+				// Load language array
+				$this->load_language_file($file_path, $lang);
+			}
+		}
 	}
 
 	/**
@@ -5931,17 +6048,17 @@ class mx_language extends mx_language_file_loader
 						// Load vanilla phpBB2 AdminCP keys
 						$this->_load_lang($this->phpbb_root_path, 'lang_admin');
 						// Core MXP AdminCP 
-						$this->_load_lang($this->mx_root_path, 'lang_admin');						
-						//Load Shared phpBB3 AdminCP common language file							
-						$this->_load_lang($this->mx_root_path . 'includes/shared/phpbb3/', 'acp/common');						
+						$this->_load_lang($this->mx_root_path, 'lang_admin');
+						//Load Shared phpBB3 AdminCP common language file
+						$this->_load_lang($this->mx_root_path . 'includes/shared/phpbb3/', 'acp/common');
 					}					
 					// Load vanilla phpBB2 keys
 					$this->_load_lang($this->phpbb_root_path, 'lang_main');
 					// Core Main Translation after shared phpBB keys so we can overwrite some settings
-					$this->_load_lang($this->mx_root_path, 'lang_main');					
-					//Load Shared phpBB3 common language file										
-					$this->_load_lang($this->mx_root_path . 'includes/shared/phpbb3/', 'common');					
-				break;					
+					$this->_load_lang($this->mx_root_path, 'lang_main');
+					//Load Shared phpBB3 common language file
+					$this->_load_lang($this->mx_root_path . 'includes/shared/phpbb3/', 'common');
+				break;
 				case 'phpbb3':
 				case 'olympus':
 				case 'ascraeus':

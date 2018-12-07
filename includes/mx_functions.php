@@ -389,7 +389,7 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 	{
 		if (!defined('TEMPLATE_ROOT_PATH'))
 		{
-			define('TEMPLATE_ROOT_PATH', $mx_root_path.'templates/'.$theme['template_name'].'/');
+			define('TEMPLATE_ROOT_PATH', "{$mx_root_path}templates/" . (isset($theme['template_name']) ?  rawurlencode($theme['template_name']) : 'all') . '/');
 		}
 		if (file_exists($mx_root_path . TEMPLATE_ROOT_PATH . 'msgdie_header.tpl'))
 		{		
@@ -459,7 +459,7 @@ function mx_block_message($title, $message)
 */
 function mx3_append_sid($url, $params = false, $is_amp = true, $session_id = false, $mod_rewrite_only = false)
 {
-	global $_SID, $_EXTRA_URL, $portal_config, $mx_mod_rewrite;
+	global $_SID, $_EXTRA_URL, $mx_user, $portal_config, $mx_mod_rewrite;
 
 	// Assign sid if session id is not specified
 	if ($session_id === false)
@@ -942,6 +942,148 @@ function mx3_chmod($filename, $perms = CHMOD_READ)
 	}
 
 	return $result;
+}
+
+
+/** /
+*
+* Credit: https://stackoverflow.com/users/2456038/rafasashi
+/**/
+function mx_file_exists($file_path = '')
+{
+	// Assume failure.
+	 $file_exists = true;
+	 $status = "unknown";
+	
+	//$file_path = 'http://php.net/images/logos/php-logo.svg';
+	//clear cached results
+	//clearstatcache();
+	
+	//trim path
+	$file_dir = trim(dirname($file_path));
+	
+	//trim file name
+	$file_name = trim(basename($file_path));
+	
+	//rebuild path
+	$file_path = $file_dir . "/{$file_name}";
+	
+	global $mx_root_path, $phpbb_root_path;
+	
+	//If you simply want to check that some file (not directory) exists, 
+	//and concerned about performance, try is_file() instead.
+	//It seems like is_file() is almost 2x faster when a file exists 
+	//and about the same when it doesn't.
+		
+	$file = $file_dir . '/' . $file_name;
+	
+	if (function_exists('is_file') && @is_file($file)) 
+	{
+		$status = "is_file";
+		$file_exists = true;
+	}
+	
+	if (function_exists('curl_init') && (!ini_get('safe_mode') || !strtolower(ini_get('safe_mode')) == 'on')) 
+	{
+		 // Assume failure.
+		 $data = -1;
+		 $ch = curl_init($file);
+		 // Issue a HEAD request and follow any redirects.
+		curl_setopt($ch, CURLOPT_NOBODY, true);
+		curl_setopt($ch, CURLOPT_HEADER, true);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+		curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win32; x86; rv:63.0) Gecko/20100101 Firefox/63.0.68');  
+		$data = curl_exec($ch);
+		
+		//error check 
+		if (curl_errno($ch))
+		{
+			$file_exists = false;
+			return $file_exists;
+		}
+		curl_close($ch);
+		
+		 if ($data) 
+		 {
+		    $content_length = "unknown";
+		    $status = "curl_init";
+			
+		    if(preg_match("/^HTTP\/1\.[01] (\d\d\d)/", $data, $matches))
+			{
+				$status = (int)$matches[1];
+				$file_exists = ($status == '200') ? true : (($status == '404') ? false : false);
+				
+			}
+		}
+	}
+	
+	if (function_exists('file_exists') && @file_exists(str_replace(array(PORTAL_URL, PHPBB_URL), array($mx_root_path, $phpbb_root_path), $file_path))) 
+	{
+		$status = "file_exists";
+		$file_exists = true;
+	}
+		
+	if (function_exists('filesize') && @filesize(str_replace(array(PORTAL_URL, PHPBB_URL), array($mx_root_path, $phpbb_root_path), $file_path))) 
+	{
+		$status = "filesize";
+		$file_exists = true;
+	}
+	
+	return $file_exists;
+}
+
+/** /
+*
+* Credit: https://stackoverflow.com/users/2456038/rafasashi
+/**/
+function mx_local_file_exists($file_path = '')
+{
+	// Assume failure.
+	 $file_exists = true;
+	 $status = "unknown";
+	
+	//$file_path = 'http://php.net/images/logos/php-logo.svg';
+	//clear cached results
+	//clearstatcache();
+	
+	//trim path
+	$file_dir = trim(dirname($file_path));
+	
+	//trim file name
+	$file_name = trim(basename($file_path));
+	
+	//rebuild path
+	$file_path = $file_dir . "/{$file_name}";
+	
+	global $mx_root_path, $phpbb_root_path;
+	
+	//If you simply want to check that some file (not directory) exists, 
+	//and concerned about performance, try is_file() instead.
+	//It seems like is_file() is almost 2x faster when a file exists 
+	//and about the same when it doesn't.
+		
+	$file = $file_dir . '/' . $file_name;
+	
+	if (function_exists('is_file') && @is_file($file)) 
+	{
+		$status = "is_file";
+		$file_exists = true;
+	}
+	
+	if (function_exists('file_exists') && @file_exists(str_replace(array(PORTAL_URL, PHPBB_URL), array($mx_root_path, $phpbb_root_path), $file_path))) 
+	{
+		$status = "file_exists";
+		$file_exists = true;
+	}
+		
+	if (function_exists('filesize') && @filesize(str_replace(array(PORTAL_URL, PHPBB_URL), array($mx_root_path, $phpbb_root_path), $file_path))) 
+	{
+		$status = "filesize";
+		$file_exists = true;
+	}
+	
+	return $file_exists;
 }
 
 /**
@@ -1471,20 +1613,41 @@ function mx_get_gravatar_url($row)
 */
 function mx_get_avatar($row, $alt, $ignore_config = false, $lazy = false)
 {
-	global $mx_user, $board_config, $mx_cache, $phpbb_root_path, $phpEx;
+	global $mx_user, $board_config, $mx_cache, $mx_root_path, $phpbb_root_path, $phpEx;
 
-	if (!$mx_user->optionget('viewavatars') && !$ignore_config)
-	{
-		return '';
-	}
+	//if (!$mx_user->optionget('viewavatars') && !$ignore_config)
+	//{
+	//	return '';
+	//}
 	
-	$row = array(
-		'avatar' 		=> isset($row['avatar']) ? $row['avatar'] : $row['user_avatar'],
+	if ( $mx_user->data['user_id'] == ANONYMOUS )
+	{
+		$row['user_avatar'] 	= !empty($row['user_avatar']) ? $row['user_avatar'] :  'guest_aphrodite.gif';
+	}
+	elseif ($mx_user->data['user_type'] = 3)
+	{
+		$row['user_avatar'] 	= !empty($row['user_avatar']) ? $row['user_avatar'] :  'admin_aphrodite.gif';
+	}
+	elseif (($mx_user->data['user_level'] = 0) && ($mx_user->data['user_active'] = 1))
+	{
+		$row['user_avatar'] 	= !empty($row['user_avatar']) ? $row['user_avatar'] :  'member_aphrodite.gif';
+	}
+	elseif ($mx_user->data['user_type'] = 1)
+	{
+		$row['user_avatar'] 	= !empty($row['user_avatar']) ? $row['user_avatar'] :  'member_aphrodite.gif';
+	}
+	elseif ($mx_user->data['user_type'] = 2)
+	{
+		$row['user_avatar'] 	= !empty($row['user_avatar']) ? $row['user_avatar'] :  'mod_aphrodite.gif';
+	}
+
+	$row = array_merge(array(
+		'avatar' 		=> !empty($row['avatar']) ? $row['avatar'] :  $row['user_avatar'],
 		'avatar_type' 	=> isset($row['avatar_type']) ? $row['avatar_type'] : $row['user_avatar_type'],
 		'avatar_width' 	=> isset($row['avatar_width']) ? $row['avatar_width'] : (isset($row['user_avatar_width']) ? $row['user_avatar_width'] : '120'),
 		'avatar_height' => isset($row['avatar_height']) ? $row['avatar_height'] : (isset($row['user_avatar_height']) ? $row['user_avatar_height'] : '120'),
-	);
-	
+	), $row);
+
 	$avatar_data = array(
 		'src' => $row['avatar'],
 		'width' => $row['avatar_width'],
@@ -1494,23 +1657,51 @@ function mx_get_avatar($row, $alt, $ignore_config = false, $lazy = false)
 	
 	$driver = $row['avatar_type'];
 	$html = '';
-
+	if (empty($driver))
+	{
+		$driver = 'upload';
+	}
+	
 	if ($driver)
 	{
+		
 		$html = '<img src="' . mx_get_gravatar_url($row) . '" ' .
 			($row['avatar_width'] ? ('width="' . $row['avatar_width'] . '" ') : '') .
 			($row['avatar_height'] ? ('height="' . $row['avatar_height'] . '" ') : '') .
 			'alt="' . ((!empty($lang[$alt])) ? $lang[$alt] : $alt) . '" />';
-			
+
 		if (!empty($html))
 		{
-			return $html;
+			//return $html;
 		}
 
 		$root_path = generate_portal_url();
-
+		if (is_file($phpbb_root_path .  'images/avatars/default_avatars/' . $row['avatar']))
+		{
+			$avatar_path = $phpbb_root_path . 'images/avatars/default_avatars/';
+		}
+		elseif (is_file($phpbb_root_path . $board_config['avatar_gallery_path'] . '/' . $row['avatar']))
+		{
+			$avatar_path = $phpbb_root_path . $board_config['avatar_gallery_path'] . '/';
+		}
+		elseif (is_file($phpbb_root_path .  'images/avatars/upload/' . $row['avatar']))
+		{
+			$avatar_path = $phpbb_root_path . 'images/avatars/upload/';
+		}
+		elseif (is_file($mx_root_path . $board_config['avatar_gallery_path'] . '/' . $row['avatar']))
+		{
+			$avatar_path = $mx_root_path . $board_config['avatar_gallery_path'] . '/';
+		}
+		elseif (is_file($mx_root_path .  'images/avatars/upload/' . $row['avatar']))
+		{
+			$avatar_path = $mx_root_path . 'images/avatars/upload/';
+		}
+		else
+		{
+			$avatar_path = $mx_root_path . 'images/avatars/default_avatars/';
+		}
 		$avatar_data = array(
-			'src' => $root_path . $board_config['avatar_gallery_path'] . '/' . $row['avatar'],
+			'src' => $avatar_path . $row['avatar'],
 			'width' => $row['avatar_width'],
 			'height' => $row['avatar_height'],
 		);
@@ -1519,7 +1710,7 @@ function mx_get_avatar($row, $alt, $ignore_config = false, $lazy = false)
 	{
 		$avatar_data['src'] = '';
 	}
-
+	
 	if (!empty($avatar_data['src']))
 	{
 		if ($lazy)
@@ -1998,7 +2189,7 @@ function mx_get_exists($table, $idfield = '', $id = 0)
 {
 	global $db;
 
-	$sql = "SELECT COUNT(*) AS total FROM '$table' WHERE $idfield = '$id'";
+	$sql = "SELECT COUNT(*) AS total FROM $table WHERE $idfield = '$id'";
 	if( !($result = $db->sql_query($sql)) )
 	{
 		mx_message_die(GENERAL_ERROR, "Couldn't get block/Column information", '', __LINE__, __FILE__, $sql);
@@ -3605,7 +3796,7 @@ function mx_get_db_stat($mode, $db_name = '')
  */
 function update_portal_backend($new_backend = PORTAL_BACKEND)
 {
-	global $mx_root_path, $lang, $phpEx, $portal_config, $mx_cache;
+	global $mx_root_path, $lang, $phpEx, $portal_config;
 
 	if( @file_exists($mx_root_path . "config.$phpEx") )
 	{
@@ -3628,7 +3819,7 @@ function update_portal_backend($new_backend = PORTAL_BACKEND)
 	*/
 
 	$new_backend = ($new_backend) ? $new_backend  : 'internal';
-	
+
 	switch ($new_backend)
 	{
 		case 'internal':
@@ -3682,7 +3873,7 @@ function update_portal_backend($new_backend = PORTAL_BACKEND)
 	$message = '<hr />';
 	for ($i = 0; $i < count($process_msgs); $i++)
 	{
-		$message .= $process_msgs[$i] . ($process_msgs[$i] == '<hr />' ? '' : '<br />') . "\n";
+		$message .= $process_msgs[$i] . ( $process_msgs[$i] == '<hr />' ? '' : '<br />' ) . "\n";
 	}
 	$message .= '<hr />';
 

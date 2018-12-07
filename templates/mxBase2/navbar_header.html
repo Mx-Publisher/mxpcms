@@ -1,0 +1,80 @@
+<div class="navbar" role="navigation">
+	<div class="inner">
+
+	<ul id="nav-breadcrumbs" class="nav-breadcrumbs linklist" role="menubar">
+		<!-- DEFINE $MICRODATA = ' itemtype="http://data-vocabulary.org/Breadcrumb" itemscope=""' -->
+		<!-- EVENT overall_header_breadcrumbs_before -->
+		<li class="breadcrumbs">
+			<!-- IF U_SITE_HOME -->
+				<span class="crumb" {$MICRODATA}><a href="{U_SITE_HOME}" itemprop="url" data-navbar-reference="home"><i class="icon fa-home fa-fw" aria-hidden="true"></i><span itemprop="title">{L_SITE_HOME}</span></a></span>
+			<!-- ENDIF -->
+			<!-- EVENT overall_header_breadcrumb_prepend -->
+				<span class="crumb" {$MICRODATA}><a href="{U_INDEX}" itemprop="url" accesskey="h" data-navbar-reference="index"><!-- IF not U_SITE_HOME --><i class="icon fa-home fa-fw"></i><!-- ENDIF --><span itemprop="title">{L_INDEX}</span></a></span>
+
+			<!-- BEGIN navlinks -->
+				<!-- EVENT overall_header_navlink_prepend -->
+				<span class="crumb" {$MICRODATA}<!-- IF navlinks.MICRODATA --> {navlinks.MICRODATA}<!-- ENDIF -->><a href="{navlinks.U_VIEW_FORUM}" itemprop="url"><span itemprop="title">{navlinks.FORUM_NAME}</span></a></span>
+				<!-- EVENT overall_header_navlink_append -->
+			<!-- END navlinks -->
+			<!-- EVENT overall_header_breadcrumb_append -->
+		</li>
+		<!-- EVENT overall_header_breadcrumbs_after -->
+
+		<!-- IF S_DISPLAY_SEARCH and not S_IN_SEARCH -->
+			<li class="rightside responsive-search">
+				<a href="{U_SEARCH}" title="{L_SEARCH_ADV_EXPLAIN}" role="menuitem">
+					<i class="icon fa-search fa-fw" aria-hidden="true"></i><span class="sr-only">{L_SEARCH}</span>
+				</a>
+			</li>
+		<!-- ENDIF -->
+		
+		<!-- IF $P_COLOR_SWITCHER -->
+		<li class="rightside" data-skip-responsive="true">
+			<div class="dropdown-container">
+			<a href="#" class="dropdown-trigger" role="menuitem" title="{L_COLOUR_SWATCH}">
+				<i class="icon fa-paint-brush fa-fw" aria-hidden="true"></i>
+			</a>
+				<div class="dropdown">
+					<div class="pointer"><div class="pointer-inner"></div></div>
+					<ul class="dropdown-contents" role="menu">
+						<li>
+							<a class="colorbutton colorblue" href="#"></a><a class="colorbutton colorgreen" href="#"></a><a class="colorbutton colorpink" href="#"></a><a class="colorbutton colorblack" href="#"></a><a class="colorbutton colorpurple" href="#"></a><a class="colorbutton colorred" href="#"></a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</li>
+		<!-- ENDIF -->
+		
+		<!-- IF SCRIPT_NAME eq 'viewtopic' or SCRIPT_NAME eq 'viewforum' -->
+		<li class="rightside" data-skip-responsive="true">
+			<div class="dropdown-container">
+			<a href="#" class="dropdown-trigger" role="menuitem" title="{L_DISPLAY} {L_OPTIONS}">
+				<i class="icon fa-cog fa-fw" aria-hidden="true"></i>
+			</a>
+				<div class="dropdown">
+					<div class="pointer"><div class="pointer-inner"></div></div>
+					<ul class="dropdown-contents customoptions" role="menu">
+					<!-- ENDIF -->
+						
+					<!-- IF SCRIPT_NAME eq 'viewtopic' or SCRIPT_NAME eq 'viewforum' -->
+					</ul>
+				</div>
+			</div>
+		</li>
+		<!-- ENDIF -->
+		
+		<!-- IF $P_NIGHTMODE -->
+		<li class="rightside" data-skip-responsive="true">
+			<a href="#" class="nightmodeon" role="menuitem" title="{L_ENABLED}">
+				<i class="icon fa-lightbulb-o fa-fw" aria-hidden="true"></i>
+			</a>
+			<a href="#" class="nightmodeoff" role="menuitem" title="{L_DISABLED}">
+				<i class="icon fa-lightbulb-o fa-fw" aria-hidden="true"></i>
+			</a>
+		</li>
+		<!-- ENDIF -->
+	</ul>
+
+	</div>
+</div>

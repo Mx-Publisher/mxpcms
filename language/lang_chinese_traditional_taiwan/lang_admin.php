@@ -1,8 +1,8 @@
-<?php
+ï»¿<?php
 /***************************************************************************
  *                            lang_main.php [Chinese_Big5]
  *                              -------------------
- *			¤p¨F²ÉÁcÅé¤Æ http://flash.to/greenboard
+ *			å°æ²™ç²’ç¹é«”åŒ– http://flash.to/greenboard
  ****************************************************************************/
 
 //
@@ -22,26 +22,26 @@
 // These are displayed in the drop down boxes for advanced
 // mode forum auth, try and keep them short!
 
-$lang['Portal_ALL']                = "©Ò¦³·|­û";
-$lang['Portal_REG']                = "µù¥U·|­û";
-$lang['Portal_PRIVATE']            = "¸s²Õ¦¨­û";
-$lang['Portal_MOD']                = "ª©­±ºÞ²z­û";
-$lang['Portal_ADMIN']              = "¨t²ÎºÞ²z­û";
+$lang['Portal_ALL']                = "æ‰€æœ‰æœƒå“¡";
+$lang['Portal_REG']                = "è¨»å†Šæœƒå“¡";
+$lang['Portal_PRIVATE']            = "ç¾¤çµ„æˆå“¡";
+$lang['Portal_MOD']                = "ç‰ˆé¢ç®¡ç†å“¡";
+$lang['Portal_ADMIN']              = "ç³»çµ±ç®¡ç†å“¡";
 
 
 // Configuration
 //
-$lang['Portal_admin']              = "¤J¤fºô¯¸±±¨î¥x";
-$lang['Portal_admin_explain']      = "¦b³o¸Ì¡M±z¥i¼W¥[, ºM°£, ½s¿è, ­«¾ã©M½Õ¸Õ±zªº¤J¤fºô¯¸";
+$lang['Portal_admin']              = "å…¥å£ç¶²ç«™æŽ§åˆ¶å°";
+$lang['Portal_admin_explain']      = "åœ¨é€™è£¡ï¹æ‚¨å¯å¢žåŠ , æ’¤é™¤, ç·¨è¼¯, é‡æ•´å’Œèª¿è©¦æ‚¨çš„å…¥å£ç¶²ç«™";
 
-$lang['Portal_General_Config']     = "¤J¤fºô¯¸°ò¥»³]©w¥x";
-$lang['Portal_Config_explain']     = "¥H¤Uªºªí®æ¥iÅý±z¹ï±zªº¤J¤fºô¯¸¶i¦æ¤@¨Ç°ò¥»ªº³]©w.";
-$lang['Portal_General_settings']   = "¤j­P³]©w";
-$lang['Portal_Name']               = "¤J¤fºô¯¸¦W¦r :";   
+$lang['Portal_General_Config']     = "å…¥å£ç¶²ç«™åŸºæœ¬è¨­å®šå°";
+$lang['Portal_Config_explain']     = "ä»¥ä¸‹çš„è¡¨æ ¼å¯è®“æ‚¨å°æ‚¨çš„å…¥å£ç¶²ç«™é€²è¡Œä¸€äº›åŸºæœ¬çš„è¨­å®š.";
+$lang['Portal_General_settings']   = "å¤§è‡´è¨­å®š";
+$lang['Portal_Name']               = "å…¥å£ç¶²ç«™åå­— :";   
 $lang['Portal_PHPBB_Url']          = "URL Adress for the PHPBB Module :";
 
-$lang['Portal_Config_updated']     = "¤J¤fºô¯¸³]©w¸g¤w¦¨¥\ªº­×§ï¤F";
-$lang['Click_return_portal_config']= "«ö %s³o¸Ì%s ªð¦^¤J¤fºô¯¸±±¨î¥x";
+$lang['Portal_Config_updated']     = "å…¥å£ç¶²ç«™è¨­å®šç¶“å·²æˆåŠŸçš„ä¿®æ”¹äº†";
+$lang['Click_return_portal_config']= "æŒ‰ %sé€™è£¡%s è¿”å›žå…¥å£ç¶²ç«™æŽ§åˆ¶å°";
 
 
 //
@@ -61,22 +61,22 @@ $lang['Menu_delete_explain']       = "The form below will allow you to delete a 
 $lang['Edit_menu']                 = "Edit a menu";
 $lang['Update']                    = "Update";
 $lang['Create_menu']               = "Create new menu";
-$lang['Create_category']           = "«Ø¥ß·s¤À°Ï";
+$lang['Create_category']           = "å»ºç«‹æ–°åˆ†å€";
 $lang['Menu_Config_updated']       = "Menu Configuration Updated Successfully";
 $lang['Menus_updated']             = "Menu and Category information updated successfully";
 $lang['Click_return_menuadmin']    = "Click %sHere%s to return to Menu Administration";
 $lang['Menu_name']                 = "Menu Name";
 $lang['Menu_desc']                 = "Description ";
 $lang['Menu_links']                = 'Web Link ';
-$lang['Category']                  = "¤À°Ï";
+$lang['Category']                  = "åˆ†å€";
 
-$lang['Edit']                      = "½s¿è";
-$lang['Delete']                    = "§R°£";
-$lang['Move_up']                   = "©¹¤W²¾°Ê";
-$lang['Move_down']                 = "©¹¤U²¾°Ê";
-$lang['Resync']                    = "­«¾ã¹ïÀ³¸ê®Æ";
+$lang['Edit']                      = "ç·¨è¼¯";
+$lang['Delete']                    = "åˆªé™¤";
+$lang['Move_up']                   = "å¾€ä¸Šç§»å‹•";
+$lang['Move_down']                 = "å¾€ä¸‹ç§»å‹•";
+$lang['Resync']                    = "é‡æ•´å°æ‡‰è³‡æ–™";
 
-$lang['Click_return_admin_index']  = "ÂI¿ï %s³o¸Ì%s ¦^¨ì±±¨î¥x­º­¶";
+$lang['Click_return_admin_index']  = "é»žé¸ %sé€™è£¡%s å›žåˆ°æŽ§åˆ¶å°é¦–é ";
 
 //
 // Module Management
@@ -120,13 +120,13 @@ $lang['Column_Size']              = "Size of the column";
 // These are displayed in the drop down boxes for advanced
 // mode Module auth, try and keep them short!
                                   
-$lang['Module_ALL']               = "©Ò¦³·|­û";
-$lang['Module_REG']               = "µù¥U·|­û";
-$lang['Module_PRIVATE']           = "¸s²Õ¦¨­û";
-$lang['Module_MOD']               = "ª©­±ºÞ²z­û";
-$lang['Module_ADMIN']             = "¨t²ÎºÞ²z­û";
+$lang['Module_ALL']               = "æ‰€æœ‰æœƒå“¡";
+$lang['Module_REG']               = "è¨»å†Šæœƒå“¡";
+$lang['Module_PRIVATE']           = "ç¾¤çµ„æˆå“¡";
+$lang['Module_MOD']               = "ç‰ˆé¢ç®¡ç†å“¡";
+$lang['Module_ADMIN']             = "ç³»çµ±ç®¡ç†å“¡";
 
-$lang['Auth_Module']              = "¨t²ÎºÞ²z­û" ;
+$lang['Auth_Module']              = "ç³»çµ±ç®¡ç†å“¡" ;
 
 $lang['Menu Navigation']          = "Navigation Menu";
 $lang['Modules']                  = "Modules";
@@ -138,8 +138,8 @@ $lang['Module Last Message']      = "Module Last Message Administration";
 $lang['Module News']              = "Module news Administration"; 
 $lang['Module Weather']           = "Module Weather Administration";  
 
-$lang['Poll_Settings']            = "¹ï¦¹¼ÒªO¶i¦æ³]©w - ½Õ¬d/§ë²¼ :";
-$lang['Poll_Display']             = "±z­n¬Ý¨º¤@­Ó§ë²¼ ?";
+$lang['Poll_Settings']            = "å°æ­¤æ¨¡æ¿é€²è¡Œè¨­å®š - èª¿æŸ¥/æŠ•ç¥¨ :";
+$lang['Poll_Display']             = "æ‚¨è¦çœ‹é‚£ä¸€å€‹æŠ•ç¥¨ ?";
 
 $lang['Welcome_install']          = "Welcome to MX-Portal Installation";
 $lang['Install_Instruction']      = "Thank you for choosing MX-System. In order to complete this install please fill out the details requested below. Please note PHPBB must already be to install and configure to install MX-portal";

@@ -1,0 +1,54 @@
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '{your-app-id}',
+      cookie     : true,
+      xfbml      : true,
+      version    : '{api-version}'
+    });
+      
+    FB.AppEvents.logPageView();   
+      
+  };
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "https://connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+</script>
+<form action="{S_LOGIN_ACTION}" method="post" id="login">
+<div class="panel">
+	<div class="inner">
+	<span class="corners-top"><span></span></span>
+
+	<div class="content">
+		<h2>{L_LOGIN}</h2>
+		
+		<fieldset class="fields1">
+		<dl>
+			<dt><label for="username">{L_USERNAME}:</label></dt>
+			<dd><input type="text" tabindex="1" name="username" id="username" size="25" maxlength="40" value="{USERNAME}" class="inputbox autowidth" /></dd>
+		</dl>
+		<dl>
+			<dt><label for="password">{L_PASSWORD}:</label></dt>
+			<dd><input type="password" tabindex="2" id="password" name="password" size="25" maxlength="25" class="inputbox autowidth" /></dd>
+			<dd><a href="{U_SEND_PASSWORD}">{L_SEND_PASSWORD}</a></dd>
+		</dl>
+		<dl>
+			<dd><label for="autologin"><input type="checkbox" name="autologin" id="autologin" tabindex="4" class="checkbox" /> {L_LOG_ME_IN}</label></dd>
+		</dl>
+		<dl>
+			<dt>&nbsp;</dt>
+			<dd>{S_HIDDEN_FIELDS}<input type="submit" name="login" tabindex="6" value="{L_LOGIN}" class="button1" /></dd>
+		</dl>
+		</fieldset>
+	</div>
+	<fb:login-button scope="public_profile,email" onlogin="checkLoginState();"></fb:login-button>		
+	<span class="corners-bottom"><span></span></span>	
+	</div>
+</div>
+</form>
+{JUMPBOX}

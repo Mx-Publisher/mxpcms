@@ -37,7 +37,6 @@ class dbal_mysqli extends dbal
 {
 	var $multi_insert = true;
 	var $version;
-	
 	/**
 	* Connect to server
 	* downgraded for phpBB2 backend

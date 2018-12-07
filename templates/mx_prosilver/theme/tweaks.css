@@ -1,41 +1,69 @@
-/* Style Sheet Tweaks
+/* proSilver Style Sheet Tweaks
 
-These style definitions are IE 8 & 9 only.
-They are required due to the poor CSS support in IE browsers.
-------------------------------------------------------------------------------*/
+These style definitions are mainly IE specific 
+tweaks required due to its poor CSS support.
+-------------------------------------------------*/
 
-/* IE 8 Tweaks (value)\9 equates to  IE <= 8
-------------------------------------------------------------------------------*/
+* html table, * html select, * html input { font-size: 100%; }
+* html hr { margin: 0; }
+* html span.corners-top, * html span.corners-bottom { background-image: url("images/corners_left.gif"); }
+* html span.corners-top span, * html span.corners-bottom span { background-image: url("images/corners_right.gif"); }
 
-/* Clear float fix */
-.inner, ul.linklist { zoom: 1\9; }
-
-/* Align checkboxes/radio buttons nicely */
-dd label input { vertical-align: text-bottom\9; }
-
-/* Fixes header-avatar aspect-ratio */
-.header-avatar img { height: 20px\9; }
-
-/* IE8 often can't handle max-width in %, so we use px instead */
-.postprofile .avatar img { max-width: 150px\9; }
-
-
-/* IE 9 Tweaks
-------------------------------------------------------------------------------*/
-
-/* Border-radius bleed fix in IE9 */
-.search-header, .search-header .inputbox, .search-header a.button {
-	border-radius: 0;
+* html #wrap {
+	width: 95%;
+	margin:0 auto 0 auto;
 }
 
-.headerbar, .forumbg {
-	background-image: url("./images/bg_header.gif");
+table.table1 {
+	width: 99%;		/* IE < 6 browsers */
+	/* Tantek hack */
+	voice-family: "\"}\"";
+	voice-family: inherit;
+	width: 100%;
+}
+html>body table.table1 { width: 100%; }	/* Reset 100% for opera */
+
+* html ul.topiclist li { position: relative; }
+* html .postbody h3 img { vertical-align: middle; }
+
+/* Form styles */
+html>body dd label input { vertical-align: text-bottom; }	/* Align checkboxes/radio buttons nicely */
+
+* html input.button1, * html input.button2 {
+	padding-bottom: 0;
+	margin-bottom: 1px;
 }
 
-.forabg {
-	background-image: url("./images/bg_list.gif");
+/* Misc layout styles */
+* html .column1, * html .column2 { width: 45%; }
+
+/* Nice method for clearing floated blocks without having to insert any extra markup (like spacer above)
+   From http://www.positioniseverything.net/easyclearing.html */
+#tabs:after, #minitabs:after, .post:after, .navbar:after, fieldset dl:after, ul.topiclist dl:after, ul.linklist:after, dl.polls:after {
+	content: "."; 
+	display: block; 
+	height: 0; 
+	clear: both; 
+	visibility: hidden;
 }
 
-.tabs .tab > a {
-	border-radius: 0;
+#tabs, #minitabs, .post, .navbar, fieldset dl, ul.topiclist dl, ul.linklist, dl.polls {
+	height: 1%;
+}
+
+/* Simple fix so forum and topic lists always have a min-height set, even in IE6
+	From http://www.dustindiaz.com/min-height-fast-hack */
+dl.icon {
+	min-height: 35px;
+	height: auto !important;
+	height: 35px;
+}
+
+* html #search-box {
+	margin-right: 35px;
+}
+
+* html .rtl #search-box {
+	margin-right: 0;
+	margin-left: 35px;
 }

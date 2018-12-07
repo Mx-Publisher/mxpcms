@@ -1,7 +1,7 @@
 <?php
 /**
 *
-* @package MX-Publisher Module - mx_phpbb2blocks
+* @package MX-Publisher Module - mx_phpbb3blocks
 * @version $Id: mx_functions_display.php,v 1.11 2013/06/28 15:37:22 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
@@ -108,14 +108,17 @@ function mx_display_forums($root_data = '', $display_moderators = true, $return_
 		'ORDER_BY'	=> 'f.left_id',
 	));
 
-	$result = $db->sql_query($sql);
+	if ( !($result = $db->sql_query($sql)) )
+	{
+		mx_message_die(GENERAL_ERROR, 'Could not query forums information', '', __LINE__, __FILE__, $sql);
+	}
 
 	$forum_tracking_info = array();
 	$branch_root_id = $root_data['forum_id'];
 	while ($row = $db->sql_fetchrow($result))
 	{
 		$forum_id = $row['forum_id'];
-
+		
 		// Mark forums read?
 		if ($mark_read == 'forums' || $mark_read == 'all')
 		{
@@ -125,13 +128,13 @@ function mx_display_forums($root_data = '', $display_moderators = true, $return_
 				continue;
 			}
 		}
-
+		
 		// Category with no members
 		if ($row['forum_type'] == FORUM_CAT && ($row['left_id'] + 1 == $row['right_id']))
 		{
 			continue;
 		}
-
+		
 		// Skip branch
 		if (isset($right_id))
 		{
@@ -141,14 +144,14 @@ function mx_display_forums($root_data = '', $display_moderators = true, $return_
 			}
 			unset($right_id);
 		}
-
+		
 		if (!$phpbb_auth->acl_get('f_list', $forum_id))
 		{
 			// if the user does not have permissions to list this forum, skip everything until next branch
 			$right_id = $row['right_id'];
 			continue;
 		}
-
+		
 		$forum_ids[] = $forum_id;
 
 		if ($board_config['load_db_lastread'] && $mx_user->data['is_registered'])
@@ -167,13 +170,12 @@ function mx_display_forums($root_data = '', $display_moderators = true, $return_
 		$row['forum_topics'] = ($phpbb_auth->acl_get('m_approve', $forum_id)) ? $row['forum_topics_real'] : $row['forum_topics'];
 
 		// Display active topics from this forum?
-		if ($show_active && $row['forum_type'] == FORUM_POST && $phpbb_auth->acl_get('f_read', $forum_id) && ($row['forum_flags'] & FORUM_FLAG_ACTIVE_TOPICS))
+		if ($show_active && $row['forum_type'] == FORUM_POST && ($phpbb_auth->acl_get('f_read', $forum_id) !== -1) && ($row['forum_flags'] & FORUM_FLAG_ACTIVE_TOPICS))
 		{
 			if (!isset($active_forum_ary['forum_topics']))
 			{
 				$active_forum_ary['forum_topics'] = 0;
 			}
-
 			if (!isset($active_forum_ary['forum_posts']))
 			{
 				$active_forum_ary['forum_posts'] = 0;
@@ -190,7 +192,7 @@ function mx_display_forums($root_data = '', $display_moderators = true, $return_
 				$active_forum_ary['exclude_forum_id'][] = $forum_id;
 			}
 		}
-
+		
 		//
 		if ($row['parent_id'] == $root_data['forum_id'] || $row['parent_id'] == $branch_root_id)
 		{
@@ -269,7 +271,7 @@ function mx_display_forums($root_data = '', $display_moderators = true, $return_
 		}
 		mx_get_moderators($forum_moderators, $forum_ids_moderator);
 	}
-
+	
 	// Used to tell whatever we have to create a dummy category or not.
 	$last_catless = true;
 	foreach ($forum_rows as $row)
@@ -573,20 +575,29 @@ function mx_get_forum_parents(&$forum_data)
 				WHERE left_id < ' . $forum_data['left_id'] . '
 					AND right_id > ' . $forum_data['right_id'] . '
 				ORDER BY left_id ASC';
-			$result = $db->sql_query($sql);
-
+			if ( !($result = $db->sql_query($sql)) )
+			{
+				mx_message_die(GENERAL_ERROR, 'Could not query forums information', '', __LINE__, __FILE__, $sql);
+			}
+			
 			while ($row = $db->sql_fetchrow($result))
 			{
 				$forum_parents[$row['forum_id']] = array($row['forum_name'], (int) $row['forum_type']);
 			}
-			$db->sql_freeresult($result);
+			if ( !($result = $db->sql_query($sql)) )
+			{
+				mx_message_die(GENERAL_ERROR, 'Could not query forums information', '', __LINE__, __FILE__, $sql);
+			}
 
 			$forum_data['forum_parents'] = serialize($forum_parents);
 
 			$sql = 'UPDATE ' . FORUMS_TABLE . "
 				SET forum_parents = '" . $db->sql_escape($forum_data['forum_parents']) . "'
 				WHERE parent_id = " . $forum_data['parent_id'];
-			$db->sql_query($sql);
+				if ( !($result = $db->sql_query($sql)) )
+				{
+					mx_message_die(GENERAL_ERROR, 'Could not update forums information', '', __LINE__, __FILE__, $sql);
+				}
 		}
 		else
 		{
@@ -833,7 +844,10 @@ function mx_display_custom_bbcodes()
 		FROM ' . BBCODES_TABLE . '
 		WHERE display_on_posting = 1
 		ORDER BY bbcode_tag';
-	$result = $db->sql_query($sql);
+	if ( !($result = $db->sql_query($sql)) )
+	{
+		mx_message_die(GENERAL_ERROR, 'Could not query bbcode information', '', __LINE__, __FILE__, $sql);
+	}
 
 	$i = 0;
 	while ($row = $db->sql_fetchrow($result))
@@ -860,8 +874,11 @@ function mx_display_reasons($reason_id = 0)
 	$sql = 'SELECT *
 		FROM ' . REPORTS_REASONS_TABLE . '
 		ORDER BY reason_order ASC';
-	$result = $db->sql_query($sql);
-
+	if ( !($result = $db->sql_query($sql)) )
+	{
+		mx_message_die(GENERAL_ERROR, 'Could not query forum reasort information', '', __LINE__, __FILE__, $sql);
+	}
+	
 	while ($row = $db->sql_fetchrow($result))
 	{
 		// If the reason is defined within the language file, we will use the localized version, else just use the database entry...
@@ -950,7 +967,10 @@ function mx_display_user_activity(&$mx_userdata)
 		$sql = 'SELECT topic_title
 			FROM ' . TOPICS_TABLE . '
 			WHERE topic_id = ' . $active_t_row['topic_id'];
-		$result = $db->sql_query($sql);
+		if ( !($result = $db->sql_query($sql)) )
+		{
+			mx_message_die(GENERAL_ERROR, 'Could not query topic information', '', __LINE__, __FILE__, $sql);
+		}
 		$active_t_row['topic_title'] = (string) $db->sql_fetchfield('topic_title');
 		$db->sql_freeresult($result);
 	}
@@ -1015,7 +1035,10 @@ function mx_watch_topic_forum_old($mode, &$s_watching, &$s_watching_img, $mx_use
 				FROM $table_sql
 				WHERE $where_sql = $match_id
 					AND user_id = $mx_user_id";
-			$result = $db->sql_query($sql);
+			if ( !($result = $db->sql_query($sql)) )
+			{
+				mx_message_die(GENERAL_ERROR, 'Could not query user notify status', '', __LINE__, __FILE__, $sql);
+			}
 
 			$notify_status = ($row = $db->sql_fetchrow($result)) ? $row['notify_status'] : NULL;
 			$db->sql_freeresult($result);
@@ -1032,7 +1055,11 @@ function mx_watch_topic_forum_old($mode, &$s_watching, &$s_watching_img, $mx_use
 					$sql = 'DELETE FROM ' . $table_sql . "
 						WHERE $where_sql = $match_id
 							AND user_id = $mx_user_id";
-					$db->sql_query($sql);
+
+					if ( !($result = $db->sql_query($sql)) )
+					{
+						mx_message_die(GENERAL_ERROR, 'Could not update unwatch notify status', '', __LINE__, __FILE__, $sql);
+					}
 				}
 
 				$redirect_url = mx3_append_sid(PHPBB_URL . "view$mode.$phpEx", "$u_url=$match_id&amp;start=$start");
@@ -1052,7 +1079,10 @@ function mx_watch_topic_forum_old($mode, &$s_watching, &$s_watching_img, $mx_use
 						SET notify_status = 0
 						WHERE $where_sql = $match_id
 							AND user_id = $mx_user_id";
-					$db->sql_query($sql);
+					if ( !($result = $db->sql_query($sql)) )
+					{
+						mx_message_die(GENERAL_ERROR, 'Could not update watching notify status', '', __LINE__, __FILE__, $sql);
+					}
 				}
 			}
 		}
@@ -1066,7 +1096,10 @@ function mx_watch_topic_forum_old($mode, &$s_watching, &$s_watching_img, $mx_use
 
 					$sql = 'INSERT INTO ' . $table_sql . " (user_id, $where_sql, notify_status)
 						VALUES ($mx_user_id, $match_id, 0)";
-					$db->sql_query($sql);
+					if ( !($result = $db->sql_query($sql)) )
+					{
+						mx_message_die(GENERAL_ERROR, 'Could not innsert user watching status', '', __LINE__, __FILE__, $sql);
+					}
 				}
 
 				$redirect_url = mx3_append_sid(PHPBB_URL . "view$mode.$phpEx", "$u_url=$match_id&amp;start=$start");
@@ -1128,7 +1161,10 @@ function mx_watch_topic_forum($mode, &$s_watching, $user_id, $forum_id, $topic_i
 				FROM $table_sql
 				WHERE $where_sql = $match_id
 					AND user_id = $user_id";
-			$result = $db->sql_query($sql);
+			if ( !($result = $db->sql_query($sql)) )
+			{
+				mx_message_die(GENERAL_ERROR, 'Could not query user notify status', '', __LINE__, __FILE__, $sql);
+			}
 
 			$notify_status = ($row = $db->sql_fetchrow($result)) ? $row['notify_status'] : NULL;
 			$db->sql_freeresult($result);
@@ -1145,7 +1181,10 @@ function mx_watch_topic_forum($mode, &$s_watching, $user_id, $forum_id, $topic_i
 					$sql = 'DELETE FROM ' . $table_sql . "
 						WHERE $where_sql = $match_id
 							AND user_id = $user_id";
-					$db->sql_query($sql);
+					if ( !($result = $db->sql_query($sql)) )
+					{
+						mx_message_die(GENERAL_ERROR, 'Could not query unwatch status', '', __LINE__, __FILE__, $sql);
+					}
 				}
 
 				$redirect_url = mx3_append_sid(PHPBB_URL . "view$mode.$phpEx", "$u_url=$match_id&amp;start=$start");
@@ -1165,7 +1204,10 @@ function mx_watch_topic_forum($mode, &$s_watching, $user_id, $forum_id, $topic_i
 						SET notify_status = 0
 						WHERE $where_sql = $match_id
 							AND user_id = $user_id";
-					$db->sql_query($sql);
+					if ( !($result = $db->sql_query($sql)) )
+					{
+						mx_message_die(GENERAL_ERROR, 'Could not query user notify status', '', __LINE__, __FILE__, $sql);
+					}
 				}
 			}
 		}
@@ -1179,7 +1221,10 @@ function mx_watch_topic_forum($mode, &$s_watching, $user_id, $forum_id, $topic_i
 
 					$sql = 'INSERT INTO ' . $table_sql . " (user_id, $where_sql, notify_status)
 						VALUES ($user_id, $match_id, 0)";
-					$db->sql_query($sql);
+					if ( !($result = $db->sql_query($sql)) )
+					{
+						mx_message_die(GENERAL_ERROR, 'Could not query user notify status', '', __LINE__, __FILE__, $sql);
+					}
 				}
 
 				$redirect_url = mx3_append_sid(PHPBB_URL . "view$mode.$phpEx", "$u_url=$match_id&amp;start=$start");
@@ -1227,7 +1272,7 @@ function mx_watch_topic_forum($mode, &$s_watching, $user_id, $forum_id, $topic_i
 * @param string &$rank_img_src the rank image source is stored here after execution
 *
 */
-function mx_get_user_rank($user_rank, $user_posts, &$rank_title, &$rank_img, &$rank_img_src)
+function _mx_get_user_rank($user_rank, $user_posts, &$rank_title, &$rank_img, &$rank_img_src)
 {
 	global $ranks, $board_config;
 
@@ -1272,7 +1317,7 @@ function mx_get_user_rank($user_rank, $user_posts, &$rank_title, &$rank_img, &$r
 *
 * @return string Avatar image
 */
-function mx_get_user_avatar($avatar, $avatar_type, $avatar_width, $avatar_height, $alt = 'USER_AVATAR')
+function _mx_get_user_avatar($avatar, $avatar_type, $avatar_width, $avatar_height, $alt = 'USER_AVATAR')
 {
 	global $mx_user, $board_config, $phpbb_root_path, $phpEx;
 

@@ -84,7 +84,7 @@
 		<th class="thHead" colspan="2">{L_PORTAL_BACKEND}</th>
 	</tr>
 	<tr>
-		<td class="row1"><label for="portal_backend">{L_PORTAL_BACKEND}</label><br /><span class="explain">{L_PORTAL_BACKEND_EXPLAIN}</span></td>
+		<td class="row1">{L_PORTAL_BACKEND}<br /><span class="gensmall">{L_PORTAL_BACKEND_EXPLAIN}</span></td>
 		<td class="row2">{PORTAL_BACKEND_SELECT}</td>
 	</tr>
 	<tr>
@@ -96,7 +96,7 @@
 		<td class="row2">{L_PORTAL_BACKEND_VALID_STATUS}</td>
 	</tr>
 	<tr>
-		<td class="catBottom" colspan="2" align="center">{S_HIDDEN_FIELDS}<input type="submit" name="submit" value="{L_SUBMIT_BACKEND}" class="mainoption" />&nbsp;&nbsp;<input type="reset" value="{L_RESET}" class="liteoption" />
+		<td class="catBottom" colspan="2" align="center"><input type="submit" name="submit" value="{L_SUBMIT_BACKEND}" class="mainoption" />
 	</tr>
 </table>
 </fieldset>

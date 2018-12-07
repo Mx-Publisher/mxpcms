@@ -122,24 +122,6 @@ else
 
 $s_last_visit = ( $mx_user->data['session_logged_in'] ) ? mx_create_date($board_config['default_dateformat'], $mx_user->data['user_lastvisit'], $board_config['board_timezone']) : '';
 
-switch (PORTAL_BACKEND)
-{
-	case 'internal':
-	case 'smf2':
-	case 'mybb':
-	case 'phpbb2':
-		$admin = ($mx_user->data['session_logged_in'] && $mx_user->data['user_level'] == ADMIN) ? true : false;
-	break;
-
-	case 'phpbb3':
-	case 'olympus':
-	case 'ascraeus':
-	case 'rhea':
-		global $phpbb_auth;
-		$admin = (($mx_user->data['user_id'] != ANONYMOUS) && $phpbb_auth->acl_get('a_')) ? true : false;
-	break;
-}
-
 // Generate logged in/logged out status
 if( !is_object($mx_backend))
 {	
@@ -280,7 +262,7 @@ if (defined('SHOW_ONLINE'))
 					break;
 				}
 				
-				if ( $row['user_allow_viewonline'] || $admin )
+				if ( $row['user_allow_viewonline'] || $mx_user->data['user_level'] == ADMIN )
 				{
 					$online_userlist .= ( $online_userlist != '' ) ? ', ' . $mx_user_online_link : $mx_user_online_link;
 				}
@@ -437,6 +419,7 @@ switch (PORTAL_BACKEND)
 			$phpbb_auth = new phpbb_auth();
 		}
 		$phpbb_auth->acl($mx_user->data);
+		$portal_config = $mx_cache->obtain_mxbb_config();
 		
 		break;
 }
@@ -472,7 +455,7 @@ if ( ($mx_user->data['session_logged_in']) && (PORTAL_BACKEND !== 'internal') &&
 		else
 		{
 			$s_privmsg_new = 0;
-			$icon_pm = $images['pm_no_new_msg'];
+			$icon_pm = isset($images['pm_no_new_msg']) ? $images['pm_no_new_msg'] : 'no_new_msg';
 		}
 		$mx_priv_msg = $lang['Private_Messages'] . ' (' . $mx_user->data['user_new_privmsg'] . ')';
 	}
@@ -481,7 +464,7 @@ if ( ($mx_user->data['session_logged_in']) && (PORTAL_BACKEND !== 'internal') &&
 		$l_privmsgs_text = $lang['No_new_pm'];
 
 		$s_privmsg_new = 0;
-		$icon_pm = $images['pm_no_new_msg'];
+		$icon_pm = isset($images['pm_no_new_msg']) ? $images['pm_no_new_msg'] : 'no_new_msg';
 		$mx_priv_msg = $lang['Private_Messages'];
 	}
 
@@ -616,7 +599,7 @@ if ( ($mx_user->data['session_logged_in']) && (PORTAL_BACKEND !== 'internal') &&
 }
 else
 {
-	$icon_pm = !empty($images['pm_no_new_msg']) ? $images['pm_no_new_msg'] : 'no_new_msg';
+	$icon_pm = isset($images['pm_no_new_msg']) ? $images['pm_no_new_msg'] : 'no_new_msg';
 	$l_privmsgs_text = $lang['Login_check_pm'];
 	$l_privmsgs_text_unread = '';
 	$s_privmsg_new = 0;
@@ -860,7 +843,7 @@ $phpbb_major = $phpbb_version_parts[0] . '.' . $phpbb_version_parts[1];
 //
 // Show the overall footer.
 //
-$admin_link = (true == $admin) ? ('<a href="admin/index.' . $phpEx . '?sid=' . $mx_user->data['session_id'] . '">' . $lang['Admin_panel'] . '</a><br /><br />') : '';
+$admin_link = ($mx_user->data['user_level'] == ADMIN) ? '<a href="admin/index.' . $phpEx . '?sid=' . $mx_user->data['session_id'] . '">' . $lang['Admin_panel'] . '</a><br /><br />' : '';
 
 // Forum rules and subscription info
 $s_watching_forum = array(
@@ -881,7 +864,23 @@ if (empty($default_lang))
 $useragent = (isset($_SERVER['HTTP_USER_AGENT'])) ? $_SERVER['HTTP_USER_AGENT'] : getenv('HTTP_USER_AGENT');
 
 
+switch (PORTAL_BACKEND)
+{
+	case 'internal':
+	case 'smf2':
+	case 'mybb':
+	case 'phpbb2':
+		$admin = ($mx_user->data['session_logged_in'] && $mx_user->data['user_level'] == ADMIN) ? true : false;
+	break;
 
+	case 'phpbb3':
+	case 'olympus':
+	case 'ascraeus':
+	case 'rhea':
+		global $phpbb_auth;
+		$admin = (!$phpbb_auth->acl_get('a_') && $mx_user->data['user_id'] != ANONYMOUS) ? true : false;
+	break;
+}
 
 //
 // Grab MXP global variables, re-cache if necessary
@@ -892,7 +891,7 @@ if (empty($portal_config['portal_status']))
 	$portal_config = $mx_cache->obtain_mxbb_config(false);
 }
 
-$web_path = PORTAL_URL;
+$web_path = (empty($portal_config['portal_url'])) ? PORTAL_URL : $portal_config['portal_url'];
 $https_path = str_replace("http://", "https://", $web_path);
 $web_path = str_replace("https://", "http://", $web_path);
 
@@ -1004,7 +1003,7 @@ $layouttemplate->assign_vars(array(
 	'S_WATCH_FORUM_TITLE'	=> $s_watching_forum['title'],
 	'S_WATCH_FORUM_TOGGLE'	=> $s_watching_forum['title_toggle'],
 	'S_WATCHING_FORUM'		=> $s_watching_forum['is_watching'],
-				
+	
 	'U_SEARCH_SELF'			=> mx_append_sid("{$phpbb_root_path}search.$phpEx?search_id=egosearch"),
 	'U_SEARCH_NEW'			=> mx_append_sid("{$phpbb_root_path}search.$phpEx?search_id=newposts"),
 	'U_SEARCH_UNANSWERED'	=> mx_append_sid("{$phpbb_root_path}search.$phpEx?search_id=unanswered"),
@@ -1034,6 +1033,9 @@ $layouttemplate->assign_vars(array(
 	'S_VIEWTOPIC' 						=> mx_append_sid("viewtopic.$phpEx?" . "f=" . $forum_id . "&amp;t=" . $topic_id), 
 	'S_VIEWFORUM' 					=> mx_append_sid("viewforum.$phpEx?" . POST_FORUM_URL . "=$forum_id"),
 	'S_IN_MCP' 							=> defined('IN_MCP') ? true : false,
+	'L_ACP_SHORT'						=> $mx_user->lang('ACP_SHORT'),
+	'L_MCP_SHORT'						=> $mx_user->lang('MCP'),
+	'L_UCP'									=> $mx_user->lang('UCP'),
 	'S_IN_PROFILE' 						=> defined('IN_PROFILE') ? true : false,
 	'S_IN_UCP' 							=> defined('IN_UCP') ? true : false,	
 	
@@ -1075,7 +1077,7 @@ $layouttemplate->assign_vars(array(
 	'S_NEW_PM'						=> ($s_privmsg_new) ? 1 : 0,
 	'S_REGISTER_ENABLED'		=> ($board_config['require_activation'] != USER_ACTIVATION_DISABLE) ? true : false,
 	'S_FORUM_ID'					=> $forum_id,
-	'S_TOPIC_ID	'					=> $topic_id,		
+	'S_TOPIC_ID	'					=> $topic_id,
 
 	'S_SIMPLE_MESSAGE'		=> false,
 
@@ -1084,15 +1086,15 @@ $layouttemplate->assign_vars(array(
 	'U_PHPBB_ROOT_PATH'		=> PHPBB_URL,
 	'TEMPLATE_ROOT_PATH'	=> TEMPLATE_ROOT_PATH,
 	
-	'SID'						=> !empty($SID) ? $SID : $mx_user->session_id,
+	'SID'							=> !empty($SID) ? $SID : $mx_user->session_id,
 	'_SID'						=> !empty($_GET['sid']) ? $_GET['sid'] : $mx_user->session_id,
-	'SESSION_ID'			=> !empty($mx_user->data['session_id']) ? $mx_user->data['session_id'] : (isset($_COOKIE[$board_config['cookie_name'] . '_sid'] ) ? $_COOKIE[$board_config['cookie_name'] . '_sid'] : ''),
+	'SESSION_ID'				=> !empty($mx_user->data['session_id']) ? $mx_user->data['session_id'] : (isset($_COOKIE[$board_config['cookie_name'] . '_sid'] ) ? $_COOKIE[$board_config['cookie_name'] . '_sid'] : ''),
 	'ROOT_PATH'			=> $web_path,
 	'FULL_SITE_PATH'		=> $web_path,
-	'CMS_PAGE_HOME'	=> PORTAL_URL,
-	'BOARD_URL'			=> PORTAL_URL,
+	'CMS_PAGE_HOME'		=> PORTAL_URL,
+	'BOARD_URL'				=> PORTAL_URL,
 	'PHPBB_VERSION'		=> PHPBB_VERSION,
-	'PHPBB_MAJOR'		=> $phpbb_major,
+	'PHPBB_MAJOR'			=> $phpbb_major,
 	'S_COOKIE_NOTICE'	=> !empty($board_config['cookie_name']),
 	
 	'T_ASSETS_VERSION'		=> $phpbb_major,
@@ -1105,16 +1107,17 @@ $layouttemplate->assign_vars(array(
 	'T_SMILIES_PATH'		=> "{$web_path}{$board_config['smilies_path']}/",
 	'T_AVATAR_GALLERY_PATH'	=> "{$web_path}{$board_config['avatar_gallery_path']}/",
 	
-	'T_ICONS_PATH'			=> !empty($board_config['icons_path']) ? "{$web_path}{$board_config['icons_path']}/" : $web_path.'/images/icons/',
+	'T_ICONS_PATH'				=> !empty($board_config['icons_path']) ? "{$web_path}{$board_config['icons_path']}/" : $web_path.'/images/icons/',
 	'T_RANKS_PATH'			=> !empty($board_config['ranks_path']) ? "{$web_path}{$board_config['ranks_path']}/" : $web_path.'/images/ranks/',
 	'T_UPLOAD_PATH'			=> !empty($board_config['upload_path']) ? "{$web_path}{$board_config['upload_path']}/" : $web_path.'/cache/',	
 	
 	'T_STYLESHEET_LINK'		=> "{$web_path}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme/stylesheet.css',
 	'T_STYLESHEET_LANG_LINK'=> "{$web_path}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme/images/lang_' . $default_lang . '/stylesheet.css',
 	'T_FONT_AWESOME_LINK'	=> "{$web_path}assets/css/font-awesome.min.css",
-		
+	'T_FONT_IONIC_LINK'			=> "{$web_path}assets/css/ionicons.min.css",
+
 	'T_JQUERY_LINK'			=> !empty($board_config['allow_cdn']) && !empty($board_config['load_jquery_url']) ? $board_config['load_jquery_url'] : "{$web_path}assets/javascript/jquery.min.js?assets_version=" . $phpbb_major,
-	'S_ALLOW_CDN'			=> !empty($board_config['allow_cdn']),		
+	'S_ALLOW_CDN'				=> !empty($board_config['allow_cdn']),	
 	
 
 	'T_THEME_NAME'			=> rawurlencode($theme['template_name']),
@@ -1134,7 +1137,7 @@ $layouttemplate->assign_vars(array(
 	//To Do - configurable in AdminCP
 	//Display full login box with autologin option
 	'S_DISPLAY_FULL_LOGIN'	=> true,
-
+	'S_IS_MOBILE'                 => (isset($mx_user->data['is_mobile']) && ($mx_user->data['is_mobile'] == 1)) ? true : false,
 	//Old phpBB2 Backend Contant 
 	'IS_ADMIN' => $admin,
 	
@@ -1144,42 +1147,42 @@ $layouttemplate->assign_vars(array(
 	// These theme variables are not used for MX-Publisher, since MX-Publisher require a theme.css file
 	'T_HEAD_STYLESHEET' => isset($mx_user->theme['head_stylesheet']) ? $mx_user->theme['head_stylesheet'] : 'stylesheet.css',
 	'T_BODY_BACKGROUND' => isset($mx_user->theme['body_background']) ? $mx_user->theme['body_background'] : '',
-	'T_BODY_BGCOLOR' => '#'.$mx_user->theme['body_bgcolor'],
-	'T_BODY_TEXT' => '#'.$mx_user->theme['body_text'],
-	'T_BODY_LINK' => '#'.$mx_user->theme['body_link'],
-	'T_BODY_VLINK' => '#'.$mx_user->theme['body_vlink'],
-	'T_BODY_ALINK' => '#'.$mx_user->theme['body_alink'],
-	'T_BODY_HLINK' => '#'.$mx_user->theme['body_hlink'],
-	'T_TR_COLOR1' => '#'.$mx_user->theme['tr_color1'],
-	'T_TR_COLOR2' => '#'.$mx_user->theme['tr_color2'],
-	'T_TR_COLOR3' => '#'.$mx_user->theme['tr_color3'],
-	'T_TR_CLASS1' => isset($mx_user->theme['tr_class1']) ? $mx_user->theme['tr_class1'] : '',
-	'T_TR_CLASS2' => isset($mx_user->theme['tr_class2']) ? $mx_user->theme['tr_class2'] : '',
-	'T_TR_CLASS3' => isset($mx_user->theme['tr_class3']) ? $mx_user->theme['tr_class3'] : '',
-	'T_TH_COLOR1' => isset($mx_user->theme['th_color1']) ? '#'.$mx_user->theme['th_color1'] : '',
-	'T_TH_COLOR2' => isset($mx_user->theme['th_color2']) ? '#'.$mx_user->theme['th_color2'] : '',
-	'T_TH_COLOR3' => isset($mx_user->theme['th_color3']) ? '#'.$mx_user->theme['th_color3'] : '',
-	'T_TH_CLASS1' => isset($mx_user->theme['th_class1']) ? $mx_user->theme['th_class1'] : '',
-	'T_TH_CLASS2' => isset($mx_user->theme['th_class2']) ? $mx_user->theme['th_class2'] : '',
-	'T_TH_CLASS3' => isset($mx_user->theme['th_class3']) ? $mx_user->theme['th_class3'] : '',
-	'T_TD_COLOR1' => isset($mx_user->theme['td_color1']) ? '#'.$mx_user->theme['td_color1'] : '',
-	'T_TD_COLOR2' => isset($mx_user->theme['td_color2']) ? '#'.$mx_user->theme['td_color2'] : '',
-	'T_TD_COLOR3' => isset($mx_user->theme['td_color3']) ? '#'.$mx_user->theme['td_color3'] : '',
-	'T_TD_CLASS1' => isset($mx_user->theme['td_class1']) ? $mx_user->theme['td_class1'] : '',
-	'T_TD_CLASS2' => isset($mx_user->theme['td_class2']) ? $mx_user->theme['td_class2'] : '',
-	'T_TD_CLASS3' => isset($mx_user->theme['td_class3']) ? $mx_user->theme['td_class3'] : '',
-	'T_FONTFACE1' => isset($mx_user->theme['fontface1']) ? $mx_user->theme['fontface1'] : '',
-	'T_FONTFACE2' => isset($mx_user->theme['fontface2']) ? $mx_user->theme['fontface2'] : '',
-	'T_FONTFACE3' => isset($mx_user->theme['fontface3']) ? $mx_user->theme['fontface3'] : '',
-	'T_FONTSIZE1' => isset($mx_user->theme['fontsize1']) ? $mx_user->theme['fontsize1'] : '',
-	'T_FONTSIZE2' => isset($mx_user->theme['fontsize2']) ? $mx_user->theme['fontsize2'] : '',
-	'T_FONTSIZE3' => isset($mx_user->theme['fontsize3']) ? $mx_user->theme['fontsize3'] : '',
-	'T_FONTCOLOR1' => isset($mx_user->theme['fontcolor1']) ? '#'.$mx_user->theme['fontcolor1'] : '',
-	'T_FONTCOLOR2' => isset($mx_user->theme['fontcolor2']) ? '#'.$mx_user->theme['fontcolor2'] : '',
-	'T_FONTCOLOR3' => isset($mx_user->theme['fontcolor3']) ? '#'.$mx_user->theme['fontcolor3'] : '',
-	'T_SPAN_CLASS1' => isset($mx_user->theme['span_class1']) ? $mx_user->theme['span_class1'] : '',
-	'T_SPAN_CLASS2' => isset($mx_user->theme['span_class2']) ? $mx_user->theme['span_class2'] : '',
-	'T_SPAN_CLASS3' => isset($mx_user->theme['span_class3']) ? $mx_user->theme['span_class3'] : '',
+	'T_BODY_BGCOLOR' => isset($mx_user->theme['body_bgcolor']) ? '#' . $mx_user->theme['body_bgcolor'] : '',
+	'T_BODY_TEXT' => isset($mx_user->theme['body_text']) ? '#' . $mx_user->theme['body_text'] : '',
+	'T_BODY_LINK' => isset($mx_user->theme['body_link']) ? '#' . $mx_user->theme['body_link'] : '',
+	'T_BODY_VLINK' => isset($mx_user->theme['body_vlink']) ? '#' . $mx_user->theme['body_vlink'] : '',
+	'T_BODY_ALINK' => isset($mx_user->theme['body_alink']) ? '#' . $mx_user->theme['body_alink'] : '',
+	'T_BODY_HLINK' => isset($mx_user->theme['body_hlink']) ? '#' . $mx_user->theme['body_hlink'] : '',
+	'T_TR_COLOR1' => isset($mx_user->theme['tr_color1']) ? '#' . $mx_user->theme['tr_color1'] : '',
+	'T_TR_COLOR2' => isset($mx_user->theme['tr_color2']) ? '#' . $mx_user->theme['tr_color2'] : '',
+	'T_TR_COLOR3' => isset($mx_user->theme['tr_color3']) ? '#' . $mx_user->theme['tr_color3'] : '',
+	'T_TR_CLASS1' => isset($mx_user->theme['tr_class1']) ? '#' . $mx_user->theme['tr_class1'] : '',
+	'T_TR_CLASS2' => isset($mx_user->theme['tr_class2']) ? '#' . $mx_user->theme['tr_class2'] : '',
+	'T_TR_CLASS3' => isset($mx_user->theme['tr_class3']) ? '#' . $mx_user->theme['tr_class3'] : '',
+	'T_TH_COLOR1' => isset($mx_user->theme['th_color1']) ? '#' . $mx_user->theme['th_color1'] : '',
+	'T_TH_COLOR2' => isset($mx_user->theme['th_color2']) ? '#' . $mx_user->theme['th_color2'] : '',
+	'T_TH_COLOR3' => isset($mx_user->theme['th_color3']) ? '#' . $mx_user->theme['th_color3'] : '',
+	'T_TH_CLASS1' => isset($mx_user->theme['th_class1']) ? '#' . $mx_user->theme['th_class1'] : '',
+	'T_TH_CLASS2' => isset($mx_user->theme['th_class2']) ? '#' . $mx_user->theme['th_class2'] : '',
+	'T_TH_CLASS3' => isset($mx_user->theme['th_class3']) ? '#' . $mx_user->theme['th_class3'] : '',
+	'T_TD_COLOR1' => isset($mx_user->theme['td_color1']) ? '#' . $mx_user->theme['td_color1'] : '',
+	'T_TD_COLOR2' => isset($mx_user->theme['td_color2']) ? '#' . $mx_user->theme['td_color2'] : '',
+	'T_TD_COLOR3' => isset($mx_user->theme['td_color3']) ? '#' . $mx_user->theme['td_color3'] : '',
+	'T_TD_CLASS1' => isset($mx_user->theme['td_class1']) ? '#' . $mx_user->theme['td_class1'] : '',
+	'T_TD_CLASS2' => isset($mx_user->theme['td_class2']) ? '#' . $mx_user->theme['td_class2'] : '',
+	'T_TD_CLASS3' => isset($mx_user->theme['td_class3']) ? '#' . $mx_user->theme['td_class3'] : '',
+	'T_FONTFACE1' => isset($mx_user->theme['fontface1']) ? '#' . $mx_user->theme['fontface1'] : '',
+	'T_FONTFACE2' => isset($mx_user->theme['fontface2']) ? '#' . $mx_user->theme['fontface2'] : '',
+	'T_FONTFACE3' => isset($mx_user->theme['fontface3']) ? '#' . $mx_user->theme['fontface3'] : '',
+	'T_FONTSIZE1' => isset($mx_user->theme['fontsize1']) ? '#' . $mx_user->theme['fontsize1'] : '',
+	'T_FONTSIZE2' => isset($mx_user->theme['fontsize2']) ? '#' . $mx_user->theme['fontsize2'] : '',
+	'T_FONTSIZE3' => isset($mx_user->theme['fontsize3']) ? '#' . $mx_user->theme['fontsize3'] : '',
+	'T_FONTCOLOR1' => isset($mx_user->theme['fontcolor1']) ? '#' . $mx_user->theme['fontcolor1'] : '',
+	'T_FONTCOLOR2' => isset($mx_user->theme['fontcolor2']) ? '#' . $mx_user->theme['fontcolor2'] : '',
+	'T_FONTCOLOR3' => isset($mx_user->theme['fontcolor3']) ? '#' . $mx_user->theme['fontcolor3'] : '',
+	'T_SPAN_CLASS1' => isset($mx_user->theme['span_class1']) ? '#' . $mx_user->theme['span_class1'] : '',
+	'T_SPAN_CLASS2' => isset($mx_user->theme['span_class2']) ? '#' . $mx_user->theme['span_class2'] : '',
+	'T_SPAN_CLASS3' => isset($mx_user->theme['span_class3']) ? '#' . $mx_user->theme['span_class3'] : '',
 
 	'L_HOME' => $lang['MX_home'],
 	//'L_HOME' => $lang['Home Page'],
@@ -1241,15 +1244,15 @@ $layouttemplate->assign_vars(array(
 	// Additional css for gecko browsers
 	'GECKO' => strstr($useragent, 'Gecko'),
 	
-	'S_ENABLE_FEEDS'								=> false,
-	'S_ENABLE_FEFILES_OVERALL'				=> false,
-	'S_ENABLE_FEFILES_FORUMS'				=> false,
-	'S_ENABLE_FEFILES_TOPICS'				=> false,
+	'S_ENABLE_FEEDS'							=> false,
+	'S_ENABLE_FEFILES_OVERALL'			=> false,
+	'S_ENABLE_FEFILES_FORUMS'			=> false,
+	'S_ENABLE_FEFILES_TOPICS'			=> false,
 	'S_ENABLE_FEFILES_TOPICS_ACTIVE'	=> false,
-	'S_ENABLE_FEFILES_NEWS'					=> false,
+	'S_ENABLE_FEFILES_NEWS'				=> false,
 			
 	'L_ACP' => $lang['Admin_panel'],
-	'U_ACP' => (true == $admin) ? "{$mx_root_path}admin/index.$phpEx?sid=" . $mx_user->session_id : $admin_link
+	'U_ACP' => ($mx_user->data['user_level'] == ADMIN) ? "{$mx_root_path}admin/index.$phpEx?sid=" . $mx_user->session_id : $admin_link
 
 ));
 

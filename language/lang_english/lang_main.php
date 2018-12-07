@@ -48,11 +48,16 @@ $lang['Hidden_block'] = 'Hidden block';
 $lang['Hidden_block_explain'] = 'This block is \'hidden\', but visible to you since you have the proper permissions set.';
 
 //
+// Navigation Block
+//
+$lang['Navigation_Menu'] = 'Menu';
+
+//
 // Overall Navigation Navigation
 //
 $lang['MX_home'] = 'Home';
 $lang['MX_forum'] = 'Forum';
-$lang['MX_navigation'] = 'Pages navigation, eg. forum navigation, like pafiledb navigation.';	
+$lang['MX_navigation'] = 'Pages navigation, eg. forum navigation, like pafiledb navigation.';
 
 //
 // Core Blocks - Language
@@ -61,6 +66,8 @@ $lang['Change_default_lang'] = 'Set the Board\'s Default Language';
 $lang['Change_user_lang'] = 'Set Your Language';
 $lang['Portal_lang'] = 'LanguageCP';
 $lang['Select_lang'] = 'Select Language:';
+$lang['Who_is_Online'] = 'Who is Online';
+$lang['Who_is_Online?'] = 'Who is Online?';
 
 //
 // Core Blocks - Theme
@@ -151,6 +158,9 @@ $lang['Please_remove_install_contrib'] = 'Please ensure both the install/ and co
 //$lang['pagetitle_NameOfFirstPage'] = 'Whatever one';
 //$lang['pagetitle_NameOfSecondPage'] = 'Whatever two';
 
+//$lang['pagedesc_NameOfFirstPage'] = 'Whatever one';
+//$lang['pagedesc_NameOfSecondPage'] = 'Whatever two';
+
 //
 // Multilangual block titles
 // - To have multilangual block titles, add lang keys 'blocktitle_BLOCK_TITLE' below
@@ -158,6 +168,9 @@ $lang['Please_remove_install_contrib'] = 'Please ensure both the install/ and co
 //
 //$lang['blocktitle_NameOfFirstPage'] = 'Whatever one';
 //$lang['blocktitle_NameOfSecondPage'] = 'Whatever two';
+
+//$lang['blockdesc_DescOfFirstPage'] = 'Whatever one';
+//$lang['blockdesc_DescOfSecondPage'] = 'Whatever two';
 
 //
 // That's all Folks!

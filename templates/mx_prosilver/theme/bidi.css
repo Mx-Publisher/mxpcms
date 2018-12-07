@@ -1,8 +1,8 @@
-/* RTL definitions
+/* proSilver RTL definitions
 ---------------------------------------- */
 
 /**
-* common.css
+* common.css 
 */
 .rtl h1 {
 	margin-right: 0;
@@ -13,10 +13,6 @@
 	text-align: left;
 }
 
-.rtl p.jumpbox-return {
-	float: right;
-}
-
 .rtl div.rules ul {
 	margin-left: 0;
 	margin-right: 20px;
@@ -24,23 +20,34 @@
 
 /* Main blocks
 ---------------------------------------- */
-.rtl .icon {
-	padding-right: 0;
-	padding-left: 2px;
-}
-
-.rtl .logo {
+.rtl #logo {
 	float: right;
 	padding: 10px 10px 0 13px;
 }
 
-/* Site Description
+/* Search box
 --------------------------------------------- */
-.rtl .site-description {
+.rtl #search-box {
+	float: left;
+	text-align: left;
+	margin-right: 0;
+	margin-left: 5px;
+}
+
+.rtl #search-box li {
+	text-align: left;
+}
+
+.rtl #search-box img {
+	margin-right: 0;
+	margin-left: 3px;
+}
+
+.rtl #site-description {
 	float: right;
 }
 
-.rtl .site-description h1 {
+.rtl #site-description h1 {
 	margin-left: 0;
 }
 
@@ -52,20 +59,20 @@
 
 /* Horizontal lists
 ----------------------------------------*/
-.rtl ul.linklist > li {
+.rtl ul.linklist li {
 	float: right;
 	margin-right: 0;
-	margin-left: 7px;
+	margin-left: 5px;
 }
 
-.rtl ul.linklist > li.rightside, .rtl p.rightside, .rtl a.rightside {
+.rtl ul.linklist li.rightside, .rtl p.rightside {
 	float: left;
-	margin-right: 7px;
+	margin-right: 5px;
 	margin-left: 0;
 	text-align: left;
 }
 
-.rtl ul.leftside > li, .rtl ul.rightside > li {
+.rtl ul.leftside li, .rtl ul.rightside li {
 	float: left;
 }
 
@@ -81,78 +88,6 @@
 	margin-left: -5px;
 	margin-right: 5px;
 	text-align: left;
-}
-
-/* Bulletin icons for list items
-----------------------------------------*/
-.rtl ul.linklist.bulletin > li:before {
-	padding-left: 4px;
-	padding-right: 0;
-}
-
-/* Dropdown menu
----------------------------------------- */
-.rtl .dropdown-container.topic-tools, .rtl .dropdown-container-left {
-	float: right;
-}
-
-.rtl .dropdown li {
-	text-align: right;
-}
-
-.rtl .dropdown-contents > li {
-	padding-left: 15px;
-	padding-right: 0;
-}
-
-.rtl .dropdown-nonscroll > li {
-	padding-left: 0;
-}
-
-.rtl .dropdown li li {
-	padding-left: 0;
-	padding-right: 18px;
-}
-
-.rtl .dropdown-extended .header {
-	text-align: right;
-}
-
-.rtl .dropdown-extended .header .header_settings, .rtl .dropdown-container-right {
-	float: left;
-}
-
-.rtl .jumpbox .dropdown-contents a {
-	margin-right: 0;
-	margin-left: 20px;
-}
-
-/* Notifications
------------------------------------------*/
-.rtl .notification_list ul li img {
-	float: right;
-	margin-left: 5px;
-	margin-right: 0;
-}
-
-.rtl .notification_list div.notifications {
-	margin-left: 0;
-	margin-right: 50px;
-}
-
-.rtl .notification_text {
-	margin-left: 0;
-	margin-right: 58px;
-}
-
-.rtl .notification_list p.notification-time {
-	text-align: left;
-}
-
-/* Responsive breadcrumbs
-----------------------------------------*/
-.rtl .breadcrumbs .crumb {
-	float: right;
 }
 
 /* Table styles
@@ -191,7 +126,8 @@
 
 /* Misc layout styles
 ---------------------------------------- */
-/* column[1-2] styles are containers for two column layouts */
+/* column[1-2] styles are containers for two column layouts 
+   Also see tweaks.css */
 .rtl .column1 {
 	float: right;
 	clear: right;
@@ -239,153 +175,74 @@
 
 /* Pagination
 ---------------------------------------- */
-.rtl .page-number {
-	float: left;
-}
-
 .rtl .pagination {
 	text-align: left;
 	float: left;
-}
-
-.rtl .pagination > ul {
-	margin-left: 0;
-	margin-right: 5px;
+	padding-left: 5px;
 }
 
 /* Pagination in viewforum for multipage topics */
 .rtl .row .pagination {
-	background-position: 100% 50%;
 	float: left;
-	padding-left: 0;
-	padding-right: 15px;
-}
-
-.rtl .row .pagination > ul {
-	margin: 0;
+	padding: 1px 0 1px 15px;
 }
 
 .rtl .pagination span {
 	direction: ltr;
 }
 
-.pagination li.page-jump {
-	margin-left: 5px;
-	margin-right: 0;
+.rtl .pagination span.page-sep {
+	display: inline;
+	visibility: hidden;
+	position: absolute;
 }
-
-/* Action Bar styles
----------------------------------------- */
-.rtl .action-bar .button {
-	margin-right: 0;
-	float: right;
-}
-
-.rtl .action-bar > .button {
-	margin-left: 5px;
-	float: right;
-}
-
-.rtl .action-bar .dropdown-button-control .button {
-	margin-left: 5px;
-}
-
 
 /* Miscellaneous styles
 ---------------------------------------- */
-.rtl .quick-links {
-	margin-left: 7px;
-	margin-right: 0;
-}
-
-.rtl .header-avatar span:after {
+.rtl #forum-permissions {
 	float: left;
+	padding-right: 5px;
 	padding-left: 0;
-	padding-right: 2px;
+	margin-right: 5px;
+	margin-left: 0;
+	text-align: left;
 }
 
-.rtl .member-search {
-	float: right;
+.rtl .forabg {
+	width: 99%;	/* fix for IE6 */
+}
+
+.rtl .forumbg {
+	width: 99%;	/* fix for IE6 */
 }
 
 /**
 * links.css
 */
 
-/* Links adjustment to correctly display an order of rtl/ltr mixed content */
-.rtl a {
-	direction: rtl;
-	unicode-bidi: embed;
+/* Back to top of page */
+.rtl .back2top {
+	text-align: left;
 }
 
-li.breadcrumbs span:first-child > a {
+.rtl a.top {
+	float: left;
+}
+
+.rtl a.top2 {
 	padding-left: 0;
-}
-
-/* Notification mark read link */
-.rtl .dropdown-extended a.mark_read {
-	border-radius: 0 3px 3px 0;
-	left: 0;
-	right: auto;
-}
-
-.rtl .back2top .top {
-	float: left;
-	margin-left: -10px;
-}
-
-.rtl .skiplink {
-	/* invisible skip link, used for accessibility  */
-	left: 0;
-	right: -999px;
-}
-
-.rtl a.feed-icon-forum {
-	float: left;
+	padding-right: 15px;
 }
 
 /**
 * content.css
 */
-.rtl ul.topiclist dt, .rtl li.header dt {
+.rtl ul.topiclist dt {
 	float: right;
-	margin-right: 0;
-	margin-left: -440px;
 }
 
-.rtl ul.topiclist.missing-column dt {
-	margin-right: 0;
-	margin-left: -345px;
-}
-
-.rtl ul.topiclist.two-long-columns dt {
-	margin-right: 0;
-	margin-left: -250px;
-}
-
-.rtl ul.topiclist.two-columns dt {
-	margin-right: 0;
-	margin-left: -80px;
-}
-
-.rtl ul.topiclist dt .list-inner {
-	margin-right: 0;
-	margin-left: 440px;
-}
-
-.rtl ul.topiclist.missing-column dt .list-inner {
-	margin-right: 0;
-	margin-left: 330px;
-}
-
-.rtl ul.topiclist.two-long-columns dt .list-inner {
-	margin-right: 0;
-	margin-left: 250px;
-}
-
-.rtl ul.topiclist.two-columns dt .list-inner {
-	margin-right: 0;
-	margin-left: 80px;
+.rtl ul.topiclist dl {
+	position: static;	/* fix for IE6 */
 }
 
 .rtl ul.topiclist dd {
@@ -395,14 +252,9 @@ li.breadcrumbs span:first-child > a {
 	border-left: none;
 }
 
-.rtl ul.topiclist dfn {
-	left: auto;
-	right: -999px;
-}
-
 .rtl ul.topiclist li.row dt a.subforum {
-	padding-right: 12px;
-	background-position: right;
+	padding: 0 0 0 12px;
+	background-position: 100% 100%;
 	position: static;
 }
 
@@ -417,69 +269,50 @@ li.breadcrumbs span:first-child > a {
 }
 
 .rtl li.header dd {
-	padding-left: 0;
-	padding-right: 1px;
+	margin-left: 0;
+	margin-right: 1px;
 }
 
-.rtl dl.row-item{
+.rtl dl.icon {
 	background-position: 99.5% 50%;
 }
 
-.rtl li.header dl.row-item dt .list-inner {
+.rtl li.header dl.icon dt {
 	/* Tweak for headers alignment when folder icon used */
 	padding-right: 0;
 	padding-left: 50px;
 }
 
-.rtl dl.row-item dt {
+.rtl dl.icon dt {
+	padding-left: 0;
+	padding-right: 45px;					/* Space for folder icon */
 	background-position: 99.5% 95%;			/* Position of topic icon */
 }
 
-.rtl dl.row-item dt .list-inner {
-	padding-left: 5px;
-	padding-right: 45px;					/* Space for folder icon */
-}
-
-.rtl dl a.row-item-link {						/* topic row icon links */
-	display: inline-block;
-	left: auto;
-	right: 0;
-	margin-left: 0;
-	margin-right: 2px;
-}
-
-.rtl dd.lastpost > span, .rtl ul.topiclist dd.info > span, .rtl ul.topiclist dd.time > span, .rtl dd.redirect > span, .rtl dd.moderation > span {
+.rtl dd.lastpost span, .rtl ul.topiclist dd.searchby span, .rtl ul.topiclist dd.info span, .rtl ul.topiclist dd.time span, .rtl dd.redirect span, .rtl dd.moderation span {
 	padding-left: 0;
 	padding-right: 5px;
 }
 
+.rtl dd.mark {
+	float: left !important;
+}
+
+.rtl ul.topiclist dd.searchextra {
+	margin-left: 0;
+	margin-right: 5px;
+	border-right: none;
+}
+
 /* Post body styles
 ----------------------------------------*/
-.rtl .date {
-	float: left;
-}
-
-.rtl .postbody, .rtl .postbody h3 {
+.rtl .postbody {
 	float: right;
-}
-
-.rtl .has-profile .postbody h3 {
-	margin-right: 0;
-	margin-left: 180px;
-}
-
-.rtl p.post-notice {
-	padding-left: 5px;
-}
-
-.rtl p.post-notice:before {
-	left: auto;
-	right: 0;
 }
 
 /* Topic review panel
 ----------------------------------------*/
-.rtl .topicreview {
+.rtl #topicreview {
 	padding-right: 0;
 	padding-left: 5px;
 }
@@ -489,6 +322,11 @@ li.breadcrumbs span:first-child > a {
 .rtl .content ul, .rtl .content ol {
 	margin-right: 3em;
 	margin-left: 0;
+}
+
+/* Post author */
+.rtl p.author {
+	margin: 0 0 0.6em 15em;
 }
 
 .rtl .signature {
@@ -513,19 +351,16 @@ li.breadcrumbs span:first-child > a {
 
 .rtl blockquote blockquote {
 	/* Nested quotes */
-	margin: 0.5em 15px 0 1px;
+	margin: 0.5em 15px 0 1px;	
 }
 
 .rtl blockquote cite {
 	/* Username/source of quoter */
+	margin-right: 20px;
 	margin-left: 0;
 }
 
-.rtl blockquote cite:before, .rtl .uncited:before {
-	padding-left: 5px;
-}
-
-.rtl blockquote .codebox {
+.rtl blockquote dl.codebox {
 	margin-right: 0;
 }
 
@@ -580,7 +415,9 @@ li.breadcrumbs span:first-child > a {
 /* Poster profile block
 ----------------------------------------*/
 .rtl .postprofile {
-	border-width: 0 1px 0 0;
+	border-left: none;
+	border-right-width: 1px;
+	border-right-style: solid;
 	float: left;
 /*	text-align: right; */
 }
@@ -596,10 +433,6 @@ li.breadcrumbs span:first-child > a {
 	margin-right: 8px;
 }
 
-.rtl .postprofile .avatar {
-	float: right;
-}
-
 .rtl .online {
 	background-position: 0 0;
 }
@@ -612,131 +445,100 @@ li.breadcrumbs span:first-child > a {
 /**
 * buttons.css
 */
-
-.rtl .caret {
-	border-right: 1px solid;
-	border-right-color: inherit;
-	border-left: none;
-	right: 6px;
+/* Rollover buttons
+   Based on: http://wellstyled.com/css-nopreload-rollovers.html
+----------------------------------------*/
+.rtl .buttons {
+	float: right;
 }
 
-/* Post control buttons
+/* Rollover state */
+.rtl .buttons div {
+	margin: 0 1px 0 5px;
+}
+
+/* Sub-header (navigation bar)
 --------------------------------------------- */
-.rtl .post-buttons {
+.rtl a.print, .rtl a.sendemail, .rtl a.fontsize {
+	text-align: right;
+}
+
+/* Icon images
+---------------------------------------- */
+.rtl .sitehome, .rtl .icon-faq, .rtl .icon-members, .rtl .icon-home, .rtl .icon-ucp, .rtl .icon-register, .rtl .icon-logout,
+.rtl .icon-bookmark, .rtl .icon-bump, .rtl .icon-subscribe, .rtl .icon-unsubscribe, .rtl .icon-pages, .rtl .icon-search {
+	background-position: 100% 50%;
+	padding: 1px 17px 0 0;
+}
+
+/* Poster profile icons
+----------------------------------------*/
+/* Rollover state */
+.rtl .postprofile ul.profile-icons li {
+	float: right;
+	margin: 0 0 3px 6px;
+}
+
+/* Positioning of moderator icons */
+.rtl .postbody ul.profile-icons {
 	float: left;
-}
-
-.rtl .has-profile .post-buttons {
-	left: 0;
-	right: auto;
-}
-
-.rtl .post-buttons li {
-	float: right;
-}
-
-/* Poster contact icons
- ----------------------------------------*/
-.rtl .contact-icons a {
-	border-left-width: 1px;
-	border-left-style: dotted;
-	border-right: none;
-	float: right;
-}
-
-.rtl .contact-icons .last-cell {
-	border-left: none;
 }
 
 /**
 * cp.css
 */
-/* Control Panel Styles
+/* proSilver Control Panel Styles
 ---------------------------------------- */
 
 
 /* Main CP box
 ----------------------------------------*/
-.rtl .cp-menu {
+.rtl #cp-menu {
 	float: right;
 }
 
-.rtl .cp-main {
+.rtl #cp-main {
 	float: right;
 }
 
-.rtl .cp-main .panel ol {
+.rtl #cp-main .panel ol {
 	margin-right: 2em;
 	margin-left: 0;
 }
 
-.rtl .cp-main .buttons {
-	margin-right: 0;
-	margin-left: 0;
+.rtl #cp-main .pagination {
+	float: left;
 }
 
-.tabs-container h2 {
-	float: right;
+.rtl #cp-main .buttons {
+	margin-right: 0;
+	margin-left: 0;
 }
 
 /* CP tabbed menu
 ----------------------------------------*/
-.rtl .tabs {
-	margin-left: 0;
-	margin-right: 7px;
+.rtl #tabs {
+	margin: 20px 7px -1px 0;
 }
 
-.rtl .tabs .tab {
+.rtl #tabs a {
 	float: right;
 }
 
-.rtl .tabs .tab > a {
-	margin-left: 1px;
-	margin-right: 0;
-}
+/*.rtl #tabs a span {
+	float: right;
+}*/
 
 /* Mini tabbed menu used in MCP
 ----------------------------------------*/
-.rtl .minitabs {
-	float: left;
-	margin-right: 0;
-	margin-left: 7px;
+.rtl #minitabs {
+	margin: -20px 0 0 7px;
 }
 
-.rtl .minitabs .tab {
+.rtl #minitabs li {
 	float: left;
-}
-
-.rtl .minitabs .tab > a {
 	margin-right: 2px;
 	margin-left: 0;
-}
-
-/* Responsive tabs
-----------------------------------------*/
-.rtl .tabs .dropdown {
-	margin-left: -2px;
-}
-
-.rtl .tabs .dropdown li {
-	text-align: left;
-}
-
-.rtl .minitabs .dropdown {
-	margin-left: -4px;
-}
-
-.rtl .minitabs .dropdown li {
-	text-align: right;
-}
-
-/* Responsive *CP navigation
-----------------------------------------*/
-@media only screen and (max-width: 900px), only screen and (max-device-width: 900px)
-{
-	.rtl .cp-menu, .rtl .navigation, .rtl .cp-main {
-		float: none;
-	}
 }
 
 /* UCP navigation menu
@@ -744,7 +546,7 @@ li.breadcrumbs span:first-child > a {
 
 /* Preferences pane layout
 ----------------------------------------*/
-.rtl .cp-main h2 {
+.rtl #cp-main h2 {
 	margin-left: 0;
 	margin-right: 10px;
 }
@@ -756,19 +558,6 @@ li.breadcrumbs span:first-child > a {
 
 /* PM Styles
 ----------------------------------------*/
-
-/* PM panel adjustments */
-.rtl .reply-all a.right {
-	background-position: 5% 60%;
-}
-
-.rtl .reply-all a.right:hover {
-	background-position: 3% 60%;
-}
-
-.rtl .reply-all {
-	padding-left: 5px;
-}
 
 /* Defined rules list for PM options */
 .rtl ol.def-rules {
@@ -785,17 +574,8 @@ li.breadcrumbs span:first-child > a {
 }
 
 /* Avatar gallery */
-.rtl .gallery label {
+.rtl #gallery label {
 	float: right;
-}
-
-/* Responsive *CP navigation
-----------------------------------------*/
-@media only screen and (max-width: 900px), only screen and (max-device-width: 900px)
-{
-	.rtl .cp-menu, .rtl .navigation, .rtl .cp-main {
-		float: none;
-	}
 }
 
 /**
@@ -834,7 +614,7 @@ li.breadcrumbs span:first-child > a {
 }
 
 .rtl fieldset.fields1 dd {
-	margin-right: 15em;
+	margin-right: 10em;
 	margin-left: 0;
 	border-right-width: 0;
 	border-left-width: 1px;
@@ -880,10 +660,6 @@ li.breadcrumbs span:first-child > a {
 	padding-right: 0;
 }
 
-.rtl .dropdown fieldset.display-options label {
-	text-align: left;
-}
-
 /* Display actions for ucp and mcp pages */
 .rtl fieldset.display-actions {
 	text-align: left;
@@ -905,186 +681,42 @@ li.breadcrumbs span:first-child > a {
 	float: left;
 }
 
+/* Jumpbox */
+.rtl fieldset.jumpbox {
+	text-align: left;
+}
+
+.rtl fieldset.quickmod {
+	float: left;
+	text-align: left;
+}
+
 /* Posting page styles
 ----------------------------------------*/
 
 /* Emoticons panel */
-.rtl .smiley-box {
+.rtl #smiley-box {
 	float: left;
-}
-
-/* Search box
----------------------------------------- */
-
-/* Topic and forum Search */
-.rtl .search-box {
-	float: right;
-}
-
-.rtl .search-box .inputbox {
-	border-left-width: 0;
-	border-right-width: 1px;
-	border-radius: 0 4px 4px 0;
-	float: right;
-	padding: 3px;
-}
-
-.rtl .button-search,
-.button-search-end {
-	float: right;
-}
-
-.rtl .button-search-end {
-	border-radius: 4px 0 0 4px;
-	border-left-width: 1px;
-	border-right-width: 0;
-}
-
-.rtl .search-header .button-search-end {
-	border: 0;
-	border-radius: 4px 0 0 4px;
-}
-
-.rtl .search-header {
-	float: left;
-	margin-right: 0;
-	margin-left: 5px;
 }
 
 /* Form button styles
 ---------------------------------------- */
 
-/** Reference: Bug #27155 */
-.rtl .wrap, .rtl .headerbar, .rtl .site-description, .rtl .navbar {
-	position: relative;
+/* Topic and forum Search */
+.rtl .search-box {
+	margin-right: 5px;
+	margin-left: 0;
+	float: right;
+}
+
+.rtl input.search {
+	background-position: right 1px;
+	padding-right: 17px;
+	padding-left: 0;
 }
 
 /**
-* plupload.css
+* tweaks.css
 */
 
-.rtl .attach-controls {
-	float: left;
-}
 
-/**
-* responsive.css
-*/
-@media only screen and (max-width: 700px), only screen and (max-device-width: 700px)
-{
-	/* .topiclist lists
-	----------------------------------------*/
-	.rtl ul.topiclist li.header dt, .rtl ul.topiclist li.header dt .list-inner {
-		margin-left: 0 !important;
-		padding-left: 0;
-	}
-
-	.rtl ul.topiclist dt, .rtl ul.topiclist dt .list-inner,
-	.rtl ul.topiclist.missing-column dt, .rtl ul.topiclist.missing-column dt .list-inner,
-	.rtl ul.topiclist.two-long-columns dt, .rtl ul.topiclist.two-long-columns dt .list-inner,
-	.rtl ul.topiclist.two-columns dt, .rtl ul.topiclist.two-columns dt .list-inner {
-		margin-left: 0;
-	}
-
-	.rtl ul.topiclist dt .list-inner.with-mark {
-		padding-left: 34px;
-	}
-
-	/* Forums and topics lists
-	----------------------------------------*/
-	.rtl ul.topiclist.forums dt {
-		margin-left: -250px;
-	}
-	.rtl ul.topiclist.forums dt .list-inner {
-		margin-left: 250px;
-	}
-
-	.rtl ul.topiclist dd.mark {
-		left: 5px;
-		right: auto;
-		text-align: right;
-	}
-
-	.rtl table.responsive.show-header thead, .rtl table.responsive.show-header th:first-child {
-		text-align: right !important;
-	}
-
-	.rtl table.responsive td {
-		text-align: right !important;
-	}
-
-	/* User profile
-	----------------------------------------*/
-	.rtl .column1, .rtl .column2, .rtl .left-box.profile-details {
-		float: none;
-	}
-
-	/* Post
-	----------------------------------------*/
-	.rtl .postprofile, .rtl .postbody, .rtl .search .postbody {
-		float: none;
-	}
-
-	.rtl .post .postprofile {
-		border-width: 0 0 1px 0;
-	}
-
-	.rtl .postprofile dt, .rtl .postprofile dd.profile-rank, .rtl .search .postprofile dd {
-		margin: 0;
-	}
-
-	.rtl .postprofile .avatar {
-		margin-left: 5px;
-		margin-right: 0;
-	}
-
-	.rtl .has-profile .post-buttons {
-		left: 20px;
-	}
-
-	/* Forms
-	----------------------------------------*/
-	.rtl fieldset dt, .rtl fieldset.fields1 dt, .rtl fieldset.fields2 dt {
-		float: none;
-	}
-
-	.rtl fieldset dd, .rtl fieldset.fields1 dd, .rtl fieldset.fields2 dd {
-		margin-right: 20px;
-	}
-}
-
-@media only screen and (max-width: 550px), only screen and (max-device-width: 550px)
-{
-	/* .topiclist lists
-	----------------------------------------*/
-	.rtl ul.topiclist.forums dt {
-		margin-left: 0;
-	}
-
-	.rtl ul.topiclist.forums dt .list-inner {
-		margin-left: 0;
-	}
-}
-
-@media only screen and (max-width: 500px), only screen and (max-device-width: 500px)
-{
-	.rtl dl.details dt, .rtl dl.details dd {
-		float: none;
-		text-align: right;
-	}
-
-	.rtl dl.details dd {
-		margin-left: 0;
-		margin-right: 20px;
-	}
-
-	.captcha-panel dd.captcha {
-		margin-right: 0;
-	}
-	
-	.rtl p.responsive-center {
-		float: none;
-		text-align: center;
-		margin-bottom: 5px;
-	}
-}

@@ -1,0 +1,68 @@
+/* remove annoying yellow background in auto fill fields in Chrome */
+input:-webkit-autofill, input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px #fff inset;
+}
+
+.headerbar, .search-header, .navbar, .post, .panel, .cp-mini {
+	border:1px solid #cec7bd;
+}
+
+.forabg, .forumbg {
+	border:1px solid #dad7cb;
+}
+
+.headerbar {
+	border-top:none;
+}
+
+.site-description h1 a, .site-description h1 a:hover, .site-description h1 a:focus {
+	color:#1f1f1f;
+	text-decoration:none;
+} 
+
+/* Official phpBB Extension compatibility... */
+
+/* Board announcements */
+#phpbb_announcement {
+	border-radius:0 !important;
+	border:1px solid #cec7bd;
+}
+
+/* Board rules */
+.boardrules-container .content {
+	background:#fefefa;
+	border:1px solid #cec7bd;
+	padding:10px;
+}
+
+.boardrules-categories {
+	margin-top:43px !important;
+}
+
+.mini-panel {
+	background:#fefefa !important;
+	border:1px solid #cec7bd;
+	border-radius:0 !important;
+}
+
+/* Collapsible categories */
+a.collapse-hide, a.collapse-show {
+	-moz-border-radius:0 !important;
+	-webkit-border-radius:0 !important;
+	border-radius:0 !important;
+	left:-5px;
+}
+
+a.collapse-btn {
+	border-color:#cec7bd !important;
+	background-color:#fff !important;
+}
+
+a.collapse-btn:hover {
+	border-color:#4f7500 !important;
+	background-color:#eff9d0 !important
+}
+
+a.collapse-btn::after, a.collapse-btn::before {
+	border-color:#333 !important;
+}

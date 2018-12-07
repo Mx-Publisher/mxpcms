@@ -56,6 +56,16 @@ class mx_nothing
 */
 class session
 {
+	/** @var \phpbb\cache\driver\driver_interface */
+	protected $cache;
+	protected $mx_cache;
+	protected $language;
+	protected $request;
+	/** @var \phpbb\config\config */
+	protected $config;
+	/** @var \phpbb\db\driver\driver_interface */
+	protected $db; 
+	
 	var $cookie_data = array();
 	var $page = array();
 	var $data = array();
@@ -78,6 +88,35 @@ class session
 	var $timezone;
 	var $dst;
 
+	/**
+	 * @var string	ISO code of the default board language
+	 */
+	var $default_language;
+	var $default_language_name;
+	
+	var	$default_template_name = 'subsilver2';
+	var	$cloned_template_name = 'subSilver';
+	
+	var	$cloned_template_path;	
+	var	$default_template_path;
+	
+	/**
+	 * @var string	ISO code of the User's language
+	 */
+	var $user_language;
+	var $user_language_name;
+	
+	var $lang_iso = 'en';	
+	var $lang_dir = 'lang_english';
+	
+	protected $common_language_files_loaded;
+	
+	var $img_lang_dir = 'en';
+	var $lang_english_name = 'English';	
+	var $lang_local_name = 'English United Kingdom';
+	var $language_list = array();
+	var $debug_paths;
+
 	var $lang_name;
 	var $lang_id = false;
 	var $lang_path;
@@ -92,18 +131,55 @@ class session
 	function session()
 	{
 		global $mx_cache, $board_config, $db, $phpbb_root_path, $mx_root_path, $phpEx;
- 		
-		$this->cache = $mx_cache;
-		$this->config = $board_config;
-		$this->db = $db;
-		$this->user = $this;
-		$this->service_providers = array('user_id'	=> 1, 'session_id'	=> 0, 'provider'	=> '', 'oauth_token' => '');
-		$this->phpbb_root_path = $phpbb_root_path;
-		$this->mx_root_path = $mx_root_path;
-		$this->php_ext = $phpEx;
-
+		global $mx_request_vars, $template, $language;
 		
+		$this->cache				= $mx_cache;
+		$this->config				= $board_config;
+		$this->db                 	= $db;
+		$this->user               	= $this;
+		$this->service_providers = array('user_id' => 1, 'session_id' => 0, 'provider'	=> '', 'oauth_token' => '');
+		$this->phpbb_root_path = $phpbb_root_path;
+		$this->mx_root_path	= $mx_root_path;
+		$this->php_ext			= $phpEx;
+		$this->lang_path			= $mx_root_path . 'language/';
+		$this->request				= $mx_request_vars;
+		$this->template			= $template;
+		$this->language			= $language;
+
+		// Setup $this->db_tools
+		if (!class_exists('mx_db_tools') && !class_exists('tools'))
+		{
+			include_once($mx_root_path . 'includes/db/db_tools.' . $phpEx);
+		}
+		if (class_exists('mx_db_tools'))
+		{
+			$this->db_tools = new mx_db_tools($this->db);
+		}
+		elseif (class_exists('tools'))
+		{
+			$this->db_tools = new tools($this->db);
+		}
+		
+		$this->service_providers = array('user_id' => 1, 'session_id' => 0, 'provider' => '', 'oauth_token' => '');
+		$this->phpbb_root_path = $phpbb_root_path;
+		$this->php_ext = $phpEx;
+	
 		$this->lang_path = $mx_root_path . 'language/';
+		/*
+        $this->crawlers = new Crawlers();
+        $this->exclusions = new Exclusions();
+        $this->uaHttpHeaders = new Headers();
+
+        $this->compiledRegex = $this->compileRegex($this->crawlers->getAll());
+        $this->compiledExclusions = $this->compileRegex($this->exclusions->getAll());
+
+        $this->setHttpHeaders($headers);
+        $this->userAgent = $this->setUserAgent($userAgent);
+		*/
+		$this->lang_path = $phpbb_root_path . 'language/';
+		$this->load();
+		$this->setup();
+		$this->setup_style();
 
 	}
 	
@@ -122,7 +198,7 @@ class session
 		$this->session_begin();
 
 		// Redefine some MXP stylish userdata
-		//$this->data['session_logged_in'] = $this->data['user_id'] != ANONYMOUS ? 1 : 0;
+		$this->data['session_logged_in'] = $this->data['user_id'] != ANONYMOUS ? 1 : 0;
 
 		if ( $this->data['user_id'] == ANONYMOUS )
 		{
@@ -149,7 +225,7 @@ class session
 				$this->data['user_active'] = 1;
 			break;
 		}
-		
+
 		$this->data['session_id'] = $this->session_id;
 		$this->data['user_session_page'] = $this->data['session_page'];
 	}
@@ -235,13 +311,13 @@ class session
 
 		$page_array += array(
 			'page_name'			=> $page_name,
-			'page_dir'			=> $page_dir,
+			'page_dir'				=> $page_dir,
 
-			'query_string'		=> $query_string,
-			'script_path'		=> str_replace(' ', '%20', htmlspecialchars($script_path)),
-			'root_script_path'	=> str_replace(' ', '%20', htmlspecialchars($root_script_path)),
+			'query_string'			=> $query_string,
+			'script_path'				=> str_replace(' ', '%20', htmlspecialchars($script_path)),
+			'root_script_path'		=> str_replace(' ', '%20', htmlspecialchars($root_script_path)),
 
-			'page'				=> $page
+			'page'					=> $page
 		);
 
 		return $page_array;
@@ -507,6 +583,39 @@ class session
 								$this->leave_newly_registered();
 							}
 						}
+						
+						// Redefine some MXP stylish userdata
+						//$this->data['session_logged_in'] = $this->data['user_id'] != ANONYMOUS ? 1 : 0;
+
+						if ( $this->data['user_id'] == ANONYMOUS )
+						{
+							$this->data['user_type'] = -1;
+						}
+
+						switch ($this->data['user_type'])
+						{
+							case 3:
+								$this->data['user_level'] = 1;
+								$this->data['user_active'] = 1;
+							break;
+							case 0:
+								$this->data['user_level'] = 0;
+								$this->data['user_active'] = 1;
+							break;
+							case 1:
+							case 2:
+								$this->data['user_level'] = 0;
+								$this->data['user_active'] = 0;
+							break;
+							default:
+								global $phpbb_auth;
+								$this->data['user_level'] = $phpbb_auth->acl_get('a_') ? 1 : ($phpbb_auth->acl_get('m_') ? 2 : 0);
+								$this->data['user_active'] = 1;
+							break;
+						}
+
+						$this->data['session_id'] = $this->session_id;
+						$this->data['user_session_page'] = $this->data['session_page'];
 						// Redefine some MXP stylish userdata
 						$this->data['session_logged_in'] = $this->data['user_id'] != ANONYMOUS ? 1 : 0;
 						$this->data['is_registered'] = ($this->data['user_id'] != ANONYMOUS && ($this->data['user_type'] == USER_NORMAL || $this->data['user_type'] == USER_FOUNDER)) ? true : false;
@@ -691,7 +800,13 @@ class session
 
 		// Force user id to be integer...
 		$this->data['user_id'] = (int) $this->data['user_id'];
-
+		$this->data['session_id'] = $this->session_id;
+		$this->data['user_session_page'] = $this->data['session_page'];
+		// Redefine some MXP stylish userdata
+		$this->data['session_logged_in'] = $this->data['user_id'] != ANONYMOUS ? 1 : 0;
+		$this->data['is_registered'] = ($this->data['user_id'] != ANONYMOUS && ($this->data['user_type'] == USER_NORMAL || $this->data['user_type'] == USER_FOUNDER)) ? true : false;
+		$this->data['is_bot'] = (!$this->data['is_registered'] && $this->data['user_id'] != ANONYMOUS) ? true : false;
+		$this->data['user_lang'] = basename($this->data['user_lang']);
 		// At this stage we should have a filled data array, defined cookie u and k data.
 		// data array should contain recent session info if we're a real user and a recent
 		// session exists in which case session_id will also be set
@@ -1574,7 +1689,8 @@ class session
 		{
 			$board_config = $mx_cache->obtain_config(false);
 		}
-		$board_config['avatar_gallery_path'] = 'includes/shared/phpbb2/images/avatar/'; 
+		
+		$board_config['avatar_gallery_path'] = isset($board_config['avatar_gallery_path']) ? $board_config['avatar_gallery_path'] : 'images/avatars'; 
 		$board_config['user_timezone'] = !empty($board_config['user_timezone']) ? $board_config['user_timezone'] : $board_config['board_timezone'];
 		$this->data['user_dst'] = !empty($this->data['user_dst']) ? $this->data['user_dst'] : $this->data['user_timezone'];
 		$board_config['require_activation'] = 0;
@@ -1614,7 +1730,7 @@ class session
 		//
 		// Send a proper content-language to the output
 		//
-		$img_lang = $default_lang = ($this->data['user_lang']) ? $this->data['user_lang'] : $board_config['default_lang'];
+		$img_lang = $default_lang = $this->lang['default_lang'] = ($this->data['user_lang']) ? $this->data['user_lang'] : $board_config['default_lang'];
 
 		if ($this->data['user_id'] != ANONYMOUS)
 		{
@@ -1627,7 +1743,7 @@ class session
 			
 			if (!empty($this->data['user_lang']))
 			{
-				$default_lang = $phpBB2->phpbb_ltrim(basename($phpBB2->phpbb_rtrim($this->data['user_lang'])), "'");
+				$default_lang = mx_ltrim(basename(mx_rtrim($this->data['user_lang'])), "'");
 			}
 
 			if (!empty($this->data['user_dateformat']))
@@ -1648,7 +1764,7 @@ class session
 			$this->timezone = $board_config['board_timezone'] * 3600;
 			$this->dst = $board_config['board_dst'] * 3600;
 			
-			$default_lang = $phpBB2->phpbb_ltrim(basename($phpBB2->phpbb_rtrim($board_config['default_lang'])), "'");
+			$default_lang = mx_ltrim(basename(mx_rtrim($board_config['default_lang'])), "'");
 	
 			
 			/**
@@ -1714,11 +1830,11 @@ class session
 				}
 				$this->data['user_lang'] = $this->lang_name;
 			}
-			/*			
-			*/			
+			/*	
+			*/	
 		}
 		
-		// Shared phpBB2 lang files dir		
+		// Shared phpBB2 lang files dir
 		// Load vanilla phpBB2 lang files if is possible
 		$shared_phpbb2_path 	= $mx_root_path . 'includes/shared/phpbb2/';
 		$shared_phpbb3_path 	= $mx_root_path . 'includes/shared/phpbb3/';
@@ -1732,7 +1848,7 @@ class session
 				// For logged in users, try the board default language next
 				// Just in case we do fallback on $board_config['phpbb_lang']  
 				// Since $board_config['default_lang'] has been overwiten in function $mx_user->_init_userprefs()				
-				$default_lang = $phpBB2->phpbb_ltrim(basename($phpBB2->phpbb_rtrim($board_config['phpbb_lang'])), "'");			
+				$default_lang = mx_ltrim(basename(mx_rtrim($board_config['phpbb_lang'])), "'");			
 			}
 			else
 			{
@@ -1767,7 +1883,7 @@ class session
 		{
 			$sql = "UPDATE " . PORTAL_TABLE . " SET
 				default_lang = '" . $this->decode_lang($this->lang['default_lang']) . "'
-				WHERE portal_id = '1'";				
+				WHERE portal_id = '1'";
 
 			if (!($result = $db->sql_query($sql)))
 			{
@@ -1782,8 +1898,7 @@ class session
 		//$lang = &$this->lang;
 		$this->lang = &$lang;
 		//print_r($this->lang);
-		$this->user_lang = !empty($this->lang['USER_LANG']) ? $this->lang['USER_LANG'] : $this->encode_lang($this->lang_name);
-		$user_lang = $this->user_lang;
+		$user_lang = $this->user_lang = !empty($this->lang['USER_LANG']) ? $this->lang['USER_LANG'] : $this->encode_lang($this->lang_name);
 		
 		$this->user_language		= $this->encode_lang($this->lang_name);
 		$this->default_language		= $this->encode_lang($board_config['default_lang']);
@@ -1815,7 +1930,7 @@ class session
 		
 		//this line is issued on backend		
 		// Core Main Translation after shared phpBB keys so we can overwrite some settings
-		@include($mx_root_path . 'language/lang_' . $lang_english_name . '/lang_main.' . $phpEx);
+		include($mx_root_path . 'language/lang_' . str_replace('lang_', '', $lang_english_name) . '/lang_main.' . $phpEx);
 		
 		$board_config['default_lang'] = $default_lang;
 		$portal_config['default_lang'] = $default_lang;
@@ -1989,7 +2104,7 @@ class session
 		$phpbb_style_value = $style_value;
 		
 		// END Styles_Demo MOD 
-		if (isset($style_value))  
+		if (isset($style_value) && (intval($style_value) == 0))  
 		{
 			//Query phpBB style_name
 			$sql = "SELECT s.style_id, s.style_name, t.template_storedb, t.template_path, t.template_id, t.bbcode_bitfield, c.theme_path, c.theme_name, c.theme_storedb, c.theme_id, i.imageset_path, i.imageset_id, i.imageset_name
@@ -1997,7 +2112,7 @@ class session
 				WHERE s.style_active = 1 AND s.style_name = '$style_value'
 					AND t.template_id = s.template_id
 					AND c.theme_id = s.theme_id
-					AND i.imageset_id = s.imageset_id";					
+					AND i.imageset_id = s.imageset_id";
 			if(($result = $db->sql_query($sql)) && ($row = $db->sql_fetchrow($result)))
 			{
 				$style = $row['style_id'];
@@ -2007,7 +2122,7 @@ class session
 			{
 				mx_message_die(CRITICAL_ERROR, "Could not query database for phpbb_styles info style_name [$style]", "", __LINE__, __FILE__, $sql);
 			}
-		}		
+		}
 		elseif (intval($style) !== 0)
 		{
 			//Query phpBB style_id get from main style init. Should be correct and valid.
@@ -2187,7 +2302,7 @@ class session
 						$image_height = $image_width = 0;
 					}
 					
-					if (strpos($image_name, 'img_') === 0 && $image_filename)
+					if (strpos($image_name, '') === 0 && $image_filename)
 					{
 						$image_name = substr($image_name, 4);
 						$sql_ary[] = array(
@@ -3650,24 +3765,24 @@ class session
 	/**
 	* Specify/Get image name , extension
 	*/
-	function img_name_ext($img, $prefix = 'img_', $new_prefix = '', $type = 'filename')
+	function img_name_ext($img, $prefix = '', $new_prefix = '', $type = 'filename')
 	{	
 		if (strpos($img, '.') !== false)
 		{
 			// Nested img
 			$image_filename = $img;
 			$img_ext = substr(strrchr($image_filename, '.'), 1);
-			$img = basename($image_filename, '.' . $img_ext);			
+			$img = basename($image_filename, '.' . $img_ext);
 			
 			unset($img_name, $image_filename);
 		}
 		else
 		{
-			$img_ext = 'gif';			
+			$img_ext = 'gif';
 		}		
 		
 		switch ($type)
-		{						
+		{
 			case 'filename':
 				return $img . '.' . $img_ext;
 			break;
@@ -3704,10 +3819,11 @@ class session
 				$img_data = '';
 				return $img_data;
 			}
-
-			$img_data['src'] = PHPBB_URL . 'styles/' . $this->theme['imageset_path'] . '/imageset/' . ($this->img_array[$img]['image_lang'] ? $this->img_array[$img]['image_lang'] .'/' : '') . $this->img_array[$img]['image_filename'];
-			$img_data['width'] = $this->img_array[$img]['image_width'];
-			$img_data['height'] = $this->img_array[$img]['image_height'];
+			
+			$img_data['src'] = PHPBB_URL . 'styles/' . rawurlencode($this->theme['template_name'] ? $this->theme['template_name'] : str_replace('.css', '', $this->theme['head_stylesheet'])) . '/imageset/' . ($this->img_array[$img]['image_lang'] ? $this->img_array[$img]['image_lang'] .'/' : '') . $this->img_array[$img]['image_filename'];
+			//$img_data['src'] = PHPBB_URL . 'styles/' . $this->theme['imageset_path'] . '/imageset/' . ($this->img_array[$img]['image_lang'] ? $this->img_array[$img]['image_lang'] .'/' : '') . $this->img_array[$img]['image_filename'];
+			$img_data['width'] = isset($this->img_array[$img]['image_width']) ? $this->img_array[$img]['image_width'] : $width;
+			$img_data['height'] = isset($this->img_array[$img]['image_height']) ? $this->img_array[$img]['image_width'] : $width;
 		}
 
 		$alt = (!empty($this->lang[$alt])) ? $this->lang[$alt] : $alt;
@@ -3749,10 +3865,10 @@ class session
 	function img($img, $alt = '', $width = false, $suffix = '', $type = '')
 	{
 		static $imgs;
-		global $phpbb_root_path, $root_path, $theme;
+		global $phpbb_root_path, $mx_root_path, $theme, $board_config;
 		
 		$title = '';
-
+		$img_ext = 'gif'; 
 		if ($alt)
 		{
 			$alt = $this->lang($alt);
@@ -3766,7 +3882,7 @@ class session
 			$img_ext = substr(strrchr($image_filename, '.'), 1);
 			$img = basename($image_filename, '.' . $img_ext);
 			$this->img_array['image_filename'] = array(
-				'img_'.$img => $img . '.' . $img_ext,
+				''.$img => $img . '.' . $img_ext,
 			);			
 			unset($img_name, $image_filename);
 		}
@@ -3774,151 +3890,191 @@ class session
 		if ($width !== false)
 		{
 			$this->img_array['image_width'] = array(
-				'img_'.$img => $width,
-			);	
-		}		
-				
-		// print_r($this->img_array['image_filename']);
-		// array ( [img_forum_read] => forum_read.gif )
+				''.$img => $width,
+			);
+		}
+		
 		// Load phpBB Template configuration data
 		$current_template_path = $this->current_template_path;
 		$template_name = $this->template_name;
 		
-		//		
-		// - First try phpBB2 then phpBB3 template
-		//		
-		if ( file_exists($phpbb_root_path . $this->current_template_path . '/' . $this->template_name . '.cfg') )
+		//Replace $this->template_path with $this->style_path
+		$current_template_path = $this->style_path . $this->template_name;
+		$default_template_path = $this->style_path . $this->default_template_name;
+		$this->current_style_phpbb_path = $this->style_path . $this->template_name;	//new
+		$this->default_style_phpbb_path = $this->style_path . $this->default_style_name; //new
+		
+		/* Here we overwrite phpBB images from the template configuration file with images from database  */
+		if (!is_array($this->img_array))
 		{
-			@include($phpbb_root_path . $this->current_template_path . '/' . $this->template_name . '.cfg'); 
-			@define('TEMPLATE_CONFIG', true);
-			
-			//$img_keys = array_keys($images);
-			//$img_values = array_values($images);
-			
-			$rows = $this->image_rows($images);
-					
-			foreach ($rows as $row)
-			{
-				$row['image_filename'] = rawurlencode($row['image_filename']);
-				
-				if(empty($row['image_name']))
-				{
-					//print_r('Your style configuration file has a typo! ');
-					//print_r($phpbb_root_path . $this->current_template_path . '/' . $this->template_name . '.cfg ');			
-					//print_r($row);
-					$row['image_name'] = 'spacer.gif';
-				}
-				/** 
-				* Now check for the correct existance of all of the images into
-				* each image of a prosilver based style. 
-				*/
-				$this->img_array[$row['image_name']] = $row;				
-			}	
-		}		
-		else if ( file_exists($phpbb_root_path . $current_template_path  . '/theme/stylesheet.css') )
-		{		
-			@define('TEMPLATE_CONFIG', true);
-			$current_template_images = $current_template_path . "/theme/images";
+			$this->img_array['image_filename'] = array(
+				'site_logo' => "logo.gif",
+				'upload_bar' => "upload_bar.gif",
+				'icon_contact_aim' => "icon_aim.gif",
+				'icon_contact_email' => "icon_email.gif",
+				'icon_contact_icq' => "icon_icq_add.gif",
+				'icon_contact_jabber' => "icon_jabber.gif",
+				'icon_contact_msnm' => "icon_msnm.gif",
+				'icon_contact_pm' => "icon_pm.gif",
+				'icon_contact_yahoo' => "icon_yim.gif",
+				'icon_contact_www' => "icon_www.gif",
+				'icon_post_delete' => "icon_delete.gif",
+				'icon_post_edit' => "icon_edit.gif",
+				'icon_post_info' => "icon_info.gif",
+				'icon_post_quote' => "icon_quote.gif",
+				'icon_post_report' => "icon_report.gif",
+				'icon_user_online' => "icon_online.gif",
+				'icon_user_offline' => "icon_offline.gif",
+				'icon_user_profile' => "icon_profile.gif",
+				'icon_user_search' => "icon_search.gif",
+				'icon_user_warn' => "icon_warn.gif",
+				'button_pm_forward' => "reply.gif",
+				'button_pm_new' => "msg_newpost.gif",
+				'button_pm_reply' => "reply.gif",
+				'button_topic_locked' => "msg_newpost.gif",
+				'button_topic_new' => "post.gif",
+				'button_topic_reply' => "reply.gif",
+				'forum_link' => "forum_link.gif",
+				'forum_read' => "forum_read.gif",
+				'forum_read_locked' => "forum_read_locked.gif",
+				'forum_read_subforum' => "forum_read_subforum.gif",
+				'forum_unread' => "forum_unread.gif",
+				'forum_unread_locked' => "forum_unread_locked.gif",
+				'forum_unread_subforum' => "forum_unread_subforum.gif",
+				'topic_moved' => "topic_moved.gif",
+				'topic_read' => "topic_read.gif",
+				'topic_read_mine' => "topic_read_mine.gif",
+				'topic_read_hot' => "topic_read_hot.gif",
+				'topic_read_hot_mine' => "topic_read_hot_mine.gif",
+				'topic_read_locked' => "topic_read_locked.gif",
+				'topic_read_locked_mine' => "topic_read_locked_mine.gif",
+				'topic_unread' => "topic_unread.gif",
+				'topic_unread_mine' => "topic_unread_mine.gif",
+				'topic_unread_hot' => "topic_unread_hot.gif",
+				'topic_unread_hot_mine' => "topic_unread_hot_mine.gif",
+				'topic_unread_locked' => "topic_unread_locked.gif",
+				'topic_unread_locked_mine' => "topic_unread_locked_mine.gif",
+				'sticky_read' => "sticky_read.gif",
+				'sticky_read_mine' => "sticky_read_mine.gif",
+				'sticky_read_locked' => "sticky_read_locked.gif",
+				'sticky_read_locked_mine' => "ticky_read_locked_mine.gif",
+				'sticky_unread' => "sticky_unread.gif",
+				'sticky_unread_mine' => "sticky_unread_mine.gif",
+				'sticky_unread_locked' => "sticky_unread_locked.gif",
+				'sticky_unread_locked_mine' => "sticky_unread_locked_mine.gif",
+				'announce_read' => "announce_read.gif",
+				'announce_read_mine' => "announce_read_mine.gif",
+				'announce_read_locked' => "announce_read_locked.gif",
+				'announce_read_locked_mine' => "announce_read_locked_mine.gif",
+				'announce_unread' => "announce_unread.gif",
+				'announce_unread_mine' => "announce_unread_mine.gif",
+				'announce_unread_locked' => "announce_unread_locked.gif",
+				'announce_unread_locked_mine' => "announce_unread_locked_mine.gif",
+				'global_read' => "announce_read.gif",
+				'global_read_mine' => "announce_read_mine.gif",
+				'global_read_locked' => "announce_read_locked.gif",
+				'global_read_locked_mine' => "announce_read_locked_mine.gif",
+				'global_unread' => "announce_unread.gif",
+				'global_unread_mine' => "announce_unread_mine.gif",
+				'global_unread_locked' => "announce_unread_locked.gif",
+				'global_unread_locked_mine' => "announce_unread_locked_mine.gif",
+				'subforum_read' => "", 
+				'subforum_unread' => "",
+				'pm_read' => "topic_read.gif",
+				'pm_unread' => "topic_unread.gif",
+				'icon_back_top' => "",
+				'icon_post_target' => "icon_post_target.gif",
+				'icon_post_target_unread' => "icon_post_target_unread.gif",
+				'icon_topic_attach' => "icon_topic_attach.gif",
+				'icon_topic_latest' => "icon_topic_latest.gif",
+				'icon_topic_newest' => "icon_topic_newest.gif",
+				'icon_topic_reported' => "icon_topic_reported.gif",
+				'icon_topic_unapproved' => "icon_topic_unapproved.gif"
+			);
 		}
 		
+		$this->img_array['image_lang'] = array(
+			'icon_post_edit' => $this->img_lang,
+			'icon_post_quote' => $this->img_lang,
+			'button_pm_forward' => $this->img_lang,
+			'button_pm_new' => $this->img_lang,
+			'button_pm_reply' => $this->img_lang,
+			'button_topic_new' => $this->img_lang,
+			'button_topic_reply' => $this->img_lang
+		);
+		
+		//Setup current style path for phpBB3 styles
+		$img_data = &$imgs[$img];
+		$current_template_path = $this->current_template_path;
+		$template_name = $this->template_name;
+		
+		//Setup cloned style as prosilver based for phpBB3 styles
+		if ( @file_exists(@mx_realpath($phpbb_root_path . $this->style_path . $this->template_name . '/style.cfg')) )
+		{
+			$cfg = mx_parse_cfg_file($phpbb_root_path . $this->style_path . $this->template_name . '/style.cfg');
+			$this->cloned_template_name = !empty($cfg['parent']) ? $cfg['parent'] : 'prosilver';
+			$this->cloned_template_path = $this->template_path . $this->cloned_template_name;
+			$this->cloned_style_phpbb_path = $cloned_template_path = $this->style_path . $this->cloned_template_name;
+			//$this->default_template_name = !empty($cfg['parent']) ? $cfg['parent'] : 'prosilver';
+		}
+		
+		//
+		// - First try phpBB3 template
+		//
+		if ( file_exists($phpbb_root_path . $this->style_path . $this->template_name  . '/theme/stylesheet.css') )
+		{
+			@define('TEMPLATE_CONFIG', true);
+			$current_template_images = $phpbb_root_path . $this->style_path . $this->template_name . "/theme/images";
+		}
+		
+		
+		//
+		// Load phpBB Template configuration data
+		// - First try current template
+		//
+		if ( is_dir( $phpbb_root_path . $this->current_template_path . "/" ) )
+		{
+			$current_template_path = $this->current_template_path;
+			$template_name = $this->template_name;
+		}
+
 		//
 		// Since we have no current Template Config file, try the cloned template instead
 		//
-		if ( file_exists($phpbb_root_path . $this->cloned_current_template_path . '/' . $this->cloned_template_name . '.cfg') && !defined('TEMPLATE_CONFIG') )
+		if ( is_dir( $phpbb_root_path . $this->cloned_current_template_path . "/" ) && !defined('TEMPLATE_CONFIG') )
 		{
 			$current_template_path = $this->cloned_current_template_path;
 			$template_name = $this->cloned_template_name;
-
-			@include($phpbb_root_path . $this->cloned_current_template_path . '/' . $this->cloned_template_name . '.cfg');
-			
-			$rows = $this->image_rows($images);
-					
-			foreach ($rows as $row)
-			{
-				$row['image_filename'] = rawurlencode($row['image_filename']);
-				
-				if(empty($row['image_name']))
-				{
-					print_r('Your style configuration file has a typo! ');
-					print_r($phpbb_root_path . $this->current_template_path . '/' . $this->template_name . '.cfg ');			
-					print_r($row);
-				}
-				/** 
-				* Now check for the correct existance of all of the images into
-				* each image of a prosilver based style. 
-				*/
-				$this->img_array[$row['image_name']] = $row;				
-			}	
 		}
-		
+
 		//
 		// Last attempt, use default template intead
 		//
-		if ( file_exists($phpbb_root_path . $this->default_current_template_path . '/' . $this->default_template_name . '.cfg') && !defined('TEMPLATE_CONFIG') )
+		if ( is_dir( $phpbb_root_path . $this->default_current_template_path . "/" ) && !defined('TEMPLATE_CONFIG') )
 		{
 			$current_template_path = $this->default_current_template_path;
 			$template_name = $this->default_template_name;
+		}
 
-			@include($phpbb_root_path . $this->default_current_template_path . '/' . $this->default_template_name . '.cfg');
-			
-			$rows = $this->image_rows($images);
-					
-			foreach ($rows as $row)
-			{
-				$row['image_filename'] = rawurlencode($row['image_filename']);
-				
-				if(empty($row['image_name']))
-				{
-					print_r('Your style configuration file has a typo! ');
-					print_r($phpbb_root_path . $this->current_template_path . '/' . $this->template_name . '.cfg ');			
-					print_r($row);
-				}
-				/** 
-				* Now check for the correct existance of all of the images into
-				* each image of a prosilver based style. 
-				*/
-				$this->img_array[$row['image_name']] = $row;				
-			}			
-		}		
+		$this->img_lang = (file_exists($phpbb_root_path . $current_template_path . $this->lang_name)) ? $this->lang_name : $board_config['default_lang'];		
 		
-		//		
-		// - First try phpBB2 then phpBB3 template lang images then old Olympus image sets
-		// default language		
-		if ( file_exists($phpbb_root_path . $current_template_path . '/images/lang_' . $this->default_language_name . '/') )
+		$img_data = &$imgs[$img];
+		
+		
+		//
+		// - First try phpBB3 template lang images then old Olympus image sets
+		// default language
+		if ( file_exists($phpbb_root_path . $current_template_path . '/theme/' . $this->default_language . '/') )
 		{
-			$this->img_lang = $this->default_language_name;
-		}		
-		else if ( file_exists($phpbb_root_path . $current_template_path  . '/theme/images/lang_' . $this->default_language_name . '/') )
-		{		
-			$this->img_lang = $this->default_language_name;
-		}		
-		else if ( file_exists($phpbb_root_path . $current_template_path  . '/theme/images/' . $this->default_language . '/') )
-		{		
 			$this->img_lang = $this->default_language;
 		}
-		else if ( file_exists($phpbb_root_path . $current_template_path  . '/theme/imageset/' . $this->default_language . '/') )
-		{		
-			$this->img_lang = $this->default_language;
-		}		
-		
-		//		
-		// - First try phpBB2 then phpBB3 template lang images then old Olympus image sets
-		// user language		
-		if ( file_exists($phpbb_root_path . $current_template_path . '/images/lang_' . $this->user_language_name . '/') )
+		else if ( file_exists($phpbb_root_path . $this->cloned_template_path  . '/theme/' . $this->default_language . '/') )
 		{
-			$this->img_lang = $this->user_language_name;
-		}		
-		else if ( file_exists($phpbb_root_path . $current_template_path  . '/theme/images/lang_' . $this->user_language_name . '/') )
-		{		
-			$this->img_lang = $this->user_language_name;
-		}		
-		else if ( file_exists($phpbb_root_path . $current_template_path  . '/theme/images/' . $this->user_language . '/') )
-		{		
-			$this->img_lang = $this->user_language;
+			$this->img_lang = $this->default_language;
 		}
-		else if ( file_exists($phpbb_root_path . $current_template_path  . '/theme/imageset/' . $this->user_language . '/') )
-		{		
-			$this->img_lang = $this->user_language;
+		else if ( file_exists($phpbb_root_path . $this->default_template_name  . '/theme/' . $this->default_language . '/') )
+		{
+			$this->img_lang = $this->default_language;
 		}
 		
 		if (empty($this->img_array))
@@ -3933,45 +4089,54 @@ class session
 				}
 			*/
 			trigger_error('NO_STYLE_DATA', E_USER_ERROR);
-		}		
-					
+		}
+		
 		$img_data = &$this->img_array['image_filename'][$img];
 		
 		if (empty($img_data))
-		{		
-			if (!isset($this->img_array['image_filename']['img_'.$img]) && !isset($this->img_array['image_filename'][$img]))
+		{
+			if (!isset($this->img_array['image_filename'][''.$img]) && !isset($this->img_array['image_filename'][$img]))
 			{
 				// Do not fill the image to let designers decide what to do if the image is empty
 				$img_data = '';
 				return $img_data;
 			}
 			
-			if (isset($this->img_array['image_lang']['img_'.$img]) && isset($this->img_array['image_lang'][$img]))
+			//
+			// - First try phpBB3 template theme images then template lang images
+			//
+			if (isset($this->img_array['image_lang'][''.$img]))
 			{
-				//		
-				// - First try phpBB2 then phpBB3 template lang images
-				//		
-				if ( file_exists($phpbb_root_path . $current_template_path . '/images/' . $this->img_array['image_lang']['img_'.$img] . '/') )
+				if ( file_exists($phpbb_root_path . $this->style_path . $this->template_name . '/theme/' . $this->img_array['image_lang'][''.$img] . '/'. (!empty($this->img_array['image_filename'][''.$img]) ? $this->img_array['image_filename'][''.$img] : $img . '.' . $img_ext)) )
 				{
-					$current_template_images = $current_template_path . '/images/' . $this->img_array['image_lang']['img_'.$img];
-				}		
-				else if ( file_exists($phpbb_root_path . $current_template_path  . '/theme/images/' . $this->img_array['image_lang']['img_'.$img] . '/') )
-				{		
-					$current_template_images = $current_template_path . '/theme/images/' . $this->img_array['image_lang']['img_'.$img];
+					$current_template_images = $this->style_path . $this->template_name . '/theme/' . $this->img_array['image_lang'][''.$img];
 				}
-				else if ( file_exists($phpbb_root_path . $current_template_path  . '/theme/images/' . $this->encode_lang($this->lang_name) . '/') )
-				{		
-					$current_template_images = $current_template_path  . '/theme/images/' . $this->encode_lang($this->lang_name);
+				else if ( file_exists($phpbb_root_path . $this->style_path . $this->template_name  . '/imageset/' . $this->img_array['image_lang'][''.$img] . '/'. (!empty($this->img_array['image_filename'][''.$img]) ? $this->img_array['image_filename'][''.$img] : $img . '.' . $img_ext)) )
+				{
+					$current_template_images = $this->style_path . $this->template_name . '/imageset/' . $this->img_array['image_lang'][''.$img];
 				}
-				else if ( file_exists($phpbb_root_path . $current_template_path  . '/theme/imageset/' . $this->encode_lang($this->lang_name) . '/') )
-				{		
-					$current_template_images = $current_template_path  . '/theme/imageset/' . $this->encode_lang($this->lang_name);
-				}				
 			}
 			
-			$img_data['src'] = PHPBB_URL . $current_template_images  . '/' . (!empty($this->img_array['image_filename']['img_'.$img]) ? $this->img_array['image_filename']['img_'.$img] : $this->img_array['image_filename'][$img]);
-			$img_data['width'] = !empty($height) ? $height : (!empty($this->img_array['image_width']) ? (!empty($this->img_array['image_width']['img_'.$img]) ? $this->img_array['image_width']['img_'.$img] : (!empty($this->img_array['image_width'][$img]) ? $this->img_array['image_width'][$img] : 47)) : 47);
-			$img_data['height'] = !empty($height) ? $height : (!empty($this->img_array['image_height']) ? (!empty($this->img_array['image_width']['img_'.$img]) ? $this->img_array['image_height']['img_'.$img] : (!empty($this->img_array['image_height'][$img]) ? $this->img_array['image_height'][$img] : 47)) : 47);
+			if ( file_exists($phpbb_root_path . $this->style_path . $this->template_name  . '/imageset/' . (!empty($this->img_array['image_filename'][''.$img]) ? $this->img_array['image_filename'][''.$img] : $img . '.' . $img_ext)) )
+			{
+				$current_template_images = $this->style_path . $this->template_name  . '/imageset/';
+			}
+			elseif ( file_exists($phpbb_root_path . $this->style_path . $this->template_name  . '/imageset/' . $this->encode_lang($this->lang_name) . '/'. (!empty($this->img_array['image_filename'][''.$img]) ? $this->img_array['image_filename'][''.$img] : $img . '.' . $img_ext)) )
+			{
+				$current_template_images = $this->style_path . $this->template_name  . '/imageset/' . $this->encode_lang($this->lang_name);
+			}
+			else if ( file_exists($phpbb_root_path . $this->style_path . $this->template_name  . '/theme/images/' . (!empty($this->img_array['image_filename'][''.$img]) ? $this->img_array['image_filename'][''.$img] : $img . '.' . $img_ext)) )
+			{
+				$current_template_images = $this->style_path . $this->template_name  . '/theme/images/';
+			}
+			else if ( file_exists($phpbb_root_path . $this->style_path . $this->template_name  . '/theme/' . $this->encode_lang($this->lang_name) . '/'. (!empty($this->img_array['image_filename'][''.$img]) ? $this->img_array['image_filename'][''.$img] : $img . '.' . $img_ext)) )
+			{
+				$current_template_images = $this->style_path . $this->template_name  . '/theme/' . $this->encode_lang($this->lang_name);
+			}
+			
+			$img_data['src'] = PHPBB_URL . $current_template_images  . '/' . (!empty($this->img_array['image_filename'][''.$img]) ? $this->img_array['image_filename'][''.$img] : $img . '.' . $img_ext);
+			$img_data['width'] = !empty($width) ? $width : (!empty($this->img_array['image_width']) ? (!empty($this->img_array['image_width'][''.$img]) ? $this->img_array['image_width'][''.$img] : (!empty($this->img_array['image_width'][$img]) ? $this->img_array['image_width'][$img] : 47)) : 47);
+			$img_data['height'] = !empty($width) ? $width : (!empty($this->img_array['image_height']) ? (!empty($this->img_array['image_width'][''.$img]) ? $this->img_array['image_height'][''.$img] : (!empty($this->img_array['image_height'][$img]) ? $this->img_array['image_height'][$img] : 47)) : 47);
 		}
 		
 		$alt = (!empty($this->lang[$alt])) ? $this->lang[$alt] : $alt;
@@ -3991,13 +4156,13 @@ class session
 			case 'height':
 				return $img_data['height'];
 			break;
-							
+			
 			case 'filename':
 				return $img . '.' . $img_ext;
 			break;
 			
-			case 'class':			
-			case 'name':		
+			case 'class':
+			case 'name':
 				return $img;
 			break;
 			
@@ -4013,9 +4178,9 @@ class session
 				return '<img src="' . $img_data['src'] . '"' . (($use_width) ? ' width="' . $use_width . '"' : '') . (($img_data['height']) ? ' height="' . $img_data['height'] . '"' : '') . ' alt="' . $alt . '" title="' . $alt . '" />';
 			break;
 			
-			case 'html':			
-			default:		
-				return '<span class="imageset ' . $img . '"' . $title . '>' . $alt . '</span>';						
+			case 'html':	
+			default:
+				return '<span class="imageset ' . $img . '"' . $title . '>' . $alt . '</span>';
 			break;
 		}
 	}
@@ -4034,13 +4199,21 @@ class session
 	function mx_img($img, $alt = '', $width = false, $suffix = '', $type = 'full_tag')
 	{
 		static $imgs;
-		global $phpbb_root_path, $mx_root_path, $mx_images;
+		global $phpbb_root_path, $mx_root_path, $mx_images, $board_config;
+		
+		$template_name = $this->template_name;
+		
+		//Replace $this->template_path with $this->style_path
+		$current_template_path = $this->style_path . $this->template_name;
+		$default_template_path = $this->style_path . $this->default_template_name;
+		$this->current_style_phpbb_path = $this->style_path . $this->template_name;	//new
+		$this->default_style_phpbb_path = $this->style_path . $this->default_style_name; //new
 		
 		//
 		// Load phpBB Template configuration data
 		// - First try current template
 		//
-		if ( file_exists( $phpbb_root_path . $this->current_template_path . "/images" ) )
+		if ( is_dir( $phpbb_root_path . $this->current_template_path . "/" ) )
 		{
 			$current_template_path = $this->current_template_path;
 			$template_name = $this->template_name;
@@ -4051,7 +4224,7 @@ class session
 		//
 		// Since we have no current Template Config file, try the cloned template instead
 		//
-		if ( file_exists( $phpbb_root_path . $this->cloned_current_template_path . "/images" ) && !defined('TEMPLATE_CONFIG') )
+		if ( is_dir( $phpbb_root_path . $this->cloned_current_template_path . "/" ) && !defined('TEMPLATE_CONFIG') )
 		{
 			$current_template_path = $this->cloned_current_template_path;
 			$template_name = $this->cloned_template_name;
@@ -4062,7 +4235,7 @@ class session
 		//
 		// Last attempt, use default template intead
 		//
-		if ( file_exists( $phpbb_root_path . $this->default_current_template_path . "/images" ) && !defined('TEMPLATE_CONFIG') )
+		if ( is_dir( $phpbb_root_path . $this->default_current_template_path . "/" ) && !defined('TEMPLATE_CONFIG') )
 		{
 			$current_template_path = $this->default_current_template_path;
 			$template_name = $this->default_template_name;
@@ -4073,100 +4246,101 @@ class session
 		$this->img_lang = (file_exists($phpbb_root_path . $current_template_path . $this->lang_name)) ? $this->lang_name : $board_config['default_lang'];		
 
 		/* Here we overwrite phpBB images from the template configuration file with images from database  */
-		
-		$this->img_array['image_filename'] = array(
-			'img_site_logo' => "logo.gif",
-			'img_upload_bar' => "upload_bar.gif",
-			'img_icon_contact_aim' => "icon_aim.gif",
-			'img_icon_contact_email' => "icon_email.gif",
-			'img_icon_contact_icq' => "icon_icq_add.gif",
-			'img_icon_contact_jabber' => "icon_jabber.gif",
-			'img_icon_contact_msnm' => "icon_msnm.gif",
-			'img_icon_contact_pm' => "icon_pm.gif",
-			'img_icon_contact_yahoo' => "icon_yim.gif",
-			'img_icon_contact_www' => "icon_www.gif",
-			'img_icon_post_delete' => "icon_delete.gif",
-			'img_icon_post_edit' => "icon_edit.gif",
-			'img_icon_post_info' => "icon_info.gif",
-			'img_icon_post_quote' => "icon_quote.gif",
-			'img_icon_post_report' => "icon_report.gif",
-			'img_icon_user_online' => "icon_online.gif",
-			'img_icon_user_offline' => "icon_offline.gif",
-			'img_icon_user_profile' => "icon_profile.gif",
-			'img_icon_user_search' => "icon_search.gif",
-			'img_icon_user_warn' => "icon_warn.gif",
-			'img_button_pm_forward' => "reply.gif",
-			'img_button_pm_new' => "msg_newpost.gif",
-			'img_button_pm_reply' => "reply.gif",
-			'img_button_topic_locked' => "msg_newpost.gif",
-			'img_button_topic_new' => "post.gif",
-			'img_button_topic_reply' => "reply.gif",
-			'img_forum_link' => "forum_link.gif",
-			'img_forum_read' => "forum_read.gif",
-			'img_forum_read_locked' => "forum_read_locked.gif",
-			'img_forum_read_subforum' => "forum_read_subforum.gif",
-			'img_forum_unread' => "forum_unread.gif",
-			'img_forum_unread_locked' => "forum_unread_locked.gif",
-			'img_forum_unread_subforum' => "forum_unread_subforum.gif",
-			'img_topic_moved' => "topic_moved.gif",
-			'img_topic_read' => "topic_read.gif",
-			'img_topic_read_mine' => "topic_read_mine.gif",
-			'img_topic_read_hot' => "topic_read_hot.gif",
-			'img_topic_read_hot_mine' => "topic_read_hot_mine.gif",
-			'img_topic_read_locked' => "topic_read_locked.gif",
-			'img_topic_read_locked_mine' => "topic_read_locked_mine.gif",
-			'img_topic_unread' => "topic_unread.gif",
-			'img_topic_unread_mine' => "topic_unread_mine.gif",
-			'img_topic_unread_hot' => "topic_unread_hot.gif",
-			'img_topic_unread_hot_mine' => "topic_unread_hot_mine.gif",
-			'img_topic_unread_locked' => "topic_unread_locked.gif",
-			'img_topic_unread_locked_mine' => "topic_unread_locked_mine.gif",
-			'img_sticky_read' => "sticky_read.gif",
-			'img_sticky_read_mine' => "sticky_read_mine.gif",
-			'img_sticky_read_locked' => "sticky_read_locked.gif",
-			'img_sticky_read_locked_mine' => "ticky_read_locked_mine.gif",
-			'img_sticky_unread' => "sticky_unread.gif",
-			'img_sticky_unread_mine' => "sticky_unread_mine.gif",
-			'img_sticky_unread_locked' => "sticky_unread_locked.gif",
-			'img_sticky_unread_locked_mine' => "sticky_unread_locked_mine.gif",
-			'img_announce_read' => "announce_read.gif",
-			'img_announce_read_mine' => "announce_read_mine.gif",
-			'img_announce_read_locked' => "announce_read_locked.gif",
-			'img_announce_read_locked_mine' => "announce_read_locked_mine.gif",
-			'img_announce_unread' => "announce_unread.gif",
-			'img_announce_unread_mine' => "announce_unread_mine.gif",
-			'img_announce_unread_locked' => "announce_unread_locked.gif",
-			'img_announce_unread_locked_mine' => "announce_unread_locked_mine.gif",
-			'img_global_read' => "announce_read.gif",
-			'img_global_read_mine' => "announce_read_mine.gif",
-			'img_global_read_locked' => "announce_read_locked.gif",
-			'img_global_read_locked_mine' => "announce_read_locked_mine.gif",
-			'img_global_unread' => "announce_unread.gif",
-			'img_global_unread_mine' => "announce_unread_mine.gif",
-			'img_global_unread_locked' => "announce_unread_locked.gif",
-			'img_global_unread_locked_mine' => "announce_unread_locked_mine.gif",
-			'img_subforum_read' => "", 
-			'img_subforum_unread' => "",
-			'img_pm_read' => "topic_read.gif",
-			'img_pm_unread' => "topic_unread.gif",
-			'img_icon_back_top' => "",
-			'img_icon_post_target' => "icon_post_target.gif",
-			'img_icon_post_target_unread' => "icon_post_target_unread.gif",
-			'img_icon_topic_attach' => "icon_topic_attach.gif",
-			'img_icon_topic_latest' => "icon_topic_latest.gif",
-			'img_icon_topic_newest' => "icon_topic_newest.gif",
-			'img_icon_topic_reported' => "icon_topic_reported.gif",
-			'img_icon_topic_unapproved' => "icon_topic_unapproved.gif"			
-		);
-		
+		if (!is_array($this->img_array))
+		{
+			$this->img_array['image_filename'] = array(
+				'site_logo' => "logo.gif",
+				'upload_bar' => "upload_bar.gif",
+				'icon_contact_aim' => "icon_aim.gif",
+				'icon_contact_email' => "icon_email.gif",
+				'icon_contact_icq' => "icon_icq_add.gif",
+				'icon_contact_jabber' => "icon_jabber.gif",
+				'icon_contact_msnm' => "icon_msnm.gif",
+				'icon_contact_pm' => "icon_pm.gif",
+				'icon_contact_yahoo' => "icon_yim.gif",
+				'icon_contact_www' => "icon_www.gif",
+				'icon_post_delete' => "icon_delete.gif",
+				'icon_post_edit' => "icon_edit.gif",
+				'icon_post_info' => "icon_info.gif",
+				'icon_post_quote' => "icon_quote.gif",
+				'icon_post_report' => "icon_report.gif",
+				'icon_user_online' => "icon_online.gif",
+				'icon_user_offline' => "icon_offline.gif",
+				'icon_user_profile' => "icon_profile.gif",
+				'icon_user_search' => "icon_search.gif",
+				'icon_user_warn' => "icon_warn.gif",
+				'button_pm_forward' => "reply.gif",
+				'button_pm_new' => "msg_newpost.gif",
+				'button_pm_reply' => "reply.gif",
+				'button_topic_locked' => "msg_newpost.gif",
+				'button_topic_new' => "post.gif",
+				'button_topic_reply' => "reply.gif",
+				'forum_link' => "forum_link.gif",
+				'forum_read' => "forum_read.gif",
+				'forum_read_locked' => "forum_read_locked.gif",
+				'forum_read_subforum' => "forum_read_subforum.gif",
+				'forum_unread' => "forum_unread.gif",
+				'forum_unread_locked' => "forum_unread_locked.gif",
+				'forum_unread_subforum' => "forum_unread_subforum.gif",
+				'topic_moved' => "topic_moved.gif",
+				'topic_read' => "topic_read.gif",
+				'topic_read_mine' => "topic_read_mine.gif",
+				'topic_read_hot' => "topic_read_hot.gif",
+				'topic_read_hot_mine' => "topic_read_hot_mine.gif",
+				'topic_read_locked' => "topic_read_locked.gif",
+				'topic_read_locked_mine' => "topic_read_locked_mine.gif",
+				'topic_unread' => "topic_unread.gif",
+				'topic_unread_mine' => "topic_unread_mine.gif",
+				'topic_unread_hot' => "topic_unread_hot.gif",
+				'topic_unread_hot_mine' => "topic_unread_hot_mine.gif",
+				'topic_unread_locked' => "topic_unread_locked.gif",
+				'topic_unread_locked_mine' => "topic_unread_locked_mine.gif",
+				'sticky_read' => "sticky_read.gif",
+				'sticky_read_mine' => "sticky_read_mine.gif",
+				'sticky_read_locked' => "sticky_read_locked.gif",
+				'sticky_read_locked_mine' => "ticky_read_locked_mine.gif",
+				'sticky_unread' => "sticky_unread.gif",
+				'sticky_unread_mine' => "sticky_unread_mine.gif",
+				'sticky_unread_locked' => "sticky_unread_locked.gif",
+				'sticky_unread_locked_mine' => "sticky_unread_locked_mine.gif",
+				'announce_read' => "announce_read.gif",
+				'announce_read_mine' => "announce_read_mine.gif",
+				'announce_read_locked' => "announce_read_locked.gif",
+				'announce_read_locked_mine' => "announce_read_locked_mine.gif",
+				'announce_unread' => "announce_unread.gif",
+				'announce_unread_mine' => "announce_unread_mine.gif",
+				'announce_unread_locked' => "announce_unread_locked.gif",
+				'announce_unread_locked_mine' => "announce_unread_locked_mine.gif",
+				'global_read' => "announce_read.gif",
+				'global_read_mine' => "announce_read_mine.gif",
+				'global_read_locked' => "announce_read_locked.gif",
+				'global_read_locked_mine' => "announce_read_locked_mine.gif",
+				'global_unread' => "announce_unread.gif",
+				'global_unread_mine' => "announce_unread_mine.gif",
+				'global_unread_locked' => "announce_unread_locked.gif",
+				'global_unread_locked_mine' => "announce_unread_locked_mine.gif",
+				'subforum_read' => "", 
+				'subforum_unread' => "",
+				'pm_read' => "topic_read.gif",
+				'pm_unread' => "topic_unread.gif",
+				'icon_back_top' => "",
+				'icon_post_target' => "icon_post_target.gif",
+				'icon_post_target_unread' => "icon_post_target_unread.gif",
+				'icon_topic_attach' => "icon_topic_attach.gif",
+				'icon_topic_latest' => "icon_topic_latest.gif",
+				'icon_topic_newest' => "icon_topic_newest.gif",
+				'icon_topic_reported' => "icon_topic_reported.gif",
+				'icon_topic_unapproved' => "icon_topic_unapproved.gif"
+			);
+		}
 		$this->img_array['image_lang'] = array(
-			'img_icon_post_edit' => $this->img_lang,
-			'img_icon_post_quote' => $this->img_lang,
-			'img_button_pm_forward' => $this->img_lang,
-			'img_button_pm_new' => $this->img_lang,
-			'img_button_pm_reply' => $this->img_lang,
-			'img_button_topic_new' => $this->img_lang,
-			'img_button_topic_reply' => $this->img_lang		
+			'icon_post_edit' => $this->img_lang,
+			'icon_post_quote' => $this->img_lang,
+			'button_pm_forward' => $this->img_lang,
+			'button_pm_new' => $this->img_lang,
+			'button_pm_reply' => $this->img_lang,
+			'button_topic_new' => $this->img_lang,
+			'button_topic_reply' => $this->img_lang
 		);
 		
 		$img_data = &$imgs[$img];
@@ -4179,8 +4353,38 @@ class session
 				$img_data = '';
 				return $img_data;
 			}
-
-			$img_data['src'] = PHPBB_URL . $current_template_path . ($this->img_array[$img]['image_lang'] ? $this->img_array[$img]['image_lang'] .'/' : '') . $this->img_array[$img]['image_filename'];
+			if (!isset($this->img_array['image_filename'][''.$img]) && !isset($this->img_array['image_filename'][$img]))
+			{
+				// Do not fill the image to let designers decide what to do if the image is empty
+				$img_data = '';
+				return $img_data;
+			}
+			
+			if (isset($this->img_array['image_lang'][''.$img]) && isset($this->img_array['image_lang'][$img]))
+			{
+				//		
+				// - First try phpBB2 then phpBB3 template lang images
+				//		
+				if ( file_exists($phpbb_root_path . $current_template_path . '/images/' . $this->img_array['image_lang'][''.$img] . '/') )
+				{
+					$current_template_images = $current_template_path . '/images/' . $this->img_array['image_lang'][''.$img];
+				}		
+				else if ( file_exists($phpbb_root_path . $current_template_path  . '/theme/images/' . $this->img_array['image_lang'][''.$img] . '/') )
+				{		
+					$current_template_images = $current_template_path . '/theme/images/' . $this->img_array['image_lang'][''.$img];
+				}
+				else if ( file_exists($phpbb_root_path . $current_template_path  . '/theme/images/' . $this->encode_lang($this->lang_name) . '/') )
+				{		
+					$current_template_images = $current_template_path  . '/theme/images/' . $this->encode_lang($this->lang_name);
+				}
+				else if ( file_exists($phpbb_root_path . $current_template_path  . '/theme/imageset/' . $this->encode_lang($this->lang_name) . '/') )
+				{		
+					$current_template_images = $current_template_path  . '/theme/imageset/' . $this->encode_lang($this->lang_name);
+				}				
+			}
+			
+			$img_data['src'] = PHPBB_URL . $current_template_images  . '/' . (!empty($this->img_array['image_filename'][''.$img]) ? $this->img_array['image_filename'][''.$img] : $this->img_array['image_filename'][$img]);
+			//$img_data['src'] = PHPBB_URL . $current_template_path . ($this->img_array[$img]['image_lang'] ? $this->img_array[$img]['image_lang'] .'/' : '') . $this->img_array[$img]['image_filename'];
 			$img_data['width'] = (!empty($width)) ? $width : ''; //$this->img_array[$img]['image_width'];
 			$img_data['height'] = (!empty($height)) ? $height : ''; //$this->img_array[$img]['image_height'];
 		}

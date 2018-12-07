@@ -36,16 +36,23 @@ if( !function_exists('add_search_words') )
 * Start session, user and style (template + theme) management
 * - populate $userdata, $lang, $theme, $images and initiate $template.
 */
-$mx_user->init($user_ip, PAGE_INDEX);
+$mx_user->init($user_ip, PAGE_ACP);
+
+/*
+* Initiate user style (template + theme) management
+* - populate $theme, $images and initiate $template.
+*/
+$mx_user->init_style();
+
 
 if ( !$userdata['session_logged_in'] )
 {
-	//mx_redirect(mx_append_sid("login.php?redirect=admin/index.$phpEx", true));
+	mx_redirect(mx_append_sid("login.php?redirect=admin/index.$phpEx", true));
 }
 
 if ( !($userdata['user_level'] == ADMIN) )
 {
-	//mx_message_die(GENERAL_MESSAGE, $lang['Not_admin']);
+	mx_message_die(GENERAL_MESSAGE, $lang['Not_admin']);
 }
 
 // Ensure $mx_user->session_id is populated...
@@ -58,12 +65,12 @@ if ($mx_request_vars->get('sid', MX_TYPE_NO_TAGS) != $mx_user->session_id)
 	$url = preg_replace('/\?$/', '', $url);
 	$url .= ((strpos($url, '?')) ? '&' : '?') . 'sid=' . $mx_user->session_id;
 
-	mx_redirect($url);
+	mx_redirect(PORTAL_URL . $url);
 }
 
 if (!$userdata['session_admin'])
 {
-	//mx_redirect(mx_append_sid("login.php?redirect=admin/index.$phpEx&admin=1", true));
+	mx_redirect(mx_append_sid("login.php?redirect=admin/index.$phpEx&admin=1", true));
 }
 
 if( empty($no_page_header) )

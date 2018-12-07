@@ -1422,6 +1422,7 @@ class tools
 	*/
 	function _sql_run_sql($statements)
 	{
+
 		if ($this->return_statements)
 		{
 			return $statements;
@@ -1445,7 +1446,7 @@ class tools
 		}
 		if (!($result))
 		{		
-			message_die(GENERAL_ERROR, "",  '<br /><br />SQL Error : ' . $this->db->sql_error('')['code'] . ' ' . $this->db->sql_error('')['message'] . ' <br />' . $sql, true, __LINE__, __FILE__, $sql);
+			mx_message_die(GENERAL_ERROR, "",  '<br /><br />SQL Error : ' . $this->db->sql_error('')['code'] . ' ' . $this->db->sql_error('')['message'] . ' <br />' . $sql, true, __LINE__, __FILE__, $sql);
 		}
 		return true;
 	}
@@ -2211,7 +2212,7 @@ class tools
 	{
 		$statements = array();
 
-		$table_prefix = substr(CONFIG_TABLE, 0, -6); // strlen(config)
+		$table_prefix = substr(PORTAL_TABLE, 0, -6); // strlen(config)
 		if (strlen($table_name . $index_name) - strlen($table_prefix) > 24)
 		{
 			$max_length = strlen($table_prefix) + 24;

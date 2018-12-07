@@ -948,7 +948,7 @@ for($page_count = -1; $page_count < $total_pages; $page_count++)
 			$block_order = $block_rows[$block]['block_order'];
 			$editor_name_tmp = mx_get_userdata($mx_block->editor_id);
 			$editor_name = $editor_name_tmp['username'];
-			$edit_time = phpBB2::create_date( $board_config['default_dateformat'], $mx_block->block_time, $board_config['board_timezone'] );
+			$edit_time = $phpBB2->create_date( $board_config['default_dateformat'], $mx_block->block_time, $board_config['board_timezone'] );
 
 			$mode = MX_PAGE_BLOCK_TYPE;
 			$deletemode = '?mode=' . $mode . '&amp;action=' . MX_DO_DELETE . '&amp;id=' . $block_id . '&amp;column_id=' . $column_id . '&amp;block_order=' . $block_order;

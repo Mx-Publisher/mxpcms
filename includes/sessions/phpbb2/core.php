@@ -1933,7 +1933,7 @@ class mx_backend
 	{
 		global $db, $mx_root_path, $phpbb_root_path, $userdata, $mx_user, $lang, $images, $phpEx;
 		global $board_config, $gen_simple_header, $layouttemplate, $mx_page, $phpBB2;
-		
+		//$images = $mx_user->images;
 		/**********/
 		$layouttemplate = isset($layouttemplate) ? $layouttemplate : "";
 		// If MX-Publisher frame template is not set, instantiate it

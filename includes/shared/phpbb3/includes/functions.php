@@ -941,13 +941,15 @@ function phpbb_is_absolute($path)
 	return (isset($path[0]) && $path[0] == '/' || preg_match('#^[a-z]:[/\\\]#i', $path)) ? true : false;
 }
 
+if (!function_exists('phpbb_own_realpath'))
+{
 /**
 * @author Chris Smith <chris@project-minerva.org>
 * @copyright 2006 Project Minerva Team
 * @param string $path The path which we should attempt to resolve.
 * @return mixed
 */
-function phpbb_own_realpath($path)
+function phpbb_own_realpath2($path)
 {
 	global $request;
 
@@ -1099,6 +1101,7 @@ function phpbb_own_realpath($path)
 	}
 
 	return $resolved; // We got here, in the end!
+}
 }
 
 /*

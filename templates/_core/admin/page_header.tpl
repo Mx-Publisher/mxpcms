@@ -4,10 +4,10 @@
 {META}
 <meta http-equiv="Content-Type" content="text/html; charset={S_CONTENT_ENCODING}" />
 <title>{SITENAME} - {L_MX_ADMIN}</title>
-
+<!-- IF PHPBB -->
 <!-- First load standard template *.css definition, located in the the phpbb template folder -->
-<link href="{T_STYLESHEET_LINK}" rel="stylesheet" type="text/css" />
-<link href="{T_STYLESHEET_LANG_LINK}" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="{U_PHPBB_ROOT_PATH}{TEMPLATE_ROOT_PATH}{T_PHPBB_STYLESHEET}" type="text/css" >
+<!-- ENDIF -->
 <!-- Then load MX-Publisher template *.css definition for mx, located in the the portal template folder -->
 <link rel="stylesheet" href="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}{T_MXBB_STYLESHEET}" type="text/css" >
 <link rel="stylesheet" href="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}admin/admin.css" type="text/css" >

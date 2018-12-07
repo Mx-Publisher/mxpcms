@@ -1207,12 +1207,12 @@ function get_mxbb_info($config)
 	}
 	return array(
 		'dbms'				=> $dbms,
-		'dbhost'			=> $dbhost,
+		'dbhost'				=> $dbhost,
 		'dbname'			=> $dbname,
-		'dbuser'			=> $dbuser,
+		'dbuser'				=> $dbuser,
 		'dbpasswd'			=> $dbpasswd,
 		'mx_table_prefix'	=> $mx_table_prefix,
-		'dbcharacter_set'	=> (defined('DB_CHARACTER_SET') ? DB_CHARACTER_SET : ''),		
+		'dbcharacter_set'	=> (defined('DB_CHARACTER_SET') ? DB_CHARACTER_SET : ''),
 		'status'			=> (defined('MX_INSTALLED') && (MX_INSTALLED === true)) ? true : false,
 	);
 }

@@ -324,7 +324,6 @@ li.breadcrumbs span:first-child > a {
 
 /* Notification mark read link */
 .rtl .dropdown-extended a.mark_read {
-	border-radius: 0 3px 3px 0;
 	left: 0;
 	right: auto;
 }
@@ -924,7 +923,6 @@ li.breadcrumbs span:first-child > a {
 .rtl .search-box .inputbox {
 	border-left-width: 0;
 	border-right-width: 1px;
-	border-radius: 0 4px 4px 0;
 	float: right;
 	padding: 3px;
 }
@@ -935,14 +933,12 @@ li.breadcrumbs span:first-child > a {
 }
 
 .rtl .button-search-end {
-	border-radius: 4px 0 0 4px;
 	border-left-width: 1px;
 	border-right-width: 0;
 }
 
 .rtl .search-header .button-search-end {
 	border: 0;
-	border-radius: 4px 0 0 4px;
 }
 
 .rtl .search-header {

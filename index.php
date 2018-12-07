@@ -193,18 +193,18 @@ for( $column = 0; $column < $mx_page->total_column; $column++ )
 						if ((@include $module_root_path . $mx_block->block_file) === false)
 						{
 							$module_root_path = $mx_root_path . $mx_block->module_root_path;
-							//this will fix the path				
+							//this will fix the path	
 							if ((@include $module_root_path . $mx_block->block_file) === false)
 							{
-								$module_root_path = $mx_block->module_root_path;			
+								$module_root_path = $mx_block->module_root_path;
 								if (!is_dir($module_root_path . $mx_block->block_file . '/'))
-								{								
+								{
 									include($module_root_path . $mx_block->block_file);
-								}																		
-							}												
-						}					
+								}
+							}
+						}
 						$mx_block->block_contents = ob_get_contents();
-					}					
+					}
 					else
 					{
 						$mx_block->block_contents = $mx_block->init_error_msg;
@@ -284,11 +284,11 @@ for( $column = 0; $column < $mx_page->total_column; $column++ )
 				//
 				// Switch: show Block header -------------------------------------------------------------------
 				//
-				if ( $mx_block->auth_view && $mx_block->show_block && $mx_block->module_root_path != 'modules/mx_phpbb/' || $mx_block->auth_mod )
+				if ( $mx_block->auth_view && $mx_block->show_block && $mx_block->module_root_path != 'modules/mx_forum/' && $mx_block->module_root_path != 'modules/mx_phpbb/' && $mx_block->module_root_path != 'modules/mx_phpbb3/' || $mx_block->auth_mod )
 				{
 					$layouttemplate->assign_block_vars('layout_column.blocks.block_header', array());
 				}
-
+				
 				//
 				// Output some subblock wrappers
 				//
@@ -299,16 +299,19 @@ for( $column = 0; $column < $mx_page->total_column; $column++ )
 						if ( $subblock == 0 )
 						{
 							$layouttemplate->assign_block_vars('layout_column.blocks.sub_start', array());
-							$inner_space = '';
+							$inner_space = $sub_inner_space = '';
 						}
 						else
 						{
-							$inner_space = '<td width="'.$mx_parent_block->sub_inner_space.'">&nbsp;</td>';
+							$inner_space = '<td width="'. $mx_parent_block->sub_inner_space .'">&nbsp;</td>';
+							$sub_inner_space = $mx_parent_block->sub_inner_space;
 						}
-
+						$block_size = $mx_parent_block->sub_block_sizes[$subblock];
 						$layouttemplate->assign_block_vars('layout_column.blocks.sub_col', array(
 							'INNER_SPACE' => $inner_space,
-							'BLOCK_SIZE' => $mx_parent_block->sub_block_sizes[$subblock]
+							'SUB_INNER_SPACE' => $sub_inner_space,
+							'BLOCK_SIZE' => $mx_parent_block->sub_block_sizes[$subblock],
+							'BLOCK_SIZES' => ($mx_block->block_sizes !== '100%') ? $mx_block->block_sizes : $mx_parent_block->sub_block_sizes[$subblock]
 						));
 
 						if ( intval($subblock + 1) == $total_subs )
@@ -316,6 +319,10 @@ for( $column = 0; $column < $mx_page->total_column; $column++ )
 							$layouttemplate->assign_block_vars('layout_column.blocks.sub_end', array());
 						}
 					}
+				}
+				else //if ($mx_block->module_root_path = 'modules/mx_navmenu/')
+				{
+					//$block_size = ($mx_block->block_sizes !== '100%') ? $mx_block->block_sizes : '100%';
 				}
 
 			} // for ... subblocks
@@ -347,7 +354,7 @@ include($mx_root_path . 'includes/page_header.' . $phpEx);
 $layouttemplate->pparse('mx_main_layout');
 
 $template->assign_vars(array(
-	'PORTAL'			=> defined('IN_PORTAL') ? true : false,		
+	'PORTAL'	=> defined('IN_PORTAL') ? true : false,
 	'PORTAL_INDEX_PAGE'	=> ($portal_config['main_layout']) ? true : false,
 ));
 

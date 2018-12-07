@@ -40,8 +40,8 @@ define('DEBUG_EXTRA', true); // [Admin Option] Show memory usage. Show link to f
 define('INCLUDES', 'includes/'); //Main Includes folder
 @ini_set('display_errors', '1');
 //@error_reporting(E_ERROR | E_WARNING | E_PARSE); // This will NOT report uninitialized variables
-//@error_reporting(E_ALL & ~E_NOTICE); //Default error reporting in PHP 5.2+
-error_reporting(E_ALL | E_NOTICE | E_STRICT);
+@error_reporting(E_ALL & ~E_NOTICE); //Default error reporting in PHP 5.2+
+//error_reporting(E_ALL | E_NOTICE | E_STRICT);
 @session_cache_expire (1440);
 @set_time_limit (1500);
 // Report all errors, except notices and deprecation messages
@@ -347,12 +347,20 @@ if (@phpversion() >= '5.1.2')
 * Instantiate the mx_request_vars class
 * make sure to do before it's ever used
 */
-$mx_request_vars = new mx_request_vars();
+$mx_request_vars = new mx_request_vars('', false);
 
 /*
 * Instantiate the mx_cache class
 */
 $mx_cache = new mx_cache();
+
+// this is needed to prevent unicode normalization
+$super_globals_disabled = $mx_request_vars->super_globals_disabled();
+// enable super globals to get literal value
+if (!$super_globals_disabled)
+{
+	//$request->disable_super_globals();
+}
 
 /*
 * Define Users/Group/Sessions backend, and validate
@@ -400,6 +408,11 @@ unset($dbpasswd);
 // Instantiate the mx_mod_rewrite class (if activated)
 //
 $mx_cache->init_mod_rewrite();
+
+//
+// Instantiate the mx_auth class
+//
+$mx_auth = $phpbb_auth =new phpbb_auth();
 
 //
 // Instantiate the mx_user class

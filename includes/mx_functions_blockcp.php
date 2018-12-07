@@ -61,7 +61,7 @@ class mx_blockcp extends mx_block
 	 */
 	function _controlpanel($id, $new_block = false)
 	{
-		global $blockcptemplate, $lang, $db, $board_config, $theme, $phpEx, $mx_root_path, $s_hidden_fields, $userdata, $cookie_states, $module_nav_icon_url, $portalpage, $mx_request_vars, $images, $mx_backend;
+		global $blockcptemplate, $lang, $db, $board_config, $theme, $phpEx, $mx_root_path, $s_hidden_fields, $mx_user, $userdata, $cookie_states, $module_nav_icon_url, $portalpage, $mx_request_vars, $images, $mx_backend;
 
 		$is_admin = ( $userdata['user_level'] == ADMIN && $userdata['session_logged_in'] ) ? TRUE : 0;
 
@@ -72,44 +72,45 @@ class mx_blockcp extends mx_block
 		{
 			die('Invalid block panel call - no id');
 		}
-		
+
 		// Main parameters
-		$block_keys = array( 'block_title' => 'block_title', 'block_desc' => 'block_desc', 'show_block' => 'show_block', 'show_title' => 'show_title', 'show_stats' => 'show_stats');
-		
+		$block_keys = array( 'block_title' => 'block_title', 'block_desc' => 'block_desc', 'block_size' => 'block_sizes', 'show_block' => 'show_block', 'show_title' => 'show_title', 'show_stats' => 'show_stats');
+
 		// General
 		$mode_general = MX_BLOCK_TYPE;
 		$mode_permissions = MX_BLOCK_PRIVATE_TYPE;
 		$mode_settings = MX_BLOCK_SETTINGS_TYPE;
-		
+
 		$block_id = $id;
 		$module_id = $mx_request_vars->is_request('module_id') ? $mx_request_vars->request('module_id', MX_TYPE_INT, 0) : mx_parent_data($block_id, 'module_id');
 		$function_id = $mx_request_vars->is_request('function_id') ? $mx_request_vars->request('function_id', MX_TYPE_INT, 0) : mx_parent_data($block_id, 'function_id');
-		
+
 		// Define auth constants
 		$block_auth_fields = array('auth_view', 'auth_edit');	// , 'auth_delete'
-		
+
 		$block_auth_ary = array(
 			'auth_view'		=> AUTH_ALL,
 			'auth_edit'		=> AUTH_ADMIN,
 		);
-		
+
 		$block_auth_levels = array('ALL', 'REG', 'PRIVATE', 'MOD', 'ADMIN', 'ANONYMOUS');
 		$block_auth_const = array(AUTH_ALL, AUTH_REG, AUTH_ACL, AUTH_MOD, AUTH_ADMIN, AUTH_ANONYMOUS);
 		$field_names = array(
 			'auth_view'		=> $lang['View'],
 			'auth_edit'		=> $lang['Edit'],
 		);
-		
+
 		// Update block
 		$action = MX_DO_UPDATE;
 		$buttonvalue = $lang['Update'];
-		
+
 		$block_title = $mx_request_vars->post($block_keys['block_title'], MX_TYPE_NO_TAGS, $this->$block_keys['block_title']);
 		$block_desc = $mx_request_vars->post($block_keys['block_desc'], MX_TYPE_NO_TAGS, $this->$block_keys['block_desc']);
+		$block_sizes = $mx_request_vars->post($block_keys['block_size'], MX_TYPE_NO_TAGS, $this->$block_keys['block_size']);
 		$show_block = $mx_request_vars->post($block_keys['show_block'], MX_TYPE_INT, $this->$block_keys['show_block']);
 		$show_title = $mx_request_vars->post($block_keys['show_title'],MX_TYPE_INT, $this->$block_keys['show_title']);
 		$show_stats = $mx_request_vars->post($block_keys['show_stats'], MX_TYPE_INT, $this->$block_keys['show_stats']);
-		
+
 		// Add block
 		$action_add = MX_DO_INSERT;
 		$buttonvalue_add = $lang['Create_block'];
@@ -122,11 +123,10 @@ class mx_blockcp extends mx_block
 
 		$show_stats_yes_add = '';
 		$show_stats_no_add = 'checked="checked"';
-		
+
 		// Now get started
 		$functionlist = get_list_formatted('function_list', $function_id, '', '', true);
 
-		
 		/*
 		* Populate missing parameters (if any)
 		*
@@ -139,11 +139,10 @@ class mx_blockcp extends mx_block
 			mx_message_die(GENERAL_ERROR, "Couldn't insert parameter information", "", __LINE__, __FILE__, $sql);
 		}
 		*/
-		
+
 		// Hidden fields
-		$s_hidden_fields .= 	'<input type="hidden" name="mode" value="' . $this->blockcp_mode . '" />
-								<input type="hidden" name="action" value="' . $action . '" />';
-								
+		$s_hidden_fields .= '<input type="hidden" name="mode" value="' . $this->blockcp_mode . '" /><input type="hidden" name="action" value="' . $action . '" />';
+
 		$show_title_yes = ( $show_title == 1 ) ? 'checked="checked"' : '';
 		$show_title_no = ( $show_title == 0 ) ? 'checked="checked"' : '';
 
@@ -152,10 +151,10 @@ class mx_blockcp extends mx_block
 
 		$show_stats_yes = ( $show_stats == 1 ) ? 'checked="checked"' : '';
 		$show_stats_no = ( $show_stats == 0 ) ? 'checked="checked"' : '';
-		
+
 		// Define some graphics
 		$module_nav_icon_url = PORTAL_URL . $images['mx_graphics']['admin_icons'] . '/';
-		
+
 		$admin_icon['contract'] = $module_nav_icon_url . 'contract.gif';
 		$admin_icon['expand'] = $module_nav_icon_url . 'expand.gif';
 
@@ -167,119 +166,121 @@ class mx_blockcp extends mx_block
 		$admin_icon['page'] = $module_nav_icon_url . 'icon_block.gif'; 
 
 		// JS
-		$cookie_tmp = $board_config['cookie_name'].'_adminBlockCP_mode';
-		$cookie_blockCP = !empty($_COOKIE[$cookie_tmp]) ? $_COOKIE[$cookie_tmp] : 'settings';
+		$cookie_tmp 			= $board_config['cookie_name'].'_adminBlockCP_mode';
+		$cookie_blockCP		= !empty($_COOKIE[$cookie_tmp]) ? $_COOKIE[$cookie_tmp] : 'settings';
 
 		// Send General Vars to template
-		$visible_general_add = $cookie_blockCP == 'general_add';
-		$visible_general = $cookie_blockCP == 'general';
-		$visible_settings = $cookie_blockCP == 'settings';
-		$visible_private = $cookie_blockCP == 'private';
-		$visible_delete = $cookie_blockCP == 'delete';
-		
+		$visible_general_add 		= $cookie_blockCP 		== 'general_add';
+		$visible_general 			= $cookie_blockCP 		== 'general';
+		$visible_settings 			= $cookie_blockCP 		== 'settings';
+		$visible_private 			= $cookie_blockCP 		== 'private';
+		$visible_delete 			= $cookie_blockCP 		== 'delete';
+
 		$blockcptemplate->assign_vars(array(
-			'VISIBLE_GENERAL_ADD' 				=> $visible_general_add ? 'block' : 'none',
+			'VISIBLE_GENERAL_ADD' 			=> $visible_general_add ? 'block' : 'none',
 			'VISIBLE_GENERAL' 					=> $visible_general ? 'block' : 'none',
 			'VISIBLE_SETTINGS' 					=> $visible_settings ? 'block' : 'none',
-			'VISIBLE_PRIVATE' 					=> $visible_private ? 'block' : 'none',
-			'VISIBLE_DELETE' 					=> $visible_delete ? 'block' : 'none',
-			'IMG_URL_GENERAL_ADD' 				=> $visible_general_add ? $admin_icon['contract'] : $admin_icon['expand'],
+			'VISIBLE_PRIVATE' 						=> $visible_private ? 'block' : 'none',
+			'VISIBLE_DELETE' 						=> $visible_delete ? 'block' : 'none',
+			'IMG_URL_GENERAL_ADD' 			=> $visible_general_add ? $admin_icon['contract'] : $admin_icon['expand'],
 			'IMG_URL_GENERAL' 					=> $visible_general ? $admin_icon['contract'] : $admin_icon['expand'],
 			'IMG_URL_SETTINGS' 					=> $visible_settings ? $admin_icon['contract'] : $admin_icon['expand'],
 			'IMG_URL_PRIVATE' 					=> $visible_private ? $admin_icon['contract'] : $admin_icon['expand'],
 			'IMG_URL_DELETE' 					=> $visible_delete ? $admin_icon['contract'] : $admin_icon['expand'],
-			
+
 			'L_TITLE' => $lang['Block_admin'],
 			'L_EXPLAIN' => $lang['Block_admin_explain'],
-			
-			'SID'				=> $userdata['session_id'],
-			
+
+			'SID' => $userdata['session_id'],
+
 			// General
-			"L_ACTION" => t('Action'),
-			"L_DELETE" => $lang['Delete'],
-			"L_UPDATE" => $lang['Update'],
-			'L_SETTING' => $lang['Settings'],
-			'L_VIEW' => $lang['View'],
-			"L_EDIT" => $lang['Edit'],
-			"L_ADD" => $lang['Create_parameter'],
-			'L_YES' => $lang['Yes'],
-			'L_NO' => $lang['No'],
-			
-			'L_SETTING' => isset($l_setting) ? $l_setting : $lang['Block_cp'],
-			'L_DELETE' => $lang['Delete'],
-			'L_EDIT' => $lang['Edit'],
-			
-			'L_AUTH_TITLE' => $lang['Auth_Block'],
-			'L_AUTH_TITLE_EXPLAIN' => $lang['Auth_Block_explain'],
-			'L_FUNCTION' => $lang['Function'],
-			
-			'L_BLOCK_TITLE' 	=> $lang['Block_title'],
-			'L_BLOCK_DESC' 		=> $lang['Block_desc'],
-			'L_SHOW_BLOCK' 		=> $lang['Show_block'],
+			"L_ACTION" 	=> t('Action'),
+			"L_DELETE" 	=> $lang['Delete'],
+			"L_UPDATE" 	=> $lang['Update'],
+			'L_SETTING' 	=> $lang['Settings'],
+			'L_VIEW' 		=> $lang['View'],
+			"L_EDIT" 		=> $lang['Edit'],
+			"L_ADD" 		=> $lang['Create_parameter'],
+			'L_YES' 			=> $lang['Yes'],
+			'L_NO' 			=> $lang['No'],
+
+			'L_SETTING' 		=> isset($l_setting) ? $l_setting : $lang['Block_cp'],
+			'L_DELETE' 		=> $lang['Delete'],
+			'L_EDIT' 			=> $lang['Edit'],
+
+			'L_AUTH_TITLE' 					=> $lang['Auth_Block'],
+			'L_AUTH_TITLE_EXPLAIN'	=> $lang['Auth_Block_explain'],
+			'L_FUNCTION'					=> $lang['Function'],
+
+			'L_BLOCK_TITLE' 				=> $lang['Block_title'],
+			'L_BLOCK_DESC' 				=> $lang['Block_desc'],
+			'L_BLOCK_SIZE' 					=> !empty($mx_user->lang['Block_size']) ? $mx_user->lang['Block_size'] : 'Block_size',
+			'L_SHOW_BLOCK' 				=> $lang['Show_block'],
 			'L_SHOW_BLOCK_EXPLAIN' => $lang['Show_block_explain'],
-			'L_SHOW_TITLE' 		=> $lang['Show_title'],
-			'L_SHOW_TITLE_EXPLAIN' => $lang['Show_title_explain'],
-			'L_SHOW_STATS' 		=> $lang['Show_stats'],
-			'L_SHOW_STATS_EXPLAIN' => $lang['Show_stats_explain'],
-			
-			'BLOCK_ID' => $block_id,
-			'BLOCK_TITLE' => '&nbsp;&nbsp;' . $block_title,
-			'BLOCK_DESC' => ( $block_desc != '' ) ? ' - ' . $block_desc : '',
-			
+			'L_SHOW_TITLE' 				=> $lang['Show_title'],
+			'L_SHOW_TITLE_EXPLAIN' 	=> $lang['Show_title_explain'],
+			'L_SHOW_STATS' 				=> $lang['Show_stats'],
+			'L_SHOW_STATS_EXPLAIN'	=> $lang['Show_stats_explain'],
+
+			'BLOCK_ID' 		=> $block_id,
+			'BLOCK_TITLE' 	=> '&nbsp;&nbsp;' . $block_title,
+			'BLOCK_DESC' 	=> ( $block_desc != '' ) ? ' - ' . $block_desc : '',
+			'BLOCK_SIZE' 	=> ( $block_sizes != '' ) ? $block_sizes : '',
+
 			'U_BLOCK_SETTINGS' => mx_append_sid(PORTAL_URL . "admin/admin_mx_blockcp.$phpEx?block_id=$block_id"),
 			'U_BLOCK_DELETE' => mx_append_sid(PORTAL_URL . "admin/admin_mx_block.$phpEx?mode=delete_block&amp;block_id=$block_id"),
 			'U_BLOCK_PERMISSIONS' => mx_append_sid(PORTAL_URL . "admin/admin_mx_block_auth.$phpEx?cat_id=$block_id"),
-			
-			'E_BLOCK_TITLE' => $block_title,
-			'E_BLOCK_DESC' => $block_desc,
-			
-			'S_FUNCTION_LIST' => $functionlist,
-			
+
+			'E_BLOCK_TITLE' 		=> $block_title,
+			'E_BLOCK_DESC' 		=> $block_desc,
+			'E_BLOCK_SIZE' 			=> $block_sizes,
+			'S_FUNCTION_LIST' 	=> $functionlist,
+
 			// Update
 			'S_SHOW_BLOCK_YES' => $show_block_yes,
 			'S_SHOW_BLOCK_NO' => $show_block_no,
-			
+
 			'S_SHOW_TITLE_YES' => $show_title_yes,
 			'S_SHOW_TITLE_NO' => $show_title_no,
-			
+
 			'S_SHOW_STATS_YES' => $show_stats_yes,
 			'S_SHOW_STATS_NO' => $show_stats_no,
-			
+
 			// Add
 			'S_SHOW_BLOCK_YES_ADD' => $show_block_yes_add,
 			'S_SHOW_BLOCK_NO_ADD' => $show_block_no_add,
-			
+
 			'S_SHOW_TITLE_YES_ADD' => $show_title_yes_add,
 			'S_SHOW_TITLE_NO_ADD' => $show_title_no_add,
-			
+
 			'S_SHOW_STATS_YES_ADD' => $show_stats_yes_add,
 			'S_SHOW_STATS_NO_ADD' => $show_stats_no_add,
-			
+
 			'S_HIDDEN_FIELDS' => $s_hidden_fields,
 			'S_SUBMIT_UPDATE' => $buttonvalue,
 			'S_SUBMIT' => $lang['Update'],
-			
+
 			'L_GROUPS' 		=> $lang['Usergroups'],
 			'L_IS_MODERATOR' 	=> t('Is_Moderator'),
-			
+
 			// Graphics
 			'IMG_URL_CONTRACT' => $admin_icon['contract'],
 			'IMG_URL_EXPAND' => $admin_icon['expand'],
-			
+
 			'IMG_ICON_PAGE' => $admin_icon['page'],
 			'IMG_ICON_PAGE_COLUMN' => isset($admin_icon['page_column']) ? $admin_icon['page_column'] : 0,
 			'IMG_ICON_FUNCTION' => $admin_icon['function'],
 			'IMG_ICON_PARAMETER' => $admin_icon['parameter'],
 			'IMG_ICON_BLOCK' => $admin_icon['block'],
 			'IMG_ICON_EDIT_BLOCK' => $admin_icon['edit_block'],
-			
+
 			// Cookies
 			'COOKIE_NAME'	=> $board_config['cookie_name'],
 			'COOKIE_PATH'	=> $board_config['cookie_path'],
 			'COOKIE_DOMAIN'	=> $board_config['cookie_domain'],
 			'COOKIE_SECURE'	=> $board_config['cookie_secure'],
 		));
-		
+
 		// Hidden fields
 		$s_hidden_general_fields = 	'<input type="hidden" name="mode" value="' . $mode_general . '" />
 									<input type="hidden" name="action" value="' . $action . '" />
@@ -289,7 +290,7 @@ class mx_blockcp extends mx_block
 									<input type="hidden" name="dynamic_block" value="' . $dynamic_block_id . '" />
 									<input type="hidden" name="portalpage" value="' . $portalpage . '" />
 									<input type="hidden" name="sid" value="' . $userdata['session_id'] . '" />';
-									
+
 		$s_hidden_general_add_fields = 	'<input type="hidden" name="mode" value="' . $mode_general . '" />
 									<input type="hidden" name="action" value="' . MX_DO_INSERT . '" />
 									<input type="hidden" name="id" value="' . $function_id . '" />
@@ -298,7 +299,7 @@ class mx_blockcp extends mx_block
 									<input type="hidden" name="dynamic_block" value="' . $dynamic_block_id . '" />
 									<input type="hidden" name="portalpage" value="' . $portalpage . '" />
 									<input type="hidden" name="sid" value="' . $userdata['session_id'] . '" />';
-									
+
 		$s_hidden_permissions_fields = 	'<input type="hidden" name="mode" value="' . $mode_permissions . '" />
 									<input type="hidden" name="action" value="' . $action . '" />
 									<input type="hidden" name="id" value="' . $block_id . '" />
@@ -313,17 +314,17 @@ class mx_blockcp extends mx_block
 									<input type="hidden" name="virtual" value="' . $virtual_id . '" />
 									<input type="hidden" name="portalpage" value="' . $portalpage . '" />
 									<input type="hidden" name="sid" value="' . $userdata['session_id'] . '" />';
-									
+
 		// Get blockcp mode -> to set action file
 		$s_action_file = $this->blockcp_mode == 'mx_blockcp' ? $mx_root_path . 'modules/mx_coreblocks/mx_blockcp.' . $phpEx : $mx_root_path . 'admin/admin_mx_block_cp.' . $phpEx;
-		
+
 		$deletemode = '?mode=' . $mode_general . '&amp;action=' . MX_DO_DELETE . '&amp;id=' . $block_id . '&amp;module_id=' . $module_id . '&amp;function_id=' . $function_id . '&amp;portalpage=' . $portalpage. '&amp;sid=' . $userdata['session_id'];
-		
+
 		$message_delete = $lang['Delete_block'] . ' - ' . $block_title
 					. '<br /><br />' . $lang['Delete_block_explain']
 					. '<br /><br />' . sprintf($lang['Click_block_delete_yes'], '<a href="' . mx_append_sid($s_action_file . $deletemode) . '">', '</a>')
 					. '<br /><br />';
-					
+
 		// Activate BlockCP SubPanels, based on auth
 		if (($this->auth_mod || $is_admin) && !$new_block)
 		{
@@ -332,11 +333,11 @@ class mx_blockcp extends mx_block
 				'S_HIDDEN_FIELDS' => $s_hidden_general_fields,
 				'S_SUBMIT' => $buttonvalue
 			));
-			
+
 			// Some general blockcp settings are moderator only
 			$blockcptemplate->assign_block_vars('blockcp_general.is_mod', array());
 		}
-		
+
 		if ( ($is_admin ) || $new_block)
 		{
 			$blockcptemplate->assign_block_vars('blockcp_general_adds', array(
@@ -344,7 +345,7 @@ class mx_blockcp extends mx_block
 				'S_HIDDEN_FIELDS' => $s_hidden_general_add_fields,
 				'S_SUBMIT' => $buttonvalue_add
 			));
-			
+
 			// Output values of individual auth fields - add
 			for( $j = 0; $j < count($block_auth_fields); $j++ )
 			{
@@ -386,7 +387,7 @@ class mx_blockcp extends mx_block
 				'S_HIDDEN_FIELDS' => $s_hidden_permissions_fields,
 				'S_SUBMIT' => $buttonvalue
 			));
-			
+
 			// Some general blockcp settings are moderator only
 			$blockcptemplate->assign_block_vars('blockcp_general.is_auth', array());
 
@@ -417,7 +418,7 @@ class mx_blockcp extends mx_block
 					'S_AUTH_LEVELS_SELECT' => $custom_auth[$j]
 				));
 			}
-			
+
 			/*
 			* PRIVATE auth
 			*/
@@ -428,18 +429,18 @@ class mx_blockcp extends mx_block
 			{
 				mx_message_die(GENERAL_ERROR, 'Could not get group list', '', __LINE__, __FILE__, $sql);
 			}
-			
+
 			while( $row = $db->sql_fetchrow($result) )
 			{
 				$groupdata[] = $row;
 			}			
 			$db->sql_freeresult($result);
-			
+
 			$view_groups = @explode(',', $this->block_info['auth_view_group']);
 			$edit_groups = @explode(',', $this->block_info['auth_edit_group']);
 			$delete_groups = @explode(',', $this->block_info['auth_delete_group']);
 			$moderator_groups = @explode(',', $this->block_info['auth_moderator_group']);
-			
+
 			$row_private = '';
 			for( $i = 0; $i < $count = count($groupdata); $i++ )
 			{

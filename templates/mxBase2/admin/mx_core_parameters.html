@@ -1,0 +1,68 @@
+				<!-- Standard Block Parameter -->
+				<!-- BEGIN separator -->
+				<p title="{separator.PARAMETER_TYPE}{separator.PARAMETER_TYPE_INFO}">
+					<label>{separator.PARAMETER_TITLE}</label>: <span class="explain">{separator.PARAMETER_TITLE_EXPLAIN}</span>
+				</p>
+				<!-- END separator -->
+
+				<!-- BEGIN block_parameter -->
+				<dl title="{block_parameter.PARAMETER_TYPE}{block_parameter.PARAMETER_TYPE_INFO}">
+					<dt><label>{block_parameter.PARAMETER_TITLE}</label>:
+						<span class="explain">{block_parameter.PARAMETER_TITLE_EXPLAIN}</span></dt>
+					<dd>{block_parameter.PARAMETER_FIELD}</dd>
+				</dl>
+				<!-- END block_parameter -->
+
+				<!-- Custom Block Parameters -->
+
+				<!-- BEGIN radio -->
+				<dl title="{radio.FIELD_DESCRIPTION}">
+					<dt><label>{radio.PARAMETER_TITLE}</label>:
+						<span class="explain">{radio.PARAMETER_TITLE_EXPLAIN}</span></dt>
+					<dd>
+						<!-- BEGIN row -->
+						<label><input type="radio" name="{radio.FIELD_ID}" value="{radio.row.FIELD_VALUE}" class="radio" {radio.row.FIELD_SELECTED} /> {radio.row.FIELD_VALUE}</label>&nbsp;
+						<!-- END row -->
+					</dd>
+				</dl>
+				<!-- END radio -->
+
+				<!-- BEGIN select -->
+				<dl title="{select.FIELD_DESCRIPTION}">
+					<dt><label>{select.PARAMETER_TITLE}</label>:
+						<span class="explain">{select.PARAMETER_TITLE_EXPLAIN}</span></dt>
+					<dd>
+						<select name="{select.FIELD_ID}">
+						<!-- BEGIN row -->
+							<option value="{select.row.FIELD_VALUE}"{select.row.FIELD_SELECTED}>{select.row.FIELD_VALUE}</option>
+						<!-- END row -->
+						</select>
+					</dd>
+				</dl>
+				<!-- END select -->
+
+				<!-- BEGIN select_multiple -->
+				<dl title="{select_multiple.FIELD_DESCRIPTION}">
+					<dt><label>{select_multiple.PARAMETER_TITLE}</label>:
+						<span class="explain">{select_multiple.PARAMETER_TITLE_EXPLAIN}</span></dt>
+					<dd>
+						<select name="{select_multiple.FIELD_ID}[]" multiple="multiple" size="4">
+						<!-- BEGIN row -->
+							<option value="{select_multiple.row.FIELD_VALUE}"{select_multiple.row.FIELD_SELECTED}>{select_multiple.row.FIELD_VALUE}</option>
+						<!-- END row -->
+						</select>
+					</dd>
+				</dl>
+				<!-- END select_multiple -->
+
+				<!-- BEGIN checkbox -->
+				<dl title="{checkbox.FIELD_DESCRIPTION}">
+					<dt><label>{checkbox.PARAMETER_TITLE}</label>:
+						<span class="explain">{checkbox.PARAMETER_TITLE_EXPLAIN}</span></dt>
+					<dd>
+						<!-- BEGIN row -->
+						<input type="checkbox" name="{checkbox.FIELD_ID}[{checkbox.row.FIELD_VALUE}]" value="{checkbox.row.FIELD_VALUE}" {checkbox.row.FIELD_CHECKED}><span class="gensmall">{checkbox.row.FIELD_VALUE}</span>&nbsp;
+						<!-- END row -->
+					</dd>
+				</dl>
+				<!-- END checkbox -->

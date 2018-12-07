@@ -1,27 +1,35 @@
-<div class="forabg block">
-	<div class="inner">
-		<ul class="topiclist forums">
-		<!-- BEGIN no_row -->
-			<li class="row bg1">{no_row.L_NO_ITEMS}</li>
-		<!-- END no_row -->
-		<!-- BEGIN msg_row -->
-			<li class="row<!-- IF msg_row.S_ROW_COUNT is even --> bg1<!-- ELSE --> bg2<!-- ENDIF --><!-- IF msg_row.S_POST_ANNOUNCE --> announce<!-- ENDIF --><!-- IF msg_row.S_POST_STICKY --> sticky<!-- ENDIF --><!-- IF msg_row.S_TOPIC_REPORTED --> reported<!-- ENDIF -->">
-				<dl class="icon" style="width:100%">
-					<dt  style="background: transparent url('{msg_row.FOLDER_IMG}') no-repeat 3px 50%;padding-left: 40px;width:75%">
-						<a href="{msg_row.U_LAST_MSG}" class="topictitle">{msg_row.LAST_MSG}</a>
-						<br />
-						<span class="gensmall"><a href="{msg_row.U_FORUM}" title="{msg_row.FORUM_NAME_ALT}" class="gensmall">{msg_row.FORUM_NAME}</a></span>
-					</dt>
-					<dd class="lastpost" nowrap="nowrap" style=" white-space:nowrap;clear:both;width:99%;text-align:right;padding-right:5px;border-left: none">
-						{msg_row.LAST_MSG_DATE}
-						<br />
-						{msg_row.TOPIC_AUTHOR_FULL} {msg_row.LAST_POSTER_FULL}
-					</dd>
-				</dl>
-			</li>
-		<!-- END msg_row -->
-		</ul>
-	</div>
-	<div class="bg1">{PAGINATION}</div>
-	<span class="corners-bottom"><span></span></span>
-</div>
+<table width="{BLOCK_SIZE}" cellpadding="4" cellspacing="1" border="0" class="forumline" style="border-top:none;">
+	<!-- BEGIN no_row -->
+	<tr>
+		<td class="row1" align="left" colspan="2">{no_row.L_NO_ITEMS}</td>
+	</tr>
+	<!-- END no_row -->
+	<!-- BEGIN msg_row -->
+	<tr>
+		<td class="row2" align="center">
+			<span class="cattitle">
+				<img src="{msg_row.FOLDER_IMG}" width="19" height="18" alt="{msg_row.L_TOPIC_FOLDER_ALT}" title="{msg_row.L_TOPIC_FOLDER_ALT}" />
+			</span>
+		</td>
+		<td class="row1" align="{U_ALIGN}">
+			<span class="genmed">
+				<b><a href="{msg_row.U_LAST_MSG}" target="{U_TARGET}" title="{msg_row.LAST_MSG_ALT}" class="genmed">{msg_row.LAST_MSG}</a></b>
+			</span><br />
+			<span class="gensmall">
+				<a href="{msg_row.U_FORUM}" target="{U_TARGET}" title="{msg_row.FORUM_NAME_ALT}" class="gensmall">{msg_row.FORUM_NAME}</a>
+			</span>
+			<div align="right">
+				<span class="gensmall" nowrap="nowrap">
+					{msg_row.LAST_MSG_DATE}
+				</span>
+				<span class="gensmall" nowrap="nowrap"> 
+					{msg_row.TOPIC_AUTHOR} {msg_row.LAST_POST_AUTHOR}{msg_row.LAST_POST_IMG}
+				</span>
+			</div>
+		</td>
+	</tr>
+	<!-- END msg_row -->
+	<tr valign="middle">
+		<td align="right" valign="top" nowrap="nowrap" colspan="2" height="28" class="cat"><span class="gensmall">{PAGINATION}</span></td>
+	</tr>
+</table>

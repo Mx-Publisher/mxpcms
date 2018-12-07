@@ -40,12 +40,12 @@ if ($mx_page->editcp_exists)
 	));
 }
 
-if( !is_object($phpBB2))
+if (!is_object($phpBB2))
 {
 	$phpBB2 = new phpBB2();
 }
 
-if( !is_object($phpbb_auth))
+if (!isset($phpbb_auth) && class_exists('phpbb_auth'))
 {
 	$phpbb_auth = new phpbb_auth();
 }
@@ -119,15 +119,20 @@ if( !is_object($mx_backend))
 
 $mx_backend->page_tail('generate_backend_version');
 
-$template->assign_vars(array(	
-	'L_AJAX_ERROR_TITLE' 								=> $lang['AJAX_ERROR_TITLE'],
-	'L_AJAX_ERROR_TEXT_ABORT' 					=> $lang['AJAX_ERROR_TEXT_ABORT'],
-	'L_AJAX_ERROR_TEXT_TIMEOUT' 				=> $lang['AJAX_ERROR_TEXT_TIMEOUT'],
-	'L_AJAX_ERROR_TEXT_PARSERERROR' 		=> $lang['AJAX_ERROR_TEXT_PARSERERROR'],
-	'L_TIMEOUT_PROCESSING_REQ' 					=> $lang['TIMEOUT_PROCESSING_REQ'],	
-	
-	'ROOT_PATH'			=> $web_path,
-	'FULL_SITE_PATH'		=> $web_path,	
+$template->assign_vars(array(
+	'L_AJAX_ERROR_TITLE' 								=> $mx_user->lang['AJAX_ERROR_TITLE'],
+	'L_AJAX_ERROR_TEXT_ABORT' 					=> $mx_user->lang['AJAX_ERROR_TEXT_ABORT'],
+	'L_AJAX_ERROR_TEXT_TIMEOUT' 				=> $mx_user->lang['AJAX_ERROR_TEXT_TIMEOUT'],
+	'L_AJAX_ERROR_TEXT_PARSERERROR' 		=> $mx_user->lang['AJAX_ERROR_TEXT_PARSERERROR'],
+	'L_TIMEOUT_PROCESSING_REQ' 					=> $mx_user->lang['TIMEOUT_PROCESSING_REQ'],
+	'L_PRIVACY'						=> $mx_user->lang['PRIVACY'],
+	'L_PRIVACY_LINK'				=> !empty($mx_user->lang['PRIVACY_LINK']) ? $mx_user->lang['PRIVACY_LINK'] : 'Privacy ',
+	'L_TERMS_LINK'				=> isset($mx_user->lang['TERMS_OF_USE_CONTENT']) ? $mx_user->lang['TERMS_OF_USE_CONTENT'] : 'Terms of use ',
+	'L_TERMS_USE'				=> $mx_user->lang['TERMS_USE'],
+	'L_TEST_CONNECTION'	=> $mx_user->lang['TEST_CONNECTION'],
+	'L_THE_TEAM'				=> $mx_user->lang['THE_TEAM'],
+	'ROOT_PATH'				=> $web_path,
+	'FULL_SITE_PATH'			=> $web_path,	
 	
 	'U_PORTAL_ROOT_PATH' 	=> PORTAL_URL,
 	'U_PHPBB_ROOT_PATH' 	=> PHPBB_URL,
