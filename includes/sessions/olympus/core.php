@@ -596,7 +596,7 @@ class phpbb_auth extends phpbb_auth_base
 		$hold_str = $this->build_bitstring($hold_ary);
 
 		if ($hold_str)
-		{			
+		{
 			$userdata['user_permissions'] = $hold_str;
 			
 			$sql = 'UPDATE ' . USERS_TABLE . "
@@ -608,7 +608,7 @@ class phpbb_auth extends phpbb_auth_base
 				// If the column exists we change it, else we add it ;)
 				$table = USERS_TABLE;
 				
-				$column_data = $userdata;				
+				$column_data = $userdata;
 				
 				if (!class_exists('phpbb_db_tools') && !class_exists('tools'))
 				{
@@ -648,17 +648,17 @@ class phpbb_auth extends phpbb_auth_base
 							// We could add error handling here...
 							$result = $db->sql_query($sql);
 							if (!($result))
-							{		
+							{
 								mx_message_die(CRITICAL_ERROR, "Could not info", '', __LINE__, __FILE__, $sql);
-							}						
-						}										
-					}				
+							}
+						}
+					}
 					
 					if ($db_tools->sql_column_exists($table, 'user_permissions'))
 					{
 						$result = true;
 					}
-					else					
+					else
 					{
 						$column_name = 'user_permissions';
 						
@@ -668,17 +668,17 @@ class phpbb_auth extends phpbb_auth_base
 						$result = $db_tools->sql_column_add($table, $column_name, $column_data, true);				
 					
 						if (!$result)
-						{											
+						{
 							$after = (!empty($column_data['after'])) ? ' AFTER ' . $column_data['after'] : '';
 							$sql = 'ALTER TABLE `' . $table . '` ADD `' . $column_name . '` ' . (($column_data['column_type_sql'] = 'NULL') ? 'TEXT' :  $column_data['column_type_sql']) . ' ' . (!empty($column_data[$column_name]) ? $column_data[$column_name] : 'NULL') . ' DEFAULT NULL'  . $after;
 							
 							// We could add error handling here...
-							$result = $db->sql_query($sql);					
+							$result = $db->sql_query($sql);
 							if (!($result))
-							{		
+							{
 								mx_message_die(CRITICAL_ERROR, "Could not info", '', __LINE__, __FILE__, $sql);
-							}							
-						}										
+							}
+						}
 					}
 					
 					if ($db_tools->sql_column_exists($table, 'user_birthday'))
@@ -695,19 +695,19 @@ class phpbb_auth extends phpbb_auth_base
 						$result = $db_tools->sql_column_add($table, $column_name, $column_data, true);
 						
 						if (!$result)
-						{											
+						{
 							$after = (!empty($column_data['after'])) ? ' AFTER ' . $column_data['after'] : '';
 							$statements[] = 'ALTER TABLE `' . $table . '` ADD `' . $column_name . '` ' . (($column_data['column_type_sql'] = 'NULL') ? 'TEXT' :  $column_data['column_type_sql']) . ' ' . (!empty($column_data[$column_name]) ? $column_data[$column_name] : 'NULL') . ' DEFAULT NULL'  . $after;					
 							
 							// We could add error handling here...
-							$result = $db->sql_query($sql);					
+							$result = $db->sql_query($sql);
 							if (!($result))
-							{		
+							{
 								mx_message_die(CRITICAL_ERROR, "Could not info", '', __LINE__, __FILE__, $sql);
-							}					
-						}																		
+							}
+						}
 					}
-				}				
+				}
 			}
 		}
 
@@ -1322,7 +1322,7 @@ class mx_backend
 			$table_prefix 	= $backend_info['table_prefix'];
 			
 			if( !isset($backend_info['dbms']) || empty($backend_info['dbms']) || $backend_info['dbhost'] != $dbhost || $backend_info['dbname'] != $dbname || $backend_info['dbuser'] != $dbuser || $backend_info['dbpasswd'] != $dbpasswd || $backend_info['table_prefix'] != $table_prefix )
-			{				
+			{
 				if ((include $phpbb_root_path . "config.$phpEx") === false)
 				{
 					print('mx_backend::validate_backend(); Configuration file (config) for  '. basename( __DIR__  ) . ' ' . $phpbb_root_path . "/config.$phpEx" . ' couldn\'t be opened.');
@@ -1580,15 +1580,15 @@ class mx_backend
 			$filename_ext = substr(strrchr($root_path, '.'), 1);
 			$filename = basename($root_path, '.' . $filename_ext);
 			$current_dir = dirname(realpath($root_path));
-			$root_path = dirname($root_path);			
+			$root_path = dirname($root_path);
 		}
-		else		
+		else
 		{
 			$filename_ext = substr(strrchr(__FILE__, '.'), 1);
 			$filename = "config";
 			$current_dir = $root_path;
-			$root_path = dirname($root_path);			
-		}		
+			$root_path = dirname($root_path);
+		}
 		
 		$config = $root_path . "/config.$phpEx";
 		
@@ -1660,14 +1660,14 @@ class mx_backend
 			$filename_ext = substr(strrchr($root_path, '.'), 1);
 			$filename = basename($root_path, '.' . $filename_ext);
 			$current_dir = dirname(realpath($root_path));
-			$root_path = dirname($root_path);			
+			$root_path = dirname($root_path);
 		}
-		else		
+		else
 		{
 			$filename_ext = substr(strrchr(__FILE__, '.'), 1);
 			$filename = "config";
 			$current_dir = $root_path;
-			$root_path = dirname($root_path);			
+			$root_path = dirname($root_path);
 		}		
 		
 		$config = $root_path . "/config.$phpEx";
@@ -1695,7 +1695,7 @@ class mx_backend
 				break;
 				case (preg_match('/3.2/i', $phpbbversion)):
 					$backend = 'rhea';
-				break;			
+				break;
 				case (preg_match('/3.3/i', $phpbbversion)):
 					$backend = 'proteus';
 				break;
@@ -2784,6 +2784,62 @@ class mx_backend
 			WHERE g.group_name NOT IN ('BOTS', 'GUESTS')
 			ORDER BY g.group_type ASC, g.group_name";
 		return $sql;
+	}
+
+	/**
+	* Return the group_id for a given group name
+	*/
+	function get_group_id($group_name = 'REGISTERED')
+	{
+		global $db, $group_mapping;
+
+		//Default Groups for phpBB Olympus
+		$default_groups = array(
+			'GUESTS',
+			'REGISTERED',
+			'REGISTERED_COPPA',
+			'GLOBAL_MODERATORS',
+			'ADMINISTRATORS',
+			'BOTS',
+		);
+
+		// first retrieve default group id
+		if (empty($group_mapping))
+		{
+			/* * /
+			$sql = 'SELECT group_id
+				FROM ' . GROUPS_TABLE . "
+				WHERE group_name = '" . $db->sql_escape($group_name) . "'
+					AND group_type = " . GROUP_SPECIAL;
+			/* */
+
+			$sql = 'SELECT group_name, group_id
+				FROM ' . GROUPS_TABLE;
+			$result = $db->sql_query($sql);
+
+			$group_mapping = array();
+			while ($row = $db->sql_fetchrow($result))
+			{
+				$group_mapping[strtoupper($row['group_name'])] = (int) $row['group_id'];
+			}
+			$db->sql_freeresult($result);
+		}
+
+		/** /
+		if (!count($group_mapping))
+		{
+			add_default_groups();
+			return get_group_id($group_name);
+		}
+		/**/
+
+		if (isset($group_mapping[strtoupper($group_name)]))
+		{
+			return $group_mapping[strtoupper($group_name)];
+		}
+
+		// generate user account data
+		return (int) $group_mapping[$group_name];
 	}
 
 	/**

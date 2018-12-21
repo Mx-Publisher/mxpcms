@@ -77,7 +77,7 @@ $tplEx = @file_exists($mx_root_path.'install/templates/mx_install_header.html') 
 * common.php from phpBB 2.0.18
 */
 @ini_set( 'display_errors', '1' );
-error_reporting(E_ALL ^ E_NOTICE);
+//error_reporting(E_ALL ^ E_NOTICE);
 //error_reporting  (E_ERROR | E_WARNING | E_PARSE); // This will NOT report uninitialized variables
 //include($mx_root_path . "modules/mx_shared/ErrorHandler/prepend.$phpEx"); // For nice error output
 
@@ -257,7 +257,7 @@ if (@ini_get('register_globals') == '1' || strtolower(@ini_get('register_globals
 // this is a security precaution to prevent someone
 // trying to break out of a SQL statement.
 //
-if (version_compare(phpversion(), "5.9.9", "<="))
+if (version_compare(phpversion(), "5.6.0", "<="))
 {
 	if( !get_magic_quotes_gpc() )
 	{
@@ -379,7 +379,7 @@ $available_dbms = array(
 			return true;
 		'),
 		'AVAILABLE'			=> true,
-		'2.0.x'				=> true,		
+		'2.0.x'				=> true,
 		'COMMENTS'		=> 'mx_remove_remarks'
 	),	
 	// Note: php 5.5 alpha 2 deprecated mysql.
@@ -409,16 +409,16 @@ $available_dbms = array(
 			return true;
 		'),
 		'AVAILABLE'			=> true,
-		'2.0.x'				=> true,		
+		'2.0.x'				=> true,
 		'COMMENTS'			=> 'mx_remove_remarks'
 	),
 	'mysql4' => array(
-		'LABEL'				=> 'MySQL 4.x',	
+		'LABEL'				=> 'MySQL 4.x',
 		'name'				=> 'MySQL',
 		'SCHEMA'			=> 'mysql',
 		'DELIM'				=> ';',
-		'DELIM_BASIC'		=> ';',			
-		'version'			=> '4.0.18',
+		'DELIM_BASIC'	=> ';',
+		'version'				=> '4.0.18',
 		'version_check'		=> 'return min(mysql_get_server_info(), mysql_get_client_info());',
 		'supported'			=> function_exists('mysql_connect'),
 		'default_user'		=> 'mysql.default_user',
@@ -441,11 +441,11 @@ $available_dbms = array(
 	),
 	'mysql' => array(
 		'LABEL'					=> 'MySQL 3.x',
-		'name'					=> 'MySQL',		
+		'name'					=> 'MySQL',
 		'SCHEMA'				=> 'mysql',
 		'DELIM'					=> ';',
 		'DELIM_BASIC'			=> ';',
-		'DRIVER'				=> 'mysql',		
+		'DRIVER'				=> 'mysql',
 		'version'				=> '3.0.21',
 		'version_check'			=> 'return min(mysql_get_server_info(), mysql_get_client_info());',
 		'supported'				=> function_exists('mysql_connect'),
@@ -531,11 +531,11 @@ $available_dbms = array(
 	/**/
 	'postgres' => array(
 		'LABEL'	=> 'PostgreSQL 8.3+',
-		'name'	=> 'PostgreSQL',		
+		'name'	=> 'PostgreSQL',
 		'SCHEMA'	=> 'postgres',
 		'MODULE'	=> 'pgsql',
 		'DELIM'		=> ';',
-		'DELIM_BASIC'	=> ';',		
+		'DELIM_BASIC'	=> ';',
 		'DRIVER'	=> 'postgres',
 		'version'	=> '8.0',
 		'function_check'	=> 'pg_connect',
@@ -567,11 +567,11 @@ $available_dbms = array(
 	/**/
 	'sqlite'	=> array(
 		'LABEL'				=> 'SQLite',
-		'name'				=> 'SQLite',		
+		'name'				=> 'SQLite',
 		'SCHEMA'			=> 'sqlite',
 		'MODULE'			=> 'sqlite',
 		'DELIM'				=> ';',
-		'DELIM_BASIC'		=> ';',		
+		'DELIM_BASIC'		=> ';',
 		'DRIVER'			=> 'sqlite',
 		'version' 			=> '1',
 		'function_check'	=> 'sqlite_open',
@@ -579,7 +579,7 @@ $available_dbms = array(
 		'supported' 		=> function_exists('sqlite_open'),
 		'always_has_db' 	=> true,
 		'utf8_default' 		=> true,
-		'utf8_support'		=> true,		
+		'utf8_support'		=> true,
 		'utf8_required'		=> true,
 		'validate_prefix'	=> create_function('&$value', '
 			global $incontext, $txt;
@@ -595,11 +595,12 @@ $available_dbms = array(
 				return $txt[\'error_db_prefix_numeric\'];
 
 			return true;
-		'),		
-		'AVAILABLE'		=> true,
+		'),
+		'AVAILABLE'	=> true,
 		'2.0.x'			=> false,
-		'COMMENTS'		=> 'mx_remove_comments'		
+		'COMMENTS'	=> 'mx_remove_comments'
 	),
+	
 	/**/
 	'sqlite3'	=> array(
 		'LABEL'			=> 'SQLite3',
@@ -691,10 +692,18 @@ if ($mx_request_vars->is_get('phpinfo') )
 /*
 * Load the installation language
 */
-$language = $mx_request_vars->request('language', MX_TYPE_NO_TAGS);
+if ($mx_request_vars->is_get('lang') )
+{
+	$language = $mx_request_vars->request('lang', MX_TYPE_NO_TAGS);
+}
+else
+{
+	$language = $mx_request_vars->request('language', MX_TYPE_NO_TAGS);
+}
+
 $language = (preg_match('#^[a-z_]+$#', $language) ? strip_tags($language) : '');
 
-if(empty($language))
+if (empty($language))
 {
 	$language = guess_lang();
 	$lang_options = '';
@@ -716,8 +725,10 @@ if(empty($language))
 		$s_hidden_fields = '';
 
 		include_once($mx_root_path . "install/includes/template.$phpEx");
+
 		$template = new Template($mx_root_path . 'install/templates');
 		page_header_install($lang['Welcome_install'], $lang['Choose_lang_explain']);
+
 		$template->set_filenames(array('language' => 'mx_install_language.'.$tplEx));
 		$template->assign_vars(array(
 			'L_INITIAL_CONFIGURATION'	=> $lang['Install_settings'],
@@ -727,6 +738,7 @@ if(empty($language))
 			'S_HIDDEN_FIELDS'			=> $s_hidden_fields,
 			'L_SUBMIT'					=> $lang['Choose_lang'],
 		));
+
 		$template->pparse('language');
 		page_footer_install();
 	}
@@ -850,38 +862,38 @@ if($confirm)
 			{
 				case 'internal':
 					$tplEx = 'tpl';
-					$backendtype = 'mxbb';					
+					$backendtype = 'mxbb';	
 					$config_settings = 'config';
 				break;
 				case 'smf2':
 					$tplEx = 'php';
-					$backendtype = 'smf';						
-					$config_settings = 'Settings';					
+					$backendtype = 'smf';
+					$config_settings = 'Settings';
 				break;
 				case 'mybb':
 					$tplEx = 'php';
-					$backendtype = 'mybb';						
-					$config_settings = 'inc/config';					
-				break;					
+					$backendtype = 'mybb';
+					$config_settings = 'inc/config';
+				break;
 				case 'phpbb2':
 					$tplEx = 'tpl';
-					$backendtype = 'phpbb';					
+					$backendtype = 'phpbb';
 					$config_settings = 'config';
 				break;
 				case 'phpbb3':
-				case 'olympus':		
+				case 'olympus':
 				case 'ascraeus':
 				case 'rhea':
-				case 'proteus':				
+				case 'proteus':
 					$tplEx = 'html';
-					$backendtype = 'phpbb';						
-					$config_settings = 'config';					
-				break;									
+					$backendtype = 'phpbb';
+					$config_settings = 'config';
+				break;
 			}
 			
 			if ($mx_request_vars->is_post('backend'))
 			{
-				if ($mx_request_vars->is_post('backend'))				
+				if ($mx_request_vars->is_post('backend'))
 				
 				//$portal_backend = file_exists($mx_root_path . $backend_path . "modcp.$phpEx") ? 'phpbb2' : 'phpbb3';
 				
@@ -889,7 +901,7 @@ if($confirm)
 				{
 					case 'mxbb':
 						$backend_info = get_mxbb_info($mx_root_path . $backend_path . "$config_settings.$phpEx");
-					break;					
+					break;
 					case 'phpbb':
 						$backend_info = get_phpbb_info($mx_root_path . $backend_path . "config.$phpEx");
 					break;
@@ -898,13 +910,13 @@ if($confirm)
 					break;
 					case 'mybb':
 						$backend_info = array_merge(get_mybb_info($mx_root_path . $backend_path . "inc/config.$phpEx"), get_mybb_settings($mx_root_path . $backend_path . "inc/settings.$phpEx"));
-					break;						
-				}				
-								
+					break;
+				}
+		
 				if( !isset($backend_info['dbms']) || $backend_info['dbms'] != $dbms || $backend_info['dbhost'] != $dbhost || $backend_info['dbname'] != $dbname || $backend_info['dbuser'] != $dbuser || $backend_info['dbpasswd'] != $dbpasswd || $backend_info['table_prefix'] != $table_prefix )
 				{
 					install_die(sprintf($lang['phpBB_nfnd_retry'], '<a href="javascript:history.go(-1);">', '</a>'));
-				}				
+				}
 			}
 			
 			if( empty($portal_url) || empty($dbms) || empty($dbhost) || empty($dbname) || empty($dbuser) || empty($mx_table_prefix) )
@@ -1163,7 +1175,7 @@ if($confirm)
 			//Creating the forum page
 			switch (PORTAL_BACKEND)
 			{
-				case 'internal':			
+				case 'internal':
 				break;
 				
 				case 'phpbb2':
@@ -1171,7 +1183,7 @@ if($confirm)
 				case 'olympus':
 				case 'ascraeus':
 				case 'rhea':
-				case 'proteus':				
+				case 'proteus':
 					$sql = array();
 					
 					$sql[] = "INSERT INTO " . $mx_table_prefix . "block VALUES('6', 'Poll', 'This is a Demo Block', '14', '0', '5', '0', '0', '0', '0', '0', '1', '1', '0', '1125841942', '2')";
@@ -1446,7 +1458,7 @@ if($confirm)
 				case 'internal':
 				break;
 				
-				case 'phpbb2':				
+				case 'phpbb2':
 					$sql[] = "INSERT INTO " . $mx_table_prefix . "module VALUES('30', 'phpBB2 Blocks', 'modules/mx_phpbb2blocks/', 'MXP Portal phpBB2 blocks', '', 'MX-Publisher Core Module', 'Original MXP <i>phpBB2 Blocks</i> module by <a href=\"http://www.mx-publisher.com\" target=\"_blank\"> The MXP Project Team</a>')";
 					$message .= mx_install_cmd_sql($sql) . '<br />';
 				break;
@@ -1455,27 +1467,27 @@ if($confirm)
 				case 'olympus':
 				case 'ascraeus':
 				case 'rhea':
-				case 'proteus':				
-					$sql[] = "INSERT INTO " . $mx_table_prefix . "module VALUES('30', 'phpBB3 Blocks', 'modules/mx_phpbb3blocks/', 'MXP Portal phpBB3 blocks', '', 'MX-Publisher Core Module', 'Original MXP <i>phpBB3 Blocks</i> module by <a href=\"http://mxpcms.sourceforge.net\" target=\"_blank\">The MXP Development Team</a>')";
+				case 'proteus':
+				$sql[] = "INSERT INTO " . $mx_table_prefix . "module VALUES('30', 'phpBB3 Blocks', 'modules/mx_phpbb3blocks/', 'MXP Portal phpBB3 blocks', '', 'MX-Publisher Core Module', 'Original MXP <i>phpBB3 Blocks</i> module by <a href=\"http://mxpcms.sourceforge.net\" target=\"_blank\">The MXP Development Team</a>')";
 					$message .= mx_install_cmd_sql($sql) . '<br />';
 				break;
 				
-				case 'phpbb4':				
+				case 'phpbb4':
 					$sql[] = "INSERT INTO " . $mx_table_prefix . "module VALUES('30', 'phpBB4 Blocks', 'modules/mx_phpbb4blocks/', 'MXP Portal phpBB4 blocks', '', 'MX-Publisher Core Module', 'Original MXP <i>phpBB4 Blocks</i> module by <a href=\"http://mxpcms.sourceforge.net\" target=\"_blank\">The MXP Development Team</a>')";
 					$message .= mx_install_cmd_sql($sql) . '<br />';
-				break;				
+				break;
 				
-				case 'smf2':		
+				case 'smf2':
 					$sql[] = "INSERT INTO " . $mx_table_prefix . "module VALUES('30', 'SMF2 Blocks', 'modules/mx_smf2blocks/', 'MXP Portal SMF2 blocks', '', 'MX-Publisher Core Module', 'Original MXP <i>SMF2 Blocks</i> module by <a href=\"http://mxpcms.sourceforge.net\" target=\"_blank\"> The MXP Development Team</a>')";
 					$message .= mx_install_cmd_sql($sql) . '<br />';
 				break;
 				
-				case 'mybb':		
-					$sql[] = "INSERT INTO " . $mx_table_prefix . "module VALUES('30', 'MyBB Blocks', 'modules/mx_mybbblocks/', 'MXP Portal MyBB blocks', '', 'MX-Publisher Core Module', 'Original MXP <i>MyBB Blocks</i> module by <a href=\"http://mxpcms.sourceforge.net\" target=\"_blank\"> The MXP Development Team</a>')";
+				case 'mybb':
+				$sql[] = "INSERT INTO " . $mx_table_prefix . "module VALUES('30', 'MyBB Blocks', 'modules/mx_mybbblocks/', 'MXP Portal MyBB blocks', '', 'MX-Publisher Core Module', 'Original MXP <i>MyBB Blocks</i> module by <a href=\"http://mxpcms.sourceforge.net\" target=\"_blank\"> The MXP Development Team</a>')";
 					$message .= mx_install_cmd_sql($sql) . '<br />';
-				break;				
-			}			
-		}		
+				break;
+			}
+		}
 		
 		for($i = 0; $i < count($lang['Portal_install_done']); $i++)
 		{
@@ -1672,6 +1684,7 @@ $smf_files_ary = find_smf($backend_search_path);
 $smf_files_cnt = count($smf_files_ary);
 $smf_found = false;
 $smf_failed = false;
+
 /*
 * Find a mybb forum path
 **/
@@ -1679,6 +1692,7 @@ $mybb_files_ary = find_mybb($backend_search_path);
 $mybb_files_cnt = count($mybb_files_ary);
 $mybb_found = false;
 $mybb_failed = false;
+
 /**/
 $i = 0;
 $portal_backend = 'internal';
@@ -1687,16 +1701,19 @@ $files_cnt = count($files_ary);
 $offset1 = $phpbb_files_cnt;
 $offset2 = $phpbb_files_cnt + $smf_files_cnt;
 $offset3 = $files_cnt;
+
 //Temp charset 
 $dbcharacter_set = 'utf8';
 //UTF-8 require to have same database in phpBB3 and mxp and mysqli is preferable
 //$dbms_type = ($portal_backend === 'internal') ? 'dbms_mxbb' : 'dbms';
 $default_dbms = 'mysqli';
+
 /*
 * ok, let's build the SELECT tag for the phpBB boards we found on this server =:-o
 */
 $select_backend_path = '<select name="select_backend_path" onchange="check_backend_path();">';
 $select_database_type = '<select name="dbms_mxbb" onchange="check_database_type();">';
+
 /*
 * Check if a config.php file exists and was altered to allow re-install
 **/
@@ -1714,18 +1731,18 @@ if (file_exists($mx_root_path . "config.$phpEx"))
 	*/
 	$template->assign_block_vars('datarow', array(
 		'INFO'				=>	$lang['Install_Instruction_mxBB'],
-		'BACKEND_PATH'		=>	'',
+		'BACKEND_PATH'	=>	'',
 		'PORTAL_URL'		=>	$portal_url,
 		'PORTAL_BACKEND' 	=>	'internal',
-		'BACKEND_URL'		=>	'',	
+		'BACKEND_URL'		=>	'',
 		'DBMS'				=>	$default_dbms,
-		'DB_HOST'			=>	$mx_info['dbhost'] ? $mx_info['dbhost'] : 'localhost',
-		'DB_NAME'			=>	$mx_info['dbname'] ? $mx_info['dbname'] : '',
-		'DB_USER'			=>	$mx_info['dbuser'] ? $mx_info['dbuser'] : '',
-		'DB_PASSWD'			=>	$mx_info['dbpasswd'] ? $mx_info['dbpasswd'] : '',
-		'DB_PREFIX'			=>	$mx_info['table_prefix'] ? $mx_info['table_prefix'] : '',
-		'DB_CHARACTER_SET'	=>	$mx_info['dbcharacter_set'] ? $mx_info['dbcharacter_set'] : "utf8",	
-		'BACKEND_ROOT'		=>	'',		
+		'DB_HOST'			=>	isset($mx_info['dbhost']) ? $mx_info['dbhost'] : 'localhost',
+		'DB_NAME'		=>	isset($mx_info['dbname']) ? $mx_info['dbname'] : '',
+		'DB_USER'			=>	isset($mx_info['dbuser']) ? $mx_info['dbuser'] : '',
+		'DB_PASSWD'		=>	isset($mx_info['dbpasswd']) ? $mx_info['dbpasswd'] : '',
+		'DB_PREFIX'		=>	isset($mx_info['table_prefix']) ? $mx_info['table_prefix'] : '',
+		'DB_CHARACTER_SET'	=>	isset($mx_info['dbcharacter_set']) ? $mx_info['dbcharacter_set'] : "utf8",
+		'BACKEND_ROOT'	=>	'',
 	));
 }
 else
@@ -1738,44 +1755,47 @@ else
 	foreach ($available_dbms as $dbms => $database)
 	{
 		$selected = ($dbms == $default_dbms) ? ' selected="selected"' : '';
+		
 		if ($database['LABEL'] && defined('INSTALL_READONLY'))
 		{
 			if (!file_exists($mx_root_path . 'install/schemas/' . $database['SCHEMA'] . '_schema_install.sql'))
-			{			
+			{
 				$available_dbms[$dbms]['AVAILABLE'] = false;
-				
-				$mx_info['dbms']			= 'mysql';
-				$mx_info['dbhost']			= 'localhost';
-				$mx_info['dbname']			= 'mx_db_name';
-				$mx_info['dbuser']			= 'mx_db_user';
-				$mx_info['dbpasswd']		= 'mx_db_password';
-				$mx_info['mx_table_prefix']	= 'mx_';
-				$mx_info['dbcharacter_set']	= 'utf8';		
-				$mx_info['status']			= false;							
+			
+				$mx_info['dbms'] = 'mysql';
+				$mx_info['dbhost'] = 'localhost';
+				$mx_info['dbname'] = 'mx_db_name';
+				$mx_info['dbuser'] = 'mx_db_user';
+				$mx_info['dbpasswd'] = 'mx_db_password';
+				$mx_info['mx_table_prefix'] = 'mx_';
+				$mx_info['dbcharacter_set']	= 'utf8';
+				$mx_info['status'] = false;
 			}
 			else
 			{
 				$available_dbms[$dbms]['AVAILABLE'] = true;
-				
-				$mx_info['dbms']			= $database['name'];
-				$mx_info['dbhost']			= $database['default_host'];
-				$mx_info['dbname']			= $database['name'];
-				$mx_info['dbuser']			= $database['default_user'];
-				$mx_info['dbpasswd']		= $database['default_password'];
-				$mx_info['mx_table_prefix']	= $database['name'];
-				$mx_info['dbcharacter_set']	= ($database['utf8_support'] = true) ? 'utf8' : 'latin1';		
-				$mx_info['status']			= false;
-				
-				$select_database_type .= '<option value="' . $dbms . '"' . $selected .'>' . $dbms . '</option>';				
-			}			
+			
+				$mx_info['dbms'] = isset($dbms[0]) ? $dbms[0]: 'mysqli';
+				$mx_info['dbhost'] = isset($database['default_host']) ? $database['default_host'] : 'localhost';
+				$mx_info['dbname'] = $database['name'];
+				$mx_info['dbuser'] = isset($database['default_user']) ? $database['default_user'] : '';
+				$mx_info['dbpasswd']	 = isset($database['default_password']) ? $database['default_password'] : '';
+				$mx_info['mx_table_prefix'] = isset($database['default_prefix']) ? $database['default_prefix'] : 'mx_';
+				$mx_info['dbcharacter_set']	= ($database['utf8_support'] = true) ? 'utf8' : 'latin1';
+				$mx_info['status'] = false;
+			
+				$select_database_type .= '<option value="' . $dbms . '"' . $selected .'>' . $dbms . '</option>';
+			}
 		}
 		else
 		{
 			$select_database_type .= '<option value="' . $dbms . '"' . $selected .'>' . $dbms . '</option>';
-		}				
+		}
 	}
+	
 	$default_dbms = $mx_info['dbms'] ? $mx_info['dbms'] : "mysql";
-	/**/	
+	
+	/**/
 	/*
 	* First, provide the option of standalone install
 	*/
@@ -1784,15 +1804,15 @@ else
 		'BACKEND_PATH'		=>	'',
 		'PORTAL_URL'		=>	$portal_url,
 		'PORTAL_BACKEND' 	=>	'internal',
-		'BACKEND_URL'		=>	'',	
+		'BACKEND_URL'		=>	'',
 		'DBMS'				=>	$default_dbms,
 		'DB_HOST'			=>	$mx_info['dbhost'] ? $mx_info['dbhost'] : 'localhost',
 		'DB_NAME'			=>	$mx_info['dbname'] ? $mx_info['dbname'] : '',
 		'DB_USER'			=>	$mx_info['dbuser'] ? $mx_info['dbuser'] : '',
 		'DB_PASSWD'			=>	$mx_info['dbpasswd'] ? $mx_info['dbpasswd'] : '',
-		'DB_PREFIX'			=>	$mx_info['table_prefix'] ? $mx_info['table_prefix'] : '',
+		'DB_PREFIX'			=>	isset($mx_info['table_prefix']) ? $mx_info['table_prefix'] : 'mx_',
 		'DB_CHARACTER_SET'	=>	$mx_info['dbcharacter_set'] ? $mx_info['dbcharacter_set'] : "latin1",
-		'BACKEND_ROOT'		=>	'',		
+		'BACKEND_ROOT'		=>	'',
 	));	
 }
 /*
@@ -1835,7 +1855,7 @@ for($i = 0; $i < $offset1; $i++)
 	{	
 		echo("phpBB File: " . $phpbb_root_path . "config.$phpEx" . " not found.");
 		$phpbbversion = $mx_portal_version; 
-		$portal_backend = 'internal';		
+		$portal_backend = 'internal';
 	}
 	// Get the DB related information if this forum is phpBB
 	if (file_exists($phpbb_root_path . "config.$phpEx"))
@@ -1854,7 +1874,7 @@ for($i = 0; $i < $offset1; $i++)
 		//Redenifing phpBb compatible variables
 		//$phpbb_info = $backend_info = get_phpbb_info($phpbb_root_path, $phpbbversion);
 		//$phpbbversion = 'phpbb'; 
-		//$portal_backend = 'internal';		
+		//$portal_backend = 'internal';
 	}	
 	// Save forums information for debuging purposes
 	$debuginfo[] = array('phpBB Info'.($phpbb_files_cnt > 1 ? " #$i" : ''),
@@ -1869,12 +1889,14 @@ for($i = 0; $i < $offset1; $i++)
 	{
 		continue;
 	}
+
 	// Try to Connect to this phpBB Database
 	if(!open_phpbb_db($db, $phpbb_info))
 	{
 		$phpbb_failed = true;
 		continue;
-	}		
+	}
+
 	// Get the phpBB URL and DB Charset
 	$phpbb_url = get_phpbb_url($phpbb_info['table_prefix'], $phpbbversion);
 	$default_dbms = $phpbb_info['dbms'] ? $phpbb_info['dbms'] : "mysql4";
@@ -1886,7 +1908,8 @@ for($i = 0; $i < $offset1; $i++)
 	{
 		$phpbb_failed = true;
 		continue;
-	}	
+	}
+
 	// Note: to get the phpBB URL we have read the config table, so it seems safe to assume this board is installed. :-)
 	$template->assign_block_vars('datarow', array(
 		'INFO'			=> $lang['Install_Instruction_phpBB'],
@@ -1899,14 +1922,15 @@ for($i = 0; $i < $offset1; $i++)
 		'DB_NAME'		=> $phpbb_info['dbname'],
 		'DB_USER'		=> $phpbb_info['dbuser'],
 		'DB_PASSWD'		=> $phpbb_info['dbpasswd'],
-		'DB_CHARACTER_SET'	=> (isset($available_dbms[$phpbb_info['dbms']]['utf8_default'])) ? "utf8" : "latin2",			
-		'DB_PREFIX'		=> $phpbb_info['table_prefix'],		
+		'DB_CHARACTER_SET'	=> (isset($available_dbms[$phpbb_info['dbms']]['utf8_default'])) ? "utf8" : "latin2",	
+		'DB_PREFIX'		=> $phpbb_info['table_prefix'],
 		'ACM_TYPE'		=> $phpbb_info['acm_type'] ? $phpbb_info['acm_type'] : 'file',
-		'BACKEND_ROOT'	=> $phpbb_root_path,			
-	));	
+		'BACKEND_ROOT'	=> $phpbb_root_path,
+	));
 	$select_backend_path .= '<option value="'.$i.'">'.$phpbb_relative.'</option>';
 	$phpbb_found = true;
 }
+
 /*
 * Now, list all SMF backend options available
 ***/
@@ -1982,7 +2006,7 @@ for($i = $offset2; $i < $files_cnt; $i++)
 	}
 	
 	// Get myBB URL and DB Charset
-	$mybbversion = $portal_backend = 'mybb';	
+	$mybbversion = $portal_backend = 'mybb';
 	$mybb_info =  $backend_info = array_merge(get_mybb_info($mybb_root_path . "inc/config.$phpEx"), get_mybb_settings($mybb_root_path . "inc/settings.$phpEx"));
 	// Get the MyBB URL
 	$mybb_url = $mybb_info['bburl'];	
@@ -2011,7 +2035,7 @@ for($i = $offset2; $i < $files_cnt; $i++)
 		'DB_PREFIX'			=> $mybb_info['table_prefix'],
 		'ACM_TYPE'			=> $mybb_info['acm_type'] ? $mybb_info['acm_type'] : 'file',
 		'DBCHARACTER_SET'	=> (isset($available_dbms[$phpbb_info['dbms']]['utf8_default'])) ? "utf8" : "ISO-8859-2",		
-		'BACKEND_ROOT'		=> $mybb_root_path,		
+		'BACKEND_ROOT'		=> $mybb_root_path,
 	));
 	$select_backend_path .= '<option value="'.$i.'">'.$mybb_relative.'</option>';
 	$mybb_found = true;
@@ -2069,9 +2093,9 @@ if ($mx_request_vars->is_post('debug'))
 $s_hidden_fields = '<input type="hidden" name="install_mode" value="' . $install_mode . '" />'.
 	'<input type="hidden" name="confirm" value="1" />'.
 	'<input type="hidden" name="language" value="' . $language . '" />'.
-	'<input type="hidden" name="phpbb_root_path" value="' . $phpbb_root_path . '" />'.
-	'<input type="hidden" name="smf_root_path" value="' . $smf_root_path . '" />'.
-	'<input type="hidden" name="mybb_root_path" value="' . $mybb_root_path . '" />';
+	'<input type="hidden" name="phpbb_root_path" value="' . $phpbb_root_path . '" />';
+$s_hidden_fields .= isset($smf_root_path) ? '<input type="hidden" name="smf_root_path" value="' . $smf_root_path . '" />' : '';
+$s_hidden_fields .= isset($mybb_root_path) ? '<input type="hidden" name="mybb_root_path" value="' . $mybb_root_path . '" />' : '';
 /* -------------------- */	
 $template->assign_vars(array(
 	'L_NOSCRIPT_WARNING'		=> $lang['Install_noscript_warning'],

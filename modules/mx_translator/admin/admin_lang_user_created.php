@@ -27,7 +27,7 @@ if (!defined('MX_ROOT_PATH')) define('MX_ROOT_PATH', './../');
 
 if(!empty($setmodules))
 {
-	$module['Language_tools']['ACP_TRANSLATOR_CONFIG'] = mx_append_sid($admin_module_root_path . $basename . '');	
+	$module['Language_tools']['ACP_MX_LANGTOOLS_TITLE'] = mx_append_sid($admin_module_root_path . $basename . '');	
 	return;
 }
 
@@ -57,11 +57,11 @@ define('IN_AJAX', (isset($_GET['ajax']) && ($_GET['ajax'] == 1) && ($_SERVER['HT
 
 //Include shared phpBB2 language file 
 $mx_user->set_lang($mx_user->lang, $mx_user->help, 'lang_main');
-
+$mx_user->set_lang($mx_user->lang, $mx_user->help, 'lang_admin');
 /* START Include language file lang_admin_extend_lang or all module language files */
 $language = ($mx_user->user_language_name) ? $mx_user->user_language_name : (($board_config['default_lang']) ? $board_config['default_lang'] : 'english');
 //$mx_user->extend(MX_LANG_ALL, MX_IMAGES_NONE, $module_root_path, true);
-$mx_user->extend('lang_admin_extend_lang', MX_IMAGES_NONE, $module_root_path, true);	
+$mx_user->extend('lang_admin_extend_lang', MX_IMAGES_NONE, $module_root_path, true);
 /* Get an instance of the admin controller */
 if (!include_once($module_root_path . 'controller/mxp_translator.' . $phpEx))
 {
@@ -347,8 +347,8 @@ if ($mode == 'key')
 			}
 			$template->assign_block_vars('row', array(
 				'L_COUNTRY'		=> $country_name,
-				'COUNTRY'			=> $country_dir,
-				'VALUE'				=> htmlspecialchars($value),
+				'COUNTRY'		=> $country_dir,
+				'VALUE'				=> is_array($value) ? htmlspecialchars(print_r($value, true)) :  htmlspecialchars($value),
 				'L_STATUS'		=> $l_status,
 				)
 			);
@@ -412,13 +412,22 @@ if ($mode == 'pack')
 		$i = 0;
 		@reset($entries['pack']);
 		while (list($key_main, $data) = @each($entries['pack']))
-		{
+		{		
 			@reset($data);
 			while (list($key_sub, $pack) = @each($data))
 			{
+				if ( ($key_main == 'mx_meta') || ($key_main == 'meta'))
+				{
+					$lang[$key_main]['langcode'] = isset($lang['USER_LANG']) ? $lang['USER_LANG'] : '';
+				}
+				elseif ($key_main == 'DEMO_VAR') 
+				{
+					$lang[$key_main]= isset($lang['DEMO_VAR']) ? $lang['DEMO_VAR'] : 'Demo Variable';
+				}									
+				
 				if (($pack == $pack_file) && (($entries['admin'][$key_main][$key_sub] && ($level == 'admin')) || (!$entries['admin'][$key_main][$key_sub] && ($level == 'normal'))))
 				{
-					$value = trim((empty($key_sub) ? $lang[$key_main] : $lang[$key_main][$key_sub]));
+					$value = trim((!isset($lang[$key_main][$key_sub]) ? $lang[$key_main] : $lang[$key_main][$key_sub]));
 					if (strlen($value) > $value_maxlength)
 					{
 						$value = substr($value, 0, $value_maxlength-3) . '...';

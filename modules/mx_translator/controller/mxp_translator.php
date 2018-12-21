@@ -1,7 +1,7 @@
 <?php
 /**
  *
- * Lnaguage Tools Extension for the phpBB Forum Software package
+ * Language Tools Extension for the phpBB Forum Software package
  * @author culprit_cz
 * @copyright (c) orynider <http://mxpcms.sourceforge.net>
 * @license GNU General Public License, version 2 (GPL-2.0)
@@ -274,27 +274,27 @@ class mxp_translator
 		// Requests
 		$this->action = $this->request->request('action', '');
 		$this->page_id = $this->request->request('page_id', 0);
-		$this->currency_id = $this->request->request('currency_id', 0);		
+		$this->currency_id = $this->request->request('currency_id', 0);
 		
 		/* general vars */
 		$this->mode = $this->request->request('mode', 'generate');
 		$this->start = $this->request->request('start', 0);
 		
-		$this->ajax = $this->request->request('ajax', 0);		
+		$this->ajax = $this->request->request('ajax', 0);
 		$this->set_file = $this->request->request('set_file', '');
-		$this->into = $this->request->request('into', '');		
-		$this->cookies	= array();		
-        $this->server = $_SERVER; //new ServerBag($server);		
+		$this->into = $this->request->request('into', '');
+		$this->cookies	= array();
+        $this->server = $_SERVER; //new ServerBag($server);
 		$this->template = $template;
 		$this->user = $mx_user;
-		$this->language	= $mx_user->lang;		
+		$this->language	= $mx_user->lang;
 		$this->root_path = !empty($mx_root_path) ? $mx_root_path : $mx_root_path;
 		$this->phpbb_admin_path = $phpbb_root_path . 'adm/';
 		$this->forum_root_path = !empty($phpbb_root_path) ? str_replace('olympus', 'rhea', $phpbb_root_path) : (!empty($smf_root_path) ? $smf_root_path : $root_path);
 		$this->table_prefix = $table_prefix;
 		$this->mx_table_prefix = $mx_table_prefix;
 		$this->php_ext = !empty($php_ext) ? $php_ext : (!empty($phpEx) ? $phpEx : ".php");
-		$this->mx_root_path = !empty($mx_root_path) ? $mx_root_path : '../' . $root_path;		
+		$this->mx_root_path = !empty($mx_root_path) ? $mx_root_path : '../' . $root_path;
 		define('MXP_MODULE_TABLE', MODULE_TABLE);
 		$this->module_root_path = !empty($module_root_path) ?  $module_root_path : $mx_root_path . 'mx_translator/';
 		//print_r($this->forum_root_path);
@@ -2877,7 +2877,7 @@ class mxp_translator
 					$lang_name = (strlen($string) > 2) ? ucfirst(str_replace($pattern, '', $string)) : $string;
 				break;
 			}		
-			return ucwords(str_replace(array(" ","-","_"), ' ', $lang_name));	
+			return ucwords(str_replace(array(" ","-","_"), ' ', $lang_name));
 		}
 		return ucwords(str_replace(array(" ","-","_"), ' ', str_replace($pattern, '', $string)));
 	}		
@@ -3639,10 +3639,10 @@ class mxp_translator
 	{
 		// get all countries installed
 		$countries = array();
-		$dir = @opendir(IP_ROOT_PATH . 'language');
+		$dir = @opendir($this->root_path . 'language');
 		while ($file = @readdir($dir))
 		{
-			if (preg_match('#^lang_#i', $file) && !is_file(IP_ROOT_PATH . 'language/' . $file) && !is_link(IP_ROOT_PATH . 'language/' . $file))
+			if (preg_match('#^lang_#i', $file) && !is_file($this->root_path . 'language/' . $file) && !is_link($this->root_path . 'language/' . $file))
 			{
 				$filename = trim(str_replace('lang_', '', $file));
 				$displayname = preg_replace("/^(.*?)_(.*)$/", "\\1 [ \\2 ]", $filename);
@@ -3658,24 +3658,34 @@ class mxp_translator
 
 	function get_packs()
 	{
-			global $countries;
+		global $countries;
 
 		/* MG Lang DB - BEGIN */
-		$skip_files = array(('lang_bbcode.' . PHP_EXT), ('lang_faq.' . PHP_EXT), ('lang_rules.' . PHP_EXT));
+		$skip_files = array(('lang_bbcode.' . $this->php_ext), ('lang_faq.' . $this->php_ext), ('lang_rules.' . $this->php_ext));
 		/* MG Lang DB - END */
 
 		// get all the extensions installed
 		$packs = array();
+		
 		@reset($countries);
+		
 		while (list($country_dir, $country_name) = @each($countries))
 		{
-			$dir = @opendir(IP_ROOT_PATH . 'language/' . $country_dir);
+			$dir = @opendir($this->root_path . 'language/' . $country_dir);
+			
 			while ($file = @readdir($dir))
 			{
-				//if(preg_match("/^lang_.*?\." . PHP_EXT . "$/", $file))
-				//if((preg_match("/^lang_user_created.*?\." . PHP_EXT . "$/", $file)) || (preg_match("/^lang_main_settings.*?\." . PHP_EXT . "$/", $file)))
-				//if((preg_match("/^lang_user_created.*?\." . PHP_EXT . "$/", $file)) || (preg_match("/^lang_profile_fields.*?\." . PHP_EXT . "$/", $file)))
-				if(preg_match("/^lang_user_created.*?\." . PHP_EXT . "$/", $file))
+				if ( ( $file == '.' || $file == '..') || (substr(strrchr($file, '.'), 1) !== $this->php_ext) || (strpos($file, 'lang_') === false))
+				{
+					continue;
+				}				
+				
+				$pattern = 'lang_u';
+				if (preg_match('/' . $pattern . '/i', $file))
+				//if(preg_match("/^lang_user_created.*?\." . $this->php_ext . "$/", $file))
+				//if((preg_match("/^lang_user_created.*?\." . $this->php_ext . "$/", $file)) || (preg_match("/^lang_main.*?\." . $this->php_ext . "$/", $file)))
+				//if((preg_match("/^lang_user_created.*?\." . $this->php_ext . "$/", $file)) || (preg_match("/^lang_admin.*?\." . $this->php_ext . "$/", $file)))
+				//if(preg_match("/^lang_user_created.*?\." . $this->php_ext . "$/", $file))
 				{
 					/* MG Lang DB - BEGIN */
 					if (!in_array($file, $skip_files))
@@ -3686,13 +3696,11 @@ class mxp_translator
 					}
 				}
 				/* MG Lang DB - BEGIN */
-				/*
-				if(preg_match("/^lang_extend_.*?\." . PHP_EXT . "$/", $file))
+				if(preg_match("/^lang_extend_.*?\." . $this->php_ext . "$/", $file))
 				{
-					$displayname = trim(str_replace(('.' . PHP_EXT), '', str_replace('lang_extend_', '', $file)));
+					$displayname = trim(str_replace(('.' . $this->php_ext), '', str_replace('lang_extend_', '', $file)));
 					$packs[$file] = $displayname;
 				}
-				*/
 				/* MG Lang DB - END */
 			}
 			@closedir($dir);
@@ -3713,11 +3721,11 @@ class mxp_translator
 		global $countries, $packs;
 
 		// get filename
-		$file = IP_ROOT_PATH . 'language/' . $country_dir . '/' . $pack_file;
+		$file = $this->root_path . 'language/' . $country_dir . '/' . $pack_file;
 		if (($pack_file != 'lang') && ($pack_file != 'custom') && !file_exists($file))
 		{
-			die('This file doesn\'t exist: ' . $file);
-			//echo('This file doesn\'t exist: ' . $file . '<br />');
+			//die('This file doesn\'t exist: ' . $file);
+			echo('This file doesn\'t exist: ' . $file . '<br />');
 		}
 
 		// process first admin then standard keys
@@ -3726,18 +3734,16 @@ class mxp_translator
 			$lang_extend_admin = ($i == 0);
 
 			/* MG Lang DB - BEGIN */
-			/*
 			// fix the filename for standard keys
 			if ($pack_file == 'lang')
 			{
-				$file = IP_ROOT_PATH . 'language/' . $country_dir . '/' . ($lang_extend_admin ? 'lang_admin.' : 'lang_main.') . PHP_EXT;
+				$file = $this->root_path . 'language/' . $country_dir . '/' . ($lang_extend_admin ? 'lang_admin.' : 'lang_main.') . $this->php_ext;
 			}
 			// fix the filename for custom keys
 			if ($pack_file == 'custom')
 			{
-				$file = IP_ROOT_PATH . 'language/' . $country_dir . '/' . 'lang_extend.' . PHP_EXT;
+				$file = $this->root_path . 'language/' . $country_dir . '/' . 'lang_extend.' . $this->php_ext;
 			}
-			*/
 			/* MG Lang DB - END */
 
 			// process
@@ -3825,14 +3831,12 @@ class mxp_translator
 		if ($modified)
 		{
 			/* MG Lang DB - BEGIN */
-			/*
 			@reset($countries);
 			while (list($country_dir, $country_name) = @each($countries))
 			{
 				$pack_file = 'custom';
 				$this->read_one_pack($country_dir, $pack_file, $entries);
 			}
-			*/
 			/* MG Lang DB - END */
 
 			// add the missing keys in a language
@@ -3989,15 +3993,15 @@ class mxp_translator
 			);
 
 			$array_replace = array(
-				'$' . 'Id: ' . $pack_filename . ' ' . $edittime . ' ' . $user->data['username'] . ' $',
+				'$' . 'Id: ' . $pack_filename . ' ' . $edittime . ' ' . $this->user->data['username'] . ' $',
 				$country_name,
 				$edittime,
-				$user->data['username'],
+				$this->user->data['username'],
 			);
 
 			$file_content = str_replace($array_find, $array_replace, $file_content);
 
-			$filename = IP_ROOT_PATH . 'language/' . $country_dir . '/' . $pack_filename;
+			$filename = $this->root_path . 'language/' . $country_dir . '/' . $pack_filename;
 			$this->write_file($filename, $file_content);
 		}
 	}
@@ -4016,7 +4020,7 @@ class mxp_translator
 			"\n",
 		);
 
-		$string = str_replace($array_find, $array_replace, stripslashes($string));
+		$string = str_replace($array_find, $array_replace, stripslashes(print_r($string, true)));
 		return $string;
 	}
 

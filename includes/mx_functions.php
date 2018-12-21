@@ -718,7 +718,7 @@ function mx_create_date($format, $gmepoch, $tz)
 	}
 	
 	// Zone offset
-	$zone_offset = $mx_user->timezone + $mx_user->dst;
+	$zone_offset = $mx_user->int_timezone + $mx_user->dst;
 		
 	// Show date <= 1 hour ago as 'xx min ago' but not greater than 60 seconds in the future
 	// A small tolerence is given for times in the future but in the same minute are displayed as '< than a minute ago'
@@ -1163,7 +1163,7 @@ function generate_portal_url($without_script_path = false)
 	$server_port = (!empty($_SERVER['SERVER_PORT'])) ? (int) $_SERVER['SERVER_PORT'] : (int) getenv('SERVER_PORT');
 
 	// Forcing server vars is the only way to specify/override the protocol
-	if ($board_config['force_server_vars'] || !$server_name)
+	if ((isset($board_config['force_server_vars']) && $board_config['force_server_vars']) || !$server_name)
 	{
 		$server_protocol = ($server_protocol) ? $server_protocol : (($portal_config['cookie_secure']) ? 'https://' : 'http://');
 		$server_name = $portal_config['server_name'];
@@ -1232,6 +1232,72 @@ function mx_generate_link_hash($link_name)
 	return $mx_user->data["hash_$link_name"];
 }
 
+/**
+*
+* @version Version 0.1 / $Id: functions.php,v 1.28 2014/05/16 18:02:39 orynider Exp $
+*
+	* Portable PHP password hashing framework.
+	*
+	* Written by Solar Designer <solar at openwall.com> in 2004-2006 and placed in
+	* the public domain.
+	*
+	* There's absolutely no warranty.
+	*
+	* The homepage URL for this framework is:
+	*
+	*	http://www.openwall.com/phpass/
+	*
+	* Please be sure to update the Version line if you edit this file in any way.
+	* It is suggested that you leave the main version number intact, but indicate
+	* your project name (after the slash) and add your own revision information.
+	*
+	* Please do not change the "private" password hashing method implemented in
+	* here, thereby making your hashes incompatible.  However, if you must, please
+	* change the hash type identifier (the "$P$") to something different.
+	*
+	* Obviously, since this code is in the public domain, the above are not
+	* requirements (there can be none), but merely suggestions.
+	*
+*
+* Hash the password
+*/
+function mx_hash($password)
+{
+	global $phpBB3;
+
+	$itoa64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+
+	$random_state = mx_unique_id();
+	$random = '';
+	$count = 6;
+
+	if (($fh = @fopen('/dev/urandom', 'rb')))
+	{
+		$random = fread($fh, $count);
+		fclose($fh);
+	}
+
+	if (strlen($random) < $count)
+	{
+		$random = '';
+
+		for ($i = 0; $i < $count; $i += 16)
+		{
+			$random_state = md5(mx_unique_id() . $random_state);
+			$random .= pack('H*', md5($random_state));
+		}
+		$random = substr($random, 0, $count);
+	}
+
+	$hash = $phpBB3->_hash_crypt_private($password, $phpBB3->_hash_gensalt_private($random, $itoa64), $itoa64);
+
+	if (strlen($hash) == 34)
+	{
+		return $hash;
+	}
+
+	return md5($password);
+}
 
 /**
 * checks a link hash - for GET requests
@@ -1242,6 +1308,58 @@ function mx_generate_link_hash($link_name)
 function mx_check_link_hash($token, $link_name)
 {
 	return $token === mx_generate_link_hash($link_name);
+}
+
+/**
+* Hashes an email address to a big integer
+*
+* @param string $email		Email address
+*
+* @return string			Unsigned Big Integer
+*/
+function mx_email_hash($email)
+{
+	return sprintf('%u', crc32(strtolower($email))) . strlen($email);
+}
+
+/**
+* Hashes an email address to a big integer
+*
+* @param string $email		Email address
+*
+* @return string			Unsigned Big Integer
+*/
+function phpbb_rhea_email_hash($email)
+{
+	return sprintf('%u', crc32(strtolower($email))) . strlen($email);
+}
+
+/**
+* Wrapper for version_compare() that allows using uppercase A and B
+* for alpha and beta releases.
+*
+* See http://www.php.net/manual/en/function.version-compare.php
+*
+* @param string $version1		First version number
+* @param string $version2		Second version number
+* @param string $operator		Comparison operator (optional)
+*
+* @return mixed					Boolean (true, false) if comparison operator is specified.
+*								Integer (-1, 0, 1) otherwise.
+*/
+function mx_version_compare($version1, $version2, $operator = null)
+{
+	$version1 = strtolower($version1);
+	$version2 = strtolower($version2);
+
+	if (is_null($operator))
+	{
+		return version_compare($version1, $version2);
+	}
+	else
+	{
+		return version_compare($version1, $version2, $operator);
+	}
 }
 
 /**
@@ -1810,14 +1928,14 @@ function mx_get_user_rank($userdata, $user_posts, &$rank_title = null, &$rank_im
  */
 function mx_language_select($default, $select_name = "language", $dirname="language")
 {
-	global $phpEx, $mx_root_path;
+	global $phpEx, $phpBB2, $mx_root_path;
 
 	$dir = opendir($mx_root_path . $dirname);
 
 	$lang = array();
 	while ( $file = readdir($dir) )
 	{
-		if (preg_match('#^lang_#i', $file) && !is_file(@phpBB2::phpbb_realpath($mx_root_path . $dirname . '/' . $file)) && !is_link(@phpBB2::phpbb_realpath($mx_root_path . $dirname . '/' . $file)))
+		if (preg_match('#^lang_#i', $file) && !is_file(@$phpBB2->phpbb_realpath($mx_root_path . $dirname . '/' . $file)) && !is_link(@$phpBB2->phpbb_realpath($mx_root_path . $dirname . '/' . $file)))
 		{
 			$filename = trim(str_replace("lang_", "", $file));
 			$displayname = preg_replace("/^(.*?)_(.*)$/", "\\1 [ \\2 ]", $filename);
@@ -2552,7 +2670,7 @@ function get_list_opt($name_select, $table, $idfield, $namefield, $id, $select)
 
 	$column_list = '<select name="'. $name_select . '">';
 	$selected = ( $id == 0 ) ? ' selected="selected"' : '';
-	$column_list .= '<option value="0"' . $selected . '>' . $lang['Not_Specified'] . "</option>\n";
+	$column_list .= '<option value="0"' . $selected . '>' . (isset($lang['Not_Specified']) ? $lang['Not_Specified'] : $lang['NOT_SPECIFIED']) . "</option>\n";
 	while( $row = $db->sql_fetchrow($result) )
 	{
 		$selected = ( $row[$idfield] == $id ) ? ' selected="selected"' : '';

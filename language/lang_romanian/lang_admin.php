@@ -15,6 +15,7 @@
 setlocale(LC_ALL, 'en');
 
 
+$lang['USER_LANG'] = 'ro';
 $lang['ENCODING'] = 'UTF-8';
 $lang['DIRECTION'] = 'ltr';
 $lang['LEFT'] = 'stânga';
@@ -219,7 +220,13 @@ $lang['list_of_queries'] = 'This is the result list of the SQL queries needed fo
 $lang['already_added'] = 'Error or Already added';
 $lang['added_upgraded'] = 'Added/Updated';
 $lang['upgrading_mods'] = 'If you get some Errors, Already Added or Updated messages, relax, this is normal when updating mods';
+$lang['upgrading_modules'] = 'If you get some Errors, Already Added or Updated messages, relax, this is normal when updating mods';
+$lang['consider_upgrading'] = 'Module is already installed...consider upgrading ;)';
+$lang['upgrading'] = 'Upgrading';
 $lang['module_upgrade'] = 'This is a upgrade';
+$lang['nothing_upgrade'] = 'Nothing to upgrade...';
+$lang['upgraded_to_ver'] = '...Now upgraded to v. ';
+$lang['module_not_installed'] = 'Module not installed...and thus cannot be upgraded';
 $lang['fresh_install'] = 'This is a fresh install';
 $lang['module_install_info'] = 'Mod Installation/Upgrading/Uninstalling Information - mod specific db tables';
 
@@ -310,6 +317,7 @@ $lang['Create_block']				= 'Creare Bloc Nou';
 $lang['Delete_block']				= 'Şterge Bloc din Portal';
 $lang['Delete_block_explain']		= 'Acesta va şterge blocul şi va actualiza toate paginile portalului asociate. Atenţie, această operaţie nu este reversibilă!';
 $lang['Click_block_delete_yes']		= 'Click %sAici%s pt. a şterge Blocul';
+$lang['Block_parameter'] = 'Block parameter';
 
 /*
 * BlockCP Administration
@@ -443,6 +451,7 @@ $lang['Sort_Descending']		= 'DESC';
 $lang['Return_to_page']			= 'Întoarcere la Pagina Portalului';
 $lang['Auth_Page_group']		= '-> Grup PRIVAT';
 $lang['Page_desc']				= 'Descripţie';
+$lang['Page_parent'] = 'Parent Page';
 $lang['Page_graph_border']		= 'Grafică bordura paginii - fişier prefix';
 $lang['Page_graph_border_explain']	= 'Pentru a folosi grafica bordurii în jurul Blocurilor, specifică prefixul pentru fişierele grafice aici. De exemplu, introdu \'border_\' pt. a folosi fişierele: border_1-1.gif, border_1-2.gif,..., border_3-3.gif pentru matricea de 3x3 cu imagini-gif. Lasă blank (gol) pt. a dezactiva grafica bordurii (implicit).';
 $lang['Add_Page']					= 'Adaugă Pagina Noua';
@@ -646,8 +655,13 @@ $lang['default_block_id_explain']	= '- Acesta este blocul implicit de afişat, e
 */
 $lang['menu_display_mode']			= 'Mod Plan';
 $lang['menu_display_mode_explain ']	= 'Mod plan Orizonal ori Vertical';
-$lang['menu_page_sync']				= 'Lumineză cel curent?';
-$lang['menu_page_sync_explain']		= 'Lumineză intrare la Meniul de Nav. curent...';
+$lang['menu_custom_tpl']				= "Custom template file";
+$lang['menu_custom_tpl_explain ']		= "Eg mx_menu_custom.tpl";
+$lang['menu_page_parent']				= "Parent Page";
+$lang['menu_page_parent_explain ']		= "Navigation from this parent page";
+$lang['menu_page_sync']				= 'Lumineza cel curent?';
+$lang['menu_page_sync_explain']		= 'Lumineza intrare la Meniul de Nav. curent...';
+
 
 /*
 * Version Checker
@@ -657,6 +671,17 @@ $lang['MXP_Version_outdated'] = 'Se pare ca instalarea ta MXP <b>nu</b> este la 
 $lang['MXP_Latest_version_info'] = 'Ultima veriune disponibilă este <b>MXP %s</b>. ';
 $lang['MXP_Current_version_info'] = 'Tu ai <b>MXP %s</b>.';
 $lang['MXP_Mailing_list_subscribe_reminder'] = 'Pentru ultimile informaţii de ştiri şi actualizări pentru MXP, de ce nu <a href="http://lists.sourceforge.net/lists/listinfo/mxpcms-news" target="_new">înscriete la lista de mailuri</a>.';
+$lang['Trans_title']				= 'Translate to your Language';
+$lang['Trans_description']			= 'Use Translate Control Panel to translate portal to your language';
+$lang['Trans_which_core']			= 'Which Part';
+$lang['Trans_select_file']			= 'Select file to translate';
+$lang['Trans_from_desc']			= 'Default language to translate from';
+$lang['Trans_leave_orig']			= 'If not translated <b>leave original</b> text';
+$lang['Trans_selected_file']		= 'Selected File';
+$lang['Trans_lang_source']			= 'Source Language';
+$lang['Trans_lang_dest']			= 'Destination Language';
+$lang['Trans_lang_block']			= 'Language block';
+$lang['Trans_save_file']			= 'Save language file';
 /* lang_admin_gd_info.php - BEGIN */
 $lang['GD_Title'] = 'GD Info';
 $lang['NO_GD'] = 'No GD';
@@ -679,18 +704,63 @@ $lang['GD_0'] = 'No GD';
 $lang['GD_1'] = 'GD1';
 $lang['GD_2'] = 'GD2';
 $lang['GD_show_img_no_gd'] = 'Show GIF thumbnails without using GD libraries (full images are loaded and then just shown resized).';
+
 /* lang_admin_gd_info.php - END */
-$lang['Trans_title']				= 'Translate to your Language';
-$lang['Trans_description']			= 'Use Translate Control Panel to translate portal to your language';
-$lang['Trans_which_core']			= 'Which Part';
-$lang['Trans_select_file']			= 'Select file to translate';
-$lang['Trans_from_desc']			= 'Default language to translate from';
-$lang['Trans_leave_orig']			= 'If not translated <b>leave original</b> text';
-$lang['Trans_selected_file']		= 'Selected File';
-$lang['Trans_lang_source']			= 'Source Language';
-$lang['Trans_lang_dest']			= 'Destination Language';
-$lang['Trans_lang_block']			= 'Language block';
-$lang['Trans_save_file']			= 'Save language file';
+
+/* lang_phpbbmyadmin.php - BEGIN */
+$lang['SQL_Admin_EXPLAIN'] = 'phpBBMyAdmin is in no way affiliated with phpMyAdmin (www.phpmyadmin.net)';
+$lang['SQL_Admin_Title'] = 'Welcome to phpBBMyAdmin';
+$lang['SQL_Admin_Copyright'] = 'phpBBMyAdmin v0.3.5 � 2003, 2004 Armin Altorffer';
+$lang['SQL_Admin_Current_Time'] = 'The current board time is %d (%s)';
+$lang['SQL_Admin_No_Access'] = 'You are not allowed to access the database!';
+$lang['SQL_Admin_Query_Title'] = 'Enter your query here';
+$lang['SQL_Admin_Tables_Error'] = 'Error retrieving list of tables, how can this be?';
+$lang['SQL_Admin_Tables_Title'] = 'Currently existing tables (%d - totalling %s)';
+$lang['SQL_Admin_No_Table'] = 'No table specified!';
+$lang['SQL_Admin_Columns_Error'] = 'Error retrieving columns!';
+$lang['SQL_Admin_Columns_Title'] = 'Columns for table %s';
+$lang['SQL_Admin_Repair_Error'] = 'Error repairing table %s!';
+$lang['SQL_Admin_Repair_Done'] = 'Done repairing %d tables.<br />Click %shere%s to return to phpBBMyAdmin board.<br />Click %shere%s to return to Admin Control Panel board.';
+$lang['SQL_Admin_Optimize_Error'] = 'Error optimizing table %s!';
+$lang['SQL_Admin_Optimize_Done'] = 'Done optimizing %d tables.<br />Click %shere%s to return to phpBBMyAdmin board.<br />Click %shere%s to return to Admin Control Panel board.';
+$lang['SQL_Admin_Optimize_All_Button'] = 'Optimize All';
+$lang['SQL_Admin_Repair_All_Button'] = 'Repair All';
+$lang['SQL_Admin_Submit_Button'] = 'Submit';
+$lang['SQL_Admin_Structure_Word'] = 'Structure';
+$lang['SQL_Admin_Field_Word'] = 'Field';
+$lang['SQL_Admin_Type_Word'] = 'Type';
+$lang['SQL_Admin_Null_Word'] = 'NULL';
+$lang['SQL_Admin_Key_Word'] = 'Key';
+$lang['SQL_Admin_Default_Word'] = 'Default';
+$lang['SQL_Admin_Extra_Word'] = 'Extra';
+$lang['SQL_Admin_Error_In_Query'] = 'Error in SQL query %s<br />Click %shere%s to return to phpBBMyAdmin board.<br />Click %shere%s to return to Admin Control Panel board.';
+$lang['SQL_Admin_No_Query'] = 'Please specify a valid SQL query!<br />Click %shere%s to return to phpBBMyAdmin board.<br />Click %shere%s to return to Admin Control Panel board.';
+$lang['SQL_Admin_Drop_Word'] = 'Drop';
+$lang['SQL_Admin_Delete_Word'] = 'Delete';
+$lang['SQL_Admin_Optimize_Word'] = 'Optimize';
+$lang['SQL_Admin_Repair_Word'] = 'Repair';
+$lang['SQL_Admin_Empty_Word'] = 'Empty';
+$lang['SQL_Admin_Browse_Word'] = 'Browse';
+$lang['SQL_Admin_ASC_Word'] = 'ASC';
+$lang['SQL_Admin_DESC_Word'] = 'DESC';
+$lang['SQL_Admin_Success_Query'] = 'Successfully performed query %s<br />Click %shere%s to return to phpBBMyAdmin board.<br />Click %shere%s to return to Admin Control Panel board.';
+$lang['SQL_Admin_Browse_Error'] = 'Error browsing table %s!';
+$lang['SQL_Admin_Browse_Title'] = 'Rows for table %s';
+$lang['SQL_Admin_Prev_Page'] = 'Previous page';
+$lang['SQL_Admin_Next_Page'] = 'Next page';
+$lang['SQL_Admin_First_Page'] = 'First page';
+$lang['SQL_Admin_Confirm'] = 'Are you sure of this?';
+$lang['SQL_Admin_Yes_Word'] = 'Yes';
+$lang['SQL_Admin_No_Word'] = 'No';
+$lang['SQL_Admin_Name_Word'] = 'Name';
+$lang['SQL_Admin_Actions_Word'] = 'Actions';
+$lang['SQL_Admin_Type_Word'] = 'Type';
+$lang['SQL_Admin_Rows_Word'] = 'Rows';
+$lang['SQL_Admin_Data_Length_Word'] = 'Size';
+$lang['SQL_Admin_Optimization_Word'] = 'Optimized';
+$lang['SQL_Admin_With_Selected_Word'] = 'With selected';
+/* lang_phpbbmyadmin.php - END */
+
 
 /*
 * Asta e tot lume!

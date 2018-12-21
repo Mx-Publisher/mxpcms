@@ -763,9 +763,10 @@ $s_feed_news = isset($s_feed_news) ? $s_feed_news : false;
 
 //
 // Format Timezone. We are unable to use array_pop here, because of PHP3 compatibility
-//
+// 'board_timezone' can be  for e.g. Europe/Bucharest
 $l_timezone = explode( '.', $board_config['board_timezone'] );
-$l_timezone = ( count( $l_timezone ) > 1 && $l_timezone[count( $l_timezone )-1] != 0 ) ? $lang[sprintf( '%.1f', $board_config['board_timezone'] )] : $lang[number_format( $board_config['board_timezone'] )];
+$lang_user_timezone = $mx_user->timezone;
+$l_timezone = (count($l_timezone) > 1 && $l_timezone[count($l_timezone)-1] != 0 ) ? $lang[sprintf('%.1f', $board_config['board_timezone'])] : $lang_user_timezone;
 
 if (empty($mx_page->page_alt_icon))
 {

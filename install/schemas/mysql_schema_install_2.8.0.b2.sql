@@ -163,14 +163,14 @@ CREATE TABLE `mx_table_column` (
 #
 INSERT INTO mx_table_column VALUES("8", "Main", "50", NULL, "100%", "4");
 INSERT INTO mx_table_column VALUES("2", "Main", "35", NULL, "100%", "1");
-INSERT INTO mx_table_column VALUES("7", "Left", "40", NULL, "200", "4");
+INSERT INTO mx_table_column VALUES("7", "Left", "40", NULL, "124", "4");
 INSERT INTO mx_table_column VALUES("6", "Main", "50", NULL, "100%", "3");
-INSERT INTO mx_table_column VALUES("5", "Left", "40", NULL, "200", "3");
+INSERT INTO mx_table_column VALUES("5", "Left", "40", NULL, "124", "3");
 INSERT INTO mx_table_column VALUES("4", "Main", "50", NULL, "100%", "2");
-INSERT INTO mx_table_column VALUES("1", "Left", "25", NULL, "200", "1");
-INSERT INTO mx_table_column VALUES("3", "Left", "40", NULL, "200", "2");
+INSERT INTO mx_table_column VALUES("1", "Left", "25", NULL, "124", "1");
+INSERT INTO mx_table_column VALUES("3", "Left", "40", NULL, "124", "2");
 INSERT INTO mx_table_column VALUES("10", "Main", "50", NULL, "100%", "5");
-INSERT INTO mx_table_column VALUES("9", "Left", "40", NULL, "200", "5");
+INSERT INTO mx_table_column VALUES("9", "Left", "40", NULL, "124", "5");
 
 #
 # Table structure for table 'mx_table_column_block'
@@ -230,10 +230,10 @@ CREATE TABLE `mx_table_column_templates` (
 #
 # Dumping data for table 'mx_table_column_templates'
 #
-INSERT INTO mx_table_column_templates VALUES("1", "Left", "40", "200", "2");
+INSERT INTO mx_table_column_templates VALUES("1", "Left", "40", "124", "2");
 INSERT INTO mx_table_column_templates VALUES("2", "Main", "50", "100%", "2");
 INSERT INTO mx_table_column_templates VALUES("3", "Main", "10", "100%", "3");
-INSERT INTO mx_table_column_templates VALUES("4", "Right", "20", "200", "3");
+INSERT INTO mx_table_column_templates VALUES("4", "Right", "20", "124", "3");
 INSERT INTO mx_table_column_templates VALUES("5", "Left", "10", "180", "4");
 INSERT INTO mx_table_column_templates VALUES("6", "Middle", "20", "100%", "4");
 INSERT INTO mx_table_column_templates VALUES("7", "Right", "30", "180", "4");

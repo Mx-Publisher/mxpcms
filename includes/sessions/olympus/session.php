@@ -86,6 +86,7 @@ class session
 	var $style = 1;
 	var $date_format;
 	var $timezone;
+	var $int_timezone;
 	var $dst;
 
 	/**
@@ -1689,8 +1690,7 @@ class session
 		{
 			$board_config = $mx_cache->obtain_config(false);
 		}
-		
-		$board_config['avatar_gallery_path'] = isset($board_config['avatar_gallery_path']) ? $board_config['avatar_gallery_path'] : 'images/avatars'; 
+		$board_config['avatar_gallery_path'] = 'includes/shared/phpbb2/images/avatar/'; 
 		$board_config['user_timezone'] = !empty($board_config['user_timezone']) ? $board_config['user_timezone'] : $board_config['board_timezone'];
 		$this->data['user_dst'] = !empty($this->data['user_dst']) ? $this->data['user_dst'] : $this->data['user_timezone'];
 		$board_config['require_activation'] = 0;
@@ -1883,7 +1883,7 @@ class session
 		{
 			$sql = "UPDATE " . PORTAL_TABLE . " SET
 				default_lang = '" . $this->decode_lang($this->lang['default_lang']) . "'
-				WHERE portal_id = '1'";
+				WHERE portal_id = '1'";				
 
 			if (!($result = $db->sql_query($sql)))
 			{
@@ -2545,8 +2545,8 @@ class session
 					if ((@include str_replace("phpbb3", "phpbb2", $language_filename)) !== false)
 					{
 						die('Language file (set_lang) ' . str_replace("phpbb2", "phpbb3", $language_filename) . ' couldn\'t be opened by set_lang().');
-					}					
-				}				
+					}
+				}
 			}
 		}
 		else
@@ -2599,10 +2599,10 @@ class session
 	 * Params are the language key and the parameters to be substituted.
 	 * This function/functionality is inspired by SHS` and Ashe.
 	 *
-	 * Example call: <samp>$user->lang('NUM_POSTS_IN_QUEUE', 1);</samp>
+	 * Example call: <samp>$mx_user->lang('NUM_POSTS_IN_QUEUE', 1);</samp>
 	 *
 	 * If the first parameter is an array, the elements are used as keys and subkeys to get the language entry:
-	 * Example: <samp>$user->lang(array('datetime', 'AGO'), 1)</samp> uses $user->lang['datetime']['AGO'] as language entry.
+	 * Example: <samp>$mx_user->lang(array('datetime', 'AGO'), 1)</samp> uses $user->lang['datetime']['AGO'] as language entry.
 	 *
 	 * @return string	Return localized string or the language key if the translation is not available
 	 */
@@ -3772,17 +3772,17 @@ class session
 			// Nested img
 			$image_filename = $img;
 			$img_ext = substr(strrchr($image_filename, '.'), 1);
-			$img = basename($image_filename, '.' . $img_ext);
+			$img = basename($image_filename, '.' . $img_ext);			
 			
 			unset($img_name, $image_filename);
 		}
 		else
 		{
-			$img_ext = 'gif';
+			$img_ext = 'gif';			
 		}		
 		
 		switch ($type)
-		{
+		{						
 			case 'filename':
 				return $img . '.' . $img_ext;
 			break;
@@ -3819,9 +3819,8 @@ class session
 				$img_data = '';
 				return $img_data;
 			}
-			
-			$img_data['src'] = PHPBB_URL . 'styles/' . rawurlencode($this->theme['template_name'] ? $this->theme['template_name'] : str_replace('.css', '', $this->theme['head_stylesheet'])) . '/imageset/' . ($this->img_array[$img]['image_lang'] ? $this->img_array[$img]['image_lang'] .'/' : '') . $this->img_array[$img]['image_filename'];
-			//$img_data['src'] = PHPBB_URL . 'styles/' . $this->theme['imageset_path'] . '/imageset/' . ($this->img_array[$img]['image_lang'] ? $this->img_array[$img]['image_lang'] .'/' : '') . $this->img_array[$img]['image_filename'];
+
+			$img_data['src'] = PHPBB_URL . 'styles/' . $this->theme['imageset_path'] . '/imageset/' . ($this->img_array[$img]['image_lang'] ? $this->img_array[$img]['image_lang'] .'/' : '') . $this->img_array[$img]['image_filename'];
 			$img_data['width'] = isset($this->img_array[$img]['image_width']) ? $this->img_array[$img]['image_width'] : $width;
 			$img_data['height'] = isset($this->img_array[$img]['image_height']) ? $this->img_array[$img]['image_width'] : $width;
 		}
@@ -3866,6 +3865,29 @@ class session
 	{
 		static $imgs;
 		global $phpbb_root_path, $mx_root_path, $theme, $board_config;
+		global $mx_block;
+		
+		//
+		// Look at MX-Publisher-Module folder.........................................................................MX-Publisher-module
+		//
+		if (isset($mx_block->module_root_path))
+		{
+			$this->module_root_path = $this->ext_path = $mx_block->module_root_path;
+		}
+		else
+		{
+			global $module_root_path; 
+			
+			if (isset($module_root_path))
+			{
+				$this->module_root_path = $this->ext_path = $module_root_path;
+			}
+			else
+			{
+				global $mx_root_path;
+				$this->module_root_path = $this->ext_path = $mx_root_path . 'modules/mx_coreblocks/';
+			}
+		}
 		
 		$title = '';
 		$img_ext = 'gif'; 

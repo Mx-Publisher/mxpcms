@@ -44,6 +44,7 @@ $mx_user->init($user_ip, PAGE_ACP);
 */
 $mx_user->init_style();
 
+$mx_user->_load_lang($mx_root_path . 'includes/shared/phpbb3/', 'acp/common');
 
 if ( !$userdata['session_logged_in'] )
 {

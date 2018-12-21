@@ -479,27 +479,27 @@ class Template
 	function load_replacements($file)
 	{	
 		global $mx_root_path, $phpbb_root_path;
-		
-		if (!file_exists($file) && !file_exists($mx_root_path . $file) && !file_exists($phpbb_root_path . $file))
+
+		if (!mx_local_file_exists($file) && !mx_local_file_exists($mx_root_path . $file) && !mx_local_file_exists($phpbb_root_path . $file))
 		{
 			// trigger_error cannot be used here, as the output already started
 			//echo 'template->_php_include(): File ' . htmlspecialchars($file) . ' does not exist or is empty';
 			return;
-		}		
+		}
 		
-		if(@file_exists($file))
+		if(@mx_local_file_exists($file))
 		{
 			$replace = array();
 			@include($file);
 			$this->replace = array_merge($this->replace, $replace);
 		}
-		elseif(@file_exists($phpbb_root_path . $file))
+		elseif(@mx_local_file_exists($phpbb_root_path . $file))
 		{
 			$replace = array();
 			@include($phpbb_root_path . $file);
 			$this->replace = array_merge($this->replace, $replace);
 		}
-		elseif(@file_exists($mx_root_path . $file))
+		elseif(@mx_local_file_exists($mx_root_path . $file))
 		{
 			$replace = array();
 			@include($mx_root_path . $file);
@@ -934,7 +934,7 @@ class Template
 			return $this->cachedir . XS_TPL_PREFIX2 . $str . $sufix2;
 		}
 		// removing not needed part
-		$file = substr($file, $this->tpldir_len, strlen($file . $sufix)) . $sufix3;
+		$file = substr($file, $this->tpldir_len, strlen($file . $sufix3)) . $sufix3;
 		// creating filename
 		return $this->cachedir . XS_TPL_PREFIX . str_replace($this->cache_search, $this->cache_replace, $file) . $sufix1;
 	}

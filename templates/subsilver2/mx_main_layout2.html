@@ -1,0 +1,163 @@
+	<div id="outer_1_col">
+	<div id="inner">
+
+<table width="100%" class="table2 main_table mx_body_table" border="0" cellspacing="5" cellpadding="0" id="main_table">
+	<tr valign="top">
+
+	<!-- BEGIN layout_column -->
+		<div id="{layout_column.COL_CLASS}">
+
+<!-- IF not S_IS_MOBILE -->
+		<td class="{layout_column.COL_CLASS}" width="<!-- IF layout_column.BLOCK_SIZE neq '100%' -->{layout_column.BLOCK_SIZE}px<!-- ENDIF -->" valign="top">
+<!-- ENDIF -->
+
+<!-- IF S_IS_MOBILE -->
+		<div id="{layout_column.COL_CLASS}" style="width: <!-- IF layout_column.BLOCK_SIZE neq '100%' -->{layout_column.blocks.sub_col.BLOCK_SIZE}<!-- ELSE -->99%<!-- ENDIF -->;" >
+<!-- ENDIF -->
+
+		<!-- BEGIN blocks -->
+		<div class="blockcontainer">
+
+			<!-- BEGIN sub_start -->
+			<div border="0" cellspacing="0" cellpadding="0" style="width:<!-- IF layout_column.BLOCK_SIZE neq '100%' -->{layout_column.BLOCK_SIZE}px<!-- ENDIF -->;">
+			<ul id="nav-main" class="nav-main linklist" role="menubar">
+				<li class="tab<!-- IF l_block1.S_SELECTED --> activetab<!-- ENDIF -->">
+			<!-- END sub_start -->
+				<dt>&nbsp;</dt>
+				<!-- BEGIN sub_col -->
+				{layout_column.blocks.sub_col.INNER_SPACE}
+				<dt class="{layout_column.blocks.sub_col.COL_CLASS}" style="width:<!-- IF layout_column.blocks.sub_col.BLOCK_SIZE neq '100%' -->{layout_column.blocks.sub_col.BLOCK_SIZE}<!-- ELSE -->{BLOCK_SIZE}<!-- ENDIF -->">
+				<!-- END sub_col -->
+
+<!-- IF S_IS_MOBILE and (layout_column.BLOCK_SIZE neq '100%') -->
+		<td>
+<!-- ENDIF -->
+						 <table width="<!-- IF layout_column.BLOCK_SIZE neq '100%' -->{BLOCK_SIZE}<!-- ELSE -->100%<!-- ENDIF -->" cellpadding="0" cellspacing="0" border="0" class="mx_graphborder">
+							 <body>
+							  <tr>
+								   <td>
+
+							  				<!-- BEGIN block_header -->
+											<div class="blockheader">
+
+							  						<table width="<!-- IF layout_column.BLOCK_SIZE neq '100%' -->{BLOCK_SIZE}<!-- ELSE -->100%<!-- ENDIF -->" cellpadding="0" cellspacing="0" border="0" class="table2 forumline" style="border-bottom:none; padding:1px 1px 0px 1px;">
+
+														<tr>
+							  								<td>
+										  						<table width="<!-- IF layout_column.BLOCK_SIZE neq '100%' -->{BLOCK_SIZE}<!-- ELSE -->100%<!-- ENDIF -->" cellpadding="0" cellspacing="0" border="0">
+										  							<thead>
+																	<tr>
+							  						<!-- END block_header -->
+
+											 							<!-- BEGIN show_title -->
+																		<th class="thCornerL" align="left" width="100%">
+																			&nbsp;{layout_column.blocks.show_title.L_TITLE}&nbsp;
+																		</th>
+																		<!-- END show_title -->
+
+																		<!-- BEGIN edit -->
+
+																		<th class="thTop" align="right" width="1">
+																			<i id="edit" class="post-buttons editCP_switch" role="edit" style="float:right;margin-bottom:2px;padding-bottom:1px;font-size:8px;display: {layout_column.blocks.edit.EDITCP_SHOW};">
+
+																				<form action="{layout_column.blocks.edit.EDIT_ACTION}" method="post" class="forum-title submit-buttons">
+																				<table width="100%" cellpadding="0" cellspacing="0" border="0">
+<thead>
+													  									<tr>
+
+																  							<!-- BEGIN hidden_block -->
+																							<td align="right">
+																								<span class="gensmall"><i>HB</i></span>
+																								{layout_column.blocks.edit.hidden_block.HIDDEN_BLOCK}
+																							</td>
+																							<!-- END hidden_block -->
+																							<td align="right">
+																							<fieldset>
+																								<!-- {layout_column.blocks.edit.EDIT_IMG} -->   
+																								<button class="button{catrow.CURRENT} editCP_switch" type="submit" title="{L_Block_Edit} :: {layout_column.blocks.edit.EDIT_BLOCK_TITLE} :: {layout_column.blocks.edit.EDIT_BLOCK_DESC}" style="font-size:9px;">
+																								<i class="fa fa-star-o" style="float:top;vertical-align: 25%;whitespace: false;" aria-hidden="false"></i>
+																								{L_EDIT}
+																								</button>
+																								{layout_column.blocks.edit.S_HIDDEN_FORM_FIELDS}
+																							</fieldset>
+														  									</td>
+
+													  									</tr>
+</thead>
+																				</table>
+																				</form>
+																			</i>
+																		</th>
+
+																		<!-- END edit -->
+
+											 							<!-- BEGIN show_title -->
+																		<th class="thCornerR" align="right" width="1">
+
+																		</th>
+																		<!-- END show_title -->
+
+													<!-- BEGIN block_header -->
+																	</tr>
+
+																</table>
+															</td>
+														</tr>
+													</thead>
+													</table>
+			</div>
+			<!-- END block_header -->
+
+													<div id="block_{layout_column.blocks.BLOCK_ID}">
+
+																{layout_column.blocks.BLOCK}
+
+													</div>
+
+								    </td>
+							   </tr>
+							 </body>
+						  </table>
+<!-- IF S_IS_MOBILE and (layout_column.BLOCK_SIZE neq '100%') -->
+		</td>
+<!-- ENDIF -->
+						<!-- BEGIN block_stats -->
+						<div align="right" style="margin-top:0px;padding-top:0px;">
+							<span class="copyright">{layout_column.blocks.block_stats.L_BLOCK_UPDATED} {layout_column.blocks.block_stats.EDITOR_NAME} ({layout_column.blocks.block_stats.EDIT_TIME})</span>
+						</div>
+						<br clear="all" />
+						<!-- END block_stats -->
+
+				<!-- BEGIN sub_col -->
+					</dt>
+				<!-- END sub_col -->
+					<dt>&nbsp;</dt>
+
+			<!-- BEGIN sub_start -->
+				</li>
+			</ul>			
+			</div>
+			<!-- END sub_start -->
+			
+		</div>
+		<!-- END blocks -->
+		
+
+<!-- IF S_IS_MOBILE -->
+		</div>
+<!-- ENDIF -->
+
+<!-- IF not S_IS_MOBILE -->
+		</td>
+<!-- ENDIF -->
+
+	</div>
+	<!-- END layout_column -->
+	
+	</tr>
+</table>
+
+	<div id="clear"></div>
+
+	</div>
+	</div>

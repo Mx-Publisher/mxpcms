@@ -65,6 +65,7 @@ else
 switch( $mode )
 {
 	case "addnew":
+
 		$install_to = $mx_request_vars->is_get('install_to') ? urldecode($mx_request_vars->get('install_to', MX_TYPE_NO_TAGS)) : $mx_request_vars->post('install_to', MX_TYPE_NO_TAGS);
 		$style_name = $mx_request_vars->is_get('style') ? urldecode($mx_request_vars->get('style', MX_TYPE_NO_TAGS)) : $mx_request_vars->post('style', MX_TYPE_NO_TAGS);
 
@@ -102,7 +103,7 @@ switch( $mode )
 						{
 							@include($mx_root_path. "templates/" . $sub_dir . "/$sub_dir.cfg");
 
-							if ($mx_template_settings['portal_backend'] == PORTAL_BACKEND)
+							if  ( ((PORTAL_BACKEND == 'phpbb2') && (PORTAL_BACKEND == $mx_template_settings['portal_backend']) ) || ((PORTAL_BACKEND == 'internal') && ($mx_template_settings['portal_backend'] == 'internal')) || ( ((PORTAL_BACKEND !== 'internal') || (PORTAL_BACKEND !== 'phpbb2')) && (($mx_template_settings['portal_backend'] !== 'internal') && ($mx_template_settings['portal_backend'] !== 'phpbb2')) || $style_name == 'prosilver') )
 							{
 								$style_name = $sub_dir;
 
@@ -157,9 +158,10 @@ switch( $mode )
 			}
 			closedir($dir);
 		}
-		break;
+	break;
 
 	case "delete":
+
 		$style_id = $mx_request_vars->request('style_id', MX_TYPE_INT);
 
 		if( !$confirm )
@@ -169,7 +171,9 @@ switch( $mode )
 				mx_message_die(GENERAL_MESSAGE, $lang['Cannot_remove_style']);
 			}
 
-			$hidden_fields = '<input type="hidden" name="mode" value="'.$mode.'" /><input type="hidden" name="style_id" value="'.$style_id.'" />';
+			$hidden_fields = '
+			<input type="hidden" name="mode" value="'.$mode.'" />
+			<input type="hidden" name="style_id" value="'.$style_id.'" />';
 
 			//
 			// Set template files
@@ -204,6 +208,7 @@ switch( $mode )
 			{
 				mx_message_die(GENERAL_ERROR, "Could not remove style data!", "", __LINE__, __FILE__, $sql);
 			}
+
 			if (PORTAL_BACKEND !== 'internal')
 			{
 				$sql = "UPDATE " . USERS_TABLE . "
@@ -219,14 +224,33 @@ switch( $mode )
 
 			mx_message_die(GENERAL_MESSAGE, $message);
 		}
-		break;
+	break;
 
 	default:
 
-		$sql = "SELECT themes_id, template_name, style_name
-			FROM " . MX_THEMES_TABLE . "
-			WHERE portal_backend = '" . PORTAL_BACKEND . "'
-			ORDER BY template_name";
+		switch ( PORTAL_BACKEND )
+		{
+			case 'internal':
+			case 'phpbb2':
+				$sql = "SELECT themes_id, template_name, style_name
+					FROM " . MX_THEMES_TABLE . "
+					WHERE portal_backend = '" . PORTAL_BACKEND . "'
+					ORDER BY template_name";
+			break;
+
+			case 'phpbb3':
+			case 'olympus':
+			case 'rhea':
+			case 'ascraeus':
+			case 'proteus':
+			default:
+				$sql = "SELECT themes_id, template_name, style_name
+					FROM " . MX_THEMES_TABLE . "
+					WHERE portal_backend <> 'internal'
+					AND portal_backend <> 'phpbb2'
+					ORDER BY template_name";
+			break;
+		}
 		if(!$result = $db->sql_query($sql))
 		{
 			mx_message_die(GENERAL_ERROR, "Could not get style information!", "", __LINE__, __FILE__, $sql);
@@ -245,7 +269,7 @@ switch( $mode )
 			"L_DELETE" => $lang['Delete'])
 		);
 
-		for($i = 0; $i < count($style_rowset); $i++)
+		for ($i = 0; $i < count($style_rowset); $i++)
 		{
 			$row_color = ( !($i % 2) ) ? $theme['td_color1'] : $theme['td_color2'];
 			$row_class = ( !($i % 2) ) ? $theme['td_class1'] : $theme['td_class2'];
@@ -258,9 +282,10 @@ switch( $mode )
 				"U_STYLES_DELETE" => mx_append_sid("admin_mx_styles.$phpEx?mode=delete&amp;style_id=" . $style_rowset[$i]['themes_id']))
 			);
 		}
-
+		
 		$template->pparse("body");
-		break;
+		
+	break;
 }
 
 if ($mx_request_vars->is_empty_post('send_file'))

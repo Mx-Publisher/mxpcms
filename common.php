@@ -411,7 +411,6 @@ $mx_cache->init_mod_rewrite();
 
 //
 // Instantiate the mx_auth class
-//
 $mx_auth = $phpbb_auth =new phpbb_auth();
 
 //

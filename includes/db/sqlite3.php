@@ -462,7 +462,7 @@ class dbal_sqlite3 extends dbal
 
 		$cache_prefix = 'sql_' . $cache_prefix;
 		$cache_folder = (!empty($cache_folder) && @is_dir($cache_folder)) ? $cache_folder : SQL_CACHE_FOLDER;
-		$cache_folder = ((@is_dir($cache_folder)) ? $cache_folder : @phpbb_realpath($cache_folder));
+		$cache_folder = ((@is_dir($cache_folder)) ? $cache_folder : realpath($cache_folder));
 
 		$res = opendir($cache_folder);
 		if($res)

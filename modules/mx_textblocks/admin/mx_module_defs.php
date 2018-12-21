@@ -287,7 +287,7 @@ class mx_module_defs
 		global $template, $board_config, $db, $theme, $lang, $images, $mx_blockcp, $mx_root_path, $phpbb_root_path, $phpEx, $mx_table_prefix, $table_prefix, $html_entities_match, $html_entities_replace;
 		global $mx_request_vars, $mx_bbcode;
 
-		$parameter_value = $mx_request_vars->is_post('preview') ? $mx_request_vars->post($parameter_data['parameter_name'], MX_TYPE_NO_TAGS) : $parameter_data['parameter_value'];
+		$parameter_value = $mx_request_vars->is_post('preview') ? urldecode($mx_request_vars->post($parameter_data['parameter_name'], MX_TYPE_NO_TAGS)) : $parameter_data['parameter_value'];
 		$bbcode_uid = $mx_request_vars->is_post('preview') ? '' : $parameter_data['parameter_opt'];
 
 		//
@@ -419,11 +419,12 @@ class mx_module_defs
 	function display_edit_WysiwygTextBlock( $block_id, $parameter_id, $parameter_data )
 	{
 		global $template, $board_config, $db, $theme, $lang, $images, $mx_blockcp, $mx_root_path, $phpbb_root_path, $phpEx, $mx_table_prefix, $table_prefix, $html_entities_match, $html_entities_replace;
-		global $mx_request_vars;
-
+		global $mx_user, $mx_request_vars;
+		
+		//parameter_name is Html
 		$parameter_value = $mx_request_vars->is_post('preview') ? $mx_request_vars->post($parameter_data['parameter_name'], MX_TYPE_NO_TAGS) : $parameter_data['parameter_value'];
 		$bbcode_uid = $mx_request_vars->is_post('preview') ? '' : $parameter_data['parameter_opt'];
-
+		
 		//
 		// Toggles
 		//
@@ -450,13 +451,12 @@ class mx_module_defs
 			// Encode for preview
 			//
 			$preview_text = $mx_text->encode_preview($parameter_value);
-
 			$template->assign_vars(array(
 				'TEXT' => $preview_text
 			));
 
 			$template->assign_block_vars('preview', array());
-
+			
 			//
 			// Decode for form editing
 			//
@@ -532,49 +532,53 @@ class mx_module_defs
       		'chinese_traditional_taiwan'         => 'zh[_-]tw',
       		'chinese_simplified'            => 'zh',
       	);
-
-      	$user_lang = $userdata['user_lang'];
-
-      	if ( !file_exists( $mx_root_path . 'modules/mx_shared/tinymce/jscripts/tiny_mce/langs/' . $convert[$user_lang] . '.js' ) )
-      	{
-     		$user_lang = $board_config['default_lang'];
-
-     		if ( !file_exists( $mx_root_path . 'modules/mx_shared/tinymce/jscripts/tiny_mce/langs/' . $convert[$user_lang] . '.js' ) )
+		
+		$tiny_lang= isset($convert[$mx_user->data['user_lang']]) ? $convert[$mx_user->data['user_lang']] : $mx_user->user_language_iso;
+		$user_lang = substr($mx_user->lang['USER_LANG'], 0, 2);
+      	if ( !is_readable( $mx_root_path . 'modules/mx_shared/tinymce/jscripts/tiny_mce/langs/' . $tiny_lang. '.js' ) )
+      	{ 
+			if (is_readable( $mx_root_path . 'modules/mx_shared/tinymce/jscripts/tiny_mce/langs/' . $user_lang . '.js' ) )
          	{
-            	$user_lang = 'english';
+            	$tiny_lang = $user_lang;
+         	}
+     		elseif (is_readable( $mx_root_path . 'modules/mx_shared/tinymce/jscripts/tiny_mce/langs/' . $board_config['default_lang'] . '.js' ) )
+         	{
+            	$tiny_lang = $board_config['default_lang'];
          	}
       	}
-
-      	$tiny_lang = $convert[$user_lang];
-
+		
       	//
       	// This switch is for enabling the wysiwyg html editor addon "tiny mce". to disable this feature
       	// either remove this section or delete the modules/tinymce folder
       	//
-      	if ( file_exists($mx_root_path . 'modules/mx_shared/tinymce/jscripts/tiny_mce/tiny_mce.js') )
+      	if ( is_readable($mx_root_path . 'modules/mx_shared/tinymce/jscripts/tiny_mce/tiny_mce.js') )
       	{
          	$langcode = mx_get_langcode();
 
          	if ($mx_blockcp->auth_mod)
          	{
 	         	$template->assign_block_vars( "tinyMCE_admin", array(
-	            	'PATH' => $mx_root_path,
+	            	'PATH' => PORTAL_URL,
 	            	'LANG' => $tiny_lang,
-	            	'TEMPLATE' => $mx_root_path . 'templates/'. $theme['template_name'] . '/' . $theme['head_stylesheet']
+	            	'TEMPLATE' => PORTAL_URL . 'templates/'. $theme['template_name'] . '/' . $theme['head_stylesheet']
 	         	));
          	}
          	else
          	{
 	         	$template->assign_block_vars( "tinyMCE", array(
-	            	'PATH' => $mx_root_path,
+	            	'PATH' => PORTAL_URL,
 	            	'LANG' => $tiny_lang,
-	            	'TEMPLATE' => $mx_root_path . 'templates/'. $theme['template_name'] . '/' . $theme['head_stylesheet']
+	            	'TEMPLATE' => PORTAL_URL . 'templates/'. $theme['template_name'] . '/' . $theme['head_stylesheet']
 	         	));
          	}
       	}
-
+		else
+		{
+			print_r("tinyMCE load error " . "<br />");
+		}
+		
 		$parameter_field = '<textarea rows="30" cols="150" wrap="virtual" name="' . $parameter_id . '" class="post">' . $parameter_value . '</textarea>';
-
+		
 		$template->assign_vars(array(
 			'HTML_STATUS' => $html_status,
 			'BBCODE_STATUS' => sprintf($bbcode_status, '<a href="' . PHPBB_URL . mx_append_sid("faq.$phpEx?mode=bbcode") . '" target="_phpbbcode">', '</a>'),
@@ -584,14 +588,14 @@ class mx_module_defs
 			//
 			// To sync script and textarea select field
 			//
-			'SELECT_NAME' =>  $parameter_data['parameter_name'],
+			'SELECT_NAME' =>  $parameter_data['parameter_name'], //i.e Html
 		));
 
 		$template->assign_block_vars('textblock', array(
 			'PARAMETER_TITLE' => ( !empty($lang[$parameter_data['parameter_name']]) ) ? $lang[$parameter_data['parameter_name']] : $parameter_data['parameter_name'],
 			'PARAMETER_TYPE' => ( !empty($lang["ParType_".$parameter_data['parameter_type']]) ) ? $lang["ParType_".$parameter_data['parameter_type']] : '',
 			'PARAMETER_TYPE_EXPLAIN' => ( !empty($lang["ParType_".$parameter_data['parameter_type'] . "_info"]) ) ? '<br />' . $lang["ParType_".$parameter_data['parameter_type'] . "_info"]  : '',
-			'TEXT' => $parameter_data['parameter_value']
+			'TEXT' => $mx_request_vars->is_post('preview') ? htmlspecialchars($parameter_data['parameter_value']) : $parameter_data['parameter_value']
 		));
 
 		$template->pparse('parameter');

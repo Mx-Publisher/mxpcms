@@ -14,6 +14,15 @@ if(!defined('IN_PORTAL') || !is_object($mx_block))
 	die("Hacking attempt");
 }
 
+//
+// Read Block Settings
+//
+$title = $mx_block->block_info['block_title'];
+$description = $b_description = $mx_block->block_info['block_desc'];
+$b_block_size = isset($mx_block->block_info['block_size']) ? $mx_block->block_info['block_size'] : '100%'; 
+$b_block_size = '100%'; 
+$block_size = !empty($block_size) ? $block_size : $b_block_size;
+
 $template->set_filenames(array(
 	'body_login' => 'mx_login.html')
 );

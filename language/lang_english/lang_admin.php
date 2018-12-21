@@ -15,6 +15,7 @@
 /*  Specify your language character encoding... [optional] */  
 setlocale(LC_ALL, 'en');
 
+$lang['USER_LANG'] = 'en';
 $lang['ENCODING'] = 'UTF-8';
 $lang['DIRECTION'] = 'ltr';
 $lang['LEFT'] = 'left';
@@ -23,6 +24,7 @@ $lang['DATE_FORMAT'] =  'd/M/Y'; // This should be changed to the default date f
 
 $lang['Mx-Publisher_adminCP']	= 'MX-Publisher Administration';
 $lang['Portal_Desc'] 			= 'A little text to describe your website.';
+
 /*
 * Left AdminCP Panel
 */
@@ -133,22 +135,28 @@ $lang['Mx_use_cache'] = 'Use MX-Publisher Block Cache';
 $lang['Mx_use_cache_explain'] = 'Block data is cached to individual cache/block_*.xml files. Block cache files are created/updated when blocks are edited.';
 $lang['Mx_mod_rewrite'] = 'Use mod_rewrite';
 $lang['Mx_mod_rewrite_explain'] = 'If you\'re running on an Apache server and have mod_rewrite activated, you may rewrite URLS; for example, you can rewrite pages like \'page=x\' with more intuitive alternatives. Please read further documentation for the mx_mod_rewrite module.';
+
 $lang['Portal_Overall_header'] = 'Overall Header File (default value)';
 $lang['Portal_Overall_header_explain'] = '- This is the default template overall_header file, e.g. overall_header.tpl.';
+
 $lang['Portal_Overall_footer'] = 'Overall Footer File (default value)';
 $lang['Portal_Overall_footer_explain'] = '- This is the default template overall_footer file, e.g. overall_footer.tpl.';
+
 $lang['Portal_Main_layout'] = 'Main Layout File (default value)';
 $lang['Portal_Main_layout_explain'] = '- This is the default template main_layout file, e.g. mx_main_layout.tpl.';
 $lang['Portal_Navigation_block'] = 'Overall Navigation Block (default value)';
 $lang['Portal_Navigation_block_explain'] = '- This is the page header navigation block, provided you\'ve chosen a overall header file which supports page navigation.';
+
 $lang['Default_style'] = 'Portal Pages Style (default)';
 $lang['Default_admin_style'] = 'AdminCP Style';
 $lang['Select_page_style'] = "Select (or use default)";
 $lang['Override_style'] = 'Override user style';
 $lang['Override_style_explain'] = 'Replaces users style with the default (for pages)';
+
 $lang['Portal_status'] = 'Enable portal';
 $lang['Portal_status_explain'] = 'Handy switch, when reconstructing the site. Only admin is able to view pages and browse around normally. While disabled, the message below is displayed.';
 $lang['Disabled_message'] = 'Portal disabled message';
+
 $lang['Portal_Backend'] = 'MX-Publisher User/Session backend';
 $lang['Portal_Backend_explain'] = 'Select internal, phpBB2 or phpBB3 sessions and users';
 $lang['Portal_Backend_path'] = 'Relative path to phpBB [non-internal]';
@@ -157,6 +165,7 @@ $lang['Portal_Backend_submit'] = 'Change and validate Backend';
 $lang['Portal_config_valid'] = 'Current Backend Status: ';
 $lang['Portal_config_valid_true'] = '<b><font color="green">Valid</font></b>';
 $lang['Portal_config_valid_false'] = '<b><font color="red">Bad Setup. Either your phpBB relative path is wrong or phpBB is uninstalled (your phpBB database is unavailable). Thus, \'internal\' backend is used.</font></b>';
+
 $lang['Phpbb_path'] = 'phpBB relative path';
 $lang['Phpbb_path_explain'] = 'Relative path to phpBB, ex. phpBB/ or ../phpBB/<br />Note the slashes "/", they are important!';
 $lang['Phpbb_url'] = 'Full phpBB URL';
@@ -164,6 +173,8 @@ $lang['Phpbb_url_explain'] = 'Full phpBB URL, ex. <br />http://www.example.com/p
 $lang['Portal_url'] = 'Full Portal URL';
 $lang['Portal_backend'] = 'Portal Backend';
 $lang['Portal_url_explain'] = 'Full Portal URL, ex. <br />http://www.example.com/';
+
+
 /*
 * Module Management
 */
@@ -181,6 +192,7 @@ $lang['Module_name'] = 'Module Name';
 $lang['Module_desc'] = 'Description';
 $lang['Module_path'] = 'Path, ex. \'modules/mx_textblocks/\'';
 $lang['Module_include_admin'] = 'Include this module in the AdminCP navigation';
+
 /*
 * Module Installation
 */
@@ -350,6 +362,8 @@ $lang['Return_to_page'] = 'Return to Portal Page';
 $lang['Auth_Page_group'] = '-> PRIVATE Group';
 $lang['Page_desc'] = 'Description';
 $lang['Page_parent'] = 'Parent Page';
+$lang['Page_graph_border']		= 'Grafica bordura paginii - fisier prefix';
+$lang['Page_graph_border_explain']	= 'Pentru a folosi grafica bordurii in jurul Blocurilor, specifica prefixul pentru fisierele grafice aici. De exemplu, introdu \'border_\' pt. a folosi fisierele: border_1-1.gif, border_1-2.gif,..., border_3-3.gif pentru matricea de 3x3 cu imagini-gif. Lasa blank (gol) pt. a dezactiva grafica bordurii (implicit).';
 $lang['Add_Page'] = 'Add New Page';
 $lang['Page_Config_updated'] = 'Page Configuration Updated Successfully';
 $lang['Click_return_page_admin'] = 'Click %sHere%s to return to Page Administration';
@@ -477,6 +491,7 @@ $lang['AUTH_ANONYMOUS'] = 'ANONYMOUS';
 /* General */
 $lang['target_block'] = 'Target Block';
 $lang['target_block_explain'] = '- links, data etc are refering with this block';
+
 /* Split column */
 $lang['block_ids'] = 'Source Blocks';
 $lang['block_ids_explain'] = '- to be placed left to right';
@@ -488,6 +503,7 @@ $lang['log_filter_date'] = 'Filter by time';
 $lang['log_filter_date_explain'] = '- Show logs from last week, month, year...';
 $lang['numOfEvents'] = 'Number';
 $lang['numOfEvents_explain'] = '- Number of events to show';
+
 /* IncludeX */
 $lang['x_listen'] = 'Listen (GET)';
 $lang['x_iframe'] = 'IFrame';
@@ -503,6 +519,8 @@ $lang['x_2'] = 'Variable 2:';
 $lang['x_2_explain'] = '- <i>IFrame:</i> frame height (pixels)<br /><i>Multimedia:</i> width (pixles)';
 $lang['x_3'] = 'Variable 3:';
 $lang['x_3_explain'] = '- <i>Multimedia:</i> height (pixles)';
+
+$lang['Not_Specified']				= 'Ne Specificat';
 /* Dynamic Block */
 $lang['default_block_id'] = 'Default Block';
 $lang['default_block_id_explain'] = '- This is the default or first block to display, unless a dynamic block is set';
@@ -513,12 +531,28 @@ $lang['menu_custom_tpl']				= "Custom template file";
 $lang['menu_custom_tpl_explain ']		= "Eg mx_menu_custom.tpl";
 $lang['menu_page_parent']				= "Parent Page";
 $lang['menu_page_parent_explain ']		= "Navigation from this parent page";
+$lang['menu_page_sync']				= 'Lumineza cel curent?';
+$lang['menu_page_sync_explain']		= 'Lumineza intrare la Meniul de Nav. curent...';
+
 /* Version Checker */
 $lang['MXP_Version_up_to_date'] = 'Your MX-Publisher installation is up to date. No updates are available for your version of MX-Publisher.';
 $lang['MXP_Version_outdated'] = 'Your MX-Publisher installation does <b>not</b> seem to be up to date. Updates are available for your version of MX-Publisher. Please visit <a href="http://mxpcms.sourceforge.net/download" target="_new">the MX-Publisher Core package download</a> to obtain the latest version.';
 $lang['MXP_Latest_version_info'] = 'The latest available version is <b>MX-Publisher %s</b>. ';
 $lang['MXP_Current_version_info'] = 'You are running <b>MX-Publisher %s</b>.';
 $lang['MXP_Mailing_list_subscribe_reminder'] = 'For the latest information on news and updates to MX-Publisher, why not <a href="http://lists.sourceforge.net/lists/listinfo/mxpcms-news" target="_new">subscribe to our mailing list</a>?';
+
+$lang['Trans_title']				= 'Translate to your Language';
+$lang['Trans_description']			= 'Use Translate Control Panel to translate portal to your language';
+$lang['Trans_which_core']			= 'Which Part';
+$lang['Trans_select_file']			= 'Select file to translate';
+$lang['Trans_from_desc']			= 'Default language to translate from';
+$lang['Trans_leave_orig']			= 'If not translated <b>leave original</b> text';
+$lang['Trans_selected_file']		= 'Selected File';
+$lang['Trans_lang_source']			= 'Source Language';
+$lang['Trans_lang_dest']			= 'Destination Language';
+$lang['Trans_lang_block']			= 'Language block';
+$lang['Trans_save_file']			= 'Save language file';
+
 /* lang_admin_gd_info.php - BEGIN */
 $lang['GD_Title'] = 'GD Info';
 $lang['NO_GD'] = 'No GD';
@@ -595,6 +629,7 @@ $lang['SQL_Admin_Data_Length_Word'] = 'Size';
 $lang['SQL_Admin_Optimization_Word'] = 'Optimized';
 $lang['SQL_Admin_With_Selected_Word'] = 'With selected';
 /* lang_phpbbmyadmin.php - END */
+
 /*
 * That's all Folks!
 * -------------------------------------------------*/

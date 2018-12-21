@@ -87,7 +87,8 @@ class google_translater
 				if (is_array($value))
 				{
 					//$value = utf8_wordwrap(serialize($value), 75, "\n", true);
-					$value = implode('[<#>]', $value);
+					print_r($value, true);
+					$value = implode('[<#>]', $this->translate($value));
 				}
 				//$text[$key] = $value;			
 				$counter++;									

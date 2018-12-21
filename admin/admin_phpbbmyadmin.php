@@ -114,6 +114,7 @@ if(!strcmp($mode, 'with_selected') && (!empty($with_selected_table_list)))
 {
 	$do_these_queries = '';
 	$message = '';
+	
 	foreach($with_selected_table_list as $table)
 	{
 		switch($with_selected)
@@ -121,24 +122,29 @@ if(!strcmp($mode, 'with_selected') && (!empty($with_selected_table_list)))
 			case 'optimize':
 				$do_these_queries .= 'OPTIMIZE TABLE ' . $table . ';';
 				$message .= 'OPTIMIZE TABLE ' . $table . ';<br />';
-				break;
+			break;
+			
 			case 'repair':
 				$do_these_queries .= 'REPAIR TABLE ' . $table . ';';
 				$message .= 'REPAIR TABLE ' . $table . ';<br />';
-				break;
+			break;
+			
 			case 'empty':
-				$dbms == 'mysql' ? $do_these_queries .= 'DELETE FROM ' . $table . ';' : $do_these_queries .= 'TRUNCATE TABLE ' . $table . ';';
-				$message .= ($dbms == 'mysql' ? 'DELETE FROM ' . $table . ';<br />' : 'TRUNCATE TABLE ' . $table . ';<br />');
-				break;
+				$do_these_queries .= (preg_match('/mysql/i', $dbms) !== false) ? 'DELETE FROM ' . $table . ';' : 'TRUNCATE TABLE ' . $table . ';';
+				$message .= ((preg_match('/mysql/i', $dbms) !== false) ? 'DELETE FROM ' . $table . ';<br />' : 'TRUNCATE TABLE ' . $table . ';<br />');
+			break;
+			
 			case 'drop':
 				$do_these_queries .= 'DROP TABLE ' . $table . ';';
 				$message .= 'DROP TABLE ' . $table . ';<br />';
-				break;
+			break;
 		}
 	}
+	
 	$message .= $lang['SQL_Admin_Confirm'];
 	$message .= '<br /><a href="' . $file . '&amp;mode=submit&amp;this_query=' . $do_these_queries . '&amp;force_normal_die=yes" class="gen">' . $lang['SQL_Admin_Yes_Word'] . '</a> / ';
 	$message .= '<a href="' . $file . '" class="gen">' . $lang['SQL_Admin_No_Word'] . '</a>';
+	
 	mx_message_die (GENERAL_MESSAGE, $message);
 }
 // END go with selected.

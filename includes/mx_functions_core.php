@@ -137,7 +137,7 @@ class mx_cache extends cache
 			$portal_config['portal_backend_path'] = $this->backend_path;
 		}
 		
-		// No backend defined ? Try Internal.		
+		// No backend defined ? Try Internal.	
 		if (!$portal_config['portal_backend'])
 		{
 			$portal_config['portal_backend'] = 'internal';
@@ -962,7 +962,7 @@ class mx_cache extends cache
 		}
 		else
 		{
-			die('invalid cache read call - no id');
+			print('invalid call mx_cache->read(id, ...) - no id');
 		}
 	}
 
@@ -5421,7 +5421,7 @@ class mx_request_vars
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * 
 	 */
 	public function raw_variable($var_name, $default, $super_global = self::REQUEST)
 	{
@@ -5487,7 +5487,7 @@ class mx_request_vars
 		else
 		{
 			$var = getenv($var_name);
-			//$this->type_cast_helper->recursive_set_var($var, $default, $multibyte);
+			$this->recursive_set_var($var, $default, $multibyte);
 			return $var;
 		}
 	}
@@ -5836,13 +5836,13 @@ class mx_request_vars
 			return $var;
 		}
 
-		//$this->type_cast_helper->recursive_set_var($var, $default, $multibyte, $trim);
+		$this->recursive_set_var($var, $default, $multibyte, $trim);
 
 		return $var;
 	}
 
 	/**
-	* {@inheritdoc}
+	*
 	*/
 	public function get_super_global($super_global = self::REQUEST)
 	{
@@ -5850,7 +5850,7 @@ class mx_request_vars
 	}
 
 	/**
-	 * {@inheritdoc}
+	 *
 	 */
 	public function escape($var, $multibyte)
 	{
@@ -5859,14 +5859,14 @@ class mx_request_vars
 			$result = array();
 			foreach ($var as $key => $value)
 			{
-				//$this->type_cast_helper->set_var($key, $key, gettype($key), $multibyte);
+				$this->set_var($key, $key, gettype($key), $multibyte);
 				$result[$key] = $this->escape($value, $multibyte);
 			}
 			$var = $result;
 		}
 		else
 		{
-			//$this->type_cast_helper->set_var($var, $var, 'string', $multibyte);
+			$this->set_var($var, $var, 'string', $multibyte);
 		}
 
 		return $var;
@@ -5914,8 +5914,111 @@ class mx_request_vars
 		$var_default = (($var_default === false) ? $var_array[0] : $var_default);
 		$var = in_array($var, $var_array) ? $var : $var_default;
 		return $var;
-	}	
+	}
 
+	/**
+	* Set variable $result to a particular type.
+	*
+	* @param mixed	&$result		The variable to fill
+	* @param mixed	$var			The contents to fill with
+	* @param mixed	$type			The variable type. Will be used with {@link settype()}
+	* @param bool	$multibyte		Indicates whether string values may contain UTF-8 characters.
+	* 								Default is false, causing all bytes outside the ASCII range (0-127) to be replaced with question marks.
+	* @param bool	$trim			Indicates whether trim() should be applied to string values.
+	* 								Default is true.
+	*/
+	public function set_var(&$result, $var, $type, $multibyte = false, $trim = true)
+	{
+		settype($var, $type);
+		$result = $var;
+
+		if ($type == 'string')
+		{
+			$result = str_replace(array("\r\n", "\r", "\0"), array("\n", "\n", ''), $result);
+
+			if ($trim)
+			{
+				$result = trim($result);
+			}
+
+			$result = htmlspecialchars($result, ENT_COMPAT, 'UTF-8');
+
+			if ($multibyte)
+			{
+				$result = utf8_normalize_nfc($result);
+			}
+
+			if (!empty($result))
+			{
+				// Make sure multibyte characters are wellformed
+				if ($multibyte)
+				{
+					if (!preg_match('/^./u', $result))
+					{
+						$result = '';
+					}
+				}
+				else
+				{
+					// no multibyte, allow only ASCII (0-127)
+					$result = preg_replace('/[\x80-\xFF]/', '?', $result);
+				}
+			}
+		}
+	}
+
+	/**
+	* Recursively sets a variable to a given type using {@link set_var set_var}
+	*
+	* @param	string	$var		The value which shall be sanitised (passed by reference).
+	* @param	mixed	$default	Specifies the type $var shall have.
+	* 								If it is an array and $var is not one, then an empty array is returned.
+	* 								Otherwise var is cast to the same type, and if $default is an array all
+	* 								keys and values are cast recursively using this function too.
+	* @param	bool	$multibyte	Indicates whether string keys and values may contain UTF-8 characters.
+	* 								Default is false, causing all bytes outside the ASCII range (0-127) to
+	* 								be replaced with question marks.
+	* @param	bool	$trim		Indicates whether trim() should be applied to string values.
+	* 								Default is true.
+	*/
+	public function recursive_set_var(&$var, $default, $multibyte, $trim = true)
+	{
+		if (is_array($var) !== is_array($default))
+		{
+			$var = (is_array($default)) ? array() : $default;
+			return;
+		}
+
+		if (!is_array($default))
+		{
+			$type = gettype($default);
+			$this->set_var($var, $var, $type, $multibyte, $trim);
+		}
+		else
+		{
+			// make sure there is at least one key/value pair to use get the
+			// types from
+			if (empty($default))
+			{
+				$var = array();
+				return;
+			}
+
+			list($default_key, $default_value) = each($default);
+			$key_type = gettype($default_key);
+
+			$_var = $var;
+			$var = array();
+
+			foreach ($_var as $k => $v)
+			{
+				$this->set_var($k, $k, $key_type, $multibyte);
+
+				$this->recursive_set_var($v, $default_value, $multibyte, $trim);
+				$var[$k] = $v;
+			}
+		}
+	} 
 }	// class mx_request_vars
 
 /**

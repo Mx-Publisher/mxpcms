@@ -2,7 +2,7 @@
 /**
 *
 * @package Functions_phpBB
-* @version $Id: bbcode.php,v 1.17 2014/05/09 07:52:03 orynider Exp $
+* @version $Id: bbcode.php,v 1.1 2014/09/15 21:14:56 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
@@ -508,28 +508,18 @@ class mx_bbcode
 
 		static $replacements = array(
 			'quote_username_open'	=> array('{USERNAME}'	=> '$1'),
-				'color'					=> array('{COLOR}'		=> '$1', '{TEXT}'			=> '$2'),
-				'size'					=> array('{SIZE}'		=> '$1', '{TEXT}'			=> '$2'),
-				'img'					=> array('{URL}'		=> '$1'),
-				'flash'					=> array('{WIDTH}'		=> '$1', '{HEIGHT}'			=> '$2', '{URL}'		=> '$3'),
-				'scribd'				=> array('{WIDTH}'		=> '$1', '{HEIGHT}'			=> '$2', '{SCRIBDURL}'	=> '$3'),
-				'youtube'				=> array('{YOUTUBEID}'	=> '$1', '{YOUTUBELINK}'		=> '$2', '{WIDTH}'		=> '$3', '{HEIGHT}'			=> '$4'),			
-				'ipaper'				=> array('{IPAPERID}'	=> '$1', '{IPAPERKEY}'		=> '$2', '{WIDTH}'		=> '$3', '{HEIGHT}'			=> '$4', '{IPAPERLINK}'	=> '$5'),			
-				'ipaper_open'		=> array('{IPAPERCODE}'	=> '$1'),			
-				'url'					=> array('{URL}'		=> '$1', '{DESCRIPTION}'	=> '$2'),
-				'web'					=> array('{URL}'		=> '$1', '{DESCRIPTION}'	=> '$2'),
-				'size'					=> array('{ID}'			=> '$1', '{TEXT}'			=> '$2'),			
-				'email'					=> array('{EMAIL}'		=> '$1', '{DESCRIPTION}'	=> '$2'),
-				'table' 				=> array('{TABLE}'		=> '$1', '{TEXT}'			=> '$2'),
-				'tr' 					=> array('{TR}'			=> '$1', '{TEXT}'			=> '$2'),
-				'th' 					=> array('{TH}'			=> '$1', '{TEXT}'			=> '$2'),
-				'td' 					=> array('{TD}'			=> '$1', '{TEXT}'			=> '$2'),
-				'thead' 				=> array('{THEAD}'		=> '$1', '{TEXT}'			=> '$2'),
-				'tbody' 				=> array('{TBODY}'		=> '$1', '{TEXT}'			=> '$2'),
-				'center' 				=> array('{CENTER}'		=> '$1', '{TEXT}'			=> '$2'),
-				'align' 				=> array('{ALIGN}'		=> '$1', '{TEXT}'			=> '$2'),
-				'float' 					=> array('{FLOAT}'		=> '$1', '{TEXT}'			=> '$2'),
-				'fa' 					=> array('{FA}'			=> '$1', '{TEXT}'			=> '$2'),			
+			'color'					=> array('{COLOR}'		=> '$1', '{TEXT}'			=> '$2'),
+			'size'					=> array('{SIZE}'		=> '$1', '{TEXT}'			=> '$2'),
+			'img'					=> array('{URL}'		=> '$1'),
+			'flash'					=> array('{WIDTH}'		=> '$1', '{HEIGHT}'			=> '$2', '{URL}'		=> '$3'),
+			'scribd'				=> array('{WIDTH}'		=> '$1', '{HEIGHT}'			=> '$2', '{SCRIBDURL}'	=> '$3'),
+			'youtube'				=> array('{YOUTUBEID}'	=> '$1', '{YOUTUBELINK}'		=> '$2', '{WIDTH}'		=> '$3', '{HEIGHT}'			=> '$4'),			
+			'ipaper'				=> array('{IPAPERID}'	=> '$1', '{IPAPERKEY}'		=> '$2', '{WIDTH}'		=> '$3', '{HEIGHT}'			=> '$4', '{IPAPERLINK}'	=> '$5'),			
+			'ipaper_open'			=> array('{IPAPERCODE}'	=> '$1'),			
+			'url'					=> array('{URL}'		=> '$1', '{DESCRIPTION}'	=> '$2'),
+			'web'					=> array('{URL}'		=> '$1', '{DESCRIPTION}'	=> '$2'),
+			'size'					=> array('{ID}'			=> '$1', '{TEXT}'			=> '$2'),			
+			'email'					=> array('{EMAIL}'		=> '$1', '{DESCRIPTION}'	=> '$2')
 		);
 
 		$tpl = preg_replace('/{L_([A-Z_]+)}/e', "(!empty(\$mx_user->lang['\$1'])) ? \$mx_user->lang['\$1'] : ucwords(strtolower(str_replace('_', ' ', '\$1')))", $tpl);
@@ -562,7 +552,7 @@ class mx_bbcode
 			$tpl = 'olist_open';
 			$type = 'upper-roman';
 		}
-		else if (preg_match('#^(disc|circle|square|radical)$#i', $type))
+		else if (preg_match('#^(disc|circle|square)$#i', $type))
 		{
 			$tpl = 'ulist_open';
 			$type = strtolower($type);
@@ -713,8 +703,7 @@ class mx_bbcode
 		$bbcode_tpl['quote_username_open'] = str_replace('{USERNAME}', '\\1', $bbcode_tpl['quote_username_open']);
 
 		$bbcode_tpl['code_open'] = str_replace('{L_CODE}', $lang['Code'], $bbcode_tpl['code_open']);
-		$bbcode_tpl['html_open'] = str_replace('{L_HTML}', $lang['Html'], $bbcode_tpl['html_open']);
-		
+
 		$bbcode_tpl['img'] = str_replace('{URL}', '\\1', $bbcode_tpl['img']);
 
 		// We do URLs in several different ways..

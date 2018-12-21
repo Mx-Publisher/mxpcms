@@ -87,43 +87,43 @@ switch( $msg_filter_time )
 {
 	case'0':
 		$msg_time_filter_lo ='no';
-	break;
+		break;
 	case'1':
 		$msg_time_filter_lo = mktime(0, 0, 0 , intval(substr($msg_today, 0, 2)), intval(substr($msg_today, 2, 2) - 1), intval(substr($msg_today, 4, 4)));
-	break;
+		break;
 	case'2':
 		$msg_time_filter_lo = mktime(0, 0, 0 , intval(substr($msg_today, 0, 2)), intval(substr($msg_today, 2, 2) - 1), intval(substr($msg_today, 4, 4)));
-	break;
+		break;
 	case'3':
 		$msg_time_filter_lo = mktime(0, 0, 0 , intval(substr($msg_today, 0, 2)), intval(substr($msg_today, 2, 2) - 1), intval(substr($msg_today, 4, 4)));
-	break;
+		break;
 	case'4':
 		$msg_time_filter_lo = mktime(0, 0, 0 , intval(substr($msg_today, 0, 2)), intval(substr($msg_today, 2, 2) - 7), intval(substr($msg_today, 4, 4)));
-	break;
+		break;
 	case'5':
 		$msg_time_filter_lo = mktime(0, 0, 0 , intval(substr($msg_today, 0, 2)), intval(substr($msg_today, 2, 2) - 14), intval(substr($msg_today, 4, 4)));
-	break;
+		break;
 	case'6':
 		$msg_time_filter_lo = mktime(0, 0, 0 , intval(substr($msg_today, 0, 2)), intval(substr($msg_today, 2, 2) - 21), intval(substr($msg_today, 4, 4)));
-	break;
+		break;
 	case'7':
 		$msg_time_filter_lo = mktime(0, 0, 0 , intval(substr($msg_today, 0, 2) - 1), intval(substr($msg_today, 2, 2)), intval(substr($msg_today, 4, 4)));
-	break;
+		break;
 	case'8':
 		$msg_time_filter_lo = mktime(0, 0, 0 , intval(substr($msg_today, 0, 2) - 2), intval(substr($msg_today, 2, 2)), intval(substr($msg_today, 4, 4)));
-	break;
+		break;
 	case'9':
 		$msg_time_filter_lo = mktime(0, 0, 0 , intval(substr($msg_today, 0, 2) - 3), intval(substr($msg_today, 2, 2)), intval(substr($msg_today, 4, 4)));
-	break;
+		break;
 	case'10':
 		$msg_time_filter_lo = mktime(0, 0, 0 , intval(substr($msg_today, 0, 2) - 6), intval(substr($msg_today, 2, 2)), intval(substr($msg_today, 4, 4)));
-	break;
+		break;
 	case'11':
 		$msg_time_filter_lo = mktime(0, 0, 0 , intval(substr($msg_today, 0, 2)), intval(substr($msg_today, 2, 2)), intval(substr($msg_today, 4, 4) - 1));
-	break;
+		break;
 	default:
 		$msg_time_filter_lo ='no';
-	break;
+		break;
 }
 
 $sql = "SELECT COUNT(*) AS msg_num
@@ -147,7 +147,7 @@ $row = $db->sql_fetchrow($result);
 $db->sql_freeresult($result);
 $msg_total_match_count = $row['msg_num'];
 
-if ( ($msg_time_filter_lo != 'no') && !empty($msg_time_filter_lo) )
+if ( $msg_time_filter_lo !='no'&& !empty($msg_time_filter_lo) )
 {
 	$sql_filter_lo = " AND p.post_time > " . $msg_time_filter_lo;
 }

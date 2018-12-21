@@ -1,29 +1,240 @@
-<div align="center">
-	<span class="copyright">
-		<!-- BEGIN editcp_exists -->
-		<span class="genmed">{editcp_exists.ADMIN_OPTIONS}</span>
-		<span class="newsbutton" onclick="mx_toggle_editCP(this, 'editCP_switch', '{editcp_exists.EDITCP_EXPAND_IMG}', '{editcp_exists.EDITCP_CONTRACT_IMG}');"><img src="{editcp_exists.EDITCP_DYNAMIC_IMG}" border="0" alt="" /></span><br />
-		<!-- END editcp_exists -->
-{ADMIN_LINK}<br />
-<!--
-	We request you retain the full copyright notice below including the link to mxpcms.sourceforge.net (and www.phpbb.com if you are using MXP with phpbb).
-	This not only gives respect to the large amount of time given freely by the developers
-	but also helps build interest, traffic and use of MXP. If you cannot (for good
-	reason) retain the full copyright we request you at least leave in place the
-	Powered by MXP line, with MXP linked to mxpcms.sourceforge.net. If you refuse
-	to include even this then support on our forums may be affected.
+		<!-- EVENT overall_footer_content_after -->
+	</div>
 
-	The MX-Publisher Team : 2008 & The phpBB Group : 2002
-// -->
-{POWERED_BY} <a href="http://mxpcms.sourceforge.net/" target="_mx-publisher" class="copyright">MX-Publisher (MXP)</a> {MX_VERSION} &copy; 2001-2008 <!-- IF PHPBB_BACKEND --> &amp; <a href="http://www.phpbb.com/" target="_phpbb" class="copyright">phpBB</a> {PHPBB_VERSION} &copy; 2001, 2003 phpBB Group <!-- ENDIF --> | <a href="{MXBB_EXTRA_URL}" target="_phpbb" class="copyright">{MXBB_EXTRA}</a>
-</div>
+<!-- EVENT overall_footer_page_body_after -->
+	<div id="wrapheader">
+	<table id="page-footer" class="table1 page-footer" width="100%" role="contentinfo">
+	<tbody>
+	<tr>
+		<td align="center">
+			<div align="center">
+
+					<div class="inner forumtitle genmed" style="text-align:center;">
+
+					<ul id="nav-footer" class="nav-footer linklist forumtitle genmed" role="menubar">
+						<li class="breadcrumbs forumtitle genmed">
+							<!-- IF U_SITE_HOME -->
+								{% spaceless %}
+								<span class="responsive-hide crumb">
+									<a href="{U_SITE_HOME}" data-navbar-reference="home">
+										<i class="responsive-hideicon fa-home fa-fw" aria-hidden="true"></i><span>{L_SITE_HOME}</span>
+									</a>
+								</span>
+								{% endspaceless %}
+							<!-- ENDIF -->
+							<!-- EVENT overall_footer_breadcrumb_prepend -->
+							{% spaceless %}
+							<span class="responsive-hide crumb">
+								<a href="{U_INDEX}" data-navbar-reference="index">
+									<!-- IF not U_SITE_HOME --><i class="icon fa-home fa-fw" aria-hidden="true"></i><!-- ENDIF --><span>{L_INDEX}</span>
+								</a>
+							</span>
+							{% endspaceless %}
+							<!-- EVENT overall_footer_breadcrumb_append -->
+						</li>
+						<!-- IF U_WATCH_FORUM_LINK and not S_IS_BOT -->
+							<li data-last-responsive="true">
+								<a href="{U_WATCH_FORUM_LINK}" title="{S_WATCH_FORUM_TITLE}" data-ajax="toggle_link" data-toggle-class="icon <!-- IF S_WATCHING_FORUM -->fa-check-square-o<!-- ELSE -->fa-square-o<!-- ENDIF --> fa-fw" data-toggle-text="{S_WATCH_FORUM_TOGGLE}" data-toggle-url="{U_WATCH_FORUM_TOGGLE}">
+									<i class="icon <!-- IF S_WATCHING_FORUM -->fa-square-o<!-- ELSE -->fa-check-square-o<!-- ENDIF --> fa-fw" aria-hidden="true"></i><span>{S_WATCH_FORUM_TITLE}</span>
+								</a>
+							</li>
+						<!-- ENDIF -->
+
+						<!-- EVENT overall_footer_timezone_before -->
+						<li class="rightside forumtitle genmed">{S_TIMEZONE}</li>
+						<!-- EVENT overall_footer_timezone_after -->
+						<!-- IF not S_IS_BOT -->
+							<li class="rightside forumtitle genmed">
+								<a href="{U_DELETE_COOKIES}" data-ajax="true" data-refresh="true" role="menuitem">
+									<i class="icon fa-trash fa-fw" aria-hidden="true"></i><span>{L_DELETE_COOKIES}</span>
+								</a>
+							</li>
+							<!-- IF S_DISPLAY_MEMBERLIST -->
+								<li class="responsive-hide rightside forumtitle genmed" data-last-responsive="true">
+									<a href="{U_MEMBERLIST}" title="{L_MEMBERLIST_EXPLAIN}" role="menuitem">
+										<i class="icon fa-group fa-fw" aria-hidden="true"></i><span>{L_MEMBERLIST}</span>
+									</a>
+								</li>
+							<!-- ENDIF -->
+						<!-- ENDIF -->
+						<!-- EVENT overall_footer_teamlink_before -->
+						<!-- IF U_TEAM -->
+							<li class="responsive-hide rightside forumtitle genmed" data-last-responsive="true">
+								<a href="{U_TEAM}" role="menuitem">
+									<i class="icon fa-shield fa-fw" aria-hidden="true"></i><span>{L_THE_TEAM}</span>
+								</a>
+							</li>
+						<!-- ENDIF -->
+						<!-- EVENT overall_footer_teamlink_after -->
+						<!-- IF U_CONTACT_US -->
+							<li class="rightside forumtitle genmed" data-last-responsive="true">
+								<a href="{U_CONTACT_US}" role="menuitem">
+									<i class="icon fa-envelope fa-fw" aria-hidden="true"></i><span>{L_CONTACT_US}</span>
+								</a>
+							</li>
+						<!-- ENDIF -->
+					</ul>
+
+					</div>
 		</td>
 	</tr>
-</table>
+		</tbody>
+
+	<tbody>
+	<tr>
+		<td align="center">
+		<div align="center">
+			<span class="copyright">
+				<!-- BEGIN editcp_exists -->
+				<span class="genmed">{editcp_exists.ADMIN_OPTIONS}</span>
+				<span class="newsbutton" onclick="mx_toggle_editCP(this, 'editCP_switch', '{editcp_exists.EDITCP_EXPAND_IMG}', '{editcp_exists.EDITCP_CONTRACT_IMG}');"><img src="{editcp_exists.EDITCP_DYNAMIC_IMG}" border="0" alt="" /></span><br />
+				<!-- END editcp_exists -->
+				
+				<!-- EVENT overall_footer_copyright_prepend -->
+				<p class="footer-row forumtitle genmed " style="text-align:center;">
+					<span class="footer-copyright">{{ CREDIT_LINE }}</span>
+				</p>
+				<!-- IF TRANSLATION_INFO -->
+				<p class="footer-row forumtitle genmed" style="text-align:center;">
+					<span class="footer-copyright">{{ TRANSLATION_INFO }}</span>
+				</p>
+				<!-- ENDIF -->
+				<!-- EVENT overall_footer_copyright_append -->
+				<!-- IF U_PRIVACY -->
+				<p class="footer-row forumtitle genmed" style="text-align:center;">
+					<a class="footer-link" href="{{ U_PRIVACY }}" title="{{ lang('PRIVACY_LINK') }}" role="menuitem">
+						<span class="footer-link-text">{L_PRIVACY_LINK}</span>
+					</a>
+					|
+					<a class="footer-link forumtitle genmed" href="{{ U_TERMS_USE }}" title="{{ lang('TERMS_LINK') }}" role="menuitem">
+						<span class="footer-link-text">{L_TERMS_LINK}</span>
+					</a>
+				</p>
+				<!-- ENDIF -->
+				<!-- IF DEBUG_OUTPUT -->
+				<p class="responsive-hide footer-row forumtitle genmed" style="text-align:center;">
+					<span class="footer-info">{{ DEBUG_OUTPUT }}</span>
+				</p>
+				<!-- ENDIF -->
+
+		
+				<!-- IF U_ACP -->
+				<p class="footer-row forumtitle genmed" style="text-align:center;">
+					<a class="footer-link text-strong" href="{{ U_ACP }}">{{ lang('ACP') }}</a>
+				</p>
+				<!-- ELSE -->
+				<p class="footer-row forumtitle genmed" style="text-align:center;">
+				{ADMIN_LINK}
+				</p>
+				<!-- ENDIF -->
+				
+				<!--
+					We request you retain the full copyright notice below including the link to mxpcms.sourceforge.net (and www.phpbb.com if you are using MXP with phpbb).
+					This not only gives respect to the large amount of time given freely by the developers
+					but also helps build interest, traffic and use of MXP. If you cannot (for good
+					reason) retain the full copyright we request you at least leave in place the
+					Powered by MXP line, with MXP linked to mxpcms.sourceforge.net. If you refuse
+					to include even this then support on our forums may be affected.
+
+					The MX-Publisher Team : 2008 & The phpBB Group : 2002
+				// -->
+				{POWERED_BY} <a href="http://mxpcms.sourceforge.net/" target="_mx-publisher" class="copyright">MX-Publisher (MXP)</a> {MX_VERSION} &copy; 2001-2008 <!-- IF PHPBB_BACKEND --> &amp; <a href="http://www.phpbb.com/" target="_phpbb" class="copyright">phpBB</a> {PHPBB_VERSION} &copy; 2001, 2003 phpBB Group <!-- ENDIF --> | <a href="{MXBB_EXTRA_URL}" target="_phpbb" class="copyright">{MXBB_EXTRA}</a>
+		</span>
+		</div>
+		</td>
+	</tr>
+		</tbody>
+
+	<tbody>
+	<tr>
+		<td align="center">
+
+	
+			<div id="darkenwrapper" class="darkenwrapper" data-ajax-error-title="{L_AJAX_ERROR_TITLE}" data-ajax-error-text="{L_AJAX_ERROR_TEXT}" data-ajax-error-text-abort="{L_AJAX_ERROR_TEXT_ABORT}" data-ajax-error-text-timeout="{L_AJAX_ERROR_TEXT_TIMEOUT}" data-ajax-error-text-parsererror="{L_AJAX_ERROR_TEXT_PARSERERROR}">
+				<div id="darken" class="darken">&nbsp;</div>
+			</div>
+
+			<div id="phpbb_alert" class="phpbb_alert" data-l-err="{L_ERROR}" data-l-timeout-processing-req="{L_TIMEOUT_PROCESSING_REQ}">
+				<a href="#" class="alert_close">
+					<i class="icon fa-times-circle fa-fw" aria-hidden="true"></i>
+				</a>
+				<h3 class="alert_title">&nbsp;</h3><p class="alert_text"></p>
+			</div>
+			<div id="phpbb_confirm" class="phpbb_alert">
+				<a href="#" class="alert_close">
+					<i class="icon fa-times-circle fa-fw" aria-hidden="true"></i>
+				</a>
+				<div class="alert_text"></div>
+			</div>
+
+
+
+
+		<div>
+			<a id="bottom" class="anchor" accesskey="z"></a>
+			<!-- IF not S_IS_BOT -->{RUN_CRON_TASK}<!-- ENDIF -->
+		</div>
+
+	</div>
+		</td>
+	</tr>
+	</tbody>
+	</table>
+	</div>
+<script type="text/javascript" src="{T_JQUERY_LINK}"></script>
+<!-- IF S_ALLOW_CDN --><script type="text/javascript">window.jQuery || document.write('\x3Cscript src="{T_ASSETS_PATH}/javascript/jquery.min.js?assets_version={T_ASSETS_VERSION}">\x3C/script>');</script><!-- ENDIF -->
+<script type="text/javascript" src="{T_ASSETS_PATH}/javascript/core.js?assets_version={T_ASSETS_VERSION}"></script>
 <!-- INCLUDEJS forum_fn.js -->
 <!-- INCLUDEJS ajax.js -->
+<!-- IF S_ALLOW_CDN -->
+	<script type="text/javascript">
+		(function($){
+			var $fa_cdn = $('head').find('link[rel="stylesheet"]').first(),
+				$span = $('<span class="fa" style="display:none"></span>').appendTo('body');
+			if ($span.css('fontFamily') !== 'FontAwesome' ) {
+				$fa_cdn.after('<link href="{T_ASSETS_PATH}/css/font-awesome.min.css" rel="stylesheet">');
+				$fa_cdn.remove();
+			}
+			$span.remove();
+		})(jQuery);
+	</script>
+<!-- ENDIF -->
+
+<!-- IF S_COOKIE_NOTICE -->
+	<script src="{T_ASSETS_PATH}/cookieconsent/cookieconsent.min.js?assets_version={T_ASSETS_VERSION}"></script>
+	<script>
+		if (typeof window.cookieconsent === "object") {
+			window.addEventListener("load", function(){
+				window.cookieconsent.initialise({
+					"palette": {
+						"popup": {
+							"background": "#0F538A"
+						},
+						"button": {
+							"background": "#E5E5E5"
+						}
+					},
+					"theme": "classic",
+					"content": {
+						"message": "{LA_COOKIE_CONSENT_MSG}",
+						"dismiss": "{LA_COOKIE_CONSENT_OK}",
+						"link": "{LA_COOKIE_CONSENT_INFO}",
+						"href": "{UA_PRIVACY}"
+					}
+				});
+			});
+		}
+	</script>
+<!-- ENDIF -->
+
+<!-- EVENT overall_footer_after -->
+
+<!-- IF S_PLUPLOAD --><!-- INCLUDE plupload.html --><!-- ENDIF -->
+{$SCRIPTS}
 <!-- This displays generation info at the bottom of the page -->
 {EXECUTION_STATS}
 {MX_ADDITIONAL_FOOTER_TEXT}
+<!-- EVENT overall_footer_body_after -->
+
 </body>
 </html>

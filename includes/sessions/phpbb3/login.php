@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: login.php,v 1.13 2014/07/07 21:31:16 orynider Exp $
+* @version $Id: login.php,v 1.1 2014/09/15 21:14:57 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
@@ -131,12 +131,13 @@ if($mx_request_vars->is_request('login') && ($userdata['user_id'] == ANONYMOUS |
 						$admin = $mx_request_vars->is_post('admin');
 						$mx_user->session_create($row['user_id'], $admin, $autologin, $viewonline = true);
 						$session_id = $mx_user->session_id;
-						
+
+
 						// Reset login tries
 						//$db->sql_query('UPDATE ' . USERS_TABLE . ' SET user_login_tries = 0, user_last_login_try = 0 WHERE user_id = ' . $row['user_id']); // phpBB2
 						$db->sql_query('UPDATE ' . USERS_TABLE . ' SET user_login_attempts = 0 WHERE user_id = ' . $row['user_id']); // phpBB3
 
-						if(!empty($session_id))
+						if( $session_id )
 						{
 							$fromurl = ( !empty($HTTP_REFERER) ) ? str_replace('&amp;', '&', htmlspecialchars($HTTP_REFERER)) : "index.$phpEx";
 							$url = !$mx_request_vars->is_empty_post('redirect') ? str_replace('&amp;', '&', $mx_request_vars->post('redirect', MX_TYPE_NO_TAGS)) : $fromurl;
@@ -192,21 +193,15 @@ if($mx_request_vars->is_request('login') && ($userdata['user_id'] == ANONYMOUS |
 					}
 
 					// Successful login... set user_login_attempts to zero...
-					if(!empty($session_id))
+					if( $session_id )
 					{
-						$url = !$mx_request_vars->is_empty_post('redirect') ? str_replace('&amp;', '&', $mx_request_vars->post('redirect', MX_TYPE_NO_TAGS)) : "index.$phpEx";
-						mx_redirect(mx3_append_sid($url, false));
-					}
-					else if(!empty($mx_user->session_id))
-					{
-						$session_id = $mx_user->session_id;						
 						$url = !$mx_request_vars->is_empty_post('redirect') ? str_replace('&amp;', '&', $mx_request_vars->post('redirect', MX_TYPE_NO_TAGS)) : "index.$phpEx";
 						mx_redirect(mx3_append_sid($url, false));
 					}
 					else
-					{						
+					{
 						mx_message_die(CRITICAL_ERROR, "Couldn't start session : login", "", __LINE__, __FILE__);
-					}					
+					}
 				}
 			}
 		}

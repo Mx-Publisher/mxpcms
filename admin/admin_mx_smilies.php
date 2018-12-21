@@ -99,6 +99,7 @@ switch (PORTAL_BACKEND)
 		$delimeter  = '=+:';
 	break;
 	case 'phpbb3':
+	default:
 		$smiley_path_url = PHPBB_URL;
 		$smiley_root_path =	$phpbb_root_path;
 		$fields = 'smiley';
@@ -203,6 +204,7 @@ if ($mx_request_vars->is_request('import_pack'))
 				break;
 
 				case 'phpbb3':
+				default:
 					$smile_data = explode($delimeter, trim($fcontents[$i]));
 					$smile_data = str_replace("'", "", $smile_data);
 					$smile_data = str_replace(",", "", $smile_data);
@@ -246,6 +248,7 @@ if ($mx_request_vars->is_request('import_pack'))
 							break;
 
 							case 'phpbb3':
+							default:
 								$sql = array(
 									'emotion'			=> $smile_emotion,
 									$fields . '_url'	=> $smile_url,
@@ -278,6 +281,7 @@ if ($mx_request_vars->is_request('import_pack'))
 						break;
 
 						case 'phpbb3':
+						default:
 							++$smiley_order;
 							$sql = array(
 								$fields . '_url'	=> $smile_url,
@@ -370,6 +374,7 @@ else if ($mx_request_vars->is_request('export_pack'))
 			break;
 
 			case 'phpbb3':
+			default:
 				$sql = 'SELECT *
 					FROM ' . SMILIES_TABLE . '
 					ORDER BY smiley_order';
@@ -397,6 +402,7 @@ else if ($mx_request_vars->is_request('export_pack'))
 			break;
 
 			case 'phpbb3':
+			default:
 				for($i = 0; $i < count($resultset); $i++ )
 				{
 					$smile_pak .= "'" . addslashes($resultset[$i][$smiley_url]) . "'" . $delimeter;
@@ -620,13 +626,12 @@ else if ( $mode != "" )
 			$smile_code = trim($smile_code);
 			$smile_url = trim($smile_url);
 
-			if (PORTAL_BACKEND === 'phpbb3')
+			if ((PORTAL_BACKEND !== 'internal') && (PORTAL_BACKEND !== 'phpbb2'))
 			{
 				$smiley_width = $mx_request_vars->post('smile_width', MX_TYPE_NO_HTML);
 				$smiley_height = $mx_request_vars->post('smile_height', MX_TYPE_NO_HTML);
 				$smiley_order = $mx_request_vars->post('smile_order', MX_TYPE_NO_HTML);
 			}
-
 
 			// If no code was entered complain ...
 			if ($smile_code == '' || $smile_url == '')
@@ -653,6 +658,7 @@ else if ( $mode != "" )
 				break;
 
 				case 'phpbb3':
+				default:
 					$sql = array(
 						'emotion'			=> $smile_emotion,
 						$fields . '_url'	=> $smile_url,
@@ -726,6 +732,7 @@ else if ( $mode != "" )
 				break;
 
 				case 'phpbb3':
+				default:
 					$sql = array(
 						'code'				=> $smile_code,
 						'emotion'			=> $smile_emotion,
@@ -768,12 +775,14 @@ else
 		break;
 
 		case 'phpbb3':
+		default:
 			$sql = 'SELECT *
 				FROM ' . $table . '
 				ORDER BY smiley_order';
 			$result = $db->sql_query($sql);
 		break;
 	}
+	
 	if( !$result )
 	{
 		mx_message_die(GENERAL_ERROR, "Couldn't obtain smileys from database", "", __LINE__, __FILE__, $sql);

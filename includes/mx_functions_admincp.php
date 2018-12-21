@@ -1084,20 +1084,20 @@ class mx_admin
 					$ipfilter = addslashes( serialize( $ipfilter ) );
 
 					$sql = "UPDATE " . PAGE_TABLE . "
-						SET page_name         = '$page_name',
-							page_desc         = '$page_desc',
-							page_parent       = '$page_parent',
-							page_icon         = '$page_icon',
-							page_alt_icon     = '$page_alt_icon',
-							default_style     = '$default_style',
+						SET page_name		 = '$page_name',
+							page_desc		 = '$page_desc',
+							page_parent	   = '$page_parent',
+							page_icon		 = '$page_icon',
+							page_alt_icon	 = '$page_alt_icon',
+							default_style	 = '$default_style',
 							override_user_style = '$override_user_style',
-							page_header       = '$page_header',
-							page_footer       = '$page_footer',
+							page_header	   = '$page_header',
+							page_footer	   = '$page_footer',
 							page_main_layout  = '$page_main_layout',
 							navigation_block  = '$navigation_block',
-							auth_view         = '$auth_view',
-							ip_filter         = '$ipfilter',
-							phpbb_stats       = '$phpbb_stats'
+							auth_view		 = '$auth_view',
+							ip_filter		 = '$ipfilter',
+							phpbb_stats	   = '$phpbb_stats'
 						WHERE page_id = $page_id";
 					if( !($result = $db->sql_query($sql)) )
 					{
@@ -2797,10 +2797,10 @@ class mx_admin
 						VALUES ('" . intval($module_data[1]) . "', '" . str_replace("\'", "''",$module_data[2]) . "', '" . str_replace("\'", "''",$module_data[3]) . "', '" . str_replace("\'", "''",$module_data[4]) . "', '" . str_replace("\'", "''",$module_data[5]) . "', '" . str_replace("\'", "''",$module_data[6]) . "' )";
 						
 					$sql_update = "UPDATE " . FUNCTION_TABLE . "
-						SET module_id       	= '" . intval($module_data[1]) . "',
-							function_id     	= '" . str_replace("\'", "''",$module_data[2]) . "',
-							function_name     	= '" . str_replace("\'", "''",$module_data[3]) . "',
-							function_desc     	= '" . str_replace("\'", "''",$module_data[4]) . "',
+						SET module_id	   	= '" . intval($module_data[1]) . "',
+							function_id	 	= '" . str_replace("\'", "''",$module_data[2]) . "',
+							function_name	 	= '" . str_replace("\'", "''",$module_data[3]) . "',
+							function_desc	 	= '" . str_replace("\'", "''",$module_data[4]) . "',
 							function_file 	= '" . str_replace("\'", "''", $module_data[5]) . "',
 							function_admin 	= '" . str_replace("\'", "''",$module_data[6]) . "'
 						WHERE function_id  = '" . intval($module_data[2]) . "'";
@@ -2824,10 +2824,10 @@ class mx_admin
 					/*
 					++$parameter_order;
 					$sql = array(
-						'function_id'        	=> (int) $module_data[1],
+						'function_id'			=> (int) $module_data[1],
 						'parameter_id'  		=> (int) $module_data[2],
-						'parameter_name'     	=> stripslashes($module_data[3]),
-						'parameter_type'     	=> stripslashes($module_data[4]),
+						'parameter_name'	 	=> stripslashes($module_data[3]),
+						'parameter_type'	 	=> stripslashes($module_data[4]),
 						'parameter_default'  	=> stripslashes($module_data[5]),
 						'parameter_function' 	=> stripslashes($module_data[6]),
 						'parameter_auth' 		=> stripslashes($module_data[7]),
@@ -2837,9 +2837,9 @@ class mx_admin
 					*/
 
 					$sql_update = "UPDATE " . PARAMETER_TABLE . "
-						SET function_id        	= '" . intval($module_data[1]) . "',
-							parameter_name     	= '" . str_replace("\'", "''",$module_data[3]) . "',
-							parameter_type     	= '" . str_replace("\'", "''",$module_data[4]) . "',
+						SET function_id			= '" . intval($module_data[1]) . "',
+							parameter_name	 	= '" . str_replace("\'", "''",$module_data[3]) . "',
+							parameter_type	 	= '" . str_replace("\'", "''",$module_data[4]) . "',
 							parameter_default  	= '" . str_replace("\'", "''", $module_data[5]) . "',
 							parameter_function 	= '" . str_replace("\'", "''",$module_data[6]) . "',
 							parameter_auth 		= '" . str_replace("\'", "''",$module_data[7]) . "',
@@ -3685,7 +3685,7 @@ class mx_admin
 			return $this->_end('FAIL');
 		}
 
-        // Allows '' to be sent as 0
+		// Allows '' to be sent as 0
 		$parent = (!$parent) ? 0 : $parent;
 
 		// allow sending the name as a string in $data to create a category
@@ -4291,7 +4291,7 @@ function mx_check_mem_limit()
 */
 function mx_get_remote_file($host, $directory, $filename, &$errstr, &$errno, $port = 80, $timeout = 10)
 {
-	global $user;
+	global $mx_user;
 
 	if ($fsock = @fsockopen($host, $port, $errno, $errstr, $timeout))
 	{
@@ -4317,7 +4317,7 @@ function mx_get_remote_file($host, $directory, $filename, &$errstr, &$errno, $po
 				}
 				else if (stripos($line, '404 not found') !== false)
 				{
-					$errstr = $user->lang['FILE_NOT_FOUND'] . ': ' . $filename;
+					$errstr = $mx_user->lang['FILE_NOT_FOUND'] . ': ' . $filename;
 					return false;
 				}
 			}
@@ -4333,11 +4333,391 @@ function mx_get_remote_file($host, $directory, $filename, &$errstr, &$errno, $po
 		}
 		else
 		{
-			$errstr = $user->lang['FSOCK_DISABLED'];
+			$errstr = $mx_user->lang['FSOCK_DISABLED'];
 			return false;
 		}
 	}
 
 	return $file_info;
 }
+
+/**
+* List Colums from phpBB and MXP 
+* 				Dbal Database Tools
+* Gets a list of columns of a table.
+*
+* @param string $table		Table name
+*
+* @return array				Array of column names (all lower case)
+*/
+function admin_list_columns($table)
+{
+	global $db;
+	$columns = array();
+	
+	switch ($db->sql_layer)
+	{
+		case 'mysql':
+		case 'mysql_40':
+		case 'mysql_41':
+			$sql = "SHOW COLUMNS FROM $table";
+		break;
+
+		// PostgreSQL has a way of doing this in a much simpler way but would
+		// not allow us to support all versions of PostgreSQL
+		case 'postgres':
+			$sql = "SELECT a.attname
+				FROM pg_class c, pg_attribute a
+				WHERE c.relname = '{$table}'
+					AND a.attnum > 0
+					AND a.attrelid = c.oid";
+		break;
+
+		// same deal with PostgreSQL, we must perform more complex operations than
+		// we technically could
+		case 'mssql':
+		case 'mssqlnative':
+			$sql = "SELECT c.name
+				FROM syscolumns c
+				LEFT JOIN sysobjects o ON c.id = o.id
+				WHERE o.name = '{$table}'";
+		break;
+
+		case 'oracle':
+			$sql = "SELECT column_name
+				FROM user_tab_columns
+				WHERE LOWER(table_name) = '" . strtolower($table) . "'";
+		break;
+
+		case 'sqlite':
+		case 'sqlite3':
+			$sql = "SELECT sql
+					FROM sqlite_master
+					WHERE type = 'table'
+						AND name = '{$table}'";
+			$result = $db->sql_query($sql);
+
+			if (!$result)
+			{
+				return false;
+			}
+
+			$row = $db->sql_fetchrow($result);
+			$db->sql_freeresult($result);
+
+			preg_match('#\((.*)\)#s', $row['sql'], $matches);
+
+			$cols = trim($matches[1]);
+			$col_array = preg_split('/,(?![\s\w]+\))/m', $cols);
+
+			foreach ($col_array as $declaration)
+			{
+				$entities = preg_split('#\s+#', trim($declaration));
+				if ($entities[0] == 'PRIMARY')
+				{
+					continue;
+				}
+
+				$column = strtolower($entities[0]);
+				$columns[$column] = $column;
+			}
+
+			return $columns;
+		break;
+	}
+	$result = $db->sql_query($sql);
+
+	while ($row = $db->sql_fetchrow($result))
+	{
+		$column = strtolower(current($row));
+		$columns[$column] = $column;
+	}
+	$db->sql_freeresult($result);
+
+	return $columns;
+}
+
+/**
+* Ported from phpMyAdmin GNU GPL-2 by FlorinCB
+* @link https://www.phpmyadmin.net/
+*
+ * Extracts the various parts from a column spec
+ *
+ * @param string $columnspec Column specification
+ *
+ * @return array associative array containing type, spec_in_brackets
+ *		and possibly enum_set_values (another array)
+*/
+function extractColumnSpec($columnspec)
+{
+	$first_bracket_pos = mb_strpos($columnspec, '(');
+	
+	if ($first_bracket_pos) 
+	{
+		$spec_in_brackets = chop(mb_substr($columnspec, $first_bracket_pos + 1, 	mb_strrpos($columnspec, ')') - $first_bracket_pos - 1));
+		// convert to lowercase just to be sure
+		$type = mb_strtolower(chop(mb_substr($columnspec, 0, $first_bracket_pos)));
+	} 
+	else 
+	{
+		// Split trailing attributes such as unsigned,
+		// binary, zerofill and get data type name
+		$type_parts = explode(' ', $columnspec);
+		$type = mb_strtolower($type_parts[0]);
+		$spec_in_brackets = '';
+	}
+
+	if ('enum' == $type || 'set' == $type) 
+	{
+		// Define our working vars
+		$enum_set_values = parseEnumSetValues($columnspec, false);
+		$printtype = $type . '(' .  str_replace("','", "', '", $spec_in_brackets) . ')';
+		$binary = false;
+		$unsigned = false;
+		$zerofill = false;
+	} 
+	else 
+	{
+		$enum_set_values = array();
+
+		/* Create printable type name */
+		$printtype = mb_strtolower($columnspec);
+
+		// Strip the "BINARY" attribute, except if we find "BINARY(" because
+		// this would be a BINARY or VARBINARY column type;
+		// by the way, a BLOB should not show the BINARY attribute
+		// because this is not accepted in MySQL syntax.
+		if (preg_match('@binary@', $printtype) && ! preg_match('@binary[\(]@', $printtype)) 
+		{
+			$printtype = preg_replace('@binary@', '', $printtype);
+			$binary = true;
+		} 
+		else 
+		{
+			$binary = false;
+		}
+
+		$printtype = preg_replace('@zerofill@', '', $printtype, -1, $zerofill_cnt);
+		$zerofill = ($zerofill_cnt > 0);
+		$printtype = preg_replace('@unsigned@', '', $printtype, -1, $unsigned_cnt);
+		$unsigned = ($unsigned_cnt > 0);
+		$printtype = trim($printtype);
+	}
+
+	$attribute	= ' ';
+
+	if ($binary)
+	{
+		$attribute = 'BINARY';
+	}
+	
+	if ($unsigned) 
+	{
+		$attribute = 'UNSIGNED';
+	}
+	
+	if ($zerofill) 
+	{
+		$attribute = 'UNSIGNED ZEROFILL';
+	}
+
+	$can_contain_collation = false;
+	
+	if (!$binary	&& preg_match("@^(char|varchar|text|tinytext|mediumtext|longtext|set|enum)@", $type)) 
+	{
+		$can_contain_collation = true;
+	}
+
+	// for the case ENUM('&#8211;','&ldquo;')
+	$displayed_type = htmlspecialchars($printtype);
+	
+	if (mb_strlen($printtype) > $GLOBALS['cfg']['LimitChars']) 
+	{
+		$displayed_type  = '<abbr title="' . htmlspecialchars($printtype) . '">';
+		$displayed_type .= htmlspecialchars(mb_substr($printtype, 0, $GLOBALS['cfg']['LimitChars']) . '...');
+		$displayed_type .= '</abbr>';
+	}
+
+	return array(
+		'type' => $type,
+		'spec_in_brackets' => $spec_in_brackets,
+		'enum_set_values'  => $enum_set_values,
+		'print_type' => $printtype,
+		'binary' => $binary,
+		'unsigned' => $unsigned,
+		'zerofill' => $zerofill,
+		'attribute' => $attribute,
+		'can_contain_collation' => $can_contain_collation,
+		'displayed_type' => $displayed_type
+	);
+}
+
+/**
+* Ported from phpMyAdmin GNU GPL-2 by FlorinCB
+* @link https://www.phpmyadmin.net/
+*
+ * Generate collation dropdown box
+ *
+ * @param string	  $name		   Element name
+ * @param string	  $id			 Element id
+ * @param null|string $default		Default value
+ * @param bool		$label		  Label
+ * @param bool		$submitOnChange Submit on change
+ *
+ * @return string
+ */
+function getCollationDropdownBox($name = null, $id = null, $default = null, $label = true, $submitOnChange = false) 
+{
+	/**
+	 * MySQL charsets map
+	 *
+	 * @var array
+	 */
+   $_charsets = array(
+		'big5'		 => 'big5',
+		'cp-866'	   => 'cp866',
+		'euc-jp'	   => 'ujis',
+		'euc-kr'	   => 'euckr',
+		'gb2312'	   => 'gb2312',
+		'gbk'		  => 'gbk',
+		'iso-8859-1'   => 'latin1',
+		'iso-8859-2'   => 'latin2',
+		'iso-8859-7'   => 'greek',
+		'iso-8859-8'   => 'hebrew',
+		'iso-8859-8-i' => 'hebrew',
+		'iso-8859-9'   => 'latin5',
+		'iso-8859-13'  => 'latin7',
+		'iso-8859-15'  => 'latin1',
+		'koi8-r'	   => 'koi8r',
+		'shift_jis'	=> 'sjis',
+		'tis-620'	  => 'tis620',
+		'utf-8'		=> 'utf8',
+		'windows-1250' => 'cp1250',
+		'windows-1251' => 'cp1251',
+		'windows-1252' => 'latin1',
+		'windows-1256' => 'cp1256',
+		'windows-1257' => 'cp1257',
+	); 
+	
+	$sql = 'SELECT * FROM information_schema.COLLATIONS';
+	$res = $db->sql_query($sql);
+	while ($row = $db->sql_fetchrow($res))
+	{
+		$char_set_name = $row['CHARACTER_SET_NAME'];
+		$name = $row['COLLATION_NAME'];
+		
+			self::$_collations[$char_set_name][] = $name;
+			
+			if ($row['IS_DEFAULT'] == 'Yes' || $row['IS_DEFAULT'] == '1') 
+			{
+				self::$_default_collations[$char_set_name] = $name;
+			}
+	}
+	$db->sql_freeresult($res);
+	
+	foreach (self::$_collations as $key => $value) 
+	{
+		sort(self::$_collations[$key], SORT_STRING);
+	}
+		
+	if (empty($name)) 
+	{
+		$name = 'collation';
+	}
+
+	$return_str  = '<select lang="en" dir="ltr" name="' . htmlspecialchars($name) . '"' . (empty($id) ? '' : ' id="' . htmlspecialchars($id) . '"') . ($submitOnChange ? ' class="autosubmit"' : '') . '>' . "\n";
+	
+	if ($label) 
+	{
+		$return_str .= '<option value="">' . __('Collation') . '</option>' . "\n";
+	}
+	
+	$return_str .= '<option value=""></option>' . "\n";
+	
+	foreach (self::$_charsets as $current_charset) 
+	{
+		$current_cs_descr	= empty(self::$_charsets_descriptions[$current_charset]) ? $current_charset : self::$_charsets_descriptions[$current_charset];
+
+		$return_str .= '<optgroup label="' . $current_charset  . '" title="' . $current_cs_descr . '">' . "\n";
+		foreach (self::$_collations[$current_charset] as $current_collation) 
+		{
+			$return_str .= '<option value="' . $current_collation . '" title="' . self::getCollationDescr($current_collation) . '"' . ($default == $current_collation ? ' selected="selected"' : '') . '>' . $current_collation . '</option>' . "\n";
+		}
+		$return_str .= '</optgroup>' . "\n";
+	}
+	$return_str .= '</select>' . "\n";
+
+	return $return_str;
+}
+
+/**
+* Ported from phpMyAdmin GNU GPL-2, by FlorinCB
+* @link https://www.phpmyadmin.net/
+*
+ * Parses ENUM/SET values
+ *
+ * @param string $definition The definition of the column
+ *						   for which to parse the values
+ * @param bool   $escapeHtml Whether to escape html entities
+ *
+ * @return array
+*/
+function parseEnumSetValues($definition, $escapeHtml = true)
+{
+	$values_string = htmlentities($definition, ENT_COMPAT, "UTF-8");
+	// There is a JS port of the below parser in functions.js
+	// If you are fixing something here,
+	// you need to also update the JS port.
+	$values = array();
+	$in_string = false;
+	$buffer = '';
+
+	for ($i = 0, $length = mb_strlen($values_string); $i < $length; $i++)
+	{
+		$curr = mb_substr($values_string, $i, 1);
+		$next = ($i == mb_strlen($values_string) - 1) ? '' : mb_substr($values_string, $i + 1, 1);
+		
+		if (!$in_string && $curr == "'") 
+		{
+			$in_string = true;
+		} 
+		else if (($in_string && $curr == "\\") && $next == "\\")
+		{
+			$buffer .= "&#92;";
+			$i++;
+		} 
+		else if (($in_string && $next == "'")	&& ($curr == "'" || $curr == "\\")) 
+		{
+			$buffer .= "&#39;";
+			$i++;
+		} 
+		else if ($in_string && $curr == "'") 
+		{
+			$in_string = false;
+			$values[] = $buffer;
+			$buffer = '';
+		} 
+		else if ($in_string) 
+		{
+			 $buffer .= $curr;
+		}
+	}
+
+	if (strlen($buffer) > 0) 
+	{
+		// The leftovers in the buffer are the last value (if any)
+		$values[] = $buffer;
+	}
+
+	if (! $escapeHtml)
+	{
+		foreach ($values as $key => $value) 
+		{
+			$values[$key] = html_entity_decode($value, ENT_QUOTES, 'UTF-8');
+		}
+	}
+
+	return $values;
+}
+
 ?>

@@ -72,13 +72,19 @@ window.onload = check_backend_path;
 //--></script>
 <noscript><div align="center" style="color:red;">{L_NOSCRIPT_WARNING}</div></noscript>
 <form name="frmInstall" action="{S_FORM_ACTION}" method="post">
-<table cellpadding="2" cellspacing="1" border="0">
+<div class="forabg">
+	<div class="inner">
+	<ul class="panel">
+<table class="tabel1" cellpadding="2" cellspacing="1" border="0">
 	<tr>
 		<th colspan="2">{L_INITIAL_CONFIGURATION}</th>
 	</tr>
 	<!-- BEGIN switch_readonly_mode -->
 	<tr>
-		<td class="row1" align="right" width="50%"><span class="gen"><b>{L_BACKEND}:&nbsp;</b></span><br /><span class="gensmall">{L_Backend_explain}:&nbsp;</span></td>
+		<td class="row1" align="right" width="50%">
+			<span class="gen"><b>{L_BACKEND}:&nbsp;</b></span><br />
+			<span class="gensmall">{L_Backend_explain}:&nbsp;</span>
+		</td>
 		<td class="row2">{S_BACKEND_PATH}</td>
 	</tr>
 	<!-- END switch_readonly_mode -->	
@@ -88,7 +94,7 @@ window.onload = check_backend_path;
 	</tr>
 	<!-- BEGIN switch_readonly_mode -->	
 	<tr>
-		<td class="row1" colspan="2" align="center"><input size="140" class="info" type="text" name="info" value="{INFO}" {READONLY} /></td></td>
+		<td class="row1" colspan="2" align="center"><input size="140" class="info" type="text" name="info" value="{INFO}" {READONLY} /></td>
 	</tr>
 	<!-- END switch_readonly_mode -->		
 	<!--
@@ -196,7 +202,7 @@ window.onload = check_backend_path;
 	<tr>
 		<td class="row1" align="right"><span class="gen">{L_DB_CHARACTER_SET}:&nbsp;</span></td>
 		<td class="row2"><input class="inputbox autowidth" type="text" name="dbcharacter_set_mxbb" value="{DB_CHARACTER_SET}" /></td>
-	</tr>	
+	</tr>
 	<tr>
 		<td class="row1" align="right"><span class="gen">{L_DB_HOST}:&nbsp;</span></td>
 		<td class="row2"><input class="inputbox autowidth" type="text" name="dbhost_mxbb" value="{DB_HOST}" /></td>
@@ -212,7 +218,7 @@ window.onload = check_backend_path;
 	<tr>
 		<td class="row1" align="right"><span class="gen">{L_DB_PASSWORD}:&nbsp;</span></td>
 		<td class="row2"><input type="password" name="dbpasswd_mxbb" value="{DB_PASSWD}" /></td>
-	</tr>	
+	</tr>
 	<tr>
 		<td class="row1" align="right"><span class="gen">{L_MXP_ADMINNAME}:&nbsp;</span></td>
 		<td class="row2"><input class="inputbox autowidth" type="text" name="admin_name_mxbb" value="" /></td>
@@ -229,11 +235,20 @@ window.onload = check_backend_path;
 		<td class="row1" colspan="2" align="center"><span class="gensmall"><font color="red">{L_MXP_ADMIN}</font></span></td></td>
 	</tr>
 	<tr>
-		<td class="catbottom" align="center" colspan="2">{S_HIDDEN_FIELDS}<input class="liteoption" type="submit" name="debug" value="Debug" /><input class="mainoption" name="mxbb" type="submit" value="{L_SUBMIT}" /></td>
+		<td class="catbottom" align="center" colspan="2">
+		{S_HIDDEN_FIELDS}
+		<input class="liteoption" type="submit" name="debug" value="Debug" />
+		<input class="mainoption" name="mxbb" type="submit" value="{L_SUBMIT}" />
+		</td>
 	</tr>
 
 	</table></div></td></tr>
 
 
 </table>
+
+	</ul>
+</div>
+</div>
+
 </form>

@@ -155,10 +155,10 @@ CREATE TABLE `mx_table_column_templates` (
 #
 # Dumping data for table 'mx_table_column_templates'
 #
-INSERT INTO mx_table_column_templates VALUES("1", "Left", "40", "200", "2");
+INSERT INTO mx_table_column_templates VALUES("1", "Left", "40", "124", "2");
 INSERT INTO mx_table_column_templates VALUES("2", "Main", "50", "100%", "2");
 INSERT INTO mx_table_column_templates VALUES("3", "Main", "10", "100%", "3");
-INSERT INTO mx_table_column_templates VALUES("4", "Right", "20", "200", "3");
+INSERT INTO mx_table_column_templates VALUES("4", "Right", "20", "124", "3");
 INSERT INTO mx_table_column_templates VALUES("5", "Left", "10", "180", "4");
 INSERT INTO mx_table_column_templates VALUES("6", "Middle", "20", "100%", "4");
 INSERT INTO mx_table_column_templates VALUES("7", "Right", "30", "180", "4");

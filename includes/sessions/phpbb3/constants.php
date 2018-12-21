@@ -2,7 +2,7 @@
 /**
 *
 * @package Style
-* @version $Id: constants.php,v 1.10 2013/06/28 15:33:47 orynider Exp $
+* @version $Id: constants.php,v 1.1 2014/09/15 21:14:56 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/

@@ -41,14 +41,7 @@ $l_timezone = (count($l_timezone) > 1 && $l_timezone[count($l_timezone)-1] != 0)
 //
 //$mx_user->session_begin();
 //$mx_user->init($user_ip, PAGE_INDEX);
-
-//
-// Authorization SQL
-//
 $phpbb_auth->acl($mx_user->data); // Do only once, in user_init // Move later
-//die('s1'.var_export($phpbb_auth->acl_getf('f_view', false)));
-$auth_data_sql_forum = $phpbb_auth->get_auth_forum();
-//die(var_export($auth_data_sql_msg));
 
 $mx_user->setup('viewforum');
 //

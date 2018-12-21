@@ -2,7 +2,7 @@
 /**
 *
 * @package Auth
-* @version $Id: functions.php,v 1.3 2013/06/28 15:33:47 orynider Exp $
+* @version $Id: functions.php,v 1.1 2014/09/15 21:14:57 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
@@ -15,7 +15,7 @@ if ( !defined( 'IN_PORTAL' ) )
 }
 
 /**
-* Olympus Parse cfg file
+* Ascraeus Parse cfg file
 */
 function mx_parse_cfg_file($filename, $lines = false)
 {
@@ -36,7 +36,7 @@ function mx_parse_cfg_file($filename, $lines = false)
 		}
 
 		// Determine first occurrence, since in values the equal sign is allowed
-		$key = strtolower(trim(substr($line, 0, $delim_pos)));
+		$key = htmlspecialchars(strtolower(trim(substr($line, 0, $delim_pos))));
 		$value = trim(substr($line, $delim_pos + 1));
 
 		if (in_array($value, array('off', 'false', '0')))
@@ -53,10 +53,19 @@ function mx_parse_cfg_file($filename, $lines = false)
 		}
 		else if (($value[0] == "'" && $value[sizeof($value) - 1] == "'") || ($value[0] == '"' && $value[sizeof($value) - 1] == '"'))
 		{
-			$value = substr($value, 1, sizeof($value)-2);
+			$value = htmlspecialchars(substr($value, 1, sizeof($value)-2));
+		}
+		else
+		{
+			$value = htmlspecialchars($value);
 		}
 
 		$parsed_items[$key] = $value;
+	}
+
+	if (isset($parsed_items['parent']) && isset($parsed_items['name']) && $parsed_items['parent'] == $parsed_items['name'])
+	{
+		unset($parsed_items['parent']);
 	}
 
 	return $parsed_items;

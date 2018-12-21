@@ -2,9 +2,12 @@
 * phpBB3 forum functions
 */
 
-/**
-* Window popup
-*/
+function find_username(url)
+{
+	popup(url, 760, 570, '_usersearch');
+	return false;
+}
+
 function popup(url, width, height, name)
 {
 	if (!name)
@@ -12,44 +15,38 @@ function popup(url, width, height, name)
 		name = '_popup';
 	}
 
-	window.open(url.replace(/&amp;/g, '&'), name, 'height=' + height + ',resizable=yes,scrollbars=yes, width=' + width);
+	window.open(url.replace(/&amp;/g, '&'), name, 'height=' + height + ',resizable=yes,scrollbars=yes,width=' + width);
 	return false;
 }
 
-/**
-* Jump to page
-*/
-function jumpto()
+function jumpto(page, per_page, base_url)
 {
-	var page = prompt(jump_page, on_page);
-
-	if (page !== null && !isNaN(page) && page > 0)
+	if (page !== null && !isNaN(page) && page == Math.floor(page) && page > 0)
 	{
-		document.location.href = base_url.replace(/&amp;/g, '&') + '&start=' + ((page - 1) * per_page);
+		if (base_url.indexOf('?') == -1)
+		{
+			document.location.href = base_url + '?start=' + ((page - 1) * per_page);
+		}
+		else
+		{
+			document.location.href = base_url.replace(/&amp;/g, '&') + '&start=' + ((page - 1) * per_page);
+		}
 	}
 }
 
-/**
-* Mark/unmark checklist
-* id = ID of parent container, name = name prefix, state = state [true/false]
-*/
 function marklist(id, name, state)
 {
-	var parent = document.getElementById(id);
-	if (!parent)
-	{
-		eval('parent = document.' + id);
-	}
+	if (document.getElementById)	{ var parent = document.getElementById(id) || document[id]; }	else if (document.all) {var parent = document.all(id);}
 
 	if (!parent)
 	{
 		return;
 	}
 
-	var rb = parent.getElementsByTagName('input');
-	
+	if (document.getElementsByTagName) {var rb = parent.getElementsByTagName('input');}	else if (document.all) {var rb = parent.document.all.tags('input');}
+
 	for (var r = 0; r < rb.length; r++)
-	{	
+	{
 		if (rb[r].name.substr(0, name.length) == name)
 		{
 			rb[r].checked = state;
@@ -57,201 +54,103 @@ function marklist(id, name, state)
 	}
 }
 
-/**
-* Resize viewable area for attached image or topic review panel (possibly others to come)
-* e = element
-*/
-function viewableArea(e, itself)
-{
-	if (!e) return;
-	if (!itself)
-	{
-		e = e.parentNode;
-	}
-	
-	if (!e.vaHeight)
-	{
-		// Store viewable area height before changing style to auto
-		e.vaHeight = e.offsetHeight;
-		e.vaMaxHeight = e.style.maxHeight;
-		e.style.height = 'auto';
-		e.style.maxHeight = 'none';
-		e.style.overflow = 'visible';
-	}
-	else
-	{
-		// Restore viewable area height to the default
-		e.style.height = e.vaHeight + 'px';
-		e.style.overflow = 'auto';
-		e.style.maxHeight = e.vaMaxHeight;
-		e.vaHeight = false;
-	}
-}
-
-/**
-* Set display of page element
-* s[-1,0,1] = hide,toggle display,show
-*/
-function dE(n, s)
-{
-	var e = document.getElementById(n);
-
-	if (!s)
-	{
-		s = (e.style.display == '' || e.style.display == 'block') ? -1 : 1;
-	}
-	e.style.display = (s == 1) ? 'block' : 'none';
-}
-
-/**
-* Alternate display of subPanels
-*/
-function subPanels(p)
-{
-	var i, e, t;
-
-	if (typeof(p) == 'string')
-	{
-		show_panel = p;
-	}
-
-	for (i = 0; i < panels.length; i++)
-	{
-		e = document.getElementById(panels[i]);
-		t = document.getElementById(panels[i] + '-tab');
-
-		if (e)
-		{
-			if (panels[i] == show_panel)
-			{
-				e.style.display = 'block';
-				if (t)
-				{
-					t.className = 'activetab';
-				}
-			}
-			else
-			{
-				e.style.display = 'none';
-				if (t)
-				{
-					t.className = '';
-				}
-			}
-		}
-	}
-}
-
-/**
-* Call print preview
-*/
-function printPage()
-{
-	if (is_ie)
-	{
-		printPreview();
-	}
-	else
-	{
-		window.print();
-	}
-}
-
-/**
-* Show/hide groups of blocks
-* c = CSS style name
-* e = checkbox element
-* t = toggle dispay state (used to show 'grip-show' image in the profile block when hiding the profiles) 
-*/
-function displayBlocks(c, e, t)
-{
-	var s = (e.checked == true) ?  1 : -1;
-
-	if (t)
-	{
-		s *= -1;
-	}
-
-	var divs = document.getElementsByTagName("DIV");
-
-	for (var d = 0; d < divs.length; d++)
-	{
-		if (divs[d].className.indexOf(c) == 0)
-		{
-			divs[d].style.display = (s == 1) ? 'none' : 'block';
-		}
-	}
-}
-
 function selectCode(a)
 {
-	// Get ID of code block
-	var e = a.parentNode.parentNode.getElementsByTagName('CODE')[0];
+	'use strict';
 
-	// Not IE
+	if (document.getElementsByTagName) {var e = a.parentNode.parentNode.getElementsByTagName('PRE')[0];}	else if (document.all) {var e = a.parentElement.parentElement.all.tags('PRE')[0];}
+	var s, r;
+
 	if (window.getSelection)
 	{
-		var s = window.getSelection();
-		// Safari
-		if (s.setBaseAndExtent)
+		s = window.getSelection();
+		if (window.opera && e.innerHTML.substring(e.innerHTML.length - 4) === '<BR>')
 		{
-			s.setBaseAndExtent(e, 0, e, e.innerText.length - 1);
+			e.innerHTML = e.innerHTML + '&nbsp;';
 		}
-		// Firefox and Opera
-		else
-		{
-			var r = document.createRange();
-			r.selectNodeContents(e);
-			s.removeAllRanges();
-			s.addRange(r);
-		}
-	}
-	// Some older browsers
-	else if (document.getSelection)
-	{
-		var s = document.getSelection();
-		var r = document.createRange();
+		r = document.createRange();
 		r.selectNodeContents(e);
 		s.removeAllRanges();
 		s.addRange(r);
 	}
-	// IE
+	else if (document.getSelection)
+	{
+		s = document.getSelection();
+		r = document.createRange();
+		r.selectNodeContents(e);
+		s.removeAllRanges();
+		s.addRange(r);
+	}
 	else if (document.selection)
 	{
-		var r = document.body.createTextRange();
+		r = document.body.createTextRange();
 		r.moveToElementText(e);
 		r.select();
 	}
 }
 
 /**
-* Play quicktime file by determining it's width/height
-* from the displayed rectangle area
+* Dropdown menus initialisation
 */
-function play_qt_file(obj)
+
+if (typeof LegacyDropDownMenus !== 'undefined')
 {
-	var rectangle = obj.GetRectangle();
-
-	if (rectangle)
+	if (!window.XMLHttpRequest)
 	{
-		rectangle = rectangle.split(',');
-		var x1 = parseInt(rectangle[0]);
-		var x2 = parseInt(rectangle[2]);
-		var y1 = parseInt(rectangle[1]);
-		var y2 = parseInt(rectangle[3]);
+		var iFrameFix=document.createElement("IFRAME"); iFrameFix.src="javascript:'<html></html>';";
+	};
 
-		var width = (x1 < 0) ? (x1 * -1) + x2 : x2 - x1;
-		var height = (y1 < 0) ? (y1 * -1) + y2 : y2 - y1;
-	}
-	else
+	if (document.getElementById('quick_links_list'))
 	{
-		var width = 200;
-		var height = 0;
+		var qkl=document.getElementById('quick_links_list'); qkl.onclick = function(e) { if (e) { e.stopPropagation(); } else { window.event.cancelBubble = true; } };
+
+		document.getElementById('quick_link').onclick = function(e) { if (e) { e.stopPropagation(); } else { window.event.cancelBubble = true; } if (typeof nfl !== 'undefined') {nfl.style.display='none'}; if (typeof usl !== 'undefined') {usl.style.display='none'}; if (typeof ttl !== 'undefined') {ttl.style.display='none'}; var qks = qkl.style.display != 'none'; qkl.style.display = qks ? 'none' : 'inline';
+			if (qkl.style.display != 'none')
+			{
+				for (i=0 ; i<qkl.getElementsByTagName('a').length ; i++) {	var LinkWidth = qkl.getElementsByTagName('a')[i].offsetWidth;	if (i==0) { var LinkWidest = LinkWidth } else if (LinkWidth>LinkWidest) { LinkWidest=LinkWidth }}	qkl.style.width = LinkWidest+8+"px";
+				if (document.addEventListener) { var TotalHeight = window.innerHeight } else { var TotalHeight = document.documentElement.offsetHeight }	if (TotalHeight>400) { qkl.style.lineHeight="220%" } else { qkl.style.lineHeight="normal" }
+				if (typeof iFrameFix !== 'undefined') {	qkl.appendChild(iFrameFix); iFrameFix.style.height=qkl.offsetHeight+"px";	iFrameFix.style.width=qkl.offsetWidth+"px";}
+			};
+			return false;
+		};
 	}
 
-	obj.width = width;
-	obj.height = height + 16;
+	if (document.getElementById('user_list'))
+	{
+		if (document.getElementById('notification_list'))
+		{
+			var nfl=document.getElementById('notification_list'); nfl.onclick = function(e) { if (e) { e.stopPropagation(); } else { window.event.cancelBubble = true; } };
 
-	obj.SetControllerVisible(true);
-	obj.Play();
+			document.getElementById('notification_link').onclick = function(e) { if (e) { e.stopPropagation(); } else { window.event.cancelBubble = true; } if (typeof qkl !== 'undefined') {qkl.style.display='none'}; usl.style.display='none'; if (typeof ttl !== 'undefined') {ttl.style.display='none'}; var nfs = nfl.style.display != 'none'; nfl.style.display = nfs ? 'none' : 'inline'; 
+
+				if (nfl.style.display != 'none')
+				{
+					var UserSideWidth = document.getElementById('user_side').offsetWidth; if (UserSideWidth < 180) { document.getElementById('notification_title').style.fontSize="80%"; document.getElementById('notification_title').style.padding="2px" } if (UserSideWidth > 270) { nfl.style.width = "270px" } else if (UserSideWidth < 90) { nfl.style.width = "90px" } else { nfl.style.width = UserSideWidth+"px" }
+					if (document.getElementById('notification_list_overflow')) { var nfo = document.getElementById('notification_list_overflow'); nfo.style.height="auto"; if (document.addEventListener) { var TotalHeight = window.innerHeight } else { var TotalHeight = document.documentElement.offsetHeight } if (TotalHeight>520) { var MaxListHeight = 350 } else if (TotalHeight>400) { var MaxListHeight = 225 } else { var MaxListHeight = 100 } var ListHeight = nfo.offsetHeight; if (ListHeight < MaxListHeight) { nfo.style.height = ListHeight+"px" } else { nfo.style.height = MaxListHeight+"px" }}
+					if (typeof iFrameFix !== 'undefined') { nfl.appendChild(iFrameFix); iFrameFix.style.height=nfl.offsetHeight+"px"; iFrameFix.style.width=nfl.offsetWidth+"px";}
+				};
+				return false;
+			};
+		}
+
+		var usl=document.getElementById('user_list'); usl.onclick = function(e) { if (e) { e.stopPropagation(); } else { window.event.cancelBubble = true; } };
+
+		document.getElementById('user_link').onclick = function(e) { if (e) { e.stopPropagation(); } else { window.event.cancelBubble = true; } if (typeof qkl !== 'undefined') {qkl.style.display='none'}; if (typeof nfl !== 'undefined') {nfl.style.display='none'}; if (typeof ttl !== 'undefined') {ttl.style.display='none'}; var uss = usl.style.display != 'none'; usl.style.display = uss ? 'none' : 'inline'; 
+			if (usl.style.display != 'none')
+			{
+				for (i=0 ; i<usl.getElementsByTagName('a').length ; i++) {	var LinkWidth = usl.getElementsByTagName('a')[i].offsetWidth;	if (i==0) { var LinkWidest = LinkWidth } else if (LinkWidth>LinkWidest) { LinkWidest=LinkWidth }} usl.style.width = LinkWidest+8+"px"; var UserSideWidth = document.getElementById('user_side').offsetWidth; var UserListMargin = UserSideWidth - usl.offsetWidth; if (document.body.className == "ltr") { usl.style.marginLeft = UserListMargin+2+"px";} else { usl.style.marginRight = UserListMargin+2+"px";}
+				if (typeof iFrameFix !== 'undefined') { usl.appendChild(iFrameFix); iFrameFix.style.height=usl.offsetHeight+"px"; iFrameFix.style.width=usl.offsetWidth+"px";}
+			};
+			return false;
+		};
+
+	}
+
+	document.onclick = function() { if (typeof qkl !== 'undefined') {qkl.style.display='none'};  if (typeof nfl !== 'undefined') {nfl.style.display='none'};  if (typeof usl !== 'undefined') {usl.style.display='none'}; if (typeof ttl !== 'undefined') {ttl.style.display='none'};};
 }
+
+/**
+* Run onload function
+*/
+
+window.onload = function () { if (document.getElementById) { document.documentElement.className = document.documentElement.className.replace(/nojs/gi,'hasjs');}	else if (document.all) { document.all.tags('html')[0].className = 'hasjs';}}

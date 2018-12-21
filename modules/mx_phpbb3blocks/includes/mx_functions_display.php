@@ -1,7 +1,7 @@
 <?php
 /**
 *
-* @package MX-Publisher Module - mx_phpbb3blocks
+* @package MX-Publisher Module - mx_phpbb2blocks
 * @version $Id: mx_functions_display.php,v 1.11 2013/06/28 15:37:22 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
@@ -118,7 +118,7 @@ function mx_display_forums($root_data = '', $display_moderators = true, $return_
 	while ($row = $db->sql_fetchrow($result))
 	{
 		$forum_id = $row['forum_id'];
-		
+
 		// Mark forums read?
 		if ($mark_read == 'forums' || $mark_read == 'all')
 		{
@@ -134,7 +134,7 @@ function mx_display_forums($root_data = '', $display_moderators = true, $return_
 		{
 			continue;
 		}
-		
+
 		// Skip branch
 		if (isset($right_id))
 		{
@@ -144,14 +144,14 @@ function mx_display_forums($root_data = '', $display_moderators = true, $return_
 			}
 			unset($right_id);
 		}
-		
+
 		if (!$phpbb_auth->acl_get('f_list', $forum_id))
 		{
 			// if the user does not have permissions to list this forum, skip everything until next branch
 			$right_id = $row['right_id'];
 			continue;
 		}
-		
+
 		$forum_ids[] = $forum_id;
 
 		if ($board_config['load_db_lastread'] && $mx_user->data['is_registered'])
@@ -170,12 +170,13 @@ function mx_display_forums($root_data = '', $display_moderators = true, $return_
 		$row['forum_topics'] = ($phpbb_auth->acl_get('m_approve', $forum_id)) ? $row['forum_topics_real'] : $row['forum_topics'];
 
 		// Display active topics from this forum?
-		if ($show_active && $row['forum_type'] == FORUM_POST && ($phpbb_auth->acl_get('f_read', $forum_id) !== -1) && ($row['forum_flags'] & FORUM_FLAG_ACTIVE_TOPICS))
+		if ($show_active && $row['forum_type'] == FORUM_POST && $phpbb_auth->acl_get('f_read', $forum_id) && ($row['forum_flags'] & FORUM_FLAG_ACTIVE_TOPICS))
 		{
 			if (!isset($active_forum_ary['forum_topics']))
 			{
 				$active_forum_ary['forum_topics'] = 0;
 			}
+
 			if (!isset($active_forum_ary['forum_posts']))
 			{
 				$active_forum_ary['forum_posts'] = 0;
@@ -192,7 +193,7 @@ function mx_display_forums($root_data = '', $display_moderators = true, $return_
 				$active_forum_ary['exclude_forum_id'][] = $forum_id;
 			}
 		}
-		
+
 		//
 		if ($row['parent_id'] == $root_data['forum_id'] || $row['parent_id'] == $branch_root_id)
 		{
@@ -271,7 +272,7 @@ function mx_display_forums($root_data = '', $display_moderators = true, $return_
 		}
 		mx_get_moderators($forum_moderators, $forum_ids_moderator);
 	}
-	
+
 	// Used to tell whatever we have to create a dummy category or not.
 	$last_catless = true;
 	foreach ($forum_rows as $row)
@@ -1272,7 +1273,7 @@ function mx_watch_topic_forum($mode, &$s_watching, $user_id, $forum_id, $topic_i
 * @param string &$rank_img_src the rank image source is stored here after execution
 *
 */
-function _mx_get_user_rank($user_rank, $user_posts, &$rank_title, &$rank_img, &$rank_img_src)
+function mx_get_user_rank($user_rank, $user_posts, &$rank_title, &$rank_img, &$rank_img_src)
 {
 	global $ranks, $board_config;
 
@@ -1317,7 +1318,7 @@ function _mx_get_user_rank($user_rank, $user_posts, &$rank_title, &$rank_img, &$
 *
 * @return string Avatar image
 */
-function _mx_get_user_avatar($avatar, $avatar_type, $avatar_width, $avatar_height, $alt = 'USER_AVATAR')
+function mx_get_user_avatar($avatar, $avatar_type, $avatar_width, $avatar_height, $alt = 'USER_AVATAR')
 {
 	global $mx_user, $board_config, $phpbb_root_path, $phpEx;
 

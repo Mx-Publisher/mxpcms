@@ -9,7 +9,8 @@
 *
 */
 
-class Template {
+class Template 
+{
 	var $classname = "Template";
 
 	// variable that holds all the data we'll be substituting into
@@ -255,8 +256,6 @@ class Template {
 		return true;
 	}
 
-
-
 	/**
 	 * Compiles the given string of code, and returns
 	 * the result in a string.
@@ -398,7 +397,6 @@ class Template {
 
 	}
 
-
 	/**
 	 * Generates a reference to the given variable inside the given (possibly nested)
 	 * block namespace. This is a string of the form:
@@ -423,7 +421,6 @@ class Template {
 		return $varref;
 
 	}
-
 
 	/**
 	 * Generates a reference to the array of data values for the given

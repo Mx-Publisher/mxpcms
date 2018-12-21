@@ -40,6 +40,13 @@ $mx_page->init($page_id);
 */
 $mx_user->init_style();
 
+//Include shared phpBB2 language file 
+$mx_user->set_lang($mx_user->lang, $mx_user->help, 'lang_main');
+//Include shared phpBB3 language file 
+$language->set_default_language(isset($mx_user->user_language) ? $mx_user->user_language : $mx_user->default_language);
+//$language->add_lang(array('common', 'acp/common', 'cli'));
+//$language->load_common_language_files();
+
 /*
 * Site under reconstruction
 */
@@ -73,7 +80,7 @@ elseif ( !$mx_page->auth_ip )
 	$message = empty( $lang['Page_Not_Authorised'] ) ? "Sorry, but you don't have privilege to access this page." : $lang['Page_Not_Authorised'];
 	mx_message_die(GENERAL_MESSAGE, $message, '', __LINE__, __FILE__, '');
 }
-
+//print_r($theme);
 /*
 * Initialize page layout template
 */

@@ -16,33 +16,92 @@
 */
 function page_header_install($title, $instruction_text = '')
 {
-	global $template, $lang, $mx_root_path, $mx_portal_name, $mx_portal_version, $tplEx, $phpEx;
+	global $template, $lang, $mx_root_path, $mx_portal_name, $mx_portal_version, $mx_request_vars, $tplEx, $phpEx;
+
+	// Get the current Server URL.
+	$server_url = ($_SERVER['SERVER_PORT'] == 443 ? 'https' : 'http' ) . '://' . $_SERVER['HTTP_HOST'];
+	// Get the MX-Publisher Path in the URL (this might not be the same as the base path when using aliases).
+	$mx_self_path = substr($_SERVER['PHP_SELF'], 0, -strlen('install/'.basename(__FILE__)));
+
+	// Get the MX-Publisher URL.
+	$portal_url = $server_url . $mx_self_path . '/';
+	$default_lang = guess_lang();
+	
+	//Base Style for Installation
+	if ($mx_request_vars->is_get('style') )
+	{
+		$style = $mx_request_vars->request('style', MX_TYPE_NO_TAGS);
+		$theme = array('template_name' => ($style !== 'prosilver') ? 'subSilver' : 'prosilver');
+	}
+	else
+	{
+		$theme = array('template_name' => ($tplEx == 'tpl') ? 'subSilver' : 'prosilver');
+	}
+
+	$board_config = array();
+	$board_config['smilies_path'] = 'includes/shared/phpbb2/images/smiles/';
+	$board_config['avatar_gallery_path'] = 'includes/shared/phpbb2/images/';
+
 
 	$template->set_filenames(array('header' => 'mx_install_header.'.$tplEx));
+
 	$template->assign_vars(array(
-		'S_CONTENT_ENCODING'	=> 'UTF-8',	
 		'L_PORTAL_NAME'			=> $mx_portal_name,
 		'L_PORTAL_VERSION'		=> $mx_portal_version,
 		'U_INSTALL_URL'			=> $mx_root_path . 'install/',
 		'L_INSTALLATION'		=> $title,
 		'U_INDEX'				=> $mx_root_path . 'install/mx_install.'.$phpEx,
-		'U_LOGO'				=> $mx_root_path . 'install/templates/logo.gif',		
+		'U_LOGO'				=> $mx_root_path . 'install/templates/logo.gif',
 		'L_INSTRUCTION_TEXT'	=> $instruction_text,
+		
+		'T_ASSETS_VERSION'		=> INSTALLER_VERSION,
+		'T_ASSETS_PATH'			=> "{$portal_url}assets",
+		'T_THEME_PATH'			=> "{$portal_url}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme',
+		'T_TEMPLATE_PATH'		=> "{$portal_url}templates/" . rawurlencode($theme['template_name']) . '',
+		'T_SUPER_TEMPLATE_PATH'	=> "{$portal_url}templates/" . rawurlencode($theme['template_name']) . '/template',
+			
+		'T_IMAGES_PATH'			=> "{$portal_url}images/",
+		'T_SMILIES_PATH'		=> "{$portal_url}{$board_config['smilies_path']}/",
+		'T_AVATAR_GALLERY_PATH'	=> "{$portal_url}{$board_config['avatar_gallery_path']}/",
+		
+		'T_STYLESHEET_LINK'		=> "{$portal_url}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme/stylesheet.css',
+		'T_STYLESHEET_LANG_LINK'=> "{$portal_url}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme/images/lang_' . $default_lang . '/stylesheet.css',
+		'T_FONT_AWESOME_LINK'	=> "{$portal_url}assets/css/font-awesome.min.css",
+		'T_FONT_IONIC_LINK'			=> "{$portal_url}assets/css/ionicons.min.css",
+
+		'T_JQUERY_LINK'			=> "{$portal_url}assets/javascript/jquery.min.js?assets_version=" . INSTALLER_VERSION,
+		'S_ALLOW_CDN'				=> false,
+		
+		'S_CONTENT_ENCODING'	=> 'UTF-8',
 	));
 	$template->pparse('header');
 }
 
 function page_footer_install($show_phpinfo = true)
 {
-	global $db, $template, $lang, $tplEx;
+	global $db, $template, $lang, $mx_request_vars, $tplEx, $phpEx;
 
 	$install_moreinfo = sprintf($lang['Install_moreinfo'],
-		'<a href="'.U_RELEASE_NOTES.'" target="_blank">', '</a>',
-		'<a href="'.U_ONLINE_MANUAL.'" target="_blank">', '</a>',
-		'<a href="'.U_ONLINE_KB.'" target="_blank">', '</a>',
-		'<a href="'.U_ONLINE_SUPPORT.'" target="_blank">', '</a>',
-		'<a href="'.U_TERMS_OF_USE.'" target="_blank">', '</a>'
+		'<a href="' . U_RELEASE_NOTES . '" target="_blank">', '</a>',
+		'<a href="' . U_ONLINE_MANUAL . '" target="_blank">', '</a>',
+		'<a href="' . U_ONLINE_KB . '" target="_blank">', '</a>',
+		'<a href="' . U_ONLINE_SUPPORT . '" target="_blank">', '</a>',
+		'<a href="' . U_TERMS_OF_USE . '" target="_blank">', '</a>'
 	);
+
+	//Base Style for Installation
+	$subSilver = ($tplEx !== $phpEx) ? '<a href="?style=subSilver">Classic Style</a>' : '';
+	$prosilver = ($tplEx !== $phpEx) ? '<a href="?style=prosilver">Normal Style</a>' : '';
+	
+	if ($mx_request_vars->is_get('style') )
+	{
+		$style = $mx_request_vars->request('style', MX_TYPE_NO_TAGS);
+		$install_theme = ($style == 'prosilver') ? $subSilver : $prosilver;
+	}
+	else
+	{
+		$install_theme = ($tplEx == 'tpl') ? $subSilver : $prosilver;
+	}
 
 	$template->set_filenames(array('footer' => 'mx_install_footer.'.$tplEx));
 	$template->assign_vars(array(
@@ -50,6 +109,8 @@ function page_footer_install($show_phpinfo = true)
 		'L_INSTALLER_VERSION'	=> INSTALLER_VERSION,
 		'L_INSTALL_MOREINFO'	=> $install_moreinfo,
 		'L_INSTALL_PHPINFO'		=> ( $show_phpinfo ? '<a href="?phpinfo" target="_blank">phpInfo</a>' : '' ),
+		'U_INSTALL_THEME'		=> $install_theme,
+		'U_INSTALL_PHPINFO'	=> ( $show_phpinfo ? '<a href="?phpinfo" target="_blank">phpInfo</a>' : '' ),
 	));
 	$template->pparse('footer');
 
@@ -398,6 +459,7 @@ function connect_check_db($error_connect, &$error, $dbms, $table_prefix, $dbhost
 	switch ($dbms['DRIVER'])
 	{
 		case 'mysql':
+		case 'mysql4':
 		case 'mysqli':
 			if (strpos($table_prefix, '-') !== false || strpos($table_prefix, '.') !== false)
 			{
@@ -1026,7 +1088,7 @@ function get_keys_sufix($key)
 
 	return (isset($rkey)) ? $rkey : $key;
 }
-	
+
 function get_backend_info($config)
 {
 	if ((@include $config) === false)
@@ -1046,11 +1108,11 @@ function get_backend_info($config)
 		'dbpasswd'		=> $dbpasswd,
 		'table_prefix'	=> $table_prefix,
 		'acm_type'		=> $acm_type ? $acm_type : '',
-		'status'		=> defined('PHPBB_INSTALLED') ? true : false,		
+		'status'		=> defined('PHPBB_INSTALLED') ? true : false,
 	);
 }
 
-function get_phpbb_info($root_path, $backend = 'phpbb3', $phpbbversion = '3.0.14')
+function get_phpbb_info($root_path, $backend = 'phpbb3', $phpbbversion = '3.2.25')
 {
 	$phpEx = substr(strrchr(__FILE__, '.'), 1);
 	$config = $root_path . "config.$phpEx";
@@ -1075,7 +1137,7 @@ function get_phpbb_info($root_path, $backend = 'phpbb3', $phpbbversion = '3.0.14
 			break;
 			case (preg_match('/3.2/i', $phpbbversion)):
 				$backend = 'rhea';
-			break;			
+			break;
 			case (preg_match('/3.3/i', $phpbbversion)):
 				$backend = 'proteus';
 			break;
@@ -1093,14 +1155,14 @@ function get_phpbb_info($root_path, $backend = 'phpbb3', $phpbbversion = '3.0.14
 			$phpbb_adm_relative_path = 'admin';
 		break;
 		
-		case 'phpbb3':
-		case 'olympus':		
+		case 'olympus':
 			$phpbb_adm_relative_path = 'adm';
 		break;
 		
 		case 'ascraeus':
 		case 'rhea':
-		case 'proteus':		
+		case 'phpbb3':
+		case 'proteus':
 			$phpbb_adm_relative_path = (isset($phpbb_adm_relative_path)) ? $phpbb_adm_relative_path : 'adm/';
 			$dbms = get_keys_sufix($dbms);
 			$acm_type = get_keys_sufix($acm_type);
@@ -1118,10 +1180,10 @@ function get_phpbb_info($root_path, $backend = 'phpbb3', $phpbbversion = '3.0.14
 		'dbuser'		=> $dbuser,
 		'dbpasswd'		=> $dbpasswd,
 		'table_prefix'	=> $table_prefix,
-		'backend'		=> $backend,		
+		'backend'		=> $backend,
 		'version'		=> $phpbbversion,
-		'acm_type'		=> $acm_type ? $acm_type : '',
-		'status'		=> defined('PHPBB_INSTALLED') ? true : false,		
+		'acm_type'		=> isset($acm_type) ? $acm_type : '',
+		'status'		=> defined('PHPBB_INSTALLED') ? true : false,
 	);
 }
 
@@ -1207,12 +1269,12 @@ function get_mxbb_info($config)
 	}
 	return array(
 		'dbms'				=> $dbms,
-		'dbhost'				=> $dbhost,
+		'dbhost'			=> $dbhost,
 		'dbname'			=> $dbname,
-		'dbuser'				=> $dbuser,
+		'dbuser'			=> $dbuser,
 		'dbpasswd'			=> $dbpasswd,
 		'mx_table_prefix'	=> $mx_table_prefix,
-		'dbcharacter_set'	=> (defined('DB_CHARACTER_SET') ? DB_CHARACTER_SET : ''),
+		'dbcharacter_set'	=> (defined('DB_CHARACTER_SET') ? DB_CHARACTER_SET : ''),		
 		'status'			=> (defined('MX_INSTALLED') && (MX_INSTALLED === true)) ? true : false,
 	);
 }
@@ -1339,24 +1401,33 @@ function open_phpbb_db(&$db, &$phpbb_info)
 	$dbname = $phpbb_info['dbname'];
 
 	$dbms = $phpbb_info['dbms'];
-	
+
 	// If we are on PHP < 5.0.0 we need to force include or we get a blank page
 	if (version_compare(PHP_VERSION, '5.0.0', '<')) 
-	{		
-		$dbms = str_replace('mysqli', 'mysql4', $dbms); //this version of php does not have mysqli extension and my crash the installer if finds a forum using this		
+	{
+		$dbms = str_replace('mysqli', 'mysql4', $dbms); 
+		//this version of php does not have mysqli extension and my crash the installer if finds a forum using this
 	}
-	
+
+	// If we are on PHP < 5.6.04 we get the error:
+	//The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead
+	if (!function_exists('mysql_connect')) 
+	{
+		$dbms = str_replace(array('mysql', 'mysql4'), 'mysqli', $dbms); 
+		//this version of php does not have mysqli extension and my crash the installer if finds a forum using this
+	}
+
 	// Load dbal and initiate class
 	//Apache 2.0.x and php < 5.2.5 combination will crash here this is fixed by upgrading to php 5.2.6 or Apache 2.2.x
-	require_once($mx_root_path . 'includes/db/' . $dbms . '.' . $phpEx);
+	include_once($mx_root_path . 'includes/db/' . $dbms . '.' . $phpEx);
 	
-	if(!$db->db_connect_id)
-	{
+	//if(!is_object($db) || !$db->db_connect_id)
+	//{
 		// Connect to DB
 		@define('SQL_LAYER', $dbms);
 		$sql_db = 'dbal_' . $dbms;
 			
-		$db	= new $sql_db();
+		$db = new $sql_db();
 			
 		if(!is_object($db))
 		{
@@ -1367,7 +1438,7 @@ function open_phpbb_db(&$db, &$phpbb_info)
 		{
 			print("Could not connect to all databases");
 		}
-	}	
+	//}
 	
 	return $db->db_connect_id;	
 }

@@ -147,7 +147,7 @@ class dbal_postgres extends dbal
 			case 'begin':
 				$result = @pg_query($this->db_connect_id, 'BEGIN');
 				$this->transaction = true;
-				break;
+			break;
 
 			case 'commit':
 				$result = @pg_query($this->db_connect_id, 'COMMIT');
@@ -157,12 +157,12 @@ class dbal_postgres extends dbal
 				{
 					@pg_query($this->db_connect_id, 'ROLLBACK');
 				}
-				break;
+			break;
 
 			case 'rollback':
 				$result = @pg_query($this->db_connect_id, 'ROLLBACK');
 				$this->transaction = false;
-				break;
+			break;
 
 			default:
 				$result = true;

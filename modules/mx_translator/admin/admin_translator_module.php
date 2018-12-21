@@ -8,9 +8,20 @@
  *
  */
 //namespace orynider\mx_translator\acp;
-$basename = basename( __FILE__);
+$modulename = 'mx_translator';
+
+if ( !empty( $setmodules ) )
+{
+	$basename = basename( __FILE__ );
+	$module['Language_tools']['ACP_TRANSLATOR_CONFIG'] = 'modules/' . $modulename . '/admin/' . $basename . '?mode=config';
+	$module['Language_tools']['ACP_TRANSLATE_MX_PORTAL'] = 'modules/' . $modulename . '/admin/' . $basename . '?s=MXP&mode=translate';
+	$module['Language_tools']['ACP_TRANSLATE_MX_MODULES'] = 'modules/' . $modulename . '/admin/' . $basename . '?s=MODS&mode=translate';
+	$module['Language_tools']['ACP_TRANSLATE_PHPBB_LANG'] = 'modules/' . $modulename . '/admin/' . $basename . '?s=PHPBB&mode=translate';
+	$module['Language_tools']['ACP_TRANSLATE_PHPBB_EXT'] = 'modules/' . $modulename . '/admin/' . $basename . '?s=phpbb_ext&mode=translate';
+	return;
+}
 $mx_root_path = './../../../';
-$module_root_path = $mx_root_path . 'modules/mx_translator/';
+$module_root_path = $mx_root_path . 'modules/' . $modulename . '/';
 $admin_module_root_path = $module_root_path . 'admin/';
 
 //$basename = basename( __FILE__);
@@ -20,24 +31,12 @@ $admin_module_root_path = $module_root_path . 'admin/';
 
 @define('IN_PORTAL', 1);
 
-/* */
-if ( !empty( $setmodules))
-{	
-	$module['Language_tools']['ACP_TRANSLATOR_CONFIG'] = mx_append_sid( $admin_module_root_path . $basename . '?mode=config');	
-	$module['Language_tools']['ACP_TRANSLATE_MX_PORTAL'] = mx_append_sid( $admin_module_root_path . $basename . '?s=MXP&mode=translate');
-	$module['Language_tools']['ACP_TRANSLATE_MX_MODULES'] = mx_append_sid( $admin_module_root_path . $basename . '?s=MODS&mode=translate');
-	$module['Language_tools']['ACP_TRANSLATE_PHPBB_LANG'] = mx_append_sid( $admin_module_root_path . $basename . '?s=PHPBB&mode=translate');
-	$module['Language_tools']['ACP_TRANSLATE_PHPBB_EXT'] = mx_append_sid( $admin_module_root_path . $basename . '?s=phpbb_ext&mode=translate');		
-	return;
-}
-/* */
-
 /**
 * mx_langtools ACP module
  */
 @define('IN_ADMIN', 1); 
 $phpEx = substr( __FILE__, strrpos( __FILE__, '.') + 1);
-if (!defined('PHP_EXT')) define('PHP_EXT', $phpEx);
+if (!defined('$php_ext')) define('$php_ext', $phpEx);
 $lang = array();
 $no_page_header = '';
 require_once($mx_root_path . 'admin/pagestart.' . $phpEx);
