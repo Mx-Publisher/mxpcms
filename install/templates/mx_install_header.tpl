@@ -138,7 +138,7 @@ if( document.all ) { document.write('<sty'+'le type="text/css">\n'+
 							<tr>
 								<td>
 								<a href="http://mxpcms.sourceforge.net" target="_blank">
-									<img src="../templates/_core/images/logo.gif" border="0" alt="MX-Publisher" vspace="1" />
+									<img src="{U_LOGO}" border="0" alt="MX-Publisher" vspace="1" />
 								</a>
 								</td>
 								<td align="center" width="100%" valign="middle">

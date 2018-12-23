@@ -1,0 +1,535 @@
+<script type="text/javascript">
+function getCookie(name)
+{
+	var cookies = document.cookie;
+	var start = cookies.indexOf(name + '=');
+	if( start < 0 ) return null;
+	var len = start + name.length + 1;
+	var end = cookies.indexOf(';', len);
+	if( end < 0 ) end = cookies.length;
+	return unescape(cookies.substring(len, end));
+}
+function setCookie(name, value, expires, path, domain, secure)
+{
+	document.cookie = name + '=' + escape (value) +
+		((expires) ? '; expires=' + ( (expires == 'never') ? 'Thu, 31-Dec-2099 23:59:59 GMT' : expires.toGMTString() ) : '') +
+		((path)    ? '; path='    + path    : '') +
+		((domain)  ? '; domain='  + domain  : '') +
+		((secure)  ? '; secure' : '');
+}
+function delCookie(name, path, domain)
+{
+	if( getCookie(name) )
+	{
+		document.cookie = name + '=;expires=Thu, 01-Jan-1970 00:00:01 GMT' +
+			((path)    ? '; path='    + path    : '') +
+			((domain)  ? '; domain='  + domain  : '');
+	}
+}
+
+function handleError() {
+ 	return true;
+}
+
+window.onerror = handleError;
+
+function menuCat(id, mode, visible, page_nav, block_nav, function_nav)
+{
+	this.cat_id = id;
+	this.block_nav = block_nav;
+	this.page_nav = page_nav;
+	this.function_nav = function_nav;
+	this.menu_mode = mode;
+	this.status = visible != '' ? visible : 'none';
+}
+var menuCats = new Array();
+
+function getObj(obj)
+{
+	return ( document.getElementById ? document.getElementById(obj) : ( document.all ? document.all[obj] : null ) );
+}
+function displayObj(obj, status)
+{
+	var x = getObj(obj);
+	if( x && x.style ) x.style.display = status;
+}
+
+var queueInterval = 0;		// milliseconds between queued steps.
+var execInterval = 0;
+var queuedSteps;
+var currentStep;
+
+function queueStep(o, s)
+{
+	this.obj = o;
+	this.status = s;
+}
+function execQueue()
+{
+	if( currentStep < queuedSteps.length )
+	{
+		var obj = queuedSteps[currentStep].obj;
+		var status = queuedSteps[currentStep].status;
+		displayObj(obj, status);
+		if( menuCats[obj] ) menuCats[obj].status = status;
+		currentStep++;
+		setTimeout("execQueue();", execInterval);
+	}
+	else
+	{
+		execInterval = queueInterval;
+	}
+}
+function onMenuCatClick(cat_id, type, init)
+{
+	var currentCat, currentStatus;
+	var imageSCR = type+'image_'+cat_id;
+	var strSubmitContent = '';
+
+	parentCatMode = 'adminCat_';
+	parentCatEditMode = 'adminCatEdit_';
+	parentCatDeleteMode = 'adminCatDelete_';
+
+	parentMenuEditMode = 'adminMenuEdit_';
+	parentMenuDeleteMode = 'adminMenuDelete_';
+
+	parentCat = parentCatMode + cat_id;
+	parentCatEdit = parentCatEditMode + cat_id;
+	parentCatDelete = parentCatDeleteMode + cat_id;
+
+	parentMenuEdit = parentMenuEditMode + cat_id;
+	parentMenuDelete = parentMenuDeleteMode + cat_id;
+
+	currentCat = type + cat_id;
+
+	currentStatus = menuCats[currentCat].status;
+
+	queuedSteps = new Array();
+	cookieArray = new Array();
+
+	currentStep = 0;
+
+	for( var forCat in menuCats )
+	{
+		if( (init == 'true' && (menuCats[forCat].status == 'block') && menuCats[forCat].menu_mode == parentCat) ||
+			(init != 'true' &&
+				( 	(currentCat == parentCat && menuCats[forCat].status == 'block') ||
+					(currentCat == parentCatEdit && menuCats[forCat].menu_mode != parentCat && menuCats[forCat].status == 'block') ||
+					(currentCat == parentCatDelete && menuCats[forCat].menu_mode != parentCat && menuCats[forCat].status == 'block') ||
+
+					(currentCat == parentMenuEdit && menuCats[forCat].menu_mode != parentCatMode && menuCats[forCat].status == 'block') ||
+					(currentCat == parentMenuDelete && menuCats[forCat].menu_mode != parentCatMode && menuCats[forCat].status == 'block')
+
+
+
+			 	)))
+		{
+			queuedSteps[currentStep++] = new queueStep(forCat, 'none');
+			menuCats[forCat].status = 'none';
+
+			forCatimage = menuCats[forCat].menu_mode+'image_'+menuCats[forCat].cat_id;
+			if( document.images && document.images[forCatimage] )
+			{
+				document.images[forCatimage].src = '{IMG_URL_EXPAND}';
+			}
+		}
+	}
+
+	if( currentStatus == 'none' )
+	{
+		if (menuCats[parentCat] && menuCats[currentCat].menu_mode != parentMenuEditMode && menuCats[currentCat].menu_mode != parentMenuDeleteMode)
+		{
+			if (menuCats[parentCat].status == 'none')
+			{
+				queuedSteps[currentStep++] = new queueStep(parentCat, 'block');
+				menuCats[parentCat].status = 'block';
+
+				forCatimage = menuCats[parentCat].menu_mode+'image_'+menuCats[parentCat].cat_id;
+				if( document.images && document.images[forCatimage] )
+				{
+					document.images[forCatimage].src = '{IMG_URL_CONTRACT}';
+				}
+			}
+		}
+
+		queuedSteps[currentStep++] = new queueStep(currentCat, 'block');
+		menuCats[currentCat].status = 'block';
+
+		if (currentCat == parentCat)
+		{
+			var	expdate = new Date();		// 72 Hours from now
+			expdate.setTime(expdate.getTime() + (72 * 60 * 60 * 1000));
+			setCookie('{COOKIE_NAME}_'+type+'xxx_id', cat_id, expdate,
+					('{COOKIE_PATH}'   == '') ? null : '{COOKIE_PATH}',
+					('{COOKIE_DOMAIN}' == '') ? null : '{COOKIE_DOMAIN}',
+					('{COOKIE_SECURE}' == '0') ? false : true);
+		}
+
+		if( document.images && document.images[imageSCR] )
+		{
+			document.images[imageSCR].src = '{IMG_URL_CONTRACT}';
+		}
+
+
+		// Update Form Selects - on the fly
+		if (parentCatEditMode == type)
+		{
+			EditForm = 'form_' + parentCatEditMode + cat_id;
+			duplicateForm(document.fromForm.pages, document.forms[EditForm].cat_url_sel, menuCats[currentCat].page_nav);
+		}
+
+		if (parentMenuEditMode == type)
+		{
+			EditForm = 'form_' + parentMenuEditMode + cat_id;
+			duplicateForm(document.fromForm.blocks, document.forms[EditForm].block_nav, menuCats[currentCat].block_nav);
+			duplicateForm(document.fromForm.pages, document.forms[EditForm].page_nav, menuCats[currentCat].page_nav);
+			duplicateForm(document.fromForm.functions, document.forms[EditForm].function_id, menuCats[currentCat].function_nav);
+		}
+	}
+	else
+	{
+		delCookie('{COOKIE_NAME}_'+type+'xxx_id',
+				('{COOKIE_PATH}'   == '') ? null : '{COOKIE_PATH}',
+				('{COOKIE_DOMAIN}' == '') ? null : '{COOKIE_DOMAIN}');
+	}
+
+	for( var forCat in menuCats )
+	{
+		if ( menuCats[forCat].status == 'block' )
+		{
+			strSubmitContent += forCat + ',';
+		}
+	}
+
+	// Remove trailing separator
+	strSubmitContent = strSubmitContent.substr(0, strSubmitContent.length - 1);
+
+	setCookie('{COOKIE_NAME}_admincp_menustates', strSubmitContent, expdate,
+			('{COOKIE_PATH}'   == '') ? null : '{COOKIE_PATH}',
+			('{COOKIE_DOMAIN}' == '') ? null : '{COOKIE_DOMAIN}',
+			('{COOKIE_SECURE}' == '0') ? false : true);
+
+	currentStep = 0;
+	setTimeout("execQueue();", execInterval);
+}
+
+function deleteOption(object,index) {
+    object.options[index] = null;
+}
+
+function addOption(object,text,value, selectedValue) {
+    var defaultSelected = false;
+    var selected = false;
+
+    if (value == selectedValue)
+    {
+    	defaultSelected = true;
+    	selected = true;
+    }
+
+    var optionName = new Option(text, value, defaultSelected, selected)
+    object.options[object.length] = optionName;
+}
+
+function copySelected(fromObject,toObject) {
+    for (var i=0, l=fromObject.options.length;i<l;i++) {
+        if (fromObject.options[i].selected)
+            addOption(toObject,fromObject.options[i].text,fromObject.options[i].value);
+    }
+    for (var i=fromObject.options.length-1;i>-1;i--) {
+        if (fromObject.options[i].selected)
+            deleteOption(fromObject,i);
+    }
+}
+
+function copyAll(fromObject,toObject) {
+    for (var i=0, l=fromObject.options.length;i<l;i++) {
+        addOption(toObject,fromObject.options[i].text,fromObject.options[i].value);
+    }
+
+    for (var i=fromObject.options.length-1;i>-1;i--) {
+        deleteOption(fromObject,i);
+    }
+}
+
+function duplicateForm(fromObject,toObject, selectedValue)
+{
+	toObject.options.length = null;
+
+    for (var i=0; i<fromObject.options.length;i++) {
+        addOption(toObject,fromObject.options[i].text,fromObject.options[i].value, selectedValue);
+
+        // For some reason i have to reselect, to make it work in IE (Haplo is confused here...)
+        if (fromObject.options[i].value == selectedValue)
+        {
+        	toObject.selectedIndex = i;
+        }
+    }
+}
+
+// -->
+</script>
+
+<div style="display:none;">
+<form name="fromForm">
+	{S_GEN_BLOCK_LIST}
+	{S_GEN_FUNCTION_LIST}
+	{S_GEN_PAGE_LIST}
+</form>
+</div>
+<div style="clear:both;padding:10px;">
+	<h2 style="margin-top:0px">{L_MENU_TITLE}</h2>
+	<div id="menu_successbox" class="successbox">{RESULT_MESSAGE}</div>
+	<script tyle="text/javascript">
+		sucbox = getObj( 'menu_successbox');
+		if ( sucbox.innerHTML.replace( '#^\s*|\s*$#', '') == '')
+		{
+			sucbox.style.display='none';
+		}
+		else
+		{
+			setTimeout( 'sucbox.style.display="none";', 3000);
+		}
+	</script>
+	<!-- BEGIN catrow -->
+	
+	<div style="clear:both;display:block;padding-top:0.1em;margin-bottom:0.1em;">
+		<div style="clear:both;display:block;padding-bottom:6px;">
+			<div style="float:right;font-size:1.1em;">
+			<!-- BEGIN is_cat -->
+			<a href="javascript:onMenuCatClick('{catrow.CAT_ID}','adminCatEdit_');"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_edit.gif" alt="{L_EDIT}"/></a>
+			<a href="{catrow.U_CAT_MOVE_UP}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_up.gif" alt="{L_MOVE_UP}"/></a>
+			<a href="{catrow.U_CAT_MOVE_DOWN}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_down.gif" alt="{L_MOVE_DOWN}"/></a>
+			<a href="javascript:onMenuCatClick('{catrow.CAT_ID}','adminCatDelete_');"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_delete.gif" alt="{L_DELETE}" /></a>
+			<!-- END is_cat -->
+			</div>
+			<div style="float:left;">
+			<img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_list.gif" alt="list" />
+			<b style="font-size:1.2em">
+			<!-- BEGIN is_new -->
+			<a href="javascript:onMenuCatClick('{catrow.CAT_ID}','adminCatEdit_');">{catrow.CAT_TITLE}</a>
+			<!-- END is_new -->
+			<!-- BEGIN is_cat -->
+			<a href="javascript:onMenuCatClick('{catrow.CAT_ID}','adminCat_');">{catrow.CAT_TITLE}</a>
+			<!-- END is_cat -->
+			</b><br/><span style="explain">{catrow.CAT_DESC}</span>
+			</div>
+		</div>
+	</div>
+	
+	<div id="adminCat_{catrow.CAT_ID}" style="clear:both;display:{catrow.VISIBLE}">
+		<!-- CAT DELETE -->
+		<div id="adminCatDelete_{catrow.CAT_ID}" style="clear:both;display:{catrow.VISIBLE_DELETE};padding:6px;">
+			<form action="{S_ACTION}" method="post">
+				<fieldset>
+					<legend>{catrow.L_TITLE_DELETE}</legend>
+					<dl>
+						<dt><label>{catrow.L_MENU_NAME}</label></dt>
+						<dd>{catrow.NAME}</dd>
+					</dl>
+					<dl>
+						<dt><label>{catrow.L_MOVE_CONTENTS}</label></dt>
+						<dd>{catrow.S_SELECT_TO}</dd>
+					</dl>
+					<dl>
+						<dt><label>{catrow.L_MOVE_CONTENTS}</label></dt>
+						<dd><input type="checkbox" name="move_contents" value="1" class="radio" /></dd>
+					</dl>
+					<p align="center">
+					{catrow.S_HIDDEN_DELETE_FIELDS}
+					<input type="submit" name="submit" value="{catrow.S_SUBMIT_DELETE}" class="button2" />
+					</p>
+				</fieldset>
+			</form>
+		</div>
+		
+		<!-- CAT EDIT -->
+		<div id="adminCatEdit_{catrow.CAT_ID}" style="clear:both;display:{catrow.VISIBLE_EDIT};padding:6px;">
+			<form name="form_adminCatEdit_{catrow.CAT_ID}" action="{S_ACTION}" method="post">
+				<fieldset>
+					<legend>{catrow.L_TITLE_EDIT}</legend>
+					<dl>
+						<dt><label>{catrow.L_CAT_TITLE}</label></dt>
+						<dd><input type="text" size="25" name="cat_title" value="{catrow.E_CAT_TITLE}" /></dd>
+					</dl>
+					<dl>
+						<dt><label>{catrow.L_CAT_DESC}</label></dt>
+						<dd><textarea name="cat_desc" rows="15" cols="35" wrap="virtual" style="width:450px" tabindex="3" class="post">{catrow.E_CAT_DESC}</textarea></dd>
+					</dl>
+					<dl>
+						<dt><label>{catrow.L_CAT_SHOW_CAT}</label></dt>
+						<dd>{catrow.S_CAT_SHOW_CAT}</dd>
+					</dl>
+					<dl>
+						<dt><label>{catrow.L_CAT_MENU_PAGE}</label></dt>
+						<dd><select name="cat_url_sel" ><option value="0">0</option></select></dd>
+					</dl>
+					<dl>
+						<dt><label>{catrow.L_CAT_LINK_TARGET}</label></dt>
+						<dd>{catrow.S_CAT_LINK_TARGET_LIST}</dd>
+					</dl>
+					<p align="center">
+						{catrow.S_HIDDEN_FIELDS}
+						<input type="submit" name="submit" value="{catrow.S_SUBMIT}" class="button2" />
+					</p>
+				</fieldset>
+			</form>
+		</div>
+		<!-- BEGIN nocat -->
+		{catrow.nocat.NONE}
+		<!-- END nocat -->
+	
+		<!-- LIST OF MENU ROWS -->
+		<div style="clear:both;margin-left:20px;margin-right:20px;">
+			<!-- BEGIN menurow -->
+			<div style="clear:both;">
+				<div style="float:right;font-size:1.1em;">
+				<!-- BEGIN is_menu -->
+				<a href="{catrow.menurow.U_MENU_MOVE_UP}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_up.gif" alt="{L_MOVE_UP}"/></a>
+				<a href="{catrow.menurow.U_MENU_MOVE_DOWN}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_down.gif" alt="{L_MOVE_DOWN}"/></a>
+				<a href="javascript:onMenuCatClick('{catrow.menurow.MENU_ID}','adminMenuDelete_');">
+					<img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_delete.gif" alt="{L_DELETE}" />
+				</a>
+				<!-- END is_menu -->
+				</div>
+				<div style="float:left">
+				<b><a href="javascript:onMenuCatClick('{catrow.menurow.MENU_ID}','adminMenuEdit_');">{catrow.menurow.MENU_TITLE}</a></b>
+				</div>
+			</div>
+			
+			<div id="adminMenuDelete_{catrow.menurow.MENU_ID}" style="clear:both;display:{catrow.menurow.VISIBLE_DELETE};padding:6px;">
+				<form>
+					<fieldset>
+						<legend>{L_DELETE}</legend>
+						<p align="center">
+							{catrow.menurow.MESSAGE_DELETE}
+						</p>
+					</fieldset>
+				</form>
+			</div>
+			
+			<div id="adminMenuEdit_{catrow.menurow.MENU_ID}" style="clear:both;display:{catrow.menurow.VISIBLE_EDIT};padding:6px;">
+				<form name="form_adminMenuEdit_{catrow.menurow.MENU_ID}" action="{S_ACTION}" method="post">
+					<fieldset>
+						<legend>{L_EDIT}</legend>
+						<dl>
+
+						  <dt><label>{catrow.menurow.L_MENU_TITLE}</label></dt>
+						  <dd><input type="text" size="45" name="menuname" value="{catrow.menurow.E_MENU_TITLE}" /></dd>
+						</dl>
+						<dl>
+						  <dt><label>{catrow.menurow.L_MENU_DESC}</label></dt>
+						  <dd><textarea rows="5" cols="45" wrap="virtual" name="message">{catrow.menurow.E_MENU_DESC}</textarea></dd>
+						</dl>
+						<dl>
+						  <dt><label>{catrow.menurow.L_MENU_LINK_TARGET}</label></dt>
+						  <dd>{catrow.menurow.S_LINK_TARGET_LIST}</dd>
+						</dl>
+						<dl>
+						  <dt>{catrow.menurow.L_MENU_ACTION_TITLE}</dt>
+						</dl>
+						<dl>
+						  <dt><label>{catrow.menurow.L_MENU_PAGE}</label></dt>
+						  <dd><select name="page_nav" ><option value="0">0</option></select></dd>
+						</dl>
+						<dl>
+						  <dt><label>{catrow.menurow.L_MENU_LINKS}</label></dt>
+						  <dd><input type="text" size="65" name="menulinks" value="{catrow.menurow.E_MENU_LINKS}" /></dd>
+						</dl>
+						<dl>
+						  <dt><label>{catrow.menurow.L_MENU_BLOCK}</label></dt>
+						  <dd><select name="block_nav" ><option value="0">0</option></select></dd>
+						</dl>
+						<dl>
+						  <dt>{catrow.menurow.L_MENU_ACTION_ADV}</dt>
+						</dl>
+						<dl>
+						  <dt><label>{catrow.menurow.L_MENU_FUNCTION}</label></dt>
+						  <dd><select name="function_id" ><option value="0">0</option></select></dd>
+						</dl>
+						<dl>
+						  <dt>{catrow.menurow.L_MENU_PERMISSIONS_TITLE}</dt>
+						</dl>
+						<dl>
+						  <dt><label>{catrow.menurow.L_AUTH_TITLE}</label></dt>
+					  	<dd>
+					      <table cellspacing="1" cellpadding="4" border="0" class="portalline">
+					    	<tr>
+					    	  <!-- BEGIN module_auth_titles -->
+					    	  <th class="thTop">{catrow.menurow.module_auth_titles.CELL_TITLE}</th>
+					    	  <!-- END module_auth_titles -->
+					    	</tr>
+							<!-- BEGIN module_auth_data -->
+					    	<tr>
+					    	  <td class="row1" align="center">{catrow.menurow.module_auth_data.S_AUTH_LEVELS_SELECT}</td>
+					    	</tr>
+							<tr>
+								<th class="thTop">{catrow.menurow.module_auth_data.L_AUTH_GROUP_LEVELS_SELECT}</th>
+							</tr>
+					    	<tr>
+					    	  <td class="row1" align="center">{catrow.menurow.module_auth_data.S_AUTH_GROUP_LEVELS_SELECT}</td>
+					    	</tr>
+					   	    <!-- END module_auth_data -->
+					      </table>
+					  	</dd>
+						</dl>
+						<dl>
+						  <dt><label>{catrow.menurow.L_MENU_ICON}</label></dt>
+						  <dd>{catrow.menurow.S_POSTICONS}</dd>
+						</dl>
+						<dl>
+						  <dt><label>{catrow.menurow.L_MENU_ALT_ICON}</label></dt>
+						  <dd><input type="text" size="65" name="menu_alt_icon" value="{catrow.menurow.E_MENU_ALT_ICON}" /></dd>
+						</dl>
+						<dl>
+						  <dt><label>{catrow.menurow.L_MENU_ALT_ICON_HOT}</label></dt>
+						  <dd><input type="text" size="65" name="menu_alt_icon_hot" value="{catrow.menurow.E_MENU_ALT_ICON_HOT}" /></dd>
+						</dl>
+						<p align="center">
+							{catrow.menurow.S_HIDDEN_FIELDS}
+							<input type="submit" name="submit" value="{catrow.menurow.S_SUBMIT}" class="button2" />
+						</p>
+
+					</fieldset>
+				</form>
+			</div>
+			<!-- BEGIN is_menu -->
+			<div style="clear:both;border-bottom:solid 1px #CCCCCC;"></div>
+			<!-- END is_menu -->
+			<!-- END menurow -->
+		</div>
+	</div>
+	<!-- BEGIN is_cat -->
+	<div style="clear:both;display:block;padding-top:0.1em;margin-bottom:0.1em;border-top:solid 1px #CCCCCC;border-collapse:collapse;"></div>
+	<!-- END is_cat -->
+	<!-- END catrow -->
+	<div style="clear:both;"></div>
+</div>
+<script type="text/javascript">
+<!-- BEGIN catrow -->
+menuCats['adminCat_{catrow.CAT_ID}'] = new menuCat('{catrow.CAT_ID}', 'adminCat_', '{catrow.VISIBLE}', '', '', '');
+menuCats['adminCatEdit_{catrow.CAT_ID}'] = new menuCat('{catrow.CAT_ID}', 'adminCatEdit_', '{catrow.VISIBLE_EDIT}', '{catrow.PAGE_NAV}', '', '');
+menuCats['adminCatDelete_{catrow.CAT_ID}'] = new menuCat('{catrow.CAT_ID}', 'adminCatDelete_', '{catrow.VISIBLE_DELETE}', '', '', '');
+
+if ('{catrow.VISIBLE_EDIT}' == 'block')
+{
+	duplicateForm(document.fromForm.pages, document.forms['form_adminCatEdit_' + '{catrow.CAT_ID}'].cat_url_sel, '{catrow.PAGE_NAV}');
+}
+
+	<!-- BEGIN menurow -->
+	menuCats['adminMenuEdit_{catrow.menurow.MENU_ID}'] = new menuCat('{catrow.menurow.MENU_ID}', 'adminMenuEdit_', '{catrow.menurow.VISIBLE_EDIT}', '{catrow.menurow.PAGE_NAV}', '{catrow.menurow.BLOCK_NAV}', '{catrow.menurow.FUNCTION_NAV}');
+	menuCats['adminMenuDelete_{catrow.menurow.MENU_ID}'] = new menuCat('{catrow.menurow.MENU_ID}', 'adminMenuDelete_', '{catrow.menurow.VISIBLE_DELETE}', '', '', '');
+
+	if ('{catrow.menurow.VISIBLE_EDIT}' == 'block')
+	{
+		duplicateForm(document.fromForm.blocks, document.forms['form_adminMenuEdit_' + '{catrow.menurow.MENU_ID}'].block_nav, '{catrow.menurow.BLOCK_NAV}');
+		duplicateForm(document.fromForm.pages, document.forms['form_adminMenuEdit_' + '{catrow.menurow.MENU_ID}'].page_nav, '{catrow.menurow.PAGE_NAV}');
+		//duplicateForm(document.fromForm.functions, document.forms['form_adminMenuEdit_' + '{catrow.menurow.MENU_ID}'].function_nav, '{catrow.menurow.FUNCTION_NAV}');
+	}
+
+	<!-- END menurow -->
+<!-- END catrow -->
+// -->
+</script>
+
+

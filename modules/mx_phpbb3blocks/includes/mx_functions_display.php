@@ -1273,7 +1273,7 @@ function mx_watch_topic_forum($mode, &$s_watching, $user_id, $forum_id, $topic_i
 * @param string &$rank_img_src the rank image source is stored here after execution
 *
 */
-function mx_get_user_rank($user_rank, $user_posts, &$rank_title, &$rank_img, &$rank_img_src)
+function mx3_get_user_rank($user_rank, $user_posts, &$rank_title, &$rank_img, &$rank_img_src)
 {
 	global $ranks, $board_config;
 
@@ -1318,7 +1318,7 @@ function mx_get_user_rank($user_rank, $user_posts, &$rank_title, &$rank_img, &$r
 *
 * @return string Avatar image
 */
-function mx_get_user_avatar($avatar, $avatar_type, $avatar_width, $avatar_height, $alt = 'USER_AVATAR')
+function mx3_get_user_avatar($avatar, $avatar_type, $avatar_width, $avatar_height, $alt = 'USER_AVATAR')
 {
 	global $mx_user, $board_config, $phpbb_root_path, $phpEx;
 

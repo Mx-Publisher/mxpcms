@@ -429,6 +429,11 @@ if( class_exists('phpBB2'))
 	$phpBB2 = new phpBB2();
 }
 
+if(!isset($phpbb_auth) || !is_object($phpbb_auth))
+{
+	$phpbb_auth = new phpbb_auth();
+}
+
 // Output the notifications
 $total_msgs = $notifications = false;
 $mx_priv_msg = $lang['Private_Messages'];
@@ -1023,6 +1028,7 @@ $layouttemplate->assign_vars(array(
 	'U_SEARCH' 						=> mx_append_sid('search.'.$phpEx),
 	'U_MEMBERLIST' 				=> mx_append_sid('memberlist.'.$phpEx),
 	'U_MODCP' 						=> mx_append_sid('modcp.'.$phpEx),
+	//'U_MCP'							=> (((PORTAL_BACKEND !== 'internal') && ($phpbb_auth->acl_get('m_') || $phpbb_auth->acl_getf_global('m_'))) ? mx_append_sid("{$phpbb_root_path}modcp.$phpEx?i=main&amp;mode=front" . $mx_user->session_id) : ''),	
 	'U_MCP'							=> (((PORTAL_BACKEND !== 'internal') && ($phpbb_auth->acl_get('m_') || $phpbb_auth->acl_getf_global('m_'))) ? mx_append_sid("{$phpbb_root_path}modcp.$phpEx?i=main&amp;mode=front" . $mx_user->session_id) : ''),	
 	'U_FAQ' 							=> mx_append_sid('faq.'.$phpEx),
 	'U_VIEWONLINE' 				=> mx_append_sid('viewonline.'.$phpEx),

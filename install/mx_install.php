@@ -712,9 +712,9 @@ if (empty($language))
 	// If there's only a language installed, we can simply bypass the
 	// language selection panel ...and guess what, use that one. ;-)
 	//
-	if( install_language_select($lang_options, $language, 'language') > 1 )
+	if (install_language_select($lang_options, $language, 'language') > 1 )
 	{
-		if( @file_exists($mx_root_path . "install/language/lang_$language/lang_admin.$phpEx") )
+		if (@file_exists($mx_root_path . "install/language/lang_$language/lang_admin.$phpEx") )
 		{
 			include($mx_root_path . "install/language/lang_$language/lang_admin.$phpEx");
 		}
@@ -1184,6 +1184,7 @@ if($confirm)
 				case 'ascraeus':
 				case 'rhea':
 				case 'proteus':
+				
 					$sql = array();
 					
 					$sql[] = "INSERT INTO " . $mx_table_prefix . "block VALUES('6', 'Poll', 'This is a Demo Block', '14', '0', '5', '0', '0', '0', '0', '0', '1', '1', '0', '1125841942', '2')";
@@ -1233,7 +1234,7 @@ if($confirm)
 					$sql[] = "INSERT INTO " . $mx_table_prefix . "column_block VALUES('7', '8', '10')";
 					$sql[] = "INSERT INTO " . $mx_table_prefix . "column_block VALUES('5', '7', '20')";
 					$sql[] = "INSERT INTO " . $mx_table_prefix . "column_block VALUES('3', '13', '30')";
-					$sql[] = "INSERT INTO " . $mx_table_prefix . "column_block VALUES('3', '8', '10')";				
+					$sql[] = "INSERT INTO " . $mx_table_prefix . "column_block VALUES('3', '8', '10')";
 
 					$sql[] = "INSERT INTO " . $mx_table_prefix . "function VALUES('8', '30', 'phpBB Index', 'phpBB Index Block', 'mx_forum." . $phpEx . "', '')";
 					$sql[] = "INSERT INTO " . $mx_table_prefix . "function VALUES('14', '30', 'MXP Polls', 'MXP Polls', 'mx_poll." . $phpEx . "', '')";
@@ -1323,7 +1324,7 @@ if($confirm)
 					$sql[] = "INSERT INTO " . $mx_table_prefix . "column_block VALUES('7', '8', '10')";
 					$sql[] = "INSERT INTO " . $mx_table_prefix . "column_block VALUES('5', '7', '20')";
 					$sql[] = "INSERT INTO " . $mx_table_prefix . "column_block VALUES('3', '13', '30')";
-					$sql[] = "INSERT INTO " . $mx_table_prefix . "column_block VALUES('3', '8', '10')";				
+					$sql[] = "INSERT INTO " . $mx_table_prefix . "column_block VALUES('3', '8', '10')";
 
 					$sql[] = "INSERT INTO " . $mx_table_prefix . "function VALUES('8', '30', 'SMF Index', 'SMF Index Block', 'mx_forum." . $phpEx . "', '')";
 					$sql[] = "INSERT INTO " . $mx_table_prefix . "function VALUES('14', '30', 'MXP Polls', 'MXP Polls', 'mx_poll." . $phpEx . "', '')";
@@ -1413,7 +1414,7 @@ if($confirm)
 					$sql[] = "INSERT INTO " . $mx_table_prefix . "column_block VALUES('7', '8', '10')";
 					$sql[] = "INSERT INTO " . $mx_table_prefix . "column_block VALUES('5', '7', '20')";
 					$sql[] = "INSERT INTO " . $mx_table_prefix . "column_block VALUES('3', '13', '30')";
-					$sql[] = "INSERT INTO " . $mx_table_prefix . "column_block VALUES('3', '8', '10')";				
+					$sql[] = "INSERT INTO " . $mx_table_prefix . "column_block VALUES('3', '8', '10')";
 
 					$sql[] = "INSERT INTO " . $mx_table_prefix . "function VALUES('8', '30', 'MyBB Index', 'MyBB Index Block', 'mx_forum." . $phpEx . "', '')";
 					$sql[] = "INSERT INTO " . $mx_table_prefix . "function VALUES('14', '30', 'MXP Polls', 'MXP Polls', 'mx_poll." . $phpEx . "', '')";
@@ -1450,7 +1451,7 @@ if($confirm)
 					$sql[] = "INSERT INTO " . $mx_table_prefix . "parameter VALUES('38', '31', 'Last_Msg_Display_Last_Author', 'Boolean', 'TRUE', '', '0', '0')";
 					$sql[] = "INSERT INTO " . $mx_table_prefix . "parameter VALUES('39', '31', 'Last_Msg_Display_Author', 'Boolean', 'TRUE', '', '0', '0')";
 					$sql[] = "INSERT INTO " . $mx_table_prefix . "parameter VALUES('40', '31', 'Last_Msg_Display_Icon_View', 'Boolean', 'TRUE', '', '0', '0')";
-				break;				
+				break;
 			}
 			
 			switch (PORTAL_BACKEND)
@@ -1468,6 +1469,7 @@ if($confirm)
 				case 'ascraeus':
 				case 'rhea':
 				case 'proteus':
+				default:
 				$sql[] = "INSERT INTO " . $mx_table_prefix . "module VALUES('30', 'phpBB3 Blocks', 'modules/mx_phpbb3blocks/', 'MXP Portal phpBB3 blocks', '', 'MX-Publisher Core Module', 'Original MXP <i>phpBB3 Blocks</i> module by <a href=\"http://mxpcms.sourceforge.net\" target=\"_blank\">The MXP Development Team</a>')";
 					$message .= mx_install_cmd_sql($sql) . '<br />';
 				break;
@@ -1634,7 +1636,7 @@ else
 		/*
 		* If not, we'll try to search from our own directory.
 		*/
-		print_r("Warning: Access to our parent directory is restricted.");		
+		print_r("Warning: Access to our parent directory is restricted.");
 		$backend_search_path = $mx_absolute_path;
 	}
 	/*
@@ -1677,6 +1679,7 @@ $phpbb_files_ary = find_phpbb($backend_search_path);
 $phpbb_files_cnt = count($phpbb_files_ary);
 $phpbb_found = false;
 $phpbb_failed = false;
+
 /*
 * Find a SMF Foum path
 */
@@ -1721,11 +1724,13 @@ if (file_exists($mx_root_path . "config.$phpEx"))
 {
 	$mx_info = get_mxbb_info($mx_root_path . "config.$phpEx");
 	$default_dbms = $mx_info['dbms'] ? $mx_info['dbms'] : "mysqli";
+	
 	if ($mx_info['mx_table_prefix'])
 	{	
 		$status = $mx_info['status'] ? 'valid' : 'invalid'; 
 		$lang['Install_Instruction_mxBB'] = $lang['Install_Instruction_mxBB'] . " Warning: Existing mxp configuration file was found with " . $status . " status, <br /> If you continue with same db table prefix the schema will be reinstalled!";
 	}
+	
 	/*
 	* First, provide the option of standalone install
 	*/
@@ -1835,22 +1840,37 @@ for($i = 0; $i < $offset1; $i++)
 		$portal_backend = 'phpbb2';
 		$phpbbversion = '2.0.24';
 	}
-	elseif (file_exists($phpbb_root_path . "style.$phpEx")) // phpBB3 Olympus
-	{
-			$portal_backend = 'olympus'; //'phpbb3'
-			$phpbbversion = '3.0.14';
-	}
 	elseif (file_exists($phpbb_root_path . "report.$phpEx")) // phpBB3 Ascraeus
 	{
 		$portal_backend = 'ascraeus';
 		$phpbbversion = '3.1.12';
 	}
-	/*
-	elseif (file_exists($phpbb_root_path . "index.$phpEx")) // phpBB4 Rhea
+	elseif (file_exists($phpbb_root_path . "style.$phpEx")) // phpBB3 Olympus
 	{
-		$phpbbversion = $portal_backend = 'rhea';
+			$portal_backend = 'olympus'; //'phpbb3'
+			$phpbbversion = '3.0.15';
 	}
-	*/	
+	elseif (file_exists($phpbb_root_path . "phpbb/language/language.$phpEx")) // phpBB3 Rhea
+	{
+		$portal_backend = 'rhea';
+		$phpbbversion = '3.3.0';
+	}
+	elseif (is_dir($phpbb_root_path . "phpbb/db/migration/data/v400/")) // phpBB4 Fallback
+	{
+		$portal_backend = 'phpbb4';
+		$phpbbversion = '4.0.0';
+	}
+	elseif (is_dir($phpbb_root_path . "phpbb/db/migration/data/v33x/")) // phpBB3 Proteus Fallback
+	{
+		$portal_backend = 'proteus';
+		$phpbbversion = '3.3.x';
+	}
+	elseif (is_dir($phpbb_root_path . "phpbb/db/migration/data/v32x/")) // phpBB3 Rhea Fallback
+	{
+		$portal_backend = 'rhea';
+		$phpbbversion = '3.3.0';
+	}
+
 	if (!file_exists($phpbb_root_path . "config.$phpEx") && !file_exists($phpbb_root_path . "Settings.$phpEx"))			
 	{	
 		echo("phpBB File: " . $phpbb_root_path . "config.$phpEx" . " not found.");
@@ -1861,21 +1881,41 @@ for($i = 0; $i < $offset1; $i++)
 	if (file_exists($phpbb_root_path . "config.$phpEx"))
 	{
 		$phpbb_info = $backend_info = get_phpbb_info($phpbb_root_path, $portal_backend, $phpbbversion);
+
+		if (file_exists($phpbb_root_path . "modcp.$phpEx")) // phpBB2
+		{
+			$portal_backend = !empty($phpbb_info['backend']) ? $phpbb_info['backend'] : $portal_backend;
+			$phpbbversion = !empty($phpbb_info['version']) ? $phpbb_info['version'] : $phpbbversion;
+		}
 		if (file_exists($phpbb_root_path . "report.$phpEx")) // phpBB3.1+
 		{
 			$portal_backend = !empty($phpbb_info['backend']) ? $phpbb_info['backend'] : $portal_backend;
 			$phpbbversion = !empty($phpbb_info['version']) ? $phpbb_info['version'] : $phpbbversion;
-		}		
+		}
+		elseif (file_exists($phpbb_root_path . "style.$phpEx")) // phpBB3 Olympus
+		{
+			$portal_backend = !empty($phpbb_info['backend']) ? $phpbb_info['backend'] : $portal_backend;
+			$phpbbversion = !empty($phpbb_info['version']) ? $phpbb_info['version'] : $phpbbversion;
+		}
+		elseif (file_exists($phpbb_root_path . "phpbb/language/language.$phpEx")) // phpBB3 Rhea
+		{
+			$portal_backend = !empty($phpbb_info['backend']) ? $phpbb_info['backend'] : $portal_backend;
+			$phpbbversion = !empty($phpbb_info['version']) ? $phpbb_info['version'] : $phpbbversion;
+		}
 	}
-	//Not phpBB
-	if (file_exists($phpbb_root_path . "Settings.$phpEx"))			
-	{	
+	elseif (!file_exists($phpbb_root_path . "Settings.$phpEx"))
+	{
+		//Not phpBB
 		echo("File: " . $phpbb_root_path . "Settings.$phpEx" . " found.");
+	}
+	elseif (file_exists($phpbb_root_path . "Settings.$phpEx"))
+	{
 		//Redenifing phpBb compatible variables
-		//$phpbb_info = $backend_info = get_phpbb_info($phpbb_root_path, $phpbbversion);
+		$phpbb_info = $backend_info = get_smf_info($phpbb_root_path, $phpbbversion);
 		//$phpbbversion = 'phpbb'; 
 		//$portal_backend = 'internal';
-	}	
+	}
+	
 	// Save forums information for debuging purposes
 	$debuginfo[] = array('phpBB Info'.($phpbb_files_cnt > 1 ? " #$i" : ''),
 		'base:'.$phpbb_base_path.

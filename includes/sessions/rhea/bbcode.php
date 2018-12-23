@@ -171,16 +171,28 @@ class mx_bbcode
 	*/
 	function bbcode_cache_init()
 	{
-		global $mx_user, $phpbb_root_path;
+		global $mx_user, $mx_root_path, $phpbb_root_path;
 
 		if (empty($this->template_filename))
 		{
 			$this->template_bitfield = new bitfield($mx_user->theme['bbcode_bitfield']);
-			$this->template_filename = $phpbb_root_path . 'styles/' . $mx_user->theme['template_path'] . '/template/bbcode.html';
+			$this->template_filename = $mx_root_path . 'templates/' . $mx_user->theme['template_path'] . '/template/bbcode.html';
 
 			if (!@file_exists($this->template_filename))
 			{
-				trigger_error('The file ' . $this->template_filename . ' is missing.', E_USER_ERROR);
+				if (isset($mx_user->theme['style_parent_tree']) && !strpos($mx_user->theme['style_parent_tree'], '/'))
+				{
+					$this->template_filename = $phpbb_root_path . 'styles/' . $mx_user->theme['style_parent_tree'] . '/template/bbcode.html';
+				}
+				else
+				{
+					$this->template_filename = $phpbb_root_path . 'styles/prosilver/template/bbcode.html';
+				}
+				
+				if (!is_file($this->template_filename))
+				{
+					mx_message_die(E_USER_ERROR, 'The file ' . $this->template_filename . ' is missing.', '', __LINE__, __FILE__, '');
+				}
 			}
 		}
 
@@ -211,7 +223,10 @@ class mx_bbcode
 			$sql = 'SELECT *
 				FROM ' . BBCODES_TABLE . '
 				WHERE ' . $db->sql_in_set('bbcode_id', $sql);
-			$result = $db->sql_query($sql, 3600);
+			if (!$result = $db->sql_query($sql))
+			{
+				mx_message_die(CRITICAL_ERROR, "Could not query bbcode database table", "", __LINE__, __FILE__, $sql);
+			}
 
 			while ($row = $db->sql_fetchrow($result))
 			{

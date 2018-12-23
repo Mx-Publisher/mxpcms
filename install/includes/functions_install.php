@@ -21,16 +21,58 @@ function page_header_install($title, $instruction_text = '')
 	// Get the current Server URL.
 	$server_url = ($_SERVER['SERVER_PORT'] == 443 ? 'https' : 'http' ) . '://' . $_SERVER['HTTP_HOST'];
 	// Get the MX-Publisher Path in the URL (this might not be the same as the base path when using aliases).
-	$mx_self_path = substr($_SERVER['PHP_SELF'], 0, -strlen('install/'.basename(__FILE__)));
+	$mx_self_path = substr($_SERVER['PHP_SELF'], 0, - strlen('install/'.basename(__FILE__)));
+	
+	// We have to generate a full HTTP/1.1 header here since we can't guarantee to have any of the information
+	// available as used by the redirect function
+	$server_name = (!empty($_SERVER['HTTP_HOST'])) ? strtolower($_SERVER['HTTP_HOST']) : ((!empty($_SERVER['SERVER_NAME'])) ? $_SERVER['SERVER_NAME'] : getenv('SERVER_NAME'));
+	$server_port = (!empty($_SERVER['SERVER_PORT'])) ? (int) $_SERVER['SERVER_PORT'] : (int) getenv('SERVER_PORT');
+	$secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 1 : 0;
+
+	if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+	{
+		$secure = 1;
+		$server_port = 443;
+	}
+
+	$script_name = (!empty($_SERVER['PHP_SELF'])) ? $_SERVER['PHP_SELF'] : getenv('PHP_SELF');
+	if (!$script_name)
+	{
+		$script_name = (!empty($_SERVER['REQUEST_URI'])) ? $_SERVER['REQUEST_URI'] : getenv('REQUEST_URI');
+	}
+
+	// $phpbb_root_path accounts for redirects from e.g. /adm
+	$script_path = trim(dirname($script_name)) . '/'; //core/install/ 
+
+	// Replace any number of consecutive backslashes and/or slashes with a single slash
+	// (could happen on some proxy setups and/or Windows servers)
+	$script_path = preg_replace('#[\\\\/]{2,}#', '/', $script_path); //core/install/ 
+
+	$portal_url = (($secure) ? 'https://' : 'http://') . $server_name;
+
+	if ($server_port && (($secure && $server_port <> 443) || (!$secure && $server_port <> 80)))
+	{
+		// HTTP HOST can carry a port number...
+		if (strpos($server_name, ':') === false)
+		{
+			$portal_url .= ':' . $server_port;
+		}
+	}
 
 	// Get the MX-Publisher URL.
-	$portal_url = $server_url . $mx_self_path . '/';
+	$install_url = $portal_url . $script_path;
+	$portal_url = str_replace('install/', '', $install_url);
 	$default_lang = guess_lang();
 	
+	//Base Style for Installation
+	$subtplEx = ($tplEx !== $phpEx) ? 'tpl' : $tplEx;
+	$protplEx = ($tplEx !== $phpEx) ? 'html' : $tplEx;
+
 	//Base Style for Installation
 	if ($mx_request_vars->is_get('style') )
 	{
 		$style = $mx_request_vars->request('style', MX_TYPE_NO_TAGS);
+		$tplEx = ($style !== 'prosilver') ? $subtplEx : $protplEx;
 		$theme = array('template_name' => ($style !== 'prosilver') ? 'subSilver' : 'prosilver');
 	}
 	else
@@ -42,37 +84,36 @@ function page_header_install($title, $instruction_text = '')
 	$board_config['smilies_path'] = 'includes/shared/phpbb2/images/smiles/';
 	$board_config['avatar_gallery_path'] = 'includes/shared/phpbb2/images/';
 
-
 	$template->set_filenames(array('header' => 'mx_install_header.'.$tplEx));
 
 	$template->assign_vars(array(
 		'L_PORTAL_NAME'			=> $mx_portal_name,
 		'L_PORTAL_VERSION'		=> $mx_portal_version,
-		'U_INSTALL_URL'			=> $mx_root_path . 'install/',
-		'L_INSTALLATION'		=> $title,
-		'U_INDEX'				=> $mx_root_path . 'install/mx_install.'.$phpEx,
-		'U_LOGO'				=> $mx_root_path . 'install/templates/logo.gif',
+		'U_INSTALL_URL'			=> $install_url,
+		'L_INSTALLATION'			=> $title,
+		'U_INDEX'						=> $install_url . "mx_install.$phpEx",
+		'U_LOGO'						=> "{$portal_url}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme/images/logo.gif',
 		'L_INSTRUCTION_TEXT'	=> $instruction_text,
 		
-		'T_ASSETS_VERSION'		=> INSTALLER_VERSION,
-		'T_ASSETS_PATH'			=> "{$portal_url}assets",
-		'T_THEME_PATH'			=> "{$portal_url}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme',
-		'T_TEMPLATE_PATH'		=> "{$portal_url}templates/" . rawurlencode($theme['template_name']) . '',
+		'T_ASSETS_VERSION'				=> INSTALLER_VERSION,
+		'T_ASSETS_PATH'					=> "{$portal_url}assets",
+		'T_THEME_PATH'					=> "{$portal_url}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme',
+		'T_TEMPLATE_PATH'				=> "{$portal_url}templates/" . rawurlencode($theme['template_name']) . '',
 		'T_SUPER_TEMPLATE_PATH'	=> "{$portal_url}templates/" . rawurlencode($theme['template_name']) . '/template',
 			
-		'T_IMAGES_PATH'			=> "{$portal_url}images/",
-		'T_SMILIES_PATH'		=> "{$portal_url}{$board_config['smilies_path']}/",
+		'T_IMAGES_PATH'					=> "{$portal_url}images/",
+		'T_SMILIES_PATH'					=> "{$portal_url}{$board_config['smilies_path']}/",
 		'T_AVATAR_GALLERY_PATH'	=> "{$portal_url}{$board_config['avatar_gallery_path']}/",
 		
-		'T_STYLESHEET_LINK'		=> "{$portal_url}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme/stylesheet.css',
-		'T_STYLESHEET_LANG_LINK'=> "{$portal_url}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme/images/lang_' . $default_lang . '/stylesheet.css',
-		'T_FONT_AWESOME_LINK'	=> "{$portal_url}assets/css/font-awesome.min.css",
-		'T_FONT_IONIC_LINK'			=> "{$portal_url}assets/css/ionicons.min.css",
+		'T_STYLESHEET_LINK'				=> "{$portal_url}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme/stylesheet.css',
+		'T_STYLESHEET_LANG_LINK'	=> "{$portal_url}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme/images/lang_' . $default_lang . '/stylesheet.css',
+		'T_FONT_AWESOME_LINK'		=> "{$portal_url}assets/css/font-awesome.min.css",
+		'T_FONT_IONIC_LINK'				=> "{$portal_url}assets/css/ionicons.min.css",
 
-		'T_JQUERY_LINK'			=> "{$portal_url}assets/javascript/jquery.min.js?assets_version=" . INSTALLER_VERSION,
-		'S_ALLOW_CDN'				=> false,
+		'T_JQUERY_LINK'					=> "{$portal_url}assets/javascript/jquery.min.js?assets_version=" . INSTALLER_VERSION,
+		'S_ALLOW_CDN'						=> false,
 		
-		'S_CONTENT_ENCODING'	=> 'UTF-8',
+		'S_CONTENT_ENCODING'		=> 'UTF-8',
 	));
 	$template->pparse('header');
 }
@@ -88,18 +129,28 @@ function page_footer_install($show_phpinfo = true)
 		'<a href="' . U_ONLINE_SUPPORT . '" target="_blank">', '</a>',
 		'<a href="' . U_TERMS_OF_USE . '" target="_blank">', '</a>'
 	);
-
+	
 	//Base Style for Installation
-	$subSilver = ($tplEx !== $phpEx) ? '<a href="?style=subSilver">Classic Style</a>' : '';
-	$prosilver = ($tplEx !== $phpEx) ? '<a href="?style=prosilver">Normal Style</a>' : '';
+	$subtplEx = ($tplEx !== $phpEx) ? 'tpl' : $tplEx;
+	$protplEx = ($tplEx !== $phpEx) ? 'html' : $tplEx;
 	
 	if ($mx_request_vars->is_get('style') )
 	{
 		$style = $mx_request_vars->request('style', MX_TYPE_NO_TAGS);
+		$tplEx = ($style !== 'prosilver') ? $subtplEx : $protplEx;
+		
+		//Base Style for Installation
+		$subSilver = ($tplEx !== $phpEx) ? '<a href="?style=subSilver">Classic Style</a>' : '';
+		$prosilver = ($tplEx !== $phpEx) ? '<a href="?style=prosilver">Normal Style</a>' : '';
+		
 		$install_theme = ($style == 'prosilver') ? $subSilver : $prosilver;
 	}
 	else
 	{
+		//Base Style for Installation
+		$subSilver = ($tplEx !== $phpEx) ? '<a href="?style=subSilver">Classic Style</a>' : '';
+		$prosilver = ($tplEx !== $phpEx) ? '<a href="?style=prosilver">Normal Style</a>' : '';
+		
 		$install_theme = ($tplEx == 'tpl') ? $subSilver : $prosilver;
 	}
 
@@ -112,6 +163,7 @@ function page_footer_install($show_phpinfo = true)
 		'U_INSTALL_THEME'		=> $install_theme,
 		'U_INSTALL_PHPINFO'	=> ( $show_phpinfo ? '<a href="?phpinfo" target="_blank">phpInfo</a>' : '' ),
 	));
+
 	$template->pparse('footer');
 
 	if( $db )

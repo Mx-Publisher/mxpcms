@@ -23,10 +23,6 @@ include_once( $module_root_path . 'includes/phpbb2blocks_constants.' . $phpEx );
 // Read Block Settings
 //
 $title = $mx_block->block_info['block_title'];
-$block_title = str_replace(' ', '_', $title);
-$title = isset($mx_user->lang[$block_title]) ? $mx_user->lang[$block_title] : $title;
-
-$desc = $mx_block->block_info['block_desc'];
 
 $template->set_filenames(array(
 	'body_last_msg' => 'mx_last_msg.tpl')
@@ -80,43 +76,43 @@ switch( $msg_filter_time )
 {
 	case '0':
 		$msg_time_filter_lo = 'no';
-	break;
+		break;
 	case '1':
 		$msg_time_filter_lo = mktime(0, 0, 0 , intval(substr($msg_today, 0, 2)), intval(substr($msg_today, 2, 2) - 1), intval(substr($msg_today, 4, 4)));
-	break;
+		break;
 	case '2':
 		$msg_time_filter_lo = mktime(0, 0, 0 , intval(substr($msg_today, 0, 2)), intval(substr($msg_today, 2, 2) - 1), intval(substr($msg_today, 4, 4)));
-	break;
+		break;
 	case '3':
 		$msg_time_filter_lo = mktime(0, 0, 0 , intval(substr($msg_today, 0, 2)), intval(substr($msg_today, 2, 2) - 1), intval(substr($msg_today, 4, 4)));
-	break;
+		break;
 	case '4':
 		$msg_time_filter_lo = mktime(0, 0, 0 , intval(substr($msg_today, 0, 2)), intval(substr($msg_today, 2, 2) - 7), intval(substr($msg_today, 4, 4)));
-	break;
+		break;
 	case '5':
 		$msg_time_filter_lo = mktime(0, 0, 0 , intval(substr($msg_today, 0, 2)), intval(substr($msg_today, 2, 2) - 14), intval(substr($msg_today, 4, 4)));
-	break;
+		break;
 	case '6':
 		$msg_time_filter_lo = mktime(0, 0, 0 , intval(substr($msg_today, 0, 2)), intval(substr($msg_today, 2, 2) - 21), intval(substr($msg_today, 4, 4)));
-	break;
+		break;
 	case '7':
 		$msg_time_filter_lo = mktime(0, 0, 0 , intval(substr($msg_today, 0, 2) - 1), intval(substr($msg_today, 2, 2)), intval(substr($msg_today, 4, 4)));
-	break;
+		break;
 	case '8':
 		$msg_time_filter_lo = mktime(0, 0, 0 , intval(substr($msg_today, 0, 2) - 2), intval(substr($msg_today, 2, 2)), intval(substr($msg_today, 4, 4)));
-	break;
+		break;
 	case '9':
 		$msg_time_filter_lo = mktime(0, 0, 0 , intval(substr($msg_today, 0, 2) - 3), intval(substr($msg_today, 2, 2)), intval(substr($msg_today, 4, 4)));
-	break;
+		break;
 	case '10':
 		$msg_time_filter_lo = mktime(0, 0, 0 , intval(substr($msg_today, 0, 2) - 6), intval(substr($msg_today, 2, 2)), intval(substr($msg_today, 4, 4)));
-	break;
+		break;
 	case '11':
 		$msg_time_filter_lo = mktime(0, 0, 0 , intval(substr($msg_today, 0, 2)), intval(substr($msg_today, 2, 2)), intval(substr($msg_today, 4, 4) - 1));
-	break;
+		break;
 	default:
 		$msg_time_filter_lo = 'no';
-	break;
+		break;
 }
 
 $sql = "SELECT COUNT(*) AS msg_num
@@ -175,7 +171,6 @@ $base_url = mx_this_url();
 
 $template->assign_vars(array(
 	'L_TITLE' => ( !empty($title) ? $title : 'Last Message' ),
-	'L_DECRIPTION' => ( !empty($desc) ? $desc : 'Last Message Post' ),
 	'U_TARGET' => $target,
 	'U_ALIGN' => $align,
 	'BLOCK_SIZE' => ( !empty($block_size) ? $block_size : '100%' ),
@@ -183,7 +178,7 @@ $template->assign_vars(array(
 	'U_URL_NEXT' => $url_next,
 	'U_URL_PREV' => $url_prev,
 	'U_PHPBB_ROOT_PATH' => PHPBB_URL,
-	'U_PHPBB_ROOT_PATH' => PORTAL_URL,
+	'U_PORTAL_ROOT_PATH' => PORTAL_URL,
 	'TEMPLATE_ROOT_PATH' => TEMPLATE_ROOT_PATH,
 	'L_MSG_PREV' => $lang['Previous'],
 	'L_MSG_NEXT' => $lang['Next'],
