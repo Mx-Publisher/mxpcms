@@ -1,9 +1,9 @@
 <?php
 /**
 *
-* @package Icy Phoenix
+* @package GoogleOAuth
 * @version $Id$
-* @copyright (c) 2008 Icy Phoenix
+* @copyright (c) 2008 phpBB Group
 * @license http://opensource.org/licenses/gpl-license.php GNU Public License
 *
 */
@@ -60,7 +60,7 @@ class GoogleConnect extends SocialConnect
 			}
 			catch (Exception $e)
 			{
-				message_die(GENERAL_ERROR, $e->getMessage());
+				mx_message_die(GENERAL_ERROR, $e->getMessage());
 			}
 		}
 		else
