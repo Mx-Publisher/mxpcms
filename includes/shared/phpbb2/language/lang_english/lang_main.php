@@ -595,7 +595,7 @@ $lang['Current_password'] = 'Current password';
 $lang['New_password'] = 'New password';
 $lang['Confirm_password'] = 'Confirm password';
 $lang['Confirm_password_explain'] = 'You must confirm your current password if you wish to change it or alter your e-mail address';
-$lang['password_if_changed'] = 'You only need to supply a password if you want to change it';
+$lang['password_if_changed'] = 'You only need to supply a password if you want to change it.<br />If Your browser puts the password automaticly, delete the password before You send the page form.';
 $lang['password_confirm_if_changed'] = 'You only need to confirm your password if you changed it above';
 
 $lang['Avatar'] = 'Avatar';
@@ -1043,6 +1043,14 @@ $lang['Critical_Error'] = 'Critical Error';
 $lang['An_error_occured'] = 'An Error Occurred';
 $lang['A_critical_error'] = 'A Critical Error Occurred';
 
+// Login
+$lang['Enter_password'] = 'Please enter your username and password to log in.';
+$lang['Login'] = 'Log in';
+$lang['Logout'] = 'Log out';
+$lang['Forgotten_password'] = 'I forgot my password';
+$lang['AUTOLOGIN'] = 'Log me on automatically each visit';
+$lang['Error_login'] = 'You have specified an incorrect or inactive username, or an invalid password.'; 
+
 $lang['Admin_reauthenticate'] = 'To administer the board you must re-authenticate yourself.';
 $lang['Login_attempts_exceeded'] = 'The maximum number of %s login attempts has been exceeded. You are not allowed to login for the next %s minutes.';
 $lang['Please_remove_install_contrib'] = 'Please ensure both the install/ and contrib/ directories are deleted';
@@ -1067,6 +1075,13 @@ $lang['youtube_link'] = 'Link';
 // Begin Simple Subforums MOD
 $lang['Subforums'] = 'Subforums';
 // End Simple Subforums MOD
+
+$lang['SOCIAL_CONNECT'] = 'You can login using your social network accounts: ';
+$lang['SOCIAL_CONNECT_LOGIN'] = 'Login with my %s account';
+$lang['SOCIAL_CONNECT_REGISTER_INFO'] = 'Your profile will be automatically filled with the information retrieved from your profile in the social network.';
+$lang['SOCIAL_CONNECT_LINK_ACCOUNT'] = 'Please login to link your social network account to your account';
+$lang['SOCIAL_CONNECT_LINK_ACCOUNT_MSG'] = 'We couldn\'t find any social network account linked with your %s account. You can either register or link an existing account with your %s account.<br /><br />Click %shere%s if you already have an account.<br/ ><br />Click %shere%s to create a new account.';
+ 
 
 //
 // That's all, Folks!

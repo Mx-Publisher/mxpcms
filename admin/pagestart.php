@@ -11,10 +11,12 @@
 
 if( !defined('IN_PORTAL') )
 {
-	die('Hacking attempt @ line: ' . __LINE__ .' & file: '. basename(__FILE__));
+	die('Hacking attempt @ file: '. basename(__FILE__));
 }
 
 @define('IN_ADMIN', true);
+@define('ADMIN_START', true);
+@define('NEED_SID', true);
 
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
 
@@ -46,10 +48,53 @@ $mx_user->init_style();
 
 $mx_user->_load_lang($mx_root_path . 'includes/shared/phpbb3/', 'acp/common');
 
-if ( !$userdata['session_logged_in'] )
+// Have they authenticated for this session?
+switch (PORTAL_BACKEND)
 {
-	mx_redirect(mx_append_sid("login.php?redirect=admin/index.$phpEx", true));
+	case 'internal':
+	case 'smf2':
+	case 'mybb':
+	case 'phpbb2':
+	case 'olympus':
+		if ( !$userdata['session_logged_in'] )
+		{
+			mx_redirect(mx_append_sid("login.php?redirect=admin/index.$phpEx", true));
+		}
+	break;
+
+	case 'ascraeus':
+	case 'rhea':
+	case 'proteus':
+	case 'phpbb3':
+		
+		if(!isset($phpbb_auth) || !is_object($phpbb_auth))
+		{
+			$phpbb_auth = new phpbb_auth();
+		}
+		$phpbb_auth->acl($mx_user->data);
+		
+		// Is user any type of admin? No, then stop here, each script needs to
+		// check specific permissions but this is a catchall
+		if (!$phpbb_auth->acl_get('a_'))
+		{
+			send_status_line(403, 'Forbidden');
+			trigger_error('NO_ADMIN');
+		}
+		
+		define('IN_LOGIN', true);
+		if ( !$mx_user->data['session_logged_in'] )
+		{
+			// Get referer to redirect user to the appropriate page after delete action
+			$redirect_url = mx_append_sid("{$phpbb_root_path}adm/index.$phpEx", "i=users&mode=overview&redirect={$mx_root_path}admin/index.$phpEx&admin=1");
+			$phpbb_login_url = mx_append_sid("{$phpbb_root_path}ucp.php?mode=login&redirect=$redirect_url");
+			
+			//This will return: header('Location: ' . $phpbb_login_url);
+			//mx_redirect($phpbb_login_url, true);
+			mx_redirect(mx_append_sid("login.php?redirect=admin/index.$phpEx", true));
+		}
+	break;
 }
+
 
 if ( !($userdata['user_level'] == ADMIN) )
 {
@@ -69,9 +114,32 @@ if ($mx_request_vars->get('sid', MX_TYPE_NO_TAGS) != $mx_user->session_id)
 	mx_redirect(PORTAL_URL . $url);
 }
 
-if (!$userdata['session_admin'])
+// Have they authenticated (again) as an admin for this session?
+switch (PORTAL_BACKEND)
 {
-	mx_redirect(mx_append_sid("login.php?redirect=admin/index.$phpEx&admin=1", true));
+	case 'internal':
+	case 'smf2':
+	case 'mybb':
+	case 'phpbb2':
+	case 'olympus':
+		if (!$userdata['session_admin'])
+		{
+			mx_redirect(mx_append_sid("login.php?redirect=admin/index.$phpEx&admin=1", true));
+		}
+	break;
+
+	case 'ascraeus':
+	case 'rhea':
+	case 'proteus':
+	case 'phpbb3':
+		if (!isset($mx_user->data['session_admin']) || !$mx_user->data['session_admin'])
+		{
+			//define('IN_LOGIN', true);
+			//mx_redirect(mx_append_sid(PHPBB_URL ."ucp.php?mode=login&redirect=" . PORTAL_URL . "admin/index.$phpEx&admin=1", true));
+			//mx_login_box('', $mx_user->lang['LOGIN_ADMIN_CONFIRM'], $mx_user->lang['LOGIN_ADMIN_SUCCESS'], true, false);
+			mx_redirect(mx_append_sid("login.php?redirect=admin/index.$phpEx&admin=1", true));
+		}
+	break;
 }
 
 if( empty($no_page_header) )

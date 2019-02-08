@@ -26,18 +26,11 @@ function page_header_install($title, $instruction_text = '')
 	// Get the MX-Publisher URL.
 	$portal_url = $server_url . $mx_self_path . '/';
 	$default_lang = guess_lang();
-
-	//Base Style for Installation
-	/*
-	$subtplEx = ($tplEx !== $phpEx) ? 'tpl' : $tplEx;
-	$protplEx = ($tplEx !== $phpEx) ? 'html' : $tplEx;
-	*/
-
+	
 	//Base Style for Installation
 	if ($mx_request_vars->is_get('style') )
 	{
 		$style = $mx_request_vars->request('style', MX_TYPE_NO_TAGS);
-		//$tplEx = ($style !== 'prosilver') ? $subtplEx : $protplEx;
 		$theme = array('template_name' => ($style !== 'prosilver') ? 'subSilver' : 'prosilver');
 	}
 	else
@@ -49,36 +42,37 @@ function page_header_install($title, $instruction_text = '')
 	$board_config['smilies_path'] = 'includes/shared/phpbb2/images/smiles/';
 	$board_config['avatar_gallery_path'] = 'includes/shared/phpbb2/images/';
 
+
 	$template->set_filenames(array('header' => 'mx_install_header.'.$tplEx));
 
 	$template->assign_vars(array(
 		'L_PORTAL_NAME'			=> $mx_portal_name,
 		'L_PORTAL_VERSION'		=> $mx_portal_version,
 		'U_INSTALL_URL'			=> $mx_root_path . 'install/',
-		'L_INSTALLATION'			=> $title,
-		'U_INDEX'						=> $mx_root_path . 'install/mx_install.'.$phpEx,
-		'U_LOGO'						=> $mx_root_path . 'install/templates/logo.gif',
+		'L_INSTALLATION'		=> $title,
+		'U_INDEX'				=> $mx_root_path . 'install/mx_install.'.$phpEx,
+		'U_LOGO'				=> $mx_root_path . 'install/templates/logo.gif',
 		'L_INSTRUCTION_TEXT'	=> $instruction_text,
 		
-		'T_ASSETS_VERSION'				=> INSTALLER_VERSION,
-		'T_ASSETS_PATH'					=> "{$portal_url}assets",
-		'T_THEME_PATH'					=> "{$portal_url}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme',
-		'T_TEMPLATE_PATH'				=> "{$portal_url}templates/" . rawurlencode($theme['template_name']) . '',
+		'T_ASSETS_VERSION'		=> INSTALLER_VERSION,
+		'T_ASSETS_PATH'			=> "{$portal_url}assets",
+		'T_THEME_PATH'			=> "{$portal_url}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme',
+		'T_TEMPLATE_PATH'		=> "{$portal_url}templates/" . rawurlencode($theme['template_name']) . '',
 		'T_SUPER_TEMPLATE_PATH'	=> "{$portal_url}templates/" . rawurlencode($theme['template_name']) . '/template',
 			
-		'T_IMAGES_PATH'					=> "{$portal_url}images/",
-		'T_SMILIES_PATH'					=> "{$portal_url}{$board_config['smilies_path']}/",
+		'T_IMAGES_PATH'			=> "{$portal_url}images/",
+		'T_SMILIES_PATH'		=> "{$portal_url}{$board_config['smilies_path']}/",
 		'T_AVATAR_GALLERY_PATH'	=> "{$portal_url}{$board_config['avatar_gallery_path']}/",
 		
-		'T_STYLESHEET_LINK'				=> "{$portal_url}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme/stylesheet.css',
-		'T_STYLESHEET_LANG_LINK'	=> "{$portal_url}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme/images/lang_' . $default_lang . '/stylesheet.css',
-		'T_FONT_AWESOME_LINK'		=> "{$portal_url}assets/css/font-awesome.min.css",
-		'T_FONT_IONIC_LINK'				=> "{$portal_url}assets/css/ionicons.min.css",
+		'T_STYLESHEET_LINK'		=> "{$portal_url}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme/stylesheet.css',
+		'T_STYLESHEET_LANG_LINK'=> "{$portal_url}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme/images/lang_' . $default_lang . '/stylesheet.css',
+		'T_FONT_AWESOME_LINK'	=> "{$portal_url}assets/css/font-awesome.min.css",
+		'T_FONT_IONIC_LINK'			=> "{$portal_url}assets/css/ionicons.min.css",
 
-		'T_JQUERY_LINK'					=> "{$portal_url}assets/javascript/jquery.min.js?assets_version=" . INSTALLER_VERSION,
-		'S_ALLOW_CDN'						=> false,
+		'T_JQUERY_LINK'			=> "{$portal_url}assets/javascript/jquery.min.js?assets_version=" . INSTALLER_VERSION,
+		'S_ALLOW_CDN'				=> false,
 		
-		'S_CONTENT_ENCODING'		=> 'UTF-8',
+		'S_CONTENT_ENCODING'	=> 'UTF-8',
 	));
 	$template->pparse('header');
 }
@@ -98,7 +92,7 @@ function page_footer_install($show_phpinfo = true)
 	//Base Style for Installation
 	$subSilver = ($tplEx !== $phpEx) ? '<a href="?style=subSilver">Classic Style</a>' : '';
 	$prosilver = ($tplEx !== $phpEx) ? '<a href="?style=prosilver">Normal Style</a>' : '';
-
+	
 	if ($mx_request_vars->is_get('style') )
 	{
 		$style = $mx_request_vars->request('style', MX_TYPE_NO_TAGS);
@@ -118,7 +112,6 @@ function page_footer_install($show_phpinfo = true)
 		'U_INSTALL_THEME'		=> $install_theme,
 		'U_INSTALL_PHPINFO'	=> ( $show_phpinfo ? '<a href="?phpinfo" target="_blank">phpInfo</a>' : '' ),
 	));
-
 	$template->pparse('footer');
 
 	if( $db )

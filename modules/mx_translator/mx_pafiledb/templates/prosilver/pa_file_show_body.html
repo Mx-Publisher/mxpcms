@@ -1,0 +1,70 @@
+<!-- INCLUDE overall_header.html -->
+
+<!-- IF S_NO_FILES -->
+<br /><br />
+	&nbsp;<b>{L_FILES_NO_FILES}</b>
+<br /><br />
+<!-- ELSE -->
+<br />
+<div class="action-bar">
+	<!-- IF .pagination or TOTAL_DOWNLOADS -->
+	<div class="pagination">
+		{TOTAL_DOWNLOADS}
+		<!-- IF .pagination -->
+			<!-- INCLUDE pagination.html -->
+		<!-- ELSE -->
+			&bull; {PAGE_NUMBER}
+		<!-- ENDIF -->
+	</div>
+	<!-- ENDIF -->
+</div>
+<!-- BEGIN files_row -->
+	<!-- IF files_row.S_FIRST_ROW -->
+		<div class="forabg forumbg-table">
+			<div class="inner">
+				<table class="table1">
+					<thead>
+						<tr>
+							<th class="files-title" style="text-align:left;">{L_FILE_TITLE}</th>
+							<th class="files-version">{L_FILE_VERSION}</th>
+							<th class="files-desc">{L_FILE_DESC}</th>
+							<th class="files-count">{L_FILE_CLICKS}</th>
+							<th class="files-filesize">{L_FILESIZE}</th>
+							<th class="files-dl">{L_FILES_DOWNLOAD}</th>
+						</tr>
+					</thead>
+					<tbody>
+						<!-- ENDIF -->
+						<tr class="<!-- IF files_row.S_ROW_COUNT is even --> bg1<!-- ELSE -->bg2<!-- ENDIF -->">
+							<td class="files-title">&nbsp;<b>{files_row.FILE_TITLE}</b></td>
+							<td class="files-version" style="text-align:center;">{files_row.FILE_VERSION}</td>
+							<td class="files-desc" style="text-align:center;">{files_row.FILE_DESC}
+							<hr />
+							<span class="small"><i>{L_FILES_UPLOADED_ON}{L_COLON} {files_row.FILE_UPLOAD_TIME}<br />
+							{L_FILES_LAST_CHANGED_ON}{L_COLON} {files_row.FILE_LAST_CHANGED}</i></span></td>
+							<td class="files-count" style="text-align:center;"><strong>{files_row.FILE_CLICKS}</strong></td>
+							<td class="files-filesize" style="text-align:center;">{files_row.FILESIZE}</td>
+							<td class="files-dl" style="text-align:center;">{files_row.U_DOWNLOAD}</td>
+						</tr>
+						<!-- IF files_row.S_LAST_ROW -->
+					</tbody>
+				</table>
+			</div>
+		</div>
+	<!-- ENDIF -->
+<!-- END files_row -->
+<div class="action-bar">
+	<!-- IF .pagination or TOTAL_DOWNLOADS -->
+	<div class="pagination">
+		{TOTAL_DOWNLOADS}
+		<!-- IF .pagination -->
+			<!-- INCLUDE pagination.html -->
+		<!-- ELSE -->
+			&bull; {PAGE_NUMBER}
+		<!-- ENDIF -->
+	</div>
+	<!-- ENDIF -->
+</div>
+<!-- ENDIF -->
+
+<!-- INCLUDE overall_footer.html -->

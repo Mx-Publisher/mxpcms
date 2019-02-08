@@ -1177,6 +1177,22 @@ class mx_backend
 	}
 
 	/**
+	* Return the group_id for a given group name
+	*/
+	function get_group_id($group_name = 'REGISTERED')
+	{
+		global $db, $group_mapping;
+
+		//Default Groups for smf2
+
+		// first retrieve default group id
+
+
+		// generate user account data
+		return (int) 1;
+	}
+
+	/**
 	 * Enter description here...
 	 *
 	 * @return unknown

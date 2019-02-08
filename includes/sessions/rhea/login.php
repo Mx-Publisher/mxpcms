@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: login.php,v 1.1 2014/09/15 21:14:57 orynider Exp $
+* @version $Id: login.php,v 1.1 2014/07/07 20:38:12 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
@@ -50,7 +50,7 @@ if($mx_request_vars->is_request('login') && ($userdata['user_id'] == ANONYMOUS |
 			}
 
 			// Check to see if user is allowed to login again... if his tries are exceeded
-			if ($user_login_attempt && $board_config['login_reset_time'] && $board_config['max_login_attempts'] && $user_login_attempts >= $board_config['max_login_attempts'] && $userdata['user_level'] != ADMIN)
+			if ($user_login_attempts && $board_config['login_reset_time'] && $board_config['max_login_attempts'] && $user_login_attempts >= $board_config['max_login_attempts'] && $userdata['user_level'] != ADMIN)
 			{
 				mx_message_die(GENERAL_MESSAGE, sprintf($lang['Login_attempts_exceeded'], $board_config['max_login_attempts'], $board_config['login_reset_time']));
 			}

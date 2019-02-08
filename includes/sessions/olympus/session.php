@@ -86,7 +86,6 @@ class session
 	var $style = 1;
 	var $date_format;
 	var $timezone;
-	var $int_timezone;
 	var $dst;
 
 	/**
@@ -129,7 +128,7 @@ class session
 	 * @access public
 	 *
 	 */	
-	function session()
+	function __construct()
 	{
 		global $mx_cache, $board_config, $db, $phpbb_root_path, $mx_root_path, $phpEx;
 		global $mx_request_vars, $template, $language;
@@ -310,18 +309,75 @@ class session
 		$script_path .= (substr($script_path, -1, 1) == '/') ? '' : '/';
 		$root_script_path .= (substr($root_script_path, -1, 1) == '/') ? '' : '/';
 
+		$forum_id = (isset($_REQUEST['f']) && $_REQUEST['f'] > 0 && $_REQUEST['f'] < 16777215) ? (int) $_REQUEST['f'] : 0;
+
 		$page_array += array(
 			'page_name'			=> $page_name,
-			'page_dir'				=> $page_dir,
+			'page_dir'			=> $page_dir,
 
-			'query_string'			=> $query_string,
-			'script_path'				=> str_replace(' ', '%20', htmlspecialchars($script_path)),
-			'root_script_path'		=> str_replace(' ', '%20', htmlspecialchars($root_script_path)),
+			'query_string'		=> $query_string,
+			'script_path'		=> str_replace(' ', '%20', htmlspecialchars($script_path)),
+			'root_script_path'	=> str_replace(' ', '%20', htmlspecialchars($root_script_path)),
 
-			'page'					=> $page
+			'page'				=> $page,
+			'forum'				=> $forum_id,
 		);
 
 		return $page_array;
+	}
+
+	/**
+	* Get valid hostname/port. HTTP_HOST is used, SERVER_NAME if HTTP_HOST not present.
+	*/
+	function extract_current_hostname()
+	{
+		global $config;
+
+		// Get hostname
+		$host = (!empty($_SERVER['HTTP_HOST'])) ? $_SERVER['HTTP_HOST'] : ((!empty($_SERVER['SERVER_NAME'])) ? $_SERVER['SERVER_NAME'] : getenv('SERVER_NAME'));
+
+		// Should be a string and lowered
+		$host = (string) strtolower($host);
+
+		// If host is equal the cookie domain or the server name (if config is set), then we assume it is valid
+		if ((isset($config['cookie_domain']) && $host === $config['cookie_domain']) || (isset($config['server_name']) && $host === $config['server_name']))
+		{
+			return $host;
+		}
+
+		// Is the host actually a IP? If so, we use the IP... (IPv4)
+		if (long2ip(ip2long($host)) === $host)
+		{
+			return $host;
+		}
+
+		// Now return the hostname (this also removes any port definition). The http:// is prepended to construct a valid URL, hosts never have a scheme assigned
+		$host = @parse_url('http://' . $host);
+		$host = (!empty($host['host'])) ? $host['host'] : '';
+
+		// Remove any portions not removed by parse_url (#)
+		$host = str_replace('#', '', $host);
+
+		// If, by any means, the host is now empty, we will use a "best approach" way to guess one
+		if (empty($host))
+		{
+			if (!empty($config['server_name']))
+			{
+				$host = $config['server_name'];
+			}
+			else if (!empty($config['cookie_domain']))
+			{
+				$host = (strpos($config['cookie_domain'], '.') === 0) ? substr($config['cookie_domain'], 1) : $config['cookie_domain'];
+			}
+			else
+			{
+				// Set to OS hostname or localhost
+				$host = (function_exists('php_uname')) ? php_uname('n') : 'localhost';
+			}
+		}
+
+		// It may be still no valid host, but for sure only a hostname (we may further expand on the cookie domain... if set)
+		return $host;
 	}
 
 	/**
@@ -1139,7 +1195,11 @@ class session
 	/**
 	* Sets a cookie
 	*
-	* Sets a cookie of the given name with the specified data for the given length of time.
+	* Sets a cookie of the given name with the specified data for the given length of time. If no time is specified, a session cookie will be set.
+	*
+	* @param string $name		Name of the cookie, will be automatically prefixed with the phpBB cookie name. track becomes [cookie_name]_track then.
+	* @param string $cookiedata	The data to hold within the cookie
+	* @param int $cookietime	The expiration time as UNIX timestamp. If 0 is provided, a session cookie is set.
 	*/
 	function set_cookie($name, $cookiedata, $cookietime)
 	{
@@ -4478,6 +4538,36 @@ class session
 		{
 			return $var;
 		}
+	}
+
+	/**
+	* Funtion to make the user leave the NEWLY_REGISTERED system group.
+	* @access public
+	*/
+	function leave_newly_registered()
+	{
+		global $db;
+
+		if (empty($this->data['user_new']))
+		{
+			return false;
+		}
+
+		if (!function_exists('remove_newly_registered'))
+		{
+			global $phpbb_root_path, $phpEx;
+
+			include($phpbb_root_path . 'includes/functions_user.' . $phpEx);
+		}
+		if ($group = remove_newly_registered($this->data['user_id'], $this->data))
+		{
+			$this->data['group_id'] = $group;
+
+		}
+		$this->data['user_permissions'] = '';
+		$this->data['user_new'] = 0;
+
+		return true;
 	}
 
 	/**

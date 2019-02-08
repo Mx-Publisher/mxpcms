@@ -44,6 +44,7 @@ $l_timezone = (count($l_timezone) > 1 && $l_timezone[count($l_timezone)-1] != 0)
 $phpbb_auth->acl($mx_user->data); // Do only once, in user_init // Move later
 
 $mx_user->setup('viewforum');
+
 //
 // End session management
 //
@@ -84,7 +85,10 @@ else
 			AND (g.group_type <> ' . GROUP_HIDDEN . ' OR ug.user_id = ' . $mx_user->data['user_id'] . ')
 		ORDER BY g.group_name ASC';
 }
-$result = $db->sql_query($sql);
+if ( !($result = $db->sql_query($sql)) )
+{
+	mx_message_die(GENERAL_ERROR, 'Could not query user groups status', '', __LINE__, __FILE__, $sql);
+}
 
 $legend = '';
 while ($row = $db->sql_fetchrow($result))
@@ -111,7 +115,10 @@ if ($board_config['load_birthdays'] && $board_config['allow_birthdays'])
 		FROM ' . USERS_TABLE . "
 		WHERE user_birthday LIKE '" . $db->sql_escape(sprintf('%2d-%2d-', $now['mday'], $now['mon'])) . "%'
 			AND user_type IN (" . USER_NORMAL . ', ' . USER_FOUNDER . ')';
-	$result = $db->sql_query($sql);
+	if ( !($result = $db->sql_query($sql)) )
+	{
+		mx_message_die(GENERAL_ERROR, 'Could not query user_birthdays', '', __LINE__, __FILE__, $sql);
+	}
 
 	while ($row = $db->sql_fetchrow($result))
 	{
@@ -126,7 +133,7 @@ if ($board_config['load_birthdays'] && $board_config['allow_birthdays'])
 }
 
 $template->set_filenames(array(
-	'block_forum' => 'mx_forum.html')
+	'block_forum' => 'forumlist_body.tpl')
 );
 
 // Assign index specific vars

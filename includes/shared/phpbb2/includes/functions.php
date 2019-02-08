@@ -2412,7 +2412,7 @@ class phpBB2
 					if ((@file_exists($theme_info_path)))
 					{
 						$template_name = $row['template_name'] = $style_installed;
-						
+							
 						/**
 						* Reset custom module default style, once used.
 						*/
@@ -2446,7 +2446,7 @@ class phpBB2
 								message_die(CRITICAL_ERROR, 'Could not update default_style theme info');
 							}
 							/** */
-						}
+						}									
 					}
 					$template_name = $row['template_name'];	
 				}					

@@ -120,11 +120,11 @@ if ($mx_request_vars->is_request('alphanum'))
 	{
 		case 'postgres':
 			$alpha_where = ( $alphanum == 'num' ) ? "AND username !~ '^[A-Z]+'" : "AND username ILIKE '$alphanum%'";
-		break;
+			break;
 
 		default:
 			$alpha_where = ( $alphanum == 'num' ) ? "AND username NOT RLIKE '^[A-Z]'" : "AND username LIKE '$alphanum%'";
-		break;
+			break;
 	}
 }
 else
@@ -213,16 +213,13 @@ switch( $mode )
 							WHERE ug.user_id = $user_id
 								AND g.group_id = ug.group_id
 								AND g.group_single_user = 1";
-					break;
-					
-					case 'phpbb3':
-					default:
+						break;
 						$sql = "SELECT u.username, g.group_id
 							FROM " . USERS_TABLE . " u, " . USER_GROUP_TABLE . " ug, " . GROUPS_TABLE . " g
 							WHERE ug.user_id = $user_id
 								AND g.group_id = ug.group_id
 								AND g.group_name IN ('BOTS', 'GUESTS')";
-					break;
+						break;
 				}
 
 				if( !($result = $db->sql_query($sql)) )
@@ -523,7 +520,6 @@ switch( $mode )
 						ORDER BY group_name ASC";
 					break;
 				case 'phpbb3':
-				default:
 					$sql = "SELECT group_id, group_name
 						FROM " . GROUPS_TABLE . "
 						WHERE group_name NOT IN ('BOTS', 'GUESTS')
@@ -611,7 +607,7 @@ switch( $mode )
 								FROM " . GROUPS_TABLE . "
 								WHERE group_id = $group_id";
 						}
-					break;
+						break;
 				}
 				if ( !($result = $db->sql_query($sql)) )
 				{
@@ -862,13 +858,13 @@ switch( $mode )
 					{
 						case USER_AVATAR_UPLOAD:
 							$avatar_img = ( $board_config['allow_avatar_upload'] ) ? '<img src="' . $phpbb_root_path . $board_config['avatar_path'] . '/' . $row['user_avatar'] . '" alt="" border="0" />' : '';
-						break;
+							break;
 						case USER_AVATAR_REMOTE:
 							$avatar_img = ( $board_config['allow_avatar_remote'] ) ? '<img src="' . $row['user_avatar'] . '" alt="" border="0" />' : '';
-						break;
+							break;
 						case USER_AVATAR_GALLERY:
 							$avatar_img = ( $board_config['allow_avatar_local'] ) ? '<img src="' . $phpbb_root_path . $board_config['avatar_gallery_path'] . '/' . $row['user_avatar'] . '" alt="" border="0" />' : '';
-						break;
+							break;
 					}
 				}
 
@@ -979,15 +975,13 @@ switch( $mode )
 						WHERE ug.user_id = " . $row['user_id'] . "
 						 AND g.group_single_user <> 1
 						 AND g.group_id = ug.group_id";
-				break;
-				
+					break;
 				case 'phpbb3':
-				default:
 					$group_sql = "SELECT * FROM " . USER_GROUP_TABLE . " ug, " . GROUPS_TABLE . " g
 						WHERE ug.user_id = " . $row['user_id'] . "
 						 AND g.group_name NOT IN ('BOTS', 'GUESTS')
 						 AND g.group_id = ug.group_id";
-				break;
+					break;
 			}
 
 			if( !($group_result = $db->sql_query($group_sql)) )

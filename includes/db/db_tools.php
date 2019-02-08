@@ -1445,8 +1445,9 @@ class tools
 			}
 		}
 		if (!($result))
-		{		
-			mx_message_die(GENERAL_ERROR, "",  '<br /><br />SQL Error : ' . $this->db->sql_error('')['code'] . ' ' . $this->db->sql_error('')['message'] . ' <br />' . $sql, true, __LINE__, __FILE__, $sql);
+		{
+			$db_sql_error = $this->db->sql_error('');
+			mx_message_die(GENERAL_ERROR, "",  '<br /><br />SQL Error : ' . $db_sql_error['code'] . ' ' . $db_sql_error['message'] . ' <br />' . $sql, true, __LINE__, __FILE__, $sql);
 		}
 		return true;
 	}

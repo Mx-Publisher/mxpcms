@@ -384,7 +384,7 @@ class version_helper
 
 		if ($info === false && $force_cache)
 		{
-			throw new version_check_exception('VERSIONCHECK_FAIL');
+			print('VERSIONCHECK_FAIL');
 		}
 		else if ($info === false || $force_update)
 		{
@@ -393,7 +393,7 @@ class version_helper
 
 			if (!empty($error_string))
 			{
-				throw new version_check_exception($error_string);
+				print($error_string);
 			}
 
 			$info = json_decode($info, true);
@@ -410,7 +410,7 @@ class version_helper
 
 			if (empty($info['stable']) && empty($info['unstable']))
 			{
-				throw new version_check_exception('VERSIONCHECK_FAIL');
+				print('VERSIONCHECK_FAIL');
 			}
 
 			$info['stable'] = (empty($info['stable'])) ? array() : $info['stable'];
@@ -480,7 +480,7 @@ class version_helper
 					if (!isset($this->version_schema[$stability_type][$key]))
 					{
 						unset($version_data[$key]);
-						throw new version_check_exception('VERSIONCHECK_INVALID_ENTRY');
+						print('VERSIONCHECK_INVALID_ENTRY');
 					}
 
 					switch ($this->version_schema[$stability_type][$key])

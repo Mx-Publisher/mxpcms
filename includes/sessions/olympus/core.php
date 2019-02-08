@@ -1253,7 +1253,7 @@ class mx_backend
 	var $user_ip = 'ffffff';
 	
 	/***/
-	function mx_backend()
+	function __construct()
 	{	
 		// Obtain and encode users IP
 		// from MXP 2.7.x common

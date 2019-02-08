@@ -556,7 +556,7 @@ function mx_append_sid($url, $non_html_amp = false, $mod_rewrite_only = false)
 	global $SID, $_SID, $mx_mod_rewrite, $userdata;
 	
 	//Fix for login page
-	if ( !empty($url) && preg_match('#'.PORTAL_URL.'#', $url) && defined('IN_LOGIN') )
+	if ( !empty($url) && preg_match('#'.PORTAL_URL.'#', $url) && !defined('IN_ADMIN') && defined('IN_LOGIN') )
 	{
 		$url = preg_replace('#' . PORTAL_URL . '#', '', $url);
 	}		
@@ -607,7 +607,7 @@ function mx_append_sid($url, $non_html_amp = false, $mod_rewrite_only = false)
  * @param string $redirect_msg
  * @param string $redirect_link
  */
-function mx_redirect($url, $redirect_msg = '', $redirect_link = '')
+function mx_redirect($url, $redirect_msg = '', $redirect_link = '', $base_url = PORTAL_URL, $permanent = false)
 {
 	global $db, $lang;
 
@@ -650,19 +650,27 @@ function mx_redirect($url, $redirect_msg = '', $redirect_link = '')
 	//Fix for login page
 	if (!defined('IN_LOGIN'))
 	{
-		$url = PORTAL_URL . $url;
-	}	
+		$url = $base_url . $url;
+	}
+
+	// Behave as per HTTP/1.1 by https://stackoverflow.com/users/89771/alix-axel 
+	if (headers_sent() === false)
+	{
+		header('Location: ' . $url, true, ($permanent === true) ? 301 : 302);
+		exit;
+	}
 
 	// Redirect via an HTML form for PITA webservers
 	if ( @preg_match('/Microsoft|WebSTAR|Xitami/', getenv('SERVER_SOFTWARE')) )
 	{
-		header('Refresh: 0; URL=' . $url);		
+		header('Refresh: 0; URL=' . $url);
 		echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"><html><head><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"><meta http-equiv="refresh" content="0; url=' . PORTAL_URL . $url . '"><title>Redirect</title></head><body><div align="center">If your browser does not support meta redirection please click <a href="' . PORTAL_URL . $url . '">HERE</a> to be redirected</div></body></html>';
 		exit;
 	}
-
+	
+	
 	// Behave as per HTTP/1.1 spec for others
-	header('Location: ' . $url);	
+	header('Location: ' . $url);
 	exit;
 }
 
@@ -718,7 +726,7 @@ function mx_create_date($format, $gmepoch, $tz)
 	}
 	
 	// Zone offset
-	$zone_offset = $mx_user->int_timezone + $mx_user->dst;
+	$zone_offset = $mx_user->timezone + $mx_user->dst;
 		
 	// Show date <= 1 hour ago as 'xx min ago' but not greater than 60 seconds in the future
 	// A small tolerence is given for times in the future but in the same minute are displayed as '< than a minute ago'
@@ -1375,7 +1383,7 @@ function mx_add_form_key($form_name, $template_variable_suffix = '')
 	$token_sid = ($mx_user->data['user_id'] == ANONYMOUS) ? $mx_user->session_id : '';
 	$token = sha1($now . $mx_user->data['user_form_salt'] . $form_name . $token_sid);
 
-	$s_fields = build_hidden_fields(array(
+	$s_fields = mx_build_hidden_fields(array(
 		'creation_time' => $now,
 		'form_token'	=> $token,
 	));
@@ -1423,6 +1431,60 @@ function mx_check_form_key($form_name, $timespan = false)
 	}
 
 	return false;
+}
+
+// Little helpers
+
+/**
+* Little helper for the build_hidden_fields function
+*/
+function mxp_build_hidden_fields($key, $value, $specialchar, $stripslashes)
+{
+	$hidden_fields = '';
+
+	if (!is_array($value))
+	{
+		$value = ($stripslashes) ? stripslashes($value) : $value;
+		$value = ($specialchar) ? htmlspecialchars($value, ENT_COMPAT, 'UTF-8') : $value;
+
+		$hidden_fields .= '<input type="hidden" name="' . $key . '" value="' . $value . '" />' . "\n";
+	}
+	else
+	{
+		foreach ($value as $_key => $_value)
+		{
+			$_key = ($stripslashes) ? stripslashes($_key) : $_key;
+			$_key = ($specialchar) ? htmlspecialchars($_key, ENT_COMPAT, 'UTF-8') : $_key;
+
+			$hidden_fields .= mxp_build_hidden_fields($key . '[' . $_key . ']', $_value, $specialchar, $stripslashes);
+		}
+	}
+
+	return $hidden_fields;
+}
+
+/**
+* Build simple hidden fields from array
+*
+* @param array $field_ary an array of values to build the hidden field from
+* @param bool $specialchar if true, keys and values get specialchared
+* @param bool $stripslashes if true, keys and values get stripslashed
+*
+* @return string the hidden fields
+*/
+function mx_build_hidden_fields($field_ary, $specialchar = false, $stripslashes = false)
+{
+	$s_hidden_fields = '';
+
+	foreach ($field_ary as $name => $vars)
+	{
+		$name = ($stripslashes) ? stripslashes($name) : $name;
+		$name = ($specialchar) ? htmlspecialchars($name, ENT_COMPAT, 'UTF-8') : $name;
+
+		$s_hidden_fields .= mxp_build_hidden_fields($name, $vars, $specialchar, $stripslashes);
+	}
+
+	return $s_hidden_fields;
 }
 
 /**
@@ -1928,7 +1990,7 @@ function mx_get_user_rank($userdata, $user_posts, &$rank_title = null, &$rank_im
  */
 function mx_language_select($default, $select_name = "language", $dirname="language")
 {
-	global $phpEx, $phpBB2, $mx_root_path;
+	global $phpEx, $phpBB2, $mx_root_path, $mx_user;
 
 	$dir = opendir($mx_root_path . $dirname);
 
@@ -1952,7 +2014,7 @@ function mx_language_select($default, $select_name = "language", $dirname="langu
 	$lang_select = '<select name="' . $select_name . '">';
 	while ( list($displayname, $filename) = @each($lang) )
 	{
-		$selected = ( strtolower($default) == strtolower($filename) ) ? ' selected="selected"' : '';
+		$selected = ( strtolower($mx_user->decode_lang($default)) == strtolower($displayname) ) ? ' selected="selected"' : '';
 		$lang_select .= '<option value="' . $filename . '"' . $selected . '>' . ucwords($displayname) . '</option>';
 	}
 	$lang_select .= '</select>';
@@ -1977,18 +2039,18 @@ function mx_style_select($default_style, $select_name = "style", $dirname = "tem
 		FROM " . MX_THEMES_TABLE . "
 		WHERE portal_backend = '" . PORTAL_BACKEND . "'
 		ORDER BY template_name, themes_id";
-	if (!($result = $db->sql_query($sql, 300)))
+	if (!($result = $db->sql_query($sql)))
 	{
 		$sql = "SELECT themes_id, style_name
 			FROM " . MX_THEMES_TABLE . "
 			WHERE portal_backend <> '" . PORTAL_BACKEND . "'
 			ORDER BY template_name, themes_id";
-		if (!($result = $db->sql_query($sql, 300)))
+		if (!($result = $db->sql_query($sql)))
 		{
 			mx_message_die(GENERAL_ERROR, "Couldn't query themes table", "", __LINE__, __FILE__, $sql);
 		}
 		$lang['Select_page_style'] = 'Bad Style-Backend';
-		$show_instruction = true;		
+		$show_instruction = true;
 	}
 	
 	$style_select = '<select name="' . $select_name . '">';
@@ -1996,8 +2058,8 @@ function mx_style_select($default_style, $select_name = "style", $dirname = "tem
 	if ($show_instruction)
 	{
 		$style_select .= '<option value="-1"' . $selected1 . '>' . $lang['Select_page_style'] . '</option>';
-	}			
-	/*
+	}
+
 	while (!($row = $db->sql_fetchrow($result)))
 	{
 		$sql = "SELECT themes_id, style_name
@@ -2009,7 +2071,7 @@ function mx_style_select($default_style, $select_name = "style", $dirname = "tem
 			mx_message_die(GENERAL_ERROR, "Couldn't query themes table", "", __LINE__, __FILE__, $sql);
 		}
 	}
-	*/
+
 	while ($row = $db->sql_fetchrow($result))
 	{
 		$id = $row['themes_id'];
@@ -2238,22 +2300,22 @@ function mx_generate_text_for_display($text, $uid, $bitfield, $flags)
 	// Parse bbcode if bbcode uid stored and bbcode enabled
 	if ($uid && ($flags & OPTION_FLAG_BBCODE))
 	{
-		if (!class_exists('bbcode'))
+		if (!class_exists('mx_bbcode'))
 		{
 			global $phpbb_root_path, $phpEx;
-			mx_cache::load_file('bbcode', 'phpbb3');
+			//mx_cache::load_file('bbcode', 'phpbb3');
 		}
 
-		if (empty($bbcode))
+		if (empty($mx_bbcode))
 		{
-			$bbcode = new bbcode($bitfield);
+			$mx_bbcode = new mx_bbcode($bitfield);
 		}
 		else
 		{
-			$bbcode->bbcode($bitfield);
+			$mx_bbcode->mx_bbcode($bitfield);
 		}
 
-		$bbcode->bbcode_second_pass($text, $uid);
+		$mx_bbcode->bbcode_second_pass($text, $uid);
 	}
 
 	$text = str_replace("\n", '<br />', $text);

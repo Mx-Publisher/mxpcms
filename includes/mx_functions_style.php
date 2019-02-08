@@ -145,27 +145,13 @@ class mx_Template extends Template
 		}
 
 		$style_path = $mx_user->template_name;
-
-		$cfg = array();
+		$this->styles_path = $mx_root_path . $this->template_path;
 		
-		if (isset($mx_user->theme['style_parent_tree']) && !strpos($mx_user->theme['style_parent_tree'], '/'))
-		{
-			$this->cloned_template_name = $mx_user->theme['style_parent_tree'];
-		}
-		elseif (is_file(realpath($phpbb_root_path . $this->style_path . $style_path . '/style.cfg')))
-		{
-			$cfg = mx_parse_cfg_file($phpbb_root_path . $this->style_path . $style_path . '/style.cfg');
-			$this->cloned_template_name = !empty($cfg['parent']) ? $cfg['parent'] : 'prosilver';
-		}
-
-
 		//
 		// Also search for "the other" file extension
 		//
 		$filename = substr_count($filename, 'tpl') ? str_replace(".tpl", ".html", $filename) : str_replace(".html", ".tpl", $filename);
-		
-		$filename1 = substr_count($filename, 'html') ? str_replace(".html", ".tpl", $filename) : $filename;
-		$filename2 = substr_count($filename, 'tpl') ? str_replace(".tpl", ".html", $filename) : $filename;
+		$filename2 = substr_count($filename, 'html') ? str_replace(".html", ".tpl", $filename) : str_replace(".tpl", ".html", $filename);
 
 		//
 		// Look at MX-Publisher-Module folder.........................................................................MX-Publisher-module
@@ -187,7 +173,7 @@ class mx_Template extends Template
 			$fileSearch[] = $mx_user->cloned_template_name; // Then check Cloned template
 			$fileSearch[] = $moduleDefault; // Finally check Default template
 			$fileSearch[] = './'; // Compatibility with primitive modules
-			
+
 			$temppath = $this->doFileSearch($fileSearch, $filename, $filename2, 'templates/', $module_root_path);
 			if (!empty($this->module_template_path))
 			{
@@ -205,9 +191,9 @@ class mx_Template extends Template
 				$moduleDefault = !empty($mx_user->loaded_default_styles[$mx_block->module_root_path]) ? $mx_user->loaded_default_styles[$mx_block->module_root_path] : $mx_user->default_template_name;
 			}
 			else
-			{
+			{		
 				$moduleDefault = !empty($mx_user->loaded_default_styles[$module_root_path]) ? $mx_user->loaded_default_styles[$module_root_path] : $mx_user->default_template_name;
-			}
+			}			
 			
 			$this->debug_paths .= '<br>Module';
 			$fileSearch = array();
@@ -215,27 +201,27 @@ class mx_Template extends Template
 			$fileSearch[] = $mx_user->cloned_template_name . ''; // Then check Cloned template
 			$fileSearch[] = $moduleDefault . ''; // Finally check Default template
 			$fileSearch[] = './'; // Compatibility with primitive modules
-			
+
 			$temppath = $this->doFileSearch($fileSearch, $filename2, $filename, 'templates/', $module_root_path);
 			if (!empty($this->module_template_path))
 			{
 				return $temppath;
 			}
-		}
+		}		
 		
 		//
 		// Look for new template files at MX-Publisher-Module adm/style folder.........................................................................MX-Publisher-module
 		//
 		if (!empty($module_root_path) && (defined('IN_ADMIN')))	
-		{
+		{		
 			if (isset($mx_block->module_root_path))
-			{
+			{		
 				$moduleDefault = !empty($mx_user->loaded_default_styles[$mx_block->module_root_path]) ? $mx_user->loaded_default_styles[$mx_block->module_root_path] : $mx_user->default_template_name;
 			}
 			else
-			{
+			{		
 				$moduleDefault = !empty($mx_user->loaded_default_styles[$module_root_path]) ? $mx_user->loaded_default_styles[$module_root_path] : $mx_user->default_template_name;
-			}
+			}			
 			
 			$this->debug_paths .= '<br>Module';
 			$fileSearch = array();
@@ -285,7 +271,7 @@ class mx_Template extends Template
 		$fileSearch[] = $mx_user->cloned_template_name; // Then check Cloned template
 		$fileSearch[] = $mx_user->default_template_name; // Then check Default template
 		$fileSearch[] = './';
-		
+
 		$temppath = $this->doFileSearch($fileSearch, $filename, $filename2, 'templates/', $mx_root_path);
 		if (!empty($this->module_template_path))
 		{
@@ -335,8 +321,8 @@ class mx_Template extends Template
 			case 'smf2':
 			case 'mybb':
 			case 'phpbb2':
-				$this->debug_paths .= '<br/>' . PORTAL_BACKEND;
-				$fileSearch = array();
+				$this->debug_paths .= '<br>phpbb2';
+				$fileSearch = array();	
 				
 				$fileSearch[] = $style_path; // First check current template
 				$fileSearch[] = $mx_user->cloned_template_name; // Then check Cloned template
@@ -347,7 +333,7 @@ class mx_Template extends Template
 				$fileSearch[] = $mx_user->default_template_name . '/template'; // Then check Default template					
 				$fileSearch[] = './';
 				
-				$temppath = $this->doFileSearch($fileSearch, $filename, $filenam2, 'templates/', $phpbb_root_path, true);
+				$temppath = $this->doFileSearch($fileSearch, $filename2, $filename, 'templates/', $phpbb_root_path, true);
 				if (!empty($this->module_template_path))
 				{
 					return $temppath;
@@ -356,7 +342,7 @@ class mx_Template extends Template
 
 			// Look at phpBB3-Root folder...
 			case 'olympus':
-				$this->debug_paths .= '<br/>phpbb3 olympus';
+				$this->debug_paths .= '<br>phpbb3';
 				$fileSearch = array();
 				$fileSearch[] = $style_path . '/' . 'template'; // First check current template
 				$fileSearch[] = $mx_user->cloned_template_name . '/' . 'template'; // Then check Cloned template
@@ -437,10 +423,10 @@ class mx_Template extends Template
 			case 'proteus':	
 			case 'phpbb3':
 			case 'ascraeus':
-				$this->debug_paths .= '<br/>phpbb ' . PORTAL_BACKEND;
+				$this->debug_paths .= '<br>phpbb3';
 				$fileSearch = array();
 				$fileSearch[] = $style_path . '/' . 'template'; // First check current template
-				$fileSearch[] = $mx_user->cloned_template_name . '/' . 'template'; // Check Cloned or Parent template
+				$fileSearch[] = $mx_user->cloned_template_name . '/' . 'template'; // Then check Cloned template
 				$fileSearch[] = $mx_user->default_template_name . '/' . 'template'; // Then check Default template
 				$fileSearch[] = './';
 				$temppath = $this->doFileSearch($fileSearch, $filename, $filename2, 'styles/', $phpbb_root_path, false);
@@ -462,7 +448,7 @@ class mx_Template extends Template
 					return $temppath;
 				}
 				
-			break;
+			break;			
 		}
 		
 		if( !file_exists($filename) )
@@ -635,20 +621,17 @@ class mx_Template extends Template
 	function doFileSearch($fileSearch, $filename, $filename2, $root, $root_path = '', $check_file2 = true)
 	{
 		$this->module_template_path = '';
-		
-		$filename = ($filename == $filename2) ? str_replace(".html", ".tpl", $filename) :  str_replace(".tpl", ".html", $filename);
-		
+
 		foreach ($fileSearch as $key => $path)
 		{
 			if (!empty($path) && ($path !== './'))
 			{
-				$filepath = $root_path . $root . $path . '/' . $filename;
-				$this->debug_paths .= '<br>' . $filepath;
+				$this->debug_paths .= '<br>' . $root_path . $root . $path . '/' . $filename;
 
-				if (file_exists($filepath))
+				if( file_exists($root_path . $root . $path . '/' . $filename) )
 				{
 					$this->module_template_path = $root . $path . '/';
-					return $filepath;
+					return $root_path . $root . $path . '/' . $filename;
 				}
 				else if( file_exists($root . '/' . $filename) )
 				{
@@ -656,11 +639,10 @@ class mx_Template extends Template
 					return $root . '/' . $filename;
 				}
 				
-				$filepath2 = $root_path . $root . $path . '/' . $filename2;
-				if ($check_file2 && file_exists($filepath2))
+				if ($check_file2 && @file_exists($root_path . $root . $path . '/' . $filename2))
 				{
 					$this->module_template_path = $root . $path . '/';
-					return $filepath2;
+					return $root_path . $root . $path . '/' . $filename2;
 				}
 				else if ($check_file2 && file_exists($root . '/' . $filename2))
 				{
@@ -677,15 +659,13 @@ class mx_Template extends Template
 				}
 				if ($check_file2)
 				{
-					$filepath2 = $root_path . $root . $filename2;
 					if( file_exists($root_path . $root . $filename2) )
 					{
 						$this->module_template_path = $root;
-						return $filepath2;
+						return $root_path . $root . $filename2;
 					}
 				}
 			}
-		
 		}
 	}
 
@@ -703,7 +683,7 @@ class mx_Template extends Template
 	{
 		global $module_root_path, $mx_root_path, $phpbb_root_path, $theme, $mx_user, $mx_block;
 
-		$style_path = !empty($theme['template_name']) ? $theme['template_name'] . '/' : $theme['style_path'] . '/';
+		$style_path = $theme['template_name'] . '/';
 
 		//
 		// Look at mxBB-Module folder.........................................................................mxBB-module
@@ -1300,12 +1280,12 @@ class mx_user extends mx_session
 			}
 		}
 		
-		// Language DataBase
+		// Language DataBase		
 		switch (PORTAL_BACKEND)
 		{
-			case 'internal':	
-			case 'phpbb2':
-			case 'mybb':
+			case 'internal':			
+			case 'phpbb2':		
+			case 'mybb':							
 					$sql_users = 'UPDATE ' . USERS_TABLE . "
 						SET user_lang = '" . $this->decode_lang($this->lang['default_lang']) . "'
 						WHERE user_lang = '" . $this->decode_lang($this->data['user_lang']) . "'";
@@ -1416,7 +1396,7 @@ class mx_user extends mx_session
 			//this will fix the path for anonymouse users
 			echo('<br />');
 			echo(filesize($mx_root_path . $this->lang_path . "lang_main.$phpEx") . '');
-			echo('<br />');			
+			echo('<br />');
 			die('Language file <a class="textbutton" href="' . $mx_root_path . $this->lang_path . 'lang_main.' . $phpEx . '"><span>' . $mx_root_path . $this->lang_path . "lang_main.$phpEx" . '</span></a>' . ' couldn\'t be opened.');
 		}
 		//  include($phpbb_root_path . 'language/lang_' . $board_config['default_lang'] . '/lang_main.' . $phpEx);
@@ -1527,10 +1507,11 @@ class mx_user extends mx_session
 			if ((@include $phpbb_root_path . $this->lang_path . '/common.'.$phpEx) === false)
 			{
 				die('Language file (_init_userprefs) ' . $phpbb_root_path . $this->lang_path . '/common.'.$phpEx . ' couldn\'t be opened by _init_userprefs().');
-			}			
+			}
 		}
-		/**/		
-		/** /		
+		
+		/**/
+		/** /
 		//
 		// Set up style to output
 		//
@@ -1584,6 +1565,8 @@ class mx_user extends mx_session
 		$this->nav_links = $nav_links;
 	}
 
+
+
 	/**
 	 * Init style.
 	 *
@@ -1592,10 +1575,15 @@ class mx_user extends mx_session
 	 */
 	function _init_style()
 	{
-		global $mx_user, $userdata, $board_config, $portal_config, $theme, $images;
+		global $mx_cache, $userdata, $board_config, $portal_config, $theme, $images;
 		global $template, $lang, $phpEx, $phpbb_root_path, $mx_root_path, $db;
 		global $mx_page, $mx_request_vars, $_GET, $_COOKIE, $phpBB3;
 
+		if ( !empty($portal_config['default_style']) && !is_array($portal_config['default_style']) )
+		{
+			$portal_config = $mx_cache->obtain_mxbb_config();
+		}
+		
 		/*
 		* Build Portal style
 		*/
@@ -1605,7 +1593,7 @@ class mx_user extends mx_session
 
 		/*
 		* Init ACP style
-		* Init Portal style
+		* Init Portal style	
 		*/
 		if ( defined('IN_ADMIN') )
 		{
@@ -1622,21 +1610,15 @@ class mx_user extends mx_session
 			$init_style = $portal_config['default_style'];
 			$init_override = $portal_config['override_user_style'];
 		}
-
-		//Fallback Style
-		if (empty($init_style))
-		{
-			$init_style = $portal_config['default_style'];
-			$init_override = $portal_config['override_user_style'];
-		}
-
+		
 		/*
 		* Setup demo style
 		*/
 		if (isset($_GET['style']))
 		{
 			global $SID, $_EXTRA_URL;
-			$init_style = $phpBB3->request_var('style', 0);
+
+			$init_style = $phpBB3->request_var('style', $portal_config['default_style']);
 			$SID .= '&amp;style=' . $init_style;
 			$_EXTRA_URL = array('style=' . $init_style);
 			
@@ -1644,10 +1626,10 @@ class mx_user extends mx_session
 			//{
 				setcookie('style', $init_style, (time() + 21600), $board_config['cookie_path'], $board_config['cookie_domain'], $board_config['cookie_secure']);
 			//	return;
-			//}
+			//}			
 		}
 		/**/
-
+		
 		/*
 		* Setup demo style
 		*/
@@ -1661,7 +1643,7 @@ class mx_user extends mx_session
 				//}
 		}
 		/**/
-
+		
 		/*
 		* Setup demo style
 		*/
@@ -1674,16 +1656,18 @@ class mx_user extends mx_session
 				//	return;
 				//}
 		}
-		/**/
-
+		/**/		
+		
 		/*
 		* Request demostyle or style, style_name or themes_id/style_id i.e. for prosilver
-		*/
+		*/		
 		if (!$mx_request_vars->is_empty_request('demostyle') || !$mx_request_vars->is_empty_request('style') && !defined('IN_ADMIN'))
 		{
 			$init_style = !$mx_request_vars->is_empty_request('demostyle') ? $phpBB3->request_var('demostyle', '') : $phpBB3->request_var('style', '');
 		}
-
+		
+		$init_style = !empty($init_style) ? $init_style : $portal_config['default_style'];
+		
 		/*
 		* Query id for default_style, or for demostyle-style, style_name or themes_id
 		*/	
@@ -1699,7 +1683,6 @@ class mx_user extends mx_session
 						WHERE portal_backend = 'internal'
 						AND style_name = '$init_style'";
 				break;
-
 				case 'phpbb2':
 					$sql = "SELECT s.themes_id as style_id, mxt.themes_id, mxt.template_name as style_path
 						FROM " . MX_THEMES_TABLE . " mxt, " . THEMES_TABLE . " s
@@ -1709,16 +1692,14 @@ class mx_user extends mx_session
 				break;
 
 				case 'olympus':
-					$sql = "SELECT m.themes_id, s.style_id, t.template_storedb, t.template_path, t.template_id, t.bbcode_bitfield, t.template_inherits_id, t.template_inherit_path, c.theme_path, c.theme_name, c.theme_storedb, c.theme_id, i.imageset_path, i.imageset_id, i.imageset_name
-						FROM " . MX_THEMES_TABLE . " m, " . STYLES_TABLE . " s, " . STYLES_TEMPLATE_TABLE . " t, " . STYLES_THEME_TABLE . " c, " . STYLES_IMAGESET_TABLE . " i
-						WHERE s.style_name = '".$init_style."'
-							AND m.portal_backend = '" . PORTAL_BACKEND . "'
-							AND t.template_path = m.template_name
-							AND t.template_id = s.template_id
-							AND c.theme_id = s.theme_id
-							AND i.imageset_id = s.imageset_id"; 
+					$sql = "SELECT  mxt.*, bbt.style_id, bbt.style_name
+						FROM " . MX_THEMES_TABLE . " AS mxt, " . STYLES_TEMPLATE_TABLE . " AS stt, " . STYLES_TABLE . " AS bbt
+						WHERE bbt.style_active = 1 AND bbt.style_name = '$init_style'
+							AND bbt.style_name = mxt.style_name
+							AND mxt.portal_backend = 'phpbb3'
+							AND stt.template_id = bbt.template_id";
 				break;
-
+				
 				case 'ascraeus':
 				case 'rhea':
 				case 'proteus':
@@ -1727,12 +1708,11 @@ class mx_user extends mx_session
 						FROM " . MX_THEMES_TABLE . " AS mxt, " . STYLES_TABLE . " AS bbt
 						WHERE bbt.style_active = 1 AND bbt.style_name = '$init_style'
 							AND bbt.style_name = mxt.style_name
-							AND mxt.portal_backend <> 'internal'
-							AND mxt.portal_backend <> 'phpbb2'
+							AND mxt.portal_backend = 'phpbb3'
 							AND mxt.template_path = bbt.style_path";
 				break;
 			}
-
+		
 			/*
 			* Query ed id for default_style, or for demostyle-style, style_name or themes_id from mxt.themes_id
 			*/	
@@ -1742,9 +1722,40 @@ class mx_user extends mx_session
 			}
 			else
 			{
-				$sql_error = print_r($db->sql_error(), true);
-				die('Could not find style name: ' . $init_style . '!' . 'SQL Error: '.$sql_error);
+				switch (PORTAL_BACKEND)
+				{
+					case 'internal':
+					case 'smf2':
+					case 'mybb':
+						$sql = "SELECT  themes_id, style_name
+							FROM " . MX_THEMES_TABLE . "
+							WHERE portal_backend = 'internal'";
+					break;
+					case 'phpbb2':
+						$sql = "SELECT  themes_id, style_name
+							FROM " . MX_THEMES_TABLE . "
+							WHERE portal_backend = '" . PORTAL_BACKEND . "'";
+					break;
+
+					case 'olympus':
+					case 'ascraeus':
+					case 'rhea':
+					case 'proteus':
+					case 'phpbb3':
+						$sql = "SELECT  themes_id, style_name
+							FROM " . MX_THEMES_TABLE . "
+							WHERE portal_backend = 'phpbb3'";
+					break;
+				}
+
+				print('Could not find style name: ' . $init_style . '!');
+
+				if(($result = $db->sql_query_limit($sql, 1)) && ($row = $db->sql_fetchrow($result)))
+				{
+					$init_style = $row['themes_id']; //Portal Style Id i.e. 7
+				}
 			}
+
 		}
 		else
 		{
@@ -1768,32 +1779,29 @@ class mx_user extends mx_session
 				break;
 			
 				case 'olympus':
-					$sql = "SELECT m.themes_id, s.style_id, t.template_storedb, t.template_path, t.template_id, t.bbcode_bitfield, t.template_inherits_id, t.template_inherit_path, c.theme_path, c.theme_name, c.theme_storedb, c.theme_id, i.imageset_path, i.imageset_id, i.imageset_name
-						FROM " . MX_THEMES_TABLE . " m, " . STYLES_TABLE . " s, " . STYLES_TEMPLATE_TABLE . " t, " . STYLES_THEME_TABLE . " c, " . STYLES_IMAGESET_TABLE . " i
-						WHERE m.themes_id = '". (int) $init_style."'
-							AND m.portal_backend = '" . PORTAL_BACKEND . "'
-							AND t.template_path = m.template_name
-							AND t.template_id = s.template_id
-							AND c.theme_id = s.theme_id
-							AND i.imageset_id = s.imageset_id"; 
+					$sql = "SELECT  mxt.themes_id, bbt.style_id, bbt.style_name
+						FROM " . MX_THEMES_TABLE . " AS mxt, " . STYLES_TEMPLATE_TABLE . " AS stt, " . STYLES_TABLE . " AS bbt
+						WHERE bbt.style_active = 1 AND mxt.themes_id = " . (int) $init_style . "
+							AND bbt.style_name = mxt.style_name
+							AND mxt.portal_backend = 'phpbb3'
+							AND stt.template_id = bbt.template_id";
 				break;
 			
 				case 'ascraeus':
 				case 'rhea':
 				case 'proteus':	
 				case 'phpbb3':
-					$sql = "SELECT  mxt.*, st.style_id, st.style_name
-						FROM " . MX_THEMES_TABLE . " mxt, " . STYLES_TABLE . " st
-						WHERE st.style_active = 1 AND mxt.themes_id = " . (int) $init_style . "
-							AND mxt.portal_backend <> 'internal'
-							AND mxt.portal_backend <> 'phpbb2'
-							AND mxt.template_name = st.style_path";
+					$sql = "SELECT  mxt.*, bbt.style_id, bbt.style_name
+						FROM " . MX_THEMES_TABLE . " AS mxt, " . STYLES_TABLE . " AS bbt
+						WHERE bbt.style_active = 1 AND bbt.style_id = " . (int) $init_style . "
+							AND bbt.style_name = mxt.style_name
+							AND mxt.portal_backend = 'phpbb3'
+							AND mxt.template_name = bbt.style_path";
 				break;
 			}
-
+			
 			if(($result = $db->sql_query($sql)) && ($row = $db->sql_fetchrow($result)))
 			{
-				$sql_error = print_r($db->sql_error(), true);
 				$init_style = $row['themes_id']; //Portal Style Id
 			}
 			else
@@ -1807,35 +1815,29 @@ class mx_user extends mx_session
 							FROM " . MX_THEMES_TABLE . "
 							WHERE portal_backend = '" . 'internal' . "'";
 					break;
-					
 					case 'phpbb2':
 						$sql2 = "SELECT s.themes_id as style_id, mxt.themes_id, mxt.template_name as style_path
 							FROM " . MX_THEMES_TABLE . " mxt, " . THEMES_TABLE . " s
 								WHERE mxt.template_name = s.template_name
 								AND mxt.portal_backend = '" . PORTAL_BACKEND . "'";
 					break;
-					
 					case 'olympus':
-						$sql2 = "SELECT m.themes_id, s.style_id, t.template_storedb, t.template_path, t.template_id, t.bbcode_bitfield, t.template_inherits_id, t.template_inherit_path, c.theme_path, c.theme_name, c.theme_storedb, c.theme_id, i.imageset_path, i.imageset_id, i.imageset_name
-							FROM " . MX_THEMES_TABLE . " m, " . STYLES_TABLE . " s, " . STYLES_TEMPLATE_TABLE . " t, " . STYLES_THEME_TABLE . " c, " . STYLES_IMAGESET_TABLE . " i
-							WHERE s.style_active = 1 
-								AND m.portal_backend = '" . PORTAL_BACKEND . "'
-								AND t.template_path = m.template_name
-								AND t.template_id = s.template_id
-								AND c.theme_id = s.theme_id
-								AND i.imageset_id = s.imageset_id"; 
+						$sql2 = "SELECT  mxt.themes_id, bbt.style_id, bbt.style_name, bbt.style_path
+							FROM " . MX_THEMES_TABLE . " AS mxt, " . STYLES_TEMPLATE_TABLE . " AS stt, " . STYLES_TABLE . " AS bbt
+							WHERE bbt.style_active = 1 
+								AND bbt.style_name = mxt.style_name
+								AND mxt.portal_backend = '" . 'phpbb3' . "'
+								AND stt.template_id = bbt.template_id";
 					break;
-					
 					case 'rhea':
 					case 'proteus':
 					case 'phpbb3':
 					case 'ascraeus':
 						$sql2 = "SELECT  mxt.themes_id, bbt.style_id, bbt.style_name, bbt.style_path
-							FROM " . MX_THEMES_TABLE . " mxt, " . STYLES_TABLE . " bbt
+							FROM " . MX_THEMES_TABLE . " AS mxt, " . STYLES_TABLE . " AS bbt
 							WHERE bbt.style_active = 1 
 								AND bbt.style_name = mxt.style_name
-							AND mxt.portal_backend <> 'internal'
-							AND mxt.portal_backend <> 'phpbb2'";
+								AND mxt.portal_backend = '" . 'phpbb3' . "'";
 					break;
 				}
 				
@@ -1845,12 +1847,44 @@ class mx_user extends mx_session
 				}
 				else
 				{
-					$sql_error = print_r($db->sql_error(), true);
-					die('style_id: ' . $init_style . ', no style with this id found ... SQL Error: '.$sql_error);
+					switch (PORTAL_BACKEND)
+					{
+						case 'internal':
+						case 'smf2':
+						case 'mybb':
+							$sql = "SELECT  themes_id, style_name
+								FROM " . MX_THEMES_TABLE;
+						break;
+						case 'phpbb2':
+							$sql = "SELECT s.themes_id as style_id, mxt.themes_id, mxt.template_name as style_path
+								FROM " . MX_THEMES_TABLE . " mxt, " . THEMES_TABLE . " s
+									WHERE mxt.template_name = s.template_name";
+						break;
+						case 'olympus':
+						case 'rhea':
+						case 'proteus':
+						case 'phpbb3':
+						case 'ascraeus':
+							$sql = "SELECT  mxt.themes_id, bbt.style_id, bbt.style_name, bbt.style_path
+								FROM " . MX_THEMES_TABLE . " AS mxt, " . STYLES_TABLE . " AS bbt
+								WHERE bbt.style_name = mxt.style_name";
+						break;
+					}
+					
+					if(($result = $db->sql_query_limit($sql, 1)) && ($row = $db->sql_fetchrow($result)))
+					{
+						$init_style = $row['themes_id']; //Portal Style Id
+					}
+					else
+					{
+						$init_style = 'prosilver'; //Portal Style Id
+					}
+					print('style_id: ' . $init_style . ', no style with this id found ... wrong backend ? ' . $sql);
 				}
 			}
+				
 		}
-
+		
 		/*
 		* Init queried id for demostyle or style, style_name or style_id
 		*/		
@@ -1862,7 +1896,7 @@ class mx_user extends mx_session
 		
 		/*
 		* Init overwrite queried
-		*/	
+		*/		
 		if (!$init_style)
 		{
 			$init_style = 1;
@@ -1880,6 +1914,7 @@ class mx_user extends mx_session
 				$user_style = $mx_request_vars->post('user_style', MX_TYPE_INT, $this->data['user_style']);
 			}
 		}
+		
 		$init_style = isset($_POST['default_style']) ? $mx_request_vars->post('default_style', MX_TYPE_INT, $init_style) : $init_style;		
 		$theme = $this->_setup_style($init_style, $user_style);		
 	}
@@ -1998,7 +2033,7 @@ class mx_user extends mx_session
 				$sql = "SELECT  t.* , s.* 
 					FROM " . MX_THEMES_TABLE . " AS m, " . STYLES_TABLE . " AS s, " . STYLES_TEMPLATE_TABLE . " AS t, " . STYLES_THEME_TABLE . " AS c, " . STYLES_IMAGESET_TABLE . " i
 					WHERE m.style_name = s.style_name
-						AND m.portal_backend = '" . PORTAL_BACKEND . "'
+						AND m.portal_backend =  '" . 'phpbb3' . "'
 						AND t.template_id = s.template_id
 						AND c.theme_id = s.theme_id
 						AND i.imageset_id = s.imageset_id
@@ -2014,8 +2049,7 @@ class mx_user extends mx_session
 				$sql = "SELECT  mxt.*, mxt.template_name AS template_path, s.* 
 					FROM " . MX_THEMES_TABLE . " AS mxt, " . STYLES_TABLE . " AS s
 					WHERE mxt.template_name = s.style_path
-						AND mxt.portal_backend <> 'internal'
-						AND mxt.portal_backend <> 'phpbb2'
+						AND mxt.portal_backend =  '" . 'phpbb3' . "'
 						AND mxt." . $sql_and . " = '" . $style . "'";
 			break;
 		}
@@ -3590,7 +3624,7 @@ class mx_user extends mx_session
 		// We include common temlate config file here to not load it every time a module template config file is included
 		//$this->theme = is_array($this->theme) ? array_merge($this->theme, $theme) : $theme;		
 		$this->theme = &$theme;
-		unset($mx_images);		
+		unset($mx_images);	
 	}
 
 	/**
@@ -3598,12 +3632,12 @@ class mx_user extends mx_session
 	 *
 	 * @access private
 	 * @param unknown_type $lang_mode
-	 */	
+	 */
 	function _load_lang($path, $filename, $require = true)
 	{
 		$lang = array();
 		
-		$board_config = $this->config;		
+		$board_config = $this->config;
 		$php_ext = $this->php_ext;
 		
 		// Now only the root for mxp blocks
@@ -3612,25 +3646,25 @@ class mx_user extends mx_session
 		$default_path = $path . 'language/lang_english/' . $filename . '.' . $php_ext;
 				
 		// phpBB		
-		if (($path != 'phpbb2') && ($path != 'phpbb3'))	
+		if (($path != 'phpbb2') && ($path != 'phpbb3'))
 		{
 			$phpbb_user_path = $path . 'language/' . $this->data['user_lang'] . '/' . $filename . '.' . $php_ext;
 			$phpbb_board_path = $path . 'language/' . $board_config['default_lang'] . '/' . $filename . '.' . $php_ext;
-			$phpbb_default_path = $path . 'language/en/' . $filename . '.' . $php_ext;		
-		}		
+			$phpbb_default_path = $path . 'language/en/' . $filename . '.' . $php_ext;
+		}
 		
-		// Shared phpBB2		
-		if ($path = 'phpbb2')	
+		// Shared phpBB2
+		if ($path = 'phpbb2')
 		{
 			$phpbb2_shared_path = $this->mx_root_path . 'includes/shared/phpbb2/';
 			
 			$phpbb_user_path = $phpbb2_shared_path . 'language/lang_' . $this->data['user_lang'] . '/' . $filename . '.' . $php_ext;
 			$phpbb_board_path = $phpbb2_shared_path . 'language/lang_' . $board_config['default_lang'] . '/' . $filename . '.' . $php_ext;
-			$phpbb_default_path = $phpbb2_shared_path . 'language/lang_english/' . $filename . '.' . $php_ext;			
-		}							
+			$phpbb_default_path = $phpbb2_shared_path . 'language/lang_english/' . $filename . '.' . $php_ext;
+		}
 		
-		// Shared phpBB3		
-		if ($path = 'phpbb3')	
+		// Shared phpBB3
+		if ($path = 'phpbb3')
 		{
 			$phpbb3_shared_path = $this->mx_root_path . 'includes/shared/phpbb3/';
 
@@ -3677,12 +3711,12 @@ class mx_user extends mx_session
 		{
 			// If the language entry is an empty array, we just return the language key $this->lang = $this->lang;	
 			// The language file is not exist throw new language_file_not_found(
-			print_r('Language file ' . $path . '|' . $filename . '.' . $php_ext . '|' . ($require ? $phpbb_user_path : $phpbb_board_path) . ' couldn\'t be opened.');			
+			print('Language file ' . $path . '|' . $filename . '.' . $php_ext . '|' . ($require ? $phpbb_user_path : $phpbb_board_path) . ' couldn\'t be opened.');
 		}
 		else
 		{
 			// If the language entry is not an empty array, we merge the language keys
-			$this->lang = array_merge($this->lang, $lang);		
+			$this->lang = array_merge($this->lang, $lang);
 		}
 	}
 	
@@ -3933,15 +3967,18 @@ class mx_user extends mx_session
 			}
 			
 			if (($lang_mode == MX_LANG_MAIN ) && ($lang_mode != MX_LANG_ALL))
-			{	
+			{
 				// -------------------------------------------------------------------------
 				// Read Module Main Language Definition
-				// -------------------------------------------------------------------------				
+				// -------------------------------------------------------------------------
 				if ((include $module_lang_path . "language/lang_" . $language . "/lang_main.$phpEx") === false)
 				{
-					if ((@include $module_lang_path . "language/$default_lang/lang_main.$phpEx") === false)
+					if (strpos($this->mx_root_path, 'mx_coreblocks') === 0)
 					{
+						if ((@include $module_lang_path . "language/$default_lang/lang_main.$phpEx") === false)
+						{
 							mx_message_die(CRITICAL_ERROR, 'Module main language file ' . $this->mx_root_path . $module_lang_path . "language/lang_" . $language . "/lang_main.$phpEx" . ' couldn\'t be opened.');
+						}
 					}
 				}
 			}
@@ -4072,7 +4109,15 @@ class mx_user extends mx_session
 		*/
 		if (empty($this->page_id))
 		{
-			die('Bad initialization method of the User Class!');
+			global $user_ip, $mx_request_vars;
+			
+			$this->page_id = $mx_request_vars->request('page_id', 1);
+			
+			// Inititate User data
+			$this->_init_session($user_ip, $this->page_id);
+			$this->_init_userprefs();
+			
+			print('Bad initialization method of the User Class!</br>');
 		}
 
 		/*

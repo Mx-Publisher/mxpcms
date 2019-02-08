@@ -1,9 +1,9 @@
 <?php
 /**
 *
-* @package FacebookOAuth
+* @package Icy Phoenix
 * @version $Id$
-* @copyright (c) 2008 phpBB Group
+* @copyright (c) 2008 Icy Phoenix
 * @license http://opensource.org/licenses/gpl-license.php GNU Public License
 *
 */

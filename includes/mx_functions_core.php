@@ -346,11 +346,15 @@ class mx_cache extends cache
 		
 		$mx_page->loaded_files[] = $file . (is_string($force_shared) ? $force_shared : '');
 		
-		$path = $mx_backend->load_file($force_shared);
-		
-		if (file_exists($path . $file.'.'.$phpEx))
+		if ($force_shared === false)
 		{
-			@include_once($path . $file.'.'.$phpEx);
+			@include_once($phpbb_root_path . 'includes/' . $file.'.'.$phpEx);
+		}
+		//$path = $mx_backend->load_file($force_shared);
+		$path = $mx_root_path . 'includes/shared/'.$force_shared.'/includes/';
+		if (($force_shared !== false) && ((@include $path . $file.'.'.$phpEx) === false))
+		{
+			print('No such file: '.$path . $file.'.'.$phpEx.'</br>');
 		}
 	}
 
@@ -962,7 +966,9 @@ class mx_cache extends cache
 		}
 		else
 		{
-			print('invalid call mx_cache->read(id, ...) - no id');
+			$id = 1;
+			
+			print('invalid cache read call - no id. </br>');
 		}
 	}
 
@@ -4827,6 +4833,10 @@ class mx_page
 			case 'ascraeus':
 			case 'rhea':
 				global $phpbb_auth;
+				if (!isset($phpbb_auth) || !is_object($phpbb_auth))
+				{
+					$phpbb_auth = new phpbb_auth();
+				}
 				$is_admin = (($mx_user->data['user_id'] != ANONYMOUS) && $phpbb_auth->acl_get('a_')) ? true : false;
 				$is_registred = ($mx_user->data['user_id'] != ANONYMOUS) ? true : false;
 			break;

@@ -89,29 +89,6 @@ $lang['Enabled'] = "פעיל";
 $lang['Disabled'] = "לא פעיל";
 $lang['Error'] = "שגיאה";
 
-/* ------------------------------------------------- */
-$lang['Goto_page'] = 'מעבר לדף';
-$lang['Post_by_author'] = 'על ידי';
-$lang['Posted_on_date'] = 'בתאריך';
-$lang['In'] = 'ב';
-
-$lang['Statistics'] = 'סטטיסטיקות';
-$lang['Legend'] = 'מקרא';
-$lang['Posted_articles_zero_total'] = "המשתמשים בפורום לא שלחו אף הודעה"; // Number of posts
-$lang['Posted_articles_total'] = "המשתמשים בפורום שלחו בסך הכל <b>%d</b> הודעות"; // Number of posts
-$lang['Posted_article_total'] = "המשתמשים בפורום שלחו הודעה אחת בלבד"; // Number of posts
-$lang['Registered_users_zero_total'] = "אין משתמשים רשומים במערכת"; // # registered users
-$lang['Registered_users_total'] = "בקהילה יש <b>%d</b> משתמשים רשומים"; // # registered users
-$lang['Registered_user_total'] = "בקהילה יש משתמש <b>אחד</b> רשום"; // # registered users
-$lang['Newest_user'] = "המשתמש החדש ביותר בקהילה הוא:: <b>%s%s%s</b>"; // a href, username, /a
-
-$lang['Rules_moderate'] = "אתה <b>יכול</b> %sלנהל פורום זה%s"; // %s replaced by a href links, do not remove! 
-
-$lang['Quick_mod'] = 'Quick-mod tools:';
-
-$lang['Search_forums'] = 'Search within';
-// ------------------------------------------------- */
-
 $lang['Next'] = "הבא";
 $lang['Previous'] = "הקודם";
 $lang['Goto_page'] = "עבור לעמוד";

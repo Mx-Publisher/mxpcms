@@ -106,25 +106,79 @@ $layouttemplate->set_filenames(array(
 	'overall_header' => empty($mx_page->page_ov_header) || ( !file_exists($mx_root_path . TEMPLATE_ROOT_PATH . $mx_page->page_ov_header) && !file_exists($mx_root_path . TEMPLATE_ROOT_PATH . $page_ov_header2) ) ? ( empty($gen_simple_header) ? 'overall_header.' . $tplEx : 'simple_header.' . $tplEx ) : $mx_page->page_ov_header
 ));
 
+// In case $phpbb_adm_relative_path is not set (in case of an update), use the default.
+switch (PORTAL_BACKEND)
+{
+	case 'internal':
+	case 'mybb':
+		//To do:
+	case 'smf2':
+		//To do:
+	break;
+	
+	case 'phpbb2':
+		$phpbb_adm_relative_path = 'admin/';
+		$phpbb_admin_path = (defined('PHPBB_ADMIN_PATH')) ? PHPBB_ADMIN_PATH : $phpbb_root_path . $phpbb_adm_relative_path;
+	break;
+	
+	default:
+		$phpbb_adm_relative_path = 'adm/';
+		$phpbb_admin_path = (defined('PHPBB_ADMIN_PATH')) ? PHPBB_ADMIN_PATH : $phpbb_root_path . $phpbb_adm_relative_path;
+	break;
+}
+
 //
 // Generate logged in/logged out status
 //
-if (  $mx_user->data['user_id'] != ANONYMOUS )
-{	
-	$u_login_logout = 'login.'.$phpEx.'?logout=true&amp;sid=' . $mx_user->data['session_id'];
-	$l_login_logout = $lang['Logout'] . ' [ ' . $mx_user->data['username'] . ' ]';
-}
-else
+switch (PORTAL_BACKEND)
 {
-	$u_login_logout = 'login.'.$phpEx;
-	$l_login_logout = $lang['Login'];
+	case 'internal':
+	case 'mybb':
+		//To do:
+	case 'smf2':
+		//To do:
+	case 'phpbb2':
+	case 'olympus':
+		$u_login = mx_append_sid("login.".$phpEx);
+		if (  $mx_user->data['user_id'] != ANONYMOUS )
+		{
+			$u_login_logout = mx_append_sid('login.'.$phpEx.'?logout=true&amp;sid=' . $mx_user->data['session_id']);
+			$l_login_logout = $lang['Logout'] . ' [ ' . $mx_user->data['username'] . ' ]';
+		}
+		else
+		{
+			$u_login_logout = mx_append_sid("login.".$phpEx);
+			$l_login_logout = $lang['Login'];
+		}
+	break;
+	
+	default:
+	
+		// Get referer to redirect user to the appropriate page after delete action
+		$redirect_url = mx_append_sid(PORTAL_URL . "index.$phpEx", (isset($page_id) ? "page={$page_id}" : "") . (isset($cat_nav) ? "&cat_nav={$cat_nav}" : ""));
+		$u_login = mx_append_sid("{$phpbb_root_path}ucp.$phpEx", 'mode=login');
+	
+		if ($mx_user->data['user_id'] != ANONYMOUS)
+		{
+			//$u_login_logout = mx_append_sid("{$phpbb_root_path}ucp.$phpEx", "mode=logout&redirect=$redirect_url", true, $mx_user->session_id);
+			$u_login_logout = mx_append_sid('login.'.$phpEx.'?logout=true&amp;sid=' . $mx_user->data['session_id']);
+			$l_login_logout = $mx_user->lang['LOGOUT'] . ' [ ' . $mx_user->data['username'] . ' ]';
+		}
+		else
+		{
+			
+			$u_login_logout = mx_append_sid("{$phpbb_root_path}ucp.php?mode=login&redirect=$redirect_url");
+			$l_login_logout = $mx_user->lang['LOGIN'];
+		}
+	
+	break;
 }
 
 $s_last_visit = ( $mx_user->data['session_logged_in'] ) ? mx_create_date($board_config['default_dateformat'], $mx_user->data['user_lastvisit'], $board_config['board_timezone']) : '';
 
 // Generate logged in/logged out status
 if( !is_object($mx_backend))
-{	
+{
 	$mx_backend = new mx_backend();
 }
 
@@ -429,11 +483,6 @@ if( class_exists('phpBB2'))
 	$phpBB2 = new phpBB2();
 }
 
-if(!isset($phpbb_auth) || !is_object($phpbb_auth))
-{
-	$phpbb_auth = new phpbb_auth();
-}
-
 // Output the notifications
 $total_msgs = $notifications = false;
 $mx_priv_msg = $lang['Private_Messages'];
@@ -493,7 +542,7 @@ if ( ($mx_user->data['session_logged_in']) && (PORTAL_BACKEND !== 'internal') &&
 	//
 	// Did the query return any data?
 	//
-	$notifications = array();	
+	$notifications = array();
 	
 	switch (PORTAL_BACKEND)
 	{
@@ -681,7 +730,7 @@ else
 			'LIMIT' 					=>  $notifications['limit'], 
 			'START' 				=>  $notifications['start'], 
 			'COUNT_UNREAD' 	=>  $notifications['count_unread'], 
-			'COUNT_TOTAL' 	=>  $notifications['count_total'], 			
+			'COUNT_TOTAL' 	=>  $notifications['count_total'], 
 			
 			'STYLING'					=> 'notification-reported',
 			'AVATAR'					=> mx_get_user_avatar($mx_user->data),
@@ -720,13 +769,13 @@ switch (PORTAL_BACKEND)
 			define('PHPBB_VERSION', '2'.$board_config['version']);
 		}	
 	
-	break;		
+	break;
 	
 	case 'phpbb3':
 	case 'olympus':
 	case 'ascraeus':
 	case 'rhea':
-		
+	
 		if ( !defined('PHPBB_VERSION') )
 		{
 			define('PHPBB_VERSION', $board_config['version']);
@@ -768,10 +817,9 @@ $s_feed_news = isset($s_feed_news) ? $s_feed_news : false;
 
 //
 // Format Timezone. We are unable to use array_pop here, because of PHP3 compatibility
-// 'board_timezone' can be  for e.g. Europe/Bucharest
+//
 $l_timezone = explode( '.', $board_config['board_timezone'] );
-$lang_user_timezone = $mx_user->timezone;
-$l_timezone = (count($l_timezone) > 1 && $l_timezone[count($l_timezone)-1] != 0 ) ? $lang[sprintf('%.1f', $board_config['board_timezone'])] : $lang_user_timezone;
+$l_timezone = ( count( $l_timezone ) > 1 && $l_timezone[count( $l_timezone )-1] != 0 ) ? $lang[sprintf( '%.1f', $board_config['board_timezone'] )] : $lang[number_format( $board_config['board_timezone'] )];
 
 if (empty($mx_page->page_alt_icon))
 {
@@ -1028,11 +1076,10 @@ $layouttemplate->assign_vars(array(
 	'U_SEARCH' 						=> mx_append_sid('search.'.$phpEx),
 	'U_MEMBERLIST' 				=> mx_append_sid('memberlist.'.$phpEx),
 	'U_MODCP' 						=> mx_append_sid('modcp.'.$phpEx),
-	//'U_MCP'							=> (((PORTAL_BACKEND !== 'internal') && ($phpbb_auth->acl_get('m_') || $phpbb_auth->acl_getf_global('m_'))) ? mx_append_sid("{$phpbb_root_path}modcp.$phpEx?i=main&amp;mode=front" . $mx_user->session_id) : ''),	
 	'U_MCP'							=> (((PORTAL_BACKEND !== 'internal') && ($phpbb_auth->acl_get('m_') || $phpbb_auth->acl_getf_global('m_'))) ? mx_append_sid("{$phpbb_root_path}modcp.$phpEx?i=main&amp;mode=front" . $mx_user->session_id) : ''),	
 	'U_FAQ' 							=> mx_append_sid('faq.'.$phpEx),
 	'U_VIEWONLINE' 				=> mx_append_sid('viewonline.'.$phpEx),
-	'U_LOGIN_LOGOUT' 			=> mx_append_sid($u_login_logout),
+	'U_LOGIN_LOGOUT' 			=> $u_login_logout,
 	'U_GROUP_CP' 					=> mx_append_sid('groupcp.'.$phpEx),
 	
 	'U_SEND_PASSWORD' 			=> ($mx_user->data['user_email']) ? mx_append_sid("{$phpbb_root_path}profile.$phpEx?mode=sendpassword") : '',
@@ -1060,8 +1107,8 @@ $layouttemplate->assign_vars(array(
 	'S_CONTENT_DIR_LEFT'	=> $lang['LEFT'],
 	'S_CONTENT_DIR_RIGHT'	=> $lang['RIGHT'],
 
-	'S_LOGIN_ACTION' 		=> mx_append_sid('login.'.$phpEx),
-	'S_LOGIN_REDIRECT'		=> $phpBB2->build_url(),
+	'S_LOGIN_ACTION'		=> ((!defined('ADMIN_START')) ? $u_login : mx_append_sid("{$phpbb_admin_path}index.$phpEx", false, true, $mx_user->session_id)),
+	'S_LOGIN_REDIRECT'		=> mx_build_hidden_fields(array('redirect' => PORTAL_URL)),
 	'S_ADMIN_AUTH' 			=> $admin,
 	
 	//Login page or box constants

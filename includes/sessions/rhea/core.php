@@ -1557,20 +1557,21 @@ class mx_backend
 
 		if ($force_shared)
 		{
-			$backend = in_array($force_shared, array('internal', 'phpbb2', 'smf2', 'mybb', 'phpbb3', 'rhea', 'ascraeus', 'rhea')) ? $force_shared : PORTAL_BACKEND;
+			$backend = in_array($force_shared, array('internal', 'phpbb2', 'smf2', 'mybb', 'phpbb3', 'olympus', 'rhea', 'ascraeus', 'proteus')) ? $force_shared : PORTAL_BACKEND;
 			switch ($backend)
 			{
 				case 'internal':
 				case 'phpbb2':
 				case 'smf2':
 				case 'mybb':
-					$path = $mx_root_path . 'includes/shared/phpbb2/includes/';
+					$mx_root_path . 'includes/shared/'.$force_shared.'/includes/';
 				break;
 					
-				case 'phpbb3':
-				case 'rhea':
+				case 'olympus':
 				case 'ascraeus':
 				case 'rhea':
+				case 'proteus':
+				case 'phpbb3':
 					$path = $mx_root_path . 'includes/shared/phpbb3/includes/';
 				break;
 			}

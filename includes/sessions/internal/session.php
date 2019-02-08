@@ -148,7 +148,6 @@ class session
 
 	var $date_format;
 	var $timezone;
-	var $int_timezone;
 	var $dst;
 	// Able to add new options (up to id 31)
 	var $keyoptions = array('viewimg' => 0, 'viewflash' => 1, 'viewsmilies' => 2, 'viewsigs' => 3, 'viewavatars' => 4, 'viewcensors' => 5, 'attachsig' => 6, 'bbcode' => 8, 'smilies' => 9, 'sig_bbcode' => 15, 'sig_smilies' => 16, 'sig_links' => 17);
@@ -327,16 +326,6 @@ class session
 		$this->request				= $mx_request_vars;
 		$this->template			= $template;
 		$this->language			= $language;
-		
-		// Give us some basic information
-		$this->time_now					= time();
-		$this->cookie_data				= array('u' => 0, 'k' => '');
-		$this->update_session_page	= true;
-		$this->browser					= (!empty($_SERVER['HTTP_USER_AGENT'])) ? htmlspecialchars((string) $_SERVER['HTTP_USER_AGENT']) : '';
-		$this->referer						= (!empty($_SERVER['HTTP_REFERER'])) ? htmlspecialchars((string) $_SERVER['HTTP_REFERER']) : '';		
-		$this->forwarded_for				= (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) ? (string) $_SERVER['HTTP_X_FORWARDED_FOR'] : '';
-		$this->host							= (!empty($_SERVER['HTTP_HOST'])) ? (string) $_SERVER['HTTP_HOST'] : 'localhost';
-		$this->page						= $this->extract_current_page($mx_root_path);
 		
 		if (!isset($this->user_ip)) 
 		{
@@ -1010,7 +999,7 @@ class session
 	*/
 	function extract_current_page($root_path)
 	{
-		global $phpBB2, $mx_root_path;
+		global $phpBB2;
 		
 		$page_array = array();
 
@@ -1081,8 +1070,7 @@ class session
 
 		$script_path .= (substr($script_path, -1, 1) == '/') ? '' : '/';
 		$root_script_path .= (substr($root_script_path, -1, 1) == '/') ? '' : '/';
-		$root_script_path = !empty($root_script_path) ? $root_script_path : $mx_root_path;
-		
+
 		$page_array += array(
 			'page_name'			=> $page_name,
 			'page_dir'				=> $page_dir,
@@ -1241,8 +1229,7 @@ class session
 	//
 	function session_begin($user_id = 1, $user_ip = false, $page_id = 1, $auto_create = 0, $enable_autologin = 0, $admin = 0)
 	{
-		global $phpbb_auth, $mx_root_path, $phpbb_root_path;
-		global $db, $board_config, $mx_backend;
+		global $db, $board_config, $mx_backend, $mx_root_path;
 		global $mx_request_vars, $SID;
 
 		$cookiename = $board_config['cookie_name'];
@@ -2088,27 +2075,12 @@ class session
 		}
 
 		$board_config['avatar_gallery_path'] = isset($board_config['avatar_gallery_path']) ? $board_config['avatar_gallery_path'] : 'images/avatars/gallery'; 
-		$board_config['user_timezone'] = isset($this->data['user_timezone']) ? $this->data['user_timezone'] : $board_config['board_timezone'];
+		$board_config['user_timezone'] = !empty($board_config['user_timezone']) ? $board_config['user_timezone'] : $board_config['board_timezone'];
 		$this->data['user_dst'] = !empty($this->data['user_dst']) ? $this->data['user_dst'] : $this->data['user_timezone'];
 		$board_config['require_activation'] = 0;
-
-		$this->int_timezone = $old_timezone = $board_config['user_timezone'] * 3600;
 		$this->date_format = $board_config['default_dateformat'];
+		$this->timezone = $board_config['user_timezone'] * 3600;
 		$this->dst = $this->data['user_timezone'] * 3600;
-		$this->timezone = $new_timezone = $this->convert_timezone($old_timezone, $this->dst); //UTC+-
-		
-		/*
-		try
-		{
-			$this->timezone = new \DateTimeZone($new_timezone);
-		}
-		catch (\Exception $e)
-		{
-			// If the timezone the user has selected is invalid, we fall back to UTC.
-			// 			Western European Time, Greenwich Mean Time
-			$this->timezone = new \DateTimeZone('UTC');
-		}
-		*/
 		
 		$sign = ($board_config['board_timezone'] < 0) ? '-' : '+';
 		$time_offset = abs($board_config['board_timezone']);
@@ -2118,7 +2090,7 @@ class session
 		$offset_hours	= ($time_offset - $offset_seconds) / 3600;		
 		
 		// Zone offset
-		$zone_offset = $old_timezone + $this->dst;
+		$zone_offset = $this->timezone + $this->dst;
 		
 		$offset_string = sprintf($board_config['default_dateformat'], $sign, $offset_hours, $offset_minutes);
 				
@@ -3720,106 +3692,6 @@ class session
 	}
 	
 	/**
-	* Ported from migrations by FlorinCB aka orynider
-	* Determine the new timezone for a given phpBB 3.0 timezone and
-	* "Daylight Saving Time" option
-	*
-	*	@param	$timezone	float	Users timezone in 3.0
-	*	@param	$dst		int		Users daylight saving time
-	*	@return		string		Users new php Timezone which is used since 3.1
-	*/
-	public function convert_timezone($timezone, $dst)
-	{
-		$offset = (float) $timezone + (int) $dst;
-
-		switch ($timezone)
-		{
-			case '-12':
-				return 'Etc/GMT+' . abs($offset);	//'[UTC - 12] Baker Island Time'
-			case '-11':
-				return 'Etc/GMT+' . abs($offset);	//'[UTC - 11] Niue Time, Samoa Standard Time'
-			case '-10':
-				return 'Etc/GMT+' . abs($offset);	//'[UTC - 10] Hawaii-Aleutian Standard Time, Cook Island Time'
-			case '-9.5':
-				return 'Pacific/Marquesas';			//'[UTC - 9:30] Marquesas Islands Time'
-			case '-9':
-				return 'Etc/GMT+' . abs($offset);	//'[UTC - 9] Alaska Standard Time, Gambier Island Time'
-			case '-8':
-				return 'Etc/GMT+' . abs($offset);	//'[UTC - 8] Pacific Standard Time'
-			case '-7':
-				return 'Etc/GMT+' . abs($offset);	//'[UTC - 7] Mountain Standard Time'
-			case '-6':
-				return 'Etc/GMT+' . abs($offset);	//'[UTC - 6] Central Standard Time'
-			case '-5':
-				return 'Etc/GMT+' . abs($offset);	//'[UTC - 5] Eastern Standard Time'
-			case '-4.5':
-				return 'America/Caracas';			//'[UTC - 4:30] Venezuelan Standard Time'
-			case '-4':
-				return 'Etc/GMT+' . abs($offset);	//'[UTC - 4] Atlantic Standard Time'
-			case '-3.5':
-				return 'America/St_Johns';			//'[UTC - 3:30] Newfoundland Standard Time'
-			case '-3':
-				return 'Etc/GMT+' . abs($offset);	//'[UTC - 3] Amazon Standard Time, Central Greenland Time'
-			case '-2':
-				return 'Etc/GMT+' . abs($offset);	//'[UTC - 2] Fernando de Noronha Time, South Georgia &amp; the South Sandwich Islands Time'
-			case '-1':
-				return 'Etc/GMT+' . abs($offset);	//'[UTC - 1] Azores Standard Time, Cape Verde Time, Eastern Greenland Time'
-			case '0':
-				return (!$dst) ? 'UTC' : 'Etc/GMT-1';	//'[UTC] Western European Time, Greenwich Mean Time'
-			case '1':
-				return 'Etc/GMT-' . $offset;		//'[UTC + 1] Central European Time, West African Time'
-			case '2':
-				return 'Etc/GMT-' . $offset;		//'[UTC + 2] Eastern European Time, Central African Time'
-			case '3':
-				return 'Etc/GMT-' . $offset;		//'[UTC + 3] Moscow Standard Time, Eastern African Time'
-			case '3.5':
-				return 'Asia/Tehran';				//'[UTC + 3:30] Iran Standard Time'
-			case '4':
-				return 'Etc/GMT-' . $offset;		//'[UTC + 4] Gulf Standard Time, Samara Standard Time'
-			case '4.5':
-				return 'Asia/Kabul';				//'[UTC + 4:30] Afghanistan Time'
-			case '5':
-				return 'Etc/GMT-' . $offset;		//'[UTC + 5] Pakistan Standard Time, Yekaterinburg Standard Time'
-			case '5.5':
-				return 'Asia/Kolkata';				//'[UTC + 5:30] Indian Standard Time, Sri Lanka Time'
-			case '5.75':
-				return 'Asia/Kathmandu';			//'[UTC + 5:45] Nepal Time'
-			case '6':
-				return 'Etc/GMT-' . $offset;		//'[UTC + 6] Bangladesh Time, Bhutan Time, Novosibirsk Standard Time'
-			case '6.5':
-				return 'Indian/Cocos';				//'[UTC + 6:30] Cocos Islands Time, Myanmar Time'
-			case '7':
-				return 'Etc/GMT-' . $offset;		//'[UTC + 7] Indochina Time, Krasnoyarsk Standard Time'
-			case '8':
-				return 'Etc/GMT-' . $offset;		//'[UTC + 8] Chinese Standard Time, Australian Western Standard Time, Irkutsk Standard Time'
-			case '8.75':
-				return 'Australia/Eucla';			//'[UTC + 8:45] Southeastern Western Australia Standard Time'
-			case '9':
-				return 'Etc/GMT-' . $offset;		//'[UTC + 9] Japan Standard Time, Korea Standard Time, Chita Standard Time'
-			case '9.5':
-				return 'Australia/ACT';				//'[UTC + 9:30] Australian Central Standard Time'
-			case '10':
-				return 'Etc/GMT-' . $offset;		//'[UTC + 10] Australian Eastern Standard Time, Vladivostok Standard Time'
-			case '10.5':
-				return 'Australia/Lord_Howe';		//'[UTC + 10:30] Lord Howe Standard Time'
-			case '11':
-				return 'Etc/GMT-' . $offset;		//'[UTC + 11] Solomon Island Time, Magadan Standard Time'
-			case '11.5':
-				return 'Pacific/Norfolk';			//'[UTC + 11:30] Norfolk Island Time'
-			case '12':
-				return 'Etc/GMT-12';				//'[UTC + 12] New Zealand Time, Fiji Time, Kamchatka Standard Time'
-			case '12.75':
-				return 'Pacific/Chatham';			//'[UTC + 12:45] Chatham Islands Time'
-			case '13':
-				return 'Pacific/Tongatapu';			//'[UTC + 13] Tonga Time, Phoenix Islands Time'
-			case '14':
-				return 'Pacific/Kiritimati';		//'[UTC + 14] Line Island Time'
-			default:
-				return 'UTC';
-		}
-	}
-	
-	/**
 	 * Setup style
 	 *
 	 * Define backend specific style defs
@@ -4290,7 +4162,7 @@ class session
 		}
 
 		// Zone offset
-		$zone_offset = $this->int_timezone + $this->dst;
+		$zone_offset = $this->timezone + $this->dst;
 
 		// Show date <= 1 hour ago as 'xx min ago' but not greater than 60 seconds in the future
 		// A small tolerence is given for times in the future but in the same minute are displayed as '< than a minute ago'

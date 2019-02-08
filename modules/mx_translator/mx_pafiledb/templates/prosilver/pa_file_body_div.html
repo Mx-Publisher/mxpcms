@@ -1,0 +1,235 @@
+<script language='javascript'>
+    <!--
+    function delete_item(theURL)
+	{
+       if (confirm('Are you sure you want to delete this item??'))
+	   {
+          window.location.href=theURL;
+       }
+       else
+	   {
+          alert ('No Action has been taken.');
+       }
+    }
+
+    function disable_popup(id)
+    {
+    	if (id)
+    	{
+    		alert(disableMsg['msg_'+id]);
+    	}
+    	else
+    	{
+    		alert('{FILE_DISABLE_MSG}');
+    	}
+    }
+	-->
+</script>
+
+<!-- INCLUDE overall_header.html -->
+<!-- INCLUDE pa_header.html -->
+<div>
+  <dl>
+	<dt valign="bottom">
+		<span class="nav"><a href="{U_DOWNLOAD_HOME}" class="nav ask target-block_{BLOCK_ID}">{DOWNLOAD}</a><!-- BEGIN navlinks -->&nbsp;&raquo;&nbsp;<a href="{navlinks.U_VIEW_CAT}" class="nav ask target-block_{BLOCK_ID}">{navlinks.CAT_NAME}</a><!-- END navlinks -->&nbsp;&raquo;&nbsp;{FILE_NAME}</span>
+	</dt>
+  </dl>
+</div>
+
+<div class="forumline forabg forumbg-table">
+<div class="inner bg1 post">
+  <dl>
+	<dt class="thCornerL" align="left"><h2>{L_FILE} - {FILE_NAME}</h2></dt>
+	<dd class="thCornerR" align="right" nowrap>
+<!-- IF AUTH_EDIT -->
+		{B_EDIT_IMG} &nbsp;&nbsp;
+<!-- ENDIF -->
+<!-- IF AUTH_DELETE -->
+		{B_DELETE_IMG}
+<!-- ENDIF -->
+	</dd>
+  </dl>
+<dl>
+	<dt class="row2" valign="middle" width="20%">
+	<span class="genmed">{L_DESC}:</span>&nbsp;
+	<span class="genmed">{FILE_LONGDESC}</span>
+	</dt>
+</dl>
+<dl>
+	<dt class="row2" valign="middle" width="20%">
+	<span class="genmed">{L_SUBMITED_BY}:</span>&nbsp;
+	<span class="name">{FILE_SUBMITED_BY}</span>
+	</dt>
+</dl>
+<!-- IF SHOW_AUTHOR -->
+<dl>
+	<dt class="row2" valign="middle" width="20%">
+	<span class="genmed">{L_AUTHOR}:</span>&nbsp;
+	<span class="genmed">{FILE_AUTHOR}</span>
+	</dt>
+</dl>
+<!-- ENDIF -->
+<!-- IF SHOW_VERSION -->
+<dl>
+	<dt class="row2" valign="middle" width="20%">
+	<span class="genmed">{L_VERSION}:</span>&nbsp;
+	<span class="genmed">{FILE_VERSION}</span>
+	</dt>
+ </dl>
+<!-- ENDIF -->
+<!-- IF SHOW_SCREENSHOT -->
+<dl>
+	<dd class="row2" valign="middle" width="20%"><span class="genmed">{L_SCREENSHOT}:</span></dd>
+	<!-- IF SS_AS_LINK -->
+	<dt class="row1" valign="middle" width="80%" colspan="2"><span class="genmed"><a href="{FILE_SCREENSHOT}" target="_blank">{L_CLICK_HERE}</a></span></dt>
+	<!-- ELSE -->
+	<dt class="row1" valign="middle" width="80%" colspan="2"><span class="genmed"><a href="javascript:mpFoto('{FILE_SCREENSHOT}')"><img src="{FILE_SCREENSHOT}" border="0" width="100" hight="100"></a></span></dt>
+	<!-- ENDIF -->
+  </dl>
+<!-- ENDIF -->
+<!-- IF SHOW_WEBSITE -->
+  <dl>
+	<dd class="row2" valign="middle" width="20%">
+	<span class="genmed">{L_WEBSITE}:</span>&nbsp;
+	<span class="genmed"><a href="{FILE_WEBSITE}" target="_blank">{L_CLICK_HERE}</a></span>
+	</dd>
+  </dl>
+<!-- ENDIF -->
+<dl>
+	<dt class="row2" valign="middle">
+	<span class="genmed">{L_DATE}:</span>&nbsp;	
+	<span class="genmed">{TIME}</span></dt>
+ </dl>
+<dl>
+	<dt class="row2" valign="middle">
+	<span class="genmed">{L_UPDATE_TIME}:</span>&nbsp;
+	<span class="genmed">{UPDATE_TIME}</span>
+	</dt>
+</dl>
+<dl>
+	<dt class="row2" valign="middle">
+	<span class="genmed">{L_LASTTDL}:</span>&nbsp;
+	<span class="genmed">{LAST}</span>
+	</dt>
+</dl>
+<dl>
+	<dt class="row2" valign="middle">
+	<span class="genmed">{L_SIZE}:</span>&nbsp;
+	<span class="genmed">{FILE_SIZE}</span>
+	</dt>
+</dl>
+<!-- BEGIN use_ratings -->
+<dl>
+	<dt class="row2" valign="middle">
+	<span class="genmed">{use_ratings.L_RATING}:</span>&nbsp;
+	<span class="genmed">{use_ratings.RATING} ({use_ratings.FILE_VOTES} {use_ratings.L_VOTES})</span>
+	</dt>
+</dl>
+<!-- END use_ratings -->
+<dl>
+	<dt class="row2" valign="middle">
+	<span class="genmed">{L_DLS}:</span>&nbsp;
+	<span class="genmed">{FILE_DLS}</span>
+	</dt>
+</dl>
+<!-- BEGIN custom_field -->
+<dl>
+	<dt class="row2" valign="middle">
+	<span class="genmed">{custom_field.CUSTOM_NAME}:</span>&nbsp;
+	<span class="genmed">{custom_field.DATA}</span>
+	</dt>
+</dl>
+<!-- END custom_field -->
+<dl>
+	<dt class="cat" align="center" colspan="3"></dt>
+</dl>
+</table>
+
+<div>
+  <dl>
+<!-- IF AUTH_DOWNLOAD -->
+	<dt width="33%" align="center">{B_DOWNLOAD_IMG}</dt>
+<!-- ENDIF -->
+
+<!-- BEGIN use_ratings -->
+	<dt width="34%" align="center">{use_ratings.B_RATE_IMG}</dt>
+<!-- END use_ratings -->
+
+<!-- IF AUTH_EMAIL -->
+	<dt width="33%" align="center">{B_EMAIL_IMG}</dt>
+<!-- ENDIF -->
+  </dl>
+</div>
+</div>
+<br />
+
+<!-- BEGIN use_comments -->
+<div class="forumline forabg forumbg-table">
+<div class="inner bg1 post">
+  	<dl>
+		<dt class="thCornerL" colspan="2">{use_comments.L_COMMENTS}</dt>
+  	</dl>
+	<!-- BEGIN no_comments -->
+  	<dl>
+		<dd colspan="2" class="row1" align="center"><span class="genmed">{use_comments.no_comments.L_NO_COMMENTS}</span></dd>
+  	</dl>
+	<!-- END no_comments -->
+
+	<!-- BEGIN text -->
+  	<dl>
+		<dt width="100" align="left" valign="top" class="row1"><span class="name">
+			<b>{use_comments.text.POSTER}</b></span><hr /><br />
+			<span class="postdetails">{use_comments.text.POSTER_RANK}<br />
+			{use_comments.text.RANK_IMAGE}{use_comments.text.POSTER_AVATAR}</span><br />&nbsp;
+		</dt>
+		<ul class="row1" height="28" valign="top">
+			<div width="100%" border="0" cellspacing="0" cellpadding="0">
+				<dl>
+					<dt width="80%" valign="middle"><span class="genmed"><img src="{use_comments.text.ICON_MINIPOST_IMG}" width="12" height="9" border="0" />&nbsp;<b>{use_comments.text.TITLE}</b> </span><span class="genmed">({use_comments.text.TIME})</span></dt>
+					<dd align="right">
+					<!-- BEGIN auth_edit -->
+					{use_comments.text.auth_edit.B_EDIT_IMG}
+					<!-- END auth_edit -->
+					<!-- BEGIN auth_delete -->
+					{use_comments.text.auth_delete.B_DELETE_IMG}
+					<!-- END auth_delete -->
+					</dd>
+				</dl>
+				<dl>
+					<dt colspan="2"><hr /></dt>
+				</dl>
+				<dl>
+					<dt colspan="2"valign="top"><span class="postbody">{use_comments.text.TEXT}</span></dt>
+				</dl>
+			</div>
+		</ul>
+  	</dl>
+  	<dl>
+		<dt class="spaceRow" colspan="2" height="1"><img src="{use_comments.text.ICON_SPACER}" alt="" width="1" height="1" /></dt>
+  	</dl>
+	<!-- END text -->
+</div>
+
+
+<!-- BEGIN comments_pag -->
+<div width="100%" border="0">
+  <dl>
+	<dt><span class="nav">{use_comments.comments_pag.PAGE_NUMBER}</span></dt>
+	<dd align="right"><span class="nav">{use_comments.comments_pag.PAGINATION}</span></dd>
+  </dl>
+</div>
+<!-- END comments_pag -->
+
+<!-- BEGIN auth_post -->
+<div width="100%" border="0" align="center">
+  	<dl>
+		<dt>{use_comments.auth_post.B_REPLY_IMG}</dt>
+  	</dl>
+</div>
+</div>
+<br clear="all" />
+<!-- END auth_post -->
+<!-- END use_comments -->
+
+<!-- INCLUDE pa_footer.html -->
+<!-- INCLUDE overall_footer.html -->

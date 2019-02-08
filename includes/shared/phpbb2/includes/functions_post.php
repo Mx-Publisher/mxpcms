@@ -552,7 +552,7 @@ function delete_post($mode, &$post_data, &$message, &$meta, &$forum_id, &$topic_
 function user_notification($mode, &$post_data, &$topic_title, &$forum_id, &$topic_id, &$post_id, &$notify_user)
 {
 	global $board_config, $lang, $db, $phpbb_root_path, $phpEx;
-	global $userdata, $user_ip;
+	global $userdata, $user_ip, $phpBB2;
 
 	$current_time = time();
 
@@ -632,7 +632,7 @@ function user_notification($mode, &$post_data, &$topic_title, &$forum_id, &$topi
 
 					$orig_word = array();
 					$replacement_word = array();
-					phpBB2::obtain_word_list($orig_word, $replacement_word);
+					$phpBB2->obtain_word_list($orig_word, $replacement_word);
 
 					$emailer->from($board_config['board_email']);
 					$emailer->replyto($board_config['board_email']);

@@ -23,7 +23,7 @@ if (!defined('IN_PORTAL'))
 //if (!defined('SQL_LAYER'))
 if (!is_object('dbal_sqlite3'))
 {
-	@define('SQL_LAYER', 'sqlite3');
+	define('SQL_LAYER', 'sqlite3');
 	include_once($mx_root_path . 'includes/db/dbal.' . $phpEx);
 	$sql_db = 'dbal_' . $dbms; // Repopulated for multiple db connections
 

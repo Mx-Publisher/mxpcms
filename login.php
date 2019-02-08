@@ -18,8 +18,6 @@ define('IN_LOGIN', true);
 define('IN_PORTAL', true);
 $mx_root_path = './';
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
-if (!defined('PHP_EXT')) define('PHP_EXT', $phpEx);
-define('CMS_PAGE_HOME', 'index.' . PHP_EXT);
 include($mx_root_path . 'common.'.$phpEx);
 
 //
@@ -54,13 +52,6 @@ else
 	$sid = '';
 }
 
-$redirect = $mx_request_vars->request('redirect', MX_TYPE_NO_TAGS);
-$redirect_url = (!empty($redirect) ? urldecode(str_replace(array('&amp;', '?', PHP_EXT . '&'), array('&', '&', PHP_EXT . '?'), $redirect)) : CMS_PAGE_HOME);
-
-if (strstr($redirect_url, "\n") || strstr($redirect_url, "\r") || strstr($redirect_url, ';url'))
-{
-	mx_message_die(GENERAL_ERROR, 'Tried to redirect to potentially insecure url.');
-}
 if($mx_request_vars->is_request('login') || $mx_request_vars->is_request('logout'))
 {
 	include($mx_root_path . 'includes/sessions/'.PORTAL_BACKEND.'/login.'.$phpEx);

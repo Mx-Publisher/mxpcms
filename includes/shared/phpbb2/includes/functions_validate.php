@@ -27,11 +27,11 @@
 //
 function validate_username($username)
 {
-	global $db, $lang, $userdata;
+	global $db, $lang, $phpBB2, $userdata;
 
 	// Remove doubled up spaces
 	$username = preg_replace('#\s+#', ' ', trim($username));
-	$username = phpBB2::phpbb_clean_username($username);
+	$username = $phpBB2->phpbb_clean_username($username);
 
 	$sql = "SELECT username
 		FROM " . USERS_TABLE . "

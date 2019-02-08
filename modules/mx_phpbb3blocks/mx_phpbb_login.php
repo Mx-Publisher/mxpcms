@@ -27,6 +27,11 @@ $l_explain = '';
 $block_size = !empty($block_size) ? $block_size : $b_block_size;
 
 //Is Admin (phpBB3+)
+if(!isset($phpbb_auth) || !is_object($phpbb_auth))
+{
+	$phpbb_auth = new phpbb_auth();
+}
+$phpbb_auth->acl($mx_user->data);
 $admin = (!$phpbb_auth->acl_get('a_') && $mx_user->data['user_id'] != ANONYMOUS) ? true : false;
 
 // Assign credential for username/password pair
@@ -36,6 +41,9 @@ $credential = ($admin) ? md5(unique_id()) : false;
 $s_hidden_fields = array(
 	'sid'		=> $mx_user->session_id,
 );
+
+// Get referer to redirect user to the appropriate page after delete action
+$redirect_url = mx_append_sid(PORTAL_URL . "index.$phpEx", (isset($page_id) ? "?page={$page_id}" : "?page=" . $mx_request_vars->request('page', MX_TYPE_INT, 2)) . (isset($cat_nav) ? "&cat_nav={$cat_nav}" : ""));
 
 if ($redirect)
 {
@@ -48,17 +56,18 @@ if ($admin)
 }
 
 $template->set_filenames(array(
-	'body_login' => 'mx_phpbb_login.html')
+	'phpbb_login' => 'mx_phpbb_login.html'
+	)
 );
 
 $template->assign_vars(array(
 	'BLOCK_SIZE' => $block_size,
-	'S_LOGIN_ACTION'		=> mx_append_sid("{PHPBB_URL}ucp.$phpEx", 'mode=login&amp;redirect={PORTAL_URL}index.php%3Fpage={$page_id}%26nav=1'),
-	'U_SEND_PASSWORD' => ($board_config['email_enable']) ? mx_append_sid("{PHPBB_URL}ucp.$phpEx", 'mode=sendpassword') : '',
+	'S_LOGIN_ACTION'		=> mx_append_sid("{$phpbb_root_path}ucp.php?mode=login&redirect=$redirect_url"),
+	'U_SEND_PASSWORD' => ($board_config['email_enable']) ? mx_append_sid("{$phpbb_root_path}ucp.$phpEx?mode=sendpassword") : '',
 
-	'U_TERMS_USE'			=> mx_append_sid("{$phpbb_root_path}ucp.$phpEx", 'mode=terms'),
-	'U_PRIVACY'				=> mx_append_sid("{$phpbb_root_path}ucp.$phpEx", 'mode=privacy'),
-	'UA_PRIVACY'			=> addslashes(mx_append_sid("{$phpbb_root_path}ucp.$phpEx", 'mode=privacy')),
+	'U_TERMS_USE'			=> mx_append_sid("{$phpbb_root_path}ucp.$phpEx?mode=terms"),
+	'U_PRIVACY'				=> mx_append_sid("{$phpbb_root_path}ucp.$phpEx?mode=privacy"),
+	'UA_PRIVACY'			=> addslashes(mx_append_sid("{$phpbb_root_path}ucp.$phpEx?mode=privacy")),
 
 	'S_DISPLAY_FULL_LOGIN'	=> ($s_display) ? true : false,
 	'S_HIDDEN_FIELDS' 		=> $s_hidden_fields,
@@ -82,7 +91,15 @@ $template->assign_vars(array(
 	'LOGIN_ERROR'		=> $err,
 	'LOGIN_EXPLAIN'		=> $l_explain,
 	
+	'S_LOGIN_REDIRECT'		=> mx_build_hidden_fields(array('redirect' => $redirect_url)),
+	'S_HIDDEN_FIELDS'		=> (isset($s_hidden_fields)) ? $s_hidden_fields : '',
 ));
+
+$template->assign_block_vars('mode', array(
+	//'REDIRECT_URL'	=> mx_redirect($redirect_url, true),
+	//'SERVICE_NAME'	=> $mx_user->lang['PHPBB'],
+	)
+);
 
 // Login box?
 if (!$userdata['session_logged_in'])
@@ -100,6 +117,6 @@ else
 	$template->assign_block_vars('switch_user_logged_in', array());
 }
 
-$template->pparse('body_login');
+$template->pparse('phpbb_login');
 
 ?>
