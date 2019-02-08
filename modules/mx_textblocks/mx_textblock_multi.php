@@ -44,7 +44,6 @@ $title_style = $mx_block->block_parameters['title_style'];
 /** Debug Block Configuration in MXP 2.7 **/
 $message = $mx_block->get_parameters('Text');
 /** **/
-print_r($message);
 $block_style = $mx_block->get_parameters( 'block_style' );
 $text_style = $mx_block->get_parameters( 'text_style' );
 $title_style = $mx_block->get_parameters( 'title_style' );
@@ -64,7 +63,7 @@ if (is_object($mx_page))
 	// - LANG: MX_LANG_MAIN (default), MX_LANG_ADMIN, MX_LANG_ALL, MX_LANG_NONE
 	// - IMAGES: MX_IMAGES (default), MX_IMAGES_NONE
 	// -------------------------------------------------------------------------
-	//$mx_user->extend(MX_LANG_MAIN, MX_IMAGES_NONE);
+	$mx_user->extend(MX_LANG_MAIN, MX_IMAGES_NONE);
 	$mx_page->add_copyright( 'MX-Publisher Knowledge Base Module' );
 }
 
@@ -88,7 +87,7 @@ $mx_text->init($allow_html, $allow_bbcode, $allow_smilies); // Note: allowed_htm
 // Decode for display
 //
 $title = $mx_text->display_simple($title);
-//$message = $mx_text->display($message, $mx_block->get_parameters( 'Text', MX_GET_PAR_OPTIONS ));
+$message = $mx_text->display($message, $mx_block->get_parameters( 'Text', MX_GET_PAR_OPTIONS ));
 
 //
 // Start output of page
