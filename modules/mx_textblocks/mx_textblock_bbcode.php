@@ -57,7 +57,7 @@ $message = $mx_text->display($message, $mx_block->get_parameters( 'Text', MX_GET
 // Start output of page
 //
 $template->set_filenames(array(
-	'body_block' => 'mx_textblock_bbcode.'.$tplEx)
+	'body_block' => 'mx_textblock_bbcode.tpl')
 );
 
 $template->assign_vars(array(

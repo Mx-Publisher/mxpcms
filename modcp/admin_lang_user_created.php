@@ -12,31 +12,30 @@
 /* MG Lang DB - END */
 
 //namespace orynider\mx_translator\acp;
-$modulename = 'mx_translator';
-
-if ( !empty( $setmodules ) )
-{
-	$basename = basename( __FILE__ );
-	$module['Language_tools']['ACP_MX_LANGTOOLS_TITLE'] = 'modules/' . $modulename . '/admin/' . $basename . '';
-	return;
-}
+$basename = basename( __FILE__);
 
 //
 // Security and Page header
 //
 @define('IN_PORTAL', 1);
-$mx_root_path = './../../../';
-$module_root_path = $mx_root_path . 'modules/' . $modulename . '/';
+$mx_root_path = './../';
+$module_root_path = $mx_root_path . 'modules/mx_translator/';
 $admin_module_root_path = $module_root_path . 'admin/';
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
 if (!defined('PHP_EXT')) define('PHP_EXT', $phpEx);
 if (!defined('MX_ROOT_PATH')) define('MX_ROOT_PATH', './../');
 
+if(!empty($setmodules))
+{
+	$module['Language_tools']['Lang_extend__custom'] = mx_append_sid($basename);
+	return;
+}
+
 //
 // Load default header
 //
 define('IN_ADMIN', 1); 
-require($mx_root_path . 'admin/pagestart.' . $phpEx);
+include_once('./pagestart.' . $phpEx);
 
 /**
 * mx_langtools ACP module
@@ -66,7 +65,7 @@ $mx_user->extend('lang_admin_extend_lang', MX_IMAGES_NONE, $module_root_path, tr
 /* Get an instance of the admin controller */
 if (!include_once($module_root_path . 'controller/mxp_translator.' . $phpEx))
 {
-	die('Cant find ' . $module_root_path . 'controller/mxp_translator.' . $phpEx);
+	die('Cant find ' . $module_root_path . 'controller/mxp_translator.' . $phpEx).' Upload mx_translator via FTP.';
 }
 include_once($mx_root_path . 'includes/mx_functions_admincp.' . $phpEx);
 

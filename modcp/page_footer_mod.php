@@ -28,7 +28,7 @@ if ( !defined('IN_PORTAL') )
 // Show the overall footer.
 //
 $template->set_filenames(array(
-	'page_footer' => 'modcp/page_footer.tpl')
+	'page_footer' => 'admin/page_footer.tpl')
 );
 
 $template->assign_vars(array(

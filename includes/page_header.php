@@ -134,15 +134,27 @@ switch (PORTAL_BACKEND)
 {
 	case 'internal':
 	case 'mybb':
-		//To do:
+		//To do: Profile oe UCP Links for each backend.
 	case 'smf2':
+		
+		$u_register = mx_append_sid('login.'.$phpEx.'?mode=register');
+		$u_profile = mx_append_sid('profile.'.$phpEx.'?mode=editprofile');
+		
 		//To do:
+		$u_modcp 	=  ((($mx_user->data['user_level'] = 2) && ($mx_user->data['user_active'] = 1)) || ($mx_user->data['user_level'] == ADMIN)) ? mx_append_sid("{$mx_root_path}modcp/index.$phpEx?i=main&mode=front&sid=" . $mx_user->session_id) : '';
+		$u_mcp	= ((($mx_user->data['user_level'] = 2) && ($mx_user->data['user_active'] = 1)) || ($mx_user->data['user_level'] == ADMIN)) ? mx_append_sid("{$mx_root_path}modcp/index.$phpEx?i=main&mode=front&sid=" . $mx_user->session_id) : '';
+	
+		$u_terms_use	= mx_append_sid("login.$phpEx?mode=terms");
+		$u_privacy	= mx_append_sid("login.$phpEx?mode=privacy");
+	break;
+
 	case 'phpbb2':
 	case 'olympus':
+	//To do: Check this in sessions/phpbb2 comparing to sessions/internal
 		$u_login = mx_append_sid("login.".$phpEx);
 		if (  $mx_user->data['user_id'] != ANONYMOUS )
 		{
-			$u_login_logout = mx_append_sid('login.'.$phpEx.'?logout=true&amp;sid=' . $mx_user->data['session_id']);
+			$u_login_logout = mx_append_sid('login.'.$phpEx.'?logout=true&sid=' . $mx_user->data['session_id']);
 			$l_login_logout = $lang['Logout'] . ' [ ' . $mx_user->data['username'] . ' ]';
 		}
 		else
@@ -150,27 +162,43 @@ switch (PORTAL_BACKEND)
 			$u_login_logout = mx_append_sid("login.".$phpEx);
 			$l_login_logout = $lang['Login'];
 		}
-	break;
+		
+		$u_register = (PORTAL_BACKEND !== 'phpbb2') ? mx_append_sid("{$phpbb_root_path}ucp.php?mode=register&redirect=$redirect_url") : mx_append_sid("{$phpbb_root_path}profile.".$phpEx."?mode=register");
+		$u_profile = (PORTAL_BACKEND !== 'phpbb2') ? mx_append_sid("{$phpbb_root_path}ucp.php?mode=editprofile") : mx_append_sid("{$phpbb_root_path}profile.".$phpEx."?mode=editprofile");
+		
+		$u_modcp 	= ((PORTAL_BACKEND !== 'phpbb2') && ($phpbb_auth->acl_get('m_') || $phpbb_auth->acl_getf_global('m_'))) ? mx_append_sid('modcp/index.'.$phpEx) : '';
+		$u_mcp	= ((PORTAL_BACKEND !== 'phpbb2') && ($phpbb_auth->acl_get('m_') || $phpbb_auth->acl_getf_global('m_'))) ? mx_append_sid("{$phpbb_root_path}mcp.$phpEx?i=main&mode=front&sid=" . $mx_user->session_id) : ( ((($mx_user->data['user_level'] = 2) && ($mx_user->data['user_active'] = 1)) || ($mx_user->data['user_level'] == ADMIN)) ? mx_append_sid("{$phpbb_root_path}modcp.$phpEx?i=main&mode=front&sid=" . $mx_user->session_id) : '');
 	
+		$u_terms_use	= (PORTAL_BACKEND !== 'phpbb2') ? mx_append_sid("{$phpbb_root_path}ucp.$phpEx?mode=terms") : mx_append_sid("{$phpbb_root_path}profile.$phpEx?mode=terms");
+		$u_privacy	= (PORTAL_BACKEND !== 'phpbb2') ? mx_append_sid("{$phpbb_root_path}ucp.$phpEx?mode=privacy") : mx_append_sid("{$phpbb_root_path}profile.$phpEx?mode=privacy");
+	break;
+
 	default:
 	
 		// Get referer to redirect user to the appropriate page after delete action
-		$redirect_url = mx_append_sid(PORTAL_URL . "index.$phpEx", (isset($page_id) ? "page={$page_id}" : "") . (isset($cat_nav) ? "&cat_nav={$cat_nav}" : ""));
+		$redirect_url = mx_append_sid(PORTAL_URL . "index.$phpEx" . (isset($page_id) ? "?page={$page_id}" : "") . (isset($cat_nav) ? "&cat_nav={$cat_nav}" : ""));
 		$u_login = mx_append_sid("{$phpbb_root_path}ucp.$phpEx", 'mode=login');
 	
 		if ($mx_user->data['user_id'] != ANONYMOUS)
 		{
 			//$u_login_logout = mx_append_sid("{$phpbb_root_path}ucp.$phpEx", "mode=logout&redirect=$redirect_url", true, $mx_user->session_id);
-			$u_login_logout = mx_append_sid('login.'.$phpEx.'?logout=true&amp;sid=' . $mx_user->data['session_id']);
+			$u_login_logout = mx_append_sid('login.'.$phpEx.'?logout=true&sid=' . $mx_user->data['session_id']);
 			$l_login_logout = $mx_user->lang['LOGOUT'] . ' [ ' . $mx_user->data['username'] . ' ]';
 		}
 		else
 		{
-			
+		
+			$u_register = mx_append_sid("{$phpbb_root_path}ucp.php?mode=register&redirect=$redirect_url");
+			$u_profile = mx_append_sid("{$phpbb_root_path}ucp.php?mode=editprofile");
+		
 			$u_login_logout = mx_append_sid("{$phpbb_root_path}ucp.php?mode=login&redirect=$redirect_url");
 			$l_login_logout = $mx_user->lang['LOGIN'];
 		}
+		$u_modcp 	= ($phpbb_auth->acl_get('m_') || $phpbb_auth->acl_getf_global('m_') || ($mx_user->data['session_logged_in'] && $mx_user->data['user_level'] == ADMIN))  ? mx_append_sid("{$mx_root_path}modcp/index.$phpEx?i=main&mode=front&sid=" . $mx_user->session_id) : '';
+		$u_mcp	= ($phpbb_auth->acl_get('m_') || $phpbb_auth->acl_getf_global('m_') || ($mx_user->data['session_logged_in'] && $mx_user->data['user_level'] == ADMIN)) ? mx_append_sid("{$phpbb_root_path}mcp.$phpEx?i=main&mode=front&sid=" . $mx_user->session_id) : '';
 	
+		$u_terms_use	= mx_append_sid("{$phpbb_root_path}ucp.$phpEx?mode=terms");
+		$u_privacy	= mx_append_sid("{$phpbb_root_path}ucp.$phpEx?mode=privacy");
 	break;
 }
 
@@ -819,7 +847,7 @@ $s_feed_news = isset($s_feed_news) ? $s_feed_news : false;
 // Format Timezone. We are unable to use array_pop here, because of PHP3 compatibility
 //
 $l_timezone = explode( '.', $board_config['board_timezone'] );
-$l_timezone = ( count( $l_timezone ) > 1 && $l_timezone[count( $l_timezone )-1] != 0 ) ? $lang[sprintf( '%.1f', $board_config['board_timezone'] )] : $lang[number_format( $board_config['board_timezone'] )];
+$l_timezone = ( count( $l_timezone ) > 1 && $l_timezone[count( $l_timezone )-1] != 0 ) ? $lang[sprintf( '%.1f', $board_config['board_timezone'] )] : $board_config['board_timezone'];
 
 if (empty($mx_page->page_alt_icon))
 {
@@ -1067,25 +1095,25 @@ $layouttemplate->assign_vars(array(
 	'U_INDEX' 							=> mx_append_sid("{$phpbb_root_path}index.$phpEx"),
 	'U_CANONICAL' 					=> mx_append_sid(PORTAL_URL . "index.$phpEx"),		
 	'U_SITE_HOME'					=> (!empty($board_config['site_home_url'])) ? $board_config['site_home_url'] : mx_append_sid('./../index.'.$phpEx),	
-	'U_REGISTER' 						=> mx_append_sid('profile.'.$phpEx.'?mode=register'),
-	'U_PROFILE' 						=> mx_append_sid('profile.'.$phpEx.'?mode=editprofile'),
+	'U_REGISTER' 						=> $u_register,
+	'U_PROFILE' 						=> $u_profile,
 	'U_RESTORE_PERMISSIONS'	=> mx_append_sid("{$phpbb_root_path}memberlist.$phpEx?mode=restore_perm"),
 	'U_USER_PROFILE'				=> mx_get_username_string('profile_url', $mx_user->data['user_id'], $mx_user->data['username'], false),	
 	'U_PRIVATEMSGS' 				=> mx_append_sid('privmsg.'.$phpEx.'?folder=inbox'),
 	'U_PRIVATEMSGS_POPUP' 	=> mx_append_sid('privmsg.'.$phpEx.'?mode=newpm'),
 	'U_SEARCH' 						=> mx_append_sid('search.'.$phpEx),
-	'U_MEMBERLIST' 				=> mx_append_sid('memberlist.'.$phpEx),
-	'U_MODCP' 						=> mx_append_sid('modcp.'.$phpEx),
-	'U_MCP'							=> (((PORTAL_BACKEND !== 'internal') && ($phpbb_auth->acl_get('m_') || $phpbb_auth->acl_getf_global('m_'))) ? mx_append_sid("{$phpbb_root_path}modcp.$phpEx?i=main&amp;mode=front" . $mx_user->session_id) : ''),	
-	'U_FAQ' 							=> mx_append_sid('faq.'.$phpEx),
-	'U_VIEWONLINE' 				=> mx_append_sid('viewonline.'.$phpEx),
+	'U_MEMBERLIST' 				=> mx_append_sid("{$phpbb_root_path}memberlist.".$phpEx),
+	'U_MXMCP' 						=> $u_modcp, //MXP ModCP
+	'U_MCP'							=> $u_mcp, //Forum MCP
+	'U_FAQ' 							=> mx_append_sid("{$phpbb_root_path}faq.".$phpEx),
+	'U_VIEWONLINE' 				=> mx_append_sid("{$phpbb_root_path}viewonline.".$phpEx),
 	'U_LOGIN_LOGOUT' 			=> $u_login_logout,
-	'U_GROUP_CP' 					=> mx_append_sid('groupcp.'.$phpEx),
+	'U_GROUP_CP' 					=> mx_append_sid("{$phpbb_root_path}groupcp.".$phpEx),
 	
 	'U_SEND_PASSWORD' 			=> ($mx_user->data['user_email']) ? mx_append_sid("{$phpbb_root_path}profile.$phpEx?mode=sendpassword") : '',
 	
-	'S_VIEWTOPIC' 						=> mx_append_sid("viewtopic.$phpEx?" . "f=" . $forum_id . "&amp;t=" . $topic_id), 
-	'S_VIEWFORUM' 					=> mx_append_sid("viewforum.$phpEx?" . POST_FORUM_URL . "=$forum_id"),
+	'S_VIEWTOPIC' 						=> mx_append_sid("{$phpbb_root_path}viewtopic.$phpEx?" . "f=" . $forum_id . "&amp;t=" . $topic_id), 
+	'S_VIEWFORUM' 					=> mx_append_sid("{$phpbb_root_path}viewforum.$phpEx?" . POST_FORUM_URL . "=$forum_id"),
 	'S_IN_MCP' 							=> defined('IN_MCP') ? true : false,
 	'L_ACP_SHORT'						=> $mx_user->lang('ACP_SHORT'),
 	'L_MCP_SHORT'						=> $mx_user->lang('MCP'),
@@ -1095,8 +1123,10 @@ $layouttemplate->assign_vars(array(
 	
 	'U_CONTACT_US'				=> ($mx_user->data['user_last_privmsg']) ? mx_append_sid("{$phpbb_root_path}memberlist.$phpEx?mode=contactadmin") : '',
 	'U_TEAM'							=> ($mx_user->data['user_id'] != ANONYMOUS && (PORTAL_BACKEND !== 'internal') && $phpbb_auth->acl_get('u_viewprofile')) ?  mx_append_sid("{$phpbb_root_path}memberlist.$phpEx?mode=team") : '',
-	'U_TERMS_USE'					=> mx_append_sid("{$phpbb_root_path}profile.$phpEx?mode=terms"),
-	'U_PRIVACY'						=> mx_append_sid("{$phpbb_root_path}profile.$phpEx?mode=privacy"),
+	
+	'U_TERMS_USE'					=> $u_terms_use,
+	'U_PRIVACY'						=> $u_privacy,
+	
 	'U_RESTORE_PERMISSIONS'	=> ($mx_user->data['user_perm_from'] && (PORTAL_BACKEND !== 'internal') && $phpbb_auth->acl_get('a_switchperm')) ? mx_append_sid("{$phpbb_root_path}profile.$phpEx?mode=restore_perm") : '',
 	'U_FEED'				=> '',	
 		

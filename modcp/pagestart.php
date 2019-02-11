@@ -24,7 +24,7 @@ if (!defined('IN_PORTAL'))
 	die("Hacking attempt");
 }
 
-define('IN_ADMIN', true);
+@define('IN_ADMIN', true);
 // Include files
 //
 // Let's include some stuff...
@@ -45,26 +45,26 @@ $mx_user->init($user_ip, PAGE_INDEX);
 //
 //
 
-if ( !$userdata['session_logged_in'] )
+if ( !$mx_user->data['session_logged_in'] )
 {
-	mx_redirect(append_sid("login.php?redirect=modcp/", true));
+	mx_redirect(mx_append_sid("login.php?redirect=admin/", true));
 }
 
-if ( $userdata['user_level'] != MOD && $userdata['user_level'] != ADMIN )
+if ( $mx_user->data['user_level'] != MOD && $mx_user->data['user_level'] != ADMIN )
 {
 	mx_message_die(GENERAL_MESSAGE, $lang['Not_admin']);
 }
 
-if( $HTTP_GET_VARS['sid'] != $userdata['session_id'] )
+if( $_GET['sid'] != $mx_user->data['session_id'] )
 {
-	$url = str_replace(preg_replace('#^\/?(.*?)\/?$#', '\1', trim($board_config['server_name'])), '', $HTTP_SERVER_VARS['REQUEST_URI']);
+	$url = str_replace(preg_replace('#^\/?(.*?)\/?$#', '\1', trim($board_config['server_name'])), '', $_SERVER['REQUEST_URI']);
 	$url = str_replace(preg_replace('#^\/?(.*?)\/?$#', '\1', trim($board_config['script_path'])), '', $url);
 	$url = str_replace('//', '/', $url);
 	$url = preg_replace('/sid=([^&]*)(&?)/i', '', $url);
 	$url = preg_replace('/\?$/', '', $url);
-	$url .= ((strpos($url, '?')) ? '&' : '?') . 'sid=' . $userdata['session_id'];
+	$url .= ((strpos($url, '?')) ? '&' : '?') . 'sid=' . $mx_user->data['session_id'];
 
-	mx_redirect("modcp/?sid=" . $userdata['session_id']);
+	mx_redirect("admin/?sid=" . $mx_user->data['session_id']);
 }
 
 

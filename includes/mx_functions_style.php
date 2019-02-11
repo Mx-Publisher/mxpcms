@@ -2133,15 +2133,14 @@ class mx_user extends mx_session
 				$init_style = ($init_style) ? $init_style : ((!$board_config['override_user_style']) ? $this->data['user_style'] : $board_config['default_style']);
 			}
 			
-			
-			
 			switch (PORTAL_BACKEND)
 			{
 				case 'internal':
 				case 'smf2':
 				case 'mybb':
-					$sql = 'SELECT *
-						FROM ' . MX_THEMES_TABLE;
+					$sql = "SELECT *
+						FROM " . MX_THEMES_TABLE . "
+						WHERE themes_id = " . (int) $init_style;
 				break;
 	
 				case 'phpbb2':
@@ -2154,26 +2153,107 @@ class mx_user extends mx_session
 				case 'olympus':
 					$sql = "SELECT bbt.*, stt.*
 						FROM " . MX_THEMES_TABLE . " mxt, " . STYLES_TABLE . " bbt, " . STYLES_TEMPLATE_TABLE . " stt
-						WHERE mxt.template_name = stt.template_path";
+						WHERE mxt.themes_id = " . (int) $init_style . "
+						AND mxt.template_name = stt.template_path";
 				break;
 
 				case 'phpbb3':
 				case 'ascraeus':
 				case 'rhea':
 				case 'proteus':
-					$sql = "SELECT bbt.*, mxt.template_name AS template_path, stt.*
+					$sql = "SELECT mxt.*, mxt.template_name AS template_path, stt.*
 						FROM " . MX_THEMES_TABLE . " mxt, " . STYLES_TABLE . " sst
-						WHERE mxt.template_name = stt.style_path";
+						WHERE mxt.themes_id = " . (int) $init_style . "
+						AND mxt.template_name = stt.style_path";
 				break;
 			}
 
-			$result = $db->sql_query($sql, 3600);
+			$result = $db->sql_query($sql);
 			$row = $this->style = $this->theme = $theme = $db->sql_fetchrow($result);
 			$db->sql_freeresult($result);
 			
-			if (!isset($row))
+			//Invert with style_id
+			if (!isset($row['template_name']))
 			{
-				mx_message_die(CRITICAL_ERROR, "Could not get MX-Publisher style data for themes_id [$init_style]");
+				switch (PORTAL_BACKEND)
+				{
+					case 'internal':
+					case 'smf2':
+					case 'mybb':
+						$sql = 'SELECT *
+							FROM ' . MX_THEMES_TABLE;
+					break;
+		
+					case 'phpbb2':
+						$sql = "SELECT s.*, mxt.*, mxt.template_name as style_path
+							FROM " . MX_THEMES_TABLE . " AS mxt, " . THEMES_TABLE . " AS s
+							WHERE s.themes_id = " . (int) $init_style . "
+								AND s.template_name = mxt.template_name";
+					break;
+
+					case 'olympus':
+						$sql = "SELECT bbt.*, stt.*
+							FROM " . MX_THEMES_TABLE . " mxt, " . STYLES_TABLE . " bbt, " . STYLES_TEMPLATE_TABLE . " stt
+							WHERE bbt.style_id = " . (int) $init_style . "
+							AND mxt.template_name = stt.template_path";
+					break;
+
+					case 'phpbb3':
+					case 'ascraeus':
+					case 'rhea':
+					case 'proteus':
+						$sql = "SELECT mxt.*, mxt.template_name AS template_path, stt.*
+							FROM " . MX_THEMES_TABLE . " mxt, " . STYLES_TABLE . " sst
+							WHERE sst.style_id = " . (int) $init_style . "
+							AND mxt.template_name = stt.style_path";
+					break;
+				}
+				$result = $db->sql_query_limit($sql, 1);
+				$row = $this->style = $this->theme = $theme = $db->sql_fetchrow($result);
+				$db->sql_freeresult($result);
+			}
+			
+			//Default with any style_id
+			if (!isset($row['template_name']))
+			{
+				switch (PORTAL_BACKEND)
+				{
+					case 'internal':
+					case 'smf2':
+					case 'mybb':
+						$sql = 'SELECT *
+							FROM ' . MX_THEMES_TABLE;
+					break;
+		
+					case 'phpbb2':
+						$sql = "SELECT s.*, mxt.*, mxt.template_name as style_path
+							FROM " . MX_THEMES_TABLE . " AS mxt, " . THEMES_TABLE . " AS s
+							WHERE s.template_name = mxt.template_name";
+					break;
+
+					case 'olympus':
+						$sql = "SELECT bbt.*, stt.*
+							FROM " . MX_THEMES_TABLE . " mxt, " . STYLES_TABLE . " bbt, " . STYLES_TEMPLATE_TABLE . " stt
+							WHERE mxt.template_name = stt.template_path";
+					break;
+
+					case 'phpbb3':
+					case 'ascraeus':
+					case 'rhea':
+					case 'proteus':
+						$sql = "SELECT mxt.*, mxt.template_name AS template_path, stt.*
+							FROM " . MX_THEMES_TABLE . " mxt, " . STYLES_TABLE . " sst
+							WHERE mxt.template_name = stt.style_path";
+					break;
+				}
+				$result = $db->sql_query_limit($sql, 1);
+				$row = $this->style = $this->theme = $theme = $db->sql_fetchrow($result);
+				$db->sql_freeresult($result);
+			}
+			
+			if (!isset($row['template_name']))
+			{
+				mx_message_die(CRITICAL_ERROR, "Could not query database for themes_id [$init_style] portal backend: ". PORTAL_BACKEND . '  rows: ' . print_r($row, true), '', __LINE__, __FILE__, $sql);
 			}
 			$db->sql_freeresult($result);
 		}
