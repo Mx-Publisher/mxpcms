@@ -1799,7 +1799,7 @@ function mx_get_avatar($row, $alt, $ignore_config = false, $lazy = false)
 	//{
 	//	return '';
 	//}
-	
+
 	if ( $mx_user->data['user_id'] == ANONYMOUS )
 	{
 		$row['user_avatar'] 	= !empty($row['user_avatar']) ? $row['user_avatar'] :  'guest_aphrodite.gif';
@@ -1822,7 +1822,7 @@ function mx_get_avatar($row, $alt, $ignore_config = false, $lazy = false)
 	}
 
 	$row = array_merge(array(
-		'avatar' 		=> !empty($row['avatar']) ? $row['avatar'] :  $row['user_avatar'],
+		'avatar' 	=> !empty($row['avatar']) ? $row['avatar'] :  $row['user_avatar'],
 		'avatar_type' 	=> isset($row['avatar_type']) ? $row['avatar_type'] : $row['user_avatar_type'],
 		'avatar_width' 	=> isset($row['avatar_width']) ? $row['avatar_width'] : (isset($row['user_avatar_width']) ? $row['user_avatar_width'] : '120'),
 		'avatar_height' => isset($row['avatar_height']) ? $row['avatar_height'] : (isset($row['user_avatar_height']) ? $row['user_avatar_height'] : '120'),
@@ -1834,14 +1834,13 @@ function mx_get_avatar($row, $alt, $ignore_config = false, $lazy = false)
 		'height' => $row['avatar_height'],
 	);
 
-	
 	$driver = $row['avatar_type'];
 	$html = '';
 	if (empty($driver))
 	{
 		$driver = 'upload';
 	}
-	
+
 	if ($driver)
 	{
 		
@@ -1904,13 +1903,13 @@ function mx_get_avatar($row, $alt, $ignore_config = false, $lazy = false)
 			$web_path = $board_url;
 
 			if (is_dir($phpbb_root_path . $mx_user->template_path . $mx_user->template_name . '/theme/images/'))
-			{			
+			{
 				$theme_images = "{$web_path}{$mx_user->template_path}" . rawurlencode($mx_user->template_name) . '/theme/images';
 			}
 			elseif (is_dir($phpbb_root_path . $mx_user->template_path . $mx_user->template_name . '/images/'))
-			{			
+			{
 				$theme_images = "{$web_path}{$mx_user->template_path}" . rawurlencode($mx_user->template_name . '/images');
-			}			
+			}
 			$src = 'src="' . $theme_images . '/no_avatar.gif" data-src="' . $avatar_data['src'] . '"';
 		}
 		else
@@ -1975,7 +1974,7 @@ function mx_get_user_rank($userdata, $user_posts, &$rank_title = null, &$rank_im
 		}
 	}
 	
-	return $user_rank_data;		
+	return $user_rank_data;
 }
 
 /**
@@ -3880,30 +3879,167 @@ else
  *
  * This function loops all meta langcodes, to convert internal MX-Publisher lang to standard langcode
  *
+ * Updated by FlorinCB aka orynider in 16.02.2019
+ *
  */
 function mx_get_langcode()
 {
-	global $userdata, $mx_root_path, $board_config, $phpEx;
+	global $mx_user, $mx_root_path, $portal_config, $board_config, $phpEx;
+	
+	$default_lang = (isset($mx_user->lang['default_lang'])) ? $mx_user->decode_lang($mx_user->lang['default_lang']) : $portal_config['default_lang'];
+	$user_lang = (isset($mx_user->data['user_lang'])) ? $mx_user->decode_lang($mx_user->data['user_lang']) : $default_lang;
 
 	//
 	// Load language file.
 	//
-	if( @file_exists($mx_root_path . 'language/lang_' . $board_config['default_lang'] . '/lang_meta.' . $phpEx) )
+	if ((@include($mx_root_path . "language/lang_" . $user_lang . "/lang_meta.$phpEx")) === false)
 	{
-		include($mx_root_path . 'language/lang_' . $board_config['default_lang'] . '/lang_meta.' . $phpEx);
-	}
-	else
-	{
-		include($mx_root_path . 'language/lang_english/lang_meta.' . $phpEx);
+		if ((@include($mx_root_path . "language/" . $default_lang . "/lang_meta.$phpEx")) === false)
+		{
+			$lang_error = 'Language file ' . $mx_root_path . "language/lang_" . $default_lang . "[or /lang_" . $user_lang . "]/lang_meta.$phpEx" . ' couldn\'t be opened.';
+		}
+		else
+		{
+			$lang_error = false;
+		}
 	}
 
 	foreach ($lang['mx_meta']['langcode'] as $langcode => $mxbbLang)
 	{
-		if ( strtolower($mxbbLang) == $userdata['user_lang'] )
+		if ( strtolower($mxbbLang) == $user_lang )
 		{
 			return $langcode;
 		}
+		else
+		{
+			return $mx_user->encode_lang($user_lang);
+		}
 	}
+}
+
+/**
+ * Guess langcode.
+ *
+ * Guess an initial language ... borrowed from phpBB 2.2 it's not perfect, 
+ * really it should do a straight match first pass and then try a "fuzzy"
+ * match on a second pass instead of a straight "fuzzy" match.
+ *
+*/
+function mx_guess_lang($encode = false)
+{
+	global $mx_user, $mx_root_path, $_SERVER;
+
+	// The order here _is_ important, at least for major_minor
+	// matches. Don't go moving these around without checking with
+	// me first - psoTFX
+	$match_lang = array(
+		'Afar'					=> 'aa', //Ethiopia
+		'Abkhazia'					=> 'ab',
+		//'Angola'					=> 'ad'
+		'avestan'					=> 'ae', //Persia
+		'afrikaans'					=> 'af', // speakers: 6,855,082 - 13,4%
+		//'AFGHANISTAN'; // langs: pashto and dari
+		'english-creole'					=> 'ag', //Antigua & Barbuda
+		'anguilla'					=> 'ai',
+		'aromanian'					=> 'aj', //Aromaya
+		'akan'					=> 'ak',
+		'albanian'					=> 'al', //ALBANIA
+		'amharic'					=> 'am', //the country flag with am is Armenia
+		'aragonese'					=> 'an', //Andorra, Netherland Antilles
+		'angolian'					=> 'ao', //Angola
+		'angika'					=> 'ap', //Anga //India
+		'arabic'					=> 'ar([_-][a-z]+)?', //country: Argentina
+		//'antarctica'			=> 'aq',
+		'assamese'					=> 'as', //American Samoa
+		'german-austrian'			=> 'at',
+		'avaric'						=> 'av',
+		'daghestanian'				=> 'av-da', //AVARIAN_KHANATE
+		'aymara'				=> 'ay',
+		'aruba'				=> 'aw', //Aruba
+		'en-au'				=> 'au', //Australia
+		'azerbaijani'				=> 'az', //Azerbaijan
+		'finnish'				=> 'ax', //The Aland Islands or Aland (Swedish: Aland, IPA: ['o?land]; Finnish: Ahvenanmaa) is an archipelago province at the entrance to the Gulf of Bothnia in the Baltic Sea belonging to Finland.
+		'bashkir'				=> 'ba', //Baskortostán (Rusia)
+		//Bosnia & Herzegovina, Bosnian, Croatian, Serbian
+		'barbados'				=> 'bb',
+		'bangladesh'				=> 'bd',
+		'belarusian'				=> 'be', //Belgium
+		//'burkina-faso'				=> 'bf',
+		'bulgarian'					=> 'bg', 
+		'bhojpuri'					=> 'bh', // Bihar (India) 
+		//'Bahrain'; // Mamlakat al-Ba?rayn (arabic)
+		'belarusian'					=> 'by',
+		//'Belarus';
+		'catalan'					=> 'ca', 
+		'czech'						=> 'cs', 
+		'danish'					=> 'da', 
+		'german'					=> 'de([_-][a-z]+)?',
+		'english'					=> 'en([_-][a-z]+)?', 
+		'estonian'					=> 'et', 
+		'finnish'					=> 'fi', 
+		'french'					=> 'fr([_-][a-z]+)?', 
+		'greek'						=> 'el', 
+		'spanish_argentina'			=> 'es[_-]ar', 
+		'spanish'					=> 'es([_-][a-z]+)?', 
+		'gaelic'					=> 'gd', 
+		'galego'					=> 'gl', 
+		'gujarati'					=> 'gu', 
+		'hebrew'					=> 'he', 
+		'hindi'						=> 'hi', 
+		'croatian'					=> 'hr', 
+		'hungarian'					=> 'hu', 
+		'icelandic'					=> 'is', 
+		'indonesian'				=> 'id([_-][a-z]+)?', 
+		'italian'					=> 'it([_-][a-z]+)?', 
+		'japanese'					=> 'ja([_-][a-z]+)?', 
+		'korean'					=> 'ko([_-][a-z]+)?', 
+		'latvian'					=> 'lv', 
+		'lithuanian'				=> 'lt', 
+		'macedonian'				=> 'mk', 
+		'dutch'						=> 'nl([_-][a-z]+)?', 
+		'norwegian'					=> 'no', 
+		'punjabi'					=> 'pa', 
+		'polish'					=> 'pl', 
+		'portuguese_brazil'			=> 'pt[_-]br', 
+		'portuguese'				=> 'pt([_-][a-z]+)?', 
+		'romanian'					=> 'ro([_-][a-z]+)?', 
+		'russian'					=> 'ru([_-][a-z]+)?', 
+		'slovenian'					=> 'sl([_-][a-z]+)?', 
+		'albanian'					=> 'sq', 
+		'serbian'					=> 'sr([_-][a-z]+)?', 
+		'slovak'					=> 'sv([_-][a-z]+)?', 
+		'swedish'					=> 'sv([_-][a-z]+)?', 
+		'thai'						=> 'th([_-][a-z]+)?', 
+		'turkish'					=> 'tr([_-][a-z]+)?', 
+		'ukranian'					=> 'uk([_-][a-z]+)?', 
+		'urdu'						=> 'ur', 
+		'viatnamese'				=> 'vi',
+		'chinese_traditional_taiwan'=> 'zh[_-]tw',
+		'chinese_simplified'		=> 'zh', 
+	);
+
+	if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']))
+	{
+		$accept_lang_ary = explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
+		for ($i = 0; $i < sizeof($accept_lang_ary); $i++)
+		{
+			@reset($match_lang);
+			while (list($lang, $match) = each($match_lang))
+			{
+				if (preg_match('#' . $match . '#i', trim($accept_lang_ary[$i])))
+				{
+					if (file_exists(@realpath($mx_root_path . 'language/lang_' . $lang)))
+					{
+						return ($encode == false) ? $lang : $mx_user->encode_lang($lang);
+					}
+				}
+			}
+		}
+	}
+	
+	$lang_iso = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? $_SERVER['HTTP_ACCEPT_LANGUAGE'] : 'en';
+	return ($encode == false) ? $mx_user->decode_lang($lang_iso) : $lang_iso;
+	
 }
 
 function mx_get_db_stat($mode, $db_name = '')

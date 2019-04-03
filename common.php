@@ -40,10 +40,10 @@ define('DEBUG_EXTRA', true); // [Admin Option] Show memory usage. Show link to f
 define('INCLUDES', 'includes/'); //Main Includes folder
 @ini_set('display_errors', '1');
 //@error_reporting(E_ERROR | E_WARNING | E_PARSE); // This will NOT report uninitialized variables
+//@error_reporting(E_ALL | E_NOTICE | E_STRICT);
 @error_reporting(E_ALL & ~E_NOTICE); //Default error reporting in PHP 5.2+
-//error_reporting(E_ALL | E_NOTICE | E_STRICT);
-@session_cache_expire (1440);
-@set_time_limit (1500);
+@session_cache_expire(1440);
+@set_time_limit(1500);
 // Report all errors, except notices and deprecation messages
 //include($mx_root_path . 'modules/mx_shared/ErrorHandler/prepend.' . $phpEx); // For nice error output
 
@@ -323,6 +323,10 @@ if( !defined('MX_INSTALLED') || (MX_INSTALLED === false) )
 	exit;
 }
 
+// In case $mx_adm_relative_path is not set (in case of an update), use the default.
+$mx_adm_relative_path = 'admin/';
+$mx_admin_path = $mx_root_path . $mx_adm_relative_path;
+
 /*
 * MX-Publisher CORE Includes
 */
@@ -330,7 +334,19 @@ require($mx_root_path . INCLUDES . 'mx_class_loader.' . $phpEx);
 require($mx_root_path . INCLUDES . 'mx_constants.' . $phpEx); // Also includes phpBB constants
 require($mx_root_path . INCLUDES . 'db/' . $dbms . '.' . $phpEx); // Load dbal and initiate class
 require($mx_root_path . INCLUDES . 'utf/utf_tools.' . $phpEx); //Load UTF-8 Tools
-require($mx_root_path . INCLUDES . 'mx_functions_core.' . $phpEx); // CORE class
+
+/**
+* Minimum Requirement: PHP 5.3.0
+*/
+if (version_compare(PHP_VERSION, '5.3') < 0)
+{
+	die('You are running an unsupported PHP version. You can ask Support Team for an downgraded version of mx_functions_core.php file. The class deactivated_super_global() require PHP 5.3.0 or higher before trying to install or update to MXP 3.0-RC2+');
+	require($mx_root_path . INCLUDES . 'mx_functions_core_beta.' . $phpEx); // CORE class
+}
+else
+{
+	require($mx_root_path . INCLUDES . 'mx_functions_core.' . $phpEx); // CORE class
+}
 
 require($mx_root_path . 'vendor/paragonie/random_compat/lib/random.' . $phpEx);
 
@@ -369,7 +385,7 @@ if (!$super_globals_disabled)
 $mx_cache->load_backend();
 
 
-//Temp fix for timezone
+//Temp fix for timezone //to do: doble code - to be removed.
 if (@function_exists('date_default_timezone_set') && @function_exists('date_default_timezone_get'))
 {
 	@date_default_timezone_set(@date_default_timezone_get());
@@ -399,7 +415,19 @@ $phpBB3 = new phpBB3();
 // MX-Publisher Includes - doing the rest
 //
 include_once($mx_root_path . INCLUDES . 'mx_functions.' . $phpEx); // CORE Functions
-include_once($mx_root_path . INCLUDES . 'mx_functions_style.' . $phpEx); // Styling and sessions
+
+/**
+* Minimum Requirement: PHP 5.3.0
+*/
+if (version_compare(PHP_VERSION, '5.3') < 0)
+{
+	die('You are running an unsupported PHP version. You can ask Support Team for an downgraded version of mx_functions_style_beta.php file. The class deactivated_super_global() require PHP 5.3.0 or higher before trying to install or update to MXP 3.0-RC2+');
+	include_once($mx_root_path . INCLUDES . 'mx_functions_style_beta.' . $phpEx); // Styling and sessions
+}
+else
+{
+	include_once($mx_root_path . INCLUDES . 'mx_functions_style.' . $phpEx); // Styling and sessions
+}
 
 // We do not need this any longer, unset for safety purposes
 unset($dbpasswd);
@@ -436,8 +464,11 @@ $mx_block = new mx_block();
 
 //
 // Obtain and encode users IP
-//
-$client_ip = (!empty($_SERVER['REMOTE_ADDR'])) ? $_SERVER['REMOTE_ADDR'] : ((!empty($_ENV['REMOTE_ADDR'])) ? $_ENV['REMOTE_ADDR'] : getenv('REMOTE_ADDR'));
+// Why no forwarded_for et al? Well, too easily spoofed. With the results of my recent requests
+// it's pretty clear that in the majority of cases you'll at least be left with a proxy/cache ip.
+$client_ip = (!empty($_SERVER['REMOTE_ADDR'])) ? (string) $_SERVER['REMOTE_ADDR'] : ((!empty($_ENV['REMOTE_ADDR'])) ? $_ENV['REMOTE_ADDR'] : getenv('REMOTE_ADDR'));
+//$client_ip = htmlspecialchars_decode($mx_request_vars->server('REMOTE_ADDR'));
+$client_ip = preg_replace('# {2,}#', ' ', str_replace(',', ' ', $client_ip));
 $user_ip = $phpBB2->encode_ip($client_ip);
 
 //
