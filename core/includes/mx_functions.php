@@ -1553,8 +1553,6 @@ if( !function_exists('memory_get_usage') )
    	}
 }
 
-if( !function_exists('get_backtrace') )
-{
 	/**
 	 * Get backtrace.
 	 *
@@ -1562,7 +1560,7 @@ if( !function_exists('get_backtrace') )
 	 *
 	 * @return string (html)
 	 */
-	function get_backtrace()
+	function mx_get_backtrace()
 	{
 		global $mx_root_path;
 
@@ -1663,7 +1661,7 @@ if( !function_exists('get_backtrace') )
 		$portal_config[$config_name] = $config_value;
 		$mx_cache->put( 'mxbb_config', $portal_config );
 	}
-}
+
 
 /**
  * Get langcode.
@@ -1712,8 +1710,8 @@ function mx_clean_string($text)
 	else
 	{
 		// ASCI control characters
-		$text = preg_replace("/[^[:space:]a-zA-Z0-9åäöÅÄÖ.,-:]/", " ", $text);
-		$text = preg_replace("/[^[:space:]a-zA-Z0-9îãâºþÎÃÂªÞ.,-:]/", " ", $text);
+		$text = preg_replace("/[^[:space:]a-zA-Z0-9Ã¥Ã¤Ã¶Ã…Ã„Ã–.,-:]/", " ", $text);
+		$text = preg_replace("/[^[:space:]a-zA-Z0-9Ã®Ã£Ã¢ÂºÃ¾ÃŽÃƒÃ‚ÂªÃž.,-:]/", " ", $text);
 		
 		// we need to reduce multiple spaces to a single one   
 		$text = preg_replace('/\s+/', ' ', $text);		
