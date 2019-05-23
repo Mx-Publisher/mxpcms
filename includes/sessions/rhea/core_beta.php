@@ -18,8 +18,8 @@ if ( !defined( 'IN_PORTAL' ) )
 // First off, include common vanilla phpBB functions, from our shared dir
 // Note: These functions will later be accessible wrapped as phpBBX::orig_functionname()
 //
-include_once($mx_root_path . 'includes/shared/phpbb2/includes/functions.' . $phpEx);
-include_once($mx_root_path . 'includes/shared/phpbb3/includes/functions.' . $phpEx);
+include_once($mx_root_path . 'includes/shared/phpbb2/includes/functions_beta.' . $phpEx);
+include_once($mx_root_path . 'includes/shared/phpbb3/includes/functions_beta.' . $phpEx);
 
 /*
 * Instantiate Dummy phpBB Classes
@@ -1285,8 +1285,8 @@ class mx_backend
 	function validate_backend($cache_config = array())
 	{
 		global $db, $phpbb_root_path, $mx_root_path;
-		global $phpEx, $tplEx, $portal_config, $acm_type;
-		global $dbms, $dbhost, $dbname, $dbuser, $dbpasswd, $table_prefix;
+		global $phpEx, $tplEx, $portal_config;
+		global $dbms, $dbhost, $dbname, $dbuser, $dbpasswd, $table_prefix, $acm_type;
 		
 		$backend_table_prefix = '';
 		
@@ -2737,7 +2737,7 @@ class mx_backend
 
 		foreach ($parsed_items as $key => $parsed_array)
 		{
-			$parsed_array = isset($theme[$key . '_path']) ? $mx_cache->get('_cfg_' . $key . '_' . $theme[$key . '_path']) : $mx_cache->get('_cfg_' . $key);
+			$parsed_array = $mx_cache->get('_cfg_' . $key . '_' . $theme[$key . '_path']);
 
 			if ($parsed_array === false)
 			{
@@ -2745,7 +2745,7 @@ class mx_backend
 			}
 
 			$reparse = false;
-			$filename = $phpbb_root_path . 'styles/' . (isset($theme[$key . '_path']) ? $theme[$key . '_path']  : '') . '/' . $key . '/' . $key . '.cfg';
+			$filename = $phpbb_root_path . 'styles/' . $theme[$key . '_path'] . '/' . $key . '/' . $key . '.cfg';
 
 			if (!file_exists($filename))
 			{
@@ -3622,27 +3622,17 @@ class mx_backend
 		$mx_cache->load_file('version_helper', 'phpbb3');
 		$version_helper = new version_helper();
 		
-		try
-		{
-			$recheck = $mx_request_vars->variable('versioncheck_force', false);
-			$updates_available = $version_helper->get_update_on_branch($recheck);
-			$upgrades_available = $version_helper->get_suggested_updates();
+		$recheck = $mx_request_vars->variable('versioncheck_force', false);
+		$updates_available = $version_helper->get_update_on_branch($recheck);
+		$upgrades_available = $version_helper->get_suggested_updates();
 				
-			if (!empty($upgrades_available))
-			{
-				$upgrades_available = array_pop($upgrades_available);
-			}
-			$version_up_to_date		= empty($updates_available);
-			$version_upgradeable		= !empty($upgrades_available);
-			$upgrade_instructions		= !empty($upgrades_available) ? $mx_user->lang('UPGRADE_INSTRUCTIONS', $upgrades_available['current'], $upgrades_available['announcement']) : false;
-		}
-		catch (\RuntimeException $e)
+		if (!empty($upgrades_available))
 		{
-			$message = call_user_func_array(array($mx_user, 'lang'), array_merge(array($e->getMessage()), $e->get_parameters()));
-
-			$versioncheck_fail		= true;
-			$versioncheck_fail_reason	= ($e->getMessage() !== 'VERSIONCHECK_FAIL') ? $message : '';
+			$upgrades_available = array_pop($upgrades_available);
 		}
+		$version_up_to_date		= empty($updates_available);
+		$version_upgradeable		= !empty($upgrades_available);
+		$upgrade_instructions		= !empty($upgrades_available) ? $mx_user->lang('UPGRADE_INSTRUCTIONS', $upgrades_available['current'], $upgrades_available['announcement']) : false;
 		
 		if ((($head_phpbb_revision == 3) && ($major_phpbb_revision == 0)) || ($head_phpbb_revision < 3))
 		{

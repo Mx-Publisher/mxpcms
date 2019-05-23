@@ -93,7 +93,7 @@ class mx_Template extends Template
 	 */
 	function mx_Template($root = '.')
 	{
-		parent::Template($root);
+		parent::init($root);
 
 		//
 		// Temp solution when the rootdir is not created
@@ -3338,7 +3338,7 @@ class mx_user extends mx_session
 					$this->lang_path = $phpbb_root_path . 'language/' . $this->lang_name . '/';
 					$this->date_format = $board_config['default_dateformat'];
 					$this->timezone = $board_config['board_timezone'] * 3600;
-					$this->dst = $board_config['board_dst'] * 3600;
+					$this->dst = isset($this->data['user_dst']) ? $this->data['user_dst'] * 3600 : $board_config['user_timezone'] * 3600;
 				}
 				
 				$this->img_lang = (@file_exists($phpbb_root_path . 'styles/' . $this->theme['imageset_path'] . '/theme/' . $this->lang_name)) ? $this->lang_name : $this->encode_lang($board_config['default_lang']);				
@@ -4051,7 +4051,7 @@ class mx_user extends mx_session
 				// -------------------------------------------------------------------------
 				// Read Module Main Language Definition
 				// -------------------------------------------------------------------------
-				if ((include $module_lang_path . "language/lang_" . $language . "/lang_main.$phpEx") === false)
+				if ((@include $module_lang_path . "language/lang_" . $language . "/lang_main.$phpEx") === false)
 				{
 					if (strpos($this->mx_root_path, 'mx_coreblocks') === 0)
 					{
@@ -4938,7 +4938,7 @@ class mx_language extends mx_language_file_loader
 	{
 		$this->loader = $this;
 
-		global $board_config, $mx_user;		
+		global $board_config, $mx_user;	
 		global $mx_root_path, $phpbb_root_path, $module_root_path;
 		
 		$this->mx_root_path	= $mx_root_path;
@@ -6333,7 +6333,7 @@ class mx_language extends mx_language_file_loader
 		// Load common language files if they not loaded yet
 		if (!$this->common_language_files_loaded)
 		{
-			$this->load_common_language_files();							
+			$this->load_common_language_files();
 		}
 		
 		if (is_array($key))

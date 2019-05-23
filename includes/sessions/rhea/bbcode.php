@@ -355,8 +355,8 @@ class mx_bbcode
 				case 10:
 					$this->bbcode_cache[$bbcode_id] = array(
 						'preg' => array(
-							'#\[email:$uid\]((.*?))\[/email:$uid\]#is'			=> $this->bbcode_tpl('email', $bbcode_id),
-							'#\[email=([^\[]+):$uid\](.*?)\[/email:$uid\]#is'	=> $this->bbcode_tpl('email', $bbcode_id)
+							'#\[email:$uid\]((.*?))\[/email:$uid\]#is'	=> $this->bbcode_tpl('email', $bbcode_id),
+							'#\[email=([^\[]+):$uid\](.*?)\[/email:$uid\]#is' => $this->bbcode_tpl('email', $bbcode_id)
 						)
 					);
 				break;
@@ -465,7 +465,7 @@ class mx_bbcode
 				'i_open'	=> '<span style="font-style: italic">',
 				'i_close'	=> '</span>',
 				'ipaper_open'	=> '<span>',
-				'ipaper_close'	=> '</span>',				
+				'ipaper_close'	=> '</span>',
 				'u_open'	=> '<span style="text-decoration: underline">',
 				'u_close'	=> '</span>',
 				'img'		=> '<center><img src="$1" alt="' . $mx_user->lang['IMAGE'] . '" /></center>',
@@ -776,7 +776,7 @@ class mx_bbcode
 		$bbcode_tpl['ipaper'] = str_replace('{IPAPERLINK}', '\\5', $bbcode_tpl['ipaper']);
 		//$bbcode_tpl['scribd'] = str_replace('{WIDTH}', '\\1', $bbcode_tpl['scribd']);
 		//$bbcode_tpl['scribd'] = str_replace('{HEIGHT}', '\\2', $bbcode_tpl['scribd']);
-		$bbcode_tpl['scribd'] = str_replace('{SCRIBDID}', '\\1', $bbcode_tpl['scribd']);		
+		$bbcode_tpl['scribd'] = str_replace('{SCRIBDID}', '\\1', $bbcode_tpl['scribd']);
 		$bbcode_tpl['scribd'] = str_replace('{SCRIBDURL}', $lang['Link'], $bbcode_tpl['scribd']);
 		//Stop more bbcode
 
@@ -826,7 +826,7 @@ class mx_bbcode
 		}
 		
 		//$text = str_replace(array("\n", "\r"), array('<br />', "\n"), $text);
-		$text = str_replace(array("\n", "\r"), array('<br />', ""), $text);			
+		$text = str_replace(array("\n", "\r"), array('<br />', ""), $text);
 		$text = preg_replace('#(script|about|applet|activex|chrome):#is', "\\1&#058;", $text);
 
 		// pad it with a space so we can distinguish between FALSE and matching the 1st char (index 0).

@@ -750,7 +750,7 @@ class session
 	*/
 	function session_create($user_id = false, $set_admin = false, $persist_login = false, $viewonline = true)
 	{
-		global $SID, $_SID, $phpBB2, $phpBB3, $db, $board_config, $cache, $mx_root_path, $phpbb_root_path, $phpEx, $mx_backend;
+		global $SID, $_SID, $phpBB2, $phpBB3, $db, $board_config, $cache, $phpbb_root_path, $phpEx, $mx_backend;
 
 		$this->data = array();
 
@@ -870,10 +870,9 @@ class session
 
 			if (!$bot)
 			{
-				$sql = 'SELECT u.*, s.*
-					FROM ' . USERS_TABLE . ' u
-					LEFT JOIN ' . SESSIONS_TABLE . ' s ON (s.session_user_id = u.user_id)
-					WHERE u.user_id = ' . (int) $this->cookie_data['u'];
+				$sql = 'SELECT *
+					FROM ' . USERS_TABLE . '
+					WHERE user_id = ' . (int) $this->cookie_data['u'];
 			}
 			else
 			{
@@ -1860,17 +1859,7 @@ class session
 		
 		$board_config['require_activation'] = 0;
 		
-		try
-		{
-			$this->timezone = $timezone = new \DateTimeZone($board_config['user_timezone']);
-		}
-		catch (\Exception $e)
-		{
-			// If the timezone the user has selected is invalid, we fall back to UTC.
-			$this->timezone = $timezone = new \DateTimeZone('UTC');
-		}
-		
-		$this->dst = $board_config['user_timezone'] * 3600;
+		$this->dst = $timezone * 3600;
 		
 		$sign = ($board_config['user_timezone'] < 0) ? '-' : '+';
 		$time_offset = abs($board_config['user_timezone']);
@@ -1880,7 +1869,7 @@ class session
 		$offset_hours	= ($time_offset - $offset_seconds) / 3600;
 		
 		// Zone offset
-		$zone_offset = $board_config['user_timezone'] + $this->dst;
+		$zone_offset = $this->timezone + $this->dst;
 		
 		$offset_string = sprintf($board_config['default_dateformat'], $sign, $offset_hours, $offset_minutes);
 		
@@ -1913,7 +1902,8 @@ class session
 
 			$this->date_format = $this->data['user_dateformat'];
 			$this->timezone = $this->data['user_timezone'] * 3600;
-			$this->dst = isset($this->data['user_dst']) ? $this->data['user_dst'] * 3600 : $board_config['user_timezone'] * 3600;
+			$this->dst = $this->data['user_dst'] * 3600;
+			
 			if (!empty($this->data['user_lang']))
 			{
 				$default_lang = mx_ltrim(basename(mx_rtrim($this->data['user_lang'])), "'");
@@ -1935,7 +1925,7 @@ class session
 			$this->lang_path = $phpbb_root_path . 'language/' . $this->lang_name . '/';
 			$this->date_format = $board_config['default_dateformat'];
 			$this->timezone = $board_config['board_timezone'] * 3600;
-			$this->dst = isset($this->data['user_dst']) ? $this->data['user_dst'] * 3600 : $board_config['user_timezone'] * 3600;
+			$this->dst = $board_config['board_dst'] * 3600;
 			
 			$default_lang = mx_ltrim(basename(mx_rtrim($board_config['default_lang'])), "'");
 	
@@ -2368,7 +2358,7 @@ class session
 		// If the style author specified the theme needs to be cached
 		// (because of the used paths and variables) than make sure it is the case.
 		// For example, if the theme uses language-specific images it needs to be stored in db.
-		if (!isset($this->theme['theme_storedb']) && isset($this->theme['parse_css_file']) && isset($this->theme['theme_id']))
+		if (!$this->theme['theme_storedb'] && $this->theme['parse_css_file'])
 		{
 			$this->theme['theme_storedb'] = 1;
 			
@@ -2418,46 +2408,7 @@ class session
 		
 		$template->set_template();
 		
-		//
-		// Added here for phpbb3 backend not for rhea backend
-		// - First try old Olympus image sets then phpBB2 and phpBB3 Proteus template lang images 
-		//
-		if (is_dir("{$phpbb_root_path}{$this->style_path}{$this->template_name}/imageset/"))
-		{
-			$this->imageset_path = '/imageset/'; //Olympus ImageSet
-			$this->img_lang = (file_exists($phpbb_root_path . $this->style_path . $this->template_name . $this->imageset_path . $this->lang_iso)) ? $this->lang_iso : $this->default_language;
-			$this->img_lang_dir = $this->img_lang;
-			$this->imageset_backend = 'olympus';
-			$this->theme['imageset_name'] = $this->template_name;
-		}
-		elseif (@is_dir("{$phpbb_root_path}{$this->template_path}{$this->template_name}/theme/images/") || @is_dir("{$phpbb_root_path}{$this->style_path}{$this->template_name}/theme/images/"))
-		{
-			$this->imageset_path = '/theme/images/';  //phpBB3 Images
-			if ((@is_dir("{$phpbb_root_path}{$this->template_path}{$this->template_name}/theme/lang_{$this->user_language_name}")) || (@is_dir("{$phpbb_root_path}{$this->template_path}{$this->template_name}/theme/lang_{$this->default_language_name}")))
-			{
-				$this->img_lang = (file_exists($phpbb_root_path . $this->template_path . $this->template_name . '/theme/' . 'lang_' . $this->user_language_name)) ? $this->user_language_name : $this->default_language_name;
-				$this->img_lang_dir = 'lang_' . $this->img_lang;
-				$this->imageset_backend = 'phpbb2';
-			}
-			
-			if ((@is_dir("{$phpbb_root_path}{$this->style_path}{$this->template_name}/theme/{$this->user_language}")) || (@is_dir("{$phpbb_root_path}{$this->template_path}{$this->template_name}/theme/{$this->default_language}")))
-			{
-				$this->img_lang = (file_exists($phpbb_root_path . $this->style_path . $this->template_name . '/theme/' . $this->user_language_name)) ? $this->user_language : $this->default_language;
-				$this->img_lang_dir = $this->img_lang;
-				$this->imageset_backend = 'phpbb3';
-			}
-			
-			$this->theme['imageset_name'] = $this->template_name;
-		}
-		elseif (@is_dir("{$phpbb_root_path}{$this->template_path}{$this->template_name}/images/"))
-		{
-			$this->imageset_path = '/images/';  //phpBB2 Images
-			$this->img_lang = (is_dir($phpbb_root_path . $this->style_path . $this->template_name . $this->imageset_path . '/images/lang_' . $this->user_language_name)) ? $this->user_language_name : $this->default_language_name;
-			$this->img_lang_dir = 'lang_' . $this->img_lang;
-			$this->imageset_backend = 'phpbb2';
-			$this->theme['imageset_name'] = $this->template_name;
-		}
-		
+		$this->img_lang = (file_exists($phpbb_root_path . 'styles/' . $this->theme['imageset_path'] . '/imageset/' . $this->lang_name)) ? $this->lang_name : $this->encode_lang($board_config['default_lang']);
 		/*
 		$sql = 'SELECT image_name, image_filename, image_lang, image_height, image_width
 			FROM ' . STYLES_IMAGESET_DATA_TABLE . '
@@ -2465,9 +2416,8 @@ class session
 			AND image_filename <> ''
 			AND image_lang IN ('" . $db->sql_escape($this->img_lang) . "', '')";
 		$result = $db->sql_query($sql, 3600);
-		*/
+
 		$localised_images = false;
-		/*
 		while ($row = $db->sql_fetchrow($result))
 		{
 			if ($row['image_lang'])
@@ -3001,9 +2951,9 @@ class session
 	* @param DateTimeZone $timezone Time zone of the time.
 	* @return \phpbb\datetime Date time object linked to the current users locale
 	*/
-	public function create_datetime($time = 'now', \DateTimeZone $timezone = null)
+	public function create_datetime($time = 'now', $timezone = null)
 	{
-		$timezone = $timezone ?: $this->timezone;
+		$timezone = $timezone ? $timezone : $this->timezone;
 		/**
 		$timezones = array('Europe/London', 'Mars/Olympus', 'Mars/Ascraeus', timezone_name_from_abbr('', $timezone, 0));
 				
@@ -3031,10 +2981,10 @@ class session
 	* @param	DateTimeZone	$timezone	Timezone of the date/time, falls back to timezone of current user
 	* @return	int			Returns the unix timestamp
 	*/
-	public function get_timestamp_from_format($format, $time, \DateTimeZone $timezone = null)
+	public function get_timestamp_from_format($format, $time, $timezone = null)
 	{
-		$timezone = $timezone ?: $this->timezone;
-		$date = \DateTime::createFromFormat($format, $time, $timezone);
+		$timezone = $timezone ? $timezone : $this->timezone;
+		$date = createFromFormat($format, $time, $timezone);
 		return ($date !== false) ? $date->format('U') : false;
 	}
 	

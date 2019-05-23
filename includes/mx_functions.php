@@ -1799,7 +1799,8 @@ function mx_get_avatar($row, $alt, $ignore_config = false, $lazy = false)
 	//{
 	//	return '';
 	//}
-
+	$avatar_data = array();
+	
 	if ( $mx_user->data['user_id'] == ANONYMOUS )
 	{
 		$row['user_avatar'] 	= !empty($row['user_avatar']) ? $row['user_avatar'] :  'guest_aphrodite.gif';
@@ -1853,9 +1854,13 @@ function mx_get_avatar($row, $alt, $ignore_config = false, $lazy = false)
 		{
 			//return $html;
 		}
-
+		
 		$root_path = generate_portal_url();
 		if (is_file($phpbb_root_path .  'images/avatars/default_avatars/' . $row['avatar']))
+		{
+			$avatar_path = $phpbb_root_path . 'images/avatars/default_avatars/';
+		}
+		elseif (is_file($phpbb_root_path .  'images/avatars/default_avatars/' . $row['user_avatar']))
 		{
 			$avatar_path = $phpbb_root_path . 'images/avatars/default_avatars/';
 		}
@@ -1878,9 +1883,9 @@ function mx_get_avatar($row, $alt, $ignore_config = false, $lazy = false)
 		else
 		{
 			$avatar_path = $mx_root_path . 'images/avatars/default_avatars/';
-		}
+		}	
 		$avatar_data = array(
-			'src' => $avatar_path . $row['avatar'],
+			'src' => empty($row['avatar']) ? $avatar_path . $row['user_avatar'] : $avatar_path . $row['avatar'],
 			'width' => $row['avatar_width'],
 			'height' => $row['avatar_height'],
 		);
@@ -3638,22 +3643,25 @@ if( !function_exists('get_backtrace') )
 	function mx_set_config($board_config_name, $board_config_value)
 	{
 		global $db, $mx_cache, $portal_config;
-
-		$sql = 'UPDATE ' . PORTAL_TABLE . "
-			SET config_value = '" . $db->sql_escape($board_config_value) . "'
-			WHERE config_name = '" . $db->sql_escape($board_config_name) . "'";
+		
+		//Aternative to $sql = "UPDATE  " . PORTAL_TABLE . " SET " . $db->sql_build_array('UPDATE', utf8_normalize_nfc($portal_config));
+		$sql = "UPDATE " . PORTAL_TABLE . "
+			SET " . $db->sql_escape($board_config_name) . " = " . $db->sql_escape($board_config_value) . "
+			WHERE portal_id = 1";
 		$db->sql_query($sql);
 
 		if (!$db->sql_affectedrows() && !isset($portal_config[$board_config_name]))
 		{
-			$sql = 'INSERT INTO ' . PORTAL_TABLE . ' ' . $db->sql_build_array('INSERT', array(
-				'config_name'	=> $board_config_name,
-				'config_value'	=> $board_config_value));
+			$portal_config[$board_config_name] = $board_config_value;
+			
+			$sql = "INSERT INTO ".PORTAL_TABLE." (".
+					implode(', ', array_keys($portal_config)).
+					") VALUES (".
+					implode(', ', array_values($portal_config)).
+					")";
 			$db->sql_query($sql);
 		}
-
-		$portal_config[$board_config_name] = $board_config_value;
-		$mx_cache->put( 'mxbb_config', $portal_config );
+		$mx_cache->put('mxbb_config', $portal_config);
 	}
 }
 

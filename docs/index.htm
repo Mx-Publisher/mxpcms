@@ -1,32 +1,114 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html dir="ltr"><head>
+<meta http-equiv="Content-Type" content="text/html# charset="iso-8859-1"/>
 
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <meta http-equiv="Content-Style-Type" content="text/css">
-<meta name="title" content="MX-Publisher.com">
+<meta name="title" content="mxpcms.sf.net">
 <meta name="author" content="The MX-Publisher (MXP) Development Team">
 <meta name="copyright" content="The MX-Publisher (MXP) Development Team">
-<link rel="icon" href="http://mxpcms.sourceforge.net/favicon.gif" type="image/gif">
+<link rel="icon" href="../favicon.gif" type="image/gif">
 
-<link rel="stylesheet" href="mxp.css" type="text/css">
+<meta name="browser" http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="blue">
+<meta content="text/html" charset="UTF-8" http-equiv="Content-Type">
+<meta name="GENERATOR" content="Kompozer, OpenOffice.org 1.1.1 (Win32)">
+<meta name="CREATED" content="20040708;12280200">
+<meta name="CHANGED" content="20040709;10181231">
 
-<style type="text/css">
-	.mx_icon {
+<style>
+@page { size: 21.59cm 27.94cm; margin: 2cm }
+P { margin-bottom: 0.21cm }
+H1 { margin-top: 0cm; margin-bottom: 0cm }
+H1.western { font-family: "Arial", sans-serif; font-size: 14pt; font-weight: medium }
+H1.cjk { font-family: "Lucida Sans Unicode"; font-size: 14pt; font-weight: medium }
+H1.ctl { font-family: "Tahoma"; font-size: 12pt; font-weight: medium }
+A:link { color: #0000ff }
+.mx_icon
+ {
 	vertical-align: middle;
 	background-color:;
 	background-image: url(/images/theme/icon_bg.gif);
 	background-repeat: no-repeat;
-	}
-	.mx_icon_hot {
+}
+.mx_icon_hot 
+{
 	vertical-align: middle;
 	background-color:;
 	background-image: url(/images/theme/icon_bg.gif);
 	background-repeat: no-repeat;
-	}
+}
 </style>
 
+<link href="../assets/css/font-awesome.min.css" rel="stylesheet" />
+<link href="../templates/prosilver/theme/stylesheet.css" rel="stylesheet" />
+<link href="../templates/prosilver/theme/images/lang_romanian/stylesheet.css" rel="stylesheet" />
+
+	<link href="../templates/prosilver/theme/bidi.css?assets_version=3.0.5" rel="stylesheet" />
+<!-- ENDIF -->
+
+<!-- IF S_PLUPLOAD -->
+	<link href="../templates/prosilver/theme/plupload.css?assets_version=3.0.5" rel="stylesheet" />
+<!-- ENDIF -->
+
+<!-- IF S_COOKIE_NOTICE -->
+	<link href="../assets/cookieconsent/cookieconsent.min.css?assets_version=3.0.5" rel="stylesheet" />
+<!-- ENDIF -->
+
+<!--[if lte IE 9]>
+	<link href="../templates/prosilver/theme/tweaks.css?assets_version=3.0.5" rel="stylesheet" />
+<![endif]-->
+
+
+<!-- IF ENABLE_PM_POPUP -->
+<script type="text/javascript"><!--
+	if(  )
+	{
+		window.open('', '_phpbbprivmsg', 'HEIGHT=225,resizable=yes,WIDTH=400');
+	}
+// --></script>
+<!-- ENDIF -->
+
+<script type="text/javascript"><!--
+
+function checkSearch()
+{
+	if (document.search_block.search_engine.value == 'google')
+	{
+		window.open('http://www.google.com/search?q=' + document.search_block.search_keywords.value, '_google', '');
+		return false;
+	}
+	else if (document.search_block.search_engine.value == 'site')
+	{
+		window.open('&search_keywords=' + document.search_block.search_keywords.value, '_self', '');
+		return false;
+	}
+	else if (document.search_block.search_engine.value == 'kb')
+	{
+		window.open('&search_keywords=' + document.search_block.search_keywords.value, '_self', '');
+		return false;
+	}
+	else if (document.search_block.search_engine.value == 'pafiledb')
+	{
+		window.open('&search_keywords=' + document.search_block.search_keywords.value, '_self', '');
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+}
+
+// --></script>
+
 <script language="javascript" type="text/javascript" src="js/Common.js"></script>
-<script language="javascript" type="text/javascript" src="js/Toggle.js"></script></head><body>
+<script language="javascript" type="text/javascript" src="js/Toggle.js"></script>
+
+<title>MX-Publisher CMS Documntation</title>
+</head>
+<body style="direction: ltr;" lang="en-US" link="#0000ff">
+
 
 <a name="top"></a>
 
@@ -39,11 +121,11 @@
 				<table border="0" cellpadding="0" cellspacing="0" width="100%">
 					<tbody><tr height="80">
 						<td align="left" valign="top" width="25%">
-							<!--<a href="http://mxpcms.sourceforge.net/index.php"><img src="http://mxpcms.sourceforge.net/templates/subSilver/images/logo.gif" border="0" alt="MX-Publisher" vspace="1"/></a>-->
-							<a href="http://mxpcms.sourceforge.net/index.php"><img src="images/theme/spacer.gif" alt="MX-Publisher" title="MX-Publisher" border="0" height="75" width="210"></a>
+							<!--<a href="http://www.mx-publisher.com/index.php"><img src="http://www.mx-publisher.com/templates/subSilver/images/logo.gif" border="0" alt="MX-Publisher" vspace="1"/></a>-->
+							<a href="http://www.mx-publisher.com/index.php"><img src="images/theme/spacer.gif" alt="MX-Publisher" title="MX-Publisher" border="0" height="75" width="210"></a>
 						</td>
 						<td align="center" valign="middle" width="50%">
-							<!--<img valign="middle" src="http://mxpcms.sourceforge.net/templates/subSilver/images/page_icons/icon_home.gif" alt="" />&nbsp;&nbsp;<span class="pagetitle">Home</span>-->
+							<!--<img valign="middle" src="http://www.mx-publisher.com/templates/subSilver/images/page_icons/icon_home.gif" alt="" />&nbsp;&nbsp;<span class="pagetitle">Home</span>-->
 						</td>
 						<td align="right" valign="top" width="25%"><span class="sitetitle">&nbsp;</span></td>
 					</tr>
@@ -63,12 +145,12 @@
 		<div id="header">
 	  	<div class="globalNav">
 		&nbsp;
-					<span class="genmed"></span> <span class="cat-button-current" onmouseout="this.className='cat-button-current';" onmouseover="this.className='cat-button-current';"><a href="http://mxpcms.sourceforge.net/home" target="" title="This is the startpage">Home</a></span>
-					<span class="genmed">|</span> <span class="cat-button" onmouseout="this.className='cat-button';" onmouseover="this.className='cat-button-current';"><a href="http://mxpcms.sourceforge.net/docs" target="" title="MXP Documentation Page">Docs</a></span>
-					<span class="genmed">|</span> <span class="cat-button" onmouseout="this.className='cat-button';" onmouseover="this.className='cat-button-current';"><a href="http://mxpcms.sourceforge.net/forum" target="" title="This is the phpBB Forum startpage">Forum</a></span>
-					<span class="genmed">|</span> <span class="cat-button" onmouseout="this.className='cat-button';" onmouseover="this.className='cat-button-current';"><a href="http://mxpcms.sourceforge.net/page39" target="" title="Demo">Demo</a></span>
-					<span class="genmed">|</span> <span class="cat-button" onmouseout="this.className='cat-button';" onmouseover="this.className='cat-button-current';"><a href="http://mxpcms.sourceforge.net/download" target="" title="MXP Downloads Page">Download</a></span>
-					<span class="genmed">|</span> <span class="cat-button" onmouseout="this.className='cat-button';" onmouseover="this.className='cat-button-current';"><a href="http://mxpcms.sourceforge.net/contribute" target="" title="Find out how you can help MXP">Contribute</a></span>
+					<span class="genmed"></span> <span class="cat-button-current" onmouseout="this.className='cat-button-current';" onmouseover="this.className='cat-button-current';"><a href="http://www.mx-publisher.com/home" target="" title="This is the startpage">Home</a></span>
+					<span class="genmed">|</span> <span class="cat-button" onmouseout="this.className='cat-button';" onmouseover="this.className='cat-button-current';"><a href="http://www.mx-publisher.com/docs" target="" title="MXP Documentation Page">Docs</a></span>
+					<span class="genmed">|</span> <span class="cat-button" onmouseout="this.className='cat-button';" onmouseover="this.className='cat-button-current';"><a href="http://www.mx-publisher.com/forum" target="" title="This is the phpBB Forum startpage">Forum</a></span>
+					<span class="genmed">|</span> <span class="cat-button" onmouseout="this.className='cat-button';" onmouseover="this.className='cat-button-current';"><a href="http://www.mx-publisher.com/page39" target="" title="Demo">Demo</a></span>
+					<span class="genmed">|</span> <span class="cat-button" onmouseout="this.className='cat-button';" onmouseover="this.className='cat-button-current';"><a href="http://www.mx-publisher.com/download" target="" title="MXP Downloads Page">Download</a></span>
+					<span class="genmed">|</span> <span class="cat-button" onmouseout="this.className='cat-button';" onmouseover="this.className='cat-button-current';"><a href="http://www.mx-publisher.com/contribute" target="" title="Find out how you can help MXP">Contribute</a></span>
 			  	</div>
 	</div>
 
@@ -77,16 +159,16 @@
 			<table border="0" cellpadding="2" cellspacing="0">
 				<tbody><tr>
 										<td style="border: medium none ;" class="" onmouseout="this.className='';" onmouseover="this.className='nav-button-current';" valign="center">
-						<img class="mx_icon" src="images/theme/icon_notify.gif" alt="Home" align="absmiddle" border="0">&nbsp;<span class="menu-button"><a href="http://mxpcms.sourceforge.net/news" target="" class="genmed" title="Home">News</a></span>
+						<img class="mx_icon" src="images/theme/icon_notify.gif" alt="Home" align="absmiddle" border="0">&nbsp;<span class="menu-button"><a href="http://www.mx-publisher.com/news" target="" class="genmed" title="Home">News</a></span>
 					</td>
 										<td style="border: medium none ;" class="" onmouseout="this.className='';" onmouseover="this.className='nav-button-current';" valign="center">
-						<img class="mx_icon" src="images/theme/icon_message.gif" alt="Home" align="absmiddle" border="0">&nbsp;<span class="menu-button"><a href="http://mxpcms.sourceforge.net/features" target="" class="genmed" title="Features">Features</a></span>
+						<img class="mx_icon" src="images/theme/icon_message.gif" alt="Home" align="absmiddle" border="0">&nbsp;<span class="menu-button"><a href="http://www.mx-publisher.com/features" target="" class="genmed" title="Features">Features</a></span>
 					</td>
 										<td style="border: medium none ;" class="" onmouseout="this.className='';" onmouseover="this.className='nav-button-current';" valign="center">
-						<img class="mx_icon" src="images/theme/icon_message.gif" alt="About the Project" align="absmiddle" border="0">&nbsp;<span class="menu-button"><a href="http://mxpcms.sourceforge.net/about" target="" class="genmed" title="About the Project">About</a></span>
+						<img class="mx_icon" src="images/theme/icon_message.gif" alt="About the Project" align="absmiddle" border="0">&nbsp;<span class="menu-button"><a href="http://www.mx-publisher.com/about" target="" class="genmed" title="About the Project">About</a></span>
 					</td>
 										<td style="border: medium none ;" class="" onmouseout="this.className='';" onmouseover="this.className='nav-button-current';" valign="center">
-						<img class="mx_icon" src="images/theme/icon_message.gif" alt="About - Terms of Use" align="absmiddle" border="0">&nbsp;<span class="menu-button"><a href="http://mxpcms.sourceforge.net/toe" target="" class="genmed" title="About - Terms of Use">Terms of Use</a></span>
+						<img class="mx_icon" src="images/theme/icon_message.gif" alt="About - Terms of Use" align="absmiddle" border="0">&nbsp;<span class="menu-button"><a href="http://www.mx-publisher.com/toe" target="" class="genmed" title="About - Terms of Use">Terms of Use</a></span>
 					</td>
 
 
@@ -109,7 +191,7 @@
 							<table class="forumline" style="border-top: medium none;" border="0" cellpadding="0" cellspacing="1" width="100%">
 							<tbody>
 							<tr>
-								<td class="row1" colspan="2" align="left"><h4>Stable Release</h4><p>MXP 2.8.2</p><p><img src="images/theme/icon_latest_reply.gif" alt="" height="9" width="18">&nbsp;<a href="http://mxpcms.sourceforge.net/download/stable">Download Now</a>!</p><h4>Development Release</h4><p>MXP 3.0.0 b1</p><p><img src="images/theme/icon_latest_reply.gif" alt="" height="9" width="18">&nbsp;<a href="http://mxpcms.sourceforge.net/download/dev">Download Now</a>!</p></td>
+								<td class="row1" colspan="2" align="left"><h4>Stable Release</h4><p>MXP 2.8.2</p><p><img src="images/theme/icon_latest_reply.gif" alt="" height="9" width="18">&nbsp;<a href="http://www.mx-publisher.com/download/stable">Download Now</a>!</p><h4>Development Release</h4><p>MXP 3.0.0 b1</p><p><img src="images/theme/icon_latest_reply.gif" alt="" height="9" width="18">&nbsp;<a href="http://www.mx-publisher.com/download/dev">Download Now</a>!</p></td>
 							</tr>
 							</tbody>
 							</table>
@@ -153,7 +235,7 @@
 
 				The phpBB Group : 2001 - 2008 & MXP Team : 2001 - 2008
 			// -->
-			Powered by  <a href="http://mxpcms.sourceforge.net/" target="_mx-system" class="copyright">MX-Publisher (MXP)</a>  © 2001-2008 &amp; <a href="http://www.phpbb.com/" target="_phpbb" class="copyright">phpBB</a>  © 2001 to 2008 phpBB Group | <a href="http://mxpcms.sourceforge.net/index.php?mx_copy=true" target="_phpbb" class="copyright">About MX-Publisher</a>
+			Powered by  <a href="http://www.mx-publisher.com/" target="_mx-system" class="copyright">MX-Publisher (MXP)</a>  © 2001-2008 &amp; <a href="http://www.phpbb.com/" target="_phpbb" class="copyright">phpBB</a>  © 2001 to 2008 phpBB Group | <a href="http://www.mx-publisher.com/index.php?mx_copy=true" target="_phpbb" class="copyright">About MX-Publisher</a>
 						<div class="pageStats" align="center">This page was updated  2008-06-21 &nbsp;</div>
 					</div>
 	</div>

@@ -200,23 +200,28 @@ class Template
 	*
 	* @param $mx_user
 	*/
-	public function __construct()
+	public function __construct($root = '.')
 	{
 		global $mx_cache, $mx_user; 
 		
 		$this->cache = $mx_cache;
 		$this->user = $mx_user;
+		
+		// setting pointer "vars"
+		$this->vars = &$this->_tpldata['.'][0];
+		// load configuration
+		$this->load_config($root, true);
 	}
 	
 	/**
 	 * Constructor. Installs XS mod on first run or updates it and sets the root dir.
 	 */
-	function Template($root = '.')
+	function init($root = '.')
 	{
 		global $mx_cache, $mx_user; 
 		
 		$this->cache = $mx_cache;
-		$this->user = $mx_user;		
+		$this->user = $mx_user;
 		
 		// setting pointer "vars"
 		$this->vars = &$this->_tpldata['.'][0];

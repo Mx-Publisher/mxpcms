@@ -101,9 +101,18 @@ if (!isset($mx_page->page_navigation_block))
 }
 
 // Parse and show the overall header.
+$start = $mx_request_vars->get('start', MX_TYPE_INT, 0);
+$view = $mx_request_vars->variable('view', '');
+
+$print_version = $mx_request_vars->is_request('print') ? true : false; 
+$no_page_header = (isset($_REQUEST['view']) || $mx_request_vars->variable('view', '') == 'print') ? true : $print_version; 
+
 $page_ov_header2 = substr_count($mx_page->page_ov_header, 'html') ? str_replace(".html", ".tpl", $mx_page->page_ov_header) : str_replace(".tpl", ".html", $mx_page->page_ov_header);
+$page_ov_header1 = ($no_page_header !== false) ? 'overall_header_print.' . $tplEx : $mx_page->page_ov_header;
+
+// Output the page
 $layouttemplate->set_filenames(array(
-	'overall_header' => empty($mx_page->page_ov_header) || ( !file_exists($mx_root_path . TEMPLATE_ROOT_PATH . $mx_page->page_ov_header) && !file_exists($mx_root_path . TEMPLATE_ROOT_PATH . $page_ov_header2) ) ? ( empty($gen_simple_header) ? 'overall_header.' . $tplEx : 'simple_header.' . $tplEx ) : $mx_page->page_ov_header
+	'overall_header' => empty($page_ov_header1) || ( !file_exists($mx_root_path . TEMPLATE_ROOT_PATH . $page_ov_header1) && !file_exists($mx_root_path . TEMPLATE_ROOT_PATH . $page_ov_header2) ) ? ( empty($gen_simple_header) ? 'overall_header.' . $tplEx : 'simple_header.' . $tplEx ) : $page_ov_header1
 ));
 
 // In case $phpbb_adm_relative_path is not set (in case of an update), use the default.
@@ -149,7 +158,6 @@ switch (PORTAL_BACKEND)
 	break;
 
 	case 'phpbb2':
-	case 'olympus':
 	//To do: Check this in sessions/phpbb2 comparing to sessions/internal
 		$u_login = mx_append_sid("login.".$phpEx);
 		if (  $mx_user->data['user_id'] != ANONYMOUS )
@@ -163,22 +171,54 @@ switch (PORTAL_BACKEND)
 			$l_login_logout = $lang['Login'];
 		}
 		
-		$u_register = (PORTAL_BACKEND !== 'phpbb2') ? mx_append_sid("{$phpbb_root_path}ucp.php?mode=register&redirect=$redirect_url") : mx_append_sid("{$phpbb_root_path}profile.".$phpEx."?mode=register");
-		$u_profile = (PORTAL_BACKEND !== 'phpbb2') ? mx_append_sid("{$phpbb_root_path}ucp.php?mode=editprofile") : mx_append_sid("{$phpbb_root_path}profile.".$phpEx."?mode=editprofile");
+		$u_register = mx_append_sid("{$phpbb_root_path}profile.".$phpEx."?mode=register");
+		$u_profile = mx_append_sid("{$phpbb_root_path}profile.".$phpEx."?mode=editprofile");
 		
-		$u_modcp 	= ((PORTAL_BACKEND !== 'phpbb2') && ($phpbb_auth->acl_get('m_') || $phpbb_auth->acl_getf_global('m_'))) ? mx_append_sid('modcp/index.'.$phpEx) : '';
-		$u_mcp	= ((PORTAL_BACKEND !== 'phpbb2') && ($phpbb_auth->acl_get('m_') || $phpbb_auth->acl_getf_global('m_'))) ? mx_append_sid("{$phpbb_root_path}mcp.$phpEx?i=main&mode=front&sid=" . $mx_user->session_id) : ( ((($mx_user->data['user_level'] = 2) && ($mx_user->data['user_active'] = 1)) || ($mx_user->data['user_level'] == ADMIN)) ? mx_append_sid("{$phpbb_root_path}modcp.$phpEx?i=main&mode=front&sid=" . $mx_user->session_id) : '');
+		$u_modcp = (($mx_user->data['user_level'] == MOD) || ($mx_user->data['user_level'] == ADMIN)) ? mx_append_sid('modcp/index.'.$phpEx) : '';
+		$u_mcp = (($mx_user->data['user_level'] == MOD) || ($mx_user->data['user_level'] == ADMIN)) ? mx_append_sid("{$phpbb_root_path}mcp.$phpEx?i=main&mode=front&sid=" . $mx_user->session_id) : ( ((($mx_user->data['user_level'] = 2) && ($mx_user->data['user_active'] = 1)) || ($mx_user->data['user_level'] == ADMIN)) ? mx_append_sid("{$phpbb_root_path}modcp.$phpEx?i=main&mode=front&sid=" . $mx_user->session_id) : '');
 	
-		$u_terms_use	= (PORTAL_BACKEND !== 'phpbb2') ? mx_append_sid("{$phpbb_root_path}ucp.$phpEx?mode=terms") : mx_append_sid("{$phpbb_root_path}profile.$phpEx?mode=terms");
-		$u_privacy	= (PORTAL_BACKEND !== 'phpbb2') ? mx_append_sid("{$phpbb_root_path}ucp.$phpEx?mode=privacy") : mx_append_sid("{$phpbb_root_path}profile.$phpEx?mode=privacy");
+		$u_terms_use = mx_append_sid("{$phpbb_root_path}profile.$phpEx?mode=terms");
+		$u_privacy = mx_append_sid("{$phpbb_root_path}profile.$phpEx?mode=privacy");
+	break;
+	
+	case 'olympus':
+	//To do: Check this in sessions/phpbb2 comparing to sessions/internal
+		$u_login = mx_append_sid("login.".$phpEx);
+		if ($mx_user->data['user_id'] != ANONYMOUS)
+		{
+			$u_login_logout = mx_append_sid('login.'.$phpEx.'?logout=true&sid=' . $mx_user->data['session_id']);
+			$l_login_logout = $lang['Logout'] . ' [ ' . $mx_user->data['username'] . ' ]';
+		}
+		else
+		{
+			$u_login_logout = mx_append_sid("login.".$phpEx);
+			$l_login_logout = $lang['Login'];
+		}
+		
+		$u_register = mx_append_sid("{$phpbb_root_path}ucp.php?mode=register&redirect=$redirect_url");
+		$u_profile = mx_append_sid("{$phpbb_root_path}ucp.php?mode=editprofile");
+		
+		$u_modcp 	= (($phpbb_auth->acl_get('m_') || $phpbb_auth->acl_getf_global('m_'))) ? mx_append_sid('modcp/index.'.$phpEx) : '';
+		$u_mcp	= (($phpbb_auth->acl_get('m_') || $phpbb_auth->acl_getf_global('m_'))) ? mx_append_sid("{$phpbb_root_path}mcp.$phpEx?i=main&mode=front&sid=" . $mx_user->session_id) : ( ((($mx_user->data['user_level'] = 2) && ($mx_user->data['user_active'] = 1)) || ($mx_user->data['user_level'] == ADMIN)) ? mx_append_sid("{$phpbb_root_path}modcp.$phpEx?i=main&mode=front&sid=" . $mx_user->session_id) : '');
+	
+		$u_terms_use	= mx_append_sid("{$phpbb_root_path}ucp.$phpEx?mode=terms");
+		$u_privacy	= mx_append_sid("{$phpbb_root_path}ucp.$phpEx?mode=privacy");
 	break;
 
 	default:
 	
+		if(!isset($phpbb_auth) || !is_object($phpbb_auth))
+		{
+			$phpbb_auth = new phpbb_auth();
+		}
+		$phpbb_auth->acl($mx_user->data);
+		
 		// Get referer to redirect user to the appropriate page after delete action
 		$redirect_url = mx_append_sid(PORTAL_URL . "index.$phpEx" . (isset($page_id) ? "?page={$page_id}" : "") . (isset($cat_nav) ? "&cat_nav={$cat_nav}" : ""));
 		$u_login = mx_append_sid("{$phpbb_root_path}ucp.$phpEx", 'mode=login');
-	
+		$u_register = mx_append_sid("{$phpbb_root_path}ucp.php?mode=register&redirect=$redirect_url");
+		$u_profile = mx_append_sid("{$phpbb_root_path}ucp.php?mode=editprofile");
+			
 		if ($mx_user->data['user_id'] != ANONYMOUS)
 		{
 			//$u_login_logout = mx_append_sid("{$phpbb_root_path}ucp.$phpEx", "mode=logout&redirect=$redirect_url", true, $mx_user->session_id);
@@ -187,10 +227,6 @@ switch (PORTAL_BACKEND)
 		}
 		else
 		{
-		
-			$u_register = mx_append_sid("{$phpbb_root_path}ucp.php?mode=register&redirect=$redirect_url");
-			$u_profile = mx_append_sid("{$phpbb_root_path}ucp.php?mode=editprofile");
-		
 			$u_login_logout = mx_append_sid("{$phpbb_root_path}ucp.php?mode=login&redirect=$redirect_url");
 			$l_login_logout = $mx_user->lang['LOGIN'];
 		}
@@ -865,8 +901,12 @@ $option_search_site = !empty($search_page_id_site) ? '<option value="site">' . $
 $option_search_forum = '<option value="forum">' . $lang['Mx_search_forum'] . '</option>';
 $option_search_google = '<option value="google">' . $lang['Mx_search_google'] . '</option>';
 
+// Search box official modules
 $search_page_id_kb = get_page_id('kb.' . $phpEx, true);
 $option_search_kb = !empty($search_page_id_kb) ? '<option value="kb">' . $lang['Mx_search_kb'] . '</option>' : '';
+
+$search_page_id_pub = get_page_id('app.' . $phpEx, true);
+$option_search_pub = !empty($search_page_id_pub) ? '<option value="pub">' . $lang['Mx_search_pub'] . '</option>' : '';
 
 $search_page_id_pafiledb = get_page_id('dload.' . $phpEx, true);
 $option_search_pafiledb = !empty($search_page_id_pafiledb) ? '<option value="pafiledb">' . $lang['Mx_search_pafiledb'] . '</option>' : '';
@@ -945,7 +985,6 @@ if (empty($default_lang))
 
 $useragent = (isset($_SERVER['HTTP_USER_AGENT'])) ? $_SERVER['HTTP_USER_AGENT'] : getenv('HTTP_USER_AGENT');
 
-
 switch (PORTAL_BACKEND)
 {
 	case 'internal':
@@ -953,6 +992,7 @@ switch (PORTAL_BACKEND)
 	case 'mybb':
 	case 'phpbb2':
 		$admin = ($mx_user->data['session_logged_in'] && $mx_user->data['user_level'] == ADMIN) ? true : false;
+		$mod = ($mx_user->data['session_logged_in'] && $mx_user->data['user_level'] == MOD) ? true : 0;
 	break;
 
 	case 'phpbb3':
@@ -961,6 +1001,7 @@ switch (PORTAL_BACKEND)
 	case 'rhea':
 		global $phpbb_auth;
 		$admin = (!$phpbb_auth->acl_get('a_') && $mx_user->data['user_id'] != ANONYMOUS) ? true : false;
+		$mod = (!$phpbb_auth->acl_get('m_') && $mx_user->data['user_id'] != ANONYMOUS) ? true : 0;
 	break;
 }
 
@@ -1095,7 +1136,7 @@ $layouttemplate->assign_vars(array(
 	'U_INDEX' 							=> mx_append_sid("{$phpbb_root_path}index.$phpEx"),
 	'U_CANONICAL' 					=> mx_append_sid(PORTAL_URL . "index.$phpEx"),		
 	'U_SITE_HOME'					=> (!empty($board_config['site_home_url'])) ? $board_config['site_home_url'] : mx_append_sid('./../index.'.$phpEx),	
-	'U_REGISTER' 						=> $u_register,
+	'U_REGISTER' 					=> $u_register,
 	'U_PROFILE' 						=> $u_profile,
 	'U_RESTORE_PERMISSIONS'	=> mx_append_sid("{$phpbb_root_path}memberlist.$phpEx?mode=restore_perm"),
 	'U_USER_PROFILE'				=> mx_get_username_string('profile_url', $mx_user->data['user_id'], $mx_user->data['username'], false),	
@@ -1220,8 +1261,8 @@ $layouttemplate->assign_vars(array(
 		
 	//To Do - configurable in AdminCP
 	//Display full login box with autologin option
-	'S_DISPLAY_FULL_LOGIN'	=> true,
-	'S_IS_MOBILE'                 => (isset($mx_user->data['is_mobile']) && ($mx_user->data['is_mobile'] == 1)) ? true : false,
+	'S_DISPLAY_FULL_LOGIN' => true,
+	'S_IS_MOBILE' => (isset($mx_user->data['is_mobile']) && ($mx_user->data['is_mobile'] == 1)) ? true : false,
 	//Old phpBB2 Backend Contant 
 	'IS_ADMIN' => $admin,
 	
@@ -1352,7 +1393,7 @@ if ($mx_page->auth_view || $mx_page->auth_mod)
 	{
 		$mx_block = new mx_block();
 	}
-	
+
 	$block_id = $mx_page->page_navigation_block;
 
 	if(!empty($block_id) )
@@ -1372,7 +1413,7 @@ if ($mx_page->auth_view || $mx_page->auth_mod)
 		// Include block file and cache output
 		//
 		ob_start();
-		@include($module_root_path . $mx_block->block_file);
+		@include_once($module_root_path . $mx_block->block_file);
 		$overall_navigation_menu = ob_get_contents();
 		ob_end_clean();
 
@@ -1409,7 +1450,7 @@ header ('Pragma: no-cache');
 
 $icongif = 'favicon.gif';
 
-include($mx_root_path . 'mx_meta.inc');
+include_once($mx_root_path . 'mx_meta.inc');
 $meta_str  = '<meta name="title"       content="' . $title     .'" />' . "\n";
 $meta_str .= '<meta name="author"      content="' . $author    .'" />' . "\n";
 $meta_str .= '<meta name="copyright"   content="' . $copyright .'" />' . "\n";
