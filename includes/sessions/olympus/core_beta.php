@@ -30,12 +30,12 @@ $phpBB3 = new phpBB3();
 //
 // Finally, load some backend specific functions
 //
-include_once($mx_root_path . 'includes/sessions/rhea/functions.' . $phpEx);
+include_once($mx_root_path . 'includes/sessions/olympus/functions.' . $phpEx);
 
 //
 // phpBB Permissions
 //
-include_once($mx_root_path . 'includes/sessions/rhea/auth.' . $phpEx);
+include_once($mx_root_path . 'includes/sessions/olympus/auth.' . $phpEx);
 
 /**
 * Permission/Auth class
@@ -596,7 +596,7 @@ class phpbb_auth extends phpbb_auth_base
 		$hold_str = $this->build_bitstring($hold_ary);
 
 		if ($hold_str)
-		{			
+		{
 			$userdata['user_permissions'] = $hold_str;
 			
 			$sql = 'UPDATE ' . USERS_TABLE . "
@@ -618,11 +618,11 @@ class phpbb_auth extends phpbb_auth_base
 				
 				if (class_exists('phpbb_db_tools'))
 				{
-					$db_tools = new phpbb_db_tools($db);
-				}
+					$db_tools = new phpbb_db_tools($db);					
+				}				
 				elseif (class_exists('tools'))
 				{
-					$db_tools = new tools($db);
+					$db_tools = new tools($db);					
 				}
 				
 				if (is_object($db_tools))
@@ -648,7 +648,7 @@ class phpbb_auth extends phpbb_auth_base
 							// We could add error handling here...
 							$result = $db->sql_query($sql);
 							if (!($result))
-							{		
+							{
 								mx_message_die(CRITICAL_ERROR, "Could not info", '', __LINE__, __FILE__, $sql);
 							}
 						}
@@ -658,7 +658,7 @@ class phpbb_auth extends phpbb_auth_base
 					{
 						$result = true;
 					}
-					else					
+					else
 					{
 						$column_name = 'user_permissions';
 						
@@ -685,7 +685,7 @@ class phpbb_auth extends phpbb_auth_base
 					{
 						$result = true;
 					}
-					else
+					else					
 					{
 						$column_name = 'user_birthday';
 						
@@ -990,10 +990,7 @@ class phpbb_auth extends phpbb_auth_base
 				{
 					$sql .= ' WHERE ' . $db->sql_in_set('forum_id', array_keys($this->acl), true);
 				}
-				if (!$result = $db->sql_query($sql))
-				{
-					mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-				}
+				$result = $db->sql_query($sql);
 
 				$this->acl_forum_ids = array();
 				while ($row = $db->sql_fetchrow($result))
@@ -1168,10 +1165,7 @@ class phpbb_auth extends phpbb_auth_base
 			$sql = 'SELECT *
 				FROM ' . ACL_ROLES_DATA_TABLE . '
 				ORDER BY role_id ASC';
-			if (!$result = $db->sql_query($sql))
-			{
-				mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-			}
+			$result = $db->sql_query($sql);
 
 			while ($row = $db->sql_fetchrow($result))
 			{
@@ -1193,10 +1187,7 @@ class phpbb_auth extends phpbb_auth_base
 		$sql = 'SELECT forum_id, auth_option_id, auth_role_id, auth_setting
 			FROM ' . ACL_USERS_TABLE . '
 			WHERE user_id = ' . $user_id;
-		if (!$result = $db->sql_query($sql))
-		{
-			mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-		}
+		$result = $db->sql_query($sql);
 
 		while ($row = $db->sql_fetchrow($result))
 		{
@@ -1220,10 +1211,7 @@ class phpbb_auth extends phpbb_auth_base
 				AND ug.user_pending = 0
 				AND NOT (ug.group_leader = 1 AND g.group_skip_auth = 1)
 				AND ug.user_id = ' . $user_id;
-			if (!$result = $db->sql_query($sql))
-			{
-				mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-			}
+		$result = $db->sql_query($sql);
 
 		while ($row = $db->sql_fetchrow($result))
 		{
@@ -1246,6 +1234,11 @@ class phpbb_auth extends phpbb_auth_base
 
 }
 
+//
+// Init the phpbb_auth class
+//
+$phpbb_auth = new phpbb_auth();
+
 /**
 * Backend specific tasks
 * @package MX-Publisher
@@ -1260,7 +1253,7 @@ class mx_backend
 	var $user_ip = 'ffffff';
 	
 	/***/
-	function mx_backend()
+	function __construct()
 	{	
 		// Obtain and encode users IP
 		// from MXP 2.7.x common
@@ -1285,7 +1278,7 @@ class mx_backend
 	function validate_backend($cache_config = array())
 	{
 		global $db, $phpbb_root_path, $mx_root_path;
-		global $phpEx, $tplEx, $portal_config, $acm_type;
+		global $phpEx, $tplEx, $portal_config;
 		global $dbms, $dbhost, $dbname, $dbuser, $dbpasswd, $table_prefix;
 		
 		$backend_table_prefix = '';
@@ -1323,10 +1316,6 @@ class mx_backend
 			
 			$dbms 			= $backend_info['dbms'];
 			$dbhost 			= $backend_info['dbhost'];
-			
-			$dbms = $this->get_keys_sufix($dbms);
-			$acm_type = $this->get_keys_sufix($acm_type);
-			
 			$dbname 		= $backend_info['dbname'];
 			$dbuser 			= $backend_info['dbuser'];
 			$dbpasswd 		= $backend_info['dbpasswd'];
@@ -1359,14 +1348,12 @@ class mx_backend
 			$sql = "SELECT config_value from " . $table_prefix . "config WHERE config_name = 'cookie_domain'";
 			if(!$_result = $db->sql_query($sql))
 			{
-				//For php 5.3.0 or less
-				$db_sql_error = $db->sql_error('');
-				print('Configuration file opened but backend check query failed for backend: '. basename( __DIR__  ) .  ', line: ' . __LINE__ . ', file: ' . __FILE__ . '<br /><br />SQL Error : ' . $db_sql_error['code'] . ' ' . $db_sql_error['message']);
+				print('Configuration file opened but backend check query failed for backend: '. basename( __DIR__  ) .  ', line: ' . __LINE__ . ', file: ' . __FILE__ . '<br /><br />SQL Error : ' . $db->sql_error('')['code'] . ' ' . $db->sql_error('')['message']);
 			}
 			$portal_backend_valid_db = $db->sql_numrows($_result) != 0;
 		}
 		else
-		{
+		{			
 			print('Configuration file for this backend (config) ' . $phpbb_root_path . "config.$phpEx" . ' couldn\'t be opened.');
 
 			if ((include $phpbb_root_path . "config.$phpEx") === false)
@@ -1413,13 +1400,6 @@ class mx_backend
 
 		$server_url_phpbb = $server_protocol . $server_name . $server_port . $script_name_phpbb;
 		define('PHPBB_URL', $server_url_phpbb);
-		
-		// Check whether the session is still valid if we have one
-		$method = basename(trim($board_config['auth_method']));
-		
-		//
-		// Instantiate the mx_auth class
-		//$mx_auth = $phpbb_auth = new phpbb_auth();
 		
 		// Define backend template extension
 		$tplEx = 'html';
@@ -1559,21 +1539,20 @@ class mx_backend
 
 		if ($force_shared)
 		{
-			$backend = in_array($force_shared, array('internal', 'phpbb2', 'smf2', 'mybb', 'phpbb3', 'olympus', 'rhea', 'ascraeus', 'proteus')) ? $force_shared : PORTAL_BACKEND;
+			$backend = in_array($force_shared, array('internal', 'phpbb2', 'smf2', 'mybb', 'phpbb3', 'olympus', 'ascraeus', 'rhea')) ? $force_shared : PORTAL_BACKEND;
 			switch ($backend)
 			{
 				case 'internal':
 				case 'phpbb2':
 				case 'smf2':
 				case 'mybb':
-					$mx_root_path . 'includes/shared/'.$force_shared.'/includes/';
+					$path = $mx_root_path . 'includes/shared/phpbb2/includes/';
 				break;
 					
+				case 'phpbb3':
 				case 'olympus':
 				case 'ascraeus':
 				case 'rhea':
-				case 'proteus':
-				case 'phpbb3':
 					$path = $mx_root_path . 'includes/shared/phpbb3/includes/';
 				break;
 			}
@@ -1586,7 +1565,7 @@ class mx_backend
 	}
 
 	/**
-	 * get_mxp_info
+	 * get_phpbb_info
 	 *
 	 * @param unknown_type $root_path
 	 * @access private
@@ -1601,15 +1580,15 @@ class mx_backend
 			$filename_ext = substr(strrchr($root_path, '.'), 1);
 			$filename = basename($root_path, '.' . $filename_ext);
 			$current_dir = dirname(realpath($root_path));
-			$root_path = dirname($root_path);			
+			$root_path = dirname($root_path);
 		}
 		else
 		{
 			$filename_ext = substr(strrchr(__FILE__, '.'), 1);
 			$filename = "config";
 			$current_dir = $root_path;
-			$root_path = dirname($root_path);			
-		}		
+			$root_path = dirname($root_path);
+		}
 		
 		$config = $root_path . "/config.$phpEx";
 		
@@ -1618,8 +1597,8 @@ class mx_backend
 		{
 			die('Configuration file ' . $config . ' couldn\'t be opened.');
 		}
+		//	
 		
-		//
 		// Check the prefix length to ensure that index names are not too long and does not contain invalid characters
 		switch ($backend)
 		{
@@ -1630,7 +1609,7 @@ class mx_backend
 			break;
 			
 			case 'phpbb3':
-			case 'rhea':
+			case 'olympus':
 				$phpbb_adm_relative_path = 'adm';
 			break;
 			
@@ -1645,9 +1624,9 @@ class mx_backend
 		
 		// If we are on PHP < 5.0.0 we need to force include or we get a blank page
 		if (version_compare(PHP_VERSION, '5.0.0', '<')) 
-		{
+		{		
 			$dbms = str_replace('mysqli', 'mysql4', $dbms); //this version of php does not have mysqli extension and my crash the installer if finds a forum using this		
-		}
+		}	
 		
 		return array(
 			'dbms'					=> $dbms,
@@ -1681,14 +1660,14 @@ class mx_backend
 			$filename_ext = substr(strrchr($root_path, '.'), 1);
 			$filename = basename($root_path, '.' . $filename_ext);
 			$current_dir = dirname(realpath($root_path));
-			$root_path = dirname($root_path);			
+			$root_path = dirname($root_path);
 		}
-		else		
+		else
 		{
 			$filename_ext = substr(strrchr(__FILE__, '.'), 1);
 			$filename = "config";
 			$current_dir = $root_path;
-			$root_path = dirname($root_path);			
+			$root_path = dirname($root_path);
 		}		
 		
 		$config = $root_path . "/config.$phpEx";
@@ -1720,7 +1699,7 @@ class mx_backend
 				case (preg_match('/3.3/i', $phpbbversion)):
 					$backend = 'proteus';
 				break;
-				case (preg_match('/4.0/i', $phpbbversion)):
+				case (preg_match('/4./i', $phpbbversion)):
 					$backend = 'phpbb4';
 				break;
 			}
@@ -1735,11 +1714,11 @@ class mx_backend
 				$phpbb_adm_relative_path = 'admin';
 			break;
 			
+			case 'phpbb3':
 			case 'olympus':
 				$phpbb_adm_relative_path = 'adm';
 			break;
 			
-			case 'phpbb3':
 			case 'ascraeus':
 			case 'rhea':
 			case 'proteus':	
@@ -1751,9 +1730,9 @@ class mx_backend
 		
 		// If we are on PHP < 5.0.0 we need to force include or we get a blank page
 		if (version_compare(PHP_VERSION, '5.0.0', '<')) 
-		{
+		{		
 			$dbms = str_replace('mysqli', 'mysql4', $dbms); //this version of php does not have mysqli extension and my crash the installer if finds a forum using this		
-		}
+		}	
 		
 		return array(
 			'dbms'			=> $dbms,
@@ -1762,10 +1741,10 @@ class mx_backend
 			'dbuser'			=> $dbuser,
 			'dbpasswd'		=> $dbpasswd,
 			'table_prefix'	=> $table_prefix,
-			'backend'		=> $backend,
+			'backend'		=> $backend,		
 			'version'			=> $phpbbversion,
 			'acm_type'		=> isset($acm_type) ? $acm_type : '',
-			'status'			=> defined('PHPBB_INSTALLED') ? true : false,
+			'status'			=> defined('PHPBB_INSTALLED') ? true : false,		
 		);
 	}
 	
@@ -2154,7 +2133,7 @@ class mx_backend
 	 */
 	public function obtain_forum_config()
 	{
-		global $db, $phpbb_root_path, $table_prefix, $mx_cache, $phpEx;
+		global $db, $phpbb_root_path, $table_prefix, $mx_cache, $phpEx;		
 		
 		if (!defined('CONFIG_TABLE'))
 		{
@@ -2186,7 +2165,7 @@ class mx_backend
 				if (!$row['is_dynamic'])
 				{
 					$cached_config[$row['config_name']] = $row['config_value'];
-				}
+				}				
 
 				$config[$row['config_name']] = $row['config_value'];
 			}
@@ -2199,10 +2178,7 @@ class mx_backend
 			$sql = 'SELECT config_name, config_value
 				FROM ' . CONFIG_TABLE . '
 				WHERE is_dynamic = 1';
-			if (!$result = $db->sql_query($sql))
-			{
-				mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-			}
+			$result = $db->sql_query($sql);
 
 			while ($row = $db->sql_fetchrow($result))
 			{
@@ -2213,25 +2189,7 @@ class mx_backend
 		
 		return $config;
 	}
-
-	/**
-	* Get key_sufix() from MX Installer
-	* we have so far in beta 3
-	* $dbms = 'phpbb\\db\\driver\\mysqli';
-	* $acm_type = 'phpbb\\cache\\driver\\file';
-	* We only need the sufix in this installer
-	*/
-	function get_keys_sufix($key)
-	{
-		$keys = explode("\\", $key);
-
-		$i = count($keys) - 1;
-		$rkey = $keys[$i];
-		$rkey = str_replace("\\", "", $rkey);	
-
-		return (isset($rkey)) ? $rkey : $key;
-	}
-
+	
 	/**
 	* Set phpbb config values
 	 *
@@ -2240,7 +2198,7 @@ class mx_backend
 	 */
 	public function set_forum_config($key, $new_value, $use_cache = false)
 	{
-		global $db, $mx_cache, $phpEx;
+		global $db, $mx_cache, $phpEx;		
 		
 		if (!defined('CONFIG_TABLE'))
 		{
@@ -2263,10 +2221,7 @@ class mx_backend
 			$sql .= " AND config_value = '" . $db->sql_escape($old_value) . "'";
 		}
 
-		if (!$result = $db->sql_query($sql))
-		{
-			mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-		}
+		$db->sql_query($sql);
 
 		if (!$db->sql_affectedrows() && isset($config[$key]))
 		{
@@ -2279,10 +2234,7 @@ class mx_backend
 				'config_name'	=> $key,
 				'config_value'	=> $new_value,
 				'is_dynamic'	=> ($use_cache) ? 0 : 1));
-			if (!$result = $db->sql_query($sql))
-			{
-				mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-			}
+			$db->sql_query($sql);
 		}
 		
 		$config[$key] = $new_value;
@@ -2419,10 +2371,7 @@ class mx_backend
 		{
 			$sql = 'INSERT INTO ' . PORTAL_TABLE . ' ' . $db->sql_build_array('INSERT', array(
 				$db->sql_escape($key) => $db->sql_escape($new_value)));
-			if (!$result = $db->sql_query($sql))
-			{
-				mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-			}
+			$db->sql_query($sql);
 		}
 
 		$portal_config[$key] = $new_value;
@@ -2519,10 +2468,7 @@ class mx_backend
 			$sql = 'SELECT *
 				FROM ' . RANKS_TABLE . '
 				ORDER BY rank_min DESC';
-			if (!$result = $db->sql_query($sql))
-			{
-				mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-			}
+			$result = $db->sql_query($sql);
 
 			$ranks = array();
 			while ($row = $db->sql_fetchrow($result))
@@ -2576,10 +2522,7 @@ class mx_backend
 				FROM ' . EXTENSIONS_TABLE . ' e, ' . EXTENSION_GROUPS_TABLE . ' g
 				WHERE e.group_id = g.group_id
 					AND (g.allow_group = 1 OR g.allow_in_pm = 1)';
-			if (!$result = $db->sql_query($sql))
-			{
-				mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-			}
+			$result = $db->sql_query($sql);
 
 			while ($row = $db->sql_fetchrow($result))
 			{
@@ -2701,10 +2644,7 @@ class mx_backend
 					ORDER BY LENGTH(bot_agent) DESC';
 				break;
 			}
-			if (!$result = $db->sql_query($sql))
-			{
-				mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-			}
+			$result = $db->sql_query($sql);
 
 			$bots = array();
 			while ($row = $db->sql_fetchrow($result))
@@ -2737,7 +2677,7 @@ class mx_backend
 
 		foreach ($parsed_items as $key => $parsed_array)
 		{
-			$parsed_array = isset($theme[$key . '_path']) ? $mx_cache->get('_cfg_' . $key . '_' . $theme[$key . '_path']) : $mx_cache->get('_cfg_' . $key);
+			$parsed_array = $mx_cache->get('_cfg_' . $key . '_' . $theme[$key . '_path']);
 
 			if ($parsed_array === false)
 			{
@@ -2745,7 +2685,7 @@ class mx_backend
 			}
 
 			$reparse = false;
-			$filename = $phpbb_root_path . 'styles/' . (isset($theme[$key . '_path']) ? $theme[$key . '_path']  : '') . '/' . $key . '/' . $key . '.cfg';
+			$filename = $phpbb_root_path . 'styles/' . $theme[$key . '_path'] . '/' . $key . '/' . $key . '.cfg';
 
 			if (!file_exists($filename))
 			{
@@ -2784,10 +2724,7 @@ class mx_backend
 
 			$sql = 'SELECT disallow_username
 				FROM ' . DISALLOW_TABLE;
-			if (!$result = $db->sql_query($sql))
-			{
-				mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-			}
+			$result = $db->sql_query($sql);
 
 			$usernames = array();
 			while ($row = $db->sql_fetchrow($result))
@@ -2847,6 +2784,62 @@ class mx_backend
 			WHERE g.group_name NOT IN ('BOTS', 'GUESTS')
 			ORDER BY g.group_type ASC, g.group_name";
 		return $sql;
+	}
+
+	/**
+	* Return the group_id for a given group name
+	*/
+	function get_group_id($group_name = 'REGISTERED')
+	{
+		global $db, $group_mapping;
+
+		//Default Groups for phpBB Olympus
+		$default_groups = array(
+			'GUESTS',
+			'REGISTERED',
+			'REGISTERED_COPPA',
+			'GLOBAL_MODERATORS',
+			'ADMINISTRATORS',
+			'BOTS',
+		);
+
+		// first retrieve default group id
+		if (empty($group_mapping))
+		{
+			/* * /
+			$sql = 'SELECT group_id
+				FROM ' . GROUPS_TABLE . "
+				WHERE group_name = '" . $db->sql_escape($group_name) . "'
+					AND group_type = " . GROUP_SPECIAL;
+			/* */
+
+			$sql = 'SELECT group_name, group_id
+				FROM ' . GROUPS_TABLE;
+			$result = $db->sql_query($sql);
+
+			$group_mapping = array();
+			while ($row = $db->sql_fetchrow($result))
+			{
+				$group_mapping[strtoupper($row['group_name'])] = (int) $row['group_id'];
+			}
+			$db->sql_freeresult($result);
+		}
+
+		/** /
+		if (!count($group_mapping))
+		{
+			add_default_groups();
+			return get_group_id($group_name);
+		}
+		/**/
+
+		if (isset($group_mapping[strtoupper($group_name)]))
+		{
+			return $group_mapping[strtoupper($group_name)];
+		}
+
+		// generate user account data
+		return (int) $group_mapping[$group_name];
 	}
 
 	/**
@@ -3036,7 +3029,7 @@ class mx_backend
 			'MENU_CAT_ID' => $menu_cat_id,
 			'MENU_CAT_ROWS' => 1,
 			//-MOD: DHTML Menu for ACP
-			'ADMIN_CATEGORY' => 'rhea adminCP')
+			'ADMIN_CATEGORY' => 'Olympus adminCP')
 		);
 
 		$template->assign_block_vars('module_phpbb.catrow.modulerow', array(
@@ -3303,10 +3296,7 @@ class mx_backend
 			case 'mssql_odbc':
 			case 'mssqlnative':
 				$sql = 'SELECT @@VERSION AS mssql_version';
-				if (!$result = $db->sql_query($sql))
-				{
-					mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-				}
+				$result = $db->sql_query($sql);
 				$row = $db->sql_fetchrow($result);
 				$db->sql_freeresult($result);
 
@@ -3332,10 +3322,7 @@ class mx_backend
 				$sql = "SELECT proname
 					FROM pg_proc
 					WHERE proname = 'pg_database_size'";
-				if (!$result = $db->sql_query($sql))
-				{
-					mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-				}
+				$result = $db->sql_query($sql);
 				$row = $db->sql_fetchrow($result);
 				$db->sql_freeresult($result);
 
@@ -3350,20 +3337,14 @@ class mx_backend
 					$sql = "SELECT oid
 						FROM pg_database
 						WHERE datname = '$database'";
-					if (!$result = $db->sql_query($sql))
-					{
-						mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-					}
+					$result = $db->sql_query($sql);
 					$row = $db->sql_fetchrow($result);
 					$db->sql_freeresult($result);
 
 					$oid = $row['oid'];
 
 					$sql = 'SELECT pg_database_size(' . $oid . ') as size';
-					if (!$result = $db->sql_query($sql))
-					{
-						mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-					}
+					$result = $db->sql_query($sql);
 					$row = $db->sql_fetchrow($result);
 					$db->sql_freeresult($result);
 
@@ -3494,10 +3475,7 @@ class mx_backend
 				case 'mssql_odbc':
 				case 'mssqlnative':
 					$sql = 'SELECT @@VERSION AS mssql_version';
-					if (!$result = $db->sql_query($sql))
-					{
-						mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-					}
+					$result = $db->sql_query($sql);
 					$row = $db->sql_fetchrow($result);
 					$db->sql_freeresult($result);
 
@@ -3523,10 +3501,7 @@ class mx_backend
 					$sql = "SELECT proname
 						FROM pg_proc
 						WHERE proname = 'pg_database_size'";
-					if (!$result = $db->sql_query($sql))
-					{
-						mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-					}
+					$result = $db->sql_query($sql);
 					$row = $db->sql_fetchrow($result);
 					$db->sql_freeresult($result);
 
@@ -3541,20 +3516,14 @@ class mx_backend
 						$sql = "SELECT oid
 							FROM pg_database
 							WHERE datname = '$mx_database'";
-						if (!$result = $db->sql_query($sql))
-						{
-							mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-						}
+						$result = $db->sql_query($sql);
 						$row = $db->sql_fetchrow($result);
 						$db->sql_freeresult($result);
 
 						$oid = $row['oid'];
 
 						$sql = 'SELECT pg_database_size(' . $oid . ') as size';
-						if (!$result = $db->sql_query($sql))
-						{
-							mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-						}
+						$result = $db->sql_query($sql);
 						$row = $db->sql_fetchrow($result);
 						$db->sql_freeresult($result);
 
@@ -3606,122 +3575,69 @@ class mx_backend
 	 */
 	function phpbb_version_check($force_update = false, $warn_fail = false, $ttl = 86400)
 	{
-		global $mx_cache, $mx_request_vars, $board_config, $lang, $phpbb_version_info;
+		global $mx_cache, $board_config, $lang, $phpbb_version_info;
 		
 		$errno = 0;
 		$errstr = $phpbb_version_info = '';
-		
 		$phpbb_version_info = $mx_cache->get('versioncheck');
-		
-		$current_phpbb_version = explode(".", $board_config['version']);
-		$head_phpbb_revision = $current_phpbb_version[0];
-		$major_phpbb_revision = $current_phpbb_version[1];
-		$minor_phpbb_revision = $current_phpbb_version[2];
-		
-		//Load class version helper
-		$mx_cache->load_file('version_helper', 'phpbb3');
-		$version_helper = new version_helper();
-		
-		try
+
+		if ($fsock = @fsockopen('www.phpbb.com', 80, $errno, $errstr, 10))
 		{
-			$recheck = $mx_request_vars->variable('versioncheck_force', false);
-			$updates_available = $version_helper->get_update_on_branch($recheck);
-			$upgrades_available = $version_helper->get_suggested_updates();
-				
-			if (!empty($upgrades_available))
+			$phpbb_version_info = mx_get_remote_file('www.phpbb.com', '/updatecheck', ((defined('PHPBB_QA')) ? '30x_qa.txt' : '30x.txt'), $errstr, $errno);
+			
+			if ($phpbb_version_info === false || $force_update)
 			{
-				$upgrades_available = array_pop($upgrades_available);
+				$errstr = '';
+				$errno = 0;
+
+				$phpbb_version_info = mx_get_remote_file('version.phpbb.com', '/phpbb',
+						((defined('PHPBB_QA')) ? '30x_qa.txt' : '30x.txt'), $errstr, $errno);
 			}
-			$version_up_to_date		= empty($updates_available);
-			$version_upgradeable		= !empty($upgrades_available);
-			$upgrade_instructions		= !empty($upgrades_available) ? $mx_user->lang('UPGRADE_INSTRUCTIONS', $upgrades_available['current'], $upgrades_available['announcement']) : false;
-		}
-		catch (\RuntimeException $e)
-		{
-			$message = call_user_func_array(array($mx_user, 'lang'), array_merge(array($e->getMessage()), $e->get_parameters()));
-
-			$versioncheck_fail		= true;
-			$versioncheck_fail_reason	= ($e->getMessage() !== 'VERSIONCHECK_FAIL') ? $message : '';
-		}
-		
-		if ((($head_phpbb_revision == 3) && ($major_phpbb_revision == 0)) || ($head_phpbb_revision < 3))
-		{
-			if ($fsock = @fsockopen('www.phpbb.com', 80, $errno, $errstr, 10))
+			
+			if (empty($phpbb_version_info))
 			{
-				$phpbb_version_info = mx_get_remote_file('www.phpbb.com', '/updatecheck', ((defined('PHPBB_QA')) ? $head_phpbb_revision . $major_phpbb_revision . 'x_qa.txt' : $head_phpbb_revision . $major_phpbb_revision . 'x.txt'), $errstr, $errno);
-				
-				
-				if ($phpbb_version_info === false || $force_update)
+				$mx_cache->destroy('versioncheck');
+				if ($warn_fail)
 				{
-					$errstr = '';
-					$errno = 0;
+					trigger_error($errstr, E_USER_WARNING);
+				}
+				return false;
+			}
 
-					$phpbb_version_info = mx_get_remote_file('version.phpbb.com', '/phpbb',
-							((defined('PHPBB_QA')) ? $head_phpbb_revision . $major_phpbb_revision . 'x_qa.txt' : $head_phpbb_revision . $major_phpbb_revision . 'x.txt'), $errstr, $errno);
-				}
-				
-				
-				if (empty($phpbb_version_info))
-				{
-					$mx_cache->destroy('versioncheck');
-					if ($warn_fail)
-					{
-						trigger_error($errstr, E_USER_WARNING);
-					}
-					return false;
-				}
+			$mx_cache->put('versioncheck', $phpbb_version_info, $ttl);
 
-				$mx_cache->put('versioncheck', $phpbb_version_info, $ttl);
-
-				$phpbb_version_info = explode("\n", $phpbb_version_info);
-				//$latest_version = trim($phpbb_version_info[0]); 
-				//$update_link = append_sid($phpbb_root_path . 'install/index.' . $phpEx, 'mode=update');
-				$latest_phpbb_head_revision = $version1 = strtolower(trim($phpbb_version_info[0]));
-				$latest_phpbb_minor_revision = trim($phpbb_version_info[2]);
-				$latest_phpbb_version = trim($phpbb_version_info[1]) . ', <a href=' . trim($phpbb_version_info[2]) . '>' . trim($phpbb_version_info[2]) . '</a> ';
-				$version2 = strtolower($board_config['version']);
-				$current_phpbb_version = explode(".", $board_config['version']);
-				$minor_phpbb_revision = $current_phpbb_version[2];
-				$operator = '<=';
-				if (version_compare($version1, $version2, $operator))
-				{
-					$phpbb_version_info = '<p style="color:green">' . $lang['Version_up_to_date'] . '</p>';
-				}
-				else
-				{
-					$phpbb_version_info = '<p style="color:red">' . $lang['Version_not_up_to_date'];
-					$phpbb_version_info .= '<br />' . sprintf($lang['Latest_version_info'], $latest_phpbb_version) . '<br />' . sprintf($lang['Current_version_info'], $board_config['version']) . '</p>';
-				}
+			$phpbb_version_info = explode("\n", $phpbb_version_info);
+			//$latest_version = trim($phpbb_version_info[0]); 
+			//$update_link = append_sid($phpbb_root_path . 'install/index.' . $phpEx, 'mode=update');
+			$latest_phpbb_head_revision = $version1 = strtolower(trim($phpbb_version_info[0]));
+			$latest_phpbb_minor_revision = trim($phpbb_version_info[2]);
+			$latest_phpbb_version = trim($phpbb_version_info[1]) . ', <a href=' . trim($phpbb_version_info[2]) . '>' . trim($phpbb_version_info[2]) . '</a> ';
+			$version2 = strtolower($board_config['version']);
+			$current_phpbb_version = explode(".", $board_config['version']);
+			$minor_phpbb_revision = $current_phpbb_version[2];
+			$operator = '<=';
+			if (version_compare($version1, $version2, $operator))
+			{
+				$phpbb_version_info = '<p style="color:green">' . $lang['Version_up_to_date'] . '</p>';
 			}
 			else
 			{
-				if ($errstr)
-				{
-					$phpbb_version_info = '<p style="color:red">' . sprintf($lang['Connect_socket_error'], $errstr) . '</p>';
-				}
-				else
-				{
-					$phpbb_version_info = '<p>' . $lang['Socket_functions_disabled'] . '</p>';
-				}
+				$phpbb_version_info = '<p style="color:red">' . $lang['Version_not_up_to_date'];
+				$phpbb_version_info .= '<br />' . sprintf($lang['Latest_version_info'], $latest_phpbb_version) . '<br />' . sprintf($lang['Current_version_info'], $board_config['version']) . '</p>';
 			}
 		}
 		else
 		{
-				if (empty($updates_available))
-				{
-					$phpbb_version_info = '<p style="color:green">' . $lang['Version_up_to_date'] . '</p>';
-				}
-				elseif (!empty($updates_available))
-				{
-					$phpbb_version_info = '<p style="color:green">' . $lang['Version_not_up_to_date'];
-					$phpbb_version_info .= '<br />' . $upgrade_instructions . '<br />' . sprintf($lang['Current_version_info'], $board_config['version']) . '</p>';
-				}
-				else
-				{
-					$phpbb_version_info = '<p style="color:red">' . $lang['Version_not_up_to_date'];
-					$phpbb_version_info .= '<br />' . $upgrade_instructions . '<br />' . sprintf($lang['Current_version_info'], $board_config['version']) . '</p>';
-				}
+			if ($errstr)
+			{
+				$phpbb_version_info = '<p style="color:red">' . sprintf($lang['Connect_socket_error'], $errstr) . '</p>';
+			}
+			else
+			{
+				$phpbb_version_info = '<p>' . $lang['Socket_functions_disabled'] . '</p>';
+			}
 		}
+
 		$phpbb_version_info .= '<p>' . $lang['Mailing_list_subscribe_reminder'] . '</p>';
 
 		return $phpbb_version_info;
@@ -3731,6 +3647,6 @@ class mx_backend
 //
 // Now load some bbcodes, to be extended for this backend (see below)
 //
-include_once($mx_root_path . 'includes/sessions/rhea/bbcode.' . $phpEx); // BBCode associated functions
+include_once($mx_root_path . 'includes/sessions/olympus/bbcode.' . $phpEx); // BBCode associated functions
 
 ?>

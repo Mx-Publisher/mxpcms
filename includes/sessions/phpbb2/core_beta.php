@@ -2,7 +2,7 @@
 /**
 *
 * @package Auth
-* @version $Id: core.php,v 1.29 2014/07/07 20:36:53 orynider Exp $
+* @version $Id: core.php,v 1.29 2014/05/16 18:02:23 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
@@ -19,23 +19,18 @@ if ( !defined( 'IN_PORTAL' ) )
 // Note: These functions will later be accessible wrapped as phpBBX::orig_functionname()
 //
 include_once($mx_root_path . 'includes/shared/phpbb2/includes/functions.' . $phpEx);
-include_once($mx_root_path . 'includes/shared/phpbb3/includes/functions.' . $phpEx);
 
-/*
-* Instantiate Dummy phpBB Classes
-$phpBB2 = new phpBB2();
-$phpBB3 = new phpBB3();
-*/
+
 
 //
 // Finally, load some backend specific functions
 //
-include_once($mx_root_path . 'includes/sessions/rhea/functions.' . $phpEx);
+include_once($mx_root_path . 'includes/sessions/phpbb2/functions.' . $phpEx);
 
 //
 // phpBB Permissions
 //
-include_once($mx_root_path . 'includes/sessions/rhea/auth.' . $phpEx);
+include_once($mx_root_path . 'includes/sessions/phpbb2/auth.' . $phpEx);
 
 /**
 * Permission/Auth class
@@ -596,7 +591,7 @@ class phpbb_auth extends phpbb_auth_base
 		$hold_str = $this->build_bitstring($hold_ary);
 
 		if ($hold_str)
-		{			
+		{
 			$userdata['user_permissions'] = $hold_str;
 			
 			$sql = 'UPDATE ' . USERS_TABLE . "
@@ -648,7 +643,7 @@ class phpbb_auth extends phpbb_auth_base
 							// We could add error handling here...
 							$result = $db->sql_query($sql);
 							if (!($result))
-							{		
+							{
 								mx_message_die(CRITICAL_ERROR, "Could not info", '', __LINE__, __FILE__, $sql);
 							}
 						}
@@ -658,7 +653,7 @@ class phpbb_auth extends phpbb_auth_base
 					{
 						$result = true;
 					}
-					else					
+					else
 					{
 						$column_name = 'user_permissions';
 						
@@ -723,7 +718,7 @@ class phpbb_auth extends phpbb_auth_base
 	function get_auth_forum($mode = 'phpbb')
 	{
 		global $userdata, $mx_root_path, $phpEx;
-		static $auth_data_sql;
+
 		//
 		// Try to reuse auth_view query result.
 		//
@@ -733,35 +728,31 @@ class phpbb_auth extends phpbb_auth_base
 			$auth_data_sql = $userdata[$userdata_key];
 			return $auth_data_sql;
 		}
+
 		//
 		// Now, this tries to optimize DB access involved in auth(),
 		// passing AUTH_LIST_ALL will load info for all forums at once.
-		// Start auth check
-		if (!$is_auth_ary = $this->acl_getf('f_read', false))
-		{
-			if ($user->data['user_id'] != ANONYMOUS)
-			{
-				//trigger_error('SORRY_AUTH_READ');
-				$auth_data_sql = false;
-			}
-			//login_box('', $user->lang['LOGIN_VIEWFORUM']);
-			$auth_data_sql = $this->acl_getf_global('m_');			
-		}
+		//
+		$is_auth_ary = $this->auth(AUTH_VIEW, AUTH_LIST_ALL, $userdata);
+
 		//
 		// Loop through the list of forums to retrieve the ids for
 		// those with AUTH_VIEW allowed.
 		//
+		$auth_data_sql = '';
 		foreach( $is_auth_ary as $fid => $is_auth_row )
 		{
-			if( ($is_auth_row['f_read']) )
+			if( ($is_auth_row['auth_view']) )
 			{
 				$auth_data_sql .= ( $auth_data_sql != '' ) ? ', ' . $fid : $fid;
 			}
 		}
+
 		if( empty($auth_data_sql) )
 		{
-			$auth_data_sql = 0;			
+			$auth_data_sql = -1;
 		}
+
 		$userdata[$userdata_key] = $auth_data_sql;
 		return $auth_data_sql;
 	}
@@ -776,7 +767,7 @@ class phpbb_auth extends phpbb_auth_base
 	{
 		global $phpbb_root_path, $mx_user;
 
-		$ignore_forum_ids = ($ignore_forum_ids) ? $ignore_forum_ids : '';
+		$ignore_forum_ids = ($ignore_forum_ids) ? $ignore_forum_ids : -1;
 
 		$auth_user = array();
 
@@ -784,7 +775,7 @@ class phpbb_auth extends phpbb_auth_base
 		{
 			foreach ($auth_level_read as $auth_level)
 			{
-				$auth_user = $this->acl_getf('!' . $auth_level, true);
+				$auth_user = $this->auth($auth_level, AUTH_LIST_ALL, $mx_user->data);
 
 				if ($num_forums = count($auth_user))
 				{
@@ -792,11 +783,14 @@ class phpbb_auth extends phpbb_auth_base
 					{
 						$unauthed = false;
 
-						if (!$auth_mod[$auth_level] && ( strstr($ignore_forum_ids,$auth_mod['forum_id']) === FALSE))
+						if (!$auth_mod[$auth_level] && (strstr($ignore_forum_ids,$auth_mod['forum_id']) === FALSE))
 						{
 							$unauthed = true;
 						}
-
+						if (!$auth_level && !$auth_mod['auth_read'] && (strstr($ignore_forum_ids,$auth_mod['forum_id']) === FALSE))
+						{
+		   					$unauthed = true;
+						}
 						if ($unauthed)
 						{
 							$ignore_forum_ids .= ($ignore_forum_ids) ? ',' . $forum_id : $forum_id;
@@ -806,30 +800,32 @@ class phpbb_auth extends phpbb_auth_base
 				unset($auth_level_read);
 			}
 		}
-		elseif ($auth_level_read)
+		else
 		{
-			$auth_user = $this->acl_getf('!' . $auth_level_read, true);
+			$auth_user = $this->auth($auth_level_read, AUTH_LIST_ALL, $mx_user->data);
 
-			if ($num_forums = count($auth_user))
+			foreach($auth_user as $forum_id => $is_auth_row)
 			{
-				while ( list($forum_id, $auth_mod) = each($auth_user) )
+				$unauthed = true;
+
+				if($auth_level_read && ($is_auth_row[$auth_level_read]))
 				{
 					$unauthed = false;
-
-					if (!$auth_mod[$auth_level] && ( strstr($ignore_forum_ids,$auth_mod['forum_id']) === FALSE))
-					{
-						$unauthed = true;
-					}
-
-					if ($unauthed)
-					{
-						$ignore_forum_ids .= ($ignore_forum_ids) ? ',' . $forum_id : $forum_id;
-					}
 				}
-			}
 
+				if(strstr($ignore_forum_ids, $forum_id))
+				{
+					$unauthed = false;
+				}
+
+				if ($unauthed)
+				{
+					$ignore_forum_ids .= ($ignore_forum_ids) ? ',' . $forum_id : $forum_id;
+				}
+
+			}
 		}
-		$ignore_forum_ids = ($ignore_forum_ids) ? $ignore_forum_ids : 0;
+		$ignore_forum_ids = ($ignore_forum_ids) ? $ignore_forum_ids : -1;
 		return $ignore_forum_ids;
 	}
 	
@@ -990,10 +986,7 @@ class phpbb_auth extends phpbb_auth_base
 				{
 					$sql .= ' WHERE ' . $db->sql_in_set('forum_id', array_keys($this->acl), true);
 				}
-				if (!$result = $db->sql_query($sql))
-				{
-					mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-				}
+				$result = $db->sql_query($sql);
 
 				$this->acl_forum_ids = array();
 				while ($row = $db->sql_fetchrow($result))
@@ -1159,92 +1152,17 @@ class phpbb_auth extends phpbb_auth_base
 	{
 		global $db, $mx_cache;
 
-		// Check if the role-cache is there
-		if (($this->role_cache = $mx_cache->get('_role_cache')) === false)
-		{
-			$this->role_cache = array();
-
-			// We pre-fetch roles
-			$sql = 'SELECT *
-				FROM ' . ACL_ROLES_DATA_TABLE . '
-				ORDER BY role_id ASC';
-			if (!$result = $db->sql_query($sql))
-			{
-				mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-			}
-
-			while ($row = $db->sql_fetchrow($result))
-			{
-				$this->role_cache[$row['role_id']][$row['auth_option_id']] = (int) $row['auth_setting'];
-			}
-			$db->sql_freeresult($result);
-
-			foreach ($this->role_cache as $role_id => $role_options)
-			{
-				$this->role_cache[$role_id] = serialize($role_options);
-			}
-
-			$mx_cache->put('_role_cache', $this->role_cache);
-		}
-
 		$hold_ary = array();
-
-		// Grab user-specific permission settings
-		$sql = 'SELECT forum_id, auth_option_id, auth_role_id, auth_setting
-			FROM ' . ACL_USERS_TABLE . '
-			WHERE user_id = ' . $user_id;
-		if (!$result = $db->sql_query($sql))
-		{
-			mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-		}
-
-		while ($row = $db->sql_fetchrow($result))
-		{
-			// If a role is assigned, assign all options included within this role. Else, only set this one option.
-			if ($row['auth_role_id'])
-			{
-				$hold_ary[$row['forum_id']] = (empty($hold_ary[$row['forum_id']])) ? unserialize($this->role_cache[$row['auth_role_id']]) : $hold_ary[$row['forum_id']] + unserialize($this->role_cache[$row['auth_role_id']]);
-			}
-			else
-			{
-				$hold_ary[$row['forum_id']][$row['auth_option_id']] = $row['auth_setting'];
-			}
-		}
-		$db->sql_freeresult($result);
-
-		// Now grab group-specific permission settings
-		$sql = 'SELECT a.forum_id, a.auth_option_id, a.auth_role_id, a.auth_setting
-			FROM ' . ACL_GROUPS_TABLE . ' a, ' . USER_GROUP_TABLE . ' ug, ' . GROUPS_TABLE . ' g
-			WHERE a.group_id = ug.group_id
-				AND g.group_id = ug.group_id
-				AND ug.user_pending = 0
-				AND NOT (ug.group_leader = 1 AND g.group_skip_auth = 1)
-				AND ug.user_id = ' . $user_id;
-			if (!$result = $db->sql_query($sql))
-			{
-				mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-			}
-
-		while ($row = $db->sql_fetchrow($result))
-		{
-			if (!$row['auth_role_id'])
-			{
-				$this->_set_group_hold_ary($hold_ary[$row['forum_id']], $row['auth_option_id'], $row['auth_setting']);
-			}
-			else if (!empty($this->role_cache[$row['auth_role_id']]))
-			{
-				foreach (unserialize($this->role_cache[$row['auth_role_id']]) as $option_id => $setting)
-				{
-					$this->_set_group_hold_ary($hold_ary[$row['forum_id']], $option_id, $setting);
-				}
-			}
-		}
-		$db->sql_freeresult($result);
-
+		$hold_ary = $this->auth(AUTH_VIEW, AUTH_LIST_ALL, $this->data);
 		return $hold_ary;
-	}
+	}	
 
 }
+
+//
+// Init the phpbb_auth class
+//
+$phpbb_auth = new phpbb_auth();
 
 /**
 * Backend specific tasks
@@ -1285,7 +1203,7 @@ class mx_backend
 	function validate_backend($cache_config = array())
 	{
 		global $db, $phpbb_root_path, $mx_root_path;
-		global $phpEx, $tplEx, $portal_config, $acm_type;
+		global $phpEx, $tplEx, $portal_config;
 		global $dbms, $dbhost, $dbname, $dbuser, $dbpasswd, $table_prefix;
 		
 		$backend_table_prefix = '';
@@ -1302,7 +1220,7 @@ class mx_backend
 		//
 		$phpbb_root_path = $phpbb_root_path ? $phpbb_root_path : $mx_root_path . $portal_config['portal_backend_path'];
 		str_replace("//", "/", $phpbb_root_path);
-		$portal_backend_valid_file = @file_exists($phpbb_root_path . "mcp.$phpEx");
+		$portal_backend_valid_file = @file_exists($phpbb_root_path . "modcp.$phpEx");
 		
 		//
 		// Load phpbb config.php (to get table prefix)
@@ -1323,10 +1241,6 @@ class mx_backend
 			
 			$dbms 			= $backend_info['dbms'];
 			$dbhost 			= $backend_info['dbhost'];
-			
-			$dbms = $this->get_keys_sufix($dbms);
-			$acm_type = $this->get_keys_sufix($acm_type);
-			
 			$dbname 		= $backend_info['dbname'];
 			$dbuser 			= $backend_info['dbuser'];
 			$dbpasswd 		= $backend_info['dbpasswd'];
@@ -1359,14 +1273,22 @@ class mx_backend
 			$sql = "SELECT config_value from " . $table_prefix . "config WHERE config_name = 'cookie_domain'";
 			if(!$_result = $db->sql_query($sql))
 			{
-				//For php 5.3.0 or less
 				$db_sql_error = $db->sql_error('');
 				print('Configuration file opened but backend check query failed for backend: '. basename( __DIR__  ) .  ', line: ' . __LINE__ . ', file: ' . __FILE__ . '<br /><br />SQL Error : ' . $db_sql_error['code'] . ' ' . $db_sql_error['message']);
+			}
+			if(!$portal_backend_valid_db = ($db->sql_numrows($_result) != 0) && ($mx_dbname !== $dbname))
+			{
+				$sql = "SELECT config_value from " . $mx_dbname . "." . $table_prefix . "config WHERE config_name = 'cookie_domain'";
+				if(!$_result = $db->sql_query($sql))
+				{
+					$db_sql_error = $db->sql_error('');
+					print('<br />Configuration file opened but backend check query failed for backend: '. basename( __DIR__  ) .  ', line: ' . __LINE__ . ', file: ' . __FILE__ . '<br /><br />SQL Error : ' . $db_sql_error['code'] . ' ' . $db_sql_error['message']);
+				}
 			}
 			$portal_backend_valid_db = $db->sql_numrows($_result) != 0;
 		}
 		else
-		{
+		{			
 			print('Configuration file for this backend (config) ' . $phpbb_root_path . "config.$phpEx" . ' couldn\'t be opened.');
 
 			if ((include $phpbb_root_path . "config.$phpEx") === false)
@@ -1392,43 +1314,107 @@ class mx_backend
 	 */
 	function setup_backend()
 	{
-		global $portal_config, $board_config, $phpbb_root_path, $phpEx;
-		
+		global $mx_cache, $portal_config, $board_config, $mx_root_path, $phpbb_root_path, $phpEx;
+
 		$script_name = preg_replace('/^\/?(.*?)\/?$/', "\\1", trim($portal_config['script_path']));
 		$server_name = trim($portal_config['server_name']);
 		$server_protocol = ( $portal_config['cookie_secure'] ) ? 'https://' : 'http://';
 		$server_port = (($portal_config['server_port']) && ($portal_config['server_port'] <> 80)) ? ':' . trim($portal_config['server_port']) . '/' : '/';
-
+		$portal_config['portal_phpbb_url'] = str_replace("//", "/", $server_name . $server_port . $script_name . '/');
 		$server_url = $server_protocol . str_replace("//", "/", $server_name . $server_port . $script_name . '/'); //On some server the slash is not added and this trick will fix it
-
-		define('PORTAL_URL', $server_url);
-		define('PORTAL_VERSION', $portal_config['portal_version']);
 
 		//
 		// Grab phpBB global variables, re-cache if necessary
 		// - optional parameter to enable/disable cache for config data. If enabled, remember to refresh the MX-Publisher cache whenever updating phpBB config settings
 		// - true: enable cache, false: disable cache
-		$board_config = $this->obtain_phpbb_config(false);
-		$script_name_phpbb = preg_replace('/^\/?(.*?)\/?$/', "\\1", trim($board_config['script_path'])) . '/';
-
-		$server_url_phpbb = $server_protocol . $server_name . $server_port . $script_name_phpbb;
-		define('PHPBB_URL', $server_url_phpbb);
+		if (empty($board_config['script_path']))
+		{
+			$board_config = $mx_cache->obtain_phpbb_config(false);
+		}
 		
-		// Check whether the session is still valid if we have one
-		$method = basename(trim($board_config['auth_method']));
+		if (empty($portal_config['portal_version']))
+		{
+			$portal_config = $mx_cache->obtain_mxbb_config(false);
+		}
+		/**
+		$this->data = !empty($this->data['user_id']) ? $this->data : $mx_user->session_pagestart($user_ip, $page_id);
+		
+		$this->cache = is_object($mx_cache) ? $mx_cache : new base();
+		*/	
+		if (preg_match('/bot|crawl|curl|dataprovider|search|get|spider|find|java|majesticsEO|google|yahoo|teoma|contaxe|yandex|libwww-perl|facebookexternalhit/i', $_SERVER['HTTP_USER_AGENT'])) 
+		{
+		    $this->data['is_bot'] = true;
+		}
+		else
+		{
+		    $this->data['is_bot'] = false;
+		}
 		
 		//
-		// Instantiate the mx_auth class
-		//$mx_auth = $phpbb_auth = new phpbb_auth();
+		// Populate session_id
+		//
+		//$this->session_id = $this->data['session_id'];	
+		$this->lang_path = $phpbb_root_path . 'language/';
 		
+		$script_name = !empty($board_config['server_name']) ? preg_replace('/^\/?(.*?)\/?$/', "\\1", trim($board_config['server_name'])) : 'localhost';
+		$server_protocol = ( $board_config['cookie_secure'] ) ? 'https://' : 'http://';
+		$server_port = (($board_config['server_port']) && ($board_config['server_port'] <> 80)) ? ':' . trim($portal_config['server_port']) . '/' : '/';
+		$script_name_phpbb = preg_replace('/^\/?(.*?)\/?$/', "\\1", trim($board_config['script_path'])) . '/';		
+		
+		if (!empty($portal_config['portal_url']))
+		{
+			$corrected_url = preg_replace('/^\/?(.*?)\/?$/', "\\1", trim($portal_config['portal_url'])) . '/';
+		}
+		else
+		{
+			$corrected_url = str_replace(array('phpBB/', $script_name_phpbb, str_replace('./../', '', $phpbb_root_path)), '', $portal_config['portal_phpbb_url'] . '/');
+			$corrected_url = (empty($portal_config['portal_phpbb_url'])  || preg_match('@^(?:phpbb.com)?([^/]+)@i', $portal_config['portal_phpbb_url'])) ? $server_protocol . str_replace("//", "/", $server_name . $server_port . $script_name . '/') : str_replace(array('https://', 'http://'), $server_protocol, $server_url) ; //On some server the slash is not added and this trick will fix it	
+		}
+		
+		$board_url = $server_url;
+		
+		define('PORTAL_VERSION', $portal_config['portal_version']);
+		//define('PORTAL_BACKEND', $portal_config['portal_backend']);
+		$server_url_phpbb = $server_protocol . (isset($server_name) ? $server_name : $script_name) . $server_port . $script_name_phpbb;
+		
+		if (empty($portal_config['portal_phpbb_url'])  || preg_match('@^(?:phpbb.com)?([^/]+)@i', $portal_config['portal_phpbb_url']))
+		{
+			$portal_config['portal_phpbb_url'] = !empty($portal_config['portal_url']) ? $server_url . $script_name_phpbb : $server_url_phpbb;
+		}		
+		
+		$server_url_phpbb = !empty($portal_config['portal_phpbb_url']) ? $server_url . $script_name_phpbb : $server_url_phpbb;				
+		$server_url_phpbb = (empty($portal_config['portal_phpbb_url']) || preg_match('@^(?:phpbb.com)?([^/]+)@i', $portal_config['portal_phpbb_url'])) ? $server_url_phpbb : $portal_config['portal_phpbb_url'];	
+		
+		define('PHPBB_URL', $server_url_phpbb);
+		define('PORTAL_URL', $board_url);
+		define('BOARD_URL', $server_url);
+		
+		$web_path = (isset($portal_config['portal_url'])) ? $board_url : $corrected_url;
+		
+		//
 		// Define backend template extension
-		$tplEx = 'html';
+		//
+		$tplEx = 'tpl';
 		if (!defined('TPL_EXT')) define('TPL_EXT', $tplEx);
+		
 		//
 		// Now sync Configs
 		// In phpBB mode, we rely on native phpBB configs, thus we need to sync mxp and phpbb settings
 		//
 		$this->sync_configs();
+
+		//
+		// Dummy include, to make all original phpBB functions available
+		//
+		include_once($phpbb_root_path . 'includes/functions.' . $phpEx); // In case we need old functions...
+		include_once($mx_root_path . 'includes/shared/phpbb3/includes/functions.' . $phpEx);
+		//
+		// Is phpBB File Attachment MOD present?
+		//
+		if( file_exists($phpbb_root_path . 'attach_mod') )
+		{
+			include_once($phpbb_root_path . 'attach_mod/attachment_mod.' . $phpEx);
+		}
 	}
 
 	/**
@@ -1559,21 +1545,16 @@ class mx_backend
 
 		if ($force_shared)
 		{
-			$backend = in_array($force_shared, array('internal', 'phpbb2', 'smf2', 'mybb', 'phpbb3', 'olympus', 'rhea', 'ascraeus', 'proteus')) ? $force_shared : PORTAL_BACKEND;
-			switch ($backend)
+			$shared = in_array($force_shared, array('internal', 'phpbb2', 'phpbb3')) ? $force_shared : PORTAL_BACKEND;
+
+			switch ($shared)
 			{
 				case 'internal':
 				case 'phpbb2':
-				case 'smf2':
-				case 'mybb':
-					$mx_root_path . 'includes/shared/'.$force_shared.'/includes/';
+					$path = $mx_root_path . 'includes/shared/phpbb2/includes/';
 				break;
-					
-				case 'olympus':
-				case 'ascraeus':
-				case 'rhea':
-				case 'proteus':
 				case 'phpbb3':
+				default:
 					$path = $mx_root_path . 'includes/shared/phpbb3/includes/';
 				break;
 			}
@@ -1582,11 +1563,12 @@ class mx_backend
 		{
 			$path = $phpbb_root_path . 'includes/';
 		}
+
 		return $path;
 	}
 
 	/**
-	 * get_mxp_info
+	 * get_phpbb_info
 	 *
 	 * @param unknown_type $root_path
 	 * @access private
@@ -1603,7 +1585,7 @@ class mx_backend
 			$current_dir = dirname(realpath($root_path));
 			$root_path = dirname($root_path);			
 		}
-		else
+		else		
 		{
 			$filename_ext = substr(strrchr(__FILE__, '.'), 1);
 			$filename = "config";
@@ -1618,8 +1600,8 @@ class mx_backend
 		{
 			die('Configuration file ' . $config . ' couldn\'t be opened.');
 		}
+		//	
 		
-		//
 		// Check the prefix length to ensure that index names are not too long and does not contain invalid characters
 		switch ($backend)
 		{
@@ -1630,13 +1612,13 @@ class mx_backend
 			break;
 			
 			case 'phpbb3':
-			case 'rhea':
+			case 'olympus':
 				$phpbb_adm_relative_path = 'adm';
 			break;
 			
 			case 'ascraeus':
 			case 'rhea':
-			case 'proteus':
+			case 'proteus':	
 				$phpbb_adm_relative_path = (isset($phpbb_adm_relative_path)) ? $phpbb_adm_relative_path : 'adm/';
 				$dbms = get_keys_sufix($dbms);
 				$acm_type = get_keys_sufix($acm_type);
@@ -1645,23 +1627,23 @@ class mx_backend
 		
 		// If we are on PHP < 5.0.0 we need to force include or we get a blank page
 		if (version_compare(PHP_VERSION, '5.0.0', '<')) 
-		{
+		{		
 			$dbms = str_replace('mysqli', 'mysql4', $dbms); //this version of php does not have mysqli extension and my crash the installer if finds a forum using this		
-		}
+		}	
 		
 		return array(
-			'dbms'					=> $dbms,
-			'dbhost'					=> $dbhost,
-			'dbname'				=> $dbname,
-			'dbuser'					=> $dbuser,
-			'dbpasswd'				=> $dbpasswd,
-			'mx_table_prefix'		=> $mx_table_prefix,	
-			//'table_prefix'	=> $table_prefix,
-			'backend'				=> $backend,
-			'version'					=> $phpbbversion,
-			'acm_type'				=> isset($acm_type) ? $acm_type : '',
-			//'phpbb_root_path'		=> $phpbb_root_path,
-			'status'					=> defined('MX_INSTALLED') ? true : false,
+			'dbms'			=> $dbms,
+			'dbhost'		=> $dbhost,
+			'dbname'		=> $dbname,
+			'dbuser'		=> $dbuser,
+			'dbpasswd'		=> $dbpasswd,
+			'mx_table_prefix'	=> $mx_table_prefix,	
+			'table_prefix'	=> $table_prefix,
+			'backend'		=> $backend,
+			'version'		=> $phpbbversion,
+			'acm_type'		=> isset($acm_type) ? $acm_type : '',
+			'phpbb_root_path'	=> $phpbb_root_path,
+			'status'		=> defined('MX_INSTALLED') ? true : false,
 		);
 	}	
 	
@@ -1681,14 +1663,14 @@ class mx_backend
 			$filename_ext = substr(strrchr($root_path, '.'), 1);
 			$filename = basename($root_path, '.' . $filename_ext);
 			$current_dir = dirname(realpath($root_path));
-			$root_path = dirname($root_path);			
+			$root_path = dirname($root_path);
 		}
-		else		
+		else
 		{
 			$filename_ext = substr(strrchr(__FILE__, '.'), 1);
 			$filename = "config";
 			$current_dir = $root_path;
-			$root_path = dirname($root_path);			
+			$root_path = dirname($root_path);
 		}		
 		
 		$config = $root_path . "/config.$phpEx";
@@ -1720,7 +1702,7 @@ class mx_backend
 				case (preg_match('/3.3/i', $phpbbversion)):
 					$backend = 'proteus';
 				break;
-				case (preg_match('/4.0/i', $phpbbversion)):
+				case (preg_match('/4./i', $phpbbversion)):
 					$backend = 'phpbb4';
 				break;
 			}
@@ -1735,14 +1717,14 @@ class mx_backend
 				$phpbb_adm_relative_path = 'admin';
 			break;
 			
+			case 'phpbb3':
 			case 'olympus':
 				$phpbb_adm_relative_path = 'adm';
 			break;
 			
-			case 'phpbb3':
 			case 'ascraeus':
 			case 'rhea':
-			case 'proteus':	
+			case 'proteus':
 				$phpbb_adm_relative_path = (isset($phpbb_adm_relative_path)) ? $phpbb_adm_relative_path : 'adm/';
 				$dbms = get_keys_sufix($dbms);
 				$acm_type = get_keys_sufix($acm_type);
@@ -1751,21 +1733,21 @@ class mx_backend
 		
 		// If we are on PHP < 5.0.0 we need to force include or we get a blank page
 		if (version_compare(PHP_VERSION, '5.0.0', '<')) 
-		{
+		{		
 			$dbms = str_replace('mysqli', 'mysql4', $dbms); //this version of php does not have mysqli extension and my crash the installer if finds a forum using this		
-		}
+		}	
 		
 		return array(
 			'dbms'			=> $dbms,
-			'dbhost'			=> $dbhost,
+			'dbhost'		=> $dbhost,
 			'dbname'		=> $dbname,
-			'dbuser'			=> $dbuser,
+			'dbuser'		=> $dbuser,
 			'dbpasswd'		=> $dbpasswd,
 			'table_prefix'	=> $table_prefix,
-			'backend'		=> $backend,
-			'version'			=> $phpbbversion,
+			'backend'		=> $backend,		
+			'version'		=> $phpbbversion,
 			'acm_type'		=> isset($acm_type) ? $acm_type : '',
-			'status'			=> defined('PHPBB_INSTALLED') ? true : false,
+			'status'		=> defined('PHPBB_INSTALLED') ? true : false,		
 		);
 	}
 	
@@ -1794,7 +1776,7 @@ class mx_backend
 		return array(
 			'dbms'				=> $db_type, // 'mysql'
 			'dbhost'			=> $db_server, // 'localhost';
-			'dbname'			=> $dbname, // 'smf';
+			'dbname'			=> $db_name, // 'smf';
 			'dbuser'			=> $db_user, // 'root';
 			'dbpasswd'			=> $db_passwd, // '';
 			'ssi_dbuser'		=> $ssi_db_user, // '';
@@ -1850,27 +1832,25 @@ class mx_backend
 	function dss_rand()
 	{
 		global $db, $portal_config, $board_config, $dss_seeded;
-		
+
 		$val = $board_config['rand_seed'] . microtime();
 		$val = md5($val);
 		$board_config['rand_seed'] = md5($board_config['rand_seed'] . $val . 'a');
-		
-		if($dss_seeded !== true)
+
+		if (($dss_seeded !== true) && defined('CONFIG_TABLE'))
 		{
 			$sql = "UPDATE " . CONFIG_TABLE . " SET
 				config_value = '" . $board_config['rand_seed'] . "'
 				WHERE config_name = 'rand_seed'";
-			//display an error debuging message only if the portal is installed/upgraded 
-			if(!@$db->sql_query($sql) && @!file_exists('install'))
+
+			if( !$db->sql_query($sql) )
 			{
 				mx_message_die(GENERAL_ERROR, "Unable to reseed PRNG", "", __LINE__, __FILE__, $sql);
 			}
-			elseif(!@$db->sql_query($sql) && @file_exists('install'))
-			{
-				mx_message_die(GENERAL_ERROR, "Unable to reseed PRNG"."<br />Please finish upgrading and <br />". t(isset($lang['Please_remove_install_contrib'])), "", __LINE__, __FILE__, $sql);
-			}
+
 			$dss_seeded = true;
 		}
+
 		return substr($val, 4, 16);
 	}
 
@@ -1878,43 +1858,40 @@ class mx_backend
 	{
 		global $template, $userdata, $lang, $db, $nav_links, $phpEx, $SID;
 
-		$sql = 'SELECT forum_id, forum_name, parent_id, forum_type, left_id, right_id
-			FROM ' . FORUMS_TABLE . '
-			ORDER BY left_id ASC';
-		$result = $db->sql_query($sql, 600);
+	//	$is_auth = auth(AUTH_VIEW, AUTH_LIST_ALL, $userdata);
 
-		$right = $padding = 0;
-		$padding_store = array('0' => 0);
-		$display_jumpbox = false;
-		$iteration = 0;
-
-		// Sometimes it could happen that forums will be displayed here not be displayed within the index page
-		// This is the result of forums not displayed at index, having list permissions and a parent of a forum with no permissions.
-		// If this happens, the padding could be "broken"
-
-		$forum_rows = array();
-		while ($row = $db->sql_fetchrow($result))
+		$sql = "SELECT c.cat_id, c.cat_title, c.cat_order
+			FROM " . CATEGORIES_TABLE . " c, " . FORUMS_TABLE . " f
+			WHERE f.cat_id = c.cat_id
+			GROUP BY c.cat_id, c.cat_title, c.cat_order
+			ORDER BY c.cat_order";
+		if ( !($result = $db->sql_query($sql)) )
 		{
-			$forum_rows[] = $row;
+			mx_message_die(GENERAL_ERROR, "Couldn't obtain category list.", "", __LINE__, __FILE__, $sql);
+		}
 
-			if ($forum_rows['left_id'] < $right)
+		$category_rows = array();
+		while ( $row = $db->sql_fetchrow($result) )
+		{
+			$category_rows[] = $row;
+		}
+
+		if ( $total_categories = count($category_rows) )
+		{
+			$sql = "SELECT *
+				FROM " . FORUMS_TABLE . "
+				ORDER BY cat_id, forum_order";
+			if ( !($result = $db->sql_query($sql)) )
 			{
-				$padding++;
-				$padding_store[$row['parent_id']] = $padding;
+				mx_message_die(GENERAL_ERROR, 'Could not obtain forums information', '', __LINE__, __FILE__, $sql);
 			}
-			else if ($row['left_id'] > $right + 1)
-			{
-				// Ok, if the $padding_store for this parent is empty there is something wrong. For now we will skip over it.
-				// @todo digging deep to find out "how" this can happen.
-				$padding = (isset($padding_store[$row['parent_id']])) ? $padding_store[$row['parent_id']] : $padding;
-			}
 
-			$right = $forum_rows['right_id'];
+			$boxstring = '<select name="' . POST_FORUM_URL . '" onchange="if(this.options[this.selectedIndex].value != -1){ forms[\'jumpbox\'].submit() }"><option value="-1">' . $lang['Select_forum'] . '</option>';
 
-			if ($forum_rows['forum_type'] == FORUM_CAT && ($forum_rows['left_id'] + 1 == $forum_rows['right_id']))
+			$forum_rows = array();
+			while ( $row = $db->sql_fetchrow($result) )
 			{
-				// Non-postable forum with no subforums, don't display
-				continue;
+				$forum_rows[] = $row;
 			}
 
 			if ( $total_forums = count($forum_rows) )
@@ -1924,24 +1901,30 @@ class mx_backend
 					$boxstring_forums = '';
 					for($j = 0; $j < $total_forums; $j++)
 					{
-					 	$selected = ( $forum_rows[$j]['forum_id'] == $match_forum_id ) ? 'selected="selected"' : '';
-						$boxstring_forums .=  '<option value="' . $forum_rows[$j]['forum_id'] . '"' . $selected . '>' . $forum_rows[$j]['forum_name'] . '</option>';
+						if ( $forum_rows[$j]['cat_id'] == $category_rows[$i]['cat_id'] && $forum_rows[$j]['auth_view'] <= AUTH_REG )
+						{
 
-						//
-						// Add an array to $nav_links for the Mozilla navigation bar.
-						// 'chapter' and 'forum' can create multiple items, therefore we are using a nested array.
-						//
-						$nav_links['chapter forum'][$forum_rows[$j]['forum_id']] = array (
-							'url' => mx_append_sid(PHPBB_URL . "viewforum.$phpEx?" . POST_FORUM_URL . "=" . $forum_rows[$j]['forum_id']),
-							'title' => $forum_rows[$j]['forum_name']
-						);
+	//					if ( $forum_rows[$j]['cat_id'] == $category_rows[$i]['cat_id'] && $is_auth[$forum_rows[$j]['forum_id']]['auth_view'] )
+	//					{
+							$selected = ( $forum_rows[$j]['forum_id'] == $match_forum_id ) ? 'selected="selected"' : '';
+							$boxstring_forums .=  '<option value="' . $forum_rows[$j]['forum_id'] . '"' . $selected . '>' . $forum_rows[$j]['forum_name'] . '</option>';
 
+							//
+							// Add an array to $nav_links for the Mozilla navigation bar.
+							// 'chapter' and 'forum' can create multiple items, therefore we are using a nested array.
+							//
+							$nav_links['chapter forum'][$forum_rows[$j]['forum_id']] = array (
+								'url' => mx_append_sid("viewforum.$phpEx?" . POST_FORUM_URL . "=" . $forum_rows[$j]['forum_id']),
+								'title' => $forum_rows[$j]['forum_name']
+							);
+
+						}
 					}
 
 					if ( $boxstring_forums != '' )
 					{
 						$boxstring .= '<option value="-1">&nbsp;</option>';
-						$boxstring .= '<option value="-1">' . $forum_rows[$i]['forum_type'] == FORUM_CAT . '</option>';
+						$boxstring .= '<option value="-1">' . $category_rows[$i]['cat_title'] . '</option>';
 						$boxstring .= '<option value="-1">----------------</option>';
 						$boxstring .= $boxstring_forums;
 					}
@@ -1950,27 +1933,28 @@ class mx_backend
 
 			$boxstring .= '</select>';
 		}
+		else
+		{
+			$boxstring .= '<select name="' . POST_FORUM_URL . '" onchange="if(this.options[this.selectedIndex].value != -1){ forms[\'jumpbox\'].submit() }"></select>';
+		}
 
 		// Let the jumpbox work again in sites having additional session id checks.
-		// if ( !empty($SID) )
-		// {
-				$boxstring .= '<input type="hidden" name="sid" value="' . $userdata['session_id'] . '" />';
-		// }
+	//	if ( !empty($SID) )
+	//	{
+			$boxstring .= '<input type="hidden" name="sid" value="' . $userdata['session_id'] . '" />';
+	//	}
 
 		$template->set_filenames(array(
 			'jumpbox' => 'jumpbox.tpl')
 		);
-
 		$template->assign_vars(array(
 			'L_GO' => $lang['Go'],
 			'L_JUMP_TO' => $lang['Jump_to'],
 			'L_SELECT_FORUM' => $lang['Select_forum'],
 
 			'S_JUMPBOX_SELECT' => $boxstring,
-			'S_JUMPBOX_ACTION' => mx_append_sid($action),
-			'S_FORUM_COUNT'	=> $j)
+			'S_JUMPBOX_ACTION' => mx_append_sid($action))
 		);
-
 		$template->assign_var_from_handle('JUMPBOX', 'jumpbox');
 
 		return;
@@ -1985,16 +1969,27 @@ class mx_backend
 	{
 		global $db, $mx_root_path, $phpbb_root_path, $userdata, $mx_user, $lang, $images, $phpEx;
 		global $board_config, $gen_simple_header, $layouttemplate, $mx_page, $phpBB2;
-
+		//$images = $mx_user->images;
+		/**********/
+		$layouttemplate = isset($layouttemplate) ? $layouttemplate : "";
+		// If MX-Publisher frame template is not set, instantiate it
+		if (!is_object($layouttemplate))
+		{
+			//
+			// Initialize template
+			//
+			$layouttemplate = new mx_Template( $mx_root_path . 'templates/'. $theme['template_name'], $board_config, $db );
+		}
+		
 		switch ($mode)
 		{
 			case 'generate_login_logout_stats':
 
-				if ( $mx_user->data['user_id'] != 1 )
+				if ( $userdata['session_logged_in'] )
 				{
 					$is_logged = true;
-					$u_login_logout = 'login.'.$phpEx.'?logout=true&amp;sid=' . $mx_user->data['session_id'];
-					$l_login_logout = $lang['Logout'] . ' [ ' . $mx_user->data['username'] . ' ]';
+					$u_login_logout = 'login.'.$phpEx.'?logout=true&amp;sid=' . $userdata['session_id'];
+					$l_login_logout = $lang['Logout'] . ' [ ' . $userdata['username'] . ' ]';
 				}
 				else
 				{
@@ -2002,24 +1997,25 @@ class mx_backend
 					$u_login_logout = 'login.'.$phpEx;
 					$l_login_logout = $lang['Login'];
 				}
-				$s_last_visit = ( $mx_user->data['session_logged_in'] ) ? $phpBB2->create_date($board_config['default_dateformat'], $mx_user->data['user_lastvisit'], $board_config['board_timezone']) : '';
+
+				$s_last_visit = ( $userdata['session_logged_in'] ) ? $phpBB2->create_date($board_config['default_dateformat'], $userdata['user_lastvisit'], $board_config['board_timezone']) : '';
 
 				//
 				// Obtain number of new private messages
 				// if user is logged in
 				//
-				if ( ($mx_user->data['session_logged_in']) && (empty($gen_simple_header)) )
+				if ( ($userdata['session_logged_in']) && (empty($gen_simple_header)) )
 				{
-					if ( $mx_user->data['user_new_privmsg'] )
+					if ( $userdata['user_new_privmsg'] )
 					{
-						$l_message_new = ( $mx_user->data['user_new_privmsg'] == 1 ) ? $lang['New_pm'] : $lang['New_pms'];
-						$l_privmsgs_text = sprintf($l_message_new, $mx_user->data['user_new_privmsg']);
+						$l_message_new = ( $userdata['user_new_privmsg'] == 1 ) ? $lang['New_pm'] : $lang['New_pms'];
+						$l_privmsgs_text = sprintf($l_message_new, $userdata['user_new_privmsg']);
 
-						if ( $mx_user->data['user_last_privmsg'] > $mx_user->data['user_lastvisit'] )
+						if ( $userdata['user_last_privmsg'] > $userdata['user_lastvisit'] )
 						{
 							$sql = "UPDATE " . USERS_TABLE . "
-								SET user_last_privmsg = " . $mx_user->data['user_lastvisit'] . "
-								WHERE user_id = " . $mx_user->data['user_id'];
+								SET user_last_privmsg = " . $userdata['user_lastvisit'] . "
+								WHERE user_id = " . $userdata['user_id'];
 							if ( !$db->sql_query($sql) )
 							{
 								mx_message_die(GENERAL_ERROR, 'Could not update private message new/read time for user', '', __LINE__, __FILE__, $sql);
@@ -2031,23 +2027,23 @@ class mx_backend
 						else
 						{
 							$s_privmsg_new = 0;
-							$icon_pm = $images['pm_no_new_msg'];
+							$icon_pm = isset($images['pm_no_new_msg']) ? $images['pm_no_new_msg'] : 'pm_no_new_msg';
 						}
-						$mx_priv_msg = $lang['Private_Messages'] . ' (' . $mx_user->data['user_new_privmsg'] . ')';
+						$mx_priv_msg = $lang['Private_Messages'] . ' (' . $userdata['user_new_privmsg'] . ')';
 					}
 					else
 					{
 						$l_privmsgs_text = $lang['No_new_pm'];
 
 						$s_privmsg_new = 0;
-						$icon_pm = $images['pm_no_new_msg'];
+						$icon_pm = isset($images['pm_no_new_msg']) ? $images['pm_no_new_msg'] : 'pm_no_new_msg';
 						$mx_priv_msg = $lang['Private_Messages'];
 					}
 
-					if ( $mx_user->data['user_unread_privmsg'] )
+					if ( $userdata['user_unread_privmsg'] )
 					{
-						$l_message_unread = ( $mx_user->data['user_unread_privmsg'] == 1 ) ? $lang['Unread_pm'] : $lang['Unread_pms'];
-						$l_privmsgs_text_unread = sprintf($l_message_unread, $mx_user->data['user_unread_privmsg']);
+						$l_message_unread = ( $userdata['user_unread_privmsg'] == 1 ) ? $lang['Unread_pm'] : $lang['Unread_pms'];
+						$l_privmsgs_text_unread = sprintf($l_message_unread, $userdata['user_unread_privmsg']);
 					}
 					else
 					{
@@ -2056,7 +2052,7 @@ class mx_backend
 				}
 				else
 				{
-					$icon_pm = $images['pm_no_new_msg'];
+					$icon_pm = isset($images['pm_no_new_msg']) ? $images['pm_no_new_msg'] : 'pm_no_new_msg';
 					$l_privmsgs_text = $lang['Login_check_pm'];
 					$l_privmsgs_text_unread = '';
 					$s_privmsg_new = 0;
@@ -2090,17 +2086,17 @@ class mx_backend
 
 			case 'generate_nav_links':
 
-				$u_register = 'ucp.'.$phpEx.'?mode=register';
-				$u_profile = 'ucp.'.$phpEx;
-				$u_privatemsgs = 'ucp.'.$phpEx.'?i=pm&folder=inbox';
-				$u_privatemsgs_popup ='ucp.'.$phpEx.'?i=pm&mode=popup';
+				$u_register = 'profile.'.$phpEx.'?mode=register' ;
+				$u_profile = 'profile.'.$phpEx.'?mode=editprofile';
+				$u_privatemsgs = 'privmsg.'.$phpEx.'?folder=inbox';
+				$u_privatemsgs_popup = 'privmsg.'.$phpEx.'?mode=newpm';
 				$u_search = 'search.'.$phpEx;
 				$u_memberlist = 'memberlist.'.$phpEx;
-				$u_modcp = 'mcp.'.$phpEx;
+				$u_modcp = 'modcp.'.$phpEx;
 				$u_faq = 'faq.'.$phpEx;
 				$u_viewonline = 'viewonline.'.$phpEx;
-				$u_group_cp = 'ucp.'.$phpEx.'?i=167';
-				$u_sendpassword = ($board_config['email_enable']) ? mx3_append_sid("{$phpbb_root_path}ucp.$phpEx", 'mode=sendpassword') : '';
+				$u_group_cp = 'groupcp.'.$phpEx;
+				$u_sendpassword = mx3_append_sid("{$phpbb_root_path}profile.$phpEx", 'mode=sendpassword');
 
 				$layouttemplate->assign_vars(array(
 					'U_REGISTER' => mx_append_sid(PHPBB_URL . $u_register),
@@ -2132,7 +2128,7 @@ class mx_backend
 		switch ($mode)
 		{
 			case 'generate_backend_version':
-				$current_phpbb_version = $board_config['version'];
+				$current_phpbb_version = '2' . $board_config['version'];
 
 				$template->assign_vars(array(
 					'PHPBB_BACKEND'				=> true,
@@ -2144,7 +2140,6 @@ class mx_backend
 		}
 	}
 
-
 	/**
 	 * obtain_phpbb_config
 	 *
@@ -2152,24 +2147,27 @@ class mx_backend
 	 * @param boolean $use_cache
 	 * @return unknown
 	 */
-	public function obtain_forum_config()
+	public function obtain_forum_config($use_cache = true)
 	{
-		global $db, $phpbb_root_path, $table_prefix, $mx_cache, $phpEx;
-		
-		if (!defined('CONFIG_TABLE'))
+		global $db, $mx_cache, $phpEx;
+
+		if (($config = $mx_cache->get('phpbb_config')) && ($use_cache) )
 		{
-			global $table_prefix, $mx_root_path;
+			return $config;
+		}
+		else
+		{		
+			if (!defined('CONFIG_TABLE'))
+			{
+				global $table_prefix, $mx_root_path;
 				
-			require $mx_root_path. "includes/sessions/phpbb2/constants.$phpEx";
-		}		
+				require $mx_root_path. "includes/sessions/phpbb2/constants.$phpEx";
+			}		
 		
-		if (($mx_cache->get('phpbb_config')) === false)
-		{
-			$config = $cached_config = array();
-								
-			$sql = 'SELECT config_name, config_value, is_dynamic
-				FROM ' . CONFIG_TABLE;
-			if (!($result = $db->sql_query($sql)))
+			$sql = "SELECT *
+				FROM " . CONFIG_TABLE;
+
+			if ( !( $result = $db->sql_query( $sql ) ) )
 			{
 				if (!function_exists('mx_message_die'))
 				{
@@ -2180,67 +2178,31 @@ class mx_backend
 					mx_message_die( GENERAL_ERROR, 'Couldnt query config information', '', __LINE__, __FILE__, $sql );
 				}
 			}
-			
-			while ($row = $db->sql_fetchrow($result))
-			{
-				if (!$row['is_dynamic'])
-				{
-					$cached_config[$row['config_name']] = $row['config_value'];
-				}
 
+			while ( $row = $db->sql_fetchrow($result) )
+			{
 				$config[$row['config_name']] = $row['config_value'];
 			}
 			$db->sql_freeresult($result);
 
-			$mx_cache->put('phpbb_config', $cached_config);
+			if ($use_cache)
+			{
+				$mx_cache->put('phpbb_config', $config);
+			}
+
+			return ( $config );
 		}
-		else
-		{
-			$sql = 'SELECT config_name, config_value
-				FROM ' . CONFIG_TABLE . '
-				WHERE is_dynamic = 1';
-			if (!$result = $db->sql_query($sql))
-			{
-				mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-			}
-
-			while ($row = $db->sql_fetchrow($result))
-			{
-				$config[$row['config_name']] = $row['config_value'];
-			}
-			$db->sql_freeresult($result);
-		}		
+	}
 		
-		return $config;
-	}
-
-	/**
-	* Get key_sufix() from MX Installer
-	* we have so far in beta 3
-	* $dbms = 'phpbb\\db\\driver\\mysqli';
-	* $acm_type = 'phpbb\\cache\\driver\\file';
-	* We only need the sufix in this installer
-	*/
-	function get_keys_sufix($key)
-	{
-		$keys = explode("\\", $key);
-
-		$i = count($keys) - 1;
-		$rkey = $keys[$i];
-		$rkey = str_replace("\\", "", $rkey);	
-
-		return (isset($rkey)) ? $rkey : $key;
-	}
-
 	/**
 	* Set phpbb config values
 	 *
 	 * @param unknown_type $config_name
 	 * @param unknown_type $config_value
 	 */
-	public function set_forum_config($key, $new_value, $use_cache = false)
+	function set_forum_config($key, $new_value, $use_cache = false)
 	{
-		global $db, $mx_cache, $phpEx;
+		global $db, $mx_cache, $phpEx;		
 		
 		if (!defined('CONFIG_TABLE'))
 		{
@@ -2250,7 +2212,7 @@ class mx_backend
 		}		
 		
 		// Read out config values
-		$config = $this->obtain_phpbb_config();
+		$config = $this->obtain_forum_config();
 		$old_value = !isset($config[$key]) ? $config[$key] : false;		
 		$use_cache = (($key == 'comments_pagination') || ($key == 'pagination')) ? true : false;
 			
@@ -2263,10 +2225,7 @@ class mx_backend
 			$sql .= " AND config_value = '" . $db->sql_escape($old_value) . "'";
 		}
 
-		if (!$result = $db->sql_query($sql))
-		{
-			mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-		}
+		$db->sql_query($sql);
 
 		if (!$db->sql_affectedrows() && isset($config[$key]))
 		{
@@ -2275,14 +2234,10 @@ class mx_backend
 
 		if (!isset($config[$key]))
 		{
-			$sql = 'INSERT INTO ' . CONFIG_TABLE . ' ' . $db->sql_build_array('INSERT', array(
+			$sql = "INSERT INTO " . CONFIG_TABLE . " " . $db->sql_build_array('INSERT', array(
 				'config_name'	=> $key,
-				'config_value'	=> $new_value,
-				'is_dynamic'	=> ($use_cache) ? 0 : 1));
-			if (!$result = $db->sql_query($sql))
-			{
-				mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-			}
+				'config_value'	=> $new_value));
+			$db->sql_query($sql);
 		}
 		
 		$config[$key] = $new_value;
@@ -2290,12 +2245,13 @@ class mx_backend
 		
 		if ($use_cache)
 		{
-			$mx_cache->destroy('config');
-			$mx_cache->put('config', $config);			
+			$mx_cache->destroy('phpbb_config');
+			$mx_cache->put('phpbb_config', $config);			
 		}
 		
 		return true;		
-	}	
+	}
+
 	
 	/**
 	 * Get MX-Publisher config data
@@ -2339,62 +2295,7 @@ class mx_backend
 			return ($portal_config);
 		}
 	}
-
-	/**
-	 * obtain_phpbb_config
-	 *
-	 * @access public
-	 * @param boolean $use_cache
-	 * @return unknown
-	 */
-	public function obtain_phpbb_config($use_cache = true)
-	{
-		global $db, $phpbb_root_path, $table_prefix, $mx_cache, $phpEx;
-
-		if (($config = $mx_cache->get('phpbb_config')) && ($use_cache) )
-		{
-			return $config;
-		}
-		else
-		{		
-			if (!defined('CONFIG_TABLE'))
-			{
-				global $table_prefix, $mx_root_path;
-				
-				require $mx_root_path. "includes/sessions/phpbb3/constants.$phpEx";
-			}
-
-			$sql = "SELECT *
-				FROM " . CONFIG_TABLE;
-
-			if ( !( $result = $db->sql_query( $sql ) ) )
-			{
-				if (!function_exists('mx_message_die'))
-				{
-					die("Couldnt query config information, Allso this hosting or server is using a cache optimizer not compatible with MX-Publisher or just lost connection to database wile query.");
-				}
-				else
-				{
-					mx_message_die( GENERAL_ERROR, 'Couldnt query config information', '', __LINE__, __FILE__, $sql );
-				}
-			}
-
-			while ( $row = $db->sql_fetchrow($result) )
-			{
-				$config[$row['config_name']] = $row['config_value'];
-			}
-			$db->sql_freeresult($result);
-
-			if ($use_cache)
-			{
-				$mx_cache->put('phpbb_config', $config);
-			}
-
-			return ( $config );
-		}
-	}
-
-
+	
 	/**
 	* Set config value. Creates missing config entry.
 	*
@@ -2419,10 +2320,7 @@ class mx_backend
 		{
 			$sql = 'INSERT INTO ' . PORTAL_TABLE . ' ' . $db->sql_build_array('INSERT', array(
 				$db->sql_escape($key) => $db->sql_escape($new_value)));
-			if (!$result = $db->sql_query($sql))
-			{
-				mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-			}
+			$db->sql_query($sql);
 		}
 
 		$portal_config[$key] = $new_value;
@@ -2490,10 +2388,9 @@ class mx_backend
 						
 		$new[$key] = $new_value;
 
-		$sql = "UPDATE " . USERS_TABLE . "
-		SET " . $db->sql_build_array('UPDATE', utf8_normalize_nfc($new)) . "
-		WHERE user_id = '" . $mx_user->data['user_id'] . "'";		
-		if (!($db->sql_query($sql)))
+		$sql = "UPDATE  " . USERS_TABLE . " SET " . $db->sql_build_array('UPDATE', utf8_normalize_nfc($new));
+		
+		if( !($db->sql_query($sql)) )
 		{
 			mx_message_die(GENERAL_ERROR, "Failed to update portal configuration ", "", __LINE__, __FILE__, $sql);
 		}
@@ -2505,335 +2402,7 @@ class mx_backend
 
 		$mx_user->data[$key] = $new_value;
 	}	
-	/**
-	* Obtain ranks
-	*/
-	public function obtain_ranks()
-	{
-		global $mx_cache;
-
-		if (($ranks = $mx_cache->get('_ranks')) === false)
-		{
-			global $db;
-
-			$sql = 'SELECT *
-				FROM ' . RANKS_TABLE . '
-				ORDER BY rank_min DESC';
-			if (!$result = $db->sql_query($sql))
-			{
-				mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-			}
-
-			$ranks = array();
-			while ($row = $db->sql_fetchrow($result))
-			{
-				if ($row['rank_special'])
-				{
-					$ranks['special'][$row['rank_id']] = array(
-						'rank_title'	=>	$row['rank_title'],
-						'rank_image'	=>	$row['rank_image']
-					);
-				}
-				else
-				{
-					$ranks['normal'][] = array(
-						'rank_title'	=>	$row['rank_title'],
-						'rank_min'		=>	$row['rank_min'],
-						'rank_image'	=>	$row['rank_image']
-					);
-				}
-			}
-			$db->sql_freeresult($result);
-
-			$mx_cache->put('_ranks', $ranks);
-		}
-
-		return $ranks;
-	}
-
-	/**
-	* Obtain allowed extensions
-	*
-	* @param mixed $forum_id If false then check for private messaging, if int then check for forum id. If true, then only return extension informations.
-	*
-	* @return array allowed extensions array.
-	*/
-	function obtain_attach_extensions($forum_id)
-	{
-		global $mx_cache;
-
-		if (($extensions = $mx_cache->get('_extensions')) === false)
-		{
-			global $db;
-
-			$extensions = array(
-				'_allowed_post'	=> array(),
-				'_allowed_pm'	=> array(),
-			);
-
-			// The rule is to only allow those extensions defined. ;)
-			$sql = 'SELECT e.extension, g.*
-				FROM ' . EXTENSIONS_TABLE . ' e, ' . EXTENSION_GROUPS_TABLE . ' g
-				WHERE e.group_id = g.group_id
-					AND (g.allow_group = 1 OR g.allow_in_pm = 1)';
-			if (!$result = $db->sql_query($sql))
-			{
-				mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-			}
-
-			while ($row = $db->sql_fetchrow($result))
-			{
-				$extension = strtolower(trim($row['extension']));
-
-				$extensions[$extension] = array(
-					'display_cat'	=> (int) $row['cat_id'],
-					'download_mode'	=> (int) $row['download_mode'],
-					'upload_icon'	=> trim($row['upload_icon']),
-					'max_filesize'	=> (int) $row['max_filesize'],
-					'allow_group'	=> $row['allow_group'],
-					'allow_in_pm'	=> $row['allow_in_pm'],
-				);
-
-				$allowed_forums = ($row['allowed_forums']) ? unserialize(trim($row['allowed_forums'])) : array();
-
-				// Store allowed extensions forum wise
-				if ($row['allow_group'])
-				{
-					$extensions['_allowed_post'][$extension] = (!sizeof($allowed_forums)) ? 0 : $allowed_forums;
-				}
-
-				if ($row['allow_in_pm'])
-				{
-					$extensions['_allowed_pm'][$extension] = 0;
-				}
-			}
-			$db->sql_freeresult($result);
-
-			$mx_cache->put('_extensions', $extensions);
-		}
-
-		// Forum post
-		if ($forum_id === false)
-		{
-			// We are checking for private messages, therefore we only need to get the pm extensions...
-			$return = array('_allowed_' => array());
-
-			foreach ($extensions['_allowed_pm'] as $extension => $check)
-			{
-				$return['_allowed_'][$extension] = 0;
-				$return[$extension] = $extensions[$extension];
-			}
-
-			$extensions = $return;
-		}
-		else if ($forum_id === true)
-		{
-			return $extensions;
-		}
-		else
-		{
-			$forum_id = (int) $forum_id;
-			$return = array('_allowed_' => array());
-
-			foreach ($extensions['_allowed_post'] as $extension => $check)
-			{
-				// Check for allowed forums
-				if (is_array($check))
-				{
-					$allowed = (!in_array($forum_id, $check)) ? false : true;
-				}
-				else
-				{
-					$allowed = true;
-				}
-
-				if ($allowed)
-				{
-					$return['_allowed_'][$extension] = 0;
-					$return[$extension] = $extensions[$extension];
-				}
-			}
-
-			$extensions = $return;
-		}
-
-		if (!isset($extensions['_allowed_']))
-		{
-			$extensions['_allowed_'] = array();
-		}
-
-		return $extensions;
-	}
-
-	/**
-	* Obtain active bots
-	*/
-	function obtain_bots()
-	{
-		global $mx_cache;
-
-		if (($bots = $mx_cache->get('_bots')) === false)
-		{
-			global $db;
-
-			switch ($db->sql_layer)
-			{
-				case 'mssql':
-				case 'mssql_odbc':
-					$sql = 'SELECT user_id, bot_agent, bot_ip
-						FROM ' . BOTS_TABLE . '
-						WHERE bot_active = 1
-					ORDER BY LEN(bot_agent) DESC';
-				break;
-
-				case 'firebird':
-					$sql = 'SELECT user_id, bot_agent, bot_ip
-						FROM ' . BOTS_TABLE . '
-						WHERE bot_active = 1
-					ORDER BY CHAR_LENGTH(bot_agent) DESC';
-				break;
-
-				// LENGTH supported by MySQL, IBM DB2 and Oracle for sure...
-				default:
-					$sql = 'SELECT user_id, bot_agent, bot_ip
-						FROM ' . BOTS_TABLE . '
-						WHERE bot_active = 1
-					ORDER BY LENGTH(bot_agent) DESC';
-				break;
-			}
-			if (!$result = $db->sql_query($sql))
-			{
-				mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-			}
-
-			$bots = array();
-			while ($row = $db->sql_fetchrow($result))
-			{
-				$bots[] = $row;
-			}
-			$db->sql_freeresult($result);
-
-			$mx_cache->put('_bots', $bots);
-		}
-
-		return $bots;
-	}
-
-	/**
-	 * Obtain cfg file data
-	 *
-	 * @param unknown_type $theme
-	 * @return unknown
-	 */
-	function obtain_cfg_items($theme)
-	{
-		global $board_config, $phpbb_root_path, $mx_cache;
-
-		$parsed_items = array(
-			'theme'		=> array(),
-			'template'	=> array(),
-			'imageset'	=> array()
-		);
-
-		foreach ($parsed_items as $key => $parsed_array)
-		{
-			$parsed_array = isset($theme[$key . '_path']) ? $mx_cache->get('_cfg_' . $key . '_' . $theme[$key . '_path']) : $mx_cache->get('_cfg_' . $key);
-
-			if ($parsed_array === false)
-			{
-				$parsed_array = array();
-			}
-
-			$reparse = false;
-			$filename = $phpbb_root_path . 'styles/' . (isset($theme[$key . '_path']) ? $theme[$key . '_path']  : '') . '/' . $key . '/' . $key . '.cfg';
-
-			if (!file_exists($filename))
-			{
-				continue;
-			}
-
-			if (!isset($parsed_array['filetime']) || (($board_config['load_tplcompile'] && @filemtime($filename) > $parsed_array['filetime'])))
-			{
-				$reparse = true;
-			}
-
-			// Re-parse cfg file
-			if ($reparse)
-			{
-				$parsed_array = mx_parse_cfg_file($filename);
-				$parsed_array['filetime'] = @filemtime($filename);
-
-				$mx_cache->put('_cfg_' . $key . '_' . $theme[$key . '_path'], $parsed_array);
-			}
-			$parsed_items[$key] = $parsed_array;
-		}
-
-		return $parsed_items;
-	}
-
-	/**
-	* Obtain disallowed usernames
-	*/
-	function obtain_disallowed_usernames()
-	{
-		global $mx_cache;
-
-		if (($usernames = $mx_cache->get('_disallowed_usernames')) === false)
-		{
-			global $db;
-
-			$sql = 'SELECT disallow_username
-				FROM ' . DISALLOW_TABLE;
-			if (!$result = $db->sql_query($sql))
-			{
-				mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-			}
-
-			$usernames = array();
-			while ($row = $db->sql_fetchrow($result))
-			{
-				$usernames[] = str_replace('%', '.*?', preg_quote(utf8_clean_string($row['disallow_username']), '#'));
-			}
-			$db->sql_freeresult($result);
-
-			$mx_cache->put('_disallowed_usernames', $usernames);
-		}
-
-		return $usernames;
-	}
-
-	/**
-	* Obtain hooks...
-	*/
-	function obtain_hooks()
-	{
-		global $phpbb_root_path, $phpEx, $mx_cache;
-
-		if (($hook_files = $mx_cache->get('_hooks')) === false)
-		{
-			$hook_files = array();
-
-			// Now search for hooks...
-			$dh = @opendir($phpbb_root_path . 'includes/hooks/');
-
-			if ($dh)
-			{
-				while (($file = readdir($dh)) !== false)
-				{
-					if (strpos($file, 'hook_') === 0 && substr($file, -(strlen($phpEx) + 1)) === '.' . $phpEx)
-					{
-						$hook_files[] = substr($file, 0, -(strlen($phpEx) + 1));
-					}
-				}
-				closedir($dh);
-			}
-
-			$mx_cache->put('_hooks', $hook_files);
-		}
-
-		return $hook_files;
-	}
-
+	
 	/**
 	 * Enter description here...
 	 *
@@ -2841,12 +2410,68 @@ class mx_backend
 	 */
 	function generate_group_select_sql()
 	{
-		// Get us all the groups exept bots and guests
-		$sql = "SELECT g.group_id, g.group_name, g.group_type
-			FROM " . GROUPS_TABLE . " g
-			WHERE g.group_name NOT IN ('BOTS', 'GUESTS')
-			ORDER BY g.group_type ASC, g.group_name";
+		$sql = "SELECT group_id, group_name
+			FROM " . GROUPS_TABLE . "
+			WHERE group_single_user <> " . TRUE . "
+			ORDER BY group_name ASC";
 		return $sql;
+	}
+
+	/**
+	* $new_group_id = $mx_backend->get_group_id('REGISTERED');
+	* Return the group_id for a given group name
+	*/
+	function get_group_id($group_name = 'REGISTERED')
+	{
+		global $db, $group_mapping;
+
+		//Default Groups for phpBB3
+		$default_groups = array(
+			'GUESTS',
+			'REGISTERED',
+			'REGISTERED_COPPA',
+			'GLOBAL_MODERATORS',
+			'ADMINISTRATORS',
+			'BOTS',
+		);
+
+		// first retrieve default group id
+		if (empty($group_mapping))
+		{
+			/* * /
+			$sql = 'SELECT group_id
+				FROM ' . GROUPS_TABLE . "
+				WHERE group_name = '" . $db->sql_escape($group_name) . "'
+					AND group_type = " . GROUP_SPECIAL;
+			/* */
+
+			$sql = 'SELECT group_name, group_id
+				FROM ' . GROUPS_TABLE;
+			$result = $db->sql_query($sql);
+
+			$group_mapping = array();
+			while ($row = $db->sql_fetchrow($result))
+			{
+				$group_mapping[strtoupper($row['group_name'])] = (int) $row['group_id'];
+			}
+			$db->sql_freeresult($result);
+		}
+
+		/** /
+		if (!count($group_mapping))
+		{
+			add_default_groups();
+			return get_group_id($group_name);
+		}
+		/**/
+
+		if (isset($group_mapping[strtoupper($group_name)]))
+		{
+			return $group_mapping[strtoupper($group_name)];
+		}
+
+		// generate user account data
+		return (int) $group_mapping[$group_name];
 	}
 
 	/**
@@ -2858,21 +2483,21 @@ class mx_backend
 	{
 		if ($guest)
 		{
-			$sql = "SELECT u.*, s.*, s.session_page AS user_session_page
-				FROM " . USERS_TABLE . " u, " . SESSIONS_TABLE . " s
-				WHERE u.user_id = " . ANONYMOUS . "
-					AND u.user_id = s.session_user_id
-					AND s.session_time >= " . ( time() - 300 ) . "
-				ORDER BY s.session_time DESC";
+			$sql = "SELECT *
+				FROM " . SESSIONS_TABLE . "
+				WHERE session_logged_in = 0
+					AND session_time >= " . ( time() - 300 ) . "
+				ORDER BY session_time DESC";
 		}
 		else
 		{
-			$sql = "SELECT u.*, s.*, s.session_time AS user_session_time, s.session_page AS user_session_page
+			$sql = "SELECT u.*, s.*
 				FROM " . USERS_TABLE . " u, " . SESSIONS_TABLE . " s
-				WHERE u.user_id <> " . ANONYMOUS . "
+				WHERE s.session_logged_in = " . TRUE . "
 					AND u.user_id = s.session_user_id
+					AND u.user_id <> " . ANONYMOUS . "
 					AND s.session_time >= " . ( time() - 300 ) . "
-				ORDER BY s.session_time DESC";
+				ORDER BY u.user_session_time DESC";
 		}
 		return $sql;
 	}
@@ -2885,7 +2510,7 @@ class mx_backend
 	 */
 	function decode_ip($str_ip)
 	{
-		return $str_ip;
+		return decode_ip($str_ip);
 	}
 
 	/**
@@ -2897,7 +2522,7 @@ class mx_backend
 	{
 		global $board_config;
 
-		return $board_config['version'];
+		return '2' . $board_config['version'];
 	}
 
 	/**
@@ -2924,51 +2549,42 @@ class mx_backend
 	*
 	* @return string A string consisting of what is wanted based on $mode.
 	*/
-	function get_username_string($mode, $user_id, $username = false, $username_colour = '', $guest_username = false, $custom_profile_url = false)
+	function get_username_string($mode, $user_id, $username = false, $user_color = false, $guest_username = false, $custom_profile_url = false)
 	{
-		global $phpbb_root_path, $mx_root_path, $phpEx, $mx_user, $phpbb_auth;
+		global $lang, $mx_user, $userdata, $theme, $phpEx;
 
-		$profile_url = '';
+		$lang['Guest'] = !$guest_username ? $lang['Guest'] : $guest_username;
 
-		//Added by OryNider
-		if (($username == false) || ($username_colour == false))
+		$this_userdata = mx_get_userdata($user_id, false);
+
+		$username = ($username) ? $username : $this_userdata['username'];
+
+		if ($this_userdata['user_level'] == ADMIN)
 		{
-			$this_userdata = mx_get_userdata($user_id, false);
-			$user_id = $this_userdata['user_id'];
-			$username = $this_userdata['username'];
-			$username_colour = $this_userdata['user_colour'];
+			$user_color = $theme['fontcolor3'];
+			$user_style = 'style="color:#' . $user_color . '; font-weight : bold;"';
 		}
-		//Added Ends
-
-		$username_colour = ($username_colour) ? '#' . $username_colour : '';
-
-		if ($guest_username === false)
+		else if ($this_userdata['user_level'] == MOD)
 		{
-			$username = ($username) ? $username : $mx_user->lang['GUEST'];
+			$user_color = $theme['fontcolor2'];
+			$user_style = 'style="color:#' . $user_color . '; font-weight : bold;"';
 		}
 		else
 		{
-			$username = ($user_id && $user_id != ANONYMOUS) ? $username : ((!empty($guest_username)) ? $guest_username : $mx_user->lang['GUEST']);
+			$user_colour = $theme['fontcolor1'];
+			$user_style = 'style="font-weight : bold;"';
 		}
 
 		// Only show the link if not anonymous
 		if ($user_id && $user_id != ANONYMOUS)
 		{
-			// Do not show the link if the user is already logged in but do not have u_viewprofile permissions (relevant for bots mostly).
-			// For all others the link leads to a login page or the profile.
-			if ($mx_user->data['user_id'] != ANONYMOUS && !$phpbb_auth->acl_get('u_viewprofile'))
-			{
-				$profile_url = '';
-			}
-			else
-			{
-				$profile_url = ($custom_profile_url !== false) ? $custom_profile_url : mx3_append_sid(PHPBB_URL . "memberlist.$phpEx", 'mode=viewprofile');
-				$profile_url .= '&amp;u=' . (int) $user_id;
-			}
+			$profile_url = mx3_append_sid(PHPBB_URL . "profile.$phpEx", 'mode=viewprofile&amp;u=' . (int) $user_id);
+			$full_url = '<a href="' . $profile_url . '"><span ' . $user_style . '>' . $username . '</span></a>';
 		}
 		else
 		{
-			$profile_url = '';
+			$profile_url = $lang['Guest'];
+			$full_url = $lang['Guest'];
 		}
 
 		switch ($mode)
@@ -2982,31 +2598,12 @@ class mx_backend
 			break;
 
 			case 'colour':
-				return $username_colour;
+				return $user_colour;
 			break;
 
 			case 'full':
 			default:
-
-				$tpl = '';
-				if (!$profile_url && !$username_colour)
-				{
-					$tpl = '{USERNAME}';
-				}
-				else if (!$profile_url && $username_colour)
-				{
-					$tpl = '<span style="color: {USERNAME_COLOUR};" class="username-coloured">{USERNAME}</span>';
-				}
-				else if ($profile_url && !$username_colour)
-				{
-					$tpl = '<a href="{PROFILE_URL}">{USERNAME}</a>';
-				}
-				else if ($profile_url && $username_colour)
-				{
-					$tpl = '<a href="{PROFILE_URL}" style="color: {USERNAME_COLOUR};" class="username-coloured">{USERNAME}</a>';
-				}
-
-				return str_replace(array('{PROFILE_URL}', '{USERNAME_COLOUR}', '{USERNAME}'), array($profile_url, $username_colour, $username), $tpl);
+				return $full_url;
 			break;
 		}
 	}
@@ -3020,8 +2617,9 @@ class mx_backend
 	 */
 	function load_phpbb_acp_menu()
 	{
-		global $phpbb_root_path, $template, $lang, $phpEx, $userdata, $mx_user;
+		global $phpbb_root_path, $template, $lang, $phpEx, $theme, $userdata, $mx_user;
 
+		$module_phpbb = read_admin($phpbb_root_path . 'admin/');
 		$template->assign_block_vars('module_phpbb', array(
 			'L_PHPBB' => $lang['Phpbb'],
 			"L_FORUM_INDEX" => $lang['Main_index'],
@@ -3029,25 +2627,49 @@ class mx_backend
 			"U_FORUM_INDEX" => mx_append_sid(PHPBB_URL . "index.$phpEx"),
 		));
 
+		ksort($module_phpbb);
+
+		//+MOD: DHTML Menu for ACP
 		$menu_cat_id = 0;
+		//-MOD: DHTML Menu for ACP
 
-		$template->assign_block_vars('module_phpbb.catrow', array(
-			//+MOD: DHTML Menu for ACP
-			'MENU_CAT_ID' => $menu_cat_id,
-			'MENU_CAT_ROWS' => 1,
-			//-MOD: DHTML Menu for ACP
-			'ADMIN_CATEGORY' => 'rhea adminCP')
-		);
+		while( list($cat, $action_array) = each($module_phpbb) )
+		{
+			$cat = ( !empty($lang[$cat]) ) ? $lang[$cat] : preg_replace("/_/", " ", $cat);
 
-		$template->assign_block_vars('module_phpbb.catrow.modulerow', array(
-			"ROW_COLOR" => "#" . $mx_user->theme['td_color1'],
-			"ROW_CLASS" => $mx_user->theme['td_class1'],
+			$template->assign_block_vars('module_phpbb.catrow', array(
+				//+MOD: DHTML Menu for ACP
+				'MENU_CAT_ID' => $menu_cat_id,
+				'MENU_CAT_ROWS' => count($action_array),
+				//-MOD: DHTML Menu for ACP
+				'ADMIN_CATEGORY' => $cat)
+			);
+
+			ksort($action_array);
+
+			$row_count = 0;
+			while( list($action, $file) = each($action_array) )
+			{
+				$row_color = ( !($row_count%2) ) ? $theme['td_color1'] : $theme['td_color2'];
+				$row_class = ( !($row_count%2) ) ? $theme['td_class1'] : $theme['td_class2'];
+
+				$action = ( !empty($lang[$action]) ) ? $lang[$action] : preg_replace("/_/", " ", $action);
+
+				$template->assign_block_vars('module_phpbb.catrow.modulerow', array(
+					"ROW_COLOR" => "#" . $row_color,
+					"ROW_CLASS" => $row_class,
+					//+MOD: DHTML Menu for ACP
+					'ROW_COUNT' => $row_count,
+					//-MOD: DHTML Menu for ACP
+					"ADMIN_MODULE" => $action,
+					"U_ADMIN_MODULE" => mx_append_sid(PHPBB_URL . 'admin/' . $file . ( ( strpos($file, '?') !== false ) ? '&sid=' : '?sid=' ) . $userdata['session_id']))
+				);
+				$row_count++;
+			}
 			//+MOD: DHTML Menu for ACP
-			'ROW_COUNT' => 0,
+			$menu_cat_id++;
 			//-MOD: DHTML Menu for ACP
-			"ADMIN_MODULE" => 'Go!',
-			"U_ADMIN_MODULE" => mx_append_sid($phpbb_root_path . 'adm/index.php?sid='.$mx_user->session_id))
-		);
+		}
 	}
 
 	/**
@@ -3056,57 +2678,26 @@ class mx_backend
 	 */
 	function load_forum_stats()
 	{
-		global $db, $dbms, $mx_dbms, $dbname, $mx_dbname, $table_prefix, $mx_table_prefix, $phpBB2, $template; 
-		global $phpEx, $board_config, $portal_config, $phpbb_root_path, $mx_root_path, $lang, $theme, $mx_user, $userdata;
-		
-		$mx_info = $this->get_mxp_info($mx_root_path . "config.$phpEx");
-		// MXP x.x auto-generated config file
-		// Do not change anything in this file!
-		$mx_dbms 			= $mx_info['dbms'];
-		$mx_dbhost 		= $mx_info['dbhost'];
-		$mx_dbname 		= $mx_info['dbname'];
-		$mx_dbuser 		= $mx_info['dbuser'];
-		$mx_dbpasswd 	= $mx_info['dbpasswd'];
-		$mx_table_prefix 	= $mx_info['mx_table_prefix'];
-		
-		$backend_info = $this->get_phpbb_info($phpbb_root_path . "config.$phpEx");
-		// phpBB x.x auto-generated config file
-		// Do not change anything in this file!
-		$phpbb_dbms 			= $backend_info['dbms'];
-		$phpbb_dbhost 		= $backend_info['dbhost'];
-		$phpbb_dbname 		= $backend_info['dbname'];
-		$phpbb_dbuser 		= $backend_info['dbuser'];
-		$phpbb_dbpasswd 	= $backend_info['dbpasswd'];
-		$phpbb_table_prefix 	= $backend_info['table_prefix'];
-		
+		global $db, $dbname, $table_prefix, $mx_table_prefix, $phpBB2, $template, $board_config, $portal_config, $phpbb_root_path, $mx_root_path, $lang, $theme, $mx_user, $userdata;
+
 		$template->assign_block_vars("forum_stats", array());
-		
 		//
 		// Get forum statistics
 		//
-		$total_posts = mx_get_db_stat('postcount', $dbname);
-		$total_users = mx_get_db_stat('usercount', $dbname);
-		$total_topics = mx_get_db_stat('topiccount', $dbname);
-		
-		$mx_total_posts = mx_get_db_stat('postcount', $mx_dbname);
-		$mx_total_users = mx_get_db_stat('usercount', $mx_dbname);
-		$mx_total_topics = mx_get_db_stat('topiccount', $mx_dbname);
-		
-		$start_date = mx_create_date($board_config['default_dateformat'], $board_config['board_startdate'], $board_config['board_timezone']);
-		$mx_start_date = mx_create_date($portal_config['default_dateformat'], $portal_config['portal_startdate'], $portal_config['board_timezone']);
-		
+		$total_posts = get_db_stat('postcount');
+		$total_users = get_db_stat('usercount');
+		$total_topics = get_db_stat('topiccount');
+
+		$start_date = $phpBB2->create_date($board_config['default_dateformat'], $board_config['board_startdate'], $board_config['board_timezone']);
+
 		$boarddays = ( time() - $board_config['board_startdate'] ) / 86400;
-		$mx_boarddays = ( time() - $portal_config['portal_startdate'] ) / 86400;
-		
+
 		$posts_per_day = sprintf("%.2f", $total_posts / $boarddays);
-		$mx_posts_per_day = sprintf("%.2f", $total_posts / $mx_boarddays);
 		$topics_per_day = sprintf("%.2f", $total_topics / $boarddays);
-		$mx_topics_per_day = sprintf("%.2f", $total_topics / $mx_boarddays);
 		$users_per_day = sprintf("%.2f", $total_users / $boarddays);
-		$mx_users_per_day = sprintf("%.2f", $total_users / $mx_boarddays);
-		
+
 		$avatar_dir_size = 0;
-		
+
 		if ($avatar_dir = @opendir($phpbb_root_path . $board_config['avatar_path']) )
 		{
 			while( $file = @readdir($avatar_dir) )
@@ -3117,7 +2708,7 @@ class mx_backend
 				}
 			}
 			@closedir($avatar_dir);
-			
+
 			//
 			// This bit of code translates the avatar directory size into human readable format
 			// Borrowed the code from the PHP.net annoted manual, origanally written by:
@@ -3141,43 +2732,6 @@ class mx_backend
 			// Couldn't open Avatar dir.
 			$avatar_dir_size = $lang['Not_available'];
 		}
-		
-		$mx_avatar_dir_size = 0;
-		$portal_config['avatar_path'] = '/images/avatars';
-		if ($mx_avatar_dir = @opendir($mx_root_path . $portal_config['avatar_path']) )
-		{
-			while( $file = @readdir($mx_avatar_dir) )
-			{
-				if( $file != "." && $file != ".." )
-				{
-					$mx_avatar_dir_size += @filesize($mx_root_path . $portal_config['avatar_path'] . "/" . $file);
-				}
-			}
-			@closedir($mx_avatar_dir);
-			
-			//
-			// This bit of code translates the avatar directory size into human readable format
-			// Borrowed the code from the PHP.net annoted manual, origanally written by:
-			// Jesse (jesse@jess.on.ca)
-			//
-			if($mx_avatar_dir_size >= 1048576)
-			{
-				$mx_avatar_dir_size = round($mx_avatar_dir_size / 1048576 * 100) / 100 . " MB";
-			}
-			else if($mx_avatar_dir_size >= 1024)
-			{
-				$mx_avatar_dir_size = round($mx_avatar_dir_size / 1024 * 100) / 100 . " KB";
-			}
-			else
-			{
-				$mx_avatar_dir_size = $mx_avatar_dir_size . " Bytes";
-			}
-		}
-		else
-		{
-			// Couldn't open Avatar dir.
-			$mx_avatar_dir_size = $lang['Not_available'];
-		}
 
 		if($posts_per_day > $total_posts)
 		{
@@ -3193,14 +2747,14 @@ class mx_backend
 		{
 			$users_per_day = $total_users;
 		}
-		
+
 		//
 		// DB size ... MySQL only
 		//
 		// This code is heavily influenced by a similar routine
 		// in phpMyAdmin 2.2.0
 		//
-		switch ($dbms)
+		switch ($db->get_sql_layer())
 		{
 			case 'mysql':
 			case 'mysql4':
@@ -3213,16 +2767,15 @@ class mx_backend
 
 					if( preg_match("/^(3\.23|4\.|5\.)/", $version) )
 					{
-						$dbname = ( preg_match("/^(3\.23\.[6-9])|(3\.23\.[1-9][1-9])|(4\.)|(5\.)/", $version) ) ? "`$dbname`" : $dbname;
-						$mx_dbname = ( preg_match("/^(3\.23\.[6-9])|(3\.23\.[1-9][1-9])|(4\.)|(5\.)/", $version) ) ? "`$dbname`" : $mx_dbname;
+						$db_name = ( preg_match("/^(3\.23\.[6-9])|(3\.23\.[1-9][1-9])|(4\.)|(5\.)/", $version) ) ? "`$dbname`" : $dbname;
 
 						$sql = "SHOW TABLE STATUS
-							FROM " . $dbname;
+							FROM " . $db_name;						
 						if($result = $db->sql_query($sql))
 						{
-							$tabledata_ary = $db->sql_fetchrowset($result);
+							$tabledata_ary = $db->sql_fetchrowset($result);							
 							
-							$dbsize = $phpb_dbsize = $mx_dbsize = 0;
+							$phpbb_dbsize = $mx_dbsize = $dbsize = 0;
 							for ($i = 0; $i < count($tabledata_ary); $i++)
 							{
 								if( isset($tabledata_ary[$i]['Engine']))
@@ -3232,7 +2785,7 @@ class mx_backend
 										if( strstr($tabledata_ary[$i]['Name'], $table_prefix) )
 										{
 											$dbsize += $tabledata_ary[$i]['Data_length'] + $tabledata_ary[$i]['Index_length'];											
-											$phpb_dbsize += $tabledata_ary[$i]['Data_length'] + $tabledata_ary[$i]['Index_length'];
+											$phpbb_dbsize += $tabledata_ary[$i]['Data_length'] + $tabledata_ary[$i]['Index_length'];
 										}
 									}
 									else
@@ -3251,7 +2804,7 @@ class mx_backend
 									else
 									{
 										$dbsize += $tabledata_ary[$i]['Data_length'] + $tabledata_ary[$i]['Index_length'];
-									}
+									}									
 								}
 							}
 						} // Else we couldn't get the table status.
@@ -3303,10 +2856,7 @@ class mx_backend
 			case 'mssql_odbc':
 			case 'mssqlnative':
 				$sql = 'SELECT @@VERSION AS mssql_version';
-				if (!$result = $db->sql_query($sql))
-				{
-					mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-				}
+				$result = $db->sql_query($sql);
 				$row = $db->sql_fetchrow($result);
 				$db->sql_freeresult($result);
 
@@ -3332,10 +2882,7 @@ class mx_backend
 				$sql = "SELECT proname
 					FROM pg_proc
 					WHERE proname = 'pg_database_size'";
-				if (!$result = $db->sql_query($sql))
-				{
-					mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-				}
+				$result = $db->sql_query($sql);
 				$row = $db->sql_fetchrow($result);
 				$db->sql_freeresult($result);
 
@@ -3350,20 +2897,14 @@ class mx_backend
 					$sql = "SELECT oid
 						FROM pg_database
 						WHERE datname = '$database'";
-					if (!$result = $db->sql_query($sql))
-					{
-						mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-					}
+					$result = $db->sql_query($sql);
 					$row = $db->sql_fetchrow($result);
 					$db->sql_freeresult($result);
 
 					$oid = $row['oid'];
 
 					$sql = 'SELECT pg_database_size(' . $oid . ') as size';
-					if (!$result = $db->sql_query($sql))
-					{
-						mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-					}
+					$result = $db->sql_query($sql);
 					$row = $db->sql_fetchrow($result);
 					$db->sql_freeresult($result);
 
@@ -3381,7 +2922,7 @@ class mx_backend
 		}
 		
 		$dbsize = ($dbsize !== 0) ? $dbsize : $lang['Not_available'];	
-		
+
 		if ( is_integer($dbsize) )
 		{
 			if( $dbsize >= 1048576 )
@@ -3398,193 +2939,6 @@ class mx_backend
 			}
 		}
 
-		if ($mx_dbname !== $dbname)
-		{
-			//
-			// DB size ... MySQL only
-			//
-			// This code is heavily influenced by a similar routine
-			// in phpMyAdmin 2.2.0
-			//
-			switch ($mx_dbms)
-			{
-				case 'mysql':
-				case 'mysql4':
-				case 'mysqli':
-					$sql = "SELECT version() AS version";
-					if($result = $db->sql_query($sql))
-					{
-						$row = $db->sql_fetchrow($result);
-						$mx_version = $row['version'];
-
-						if( preg_match("/^(3\.23|4\.|5\.)/", $mx_version) )
-						{
-							$mx_dbname = ( preg_match("/^(3\.23\.[6-9])|(3\.23\.[1-9][1-9])|(4\.)|(5\.)/", $mx_version) ) ? "`$mx_dbname`" : $mx_dbname;
-
-							$sql = "SHOW TABLE STATUS
-								FROM " . $mx_dbname;						
-							if($result = $db->sql_query($sql))
-							{
-								$mx_tabledata_ary = $db->sql_fetchrowset($result);
-								
-								$mx_dbsize = 0;
-								for ($i = 0; $i < count($mx_tabledata_ary); $i++)
-								{
-									if( isset($mx_tabledata_ary[$i]['Engine']))
-									{
-										if( $mx_table_prefix != "" )
-										{
-											if( strstr($mx_tabledata_ary[$i]['Name'], $mx_table_prefix) )
-											{										
-												$mx_dbsize += $mx_tabledata_ary[$i]['Data_length'] + $mx_tabledata_ary[$i]['Index_length'];
-											}
-										}
-										else
-										{
-											$mx_dbsize += $mx_tabledata_ary[$i]['Data_length'] + $mx_tabledata_ary[$i]['Index_length'];
-										}
-									}
-								}
-							} // Else we couldn't get the table status.
-							$sql = "SELECT table_schema 'database',
-							concat( round( sum( data_length + index_length ) / ( 1024 *1024 ) , 2 ) , 'M' ) size
-							FROM information_schema.TABLES
-							WHERE ENGINE=('MyISAM' || 'InnoDB' )
-							GROUP BY table_schema";						
-							if($result = $db->sql_query($sql))
-							{
-								$mx_tabledata_ary = $db->sql_fetchrowset($result);						
-								$mx_dbsize = isset($mx_dbsize) ? $mx_dbsize : 0;					
-								for ($i = 0; $i < count($mx_tabledata_ary); $i++)
-								{
-									if(isset($mx_tabledata_ary[$i]['database']))
-									{
-										if( strstr($mx_tabledata_ary[$i]['database'], $mx_dbname) )
-										{
-											$mx_dbsize = $mx_tabledata_ary[$i]['size'];
-										}
-																		
-									}							
-								}
-							} // Else we couldn't get the table status.					
-						}
-						else
-						{
-							$mx_dbsize = $lang['Not_available'];
-						}
-					}
-					else
-					{
-						$mx_dbsize = $lang['Not_available'];
-					}
-					$db->sql_freeresult($result);
-
-				break;
-
-				case 'sqlite3':
-					global $mx_dbhost;
-
-					if (file_exists($mx_dbhost))
-					{
-						$dbsize = filesize($mx_dbhost);
-					}
-
-				break;
-
-				case 'mssql_odbc':
-				case 'mssqlnative':
-					$sql = 'SELECT @@VERSION AS mssql_version';
-					if (!$result = $db->sql_query($sql))
-					{
-						mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-					}
-					$row = $db->sql_fetchrow($result);
-					$db->sql_freeresult($result);
-
-					$sql = 'SELECT ((SUM(size) * 8.0) * 1024.0) as dbsize
-						FROM sysfiles';
-
-					if ($row)
-					{
-						// Azure stats are stored elsewhere
-						if (strpos($row['mssql_version'], 'SQL Azure') !== false)
-						{
-							$sql = 'SELECT ((SUM(reserved_page_count) * 8.0) * 1024.0) as dbsize
-							FROM sys.dm_db_partition_stats';
-						}
-					}
-
-					$result = $db->sql_query($sql, 7200);
-					$mx_dbsize = ($row = $db->sql_fetchrow($result)) ? $row['dbsize'] : false;
-					$db->sql_freeresult($result);
-				break;
-
-				case 'postgres':
-					$sql = "SELECT proname
-						FROM pg_proc
-						WHERE proname = 'pg_database_size'";
-					if (!$result = $db->sql_query($sql))
-					{
-						mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-					}
-					$row = $db->sql_fetchrow($result);
-					$db->sql_freeresult($result);
-
-					if ($row['proname'] == 'pg_database_size')
-					{
-						$mx_database = $db->get_db_name();
-						if (strpos($mx_database, '.') !== false)
-						{
-							list($mx_database, ) = explode('.', $mx_database);
-						}
-
-						$sql = "SELECT oid
-							FROM pg_database
-							WHERE datname = '$mx_database'";
-						if (!$result = $db->sql_query($sql))
-						{
-							mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-						}
-						$row = $db->sql_fetchrow($result);
-						$db->sql_freeresult($result);
-
-						$oid = $row['oid'];
-
-						$sql = 'SELECT pg_database_size(' . $oid . ') as size';
-						if (!$result = $db->sql_query($sql))
-						{
-							mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-						}
-						$row = $db->sql_fetchrow($result);
-						$db->sql_freeresult($result);
-
-						$mx_dbsize = $row['size'];
-					}
-				break;
-
-				case 'oracle':
-					$sql = 'SELECT SUM(bytes) as dbsize
-						FROM user_segments';
-					$result = $db->sql_query($sql, 7200);
-					$mx_dbsize = ($row = $db->sql_fetchrow($result)) ? $row['dbsize'] : false;
-					$db->sql_freeresult($result);
-				break;
-			}
-			
-			$template->assign_block_vars('mx_stats', array(
-				"NUMBER_OF_POSTS" 	=> $mx_total_posts,
-				"NUMBER_OF_TOPICS" 	=> $mx_total_topics,
-				"NUMBER_OF_USERS" 	=> $mx_total_users,
-				"START_DATE" 				=> $mx_start_date,
-				"POSTS_PER_DAY" 			=> $mx_posts_per_day,
-				"TOPICS_PER_DAY" 		=> $mx_topics_per_day,
-				"USERS_PER_DAY" 			=> $mx_users_per_day,
-				"AVATAR_DIR_SIZE" 		=> $mx_avatar_dir_size,
-				"DB_SIZE" 						=> $mx_dbsize,
-				"GZIP_COMPRESSION" 	=> ( $board_config['gzip_compress'] ) ? $lang['ON'] : $lang['OFF']
-				)
-			);
-		}
 		$template->assign_vars(array(
 			"NUMBER_OF_POSTS" => $total_posts,
 			"NUMBER_OF_TOPICS" => $total_topics,
@@ -3606,122 +2960,68 @@ class mx_backend
 	 */
 	function phpbb_version_check($force_update = false, $warn_fail = false, $ttl = 86400)
 	{
-		global $mx_cache, $mx_request_vars, $board_config, $lang, $phpbb_version_info;
+		global $mx_cache, $board_config, $lang, $phpbb_version_info;
 		
 		$errno = 0;
 		$errstr = $phpbb_version_info = '';
-		
 		$phpbb_version_info = $mx_cache->get('versioncheck');
-		
-		$current_phpbb_version = explode(".", $board_config['version']);
-		$head_phpbb_revision = $current_phpbb_version[0];
-		$major_phpbb_revision = $current_phpbb_version[1];
-		$minor_phpbb_revision = $current_phpbb_version[2];
-		
-		//Load class version helper
-		$mx_cache->load_file('version_helper', 'phpbb3');
-		$version_helper = new version_helper();
-		
-		try
+
+		if ($fsock = @fsockopen('www.phpbb.com', 80, $errno, $errstr, 10))
 		{
-			$recheck = $mx_request_vars->variable('versioncheck_force', false);
-			$updates_available = $version_helper->get_update_on_branch($recheck);
-			$upgrades_available = $version_helper->get_suggested_updates();
-				
-			if (!empty($upgrades_available))
+			//$phpbb_version_info = mx_get_remote_file('www.phpbb.com', '/updatecheck', ((defined('PHPBB_QA')) ? '30x_qa.txt' : '30x.txt'), $errstr, $errno);
+			if ($phpbb_version_info === false || $force_update)
 			{
-				$upgrades_available = array_pop($upgrades_available);
+				$errstr = '';
+				$errno = 0;
+
+				$phpbb_version_info = mx_get_remote_file('version.phpbb.com/20x.txt', '/phpbb',
+						((defined('PHPBB_QA')) ? '20x_qa.txt' : '20x.txt'), $errstr, $errno);
 			}
-			$version_up_to_date		= empty($updates_available);
-			$version_upgradeable		= !empty($upgrades_available);
-			$upgrade_instructions		= !empty($upgrades_available) ? $mx_user->lang('UPGRADE_INSTRUCTIONS', $upgrades_available['current'], $upgrades_available['announcement']) : false;
-		}
-		catch (\RuntimeException $e)
-		{
-			$message = call_user_func_array(array($mx_user, 'lang'), array_merge(array($e->getMessage()), $e->get_parameters()));
-
-			$versioncheck_fail		= true;
-			$versioncheck_fail_reason	= ($e->getMessage() !== 'VERSIONCHECK_FAIL') ? $message : '';
-		}
-		
-		if ((($head_phpbb_revision == 3) && ($major_phpbb_revision == 0)) || ($head_phpbb_revision < 3))
-		{
-			if ($fsock = @fsockopen('www.phpbb.com', 80, $errno, $errstr, 10))
+			
+			if (empty($phpbb_version_info))
 			{
-				$phpbb_version_info = mx_get_remote_file('www.phpbb.com', '/updatecheck', ((defined('PHPBB_QA')) ? $head_phpbb_revision . $major_phpbb_revision . 'x_qa.txt' : $head_phpbb_revision . $major_phpbb_revision . 'x.txt'), $errstr, $errno);
-				
-				
-				if ($phpbb_version_info === false || $force_update)
+				$mx_cache->destroy('versioncheck');
+				if ($warn_fail)
 				{
-					$errstr = '';
-					$errno = 0;
+					trigger_error($errstr, E_USER_WARNING);
+				}
+				return false;
+			}
 
-					$phpbb_version_info = mx_get_remote_file('version.phpbb.com', '/phpbb',
-							((defined('PHPBB_QA')) ? $head_phpbb_revision . $major_phpbb_revision . 'x_qa.txt' : $head_phpbb_revision . $major_phpbb_revision . 'x.txt'), $errstr, $errno);
-				}
-				
-				
-				if (empty($phpbb_version_info))
-				{
-					$mx_cache->destroy('versioncheck');
-					if ($warn_fail)
-					{
-						trigger_error($errstr, E_USER_WARNING);
-					}
-					return false;
-				}
+			$mx_cache->put('versioncheck', $phpbb_version_info, $ttl);			
 
-				$mx_cache->put('versioncheck', $phpbb_version_info, $ttl);
-
-				$phpbb_version_info = explode("\n", $phpbb_version_info);
-				//$latest_version = trim($phpbb_version_info[0]); 
-				//$update_link = append_sid($phpbb_root_path . 'install/index.' . $phpEx, 'mode=update');
-				$latest_phpbb_head_revision = $version1 = strtolower(trim($phpbb_version_info[0]));
-				$latest_phpbb_minor_revision = trim($phpbb_version_info[2]);
-				$latest_phpbb_version = trim($phpbb_version_info[1]) . ', <a href=' . trim($phpbb_version_info[2]) . '>' . trim($phpbb_version_info[2]) . '</a> ';
-				$version2 = strtolower($board_config['version']);
-				$current_phpbb_version = explode(".", $board_config['version']);
-				$minor_phpbb_revision = $current_phpbb_version[2];
-				$operator = '<=';
-				if (version_compare($version1, $version2, $operator))
-				{
-					$phpbb_version_info = '<p style="color:green">' . $lang['Version_up_to_date'] . '</p>';
-				}
-				else
-				{
-					$phpbb_version_info = '<p style="color:red">' . $lang['Version_not_up_to_date'];
-					$phpbb_version_info .= '<br />' . sprintf($lang['Latest_version_info'], $latest_phpbb_version) . '<br />' . sprintf($lang['Current_version_info'], $board_config['version']) . '</p>';
-				}
+			$phpbb_version_info = explode("\n", $phpbb_version_info);
+			//$latest_version = trim($phpbb_version_info[0]); 
+			//$update_link = append_sid($phpbb_root_path . 'install/index.' . $phpEx, 'mode=update');
+			$latest_phpbb_head_revision = $version1 = strtolower(trim($phpbb_version_info[0]));
+			$latest_phpbb_minor_revision = trim($phpbb_version_info[2]);
+			$latest_phpbb_version = trim($phpbb_version_info[0]) . '.' . trim($phpbb_version_info[1]) . '.' . trim($phpbb_version_info[2]);
+			$version2 = strtolower('2'.$board_config['version']);
+			$current_phpbb_version = explode(".", $board_config['version']);
+			$minor_phpbb_revision = $current_phpbb_version[2];
+			$operator = '<=';
+			if (version_compare($version1, $version2, $operator))
+			{
+				$phpbb_version_info = '<p style="color:green">' . $lang['Version_up_to_date'] . '</p>';
 			}
 			else
 			{
-				if ($errstr)
-				{
-					$phpbb_version_info = '<p style="color:red">' . sprintf($lang['Connect_socket_error'], $errstr) . '</p>';
-				}
-				else
-				{
-					$phpbb_version_info = '<p>' . $lang['Socket_functions_disabled'] . '</p>';
-				}
+				$phpbb_version_info = '<p style="color:red">' . $lang['Version_not_up_to_date'];
+				$phpbb_version_info .= '<br />' . sprintf($lang['Latest_version_info'], $latest_phpbb_version) . sprintf($lang['Current_version_info'], $board_config['version']) . '</p>';
 			}
 		}
 		else
 		{
-				if (empty($updates_available))
-				{
-					$phpbb_version_info = '<p style="color:green">' . $lang['Version_up_to_date'] . '</p>';
-				}
-				elseif (!empty($updates_available))
-				{
-					$phpbb_version_info = '<p style="color:green">' . $lang['Version_not_up_to_date'];
-					$phpbb_version_info .= '<br />' . $upgrade_instructions . '<br />' . sprintf($lang['Current_version_info'], $board_config['version']) . '</p>';
-				}
-				else
-				{
-					$phpbb_version_info = '<p style="color:red">' . $lang['Version_not_up_to_date'];
-					$phpbb_version_info .= '<br />' . $upgrade_instructions . '<br />' . sprintf($lang['Current_version_info'], $board_config['version']) . '</p>';
-				}
+			if ($errstr)
+			{
+				$phpbb_version_info = '<p style="color:red">' . sprintf($lang['Connect_socket_error'], $errstr) . '</p>';
+			}
+			else
+			{
+				$phpbb_version_info = '<p>' . $lang['Socket_functions_disabled'] . '</p>';
+			}
 		}
+
 		$phpbb_version_info .= '<p>' . $lang['Mailing_list_subscribe_reminder'] . '</p>';
 
 		return $phpbb_version_info;
@@ -3731,6 +3031,5 @@ class mx_backend
 //
 // Now load some bbcodes, to be extended for this backend (see below)
 //
-include_once($mx_root_path . 'includes/sessions/rhea/bbcode.' . $phpEx); // BBCode associated functions
-
+include_once($mx_root_path . 'includes/sessions/phpbb2/bbcode.' . $phpEx); // BBCode associated functions
 ?>

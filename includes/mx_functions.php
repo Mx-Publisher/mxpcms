@@ -411,6 +411,141 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 }
 
 /**
+; User error handling and logging in PHP;
+; E_USER_ERROR      		- user-generated error message
+; E_USER_WARNING    	- user-generated warning message
+; E_USER_NOTICE     		- user-generated notice message
+; E_USER_DEPRECATED - user-generated deprecation warnings 
+*/
+function mx_msg_handler($msg_code, $msg_text = '', $msg_title = '', $err_line = '', $err_file = '', $sql = '')
+{		
+	global $db, $mx_user, $board_config;
+	
+	// Do not display notices if we suppress them via @
+	if (error_reporting() == 0 && $errno != E_USER_ERROR && $errno != E_USER_WARNING && $errno != E_USER_NOTICE && $errno != E_USER_DEPRECATED)
+	{
+		return;
+	}	
+			
+	//
+	// Get SQL error if we are debugging. Do this as soon as possible to prevent
+	// subsequent queries from overwriting the status of sql_error()
+	//
+	if (DEBUG && ($msg_code == E_USER_NOTICE || $msg_code == E_USER_ERROR))
+	{	
+		if ( isset($sql) )
+		{
+			$sql_error = $db->sql_error($sql);
+			$sql_error['message'] = $sql_error['message'] ? $sql_error['message'] : '<br /><br />SQL : ' . $sql; 
+			$sql_error['code'] = $sql_error['code'] ? $sql_error['code'] : 0;
+		}
+		else
+		{
+			$sql_error = $db->sql_error_returned;
+			$sql_error['message'] = $db->sql_error_returned['message']; 
+			$sql_error['code'] = $db->sql_error_returned['code'];
+		}
+				
+		$debug_text = '';
+				
+		//Some code with harcoded language from function db::sql_error() and other from msg_handler() with some fixes here
+		// If error occurs in initiating the session we need to use a pre-defined language string
+		// This could happen if the connection could not be established for example (then we are not able to grab the default language)
+		if ( isset($sql_error['message']) )
+		{	
+				$message = 'SQL  ' . $mx_user->lang('ERROR') . ' [ ' . $db->sql_layer . ' ]<br /><br />' . $sql_error['message'] . ' [' . $sql_error['code'] . ']';
+					
+				if (!empty($mx_user->lang('SQL_ERROR_OCCURRED')))
+				{
+					$message .= '<br /><br />An sql error occurred while fetching this page. Please contact an administrator if this problem persists.';
+				}
+				else
+				{
+					if (!empty($this->config['board_contact']))
+					{
+						$message .= '<br /><br />' . sprintf($mx_user->lang('SQL_ERROR_OCCURRED'), '<a href="mailto:' . $board_config['board_contact'] . '">', '</a>');
+					}
+					else
+					{
+						$message .= '<br /><br />' . sprintf($mx_user->lang('SQL_ERROR_OCCURRED'), '', '');
+					}
+				}
+				$debug_text .= '<br /><br />SQL '  . $mx_user->lang('ERROR') . ' ' . $mx_user->lang('COLON') . ' ' . $sql_error['code'] . ' ' . $sql_error['message'];
+		}
+				
+		if ( isset($sql_store) )
+		{
+			$debug_text .= "<br /><br />$sql_store";
+		}
+
+		if ( isset($err_line) && isset($err_file) )
+		{
+			$debug_text .= '</br /><br />Line : ' . $err_line . '<br />File : ' . $err_file;
+		}
+	}
+			
+	switch($msg_code)
+	{
+		case E_USER_ERROR:
+			if ( $msg_title == '' )
+			{
+					$msg_title = $mx_user->lang('GENERAL_ERROR'); 
+			}
+		break;
+
+		case E_USER_WARNING:
+			if ( $msg_text == '' )
+			{
+				$msg_text = $mx_user->lang('GENERAL_ERROR');
+			}
+
+			if ( $msg_title == '' )
+			{
+				$msg_title = $mx_user->lang('ERROR');
+			}
+		break;
+				
+		case E_USER_NOTICE:
+			if ( $msg_title == '' )
+			{
+				$msg_title = $mx_user->lang('INFORMATION');
+			}
+		break;
+				
+		case E_USER_DEPRECATED:
+			if ($msg_text == '')
+			{
+				$msg_text = $mx_user->lang('GENERAL_ERROR');
+			}
+
+			if ($msg_title == '')
+			{
+				$msg_title = 'phpBB' . $mx_user->lang('COLON') . '<b>' . $mx_user->lang('ERROR') . '</b>';
+			}
+		break;
+	}
+			
+	//
+	// Add on DEBUG info if we've enabled debug mode and this is an error. This
+	// prevents debug info being output for general messages should DEBUG be
+	// set TRUE by accident (preventing confusion for the end user!)
+	//
+	if ( DEBUG && ( $msg_code == E_USER_NOTICE || $msg_code == E_USER_ERROR ) )
+	{
+		if ( $debug_text != '' )
+		{
+			$msg_text = $msg_text . '<br /><br /><b><u>DEBUG MODE</u></b> ' . $debug_text;
+		}
+	}
+			
+	$msg_text = (!empty($mx_user->lang[$msg_text])) ? $mx_user->lang[$msg_text] : $msg_text;
+	$msg_title = (!empty($mx_user->lang[$msg_title])) ? $mx_user->lang[$msg_title] : $msg_title;
+			
+	mx_message_die($msg_code, $msg_text, $msg_title, $err_line, $err_file, $sql);
+}
+
+
+/**
  * Simple mx_message_die.
  *
  * mx_block_message is basically a simple version of a mx_message_die kind of function.
@@ -1823,7 +1958,7 @@ function mx_get_avatar($row, $alt, $ignore_config = false, $lazy = false)
 	}
 
 	$row = array_merge(array(
-		'avatar' 	=> !empty($row['avatar']) ? $row['avatar'] :  $row['user_avatar'],
+		'avatar' 		=> !empty($row['avatar']) ? $row['avatar'] :  $row['user_avatar'],
 		'avatar_type' 	=> isset($row['avatar_type']) ? $row['avatar_type'] : $row['user_avatar_type'],
 		'avatar_width' 	=> isset($row['avatar_width']) ? $row['avatar_width'] : (isset($row['user_avatar_width']) ? $row['user_avatar_width'] : '120'),
 		'avatar_height' => isset($row['avatar_height']) ? $row['avatar_height'] : (isset($row['user_avatar_height']) ? $row['user_avatar_height'] : '120'),
@@ -1835,13 +1970,14 @@ function mx_get_avatar($row, $alt, $ignore_config = false, $lazy = false)
 		'height' => $row['avatar_height'],
 	);
 
+	
 	$driver = $row['avatar_type'];
 	$html = '';
 	if (empty($driver))
 	{
 		$driver = 'upload';
 	}
-
+	
 	if ($driver)
 	{
 		
@@ -1854,7 +1990,7 @@ function mx_get_avatar($row, $alt, $ignore_config = false, $lazy = false)
 		{
 			//return $html;
 		}
-		
+
 		$root_path = generate_portal_url();
 		if (is_file($phpbb_root_path .  'images/avatars/default_avatars/' . $row['avatar']))
 		{
@@ -1883,7 +2019,7 @@ function mx_get_avatar($row, $alt, $ignore_config = false, $lazy = false)
 		else
 		{
 			$avatar_path = $mx_root_path . 'images/avatars/default_avatars/';
-		}	
+		}
 		$avatar_data = array(
 			'src' => empty($row['avatar']) ? $avatar_path . $row['user_avatar'] : $avatar_path . $row['avatar'],
 			'width' => $row['avatar_width'],

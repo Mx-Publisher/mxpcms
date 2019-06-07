@@ -628,23 +628,23 @@ class mx_Template extends Template
 			{
 				$this->debug_paths .= '<br>' . $root_path . $root . $path . '/' . $filename;
 
-				if( file_exists($root_path . $root . $path . '/' . $filename) )
+				if(@is_file($root_path . $root . $path . '/' . $filename) )
 				{
 					$this->module_template_path = $root . $path . '/';
 					return $root_path . $root . $path . '/' . $filename;
 				}
-				else if( file_exists($root . '/' . $filename) )
+				else if(@is_file($root . '/' . $filename) )
 				{
 					$this->module_template_path = $root . '/';
 					return $root . '/' . $filename;
 				}
 				
-				if ($check_file2 && @file_exists($root_path . $root . $path . '/' . $filename2))
+				if ($check_file2 && @is_file($root_path . $root . $path . '/' . $filename2))
 				{
 					$this->module_template_path = $root . $path . '/';
 					return $root_path . $root . $path . '/' . $filename2;
 				}
-				else if ($check_file2 && file_exists($root . '/' . $filename2))
+				else if ($check_file2 && @is_file($root . '/' . $filename2))
 				{
 					$this->module_template_path = $root . '/';
 					return $root . '/' . $filename2;
@@ -2162,7 +2162,7 @@ class mx_user extends mx_session
 				case 'rhea':
 				case 'proteus':
 					$sql = "SELECT mxt.*, mxt.template_name AS template_path, stt.*
-						FROM " . MX_THEMES_TABLE . " mxt, " . STYLES_TABLE . " sst
+						FROM " . MX_THEMES_TABLE . " mxt, " . STYLES_TABLE . " stt
 						WHERE mxt.themes_id = " . (int) $init_style . "
 						AND mxt.template_name = stt.style_path";
 				break;
@@ -2202,8 +2202,8 @@ class mx_user extends mx_session
 					case 'ascraeus':
 					case 'rhea':
 					case 'proteus':
-						$sql = "SELECT mxt.*, mxt.template_name AS template_path, stt.*
-							FROM " . MX_THEMES_TABLE . " mxt, " . STYLES_TABLE . " sst
+						$sql = "SELECT mxt.*, mxt.template_name AS template_path, sst.*
+							FROM " . MX_THEMES_TABLE . " AS mxt, " . STYLES_TABLE . " AS sst
 							WHERE sst.style_id = " . (int) $init_style . "
 							AND mxt.template_name = stt.style_path";
 					break;
@@ -2242,7 +2242,7 @@ class mx_user extends mx_session
 					case 'rhea':
 					case 'proteus':
 						$sql = "SELECT mxt.*, mxt.template_name AS template_path, stt.*
-							FROM " . MX_THEMES_TABLE . " mxt, " . STYLES_TABLE . " sst
+							FROM " . MX_THEMES_TABLE . " AS mxt, " . STYLES_TABLE . " AS stt
 							WHERE mxt.template_name = stt.style_path";
 					break;
 				}

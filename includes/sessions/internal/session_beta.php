@@ -16,31 +16,33 @@ if ( !defined('IN_PORTAL') )
 
 /**
  * Modifications:
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
-*/
- 
+ *		- replaced $config -> $board_config - by Jon
+ *		- replaced $cache = new mx_nothing(); to disable bots() - by Jon
+ *		- removed '?' in the returned $SID string - by Jon
+ *		- in function setup()
+ *			$auth -> $phpbb_auth - by OryNider
+ *			-new globals:  $mx_root_path, $mx_cache - by OryNider
+ *			$this->lang_name was redefined to use in
+ *			worst case the new $board_config['phpbb_lang']
+ *			wich was defined in mx_functions_style.php
+ *			before lang name is expanded - by OryNider
+ *			$template = new mx_Template(); - by OryNider
+ *			- before $this->add_lang($lang_set); the phpBB common language is included
+ *			if fails with $phpbb_root_path added
+ *		- in function set_lang()
+ *			- if empty $this->lang_path will be redefined
+ *			from $phpbb_root_path and new $board_config['phpbb_lang']
+ *			wich in this case are set as globals - by OryNider
+ *			(similar check has been added in the phpBB3 version too)
+ *		- added function images() to help redefining $images var
+ *		and indexes were is needed - by OryNider
+ */
+
 /**
  * Disable bots
  *
+ * Class wrapper
+ * mx_dss_rand
  */
 class mx_nothing
 {
@@ -50,44 +52,59 @@ class mx_nothing
 	}
 }
 
+/*
+ * This class is part of Crawler Detect - the web crawler detection library.
+ *
+ * (c) Mark Beech <m@rkbee.ch>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file fixtures\LICENSE.
+ */
+//namespace Jaybizzle\CrawlerDetect;
+abstract class AbstractProvider
+{
+    /**
+     * The data set.
+     * 
+     * @var array
+     */
+    protected $data;
+    /**
+     * Return the data set.
+     * 
+     * @return array
+     */
+    public function getAll()
+    {
+        return $this->data;
+    }
+}
+
+include_once($mx_root_path . 'includes/fixtures/headers.'.$phpEx);
+include_once($mx_root_path . 'includes/fixtures/crawlers.'.$phpEx);
+include_once($mx_root_path . 'includes/fixtures/exclusions.'.$phpEx);
+
 /**
 * Session class
 * @package MX-Publisher
 */
 class session
 {
-	/** @var \phpbb\cache\driver\driver_interface */
-	protected $cache;
-	protected $mx_cache;
-	protected $language;
-	protected $request;
-	/** @var \phpbb\config\config */
-	protected $config;
-	/** @var \phpbb\db\driver\driver_interface */
-	protected $db; 
+	/**#@+
+	 * user class specific vars
+	 *
+	 */
+	var $loaded_langs = array();
+	var $loaded_styles = array();
+	var $loaded_default_styles = array();
 	
-	var $cookie_data = array();
-	var $page = array();
-	var $data = array();
-	var $browser = '';
-	var $forwarded_for = '';
-	var $host = '';
-	var $session_id = '';
-	var $ip = '';
-	var $page_id = '';
-	var $user_ip = '';	
-	var $load = 0;
-	var $time_now = 0;
-	var $update_session_page = true;
-
+	var $lang_path = 'language/';
 	var $lang = array();
 	var $help = array();
-	var $theme = array();
-	var $date_format;
-	var $timezone;
-	var $int_timezone;
-	var $dst;
+	var $lang_name;
+	var $lang_id = false;
 
+	var $img_lang;
 	/**
 	 * @var string	ISO code of the default board language
 	 */
@@ -98,28 +115,139 @@ class session
 	 */
 	var $user_language;
 	var $user_language_name;
-	
-	var $lang_iso = 'en';	
-	var $lang_dir = 'lang_english';
-	
-	protected $common_language_files_loaded;
-	
-	var $img_lang_dir = 'en';
-	var $lang_english_name = 'English';	
-	var $lang_local_name = 'English United Kingdom';
-	var $language_list = array();
-	var $debug_paths;
 
-	var $lang_name;
-	var $lang_path;
-	var $img_lang;
+		
+	var $lang_iso = 'en';		
+	var $lang_dir = 'lang_english';
+	//
+	var $img_lang_dir = 'en';
+
+	var $template_path = 'templates/';
+	var $styles_path = 'templates/';
+
+	var $template_name = '';
+	var $template_names = array();
+	var $current_template_path = '';
+
+	var $cloned_template_name = 'subSilver';
+	var $default_template_name = 'subsilver2';
+	
+	var $cloned_current_template_name = 'prosilver';
+	var $default_current_template_name = '';	
+	
+	var $cloned_current_template_path = 'templates/subSilver';
+	var $default_current_template_path = 'templates/subsilver2';
+	
+	var $imageset_backend = 'phpbb2';
+	var $ext_imageset_backend = 'phpbb2';
+
 	var $img_array = array();
+	var $default_module_style = '';
+	var $style = array();
+	var $theme = array();
+
+	var $date_format;
+	var $timezone;
+	var $dst;
+	// Able to add new options (up to id 31)
+	var $keyoptions = array('viewimg' => 0, 'viewflash' => 1, 'viewsmilies' => 2, 'viewsigs' => 3, 'viewavatars' => 4, 'viewcensors' => 5, 'attachsig' => 6, 'bbcode' => 8, 'smilies' => 9, 'sig_bbcode' => 15, 'sig_smilies' => 16, 'sig_links' => 17);
+	
+	var $is_admin = false;
+	
+	var $page_id = '';
+	var $user_ip = '';
+
+	/** @var \phpbb\cache\driver\driver_interface */
+	protected $cache;
+	protected $language;
+	protected $request;
+	/** @var \phpbb\config\config */
+	protected $config;
+	/** @var \phpbb\db\driver\driver_interface */
+	protected $db; 
+
+	var $cookie_data = array();
+	var $page = array();
+	var $data = array();
+	var $browser = '';
+	var $forwarded_for = '';
+	var $host = '';
+	var $session_id = '';
+	var $ip = '';
+	var $datetime = '';
+
+	var $load = 0;
+	var $time_now = 0;
+	var $update_session_page = true;
+	
+	var $module_lang_path = array();
+	protected $phpbb_root_path;
+
+	
+    /**
+     * The user agent.
+     *
+     * @var null
+     */
+    protected $userAgent = null;
+
+    /**
+     * Headers that contain a user agent.
+     *
+     * @var array
+     */
+    protected $httpHeaders = array();
+
+    /**
+     * Store regex matches.
+     *
+     * @var array
+     */
+    protected $matches = array();
+
+    /**
+     * Crawlers object.
+     *
+     * @var \Jaybizzle\CrawlerDetect\Fixtures\Crawlers
+     */
+    protected $crawlers;
+
+    /**
+     * Exclusions object.
+     *
+     * @var \Jaybizzle\CrawlerDetect\Fixtures\Exclusions
+     */
+    protected $exclusions;
+
+    /**
+     * Headers object.
+     *
+     * @var \Jaybizzle\CrawlerDetect\Fixtures\Headers
+     */
+    protected $uaHttpHeaders;
+
+    /**
+     * The compiled regex string.
+     *
+     * @var string
+     */
+    protected $compiledRegex;
+
+    /**
+     * The compiled exclusions regex string.
+     *
+     * @var string
+     */
+    protected $compiledExclusions;
+	
+	//var  $phpbb_root_path;	
+	/**#@-*/
 	
 	/**
 	 * Load sessions
 	 * @access public
 	 *
-	 */	
+	 */
 	function session()
 	{
 		global $mx_cache, $board_config, $db, $phpbb_root_path, $mx_root_path, $phpEx;
@@ -157,7 +285,7 @@ class session
 		$this->php_ext = $phpEx;
 	
 		$this->lang_path = $mx_root_path . 'language/';
-		/*
+	
         $this->crawlers = new Crawlers();
         $this->exclusions = new Exclusions();
         $this->uaHttpHeaders = new Headers();
@@ -167,12 +295,14 @@ class session
 
         $this->setHttpHeaders($headers);
         $this->userAgent = $this->setUserAgent($userAgent);
-		*/
+		
 		$this->lang_path = $phpbb_root_path . 'language/';
 		$this->load();
 		$this->setup();
-
 	}
+	// ------------------------------
+	// Private Methods
+	//
 	
 	/**
 	 * Load sessions
@@ -181,12 +311,30 @@ class session
 	 */
 	function load()
 	{
+		global $mx_cache, $board_config, $db, $phpbb_root_path, $mx_root_path, $phpEx;
+		global $mx_request_vars, $template, $language;
+		
+		$this->cache				= $mx_cache;
+		$this->config				= $board_config;
+		$this->db                 	= $db;
+		$this->user               	= $this;
+		$this->service_providers = array('user_id' => 1, 'session_id' => 0, 'provider'	=> '', 'oauth_token' => '');
+		$this->phpbb_root_path = $phpbb_root_path;
+		$this->mx_root_path	= $mx_root_path;
+		$this->php_ext			= $phpEx;
+		$this->lang_path			= $mx_root_path . 'language/';
+		$this->request				= $mx_request_vars;
+		$this->template			= $template;
+		$this->language			= $language;
+		
 		if (!isset($this->user_ip)) 
 		{
 			global $user_ip;
 		
 			$this->user_ip = $user_ip;
 		}		
+		
+		//$this->page_id = $page_id ? $page_id : $this->request->request('page', MX_TYPE_INT, PAGE_INDEX);
 		
 		if (!isset($this->page_id)) 
 		{
@@ -225,14 +373,33 @@ class session
 			if (!isset($this->cache)) 
 			{
 				$this->cache= new mx_cache();
-			}			
-		}		
+			}
+		}
+		
+		// Setup $this->db_tools
+		if (!class_exists('mx_db_tools') && !class_exists('tools'))
+		{
+			include_once($this->mx_root_path . 'includes/db/db_tools.' . $phpEx);
+		}
+		if (class_exists('mx_db_tools'))
+		{
+			$this->db_tools = new mx_db_tools($this->db);
+		}
+		elseif (class_exists('tools'))
+		{
+			$this->db_tools = new tools($this->db);
+		}
 		
 		//
 		// Populate user data
-		//			
+		//
 		$this->data = $this->session_pagestart($this->user_ip, - ( MX_PORTAL_PAGES_OFFSET + $this->page_id ));
 		
+
+		//
+		// Populate session_id
+		$this->session_id = $this->data['session_id'];
+			
 		if (preg_match('/bot|crawl|curl|dataprovider|search|get|spider|find|java|majesticsEO|google|yahoo|teoma|contaxe|yandex|libwww-perl|facebookexternalhit/i', $_SERVER['HTTP_USER_AGENT'])) 
 		{
 		    $this->data['is_bot'] = true;
@@ -242,22 +409,588 @@ class session
 		    $this->data['is_bot'] = false;
 		}
 		
+		$status = $this->mobile_device_detect();
+		
+		if (!$this->db->sql_field_exists('user_type', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_type</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_type', array('column_type_sql' => 'tinyint(2)', 'null' => 'NOT NULL', 'default' => '0', 'after' => 'user_id'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('username_clean', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">username_clean</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'username_clean', array('column_type_sql' => 'varchar(255)', 'null' => 'NOT NULL', 'default' => '', 'after' => 'username'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_email_hash', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_email_hash</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_email_hash', array('column_type_sql' => 'BIGINT(20)', 'null' => 'NOT NULL', 'default' => '0', 'after' => 'user_email'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('group_id', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">group_id</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'group_id', array('column_type_sql' => 'mediumint(8)', 'null' => 'NOT NULL', 'default' => '3', 'after' => 'user_type'), false);
+		}
+
+		if (!$this->db->sql_field_exists('user_ip', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_ip</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_ip', array('column_type_sql' => 'varchar(40)', 'null' => 'NOT NULL', 'default' => '"'.@mx_encode_ip('127.0.0.1').'"', 'after' => 'user_active'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_passchg', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_passchg</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_passchg', array('column_type_sql' => 'int(11)', 'null' => 'NOT NULL', 'default' => '0', 'after' => 'user_password'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_options', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_options</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_options', array('column_type_sql' => 'int(11)', 'null' => 'NOT NULL', 'default' => '230271', 'after' => 'user_level '), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_newpasswd', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_newpasswd</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_newpasswd', array('column_type_sql' => 'varchar(33)', 'null' => 'NOT NULL', 'default' => '', 'after' => 'user_active'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_new', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_new</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_new', array('column_type_sql' => 'tinyint(1)', 'null' => 'NOT NULL', 'default' => '1', 'after' => 'user_newpasswd'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_inactive_reason', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_inactive_reason</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_inactive_reason', array('column_type_sql' => 'tinyint(4)', 'null' => 'NOT NULL', 'default' => '0', 'after' => 'user_last_login_try'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_inactive_time', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_inactive_time</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_inactive_time', array('column_type_sql' => 'int(2)', 'null' => 'NOT NULL', 'default' => '0', 'after' => 'user_inactive_reason'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_lastmark', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_lastmark</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_lastmark', array('column_type_sql' => 'int(11)', 'null' => 'NOT NULL', 'default' => '0', 'after' => 'user_lastvisit'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_lastvisit', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_lastvisit</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_lastvisit', array('column_type_sql' => 'int(11)', 'null' => 'NOT NULL', 'default' => '0', 'after' => 'user_birthday'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_lastpage', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_lastpage</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_lastpage', array('column_type_sql' => 'varchar(200)', 'null' => 'NOT NULL', 'default' => '""', 'after' => 'user_lastmark'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_lastblock', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_lastblock</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_lastblock', array('column_type_sql' => 'varchar(200)', 'null' => 'NOT NULL', 'default' => '""', 'after' => 'user_lastpage'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_colour', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_colour</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_colour', array('column_type_sql' => 'varchar(50)', 'null' => 'NOT NULL', 'default' => '"9E8DA7"', 'after' => 'user_passchg'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_avatar_width', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_avatar_width</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_avatar_width', array('column_type_sql' => 'tinyint(6)', 'null' => 'NOT NULL', 'default' => 98, 'after' => 'user_last_login_try'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_avatar_height', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_avatar_height</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_avatar_height', array('column_type_sql' => 'tinyint(6)', 'null' => 'NOT NULL', 'default' => 98, 'after' => 'user_last_login_try'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_allow_viewonline', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_allow_viewonline</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_allow_viewonline', array('column_type_sql' => 'tinyint(1)', 'null' => 'NOT NULL', 'default' => '1', 'after' => 'user_email_hash'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_allow_massemail', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_allow_massemail</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_allow_massemail', array('column_type_sql' => 'tinyint(1)', 'null' => 'NOT NULL', 'default' => '1', 'after' => 'user_allow_viewonline'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_sig', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_sig</span></p><i><p>Cheching for user_sig column in USERS_TABLE schema!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_sig', array('column_type_sql_default'	=> 'mediumtext ', 'column_type_sql' => 'mediumtext', 'null' => 'NOT NULL', 'after' => 'user_last_login_try'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_sig_bbcode_uid', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_sig_bbcode_uid</span></p><i><p>Cheching for user_sig_bbcode_uid column in USERS_TABLE schema!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_sig_bbcode_uid', array('column_type_sql_default'	=> 'varchar(8)', 'column_type_sql' => 'varchar(8)', 'null' => 'NOT NULL', 'after' => 'user_sig'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_sig_bbcode_bitfield', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_sig_bbcode_bitfield</span></p><i><p>Cheching for user_sig_bbcode_bitfield column in USERS_TABLE schema!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_sig_bbcode_bitfield', array('column_type_sql_default'	=> 'varchar(255)', 'column_type_sql' => 'varchar(255)', 'null' => 'NOT NULL', 'default' => '"1111111111111"', 'after' => 'user_sig_bbcode_uid'), false);
+		}
+		
+		//
+		// Check USERS_TABLE schema for user_agent
+		//
+		if (!$this->db->sql_field_exists('user_agent', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_agent</span></p><i><p>Cheching for user_agent column in USERS_TABLE schema!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_agent', array('column_type_sql_default'	=> 'varchar(255)', 'column_type_sql' => 'varchar(99)', 'null' => 'NOT NULL', 'default' => '"Mozilla/5.0 (Windows NT 10.0; rv:63.0) Gecko/20100101 Firefox/63.0.68"', 'after' => 'user_sig'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_form_salt', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_form_salt</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_form_salt', array('column_type_sql' => 'varchar(32)', 'null' => 'NOT NULL', 'default' => '""'), false);
+		}
+		
+		//
+		// Check USERS_TABLE schema for is_bot
+		//
+		if (!$this->db->sql_field_exists('is_bot', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">is_bot</span></p><i><p>Cheching for is_bot column in USERS_TABLE schema!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'is_bot', array('column_type_sql'	=> 'int(2)', 'null' => 'NOT NULL', 'default' => '0'), false);
+		}
+		
+		//
+		// Check USERS_TABLE schema for is_mobile
+		//
+		if (!$this->db->sql_field_exists('is_mobile', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">is_mobile</span></p><i><p>Cheching for is_mobile column in USERS_TABLE schema!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'is_mobile', array('column_type_sql'	=> 'int(2)', 'null' => 'NOT NULL', 'default' => '0', 'after' => 'is_bot'), false);
+		}
+		
+		//
+		// Check USERS_TABLE schema for device_name
+		//
+		if (!$this->db->sql_field_exists('device_name', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">device_name</span></p><i><p>Cheching for device_name column in USERS_TABLE schema!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'device_name', array('column_type_sql' => 'varchar(99)', 'null' => 'NOT NULL', 'default' => $status[1],  'after' => 'user_agent'), false);
+		}
+		
+		/*
+		if (!isset($this->data['device_name']))
+		{	
+			$after = '';
+			$sql_arry = array(
+				"ADD COLUMN  int(2) UNSIGNED NOT NULL DEFAULT 1" . $after,
+				"ADD COLUMN is_mobile int(2) UNSIGNED NOT NULL DEFAULT 1",
+				"ADD COLUMN user_agent varchar(255) NOT NULL",
+				"ADD COLUMN device_name varchar(99) NOT NULL",
+			);
+			
+			foreach ($sql_arry as $alter)
+			{
+				$sql = "ALTER TABLE " . USERS_TABLE . " " . $alter;
+				$this->db->sql_return_on_error(true);
+				$result = $this->db->sql_query($sql);
+				$this->db->sql_return_on_error(false);
+				
+				// We could add error handling here...
+				if (!($result))
+				{		
+					print_r("Could not upgrade users table at ". ' '. __LINE__ . ': '. __FILE__ . ':<br /> ' . $sql . '<br />');
+				}
+			}
+		}
+		*/
+		
+		$this->data['is_mobile'] = $status;
+		$this->data['device_name'] = $this->cookie_data['mobile_name'] = $status[1];
+		$cookie_mobile_name = $this->request->variable($this->config['cookie_name'] . '_mobile_name', '', true, mx_request_vars::COOKIE);
+		if (!$cookie_mobile_name)
+		{
+			$this->user->set_cookie('mobile_name', $status[1], time() + 5 * 24 * 60 * 60, '/', false, false);
+		}
+		
+		if (!$this->db->sql_field_exists('group_colour', GROUPS_TABLE))
+		{
+			print('<p><span style="color: red;"></span></p><i><p>Refreshing the groups table!</p></i>');
+			$this->db_tools->sql_column_add(GROUPS_TABLE, 'group_colour', array('column_type_sql' => 'varchar(50)', 'null' => 'NOT NULL', 'after' => ''), false);
+			
+			/*
+			-- Refreshing Groups
+			*/
+			$default_groups = array(
+				//'Anonymous'					=> array('', 0, 0, 1, 'Personal User'),
+				'GUESTS'						=> array('', 0, 0, 0, 'Default Group'),
+				'REGISTERED'					=> array('', 0, 0, 0, 'Default Group'),
+				'REGISTERED_COPPA'		=> array('', 0, 0, 0, 'Default Group'),
+				'GLOBAL_MODERATORS'	=> array('00AA00', 2, 0, 0, 'Default Group'),
+				'ADMINISTRATORS'			=> array('AA0000', 1, 1, 0, 'Default Group'),
+				'BOTS'							=> array('9E8DA7', 0, 0, 0, 'Default Group'),
+				'NEWLY_REGISTERED'		=> array('', 0, 0, 0, 'Default Group'),
+			);
+			
+			/*
+			-- Refreshing Groups
+			*/
+			$sql = 'SELECT *
+				FROM ' . GROUPS_TABLE . '
+				WHERE ' . $this->db->sql_in_set('group_name', array_keys($default_groups));
+			$result = $this->db->sql_query($sql);
+			while ($row = $this->db->sql_fetchrow($result))
+			{
+				unset($default_groups[strtoupper($row['group_name'])]);
+			}
+			$this->db->sql_freeresult($result);
+			
+			$sql_ary = array();
+			foreach ($default_groups as $name => $data)
+			{
+				$sql_ary[] = array(
+					'group_type'					=> GROUP_CLOSED,
+					'group_name'					=> (string) $name,
+					'group_description'			=> (string) $data[4],
+					//'group_desc_uid'		=> '',
+					//'group_desc_bitfield'	=> '',
+					'group_colour'					=> (string) $data[0],
+					//'group_legend'			=> (int) $data[1],
+					'group_moderator'			=> (int) $data[2],
+					'group_single_user'			=> (int) $data[3],
+				);
+			}
+			if (count($sql_ary))
+			{
+				$this->db->sql_multi_insert(GROUPS_TABLE, $sql_ary);
+			}
+			
+			/** /
+			$sql_ary[] = array(
+				'group_id'						=> (int) $db->sql_nextid(),
+				'user_id'							=> '',
+				'user_pending'					=>  '0',
+			);
+			if (count($sql_ary))
+			{
+				$this->db->sql_multi_insert(USER_GROUP_TABLE, $sql_ary);
+			}
+			/**/
+			
+		}
+		
+		//
+		// Check BOTS_TABLE Schema
+		//
+		if (!$this->db->sql_field_exists('bot_id', BOTS_TABLE))
+		{
+			print('<p><span style="color: red;"></span></p><i><p>Creating the BOTS_TABLE!</p></i>');
+			
+			/* Updating from IP 1.2.10.37
+			* Make sure we have bot_name field
+			*
+			* old phpbb2 colums field names: 
+			* 	bot_id, bot_name, last_visit, bot_visits, bot_pages list($page_id, )
+			* new phpbb colums field names: 
+			* 	bot_id, bot_name, bot_last_visit, bot_visit_counter
+			*/
+			$schema = array(
+				'COLUMNS'	=> array(
+					'bot_id'				=> array('UINT', NULL, 'auto_increment'),
+					'bot_active'			=> array('BOOL', 1),
+					'bot_name'			=> array('STEXT_UNI', ''),
+					'bot_color'			=> array('VCHAR', ''),
+					'user_id'				=> array('UINT', 0),
+					'bot_agent'			=> array('VCHAR', ''),
+					'bot_ip'				=> array('VCHAR', ''),
+					'bot_last_visit'		=> array('VCHAR:11', ''),
+					'bot_visit_counter'	=> array('UINT:8', 0),
+				),
+				'PRIMARY_KEY'	=> 'bot_id',
+				'KEYS'	=> array(
+					'bot_active'	=> array('INDEX', 'bot_active'),
+				),
+			);
+			if (!$this->db->sql_table_exists(BOTS_TABLE))
+			{
+				$this->db_tools->sql_create_table(BOTS_TABLE, $schema);
+			}
+		}
+		
+		if ($this->isCrawler($this->request->server('HTTP_USER_AGENT')) && ($this->data['is_bot'] !== 1)) 
+		{
+		    $this->data['is_bot'] = 1;
+			
+			// Register new bot...
+			
+			$sql = 'SELECT group_id
+				FROM ' . GROUPS_TABLE . "
+				WHERE group_name = 'BOTS'
+					AND group_type = " . GROUP_CLOSED;
+			if ( !($result = $this->db->sql_query($sql)) )
+			{
+				mx_message_die(CRITICAL_ERROR, 'Could not update user info');
+			}
+			$add_group_id = (int) $this->db->sql_fetchfield('group_id');
+			$this->db->sql_freeresult($result);
+			
+			$bots = array(
+				'AdsBot [Google]'					=> array('AdsBot-Google', 'adsbot-support@google.com'),
+				'Alexa [Bot]'						=> array('ia_archiver', 'crawler@alexa.com'),
+				'Alta Vista [Bot]'					=> array('Scooter/', 'search-support@altavista.de'),
+				'Ask Jeeves [Bot]'					=> array('Ask Jeeves', 'askjeevesbot@askjeeves.com'),
+				'Baidu [Spider]'						=> array('Baiduspider+(', 'ir@baidu.com'),
+				'Bing [Bot]'							=> array('bingbot/', 'bingbot@microsoft.com'), //bingbot-feedback@microsoft.com
+				'Exabot [Bot]'						=> array('Exabot/', 'crawler@exabot.com'),
+				'FAST Enterprise [Crawler]'		=> array('FAST Enterprise Crawler', 'scirus-crawler@fast.no'),
+				'FAST WebCrawler [Crawler]'	=> array('FAST-WebCrawler/', 'atw-crawler@fast.no'),
+				'Francis [Bot]'						=> array('http://www.neomo.de/', 'francis@neomo.de'),
+				'Gigabot [Bot]'						=> array('Gigabot/', 'gigabot-support@google.com'),
+				'Google Adsense [Bot]'			=> array('Mediapartners-Google', 'adsense-support@google.com'),
+				'Google Desktop'					=> array('Google Desktop', 'desktop-support@google.com'),
+				'Google Feedfetcher'				=> array('Feedfetcher-Google', 'feedfetcher-support@google.com'),
+				'Google [Bot]'						=> array('Googlebot', 'googlebot@googlebot.com'),
+				'Heise IT-Markt [Crawler]'		=> array('heise-IT-Markt-Crawler', 'info-hg@heise.de'),
+				'Heritrix [Crawler]'					=> array('heritrix/1.', 'info@archive.org'),
+				'IBM Research [Bot]'				=> array('ibm.com/cs/crawler', 'crawler@almaden.ibm.com'),
+				'ICCrawler - ICjobs'				=> array('ICCrawler - ICjobs', 'bot@icjobs.de'),
+				'ichiro [Crawler]'					=> array('ichiro/2', 'ichiro@mail.goo.ne.jp'), //ichiro@abc.ne.jp
+				'Majestic-12 [Bot]'				=> array('MJ12bot/', 'help@majestic.com'),
+				'Metager [Bot]'						=> array('MetagerBot/', ' office@suma-ev.de'),
+				'MSN NewsBlogs'					=> array('msnbot-NewsBlogs/', 'msnbot-newsblogs@microsoft.com'),
+				'MSN [Bot]'							=> array('msnbot/', 'msnbot@microsoft.com'),
+				'MSNbot Media'					=> array('msnbot-media/', 'msnbot-media@microsoft.com'),
+				'NG-Search [Bot]'					=> array('NG-Search/', 'info@newvisionsystems.com'),
+				'Nutch [Bot]'						=> array('http://lucene.apache.org/nutch/', 'nutch-agent@lucene.apache.org'),
+				'Nutch/CVS [Bot]'					=> array('NutchCVS/', 'nutch-agent@lists.sourceforge.net'),
+				'OmniExplorer [Bot]'				=> array('OmniExplorer_Bot/', 'info@etherdesk.com'),
+				'Online link [Validator]'			=> array('online link validator', ''),
+				'psbot [Picsearch]'					=> array('psbot/0', 'custom@passionsports.ca'),
+				'Seekport [Bot]'					=> array('Seekbot/', 'info@seekbot.net'),
+				'Sensis [Crawler]'					=> array('Sensis Web Crawler', 'digitalenquiries@sensis.com.au'),
+				'SEO Crawler'						=> array('SEO search Crawler/', ''),
+				'Seoma [Crawler]'					=> array('Seoma [SEO Crawler]', 'comp-seo@seomaconsulting.com'),
+				'SEOSearch [Crawler]'			=> array('SEOsearch/', 'e-search@seosearch.biz'),
+				'Snappy [Bot]'						=> array('Snappy/1.1 ( http://www.urltrends.com/ )', ''),
+				'Steeler [Crawler]'					=> array('http://www.tkl.iis.u-tokyo.ac.jp/~crawler/', ''),
+				'Synoo [Bot]'						=> array('SynooBot/', 'synoobot'),
+				'Telekom [Bot]'					=> array('crawleradmin.t-info@telekom.de', 'crawleradmin.t-info@telekom.de'),
+				'TurnitinBot [Bot]'					=> array('TurnitinBot/', 'tiisupport@turnitin.com'),
+				'Voyager [Bot]'						=> array('voyager/1.0', ''),
+				'W3 [Sitesearch]'					=> array('W3 SiteSearch Crawler', 'sitesearch@w3.org'), //MIT/LCS (Massachusetts Institute of Technology, Laboratory for Computer Science)
+				'W3C [Linkcheck]'				=> array('W3C-checklink/', 'site-comments@w3.org'),
+				'W3C [Validator]'					=> array('W3C_*Validator', 'www-validator@w3.org'),
+				'WiseNut [Bot]'						=> array('http://www.WISEnutbot.com', 'ZyBorg@WISEnutbot.com'),
+				'YaCy [Bot]'							=> array('yacybot', '(mc@yacy.net'),
+				'Yahoo MMCrawler [Bot]'		=> array('Yahoo-MMCrawler/', 'vertical-crawl-support@yahoo-inc.com'),
+				'Yahoo Slurp [Bot]'				=> array('Yahoo! DE Slurp', 'slurp@inktomi.com'),
+				'Yahoo [Bot]'						=> array('Yahoo! Slurp', 'crawl-support@yahoo-inc.com'),
+				'YahooSeeker [Bot]'				=> array('YahooSeeker/', 'seeker-support@yahoo-inc.com'),
+			);
+			
+			$botmatches = $this->getMatches();
+			
+
+			//$bots[$bot_name] = $bot_ary[$user_agent][$bot_email];
+			foreach ($bots as $bot_name => $bot_ary)
+			{
+				$user_row = array(
+					'user_type'			=> USER_IGNORE,
+					'group_id'			=> $add_group_id,
+					'username'			=> $bot_name,
+					'user_regdate'		=> time(),
+					'user_password'	=> '',
+					'user_colour'		=> '9E8DA7',
+					'user_email'			=> $bot_ary[1],
+					//phpbb2/'user_timezone'	=> $this->config['board_timezone'],
+					//phpbb2/'user_dateformat'	=> $this->config['default_dateformat'],
+					//phpbb2/'user_lang'			=> $this->config['default_lang'],
+					//phpbb2/'user_style'			=> (int) $this->config['default_style'],
+					'is_bot'				=> (int) 1,
+					'is_mobile'			=> (int) $this->data['is_mobile'] ,
+					'user_agent'  		=> (string) $bot_ary[0],
+					'user_ip'				=> (string) $this->user_ip,
+					'device_name' 		=> (string) $this->data['device_name'],
+					'user_allow_massemail'	=> 0,
+				);
+			}
+			  
+			$sql = "SELECT user_id, username as bot_name
+					FROM " . USERS_TABLE . "
+					WHERE username = '$bot_name'";
+			if ( !($result = $this->db->sql_query($sql)) )
+			{
+				mx_message_die(GENERAL_ERROR, 'Couldn\'t query data from bots table.', '', __LINE__, __FILE__, $sql);
+			}
+				
+			$sql_bot_name_check = $this->db->sql_numrows($result);
+			$row = $this->db->sql_fetchrow($result);
+			$current_name = $row['bot_name'];
+			$this->db->sql_freeresult($result);
+		
+			if(($sql_bot_name_check > 0) && ($current_name != $bot_name))
+			{
+				$bot_errors = $lang['Error_Bot_Name_Taken'];
+			}
+			
+			if ($current_name !== $bot_name)
+			{
+				// Register user...
+				print('<p><span style="color: red;"></span></p><i><p>Registering Your IP to the dabadase...!</p></i>');
+				if (!function_exists('user_add'))
+				{
+					include($this->mx_root_path . 'includes/shared/phpbb2/includes/functions_user.' . $this->php_ext);
+				}
+				
+				$user_id = (int) user_add($user_row);
+				
+				/*
+				* Make sure we have bot_name field
+				*
+				*/
+				$ary = array(
+					'bot_active'			=> 1,
+					'bot_name'			=> $bot_name,
+					'user_id'				=> $user_id,
+					'bot_agent'			=> $bot_ary[0],
+					'bot_ip'				=> $this->user_ip,
+					//'bot_style'		=> (int) $board_config['default_style'],
+					'bot_color'			=> '9E8DA7',
+					'bot_last_visit'		=> time(),
+					'bot_visit_counter'	=> 1,
+				);
+				
+				/*
+				* Update bots table
+				*/
+				//$this->db->sql_return_on_error(true);
+				if ( !($result = $this->db->sql_query('INSERT INTO ' . BOTS_TABLE . ' ' . $this->db->sql_build_array('INSERT', $ary))) )
+				{
+					mx_message_die(GENERAL_ERROR, 'Couldn\'t insert data into bots table.', '', __LINE__, __FILE__,  '<br /><br />SQL Error : ' . $this->db->sql_error('')['code'] . ' ' . $this->db->sql_error('')['message']);
+				}
+				//$this->db->sql_return_on_error(false);
+				/*
+				*/
+			}
+			else
+			{
+				$user_id = (int) $row['user_id'];
+				//$bot_name = (string) $row['bot_name'];
+				
+				$sql = "SELECT *
+					FROM " . BOTS_TABLE . "
+					WHERE bot_name = '$bot_name'";
+				if ( !($result = $this->db->sql_query($sql)) )
+				{
+					mx_message_die(GENERAL_ERROR, 'Couldn\'t delete data from bots table.', '', __LINE__, __FILE__, $sql);
+				}
+				
+				$sql_bot_name_check = $this->db->sql_numrows($result);
+				$row = $this->db->sql_fetchrow($result);
+				$current_name = $row['bot_name'];
+				$this->db->sql_freeresult($result);
+		
+				if(($sql_bot_name_check > 0) && ($current_name != $bot_name))
+				{
+					$bot_errors = $lang['Error_Bot_Name_Taken'];
+				}
+				elseif(($sql_bot_name_check > 0) && ($current_name == $bot_name))
+				{
+					//$user_id = (int) $this->data['user_id'];
+					// Update existing bot last visit time
+					$sql = "UPDATE " . BOTS_TABLE . "
+									SET bot_visit_counter = (bot_visit_counter + 1),
+										bot_last_visit = '" . time() . "'
+									WHERE bot_id = '" . $row['bot_id'] . "'";
+					if ( !($result = $this->db->sql_query($sql)) )
+					{
+						mx_message_die(CRITICAL_ERROR, 'Could not update bot info', '', __LINE__, __FILE__, $sql);
+					}
+					$this->db->sql_freeresult($result);
+				}
+				else
+				{
+					// Register user...
+					print('<p><span style="color: red;"></span></p><i><p>Registering You as bot to the dabadase...!</p></i>');
+					
+					/*
+					* Make sure we have bot_name field
+					*/
+					$ary = array(
+						'bot_active'			=> 1,
+						'bot_name'			=> $bot_name,
+						'user_id'				=> $user_id,
+						'bot_agent'			=> $bot_ary[0],
+						'bot_ip'				=> $user_ip,
+						//'bot_style'		=> (int) $board_config['default_style'],
+						'bot_color'			=> '9E8DA7',
+						'bot_last_visit'		=> time(),
+						'bot_visit_counter'	=> 1,
+					);
+					
+					/*
+					* Update bots table
+					*/
+					//$this->db->sql_return_on_error(true);
+					if ( !($result = $this->db->sql_query('INSERT INTO ' . BOTS_TABLE . ' ' . $this->db->sql_build_array('INSERT', $ary))) )
+					{
+						mx_message_die(GENERAL_ERROR, 'Couldn\'t insert data into bots table.', '', __LINE__, __FILE__,  '<br /><br />SQL Error : ' . $this->db->sql_error('')['code'] . ' ' . $this->db->sql_error('')['message']);
+					}
+					//$this->db->sql_return_on_error(false);
+					/*
+					*/
+				}
+			}
+		}
+		else
+		{
+		    $this->data['is_bot'] = false;
+		}
+		
+		
+		
+		
+		if (preg_match('/bot|crawl|curl|dataprovider|search|get|spider|find|java|majesticsEO|google|yahoo|teoma|contaxe|yandex|libwww-perl|facebookexternalhit/i', $_SERVER['HTTP_USER_AGENT'])) 
+		{
+		    $this->data['is_bot'] = true;
+		}
+		
+		$this->data['user_perm_from'] = '';
+		
 		$this->data['user_topic_sortby_type'] = 't';
 		$this->data['user_topic_sortby_dir'] = 'd';
 		$this->data['user_topic_show_days'] = 0;
-
+		
+		$this->data['user_last_privmsg'] = 0;
+		
 		$this->data['user_post_sortby_type'] = 't';
 		$this->data['user_post_sortby_dir'] = 'a';
 		$this->data['user_post_show_days'] = 0;
-
+		
+		$this->data['user_new_privmsg'] = 0;
+		$this->data['user_unread_privmsg'] = 0;
+		$this->data['user_form_salt'] = bin2hex(random_bytes(8));
+		$this->data['user_avatar'] = 'includes/shared/phpbb2/images/user_avatar.png';		
+		$this->data['user_avatar_type'] = 2;
+		
 		
 		$this->data['user_form_salt'] = bin2hex(random_bytes(8));
 		
-		//
-		// Populate session_id
-		//
-		$this->session_id = $this->data['session_id'];
 	}
+	
 
 	/**
 	* Extract current session page
@@ -352,13 +1085,151 @@ class session
 		return $page_array;
 	}
 
+	
+	/*
+	 * This class is part of Crawler Detect - the web crawler detection library.
+	 *
+	 * (c) Mark Beech <m@rkbee.ch>
+	 *
+	 * This source file is subject to the MIT license that is bundled
+	 * with this source code in the file fixtures\LICENSE.
+	 */
+	 
+	// ------------------------------
+	// Public Methods
+	// 
+	 
+    /**
+     * Compile the regex patterns into one regex string.
+     *
+     * @param array
+     * 
+     * @return string
+     */
+    public function compileRegex($patterns)
+    {
+        return '('.implode('|', $patterns).')';
+    }
+
+    /**
+     * Set HTTP headers.
+     *
+     * @param array|null $httpHeaders
+     */
+	 public function setHttpHeaders($httpHeaders)
+	{
+		// Use global _SERVER if $httpHeaders aren't defined.
+		if (! is_array($httpHeaders) || ! count($httpHeaders))
+		{
+			// enable super globals to get literal value
+			$super_globals_disabled = $this->request->super_globals_disabled();
+			
+			if ($super_globals_disabled)
+			{
+				$this->request->enable_super_globals();
+			}
+			
+			$httpHeaders = $_SERVER;
+			
+			if ($super_globals_disabled)
+			{
+				$this->request->disable_super_globals();
+			}
+		}
+		
+		// Clear existing headers.
+		$this->httpHeaders = array();
+		// Only save HTTP headers. In PHP land, that means
+		// only _SERVER vars that start with HTTP_.
+		foreach ($httpHeaders as $key => $value)
+		{
+            if (strpos($key, 'HTTP_') === 0) 
+			{
+                $this->httpHeaders[$key] = $value;
+            }
+        }
+		unset($httpHeaders);
+    }
+
+    /**
+     * Return user agent headers.
+     *
+     * @return array
+     */
+    public function getUaHttpHeaders()
+    {
+        return $this->uaHttpHeaders->getAll();
+    }
+
+    /**
+     * Set the user agent.
+     *
+     * @param string $userAgent
+     */
+    public function setUserAgent($userAgent)
+    {
+        if (is_null($userAgent)) 
+		{
+            foreach ($this->getUaHttpHeaders() as $altHeader) 
+			{
+                if (isset($this->httpHeaders[$altHeader])) 
+				{
+                    $userAgent .= $this->httpHeaders[$altHeader].' ';
+                }
+            }
+        }
+        return $userAgent;
+    }
+
+    /**
+     * Check user agent string against the regex.
+     *
+     * @param string|null $userAgent
+     *
+     * @return bool
+     */
+    public function isCrawler($userAgent = null)
+    {
+        $agent = $userAgent ?: $this->userAgent;
+
+        $agent = preg_replace('/'.$this->compiledExclusions.'/i', '', $agent);
+
+        if (strlen(trim($agent)) == 0) 
+		{
+            return false;
+        }
+
+        $result = preg_match('/'.$this->compiledRegex.'/i', trim($agent), $matches);
+		//print_r($result);
+        if ($matches)
+		{
+            $this->matches = $matches;
+        }
+
+        return (bool) $result;
+    }
+
+    /**
+     * Return the matches.
+     *
+     * @return string|null
+     */
+    public function getMatches()
+    {
+        return isset($this->matches[0]) ? $this->matches[0] : null;
+    }
+	
+	// ------------------------------
+	// Init user class.
+	//
+	
 	//
 	// Adds/updates a new session to the database for the given userid.
 	// Returns the new session ID on success.
 	//
 	function session_begin($user_id = 1, $user_ip = false, $page_id = 1, $auto_create = 0, $enable_autologin = 0, $admin = 0)
 	{
-		global $db, $board_config, $mx_backend, $phpbb_root_path, $mx_root_path;
+		global $db, $board_config, $mx_backend, $mx_root_path;
 		global $mx_request_vars, $SID;
 
 		$cookiename = $board_config['cookie_name'];
@@ -374,7 +1245,7 @@ class session
 		$this->referer						= (!empty($_SERVER['HTTP_REFERER'])) ? htmlspecialchars((string) $_SERVER['HTTP_REFERER']) : '';		
 		$this->forwarded_for				= (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) ? (string) $_SERVER['HTTP_X_FORWARDED_FOR'] : '';
 		$this->host							= (!empty($_SERVER['HTTP_HOST'])) ? (string) $_SERVER['HTTP_HOST'] : 'localhost';
-		$this->page						= $this->extract_current_page($phpbb_root_path);
+		$this->page						= $this->extract_current_page($mx_root_path);
 
 		if ( isset($_COOKIE[$cookiename . '_sid']) || isset($_COOKIE[$cookiename . '_data']) )
 		{
@@ -399,7 +1270,7 @@ class session
 
 		$last_visit = 0;
 		$current_time = time();
-
+		
 		//
 		// Are auto-logins allowed?
 		// If allow_autologin is not set or is true then they are
@@ -409,23 +1280,25 @@ class session
 		{
 			$enable_autologin = $sessiondata['autologinid'] = false;
 		}
-
+		
 		//
 		// First off attempt to join with the autologin value if we have one
 		// If not, just use the user_id value
 		//
 		$userdata = array();
-
+		
 		if ($user_id != ANONYMOUS)
 		{
 			if (isset($sessiondata['autologinid']) && (string) $sessiondata['autologinid'] != '' && $user_id)
 			{
-				$sql = 'SELECT u.*, u.user_id as user_colour, u.user_level as user_type, u.user_avatar as avatar, u.user_avatar_type as avatar_type 
-					FROM ' . USERS_TABLE . ' u, ' . SESSIONS_KEYS_TABLE . ' k
+				$sql = 'SELECT u.*, u.user_id as user_colour, u.user_level as user_type, p.default_lang as user_lang, p.board_timezone as user_timezone 
+					FROM ' . USERS_TABLE . ' u, ' . SESSIONS_KEYS_TABLE . ' k, ' . PORTAL_TABLE . ' p
 					WHERE u.user_id = ' . (int) $user_id . "
 						AND u.user_active = 1
 						AND k.user_id = u.user_id
-						AND k.key_id = '" . md5($sessiondata['autologinid']) . "'";
+						AND k.key_id = '" . md5($sessiondata['autologinid']) . "'
+						AND p.portal_id = '1'";
+				
 				if (!($result = $db->sql_query($sql)))
 				{
 					mx_message_die(CRITICAL_ERROR, 'Error doing DB query userdata row fetch', '', __LINE__, __FILE__, $sql);
@@ -440,11 +1313,13 @@ class session
 			{
 				$sessiondata['autologinid'] = '';
 				$sessiondata['userid'] = $user_id;
-
-				$sql = 'SELECT u.*, u.user_id as user_colour, u.user_level as user_type, u.user_avatar as avatar, u.user_avatar_type as avatar_type
-					FROM ' . USERS_TABLE . ' u
-					WHERE user_id = ' . (int) $user_id . '
-						AND user_active = 1';
+				
+				$sql = 'SELECT u.*, u.user_id as user_colour, u.user_level as user_type, p.default_lang as user_lang, p.board_timezone as user_timezone 
+					FROM ' . USERS_TABLE . ' u, ' . PORTAL_TABLE . ' p
+					WHERE u.user_id = ' . (int) $user_id . '
+						AND u.user_active = 1
+						AND p.portal_id = 1';
+						
 				if (!($result = $db->sql_query($sql)))
 				{
 					mx_message_die(CRITICAL_ERROR, 'Error doing DB query userdata row fetch', '', __LINE__, __FILE__, $sql);
@@ -459,7 +1334,7 @@ class session
 		elseif ($mx_request_vars->is_request('login'))
 		{
 			die('Invalid user_id to login: '.ANONYMOUS);
-		}
+		}	
 		else
 		{
 			// Bot user, if they have a SID in the Request URI we need to get rid of it otherwise they'll index this page with the SID, duplicate content oh my!
@@ -483,10 +1358,11 @@ class session
 			$sessiondata['autologinid'] = '';
 			$sessiondata['userid'] = $user_id = ANONYMOUS;
 			$enable_autologin = $login = 0;
-
-			$sql = 'SELECT u.*, u.user_id as user_colour, u.user_level as user_type, u.user_avatar as avatar, u.user_avatar_type as avatar_type
-				FROM ' . USERS_TABLE . ' u
-				WHERE user_id = ' . (int) $user_id;
+			
+			$sql = 'SELECT u.*, u.user_id as user_colour, u.user_level as user_type, p.default_lang as user_lang, p.board_timezone as user_timezone 
+					FROM ' . USERS_TABLE . ' u, ' . SESSIONS_KEYS_TABLE . ' k, ' . PORTAL_TABLE . ' p
+					WHERE u.user_id = ' . (int) $user_id . '
+						AND p.portal_id = 1';	
 			if (!($result = $db->sql_query($sql)))
 			{
 				mx_message_die(CRITICAL_ERROR, 'Error doing DB query userdata row fetch', '', __LINE__, __FILE__, $sql);
@@ -496,33 +1372,44 @@ class session
 			$db->sql_freeresult($result);
 		}
 
-
-		//
-		// Initial ban check against user id, IP and email address
-		//
-		preg_match('/(..)(..)(..)(..)/', $user_ip, $user_ip_parts);
-
-		$sql = "SELECT *
-			FROM " . BANLIST_TABLE . "
-			WHERE ban_ip IN ('" . $user_ip_parts[1] . $user_ip_parts[2] . $user_ip_parts[3] . $user_ip_parts[4] . "', '" . $user_ip_parts[1] . $user_ip_parts[2] . $user_ip_parts[3] . "ff', '" . $user_ip_parts[1] . $user_ip_parts[2] . "ffff', '" . $user_ip_parts[1] . "ffffff')
-				OR ban_userid = $user_id";
-		if ( $user_id != ANONYMOUS )
+		/*
+		* Initial ban check against user id, IP and email address
+		* Is user banned? Are they excluded? Won't return on ban, exists within method
+		* /
+		$this->check_ban_for_current_session($board_config);
+		* -------------------------------------------------------- * /
+		# Added to table structure for 'phpbb3_banlist'
+		  +`ban_start` int(11) UNSIGNED NOT NULL DEFAULT '0',
+		  +`ban_end` int(11) UNSIGNED NOT NULL DEFAULT '0',
+		  +`ban_exclude` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
+		  +`ban_reason` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
+		  +`ban_give_reason` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
+		/**/	
+		$schema = array(
+			'COLUMNS'	=> array(
+				'ban_id'				=> array('UINT', NULL, 'auto_increment'),
+				'ban_userid'			=> array('UINT', 0),
+				'ban_ip'				=> array('VCHAR', ''),
+				'ban_email'			=> array('VCHAR:100', ''),
+				'bot_start'			=> array('UINT:11', 0),
+				'bot_end'			=> array('UINT:11', 0),
+				'ban_exclude'		=> array('UINT:2', ''),
+				'ban_reason'		=> array('VCHAR', ''),
+				'ban_give_reason'	=> array('VCHAR', ''),
+			),
+			'PRIMARY_KEY'	=> 'bot_id',
+				'KEYS'	=> array(
+				'KEY' => array('ban_end', 'ban_end'),
+				'KEY' => array('ban_user', 'ban_userid', 'ban_exclude'),
+				'KEY' => array('ban_email', 'ban_email', 'ban_exclude'),
+				'KEY' => array('ban_ip', 'ban_ip', 'ban_exclude')
+			),
+		);
+		if (!$this->db->sql_table_exists(BANLIST_TABLE))
 		{
-			$sql .= " OR ban_email LIKE  ". $userdata['user_email'];
+			$this->db_tools->sql_create_table(BANLIST_TABLE, $schema);
 		}
-		if ( !($result = $db->sql_query($sql)) )
-		{
-			mx_message_die(CRITICAL_ERROR, 'Could not obtain ban information', '', __LINE__, __FILE__, $sql);
-		}
-
-		if ( $ban_info = $db->sql_fetchrow($result) )
-		{
-			if ( $ban_info['ban_ip'] || $ban_info['ban_userid'] || $ban_info['ban_email'] )
-			{
-				mx_message_die(CRITICAL_MESSAGE, 'You_been_banned');
-			}
-		}
-
+		
 		//
 		// Create or update the session
 		//
@@ -542,7 +1429,7 @@ class session
 				mx_message_die(CRITICAL_ERROR, 'Error creating new session', '', __LINE__, __FILE__, $sql);
 			}
 		}
-
+		
 		if ( $user_id != ANONYMOUS )
 		{
 			$last_visit = ( $userdata['user_session_time'] > 0 ) ? $userdata['user_session_time'] : $current_time;
@@ -596,8 +1483,8 @@ class session
 			{
 				$sessiondata['autologinid'] = '';
 			}
-			
-			//		$sessiondata['autologinid'] = (!$admin) ? (( $enable_autologin && $sessionmethod == SESSION_METHOD_COOKIE ) ? $auto_login_key : '') : $sessiondata['autologinid'];
+
+	//		$sessiondata['autologinid'] = (!$admin) ? (( $enable_autologin && $sessionmethod == SESSION_METHOD_COOKIE ) ? $auto_login_key : '') : $sessiondata['autologinid'];
 			$sessiondata['userid'] = $user_id;
 		}
 		
@@ -619,6 +1506,12 @@ class session
 		if (($userdata['user_level'] = 0) && ($userdata['user_active'] = 0))
 		{
 			$userdata['user_type'] = 1; //or 2
+		}
+		
+		//Moderator
+		if (($userdata['user_level'] = 2) && ($userdata['user_active'] = 1))
+		{
+			$userdata['user_type'] = 2; //or 1
 		}
 		
 		$userdata['session_id'] = $session_id;
@@ -645,29 +1538,13 @@ class session
 	//
 	function session_pagestart($user_ip, $thispage_id)
 	{
-		global $db, $lang, $board_config, $phpbb_root_path, $mx_root_path, $SID;
-		global $mx_request_vars;
-		
-		/*
-		* Instantiate the mx_request_vars class
-		* make sure to do before it's ever used
-		*/
-		$mx_request_vars = isset($mx_request_vars) ? $mx_request_vars : new mx_request_vars();		
-				
+		global $db, $lang, $board_config;
+		global $mx_request_vars, $SID;
+
 		$cookiename = $board_config['cookie_name'];
 		$cookiepath = $board_config['cookie_path'];
 		$cookiedomain = $board_config['cookie_domain'];
 		$cookiesecure = $board_config['cookie_secure'];
-
-		// Give us some basic information
-		$this->time_now					= time();
-		$this->cookie_data				= array('u' => 0, 'k' => '');
-		$this->update_session_page	= true;
-		$this->browser					= (!empty($_SERVER['HTTP_USER_AGENT'])) ? htmlspecialchars((string) $_SERVER['HTTP_USER_AGENT']) : '';
-		$this->referer						= (!empty($_SERVER['HTTP_REFERER'])) ? htmlspecialchars((string) $_SERVER['HTTP_REFERER']) : '';		
-		$this->forwarded_for				= (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) ? (string) $_SERVER['HTTP_X_FORWARDED_FOR'] : '';
-		$this->host							= (!empty($_SERVER['HTTP_HOST'])) ? (string) $_SERVER['HTTP_HOST'] : 'localhost';
-		$this->page						= $this->extract_current_page($mx_root_path);
 
 		$current_time = time();
 		unset($userdata);
@@ -702,10 +1579,11 @@ class session
 			// session_id exists so go ahead and attempt to grab all
 			// data in preparation
 			//
-			$sql = "SELECT u.*, u.user_id as user_colour, u.user_level as user_type, u.user_avatar as avatar, u.user_avatar_type as avatar_type, s.*
-				FROM " . SESSIONS_TABLE . " s, " . USERS_TABLE . " u
+			$sql = "SELECT u.*, u.user_id as user_colour, u.user_level as user_type, p.default_lang as user_lang, p.board_timezone as user_timezone, s.*
+				FROM " . SESSIONS_TABLE . " s, " . USERS_TABLE . " u, " . PORTAL_TABLE . " p
 				WHERE s.session_id = '$session_id'
-					AND u.user_id = s.session_user_id";
+					AND u.user_id = s.session_user_id
+					AND p.portal_id = 1";						
 			if ( !($result = $db->sql_query($sql)) )
 			{
 				mx_message_die(CRITICAL_ERROR, 'Error doing DB query userdata row fetch', '', __LINE__, __FILE__, $sql);
@@ -841,8 +1719,8 @@ class session
 		// We expect that message_die will be called after this function,
 		// but just in case it isn't, reset $userdata to the details for a guest
 		//
-		$sql = 'SELECT u.*, u.user_id as user_colour, u.user_level as user_type, u.user_avatar as avatar, u.user_avatar_type as avatar_type
-			FROM ' . USERS_TABLE . ' u
+		$sql = 'SELECT u.*, u.user_id as user_colour, u.user_level as user_type, p.default_lang as user_lang, p.board_timezone as user_timezone
+			FROM ' . USERS_TABLE . ' u, ' . PORTAL_TABLE . ' p
 			WHERE user_id = ' . ANONYMOUS;
 		if ( !($result = $db->sql_query($sql)) )
 		{
@@ -991,7 +1869,7 @@ class session
 		$banned = false;
 
 		preg_match('/(..)(..)(..)(..)/', $user_ips, $user_ip_parts);
-
+		/*
 		$sql = "SELECT ban_ip, ban_userid, ban_email
 			FROM " . BANLIST_TABLE . "
 			WHERE ban_ip IN ('" . $user_ip_parts[1] . $user_ip_parts[2] . $user_ip_parts[3] . $user_ip_parts[4] . "', '" . $user_ip_parts[1] . $user_ip_parts[2] . $user_ip_parts[3] . "ff', '" . $user_ip_parts[1] . $user_ip_parts[2] . "ffff', '" . $user_ip_parts[1] . "ffffff')
@@ -1038,7 +1916,7 @@ class session
 		{
 			mx_message_die(CRITICAL_ERROR, 'Could not obtain ban information', '', __LINE__, __FILE__, $sql);
 		}
-
+		
 		$ban_triggered_by = 'user';
 		if ( $ban_info = $db->sql_fetchrow($result) )
 		{
@@ -1049,7 +1927,7 @@ class session
 			}
 		}
 		$db->sql_freeresult($result);
-
+		*/
 		if ($banned && !$return)
 		{
 			mx_message_die(CRITICAL_MESSAGE, 'You_been_banned');
@@ -1067,7 +1945,7 @@ class session
 	{
 		if (!defined('SKIP_CHECK_BAN') && $this->data['user_type'] != USER_FOUNDER)
 		{
-			if (!$config['forwarded_for_check'])
+			if (!isset($config['forwarded_for_check']))
 			{
 				$this->check_ban($this->data['user_id'], $this->ip);
 			}
@@ -1154,14 +2032,14 @@ class session
 	function setup($lang_set = false, $style = false)
 	{
 		global $mx_cache, $template, $phpbb_auth, $phpEx, $phpbb_root_path, $mx_root_path;
-		global $mx_request_vars, $portal_config, $shared_lang_path; //added for mxp
+		global $mx_request_vars, $portal_config, $shared_lang_path, $phpBB2; //added for mxp
 
 
 		global $board_config, $theme, $images;
 		global $db, $board_config, $userdata, $phpbb_root_path;		
 		global $template, $lang, $phpEx, $nav_links;
 		
-		$this->data = !empty($this->data['user_id']) ? $this->data : session_pagestart($this->user_ip, $this->page_id);
+		$this->data = !empty($this->data['user_id']) ? $this->data : $this->session_pagestart($this->user_ip, $this->page_id);
 		
 		$this->cache = is_object($mx_cache) ? $mx_cache : new base();
 		
@@ -1185,7 +2063,14 @@ class session
 		//$this->lang_path = $phpbb_root_path . 'language/';
 		
 		$lang_set = !$lang_set ? (defined('IN_ADMIN') ? 'lang_admin' : 'lang_main') : $lang_set;
-		
+		//
+		// Grab MXP global variables, re-cache if necessary
+		// - optional parameter to enable/disable cache for config data. If enabled, remember to refresh the MX-Publisher cache whenever updating MXP config settings
+		// - true: enable cache, false: disable cache
+		if (empty($portal_config['portal_status']))
+		{
+			$portal_config = $this->obtain_mxbb_config(false);
+		}		
 		//
 		// Grab phpBB global variables, re-cache if necessary
 		// - optional parameter to enable/disable cache for config data. If enabled, remember to refresh the MX-Publisher cache whenever updating phpBB config settings
@@ -1193,11 +2078,12 @@ class session
 		if (empty($board_config['script_path']))
 		{
 			$board_config = $mx_cache->obtain_config(false);
-		}		
-		$board_config['avatar_gallery_path'] = isset($board_config['avatar_gallery_path']) ? $board_config['avatar_gallery_path'] : 'images/avatars'; 
+		}
+
+		$board_config['avatar_gallery_path'] = isset($board_config['avatar_gallery_path']) ? $board_config['avatar_gallery_path'] : 'images/avatars/gallery'; 
 		$board_config['user_timezone'] = !empty($board_config['user_timezone']) ? $board_config['user_timezone'] : $board_config['board_timezone'];
 		$this->data['user_dst'] = !empty($this->data['user_dst']) ? $this->data['user_dst'] : $this->data['user_timezone'];
-		$board_config['require_activation'] = 0;		
+		$board_config['require_activation'] = 0;
 		$this->date_format = $board_config['default_dateformat'];
 		$this->timezone = $board_config['user_timezone'] * 3600;
 		$this->dst = $this->data['user_timezone'] * 3600;
@@ -1221,7 +2107,7 @@ class session
 		$l_timezone = (count($l_timezone) > 1) ? $this->lang(sprintf('%.1f', $board_config['board_timezone'])) : $offset_string;
 
 		$server_name = !empty($board_config['server_name']) ? preg_replace('/^\/?(.*?)\/?$/', "\\1", trim($board_config['server_name'])) : 'localhost';
-		$server_protocol = ($board_config['cookie_secure'] ) ? 'https://' : 'http://';
+		$server_protocol = ($board_config['cookie_secure'] ) ? 'http://' : 'http://';
 		$server_port = (($board_config['server_port']) && ($board_config['server_port'] <> 80)) ? ':' . trim($board_config['server_port']) . '/' : '/';
 		$script_name_phpbb = preg_replace('/^\/?(.*?)\/?$/', "\\1", trim($board_config['script_path'])) . '/';		
 		$server_url = $server_protocol . str_replace("//", "/", $server_name . $server_port . '/'); //On some server the slash is not added and this trick will fix it	
@@ -1240,7 +2126,7 @@ class session
 		{
 			if (!empty($this->data['user_lang']))
 			{
-				$default_lang = phpbb_ltrim(basename(phpbb_rtrim($this->data['user_lang'])), "'");
+				$default_lang = $phpBB2->phpbb_ltrim(basename($phpBB2->phpbb_rtrim($this->data['user_lang'])), "'");
 			}
 
 			if (!empty($this->data['user_dateformat']))
@@ -1255,22 +2141,24 @@ class session
 		}
 		else
 		{
-			$default_lang = phpbb_ltrim(basename(phpbb_rtrim($board_config['default_lang'])), "'");
+			$default_lang = $phpBB2->phpbb_ltrim(basename($phpBB2->phpbb_rtrim($board_config['default_lang'])), "'");
 		}
 		
-		// Shared phpBB2 lang files dir
+		// Shared phpBB2 lang files dir		
 		// Load vanilla phpBB2 lang files if is possible
-		$shared_lang_path = $mx_root_path . 'includes/shared/phpbb2/language/';
-		$lang_path = $phpbb_root_path . 'language/';
+		$shared_phpbb2_path 	= $mx_root_path . 'includes/shared/phpbb2/';
+		$shared_phpbb3_path 	= $mx_root_path . 'includes/shared/phpbb3/';
+		$shared_lang_path 		= $mx_root_path . 'includes/shared/phpbb2/language/';		
+		$lang_path 				= $mx_root_path . 'includes/shared/phpbb2/language/';				
 		
-		if (!file_exists(@phpbb_realpath($lang_path . 'lang_' . $default_lang . '/lang_main.'.$phpEx)) && !file_exists(@phpbb_realpath($shared_lang_path . 'lang_' . $default_lang . '/lang_main.'.$phpEx)))
+		if (!file_exists(@phpbb_realpath($shared_phpbb2_path . 'lang_' . $default_lang . '/lang_main.'.$phpEx)) && !file_exists(@phpbb_realpath($shared_lang_path . 'lang_' . $default_lang . '/lang_main.'.$phpEx)))
 		{
 			if ($userdata['user_id'] !== ANONYMOUS)
 			{
 				// For logged in users, try the board default language next
 				// Just in case we do fallback on $board_config['phpbb_lang']  
 				// Since $board_config['default_lang'] has been overwiten in function $mx_user->_init_userprefs()				
-				$default_lang = phpbb_ltrim(basename(phpbb_rtrim($board_config['phpbb_lang'])), "'");			
+				$default_lang = ltrim(basename(rtrim($board_config['phpbb_lang'])), "'");
 			}
 			else
 			{
@@ -1280,7 +2168,7 @@ class session
 				$default_lang = 'english';
 			}
 			
-			if (!file_exists(@phpbb_realpath($phpbb_root_path . 'language/lang_' . $default_lang . '/lang_main.'.$phpEx)))
+			if (!file_exists(@phpbb_realpath($shared_phpbb2_path . 'language/lang_' . $default_lang . '/lang_main.'.$phpEx)))
 			{
 				mx_message_die(CRITICAL_ERROR, 'Could not locate valid phpBB2 language pack in $mx_user->setup() for: ' . $default_lang);
 			}
@@ -1290,22 +2178,22 @@ class session
 		// before we go any further since it means there is something wrong with it
 		if ($this->data['user_id'] != ANONYMOUS && $this->data['user_lang'] !== $default_lang)
 		{
+			/* * /
 			$sql = 'UPDATE ' . USERS_TABLE . "
-				SET user_lang = '" . $default_lang . "'
-				WHERE user_lang = '" . $this->data['user_lang'] . "'";
-
+				SET user_lang = '" . $this->decode_lang($this->lang['default_lang']) . "'
+				WHERE user_lang = '" . $this->decode_lang($this->data['user_lang']) . "'";
 			if (!($result = $db->sql_query($sql)))
 			{
-				mx_message_die(CRITICAL_ERROR, 'Could not update user language info');
+				mx_message_die(CRITICAL_ERROR, 'Could not update user language info in setup');
 			}
-
+			/* */
 			$this->data['user_lang'] = $default_lang;
 		}
 		elseif ($this->data['user_id'] == ANONYMOUS && $board_config['default_lang'] !== $default_lang)
 		{
-			$sql = 'UPDATE ' . CONFIG_TABLE . "
-				SET config_value = '" . $default_lang . "'
-				WHERE config_name = 'default_lang'";
+			$sql = "UPDATE " . PORTAL_TABLE . " SET
+				default_lang = '" . $this->decode_lang($this->lang['default_lang']) . "'
+				WHERE portal_id = '1'";				
 
 			if (!($result = $db->sql_query($sql)))
 			{
@@ -1314,9 +2202,9 @@ class session
 		}
 
 		$board_config['default_lang'] = $default_lang;
-
+		$portal_config['default_lang'] = $default_lang;
 		$this->lang_name = $this->lang['default_lang'] = $default_lang;
-		$this->lang_path = $phpbb_root_path . 'language/lang_' . $board_config['default_lang'] . '/';
+		$this->lang_path = $shared_phpbb2_path . 'language/lang_' . $board_config['default_lang'] . '/';
 		
 		//
 		// We include common language file here to not load it every time a custom language file is included
@@ -1336,26 +2224,26 @@ class session
 		
 		$this->add_lang($lang_set);
 
-		//  We include common language file here to not load it every time a custom language file is included
+		// We include common language file here to not load it every time a custom language file is included
+		$this->set_lang($this->lang, $this->help, 'common');
 		//  $lang = &$this->lang;
 		
 		unset($lang_set);
 			
 		if (defined('IN_ADMIN'))
 		{
-			if(!file_exists(@phpbb_realpath($phpbb_root_path . 'language/lang_' . $board_config['default_lang'] . '/lang_admin.'.$phpEx)))
+			if(!file_exists(@phpbb_realpath($shared_phpbb2_path . 'language/lang_' . $board_config['default_lang'] . '/lang_admin.'.$phpEx)))
 			{
 				$board_config['default_lang'] = 'english';
 			}
-
-			include($phpbb_root_path . 'language/lang_' . $board_config['default_lang'] . '/lang_admin.' . $phpEx);
+			include($shared_phpbb2_path . 'language/lang_' . $board_config['default_lang'] . '/lang_admin.' . $phpEx);
 		}
 		
 		//
 		// We setup common user language variables
 		//
 		$this->lang = &$lang;
-		//print_r($this->lang);
+		//print_r($this->lang);		
 		$this->user_lang = !empty($this->lang['USER_LANG']) ? $this->lang['USER_LANG'] : $this->encode_lang($this->lang_name);
 		$user_lang = $this->user_lang;
 		
@@ -1390,9 +2278,9 @@ class session
 		//
 		// Finishing setting language variables to ouput
 		//
-		$this->lang_iso = $lang_iso = $lang_entries['lang_iso'];
+		$this->lang_iso = $lang_iso = $lang_entries['lang_iso'];		
 		$this->lang_dir = $lang_dir = $lang_entries['lang_dir'];
-		$this->lang_english_name = $lang_english_name = $lang_entries['lang_english_name'];
+		$this->lang_english_name = $lang_english_name = $lang_entries['lang_english_name'];		
 		$this->lang_local_name = $lang_local_name = $lang_entries['lang_local_name'];
 		
 		//
@@ -2444,26 +3332,26 @@ class session
 		// and be able to change the variables within code.
 		//
 		$nav_links['top'] = array (
-			'url' => append_sid($phpbb_root_path . 'index.' . $phpEx),
+			'url' => mx_append_sid($phpbb_root_path . 'index.' . $phpEx),
 			'title' => sprintf($lang['Forum_Index'], $board_config['sitename'])
 		);
 		$nav_links['search'] = array (
-			'url' => append_sid($phpbb_root_path . 'search.' . $phpEx),
+			'url' => mx_append_sid($phpbb_root_path . 'search.' . $phpEx),
 			'title' => $lang['Search']
 		);
 		$nav_links['help'] = array (
-			'url' => append_sid($phpbb_root_path . 'faq.' . $phpEx),
+			'url' => mx_append_sid($phpbb_root_path . 'faq.' . $phpEx),
 			'title' => $lang['FAQ']
 		);
 		$nav_links['author'] = array (
-			'url' => append_sid($phpbb_root_path . 'memberlist.' . $phpEx),
+			'url' => mx_append_sid($phpbb_root_path . 'memberlist.' . $phpEx),
 			'title' => $lang['Memberlist']
 		);
 
 		//
 		// Dummy include, to make all original phpBB functions available
 		//
-		include_once($phpbb_root_path . 'includes/functions.' . $phpEx); // In case we need old functions...
+		include_once($mx_root_path . 'includes/shared/phpbb2/includes/functions.' . $phpEx); // In case we need old functions...
 
 		//
 		// Is phpBB File Attachment MOD present?
@@ -2475,7 +3363,340 @@ class session
 		
 		return;
 	}
-
+	
+	/**
+	* @package Sessions - Mobile Device
+	* @author FlorinCB aka orynider
+	* @copyright (c) 2015 Sniper_E - http://www.sniper-e.com
+	* @copyright (c) 2015 dmzx - http://www.dmzx-web.net
+	* @copyright (c) 2015 martin - http://www.martins-phpbb.com
+	* @license http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
+	*/
+	public function mobile_device_detect($iphone = true, $ipod = true, $ipad = true, $android = true, $opera = true, $blackberry = true, $palm = true, $windows = true, $lg = true)
+	{
+		$mobile_browser = false;
+		$user_agent = $this->request->server('HTTP_USER_AGENT');
+		
+		switch (true)
+		{		
+			case (preg_match('/x86_64|WOW64|Win64|Iceweasel/i', $user_agent) && $this->config['mobile_test_enable']);
+				$status = $this->user->lang('DESKTOP');
+				$mobile_browser = true;
+			break;
+			case (preg_match('/Bot|CFNetwork|libwww|Java|Jigsaw|SpreadTrum|httpget/i', $user_agent)) || $this->user->data['is_bot'];
+				$mobile_browser = false;
+			break;
+			case (preg_match('/ipad/i',$user_agent));
+				$status = $this->user->lang('IPAD');
+				$mobile_browser = $ipad;
+			break;
+			case (preg_match('/ipod/i',$user_agent));
+				$status = $this->user->lang('IPOD');
+				$mobile_browser = $ipod;
+			break;
+			case (preg_match('/iphone/i', $user_agent));
+				$status = $this->user->lang('IPHONE');
+				$mobile_browser = $iphone;
+			break;
+			case (preg_match('/android/i', $user_agent));
+				if (preg_match('/SM-G870A/i', $user_agent))
+				{
+					$status = $this->user->lang('SGS5A');
+				}
+				else if (preg_match('/SM-G900A|SM-G900F|SM-G900H|SM-G900M|SM-G900P|SM-G900R4|SM-G900T|SM-G900V|SM-G900W8|SM-G800F/i', $user_agent))
+				{
+					$status = $this->user->lang('SGS5');
+				}
+				else if (preg_match('/SM-G920F/i', $user_agent))
+				{
+					$status = $this->user->lang('SGS6');
+				}
+				else if (preg_match('/SGH-I497/i', $user_agent))
+				{
+					$status = $this->user->lang('SG2T');
+				}
+				else if (preg_match('/GT-P5210|SM-T110|SM-T310/i', $user_agent))
+				{
+					$status = $this->user->lang('SGT3');
+				}
+				else if (preg_match('/SM-T210/i', $user_agent))
+				{
+					$status = $this->user->lang('SGT3W');
+				}
+				else if (preg_match('/SM-T335|SM-T530/i', $user_agent))
+				{
+					$status = $this->user->lang('SGT4');
+				}
+				else if (preg_match('/SM-T520/i', $user_agent))
+				{
+					$status = $this->user->lang('SGTP');
+				}
+				else if (preg_match('/SGH-I537/i', $user_agent))
+				{
+					$status = $this->user->lang('SGS4A');
+				}
+				else if (preg_match('/GT-I9505|GT-I9500|SPH-L720T/i', $user_agent))
+				{
+					$status = $this->user->lang('SGS4');
+				}
+				else if (preg_match('/GT-I9100P/i', $user_agent))
+				{
+					$status = $this->user->lang('SGS2');
+				}
+				else if (preg_match('/SM-N9005|SM-P600/i', $user_agent))
+				{
+					$status = $this->user->lang('SGN3');
+				}
+				else if (preg_match('/SM-N7505/i', $user_agent))
+				{
+					$status = $this->user->lang('SGN3N');
+				}
+				else if (preg_match('/SM-N910C|SM-N910F/i', $user_agent))
+				{
+					$status = $this->user->lang('SGN4');
+				}
+				else if (preg_match('/SM-N920P/i', $user_agent))
+				{
+					$status = $this->user->lang('SGN5');
+				}
+				else if (preg_match('/SM-G357FZ/i', $user_agent))
+				{
+					$status = $this->user->lang('SGA4');
+				}
+				else if (preg_match('/SM-G925P/i', $user_agent))
+				{
+					$status = $this->user->lang('SGS6E');
+				}
+				else if (preg_match('/SM-G935F/i', $user_agent))
+				{
+					$status = $this->user->lang('SGS7E');
+				}
+				else if (preg_match('/SM-G950F|SM-G955F/i', $user_agent))
+				{
+					$status = $this->user->lang('SGS8');
+				}
+				else if (preg_match('/GT-S7582/i', $user_agent))
+				{
+					$status = $this->user->lang('SGSD2');
+				}
+				else if (preg_match('/GT-I9100P/i', $user_agent))
+				{
+					$status = $this->user->lang('SGS2');
+				}
+				else if (preg_match('/HONORPLK-L01/i',$user_agent))
+				{
+					$status = $this->user->lang('HPL01');
+				}
+				else if (preg_match('/EVA-L09/i', $user_agent))
+				{
+					$status = $this->user->lang('HPL09');
+				}
+				else if (preg_match('/VNS-L23/i', $user_agent))
+				{
+					$status = $this->user->lang('HPL23');
+				}
+				else if (preg_match('/IMM76B/i', $user_agent))
+				{
+					$status = $this->user->lang('SGN');
+				}
+				else if (preg_match('/TF101/i', $user_agent))
+				{
+					$status = $this->user->lang('ATT');
+				}
+				else if (preg_match('/Archos 40b/i', $user_agent))
+				{
+					$status = $this->user->lang('A4TS');
+				}
+				else if (preg_match('/A0001/i', $user_agent))
+				{
+					$status = $this->user->lang('OPO');
+				}
+				else if (preg_match('/Orange Nura/i', $user_agent))
+				{
+					$status = $this->user->lang('ORN');
+				}
+				else if (preg_match('/XT1030/i', $user_agent))
+				{
+					$status = $this->user->lang('MDM');
+				}
+				else if (preg_match('/TIANYU-KTOUCH/i', $user_agent))
+				{
+					$status = $this->user->lang('TKT');
+				}
+				else if (preg_match('/D2005|D2105/i',$user_agent))
+				{
+					$status = $this->user->lang('SXED');
+				}
+				else if (preg_match('/C2005|D2303/i', $user_agent))
+				{
+					$status = $this->user->lang('SXM2');
+				}
+				else if (preg_match('/C6906/i', $user_agent))
+				{
+					$status = $this->user->lang('SXZ1');
+				}
+				else if (preg_match('/D5803/i', $user_agent))
+				{
+					$status = $this->user->lang('SXZ3');
+				}
+				else if (preg_match('/P710/i', $user_agent))
+				{
+					$status = $this->user->lang('LGOL7IT');
+				}
+				else if (preg_match('/LG-H850/i', $user_agent))
+				{
+					$status = $this->user->lang('LGH850');
+				}
+				else if (preg_match('/LG-V500/i', $user_agent))
+				{
+					$status = $this->user->lang('LGV500');
+				}
+				else if (preg_match('/lg/i', $user_agent))
+				{
+					$status = $this->user->lang('LG');
+				}
+				else if (preg_match('/ASUS_T00J/i', $user_agent))
+				{
+					$status = $this->user->lang('ATOOJ');
+				}
+				else if (preg_match('/Aquaris E5/i', $user_agent))
+				{
+					$status = $this->user->lang('AE5HD');
+				}
+				else if (preg_match('/HTC Desire|626s/i', $user_agent))
+				{
+					$status = $this->user->lang('HTCD');
+				}
+				else if (preg_match('/Nexus One/i', $user_agent))
+				{
+					$status = $this->user->lang('N1');
+				}
+				else if (preg_match('/Nexus 4|LRX22C|LVY48F|LMY47V/i', $user_agent))
+				{
+					$status = $this->user->lang('N4');
+				}
+				else if (preg_match('/Nexus 5|LMY48S/i', $user_agent))
+				{
+					$status = $this->user->lang('N5');
+				}
+				else if (preg_match('/Nexus 7|KTU84P/i', $user_agent))
+				{
+					$status = $this->user->lang('N7');
+				}
+				else if (preg_match('/Nexus 9|LMY47X/i',$user_agent))
+				{
+					$status = $this->user->lang('N9');
+				}
+				else if (preg_match('/Lenovo_K50_T5/i', $user_agent))
+				{
+					$status = $this->user->lang('LK50T5');
+				}
+				else
+				{
+					$status = $this->user->lang('ANDROID');
+				}
+				$mobile_browser = $android;
+			break;
+			case (preg_match('/opera mini/i', $user_agent));
+				$status = $this->user->lang('MOBILE_DEVICE');
+				$mobile_browser = $opera;
+			break;
+			case (preg_match('/blackberry/i', $user_agent));
+				if (preg_match('/BlackBerry9900|BlackBerry9930|BlackBerry9790|BlackBerry9780|BlackBerry9700|BlackBerry9650|BlackBerry9000|/i',$user_agent))
+				{
+					$status = 'BlackBerry Bold';
+				}
+				else if (preg_match('/BlackBerry9380|BlackBerry9370|BlackBerry9360|BlackBerry9350|BlackBerry9330|BlackBerry9320|BlackBerry9300|BlackBerry9220|BlackBerry8980|BlackBerry8900|BlackBerry8530|BlackBerry8520|BlackBerry8330|BlackBerry8320|BlackBerry8310|BlackBerry8300/i',$user_agent))
+				{
+					$status = $this->user->lang('BBCURVE');
+				}
+				else if (preg_match('/BlackBerry9860|BlackBerry9850|BlackBerry9810|BlackBerry9800/i', $user_agent))
+				{
+					$status = $this->user->lang('BBTORCH');
+				}
+				else if (preg_match('/BlackBerry9900/i', $user_agent))
+				{
+					$status = $this->user->lang('BBTOUCH');
+				}
+				else if (preg_match('/BlackBerry9105/i', $user_agent))
+				{
+					$status = $this->user->lang('BBPEARL');
+				}
+				else if (preg_match('/BlackBerry8220/i', $user_agent))
+				{
+					$status = $this->user->lang('BBPEARLF');
+				}
+				else if (preg_match('/BlackBerry Storm|BlackBerry Storm2/i', $user_agent))
+				{
+					$status = $this->user->lang('BBSTORM');
+				}
+				else if (preg_match('/BlackBerry Passport/i', $user_agent))
+				{
+					$status = $this->user->lang('BBPP');
+				}
+				else if (preg_match('/BlackBerry Porsche/i',$user_agent))
+				{
+					$status = $this->user->lang('BBP');
+				}
+				else if (preg_match('/BlackBerry PlayBook/i', $user_agent))
+				{
+					$status = $this->user->lang('BBPB');
+				}
+				else
+				{
+					$status = $this->user->lang('BLACKBERRY');
+				}
+				$mobile_browser = $blackberry;
+			break;
+			case (preg_match('/(pre\/|palm os|palm|hiptop|avantgo|plucker|xiino|blazer|elaine)/i', $user_agent));
+				$status = $this->user->lang('PALM');
+				$mobile_browser = $palm;
+			break;
+			case (preg_match('/(iris|3g_t|windows ce|windows Phone|opera mobi|windows ce; smartphone;|windows ce; iemobile)/i', $user_agent));
+				if (preg_match('/Lumia 640 XL/i', $user_agent))
+				{
+					$status = $this->user->lang('L640XL');
+				}
+				else
+				{
+					$status = $this->user->lang('WSP');
+				}
+				$mobile_browser = $windows;
+			break;
+			case (preg_match('/lge vx10000/i', $user_agent));
+				$status = $this->user->lang('VOYAGER');
+				$mobile_browser = $windows;
+			break;
+			case (preg_match('/(mini 9.5|vx1000|lge |m800|e860|u940|ux840|compal|wireless| mobi|ahong|lg380|lgku|lgu900|lg210|lg47|lg920|lg840|lg370|sam-r|mg50|s55|g83|t66|vx400|mk99|d615|d763|el370|sl900|mp500|samu3|samu4|vx10|xda_|samu5|samu6|samu7|samu9|a615|b832|m881|s920|n210|s700|c-810|_h797|mob-x|sk16d|848b|mowser|s580|r800|471x|v120|rim8|c500foma:|160x|x160|480x|x640|t503|w839|i250|sprint|w398samr810|m5252|c7100|mt126|x225|s5330|s820|htil-g1|fly v71|s302|-x113|novarra|k610i|-three|8325rc|8352rc|sanyo|vx54|c888|nx250|n120|mtk |c5588|s710|t880|c5005|i;458x|p404i|s210|c5100|teleca|s940|c500|s590|foma|samsu|vx8|vx9|a1000|_mms|myx|a700|gu1100|bc831|e300|ems100|me701|me702m-three|sd588|s800|8325rc|ac831|mw200|brew |d88|htc\/|htc_touch|355x|m50|km100|d736|p-9521|telco|sl74|ktouch|m4u\/|me702|8325rc|kddi|phone|lg |sonyericsson|samsung|240x|x320|vx10|nokia|sony cmd|motorola|up.browser|up.link|mmp|symbian|smartphone|midp|wap|vodafone|o2|pocket|kindle|mobile|psp|treo)/i', $user_agent));
+				$status = $this->user->lang('MOBILE_DEVICE');
+				$mobile_browser = true;
+			break;
+			case (isset($post['HTTP_X_WAP_PROFILE'])||isset($post['HTTP_PROFILE']));
+				$status = $this->user->lang('MOBILE_DEVICE');
+				$mobile_browser = true;
+			break;
+			case (in_array(strtolower(substr($user_agent, 0, 4)), array('1207'=>'1207','3gso'=>'3gso','4thp'=>'4thp','501i'=>'501i','502i'=>'502i','503i'=>'503i','504i'=>'504i','505i'=>'505i','506i'=>'506i','6310'=>'6310','6590'=>'6590','770s'=>'770s','802s'=>'802s','a wa'=>'a wa','acer'=>'acer','acs-'=>'acs-','airn'=>'airn','alav'=>'alav','asus'=>'asus','attw'=>'attw','au-m'=>'au-m','aur '=>'aur ','aus '=>'aus ','abac'=>'abac','acoo'=>'acoo','aiko'=>'aiko','alco'=>'alco','alca'=>'alca','amoi'=>'amoi','anex'=>'anex','anny'=>'anny','anyw'=>'anyw','aptu'=>'aptu','arch'=>'arch','argo'=>'argo','bell'=>'bell','bird'=>'bird','bw-n'=>'bw-n','bw-u'=>'bw-u','beck'=>'beck','benq'=>'benq','bilb'=>'bilb','blac'=>'blac','c55/'=>'c55/','cdm-'=>'cdm-','chtm'=>'chtm','capi'=>'capi','cond'=>'cond','craw'=>'craw','dall'=>'dall','dbte'=>'dbte','dc-s'=>'dc-s','dica'=>'dica','ds-d'=>'ds-d','ds12'=>'ds12','dait'=>'dait','devi'=>'devi','dmob'=>'dmob','doco'=>'doco','dopo'=>'dopo','el49'=>'el49','erk0'=>'erk0','esl8'=>'esl8','ez40'=>'ez40','ez60'=>'ez60','ez70'=>'ez70','ezos'=>'ezos','ezze'=>'ezze','elai'=>'elai','emul'=>'emul','eric'=>'eric','ezwa'=>'ezwa','fake'=>'fake','fly-'=>'fly-','fly_'=>'fly_','g-mo'=>'g-mo','g1 u'=>'g1 u','g560'=>'g560','gf-5'=>'gf-5','grun'=>'grun','gene'=>'gene','go.w'=>'go.w','good'=>'good','grad'=>'grad','hcit'=>'hcit','hd-m'=>'hd-m','hd-p'=>'hd-p','hd-t'=>'hd-t','hei-'=>'hei-','hp i'=>'hp i','hpip'=>'hpip','hs-c'=>'hs-c','htc '=>'htc ','htc-'=>'htc-','htca'=>'htca','htcg'=>'htcg','htcp'=>'htcp','htcs'=>'htcs','htct'=>'htct','htc_'=>'htc_','haie'=>'haie','hita'=>'hita','huaw'=>'huaw','hutc'=>'hutc','i-20'=>'i-20','i-go'=>'i-go','i-ma'=>'i-ma','i230'=>'i230','iac'=>'iac','iac-'=>'iac-','iac/'=>'iac/','ig01'=>'ig01','im1k'=>'im1k','inno'=>'inno','iris'=>'iris','jata'=>'jata','java'=>'java','kddi'=>'kddi','kgt'=>'kgt','kgt/'=>'kgt/','kpt '=>'kpt ','kwc-'=>'kwc-','klon'=>'klon','lexi'=>'lexi','lg g'=>'lg g','lg-a'=>'lg-a','lg-b'=>'lg-b','lg-c'=>'lg-c','lg-d'=>'lg-d','lg-f'=>'lg-f','lg-g'=>'lg-g','lg-k'=>'lg-k','lg-l'=>'lg-l','lg-m'=>'lg-m','lg-o'=>'lg-o','lg-p'=>'lg-p','lg-s'=>'lg-s','lg-t'=>'lg-t','lg-u'=>'lg-u','lg-w'=>'lg-w','lg/k'=>'lg/k','lg/l'=>'lg/l','lg/u'=>'lg/u','lg50'=>'lg50','lg54'=>'lg54','lge-'=>'lge-','lge/'=>'lge/','lynx'=>'lynx','leno'=>'leno','m1-w'=>'m1-w','m3ga'=>'m3ga','m50/'=>'m50/','maui'=>'maui','mc01'=>'mc01','mc21'=>'mc21','mcca'=>'mcca','medi'=>'medi','meri'=>'meri','mio8'=>'mio8','mioa'=>'mioa','mo01'=>'mo01','mo02'=>'mo02','mode'=>'mode','modo'=>'modo','mot '=>'mot ','mot-'=>'mot-','mt50'=>'mt50','mtp1'=>'mtp1','mtv '=>'mtv ','mate'=>'mate','maxo'=>'maxo','merc'=>'merc','mits'=>'mits','mobi'=>'mobi','motv'=>'motv','mozz'=>'mozz','n100'=>'n100','n101'=>'n101','n102'=>'n102','n202'=>'n202','n203'=>'n203','n300'=>'n300','n302'=>'n302','n500'=>'n500','n502'=>'n502','n505'=>'n505','n700'=>'n700','n701'=>'n701','n710'=>'n710','nec-'=>'nec-','nem-'=>'nem-','newg'=>'newg','neon'=>'neon','netf'=>'netf','noki'=>'noki','nzph'=>'nzph','o2 x'=>'o2 x','o2-x'=>'o2-x','opwv'=>'opwv','owg1'=>'owg1','opti'=>'opti','oran'=>'oran','p800'=>'p800','pand'=>'pand','pg-1'=>'pg-1','pg-2'=>'pg-2','pg-3'=>'pg-3','pg-6'=>'pg-6','pg-8'=>'pg-8','pg-c'=>'pg-c','pg13'=>'pg13','phil'=>'phil','pn-2'=>'pn-2','pt-g'=>'pt-g','palm'=>'palm','pana'=>'pana','pire'=>'pire','pock'=>'pock','pose'=>'pose','psio'=>'psio','qa-a'=>'qa-a','qc-2'=>'qc-2','qc-3'=>'qc-3','qc-5'=>'qc-5','qc-7'=>'qc-7','qc07'=>'qc07','qc12'=>'qc12','qc21'=>'qc21','qc32'=>'qc32','qc60'=>'qc60','qci-'=>'qci-','qwap'=>'qwap','qtek'=>'qtek','r380'=>'r380','r600'=>'r600','raks'=>'raks','rim9'=>'rim9','rove'=>'rove','s55/'=>'s55/','sage'=>'sage','sams'=>'sams','sc01'=>'sc01','sch-'=>'sch-','scp-'=>'scp-','sdk/'=>'sdk/','se47'=>'se47','sec-'=>'sec-','sec0'=>'sec0','sec1'=>'sec1','semc'=>'semc','sgh-'=>'sgh-','shar'=>'shar','sie-'=>'sie-','sk-0'=>'sk-0','sl45'=>'sl45','slid'=>'slid','smb3'=>'smb3','smt5'=>'smt5','sp01'=>'sp01','sph-'=>'sph-','spv '=>'spv ','spv-'=>'spv-','sy01'=>'sy01','samm'=>'samm','sany'=>'sany','sava'=>'sava','scoo'=>'scoo','send'=>'send','siem'=>'siem','smar'=>'smar','smit'=>'smit','soft'=>'soft','sony'=>'sony','t-mo'=>'t-mo','t218'=>'t218','t250'=>'t250','t600'=>'t600','t610'=>'t610','t618'=>'t618','tcl-'=>'tcl-','tdg-'=>'tdg-','telm'=>'telm','tim-'=>'tim-','ts70'=>'ts70','tsm-'=>'tsm-','tsm3'=>'tsm3','tsm5'=>'tsm5','tx-9'=>'tx-9','tagt'=>'tagt','talk'=>'talk','teli'=>'teli','topl'=>'topl','hiba'=>'hiba','up.b'=>'up.b','upg1'=>'upg1','utst'=>'utst','v400'=>'v400','v750'=>'v750','veri'=>'veri','vk-v'=>'vk-v','vk40'=>'vk40','vk50'=>'vk50','vk52'=>'vk52','vk53'=>'vk53','vm40'=>'vm40','vx98'=>'vx98','virg'=>'virg','vite'=>'vite','voda'=>'voda','vulc'=>'vulc','w3c '=>'w3c ','w3c-'=>'w3c-','wapj'=>'wapj','wapp'=>'wapp','wapu'=>'wapu','wapm'=>'wapm','wig '=>'wig ','wapi'=>'wapi','wapr'=>'wapr','wapv'=>'wapv','wapy'=>'wapy','wapa'=>'wapa','waps'=>'waps','wapt'=>'wapt','winc'=>'winc','winw'=>'winw','wonu'=>'wonu','x700'=>'x700','xda2'=>'xda2','xdag'=>'xdag','yas-'=>'yas-','your'=>'your','zte-'=>'zte-','zeto'=>'zeto','acs-'=>'acs-','alav'=>'alav','alca'=>'alca','amoi'=>'amoi','aste'=>'aste','audi'=>'audi','avan'=>'avan','benq'=>'benq','bird'=>'bird','blac'=>'blac','blaz'=>'blaz','brew'=>'brew','brvw'=>'brvw','bumb'=>'bumb','ccwa'=>'ccwa','cell'=>'cell','cldc'=>'cldc','cmd-'=>'cmd-','dang'=>'dang','doco'=>'doco','eml2'=>'eml2','eric'=>'eric','fetc'=>'fetc','hipt'=>'hipt','http'=>'http','ibro'=>'ibro','idea'=>'idea','ikom'=>'ikom','inno'=>'inno','ipaq'=>'ipaq','jbro'=>'jbro','jemu'=>'jemu','java'=>'java','jigs'=>'jigs','kddi'=>'kddi','keji'=>'keji','kyoc'=>'kyoc','kyok'=>'kyok','leno'=>'leno','lg-c'=>'lg-c','lg-d'=>'lg-d','lg-g'=>'lg-g','lge-'=>'lge-','libw'=>'libw','m-cr'=>'m-cr','maui'=>'maui','maxo'=>'maxo','midp'=>'midp','mits'=>'mits','mmef'=>'mmef','mobi'=>'mobi','mot-'=>'mot-','moto'=>'moto','mwbp'=>'mwbp','mywa'=>'mywa','nec-'=>'nec-','newt'=>'newt','nok6'=>'nok6','noki'=>'noki','o2im'=>'o2im','opwv'=>'opwv','palm'=>'palm','pana'=>'pana','pant'=>'pant','pdxg'=>'pdxg','phil'=>'phil','play'=>'play','pluc'=>'pluc','port'=>'port','prox'=>'prox','qtek'=>'qtek','qwap'=>'qwap','rozo'=>'rozo','sage'=>'sage','sama'=>'sama','sams'=>'sams','sany'=>'sany','sch-'=>'sch-','sec-'=>'sec-','send'=>'send','seri'=>'seri','sgh-'=>'sgh-','shar'=>'shar','sie-'=>'sie-','siem'=>'siem','smal'=>'smal','smar'=>'smar','sony'=>'sony','sph-'=>'sph-','symb'=>'symb','t-mo'=>'t-mo','teli'=>'teli','tim-'=>'tim-','tosh'=>'tosh','treo'=>'treo','tsm-'=>'tsm-','upg1'=>'upg1','upsi'=>'upsi','vk-v'=>'vk-v','voda'=>'voda','vx52'=>'vx52','vx53'=>'vx53','vx60'=>'vx60','vx61'=>'vx61','vx70'=>'vx70','vx80'=>'vx80','vx81'=>'vx81','vx83'=>'vx83','vx85'=>'vx85','wap-'=>'wap-','wapa'=>'wapa','wapi'=>'wapi','wapp'=>'wapp','wapr'=>'wapr','webc'=>'webc','whit'=>'whit','winw'=>'winw','wmlb'=>'wmlb','xda-'=>'xda-',)));
+				$status = $this->user->lang('MOBILE_DEVICE');
+				$mobile_browser = true;
+			break;
+			default;
+				$status = $this->user->lang('DESKTOP');
+				$mobile_browser = false;
+			break;
+		}
+		header('Cache-Control: no-transform');
+		header('Vary: User-Agent');
+		
+		if ($mobile_browser == '')
+		{
+			return $mobile_browser;
+		}
+		else
+		{
+			return array($mobile_browser, $status);
+		}
+	}
+	
 	/**
 	 * Setup style
 	 *
@@ -2484,37 +3705,37 @@ class session
 	 */
 	function setup_style()
 	{		
-		$template = new mx_Template($this->phpbb_root_path . $this->template_path . $this->template_name);
-		@define('IP_ROOT_PATH', $this->phpbb_root_path); //for ICY-PHOENIX Styles
+		$template = new mx_Template($this->mx_root_path . $this->template_path . $this->template_name);
+		@define('IP_ROOT_PATH', $this->mx_root_path); //for ICY-PHOENIX Styles
 		
 		if (is_object($template))
 		{
-			if(is_dir($this->phpbb_root_path . $this->current_template_path . '/theme/images/'))
+			if(is_dir($this->mx_root_path . $this->current_template_path . '/theme/images/'))
 			{
 				$current_template_images = $this->current_template_images = $this->current_template_path . "/theme/images";						
 			}
-			elseif(is_dir($this->phpbb_root_path . $this->current_template_path . '/images/'))
+			elseif(is_dir($this->mx_root_path . $this->current_template_path . '/images/'))
 			{
 				$current_template_images = $this->current_template_images = $this->current_template_path . "/images";					
 			}			
 			
-			$phpbb_root_path = $this->phpbb_root_path;			
+			global $phpBB2;
+			
+			$phpbb_root_path = $this->mx_root_path;			
+			
 			$current_template_path = $this->template_path . $this->template_name;
 			
 			$cfg = array();
 			//$row = $this->theme;
 			
 			/**
-			/* Try phpBB2 then phpBB3 style 
 			/* session->setup_style( )
-			/* Icludes here PHPBB styles configuration file
-			/* include( 'www\phpbb2\templates\prosilver2\prosilver2.cfg' )
 			**/
 			unset($GLOBALS['TEMPLATE_CONFIG']);		
 			$mx_template_config = false;			
-			if(@file_exists(@phpbb_realpath($phpbb_root_path . $this->template_path . $this->template_name . '/' . $this->template_name . '.cfg')) )
+			if(@file_exists(@$phpBB2->phpbb_realpath($mx_root_path . $this->template_path . $this->template_name . '/' . $this->template_name . '.cfg')) )
 			{
-				@include($phpbb_root_path . $this->template_path . $this->template_name . '/' . $this->template_name . '.cfg');
+				@include($mx_root_path . $this->template_path . $this->template_name . '/' . $this->template_name . '.cfg');
 								
 				if (!defined('TEMPLATE_CONFIG'))
 				{
@@ -2524,26 +3745,26 @@ class session
 					@define(TEMPLATE_CONFIG, TRUE);					
 				}				
 			}			
-			elseif( @file_exists(@phpbb_realpath($phpbb_root_path . $this->template_path . $this->template_name . "/style.cfg")) )
+			elseif( @file_exists(@phpbb_realpath($mx_root_path . $this->template_path . $this->template_name . "/style.cfg")) )
 			{
 				//
 				// Do not alter this line!
 				//
 				@define(TEMPLATE_CONFIG, TRUE);
-				$cfg = parse_cfg_file($phpbb_root_path. $this->template_path . basename($this->template_name) . '/style.cfg');
+				$cfg = parse_cfg_file($mx_root_path. $this->template_path . basename($this->template_name) . '/style.cfg');
 				
 				//		
 				// - First try phpBB2 then phpBB3 template lang images then old Olympus image sets
 				//		
-				if ( is_dir($this->phpbb_root_path . $this->current_template_path . '/theme/images/') )
+				if ( file_exists($mx_root_path . $this->current_template_path . '/images/') )
 				{
-					$this->current_template_images = $this->current_template_path . '/theme/images';
+					$this->current_template_images = $this->current_template_path . '/images';
 				}		
-				else if ( is_dir($this->phpbb_root_path . $this->current_template_path  . '/images/') )
+				else if ( file_exists($mx_root_path . $this->current_template_path  . '/theme/images/') )
 				{		
-					$this->current_template_images = $this->current_template_path  . '/images';
+					$this->current_template_images = $this->current_template_path  . '/theme/images';
 				}		
-				if ( is_dir($this->phpbb_root_path . $this->current_template_path  . '/imageset/') )
+				if ( file_exists($mx_root_path . $this->current_template_path  . '/imageset/') )
 				{		
 					$this->current_template_images = $this->current_template_path  . '/imageset';
 				}
@@ -2628,24 +3849,13 @@ class session
 				$board_config['vote_graphic_length'] = 205;
 				$board_config['privmsg_graphic_length'] = 175;			
 			}
-			else		
-			{
-				if ((@include $phpbb_root_path . $this->template_path . "prosilver2/prosilver2.cfg") === false)
-				{
-					mx_message_die(CRITICAL_ERROR, "Could not open phpBB $this->template_name template config file", '', __LINE__, __FILE__);
-				}
-				else
-				{
-					print_r("Could not open phpBB $this->template_name template config file");
-				}
-			}
-			
+		
 			if (!defined('TEMPLATE_CONFIG'))
 			{
 				mx_message_die(CRITICAL_ERROR, "Could not open $this->template_name template config file", '', __LINE__, __FILE__, $sql);
 			}
 			
-			$img_lang = (file_exists(@phpbb_realpath($phpbb_root_path . $this->current_template_path . '/images/lang_' . $board_config['default_lang']))) ? $board_config['default_lang'] : 'english';
+			$img_lang = (file_exists(@$phpBB2->phpbb_realpath($mx_root_path . $this->current_template_path . '/images/lang_' . $board_config['default_lang']))) ? $board_config['default_lang'] : 'english';
 		
 			while(list($key, $value) = @each($images))
 			{
@@ -2732,10 +3942,10 @@ class session
 				$language_filename = $this->lang_path . (($use_help) ? 'help_' : '') . $lang_file . '.' . $phpEx;
 			}
 
-			//fix for mxp phpbb2 backend
+			//fix for mxp internal backend
 			if ((@include $language_filename) === false)
 			{
-				global $module_root_path;				
+				global $module_root_path;	
 				
 				//
 				//this will fix the path for shared language files
@@ -2765,7 +3975,7 @@ class session
 				{
 					//continue;
 				}	
-				elseif ((@include $module_root_path  . $language_filename) !== false)
+				elseif ((@include $module_root_path . $language_filename) !== false)
 				{
 					//continue;
 				}					
@@ -2837,7 +4047,7 @@ class session
 	 * Example call: <samp>$user->lang('NUM_POSTS_IN_QUEUE', 1);</samp>
 	 *
 	 * If the first parameter is an array, the elements are used as keys and subkeys to get the language entry:
-	 * Example: <samp>$mx_user->lang(array('datetime', 'AGO'), 1)</samp> uses $user->lang['datetime']['AGO'] as language entry.
+	 * Example: <samp>$user->lang(array('datetime', 'AGO'), 1)</samp> uses $user->lang['datetime']['AGO'] as language entry.
 	 *
 	 * @return string	Return localized string or the language key if the translation is not available
 	 */
@@ -2915,10 +4125,8 @@ class session
 			$key_found = end($numbers);
 		}
 		
-
-		
 		// Use the language string we determined and pass it to sprintf()
-		$args[0] = $lang[$key_found];
+		$args[0] = isset($lang[$key_found]) ? $lang[$key_found] : $key_found;
 		return call_user_func_array('sprintf', $args);
 		//return $this->lang_array($key, $args);
 	}
@@ -3140,17 +4348,7 @@ class session
 	* Specify/Get phpBB3 images array from phpBB2 images  variable
 	*/
 	function image_rows($images)
-	{
-			if (!is_array($images))
-			{
-				//mx_message_die(CRITICAL_ERROR, 'Error getting images array from images variable', '', __LINE__, __FILE__, print_r($images, true));
-			}
-			
-			// Begin Simple Subforums MOD
-			$images['forums'] = isset($images['forums']) ? $images['forums'] : 'forum_read_subforum.gif';
-			$images['forums_new'] = isset($images['forums_new']) ? $images['forums_new'] : 'forum_unread_subforum.gif';
-			// End Simple Subforums MOD
-			
+	{	
 			/* Here we overwrite phpBB images from the template db or configuration file  */		
 			$rows = array( 
 			array(	'image_id' => 1, 
@@ -3784,7 +4982,7 @@ class session
 	/**
 	* Specify/Get image name , extension
 	*/
-	function img_name_ext($img, $prefix = '', $new_prefix = '', $type = 'filename')
+	function img_name_ext($img, $prefix = 'img_', $new_prefix = '', $type = 'filename')
 	{	
 		if (strpos($img, '.') !== false)
 		{
@@ -3833,7 +5031,8 @@ class session
 	*/
 	function img($img, $alt = '', $width = false, $suffix = '', $type = '')
 	{
-		static $imgs; //$mx_root_path;
+		static $imgs;
+		global $phpbb_root_path, $root_path, $theme;
 		global $mx_block;
 		
 		//
@@ -3859,10 +5058,10 @@ class session
 		}
 		
 		$title = '';
-		
+
 		if ($alt)
 		{
-			$alt = $this->user->lang($alt);
+			$alt = $this->lang($alt);
 			$title = ' title="' . $alt . '"';
 		}
 		
@@ -3872,8 +5071,8 @@ class session
 			$image_filename = $img;
 			$img_ext = substr(strrchr($image_filename, '.'), 1);
 			$img = basename($image_filename, '.' . $img_ext);
-			$this->img_array[$img]['image_filename'] = array(
-				''.$img => $img . '.' . $img_ext,
+			$this->img_array['image_filename'] = array(
+				'img_'.$img => $img . '.' . $img_ext,
 			);			
 			unset($img_name, $image_filename);
 		}
@@ -3881,7 +5080,7 @@ class session
 		if ($width !== false)
 		{
 			$this->img_array['image_width'] = array(
-				''.$img => $width,
+				'img_'.$img => $width,
 			);	
 		}		
 				
@@ -3894,9 +5093,9 @@ class session
 		//		
 		// - First try phpBB2 then phpBB3 template
 		//		
-		if ( file_exists($this->phpbb_root_path . $this->current_template_path . '/' . $this->template_name . '.cfg') )
+		if ( file_exists($phpbb_root_path . $this->current_template_path . '/' . $this->template_name . '.cfg') )
 		{
-			@include($this->phpbb_root_path . $this->current_template_path . '/' . $this->template_name . '.cfg'); 
+			@include($phpbb_root_path . $this->current_template_path . '/' . $this->template_name . '.cfg'); 
 			@define('TEMPLATE_CONFIG', true);
 			
 			//$img_keys = array_keys($images);
@@ -3911,7 +5110,7 @@ class session
 				if(empty($row['image_name']))
 				{
 					//print_r('Your style configuration file has a typo! ');
-					//print_r($this->phpbb_root_path . $this->current_template_path . '/' . $this->template_name . '.cfg ');			
+					//print_r($phpbb_root_path . $this->current_template_path . '/' . $this->template_name . '.cfg ');			
 					//print_r($row);
 					$row['image_name'] = 'spacer.gif';
 				}
@@ -3922,7 +5121,7 @@ class session
 				$this->img_array[$row['image_name']] = $row;				
 			}	
 		}		
-		else if ( file_exists($this->phpbb_root_path . $current_template_path  . '/theme/stylesheet.css') )
+		else if ( file_exists($phpbb_root_path . $current_template_path  . '/theme/stylesheet.css') )
 		{		
 			@define('TEMPLATE_CONFIG', true);
 			$current_template_images = $current_template_path . "/theme/images";
@@ -3931,12 +5130,12 @@ class session
 		//
 		// Since we have no current Template Config file, try the cloned template instead
 		//
-		if ( file_exists($this->phpbb_root_path . $this->cloned_current_template_path . '/' . $this->cloned_template_name . '.cfg') && !defined('TEMPLATE_CONFIG') )
+		if ( file_exists($phpbb_root_path . $this->cloned_current_template_path . '/' . $this->cloned_template_name . '.cfg') && !defined('TEMPLATE_CONFIG') )
 		{
 			$current_template_path = $this->cloned_current_template_path;
 			$template_name = $this->cloned_template_name;
 
-			@include($this->phpbb_root_path . $this->cloned_current_template_path . '/' . $this->cloned_template_name . '.cfg');
+			@include($phpbb_root_path . $this->cloned_current_template_path . '/' . $this->cloned_template_name . '.cfg');
 			
 			$rows = $this->image_rows($images);
 					
@@ -3947,7 +5146,7 @@ class session
 				if(empty($row['image_name']))
 				{
 					print_r('Your style configuration file has a typo! ');
-					print_r($this->phpbb_root_path . $this->current_template_path . '/' . $this->template_name . '.cfg ');			
+					print_r($phpbb_root_path . $this->current_template_path . '/' . $this->template_name . '.cfg ');			
 					print_r($row);
 				}
 				/** 
@@ -3961,12 +5160,12 @@ class session
 		//
 		// Last attempt, use default template intead
 		//
-		if ( file_exists($this->phpbb_root_path . $this->default_current_template_path . '/' . $this->default_template_name . '.cfg') && !defined('TEMPLATE_CONFIG') )
+		if ( file_exists($phpbb_root_path . $this->default_current_template_path . '/' . $this->default_template_name . '.cfg') && !defined('TEMPLATE_CONFIG') )
 		{
 			$current_template_path = $this->default_current_template_path;
 			$template_name = $this->default_template_name;
 
-			@include($this->phpbb_root_path . $this->default_current_template_path . '/' . $this->default_template_name . '.cfg');
+			@include($phpbb_root_path . $this->default_current_template_path . '/' . $this->default_template_name . '.cfg');
 			
 			$rows = $this->image_rows($images);
 					
@@ -3977,225 +5176,118 @@ class session
 				if(empty($row['image_name']))
 				{
 					print_r('Your style configuration file has a typo! ');
-					print_r($this->phpbb_root_path . $this->current_template_path . '/' . $this->template_name . '.cfg ');			
+					print_r($phpbb_root_path . $this->current_template_path . '/' . $this->template_name . '.cfg ');			
 					print_r($row);
 				}
 				/** 
 				* Now check for the correct existance of all of the images into
 				* each image of a prosilver based style. 
 				*/
-				$this->img_array[$row['image_name']] = $row;
-			}
-		}
-		
-		//
-		// - First try phpBB2 then phpBB3 template lang images then old Olympus image sets
-		// default language
-		if ( file_exists($this->phpbb_root_path . $current_template_path . '/images/lang_' . $this->default_language_name . '/') )
-		{
-			$this->img_lang = $this->default_language_name;
-		}
-		else if ( file_exists($this->phpbb_root_path . $current_template_path  . '/theme/images/lang_' . $this->default_language_name . '/') )
-		{
-			$this->img_lang = $this->default_language_name;
-		}
-		else if ( file_exists($this->phpbb_root_path . $current_template_path  . '/theme/' . $this->default_language . '/') )
-		{
-			$this->img_lang = $this->default_language;
-		}
-		else if ( file_exists($this->phpbb_root_path . $current_template_path  . '/theme/imageset/' . $this->default_language . '/') )
-		{
-			$this->img_lang = $this->default_language;
-		}
-	
-		//
-		// - First try phpBB2 then phpBB3 template lang images then old Olympus image sets
-		// user language
-		if ( file_exists($this->phpbb_root_path . $current_template_path . '/images/lang_' . $this->user_language_name . '/') )
-		{
-			$this->img_lang = $this->user_language_name;
-		}		
-		else if ( file_exists($this->phpbb_root_path . $current_template_path  . '/theme/images/lang_' . $this->user_language_name . '/') )
-		{		
-			$this->img_lang = $this->user_language_name;
-		}		
-		else if ( file_exists($this->phpbb_root_path . $current_template_path  . '/theme/' . $this->user_language . '/') )
-		{		
-			$this->img_lang = $this->user_language;
-		}
-		else if ( file_exists($this->phpbb_root_path . $current_template_path  . '/theme/imageset/' . $this->user_language . '/') )
-		{		
-			$this->img_lang = $this->user_language;
-		}
-		
-		/**
-		* group everything by the Core images IDs
-		*/
-		$img_rows = $this->image_rows($this->images);		
-		
-		/** /
-		$count = count($img_rows);	
-		for ($i = 0; $i < $count; ++$i)
-		{
-			if($img_row[$i]['image_name'] = $img)
-			{
-				$this->img_data[$img]['image_id'] 		= $img_rows[$i]['image_id'];
-				$this->img_data[$img]['image_name']		= $img_rows[$i]['image_name'];
-				$this->img_data[$img]['image_filename']	= $img_rows[$i]['image_filename'];
-				$this->img_data[$img]['image_lang'] 		= $img_rows[$i]['image_lang']; 
-				$this->img_data[$img]['image_height'] 	= $img_rows[$i]['image_height']; 
-				$this->img_data[$img]['image_width'] 	= $img_rows[$i]['image_width']; 
-				$this->img_data[$img]['imageset_id'] 	= $img_rows[$i]['imageset_id']; 				
-			}
-			
-		}
-		/**/
-		
-		foreach ($img_rows as $row)
-		{
-			$row['image_filename'] = rawurlencode($row['image_filename']);
-		
-			if(empty($row['image_name']))
-			{
-				//print_r('Your style configuration file has a typo! ');
-				//print_r($this->phpbb_root_path . $this->current_template_path . '/' . $this->template_name . '.cfg ');			
-				$row['image_name'] = 'spacer.gif';
-			}
-			/** 
-			* Now check for the correct existance of all of the images into
-			* each image of a prosilver based style. 
-			*/
-			$this->img_data[$row['image_name']] = $row;
-		}
-		
-		$current_template_name = !isset($this->current_module_template_name) ? $this->template_name : $this->current_module_template_name;				
-		$current_template_path = !isset($this->current_module_images) ? $current_template_path : $this->module_root_path . $this->current_module_images;				
-			
-		if (isset($this->img_data[$img]['image_lang']) && !isset($this->current_module_images))
-		{
-			//
-			// - First try phpBB2 then phpBB3 template lang images
-			//
-			if ( file_exists($this->phpbb_root_path . $current_template_path . $current_template_name . '/images/' . $this->decode_lang($this->img_data[$img]['image_lang']) . '/') )
-			{
-				$current_template_images = $current_template_path . $current_template_name . '/images/' . $this->decode_lang($this->img_data[$img]['image_lang']);
-			}
-			else if ( file_exists($this->phpbb_root_path . $current_template_path  . $current_template_name. '/theme/images/' . $this->img_data[$img]['image_lang'] . '/') )
-			{
-				$current_template_images = $current_template_path . $current_template_name . '/theme/images/' . $this->img_data[$img]['image_lang'];
-			}
-			else if ( file_exists($this->phpbb_root_path . $current_template_path  . $current_template_name . '/theme/images/' . $this->encode_lang($this->lang_name) . '/') )
-			{
-				$current_template_images = $current_template_path  . $current_template_name . '/theme/images/' . $this->encode_lang($this->lang_name);
-			}
-			else if ( file_exists($this->phpbb_root_path . $current_template_path  . $current_template_name . '/theme/imageset/' . $this->encode_lang($this->lang_name) . '/') )
-			{
-				$current_template_images = $current_template_path  . $current_template_name . '/theme/imageset/' . $this->encode_lang($this->lang_name);
-			}
-		}
-		elseif (isset($this->img_data[$img]['image_lang']) && isset($this->current_module_images))
-		{
-			//
-			// - First try phpBB2 then phpBB3 template lang images
-			//
-			if ( file_exists($this->phpbb_root_path . $this->module_root_path . $current_template_path . $current_template_name . '/images/' . $this->decode_lang($this->img_data[$img]['image_lang']) . '/') )
-			{
-				$current_template_images = $current_template_path . $current_template_name . '/images/' . $this->decode_lang($this->img_data[$img]['image_lang']);
-			}
-			else if ( file_exists($this->phpbb_root_path . $this->module_root_path . $current_template_path  . $current_template_name . '/theme/images/' . $this->img_data[$img]['image_lang'] . '/') )
-			{
-				$current_template_images = $current_template_path . $current_template_name . '/theme/images/' . $this->img_data[$img]['image_lang'];
-			}
-			else if ( file_exists($this->phpbb_root_path . $this->module_root_path . $current_template_path  . $current_template_name . '/theme/images/' . $this->encode_lang($this->lang_name) . '/') )
-			{
-				$current_template_images = $current_template_path  . $current_template_name . '/theme/images/' . $this->encode_lang($this->lang_name);
-			}
-			else if ( file_exists($this->phpbb_root_path . $this->module_root_path . $current_template_path  . '/theme/imageset/' . $this->encode_lang($this->lang_name) . '/') )
-			{
-				$current_template_images = $current_template_path  . $current_template_name . '/theme/imageset/' . $this->encode_lang($this->lang_name);
-			}
-		}
-		else
-		{
-			//
-			// - First try phpBB2 then phpBB3 template lang images then old Olympus image sets
-			// default language		
-			if ( file_exists($this->phpbb_root_path . $current_template_path . $current_template_name . '/images/lang_' . $this->default_language_name . '/') )
-			{
-				$this->img_lang = $this->default_language_name;
-			}		
-			else if ( file_exists($this->phpbb_root_path . $current_template_path  . $current_template_name . '/theme/images/lang_' . $this->default_language_name . '/') )
-			{		
-				$this->img_lang = $this->default_language_name;
-			}		
-			else if ( file_exists($this->phpbb_root_path . $current_template_path  . $current_template_name . '/theme/images/' . $this->default_language . '/') )
-			{		
-				$this->img_lang = $this->default_language;
-			}
-			else if ( file_exists($this->phpbb_root_path . $current_template_path  . $current_template_name . '/theme/imageset/' . $this->default_language . '/') )
-			{		
-				$this->img_lang = $this->default_language;
-			}		
-			
-			//		
-			// - First try phpBB2 then phpBB3 template lang images then old Olympus image sets
-			// user language		
-			if ( file_exists($this->phpbb_root_path . $current_template_path . $current_template_name . '/images/lang_' . $this->user_language_name . '/') )
-			{
-				$this->img_lang = $this->user_language_name;
-			}		
-			else if ( file_exists($this->phpbb_root_path . $current_template_path  . $current_template_name . '/theme/images/lang_' . $this->user_language_name . '/') )
-			{		
-				$this->img_lang = $this->user_language_name;
-			}		
-			else if ( file_exists($this->phpbb_root_path . $current_template_path  . $current_template_name . '/theme/images/' . $this->user_language . '/') )
-			{		
-				$this->img_lang = $this->user_language;
-			}
-			else if ( file_exists($this->phpbb_root_path . $current_template_path  . $current_template_name . '/theme/imageset/' . $this->user_language . '/') )
-			{		
-				$this->img_lang = $this->user_language;
+				$this->img_array[$row['image_name']] = $row;				
 			}			
 		}		
 		
-		$board_url = generate_board_url() . '/';
-		
-		if (isset($this->images[$img]))
+		//		
+		// - First try phpBB2 then phpBB3 template lang images then old Olympus image sets
+		// default language		
+		if ( file_exists($phpbb_root_path . $current_template_path . '/images/lang_' . $this->default_language_name . '/') )
 		{
-			$this->img_data[$img]['src'] = $this->images[$img];
+			$this->img_lang = $this->default_language_name;
 		}		
-		elseif (isset($this->img_data[$img]['image_filename']))
-		{
-			$this->img_data[$img]['src'] = PHPBB_URL . $current_template_images . '/' . $this->img_data[$img]['image_filename'];	
+		else if ( file_exists($phpbb_root_path . $current_template_path  . '/theme/images/lang_' . $this->default_language_name . '/') )
+		{		
+			$this->img_lang = $this->default_language_name;
+		}		
+		else if ( file_exists($phpbb_root_path . $current_template_path  . '/theme/images/' . $this->default_language . '/') )
+		{		
+			$this->img_lang = $this->default_language;
 		}
-		else
-		{
-			$lastrow = count($img_rows) -1;
-			$this->img_data[$img]['image_id'] 		= $lastrow + 1;
-			$this->img_data[$img]['image_name']		= $img;
-			$this->img_data[$img]['image_filename']	= $img . '.' . (isset($img_ext) ? $img_ext : 'gif');
-			$this->img_data[$img]['image_lang'] 	= $this->img_lang; 
-			$this->img_data[$img]['image_height'] 	= ($width === false) ? '' : $width; 
-			$this->img_data[$img]['image_width'] 	= ($width === false) ? '' : $width; 
-			$this->img_data[$img]['imageset_id'] 	= $img_rows[$lastrow]['imageset_id']; 
-			
-			$this->img_data[$img]['src'] = PHPBB_URL . $current_template_images . '/' . $this->img_data[$img]['image_filename'];								
+		else if ( file_exists($phpbb_root_path . $current_template_path  . '/theme/imageset/' . $this->default_language . '/') )
+		{		
+			$this->img_lang = $this->default_language;
 		}		
 		
-		$this->img_data[$img]['width'] = !empty($height) ? $height : (!empty($this->img_array[$img]['image_width']) ? (!empty($this->img_array[$img]['image_width']) ? $this->img_array[$img]['image_width'] : (!empty($this->img_array[$img]['image_width']) ? $this->img_array[$img]['image_width'] : 47)) : 47);
-		$this->img_data[$img]['height'] = !empty($height) ? $height : (!empty($this->img_array[$img]['image_height']) ? (!empty($this->img_array[$img]['image_width']) ? $this->img_array[$img]['image_height'] : (!empty($this->img_array[$img]['image_height']) ? $this->img_array[$img]['image_height'] : 47)) : 47);
+		//		
+		// - First try phpBB2 then phpBB3 template lang images then old Olympus image sets
+		// user language		
+		if ( file_exists($phpbb_root_path . $current_template_path . '/images/lang_' . $this->user_language_name . '/') )
+		{
+			$this->img_lang = $this->user_language_name;
+		}		
+		else if ( file_exists($phpbb_root_path . $current_template_path  . '/theme/images/lang_' . $this->user_language_name . '/') )
+		{		
+			$this->img_lang = $this->user_language_name;
+		}		
+		else if ( file_exists($phpbb_root_path . $current_template_path  . '/theme/images/' . $this->user_language . '/') )
+		{		
+			$this->img_lang = $this->user_language;
+		}
+		else if ( file_exists($phpbb_root_path . $current_template_path  . '/theme/imageset/' . $this->user_language . '/') )
+		{		
+			$this->img_lang = $this->user_language;
+		}
+		
+		if (empty($this->img_array))
+		{
+			/** 
+				* Now check for the correct existance of all of the images into
+				* each image of a prosilver based style. 
+				foreach ($rows as $row)
+				{
+					$row['image_filename'] = rawurlencode($row['image_filename']);
+					$this->img_array[$row['image_name']] = $row;				
+				}
+			*/
+			trigger_error('NO_STYLE_DATA', E_USER_ERROR);
+		}		
+					
+		$img_data = &$this->img_array['image_filename'][$img];
+		
+		if (empty($img_data))
+		{		
+			if (!isset($this->img_array['image_filename']['img_'.$img]) && !isset($this->img_array['image_filename'][$img]))
+			{
+				// Do not fill the image to let designers decide what to do if the image is empty
+				$img_data = '';
+				return $img_data;
+			}
 			
+			if (isset($this->img_array['image_lang']['img_'.$img]) && isset($this->img_array['image_lang'][$img]))
+			{
+				//		
+				// - First try phpBB2 then phpBB3 template lang images
+				//		
+				if ( file_exists($phpbb_root_path . $current_template_path . '/images/' . $this->img_array['image_lang']['img_'.$img] . '/') )
+				{
+					$current_template_images = $current_template_path . '/images/' . $this->img_array['image_lang']['img_'.$img];
+				}		
+				else if ( file_exists($phpbb_root_path . $current_template_path  . '/theme/images/' . $this->img_array['image_lang']['img_'.$img] . '/') )
+				{		
+					$current_template_images = $current_template_path . '/theme/images/' . $this->img_array['image_lang']['img_'.$img];
+				}
+				else if ( file_exists($phpbb_root_path . $current_template_path  . '/theme/images/' . $this->encode_lang($this->lang_name) . '/') )
+				{		
+					$current_template_images = $current_template_path  . '/theme/images/' . $this->encode_lang($this->lang_name);
+				}
+				else if ( file_exists($phpbb_root_path . $current_template_path  . '/theme/imageset/' . $this->encode_lang($this->lang_name) . '/') )
+				{		
+					$current_template_images = $current_template_path  . '/theme/imageset/' . $this->encode_lang($this->lang_name);
+				}				
+			}
+			
+			$img_data['src'] = PHPBB_URL . $current_template_images  . '/' . (!empty($this->img_array['image_filename']['img_'.$img]) ? $this->img_array['image_filename']['img_'.$img] : $this->img_array['image_filename'][$img]);
+			$img_data['width'] = !empty($height) ? $height : (!empty($this->img_array['image_width']) ? (!empty($this->img_array['image_width']['img_'.$img]) ? $this->img_array['image_width']['img_'.$img] : (!empty($this->img_array['image_width'][$img]) ? $this->img_array['image_width'][$img] : 47)) : 47);
+			$img_data['height'] = !empty($height) ? $height : (!empty($this->img_array['image_height']) ? (!empty($this->img_array['image_width']['img_'.$img]) ? $this->img_array['image_height']['img_'.$img] : (!empty($this->img_array['image_height'][$img]) ? $this->img_array['image_height'][$img] : 47)) : 47);
+		}
+		
 		$alt = (!empty($this->lang[$alt])) ? $this->lang[$alt] : $alt;
 		
-		$use_width = ($width === false) ? $img_data[$img]['width'] : $width;
-		$use_height = ($width === false) ? $img_data[$img]['height'] : $width;
-		
-		$full_tag = '<img src="' . $this->img_data[$img]['src'] . '"' . (($use_width) ? ' width="' . $use_width . '"' : '') . (($use_height) ? ' height="' . $use_height . '"' : '') . ' alt="' . $alt . '" title="' . $alt . '" />';
+		$use_width = ($width === false) ? $img_data['width'] : $width;
 		
 		switch ($type)
 		{
 			case 'src':
-				return $this->img_data[$img]['src'];
+				return $img_data['src'];
 			break;
 
 			case 'width':
@@ -4203,15 +5295,15 @@ class session
 			break;
 
 			case 'height':
-				return $this->img_data[$img]['height'];
+				return $img_data['height'];
 			break;
-			
+							
 			case 'filename':
 				return $img . '.' . $img_ext;
 			break;
 			
-			case 'class':
-			case 'name':
+			case 'class':			
+			case 'name':		
 				return $img;
 			break;
 			
@@ -4224,8 +5316,7 @@ class session
 			break;
 			
 			case 'full_tag':
-				
-				return $full_tag;
+				return '<img src="' . $img_data['src'] . '"' . (($use_width) ? ' width="' . $use_width . '"' : '') . (($img_data['height']) ? ' height="' . $img_data['height'] . '"' : '') . ' alt="' . $alt . '" title="' . $alt . '" />';
 			break;
 			
 			case 'html':			
