@@ -2308,7 +2308,8 @@ class session
 				mx_message_die(CRITICAL_ERROR, "Could not query database for phpbb_styles info style_id [$style]", "", __LINE__, __FILE__, $sql);
 			}
 		}
-		
+		// Default phpBB3 style as parent
+		$row['style_parent_tree'] = empty($row['style_parent_tree']) ? $row['style_parent_tree'] : 'prosilver';
 		$this->theme = is_array($this->theme) ? array_merge($this->theme, $row) : $row;
 		$db->sql_freeresult($result);
 		
@@ -2331,7 +2332,10 @@ class session
 				WHERE s.style_id = $style
 					AND t.template_name = s.style_path";
 			$result = $db->sql_query($sql, 3600);
-			$this->theme = is_array($this->theme) ? array_merge($this->theme, $db->sql_fetchrow($result)) : $db->sql_fetchrow($result);
+			$row = $db->sql_fetchrow($result);
+			// Default phpBB3 style as parent
+			$row['style_parent_tree'] =empty($row['style_parent_tree']) ? $row['style_parent_tree'] : 'prosilver';
+			$this->theme = is_array($this->theme) ? array_merge($this->theme, $row) : $row;
 			$db->sql_freeresult($result);
 			
 			$style = $this->theme['style_id'];
@@ -2363,6 +2367,12 @@ class session
 			{
 				$this->theme[$key] = htmlspecialchars($this->theme[$key]);
 			}
+		}
+		
+		// Default phpBB3 style as parent
+		if (!isset($this->theme['style_parent_tree']))
+		{	
+			$this->theme['style_parent_tree'] = 'prosilver';
 		}
 		
 		// If the style author specified the theme needs to be cached

@@ -310,6 +310,8 @@ class session
 		$script_path .= (substr($script_path, -1, 1) == '/') ? '' : '/';
 		$root_script_path .= (substr($root_script_path, -1, 1) == '/') ? '' : '/';
 
+		$forum_id = (isset($_REQUEST['f']) && $_REQUEST['f'] > 0 && $_REQUEST['f'] < 16777215) ? (int) $_REQUEST['f'] : 0;
+
 		$page_array += array(
 			'page_name'			=> $page_name,
 			'page_dir'				=> $page_dir,
@@ -318,10 +320,65 @@ class session
 			'script_path'				=> str_replace(' ', '%20', htmlspecialchars($script_path)),
 			'root_script_path'		=> str_replace(' ', '%20', htmlspecialchars($root_script_path)),
 
-			'page'					=> $page
+			'page'				=> $page,
+			'forum'				=> $forum_id,
 		);
 
 		return $page_array;
+	}
+
+	/**
+	* Get valid hostname/port. HTTP_HOST is used, SERVER_NAME if HTTP_HOST not present.
+	*/
+	function extract_current_hostname()
+	{
+		global $config;
+
+		// Get hostname
+		$host = (!empty($_SERVER['HTTP_HOST'])) ? $_SERVER['HTTP_HOST'] : ((!empty($_SERVER['SERVER_NAME'])) ? $_SERVER['SERVER_NAME'] : getenv('SERVER_NAME'));
+
+		// Should be a string and lowered
+		$host = (string) strtolower($host);
+
+		// If host is equal the cookie domain or the server name (if config is set), then we assume it is valid
+		if ((isset($config['cookie_domain']) && $host === $config['cookie_domain']) || (isset($config['server_name']) && $host === $config['server_name']))
+		{
+			return $host;
+		}
+
+		// Is the host actually a IP? If so, we use the IP... (IPv4)
+		if (long2ip(ip2long($host)) === $host)
+		{
+			return $host;
+		}
+
+		// Now return the hostname (this also removes any port definition). The http:// is prepended to construct a valid URL, hosts never have a scheme assigned
+		$host = @parse_url('http://' . $host);
+		$host = (!empty($host['host'])) ? $host['host'] : '';
+
+		// Remove any portions not removed by parse_url (#)
+		$host = str_replace('#', '', $host);
+
+		// If, by any means, the host is now empty, we will use a "best approach" way to guess one
+		if (empty($host))
+		{
+			if (!empty($config['server_name']))
+			{
+				$host = $config['server_name'];
+			}
+			else if (!empty($config['cookie_domain']))
+			{
+				$host = (strpos($config['cookie_domain'], '.') === 0) ? substr($config['cookie_domain'], 1) : $config['cookie_domain'];
+			}
+			else
+			{
+				// Set to OS hostname or localhost
+				$host = (function_exists('php_uname')) ? php_uname('n') : 'localhost';
+			}
+		}
+
+		// It may be still no valid host, but for sure only a hostname (we may further expand on the cookie domain... if set)
+		return $host;
 	}
 
 	/**
@@ -516,9 +573,9 @@ class session
 					// Check whether the session is still valid if we have one
 					$method = basename(trim($board_config['auth_method']));
 
-					if ((@include_once $mx_root_path . "includes/sessions/rhea/provider/" . $method . ".$phpEx") === false)
+					if ((@include_once $mx_root_path . "includes/sessions/proteus/provider/" . $method . ".$phpEx") === false)
 					{
-						mx_message_die(CRITICAL_ERROR, 'File ' . $mx_root_path . "includes/sessions/rhea/provider/" . $method . ".$phpEx" . ' couldn\'t be opened.');
+						mx_message_die(CRITICAL_ERROR, 'File ' . $mx_root_path . "includes/sessions/proteus/provider/" . $method . ".$phpEx" . ' couldn\'t be opened.');
 					}
 
 					if (class_exists($method))
@@ -528,7 +585,7 @@ class session
 					}
 					else
 					{
-						mx_message_die(CRITICAL_ERROR, 'Class not found: ' . 'in file ' . $mx_root_path . "includes/sessions/rhea/provider/" . $method . ".$phpEx" . ' couldn\'t be opened.');
+						mx_message_die(CRITICAL_ERROR, 'Class not found: ' . 'in file ' . $mx_root_path . "includes/sessions/proteus/provider/" . $method . ".$phpEx" . ' couldn\'t be opened.');
 					}
 
 					//phpBB Olympus login
@@ -547,7 +604,7 @@ class session
 					}
 					/* */
 
-					//phpBB Rhea Login
+					//phpBB Proteus Login
 					$ret = $provider->validate_session($this->data);
 					
 					if ($ret !== null && !$ret)
@@ -635,6 +692,10 @@ class session
 							break;
 							default:
 								global $phpbb_auth;
+								if (!isset($phpbb_auth) || !is_object($phpbb_auth))
+								{
+									$phpbb_auth = new phpbb_auth();
+								}
 								$this->data['user_level'] = $phpbb_auth->acl_get('a_') ? 1 : ($phpbb_auth->acl_get('m_') ? 2 : 0);
 								$this->data['user_active'] = 1;
 							break;
@@ -689,7 +750,7 @@ class session
 	*/
 	function session_create($user_id = false, $set_admin = false, $persist_login = false, $viewonline = true)
 	{
-		global $SID, $_SID, $phpBB2, $phpBB3, $db, $board_config, $cache, $phpbb_root_path, $phpEx, $mx_backend;
+		global $SID, $_SID, $phpBB2, $phpBB3, $db, $board_config, $cache, $mx_root_path, $phpbb_root_path, $phpEx, $mx_backend;
 
 		$this->data = array();
 
@@ -809,9 +870,10 @@ class session
 
 			if (!$bot)
 			{
-				$sql = 'SELECT *
-					FROM ' . USERS_TABLE . '
-					WHERE user_id = ' . (int) $this->cookie_data['u'];
+				$sql = 'SELECT u.*, s.*
+					FROM ' . USERS_TABLE . ' u
+					LEFT JOIN ' . SESSIONS_TABLE . ' s ON (s.session_user_id = u.user_id)
+					WHERE u.user_id = ' . (int) $this->cookie_data['u'];
 			}
 			else
 			{
@@ -1694,6 +1756,10 @@ class session
 			break;
 			default:
 				global $phpbb_auth;
+				if (!isset($phpbb_auth) || !is_object($phpbb_auth))
+				{
+					$phpbb_auth = new phpbb_auth();
+				}
 				$this->data['user_level'] = $phpbb_auth->acl_get('a_') ? 1 : ($phpbb_auth->acl_get('m_') ? 2 : 0);
 				$this->data['user_active'] = 1;
 			break;
@@ -1804,7 +1870,7 @@ class session
 			$this->timezone = $timezone = new \DateTimeZone('UTC');
 		}
 		
-		$this->dst = $timezone * 3600;
+		$this->dst = $board_config['user_timezone'] * 3600;
 		
 		$sign = ($board_config['user_timezone'] < 0) ? '-' : '+';
 		$time_offset = abs($board_config['user_timezone']);
@@ -1814,7 +1880,7 @@ class session
 		$offset_hours	= ($time_offset - $offset_seconds) / 3600;
 		
 		// Zone offset
-		$zone_offset = $this->timezone + $this->dst;
+		$zone_offset = $board_config['user_timezone'] + $this->dst;
 		
 		$offset_string = sprintf($board_config['default_dateformat'], $sign, $offset_hours, $offset_minutes);
 		
@@ -1847,8 +1913,7 @@ class session
 
 			$this->date_format = $this->data['user_dateformat'];
 			$this->timezone = $this->data['user_timezone'] * 3600;
-			$this->dst = $this->data['user_dst'] * 3600;
-			
+			$this->dst = isset($this->data['user_dst']) ? $this->data['user_dst'] * 3600 : $board_config['user_timezone'] * 3600;
 			if (!empty($this->data['user_lang']))
 			{
 				$default_lang = mx_ltrim(basename(mx_rtrim($this->data['user_lang'])), "'");
@@ -1870,7 +1935,7 @@ class session
 			$this->lang_path = $phpbb_root_path . 'language/' . $this->lang_name . '/';
 			$this->date_format = $board_config['default_dateformat'];
 			$this->timezone = $board_config['board_timezone'] * 3600;
-			$this->dst = $board_config['board_dst'] * 3600;
+			$this->dst = isset($this->data['user_dst']) ? $this->data['user_dst'] * 3600 : $board_config['user_timezone'] * 3600;
 			
 			$default_lang = mx_ltrim(basename(mx_rtrim($board_config['default_lang'])), "'");
 	
@@ -2111,7 +2176,7 @@ class session
 				$user_style = $this->data['user_style'] ? $this->data['user_style'] : $this->phpbb_style['style_id'];
 				//If user have other style in mxp then the one from phpBB not to have forum page and modules graphics will be messaed up
 				//Anonymouse users should see all block graphic corect
-				//Query phpBB3 Rhea style_id corepondent to mxp themes_id
+				//Query phpBB3 Proteus style_id corepondent to mxp themes_id
 				$sql = "SELECT s.style_id, s.style_name
 					FROM " . MX_THEMES_TABLE . " AS m, " . STYLES_TABLE . " AS s
 					WHERE m.themes_id = " . (int) $user_style . "
@@ -2131,7 +2196,7 @@ class session
 				$default_style = $portal_config['default_style'];
 				//If user have other style in mxp then the one from phpBB not to have forum page and modules graphics will be messaed up
 				//Anonymouse users should see all block graphic corect
-				//Query phpBB3 Rhea style_id corepondent to mxp themes_id
+				//Query phpBB3 Proteus style_id corepondent to mxp themes_id
 				$sql = "SELECT s.style_id, s.style_name
 					FROM " . MX_THEMES_TABLE . " AS m, " . STYLES_TABLE . " AS s
 					WHERE m.themes_id = " . (int) $default_style . "
@@ -2156,7 +2221,7 @@ class session
 			$style_value = $phpBB3->request_var('demostyle', '');
 			if (intval($style_value) == 0)
 			{
-				//Query phpBB3 Rhea style_id corepondent to mxp style_name
+				//Query phpBB3 Proteus style_id corepondent to mxp style_name
 				//Any Demo Style here should work also for portal and forums
 				//Any Demo Style Name should be supported using same guild lines for portal as for forums for e.g. with spaces etc.				
 				$sql = "SELECT s.style_id, s.style_name
@@ -2211,7 +2276,7 @@ class session
 		// END Styles_Demo MOD 
 		if (isset($style_value) && (intval($style_value) == 0))  
 		{
-			//Query phpBB3 Rhea style_name
+			//Query phpBB3 Proteus style_name
 			$sql = "SELECT s.*
 				FROM " . STYLES_TABLE . " AS s
 				WHERE s.style_active = 1 AND s.style_name = '$style_value'";
@@ -2227,7 +2292,7 @@ class session
 		}
 		elseif (intval($style) !== 0)
 		{
-			//Query phpBB3 Rhea style_id get from main style init. Should be correct and valid.
+			//Query phpBB3 Proteus style_id get from main style init. Should be correct and valid.
 			$sql = "SELECT s.*, m.*
 				FROM " . MX_THEMES_TABLE . " AS m, " . STYLES_TABLE . " AS s
 				WHERE s.style_id = " . (int) $style . "
@@ -2243,7 +2308,8 @@ class session
 				mx_message_die(CRITICAL_ERROR, "Could not query database for phpbb_styles info style_id [$style]", "", __LINE__, __FILE__, $sql);
 			}
 		}
-		
+		// Default phpBB3 style as parent
+		$row['style_parent_tree'] = empty($row['style_parent_tree']) ? $row['style_parent_tree'] : 'prosilver';
 		$this->theme = is_array($this->theme) ? array_merge($this->theme, $row) : $row;
 		$db->sql_freeresult($result);
 		
@@ -2260,13 +2326,16 @@ class session
 				mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
 			}
 			
-			//Query phpBB3 Rhea style_id get from main style init. Should be correct and valid.
+			//Query phpBB3 Proteus style_id get from main style init. Should be correct and valid.
 			$sql = "SELECT s.*, t.*
 				FROM " . MX_THEMES_TABLE . " AS t, " . STYLES_TABLE . " AS s
 				WHERE s.style_id = $style
 					AND t.template_name = s.style_path";
 			$result = $db->sql_query($sql, 3600);
-			$this->theme = is_array($this->theme) ? array_merge($this->theme, $db->sql_fetchrow($result)) : $db->sql_fetchrow($result);
+			$row = $db->sql_fetchrow($result);
+			// Default phpBB3 style as parent
+			$row['style_parent_tree'] =empty($row['style_parent_tree']) ? $row['style_parent_tree'] : 'prosilver';
+			$this->theme = is_array($this->theme) ? array_merge($this->theme, $row) : $row;
 			$db->sql_freeresult($result);
 			
 			$style = $this->theme['style_id'];
@@ -2300,10 +2369,16 @@ class session
 			}
 		}
 		
+		// Default phpBB3 style as parent
+		if (!isset($this->theme['style_parent_tree']))
+		{	
+			$this->theme['style_parent_tree'] = 'prosilver';
+		}
+		
 		// If the style author specified the theme needs to be cached
 		// (because of the used paths and variables) than make sure it is the case.
 		// For example, if the theme uses language-specific images it needs to be stored in db.
-		if (!$this->theme['theme_storedb'] && $this->theme['parse_css_file'])
+		if (!isset($this->theme['theme_storedb']) && isset($this->theme['parse_css_file']) && isset($this->theme['theme_id']))
 		{
 			$this->theme['theme_storedb'] = 1;
 			
@@ -2353,7 +2428,46 @@ class session
 		
 		$template->set_template();
 		
-		$this->img_lang = (file_exists($phpbb_root_path . 'styles/' . $this->theme['imageset_path'] . '/imageset/' . $this->lang_name)) ? $this->lang_name : $this->encode_lang($board_config['default_lang']);
+		//
+		// Added here for phpbb3 backend not for proteus backend
+		// - First try old Olympus image sets then phpBB2 and phpBB3 Proteus template lang images 
+		//
+		if (is_dir("{$phpbb_root_path}{$this->style_path}{$this->template_name}/imageset/"))
+		{
+			$this->imageset_path = '/imageset/'; //Olympus ImageSet
+			$this->img_lang = (file_exists($phpbb_root_path . $this->style_path . $this->template_name . $this->imageset_path . $this->lang_iso)) ? $this->lang_iso : $this->default_language;
+			$this->img_lang_dir = $this->img_lang;
+			$this->imageset_backend = 'olympus';
+			$this->theme['imageset_name'] = $this->template_name;
+		}
+		elseif (@is_dir("{$phpbb_root_path}{$this->template_path}{$this->template_name}/theme/images/") || @is_dir("{$phpbb_root_path}{$this->style_path}{$this->template_name}/theme/images/"))
+		{
+			$this->imageset_path = '/theme/images/';  //phpBB3 Images
+			if ((@is_dir("{$phpbb_root_path}{$this->template_path}{$this->template_name}/theme/lang_{$this->user_language_name}")) || (@is_dir("{$phpbb_root_path}{$this->template_path}{$this->template_name}/theme/lang_{$this->default_language_name}")))
+			{
+				$this->img_lang = (file_exists($phpbb_root_path . $this->template_path . $this->template_name . '/theme/' . 'lang_' . $this->user_language_name)) ? $this->user_language_name : $this->default_language_name;
+				$this->img_lang_dir = 'lang_' . $this->img_lang;
+				$this->imageset_backend = 'phpbb2';
+			}
+			
+			if ((@is_dir("{$phpbb_root_path}{$this->style_path}{$this->template_name}/theme/{$this->user_language}")) || (@is_dir("{$phpbb_root_path}{$this->template_path}{$this->template_name}/theme/{$this->default_language}")))
+			{
+				$this->img_lang = (file_exists($phpbb_root_path . $this->style_path . $this->template_name . '/theme/' . $this->user_language_name)) ? $this->user_language : $this->default_language;
+				$this->img_lang_dir = $this->img_lang;
+				$this->imageset_backend = 'phpbb3';
+			}
+			
+			$this->theme['imageset_name'] = $this->template_name;
+		}
+		elseif (@is_dir("{$phpbb_root_path}{$this->template_path}{$this->template_name}/images/"))
+		{
+			$this->imageset_path = '/images/';  //phpBB2 Images
+			$this->img_lang = (is_dir($phpbb_root_path . $this->style_path . $this->template_name . $this->imageset_path . '/images/lang_' . $this->user_language_name)) ? $this->user_language_name : $this->default_language_name;
+			$this->img_lang_dir = 'lang_' . $this->img_lang;
+			$this->imageset_backend = 'phpbb2';
+			$this->theme['imageset_name'] = $this->template_name;
+		}
+		
 		/*
 		$sql = 'SELECT image_name, image_filename, image_lang, image_height, image_width
 			FROM ' . STYLES_IMAGESET_DATA_TABLE . '
@@ -2361,8 +2475,9 @@ class session
 			AND image_filename <> ''
 			AND image_lang IN ('" . $db->sql_escape($this->img_lang) . "', '')";
 		$result = $db->sql_query($sql, 3600);
-
+		*/
 		$localised_images = false;
+		/*
 		while ($row = $db->sql_fetchrow($result))
 		{
 			if ($row['image_lang'])
@@ -3994,6 +4109,29 @@ class session
 	{
 		static $imgs;
 		global $phpbb_root_path, $mx_root_path, $theme, $board_config;
+		global $mx_block;
+		
+		//
+		// Look at MX-Publisher-Module folder.........................................................................MX-Publisher-module
+		//
+		if (isset($mx_block->module_root_path))
+		{
+			$this->module_root_path = $this->ext_path = $mx_block->module_root_path;
+		}
+		else
+		{
+			global $module_root_path; 
+			
+			if (isset($module_root_path))
+			{
+				$this->module_root_path = $this->ext_path = $module_root_path;
+			}
+			else
+			{
+				global $mx_root_path;
+				$this->module_root_path = $this->ext_path = $mx_root_path . 'modules/mx_coreblocks/';
+			}
+		}
 		
 		$title = '';
 		$img_ext = 'gif'; 
@@ -4584,6 +4722,36 @@ class session
 		{
 			return $var;
 		}
+	}
+
+	/**
+	* Funtion to make the user leave the NEWLY_REGISTERED system group.
+	* @access public
+	*/
+	function leave_newly_registered()
+	{
+		global $db;
+
+		if (empty($this->data['user_new']))
+		{
+			return false;
+		}
+
+		if (!function_exists('remove_newly_registered'))
+		{
+			global $phpbb_root_path, $phpEx;
+
+			include($phpbb_root_path . 'includes/functions_user.' . $phpEx);
+		}
+		if ($group = remove_newly_registered($this->data['user_id'], $this->data))
+		{
+			$this->data['group_id'] = $group;
+
+		}
+		$this->data['user_permissions'] = '';
+		$this->data['user_new'] = 0;
+
+		return true;
 	}
 
 	/**

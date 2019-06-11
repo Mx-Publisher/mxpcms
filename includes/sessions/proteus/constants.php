@@ -28,7 +28,7 @@
 */
 
 // phpBB Version
-//@define('PHPBB_VERSION', '3.3.0-a1-dev');
+//@define('PHPBB_VERSION', '3.2.8');
 
 // QA-related
 // define('PHPBB_QA', 1);

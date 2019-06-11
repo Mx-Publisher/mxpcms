@@ -30,12 +30,12 @@ $phpBB3 = new phpBB3();
 //
 // Finally, load some backend specific functions
 //
-include_once($mx_root_path . 'includes/sessions/rhea/functions.' . $phpEx);
+include_once($mx_root_path . 'includes/sessions/proteus/functions.' . $phpEx);
 
 //
 // phpBB Permissions
 //
-include_once($mx_root_path . 'includes/sessions/rhea/auth.' . $phpEx);
+include_once($mx_root_path . 'includes/sessions/proteus/auth.' . $phpEx);
 
 /**
 * Permission/Auth class
@@ -1285,7 +1285,7 @@ class mx_backend
 	function validate_backend($cache_config = array())
 	{
 		global $db, $phpbb_root_path, $mx_root_path;
-		global $phpEx, $tplEx, $portal_config;
+		global $phpEx, $tplEx, $portal_config, $acm_type;
 		global $dbms, $dbhost, $dbname, $dbuser, $dbpasswd, $table_prefix;
 		
 		$backend_table_prefix = '';
@@ -1359,12 +1359,14 @@ class mx_backend
 			$sql = "SELECT config_value from " . $table_prefix . "config WHERE config_name = 'cookie_domain'";
 			if(!$_result = $db->sql_query($sql))
 			{
-				print('Configuration file opened but backend check query failed for backend: '. basename( __DIR__  ) .  ', line: ' . __LINE__ . ', file: ' . __FILE__ . '<br /><br />SQL Error : ' . $db->sql_error('')['code'] . ' ' . $db->sql_error('')['message']);
+				//For php 5.3.0 or less
+				$db_sql_error = $db->sql_error('');
+				print('Configuration file opened but backend check query failed for backend: '. basename( __DIR__  ) .  ', line: ' . __LINE__ . ', file: ' . __FILE__ . '<br /><br />SQL Error : ' . $db_sql_error['code'] . ' ' . $db_sql_error['message']);
 			}
 			$portal_backend_valid_db = $db->sql_numrows($_result) != 0;
 		}
 		else
-		{			
+		{
 			print('Configuration file for this backend (config) ' . $phpbb_root_path . "config.$phpEx" . ' couldn\'t be opened.');
 
 			if ((include $phpbb_root_path . "config.$phpEx") === false)
@@ -1557,20 +1559,21 @@ class mx_backend
 
 		if ($force_shared)
 		{
-			$backend = in_array($force_shared, array('internal', 'phpbb2', 'smf2', 'mybb', 'phpbb3', 'rhea', 'ascraeus', 'rhea')) ? $force_shared : PORTAL_BACKEND;
+			$backend = in_array($force_shared, array('internal', 'phpbb2', 'smf2', 'mybb', 'phpbb3', 'olympus', 'rhea', 'ascraeus', 'proteus')) ? $force_shared : PORTAL_BACKEND;
 			switch ($backend)
 			{
 				case 'internal':
 				case 'phpbb2':
 				case 'smf2':
 				case 'mybb':
-					$path = $mx_root_path . 'includes/shared/phpbb2/includes/';
+					$mx_root_path . 'includes/shared/'.$force_shared.'/includes/';
 				break;
 					
-				case 'phpbb3':
-				case 'rhea':
+				case 'olympus':
 				case 'ascraeus':
 				case 'rhea':
+				case 'proteus':
+				case 'phpbb3':
 					$path = $mx_root_path . 'includes/shared/phpbb3/includes/';
 				break;
 			}
@@ -1583,7 +1586,7 @@ class mx_backend
 	}
 
 	/**
-	 * get_phpbb_info
+	 * get_mxp_info
 	 *
 	 * @param unknown_type $root_path
 	 * @access private
@@ -1627,7 +1630,6 @@ class mx_backend
 			break;
 			
 			case 'phpbb3':
-			case 'rhea':
 				$phpbb_adm_relative_path = 'adm';
 			break;
 			
@@ -2734,7 +2736,7 @@ class mx_backend
 
 		foreach ($parsed_items as $key => $parsed_array)
 		{
-			$parsed_array = $mx_cache->get('_cfg_' . $key . '_' . $theme[$key . '_path']);
+			$parsed_array = isset($theme[$key . '_path']) ? $mx_cache->get('_cfg_' . $key . '_' . $theme[$key . '_path']) : $mx_cache->get('_cfg_' . $key);
 
 			if ($parsed_array === false)
 			{
@@ -2742,7 +2744,7 @@ class mx_backend
 			}
 
 			$reparse = false;
-			$filename = $phpbb_root_path . 'styles/' . $theme[$key . '_path'] . '/' . $key . '/' . $key . '.cfg';
+			$filename = $phpbb_root_path . 'styles/' . (isset($theme[$key . '_path']) ? $theme[$key . '_path']  : '') . '/' . $key . '/' . $key . '.cfg';
 
 			if (!file_exists($filename))
 			{
@@ -3033,7 +3035,7 @@ class mx_backend
 			'MENU_CAT_ID' => $menu_cat_id,
 			'MENU_CAT_ROWS' => 1,
 			//-MOD: DHTML Menu for ACP
-			'ADMIN_CATEGORY' => 'rhea adminCP')
+			'ADMIN_CATEGORY' => 'proteus adminCP')
 		);
 
 		$template->assign_block_vars('module_phpbb.catrow.modulerow', array(
@@ -3728,6 +3730,6 @@ class mx_backend
 //
 // Now load some bbcodes, to be extended for this backend (see below)
 //
-include_once($mx_root_path . 'includes/sessions/rhea/bbcode.' . $phpEx); // BBCode associated functions
+include_once($mx_root_path . 'includes/sessions/proteus/bbcode.' . $phpEx); // BBCode associated functions
 
 ?>

@@ -888,8 +888,8 @@ class phpbb_auth_base
 		// Check whether the session is still valid if we have one
 		$method = basename(trim($board_config['auth_method']));
 
-		//phpBB3 Rhea Provider
-		//if ((@include_once $mx_root_path . "includes/session/rhea/provider/" . $method . ".$phpEx") === false)
+		//phpBB3 Proteus Provider
+		//if ((@include_once $mx_root_path . "includes/session/proteus/provider/" . $method . ".$phpEx") === false)
 		//{
 		//Fall to phpBB3 Olympus Auth Provider 
 		if ((@include_once $mx_root_path . "includes/shared/phpbb3/includes/auth/auth_" . $method . ".$phpEx") === false)

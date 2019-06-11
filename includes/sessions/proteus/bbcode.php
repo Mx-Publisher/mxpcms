@@ -171,16 +171,34 @@ class mx_bbcode
 	*/
 	function bbcode_cache_init()
 	{
-		global $mx_user, $phpbb_root_path;
+		global $mx_user, $mx_root_path, $phpbb_root_path;
 
 		if (empty($this->template_filename))
 		{
 			$this->template_bitfield = new bitfield($mx_user->theme['bbcode_bitfield']);
-			$this->template_filename = $phpbb_root_path . 'styles/' . $mx_user->theme['template_path'] . '/template/bbcode.html';
-
+			$this->template_filename = $mx_root_path . 'templates/' . $mx_user->theme['template_path'] . '/template/bbcode.html';
+			
+			// Default phpBB3 style as parent
+			if (empty($mx_user->theme['style_parent_tree']))
+			{	
+				$mx_user->theme['style_parent_tree'] = 'prosilver';
+			}
+			
 			if (!@file_exists($this->template_filename))
 			{
-				trigger_error('The file ' . $this->template_filename . ' is missing.', E_USER_ERROR);
+				if (isset($mx_user->theme['style_parent_tree']) && !strpos($mx_user->theme['style_parent_tree'], '/'))
+				{
+					$this->template_filename = $phpbb_root_path . 'styles/' . $mx_user->theme['style_parent_tree'] . '/template/bbcode.html';
+				}
+				else
+				{
+					$this->template_filename = $phpbb_root_path . 'styles/prosilver/template/bbcode.html';
+				}
+				
+				if (!is_file($this->template_filename))
+				{
+					mx_message_die(E_USER_ERROR, 'The file ' . $this->template_filename . ' is missing.', '', __LINE__, __FILE__, '');
+				}
 			}
 		}
 
@@ -211,7 +229,10 @@ class mx_bbcode
 			$sql = 'SELECT *
 				FROM ' . BBCODES_TABLE . '
 				WHERE ' . $db->sql_in_set('bbcode_id', $sql);
-			$result = $db->sql_query($sql, 3600);
+			if (!$result = $db->sql_query($sql))
+			{
+				mx_message_die(CRITICAL_ERROR, "Could not query bbcode database table", "", __LINE__, __FILE__, $sql);
+			}
 
 			while ($row = $db->sql_fetchrow($result))
 			{
@@ -340,8 +361,8 @@ class mx_bbcode
 				case 10:
 					$this->bbcode_cache[$bbcode_id] = array(
 						'preg' => array(
-							'#\[email:$uid\]((.*?))\[/email:$uid\]#is'			=> $this->bbcode_tpl('email', $bbcode_id),
-							'#\[email=([^\[]+):$uid\](.*?)\[/email:$uid\]#is'	=> $this->bbcode_tpl('email', $bbcode_id)
+							'#\[email:$uid\]((.*?))\[/email:$uid\]#is'	=> $this->bbcode_tpl('email', $bbcode_id),
+							'#\[email=([^\[]+):$uid\](.*?)\[/email:$uid\]#is' => $this->bbcode_tpl('email', $bbcode_id)
 						)
 					);
 				break;
@@ -450,7 +471,7 @@ class mx_bbcode
 				'i_open'	=> '<span style="font-style: italic">',
 				'i_close'	=> '</span>',
 				'ipaper_open'	=> '<span>',
-				'ipaper_close'	=> '</span>',				
+				'ipaper_close'	=> '</span>',
 				'u_open'	=> '<span style="text-decoration: underline">',
 				'u_close'	=> '</span>',
 				'img'		=> '<center><img src="$1" alt="' . $mx_user->lang['IMAGE'] . '" /></center>',
@@ -761,7 +782,7 @@ class mx_bbcode
 		$bbcode_tpl['ipaper'] = str_replace('{IPAPERLINK}', '\\5', $bbcode_tpl['ipaper']);
 		//$bbcode_tpl['scribd'] = str_replace('{WIDTH}', '\\1', $bbcode_tpl['scribd']);
 		//$bbcode_tpl['scribd'] = str_replace('{HEIGHT}', '\\2', $bbcode_tpl['scribd']);
-		$bbcode_tpl['scribd'] = str_replace('{SCRIBDID}', '\\1', $bbcode_tpl['scribd']);		
+		$bbcode_tpl['scribd'] = str_replace('{SCRIBDID}', '\\1', $bbcode_tpl['scribd']);
 		$bbcode_tpl['scribd'] = str_replace('{SCRIBDURL}', $lang['Link'], $bbcode_tpl['scribd']);
 		//Stop more bbcode
 
@@ -811,7 +832,7 @@ class mx_bbcode
 		}
 		
 		//$text = str_replace(array("\n", "\r"), array('<br />', "\n"), $text);
-		$text = str_replace(array("\n", "\r"), array('<br />', ""), $text);			
+		$text = str_replace(array("\n", "\r"), array('<br />', ""), $text);
 		$text = preg_replace('#(script|about|applet|activex|chrome):#is', "\\1&#058;", $text);
 
 		// pad it with a space so we can distinguish between FALSE and matching the 1st char (index 0).

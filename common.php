@@ -22,6 +22,12 @@ if (!defined('E_STRICT'))
 	define('E_STRICT', 2048);
 }
 
+if (!defined('MX_ENVIRONMENT'))
+{
+	@define('MX_ENVIRONMENT', 'production');
+	//@define('MX_ENVIRONMENT', 'development');
+}
+
 /*
 * To be able to include phpBB functions/methods
 */
@@ -42,10 +48,8 @@ define('INCLUDES', 'includes/'); //Main Includes folder
 //@error_reporting(E_ERROR | E_WARNING | E_PARSE); // This will NOT report uninitialized variables
 //@error_reporting(E_ALL | E_NOTICE | E_STRICT);
 @error_reporting(E_ALL & ~E_NOTICE); //Default error reporting in PHP 5.2+
-@session_cache_expire(1440);
-@set_time_limit(1500);
-// Report all errors, except notices and deprecation messages
-//include($mx_root_path . 'modules/mx_shared/ErrorHandler/prepend.' . $phpEx); // For nice error output
+@session_cache_expire (1440);
+@set_time_limit (1500);
 
 // ================================================================================
 // The following code is based on common.php from phpBB
@@ -335,6 +339,18 @@ require($mx_root_path . INCLUDES . 'mx_constants.' . $phpEx); // Also includes p
 require($mx_root_path . INCLUDES . 'db/' . $dbms . '.' . $phpEx); // Load dbal and initiate class
 require($mx_root_path . INCLUDES . 'utf/utf_tools.' . $phpEx); //Load UTF-8 Tools
 
+if (MX_ENVIRONMENT === 'development')
+{
+
+	//Report all errors, except notices and deprecation messages.  For nice error output.
+	include($mx_root_path . 'modules/mx_shared/ErrorHandler/prepend.' . $phpEx);
+
+}
+else
+{
+	set_error_handler(defined('MX_MSG_HANDLER') ? MX_MSG_HANDLER : 'mx_msg_handler');
+}
+
 /**
 * Minimum Requirement: PHP 5.3.0
 */
@@ -385,7 +401,7 @@ if (!$super_globals_disabled)
 $mx_cache->load_backend();
 
 
-//Temp fix for timezone //to do: doble code - to be removed.
+//Temp fix for timezone
 if (@function_exists('date_default_timezone_set') && @function_exists('date_default_timezone_get'))
 {
 	@date_default_timezone_set(@date_default_timezone_get());

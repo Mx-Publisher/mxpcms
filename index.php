@@ -80,7 +80,7 @@ elseif ( !$mx_page->auth_ip )
 	$message = empty( $lang['Page_Not_Authorised'] ) ? "Sorry, but you don't have privilege to access this page." : $lang['Page_Not_Authorised'];
 	mx_message_die(GENERAL_MESSAGE, $message, '', __LINE__, __FILE__, '');
 }
-
+//print_r($theme);
 /*
 * Initialize page layout template
 */
@@ -367,5 +367,4 @@ $template->assign_vars(array(
 
 // Output footer
 include($mx_root_path . 'includes/page_tail.' . $phpEx);
-
 ?>
