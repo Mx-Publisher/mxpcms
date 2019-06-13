@@ -770,8 +770,28 @@ class phpBB2
 	}
 
 	/**
-	 * {@inheritdoc}
-	 */
+	* Global function for chmodding directories and files for internal use
+	*
+	* This function determines owner and group whom the file belongs to and user and group of PHP and then set safest possible file permissions.
+	* The function determines owner and group from common.php file and sets the same to the provided file.
+	* The function uses bit fields to build the permissions.
+	* The function sets the appropiate execute bit on directories.
+	*
+	* Supported constants representing bit fields are:
+	*
+	* CHMOD_ALL - all permissions (7)
+	* CHMOD_READ - read permission (4)
+	* CHMOD_WRITE - write permission (2)
+	* CHMOD_EXECUTE - execute permission (1)
+	*
+	* NOTE: The function uses POSIX extension and fileowner()/filegroup() functions. If any of them is disabled, this function tries to build proper permissions, by calling is_readable() and is_writable() functions.
+	*
+	* @param string	$filename	The file/directory to be chmodded
+	* @param int	$perms		Permissions to set
+	*
+	* @return bool	true on success, otherwise false
+	* @author faw, phpBB Group
+	*/
 	function mx_chmod($files, $perms = null, $recursive = false, $force_chmod_link = false)
 	{
 		if (is_null($perms))
@@ -2412,7 +2432,7 @@ class phpBB2
 					if ((@file_exists($theme_info_path)))
 					{
 						$template_name = $row['template_name'] = $style_installed;
-							
+						
 						/**
 						* Reset custom module default style, once used.
 						*/
@@ -2446,7 +2466,7 @@ class phpBB2
 								message_die(CRITICAL_ERROR, 'Could not update default_style theme info');
 							}
 							/** */
-						}									
+						}
 					}
 					$template_name = $row['template_name'];	
 				}					
@@ -2897,7 +2917,7 @@ class phpBB2
 
 				for($i = $total_pages - 2; $i < $total_pages + 1; $i++)
 				{
-					$page_string .= ( $i == $on_page ) ? '<strong>' . $i . '</strong>'  : '<a href="' . $this->append_sid($base_url . "&amp;start=" . ( ( $i - 1 ) * $per_page ) ) . '">' . $i . '</a>';
+					$page_string .= ( $i == $on_page ) ? '<strong>' . $i . '</strong>'  : '<a href="' . mx_append_sid($base_url . "&amp;start=" . ( ( $i - 1 ) * $per_page ) ) . '">' . $i . '</a>';
 					if( $i <  $total_pages )
 					{
 						$page_string .= ", ";
@@ -2909,7 +2929,7 @@ class phpBB2
 		{
 			for($i = 1; $i < $total_pages + 1; $i++)
 			{
-				$page_string .= ( $i == $on_page ) ? '<strong>' . $i . '</strong>' : '<a href="' . $this->append_sid($base_url . "&amp;start=" . ( ( $i - 1 ) * $per_page ) ) . '">' . $i . '</a>';
+				$page_string .= ( $i == $on_page ) ? '<strong>' . $i . '</strong>' : '<a href="' . mx_append_sid($base_url . "&amp;start=" . ( ( $i - 1 ) * $per_page ) ) . '">' . $i . '</a>';
 				if ( $i <  $total_pages )
 				{
 					$page_string .= ', ';
@@ -2926,7 +2946,7 @@ class phpBB2
 
 			if ($on_page < $total_pages)
 			{
-				$page_string .= '&nbsp;&nbsp;<a href="' . $this->append_sid($base_url . "&amp;start=" . ($on_page * $per_page)) . '">' . $lang['Next'] . '</a>';
+				$page_string .= '&nbsp;&nbsp;<a href="' . mx_append_sid($base_url . "&amp;start=" . ($on_page * $per_page)) . '">' . $lang['Next'] . '</a>';
 			}
 
 		}

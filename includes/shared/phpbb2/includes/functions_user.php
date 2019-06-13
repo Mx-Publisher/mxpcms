@@ -408,7 +408,8 @@ function user_add($user_row, $cp_data = false, $notifications_data = null)
 	$sql = 'INSERT INTO ' . USERS_TABLE . ' ' . $db->sql_build_array('INSERT', $sql_ary);
 	if ( !($result = $db->sql_query($sql)) )
 	{
-		mx_message_die(CRITICAL_ERROR, 'Could not update user info', '<br /><br />SQL Error : ' . $db->sql_error('')['code'] . ' ' . $db->sql_error('')['message'] . ' <br />' . $sql, __LINE__, __FILE__, $sql);
+		$sql_error = $db->sql_error('');
+		mx_message_die(CRITICAL_ERROR, 'Could not update user info', '<br /><br />SQL Error : ' . $sql_error ['code'] . ' ' . $sql_error['message'] . ' <br />' . $sql, __LINE__, __FILE__, $sql);
 	}
 
 	$mx_user_id = $db->sql_nextid();

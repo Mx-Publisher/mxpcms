@@ -16,7 +16,107 @@ if ( !defined('IN_PORTAL') )
 }
 
 global $do_gzip_compress;
+// In case $phpbb_adm_relative_path is not set (in case of an update), use the default.
+switch (PORTAL_BACKEND)
+{
+	case 'internal':
+	case 'mybb':
+		//To do:
+	case 'smf2':
+		//To do:
+	break;
+	
+	case 'phpbb2':
+		$phpbb_adm_relative_path = 'admin/';
+		$phpbb_admin_path = (defined('PHPBB_ADMIN_PATH')) ? PHPBB_ADMIN_PATH : $phpbb_root_path . $phpbb_adm_relative_path;
+	break;
+	
+	default:
+		$phpbb_adm_relative_path = 'adm/';
+		$phpbb_admin_path = (defined('PHPBB_ADMIN_PATH')) ? PHPBB_ADMIN_PATH : $phpbb_root_path . $phpbb_adm_relative_path;
+	break;
+}
 
+//
+// Generate logged in/logged out status
+//
+switch (PORTAL_BACKEND)
+{
+	case 'internal':
+	case 'mybb':
+		//To do: Profile oe UCP Links for each backend.
+	case 'smf2':
+		
+		$u_register = mx_append_sid('login.'.$phpEx.'?mode=register');
+		$u_profile = mx_append_sid('profile.'.$phpEx.'?mode=editprofile');
+		
+		//To do:
+		$u_modcp 	=  ((($mx_user->data['user_level'] = 2) && ($mx_user->data['user_active'] = 1)) || ($mx_user->data['user_level'] == ADMIN)) ? mx_append_sid("{$mx_root_path}modcp/index.$phpEx?i=main&mode=front&sid=" . $mx_user->session_id) : '';
+		$u_mcp	= ((($mx_user->data['user_level'] = 2) && ($mx_user->data['user_active'] = 1)) || ($mx_user->data['user_level'] == ADMIN)) ? mx_append_sid("{$mx_root_path}modcp/index.$phpEx?i=main&mode=front&sid=" . $mx_user->session_id) : '';
+	
+		$u_terms_use	= mx_append_sid("login.$phpEx?mode=terms");
+		$u_privacy	= mx_append_sid("login.$phpEx?mode=privacy");
+	break;
+
+	case 'phpbb2':
+	case 'olympus':
+	//To do: Check this in sessions/phpbb2 comparing to sessions/internal
+		$u_login = mx_append_sid("login.".$phpEx);
+		if (  $mx_user->data['user_id'] != ANONYMOUS )
+		{
+			$u_login_logout = mx_append_sid('login.'.$phpEx.'?logout=true&sid=' . $mx_user->data['session_id']);
+			$l_login_logout = $lang['Logout'] . ' [ ' . $mx_user->data['username'] . ' ]';
+		}
+		else
+		{
+			$u_login_logout = mx_append_sid("login.".$phpEx);
+			$l_login_logout = $lang['Login'];
+		}
+		
+		$u_register = (PORTAL_BACKEND !== 'phpbb2') ? mx_append_sid("{$phpbb_root_path}ucp.php?mode=register&redirect=$redirect_url") : mx_append_sid("{$phpbb_root_path}profile.".$phpEx."?mode=register");
+		$u_profile = (PORTAL_BACKEND !== 'phpbb2') ? mx_append_sid("{$phpbb_root_path}ucp.php?mode=editprofile") : mx_append_sid("{$phpbb_root_path}profile.".$phpEx."?mode=editprofile");
+		
+		$u_modcp 	= ((PORTAL_BACKEND !== 'phpbb2') && ($phpbb_auth->acl_get('m_') || $phpbb_auth->acl_getf_global('m_'))) ? mx_append_sid('modcp/index.'.$phpEx) : '';
+		$u_mcp	= ((PORTAL_BACKEND !== 'phpbb2') && ($phpbb_auth->acl_get('m_') || $phpbb_auth->acl_getf_global('m_'))) ? mx_append_sid("{$phpbb_root_path}mcp.$phpEx?i=main&mode=front&sid=" . $mx_user->session_id) : ( ((($mx_user->data['user_level'] = 2) && ($mx_user->data['user_active'] = 1)) || ($mx_user->data['user_level'] == ADMIN)) ? mx_append_sid("{$phpbb_root_path}modcp.$phpEx?i=main&mode=front&sid=" . $mx_user->session_id) : '');
+	
+		$u_terms_use	= (PORTAL_BACKEND !== 'phpbb2') ? mx_append_sid("{$phpbb_root_path}ucp.$phpEx?mode=terms") : mx_append_sid("{$phpbb_root_path}profile.$phpEx?mode=terms");
+		$u_privacy	= (PORTAL_BACKEND !== 'phpbb2') ? mx_append_sid("{$phpbb_root_path}ucp.$phpEx?mode=privacy") : mx_append_sid("{$phpbb_root_path}profile.$phpEx?mode=privacy");
+	break;
+
+	default:
+	
+		if(!isset($phpbb_auth) || !is_object($phpbb_auth))
+		{
+			$phpbb_auth = new phpbb_auth();
+		}
+		$phpbb_auth->acl($mx_user->data);
+		
+		// Get referer to redirect user to the appropriate page after delete action
+		$redirect_url = mx_append_sid(PORTAL_URL . "index.$phpEx" . (isset($page_id) ? "?page={$page_id}" : "") . (isset($cat_nav) ? "&cat_nav={$cat_nav}" : ""));
+		$u_login = mx_append_sid("{$phpbb_root_path}ucp.$phpEx", 'mode=login');
+	
+		if ($mx_user->data['user_id'] != ANONYMOUS)
+		{
+			//$u_login_logout = mx_append_sid("{$phpbb_root_path}ucp.$phpEx", "mode=logout&redirect=$redirect_url", true, $mx_user->session_id);
+			$u_login_logout = mx_append_sid('login.'.$phpEx.'?logout=true&sid=' . $mx_user->data['session_id']);
+			$l_login_logout = $mx_user->lang['LOGOUT'] . ' [ ' . $mx_user->data['username'] . ' ]';
+		}
+		else
+		{
+		
+			$u_register = mx_append_sid("{$phpbb_root_path}ucp.php?mode=register&redirect=$redirect_url");
+			$u_profile = mx_append_sid("{$phpbb_root_path}ucp.php?mode=editprofile");
+		
+			$u_login_logout = mx_append_sid("{$phpbb_root_path}ucp.php?mode=login&redirect=$redirect_url");
+			$l_login_logout = $mx_user->lang['LOGIN'];
+		}
+		$u_modcp 	= ($phpbb_auth->acl_get('m_') || $phpbb_auth->acl_getf_global('m_') || ($mx_user->data['session_logged_in'] && $mx_user->data['user_level'] == ADMIN))  ? mx_append_sid("{$mx_root_path}modcp/index.$phpEx?i=main&mode=front&sid=" . $mx_user->session_id) : '';
+		$u_mcp	= ($phpbb_auth->acl_get('m_') || $phpbb_auth->acl_getf_global('m_') || ($mx_user->data['session_logged_in'] && $mx_user->data['user_level'] == ADMIN)) ? mx_append_sid("{$phpbb_root_path}mcp.$phpEx?i=main&mode=front&sid=" . $mx_user->session_id) : '';
+	
+		$u_terms_use	= mx_append_sid("{$phpbb_root_path}ucp.$phpEx?mode=terms");
+		$u_privacy	= mx_append_sid("{$phpbb_root_path}ucp.$phpEx?mode=privacy");
+	break;
+}
 //
 // Show the overall footer.
 //
@@ -181,8 +281,8 @@ $template->assign_vars(array(
 	'U_CONTACT_US'			=> ($mx_user->data['user_last_privmsg']) ? mx_append_sid("{$phpbb_root_path}memberlist.$phpEx?mode=contactadmin") : '',
 	
 	'U_TEAM'					=> ($mx_user->data['user_id'] != ANONYMOUS && (PORTAL_BACKEND !== 'internal') && $phpbb_auth->acl_get('u_viewprofile')) ?  mx_append_sid("{$phpbb_root_path}memberlist.$phpEx?mode=team") : '',
-	'U_TERMS_USE'			=> mx_append_sid("{$phpbb_root_path}profile.$phpEx?mode=terms"),
-	'U_PRIVACY'				=> mx_append_sid("{$phpbb_root_path}profile.$phpEx?mode=privacy"),
+	'U_TERMS_USE'			=> $u_terms_use,
+	'U_PRIVACY'				=> $u_privacy,
 		
 	'MX_ADDITIONAL_FOOTER_TEXT' => $mx_addional_footer_text,
 	'EXECUTION_STATS'			=> (defined('DEBUG')) ? $debug_output : ''

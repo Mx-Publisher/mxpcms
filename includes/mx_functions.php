@@ -419,7 +419,7 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 */
 function mx_msg_handler($msg_code, $msg_text = '', $msg_title = '', $err_line = '', $err_file = '', $sql = '')
 {		
-	global $db, $mx_user, $board_config;
+	global $db, $mx_user, $board_config, $phpbb_auth, $mx_root_path;
 	
 	// Do not display notices if we suppress them via @
 	if (error_reporting() == 0 && $errno != E_USER_ERROR && $errno != E_USER_WARNING && $errno != E_USER_NOTICE && $errno != E_USER_DEPRECATED)
@@ -455,13 +455,13 @@ function mx_msg_handler($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 		{	
 				$message = 'SQL  ' . $mx_user->lang('ERROR') . ' [ ' . $db->sql_layer . ' ]<br /><br />' . $sql_error['message'] . ' [' . $sql_error['code'] . ']';
 					
-				if (!empty($mx_user->lang('SQL_ERROR_OCCURRED')))
+				if (!empty($mx_user->lang['SQL_ERROR_OCCURRED']))
 				{
 					$message .= '<br /><br />An sql error occurred while fetching this page. Please contact an administrator if this problem persists.';
 				}
 				else
 				{
-					if (!empty($this->config['board_contact']))
+					if (!empty($board_config['board_contact']))
 					{
 						$message .= '<br /><br />' . sprintf($mx_user->lang('SQL_ERROR_OCCURRED'), '<a href="mailto:' . $board_config['board_contact'] . '">', '</a>');
 					}
@@ -486,42 +486,207 @@ function mx_msg_handler($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 			
 	switch($msg_code)
 	{
-		case E_USER_ERROR:
-			if ( $msg_title == '' )
+		case E_NOTICE:
+		case E_WARNING:
+
+			// Check the error reporting level and return if the error level does not match
+			// If DEBUG is defined the default level is E_ALL
+			if (($errno & ((defined('DEBUG')) ? E_ALL : error_reporting())) == 0)
 			{
-					$msg_title = $mx_user->lang('GENERAL_ERROR'); 
+				return;
 			}
+
+			if (strpos($errfile, 'cache') === false && strpos($errfile, 'template.') === false)
+			{
+				$errfile = mx_filter_root_path($errfile);
+				$msg_text = mx_filter_root_path($msg_text);
+				$error_name = ($errno === E_WARNING) ? 'PHP Warning' : 'PHP Notice';
+				echo '<b>[phpBB Debug] ' . $error_name . '</b>: in file <b>' . $errfile . '</b> on line <b>' . $errline . '</b>: <b>' . $msg_text . '</b><br />' . "\n";
+				echo '<br /><br />BACKTRACE<br />' . get_backtrace() . '<br />' . "\n";
+			}
+
+			return;
+
+		break;
+
+		case E_USER_ERROR:
+
+			if (!empty($mx_user) && $mx_user->is_setup())
+			{
+				$msg_text = (!empty($mx_user->lang[$msg_text])) ? $mx_user->lang[$msg_text] : $msg_text;
+				$msg_title = (!isset($msg_title)) ? $mx_user->lang['GENERAL_ERROR'] : ((!empty($mx_user->lang[$msg_title])) ? $mx_user->lang[$msg_title] : $msg_title);
+
+				$l_return_index = sprintf($mx_user->lang['RETURN_INDEX'], '<a href="' . $mx_root_path . '">', '</a>');
+				$l_notify = '';
+
+				if (!empty($board_config['board_contact']))
+				{
+					$l_notify = '<p>' . sprintf($mx_user->lang['NOTIFY_ADMIN_EMAIL'], $board_config['board_contact']) . '</p>';
+				}
+			}
+			else
+			{
+				$msg_title = 'General Error';
+				$l_return_index = '<a href="' . $phpbb_root_path . '">Return to index page</a>';
+				$l_notify = '';
+
+				if (!empty($board_config['board_contact']))
+				{
+					$l_notify = '<p>Please notify the board administrator or webmaster: <a href="mailto:' . $board_config['board_contact'] . '">' . $config['board_contact'] . '</a></p>';
+				}
+			}
+
+			$log_text = $msg_text;
+			$backtrace = get_backtrace();
+			if ($backtrace)
+			{
+				$log_text .= '<br /><br />BACKTRACE<br />' . $backtrace;
+			}
+
+			if (defined('IN_INSTALL') || defined('DEBUG') || isset($phpbb_auth) && $phpbb_auth->acl_get('a_'))
+			{
+				$msg_text = $log_text;
+
+				// If this is defined there already was some output
+				// So let's not break it
+				if (defined('IN_DB_UPDATE'))
+				{
+					echo '<div class="errorbox">' . $msg_text . '</div>';
+
+					$db->sql_return_on_error(true);
+					mx_end_update($mx_cache, $board_config);
+				}
+			}
+
+			if ((defined('IN_CRON') || defined('IMAGE_OUTPUT')) && isset($db))
+			{
+				// let's avoid loops
+				$db->sql_return_on_error(true);
+				echo '<b>[phpBB Debug] ' . $error_name . '</b>: in file <b>' . $errfile . '</b> on line <b>' . $errline . '</b>: <b>' . $msg_text . '</b><br />' . "\n";
+				echo '<br /><br />BACKTRACE<br />' . get_backtrace() . '<br />' . "\n";
+				$db->sql_return_on_error(false);
+			}
+
+			// Do not send 200 OK, but service unavailable on errors
+			//send_status_line(503, 'Service Unavailable');
+
+			garbage_collection();
+
+			// Try to not call the adm page data...
+
+			echo '<!DOCTYPE html>';
+			echo '<html dir="ltr">';
+			echo '<head>';
+			echo '<meta charset="utf-8">';
+			echo '<meta http-equiv="X-UA-Compatible" content="IE=edge">';
+			echo '<title>' . $msg_title . '</title>';
+			echo '<style type="text/css">' . "\n" . '/* <![CDATA[ */' . "\n";
+			echo '* { margin: 0; padding: 0; } html { font-size: 100%; height: 100%; margin-bottom: 1px; background-color: #E4EDF0; } body { font-family: "Lucida Grande", Verdana, Helvetica, Arial, sans-serif; color: #536482; background: #E4EDF0; font-size: 62.5%; margin: 0; } ';
+			echo 'a:link, a:active, a:visited { color: #006699; text-decoration: none; } a:hover { color: #DD6900; text-decoration: underline; } ';
+			echo '#wrap { padding: 0 20px 15px 20px; min-width: 615px; } #page-header { text-align: right; height: 40px; } #page-footer { clear: both; font-size: 1em; text-align: center; } ';
+			echo '.panel { margin: 4px 0; background-color: #FFFFFF; border: solid 1px  #A9B8C2; } ';
+			echo '#errorpage #page-header a { font-weight: bold; line-height: 6em; } #errorpage #content { padding: 10px; } #errorpage #content h1 { line-height: 1.2em; margin-bottom: 0; color: #DF075C; } ';
+			echo '#errorpage #content div { margin-top: 20px; margin-bottom: 5px; border-bottom: 1px solid #CCCCCC; padding-bottom: 5px; color: #333333; font: bold 1.2em "Lucida Grande", Arial, Helvetica, sans-serif; text-decoration: none; line-height: 120%; text-align: left; } ';
+			echo "\n" . '/* ]]> */' . "\n";
+			echo '</style>';
+			echo '</head>';
+			echo '<body id="errorpage">';
+			echo '<div id="wrap">';
+			echo '	<div id="page-header">';
+			echo '		' . $l_return_index;
+			echo '	</div>';
+			echo '	<div id="acp">';
+			echo '	<div class="panel">';
+			echo '		<div id="content">';
+			echo '			<h1>' . $msg_title . '</h1>';
+
+			echo '			<div>' . $msg_text . '</div>';
+
+			echo $l_notify;
+
+			echo '		</div>';
+			echo '	</div>';
+			echo '	</div>';
+			echo '	<div id="page-footer">';
+			echo '		Powered by <a href="https://mxpcms.sourceforge.net/">MXP</a>&reg; CMS &amp; phpBB <a href="https://www.phpbb.com/">phpBB</a>&reg; Forum Software &copy; phpBB Limited';
+			echo '	</div>';
+			echo '</div>';
+			echo '</body>';
+			echo '</html>';
+
+			exit_handler();
+
+			// On a fatal error (and E_USER_ERROR *is* fatal) we never want other scripts to continue and force an exit here.
+			exit;
 		break;
 
 		case E_USER_WARNING:
-			if ( $msg_text == '' )
-			{
-				$msg_text = $mx_user->lang('GENERAL_ERROR');
-			}
-
-			if ( $msg_title == '' )
-			{
-				$msg_title = $mx_user->lang('ERROR');
-			}
-		break;
-				
 		case E_USER_NOTICE:
-			if ( $msg_title == '' )
+
+			define('IN_ERROR_HANDLER', true);
+
+			if (empty($mx_user->data))
 			{
-				$msg_title = $mx_user->lang('INFORMATION');
-			}
-		break;
-				
-		case E_USER_DEPRECATED:
-			if ($msg_text == '')
-			{
-				$msg_text = $mx_user->lang('GENERAL_ERROR');
+				$mx_user->session_begin();
 			}
 
-			if ($msg_title == '')
+			// We re-init the auth array to get correct results on login/logout
+			$phpbb_auth->acl($mx_user->data);
+
+			if (!$mx_user->is_setup())
 			{
-				$msg_title = 'phpBB' . $mx_user->lang('COLON') . '<b>' . $mx_user->lang('ERROR') . '</b>';
+				$mx_user->setup();
 			}
+
+			if ($msg_text == 'ERROR_NO_ATTACHMENT' || $msg_text == 'NO_FORUM' || $msg_text == 'NO_TOPIC' || $msg_text == 'NO_USER')
+			{
+				//send_status_line(404, 'Not Found');
+			}
+
+			$msg_text = (!empty($mx_user->lang[$msg_text])) ? $mx_user->lang[$msg_text] : $msg_text;
+			$msg_title = (!isset($msg_title)) ? $mx_user->lang['INFORMATION'] : ((!empty($mx_user->lang[$msg_title])) ? $mx_user->lang[$msg_title] : $msg_title);
+
+			if (!defined('HEADER_INC'))
+			{
+				if (defined('IN_ADMIN') && isset($mx_user->data['session_admin']) && $mx_user->data['session_admin'])
+				{
+					mx_admin_page_header($msg_title);
+				}
+				else
+				{
+					mx_page_header($msg_title);
+				}
+			}
+
+			$template->set_filenames(array(
+				'body' => 'message_body.html')
+			);
+
+			$template->assign_vars(array(
+				'MESSAGE_TITLE'		=> $msg_title,
+				'MESSAGE_TEXT'		=> $msg_text,
+				'S_USER_WARNING'	=> ($errno == E_USER_WARNING) ? true : false,
+				'S_USER_NOTICE'		=> ($errno == E_USER_NOTICE) ? true : false)
+			);
+
+			// We do not want the cron script to be called on error messages
+			define('IN_CRON', true);
+
+			if (defined('IN_ADMIN') && isset($mx_user->data['session_admin']) && $mx_user->data['session_admin'])
+			{
+				mx_admin_page_footer();
+			}
+			else
+			{
+				mx_page_footer();
+			}
+
+			exit_handler();
+		break;
+
+		// PHP4 compatibility
+		case E_DEPRECATED:
+			return true;
 		break;
 	}
 			
@@ -2174,11 +2339,50 @@ function mx_language_select($default, $select_name = "language", $dirname="langu
 function mx_style_select($default_style, $select_name = "style", $dirname = "templates", $show_instruction = false)
 {
 	global $db, $lang, $mx_root_path;
+
+	switch (PORTAL_BACKEND)
+	{
+		case 'internal':
+		case 'smf2':
+		case 'mybb':
+			$sql = "SELECT  themes_id, style_name
+						FROM " . MX_THEMES_TABLE . "
+							WHERE portal_backend = '" . 'internal' . "'
+								OR portal_backend = '" . PORTAL_BACKEND . "'
+								ORDER BY template_name, themes_id";
+		break;
+					
+		case 'phpbb2':
+			$sql = "SELECT s.themes_id as style_id, mxt.themes_id, mxt.template_name as style_path
+						FROM " . MX_THEMES_TABLE . " mxt, " . THEMES_TABLE . " s
+							WHERE mxt.template_name = s.template_name
+								AND ( mxt.portal_backend = 'phpbb2' OR mxt.portal_backend = '" . PORTAL_BACKEND . "' )
+								ORDER BY mxt.template_name, mxt.themes_id";
+		break;
+					
+		case 'olympus':
+			$sql = "SELECT  mxt.themes_id, bbt.style_id, bbt.style_name, bbt.style_path
+						FROM " . MX_THEMES_TABLE . " AS mxt, " . STYLES_TEMPLATE_TABLE . " AS stt, " . STYLES_TABLE . " AS bbt
+							WHERE bbt.style_active = 1 
+								AND bbt.style_name = mxt.style_name
+								AND ( mxt.portal_backend = 'phpbb3' OR mxt.portal_backend = '" . PORTAL_BACKEND . "' )
+								AND stt.template_id = bbt.template_id
+								ORDER BY mxt.template_name, mxt.themes_id";
+		break;
+					
+		case 'rhea':
+		case 'proteus':
+		case 'phpbb3':
+		case 'ascraeus':
+			$sql = "SELECT  mxt.themes_id, bbt.style_id, bbt.style_name, bbt.style_path
+						FROM " . MX_THEMES_TABLE . " AS mxt, " . STYLES_TABLE . " AS bbt
+							WHERE bbt.style_active = 1 
+								AND bbt.style_name = mxt.style_name
+								AND ( mxt.portal_backend = 'phpbb3' OR mxt.portal_backend = '" . PORTAL_BACKEND . "' )
+								ORDER BY mxt.template_name, mxt.themes_id";
+		break;
+	}
 	
-	$sql = "SELECT themes_id, style_name
-		FROM " . MX_THEMES_TABLE . "
-		WHERE portal_backend = '" . PORTAL_BACKEND . "'
-		ORDER BY template_name, themes_id";
 	if (!($result = $db->sql_query($sql)))
 	{
 		$sql = "SELECT themes_id, style_name

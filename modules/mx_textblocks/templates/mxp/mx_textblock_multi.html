@@ -1,0 +1,40 @@
+<div class="clear"></div>
+<div class="forabg block">
+	<div class="inner bg1 post" style="margin-bottom:0px">
+		<span class="corners-top"><span></span></span>
+		<div class="bg2 content" style="margin-top:0x;">
+			<!-- BEGIN switch_toc -->
+			<div class="box">
+				<dt>
+					<br />
+					<span class="topictitle">{L_TOC}</span><br /><hr />
+					<span class="nav">
+					<!-- BEGIN pages -->
+					{switch_toc.pages.TOC_ITEM}
+					<!-- END pages -->
+					</span>
+				</dt>
+			</dl>
+			<!-- END switch_toc -->
+			<div class="textbody content" id="message">
+				
+				<span class="content">{U_TEXT}</span>
+				
+			</div>
+			<!-- BEGIN switch_pages  -->
+			<dl class="textbody">
+				<dt>
+					<br />
+					<span class="topictitle"></span><br /><hr />{L_GOTO_PAGE}
+					<span class="nav">
+					<!-- BEGIN pages -->
+					{switch_pages.pages.PAGE_LINK}
+					<!-- END pages -->
+					</span>
+				</dt>
+			</dl>
+			<!-- END switch_pages -->
+		</div>
+	</div>
+	<span class="corners-bottom"><span></span></span>
+</div>

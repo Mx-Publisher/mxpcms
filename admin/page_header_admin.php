@@ -74,7 +74,7 @@ $board_url = PORTAL_URL;
 $web_path = (defined('PHPBB_USE_BOARD_URL_PATH') && PHPBB_USE_BOARD_URL_PATH) ? $board_url : $corrected_url;
 
 // Send a proper content-language to the output
-$user_lang = !empty($mx_user->lang['USER_LANG']) ? $mx_user->lang['USER_LANG'] : $mx_user->encode_lang($mx_user->lang_name);
+$user_lang = !empty($mx_user->lang['USER_LANG']) ? $mx_user->lang['USER_LANG'] : $mx_user->encode_lang($user->lang_name);
 
 if (!defined('TEMPLATE_ROOT_PATH'))
 {
@@ -89,7 +89,7 @@ $template->set_filenames(array('header' => 'admin/page_header.tpl'));
 
 // Format Timezone. We are unable to use array_pop here, because of PHP3 compatibility
 $l_timezone = explode('.', $board_config['board_timezone']);
-$l_timezone = (count($l_timezone) > 1 && isset($l_timezone[count($l_timezone)-1])) ? $lang[sprintf('%.1f', $board_config['board_timezone'])] : $lang[number_format(sprintf('%.1f', $mx_user->timezone))];
+$l_timezone = (count($l_timezone) > 1 && isset($l_timezone[count($l_timezone)-1])) ? $lang[sprintf('%.1f', $board_config['board_timezone'])] : $lang[number_format($mx_user->timezone)];
 
 $useragent = (isset($_SERVER['HTTP_USER_AGENT'])) ? $_SERVER['HTTP_USER_AGENT'] : getenv('HTTP_USER_AGENT');
 $template_config_row = $mx_user->_load_template_config();

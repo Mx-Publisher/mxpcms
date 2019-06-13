@@ -1279,6 +1279,7 @@ class mx_backend
 	{
 		global $db, $phpbb_root_path, $mx_root_path;
 		global $phpEx, $tplEx, $portal_config;
+		global $mx_dbms, $mx_dbhost, $mx_dbname, $mx_dbuser, $mx_dbpasswd, $mx_table_prefix;
 		global $dbms, $dbhost, $dbname, $dbuser, $dbpasswd, $table_prefix;
 		
 		$backend_table_prefix = '';
@@ -1295,31 +1296,47 @@ class mx_backend
 		//
 		$phpbb_root_path = $phpbb_root_path ? $phpbb_root_path : $mx_root_path . $portal_config['portal_backend_path'];
 		str_replace("//", "/", $phpbb_root_path);
-		$portal_backend_valid_file = @file_exists($phpbb_root_path . "mcp.$phpEx");
+		if (($this->file_exists($phpbb_root_path . "config.$phpEx") == true))
+		{		
+			$portal_backend_valid_file = $this->file_exists($phpbb_root_path . "mcp.$phpEx");
+			
+		}
+		elseif (($this->file_exists(str_replace('./', './../', $phpbb_root_path) . "config.$phpEx") == true))
+		{		
+			$portal_backend_valid_file = $this->file_exists(str_replace('./', './../', $phpbb_root_path) . "mcp.$phpEx");
+			$phpbb_root_path = str_replace('./', './../', $phpbb_root_path);
+			
+		}
+		elseif (($this->file_exists('./../../' . str_replace(array('/', '.'), '', $phpbb_root_path) . '/' . "config.$phpEx") == true))
+		{		
+			$phpbb_root_path = './../../' . str_replace(array('/', '.'), '', $phpbb_root_path) . '/';
+			$portal_backend_valid_file = $this->file_exists($phpbb_root_path . "mcp.$phpEx");
+		}			
 		
 		//
 		// Load phpbb config.php (to get table prefix)
 		// If this fails MXP2 will not work
 		//
-		if ((is_file($phpbb_root_path . "config.$phpEx") == true))
+		if (($this->file_exists($phpbb_root_path . "config.$phpEx") == true))
 		{
 			$backend_info = $this->get_phpbb_info($phpbb_root_path . "config.$phpEx");
 			
 			// phpBB x.x auto-generated config file
 			// Do not change anything in this file!
-			$mx_dbms 			= $dbms;
-			$mx_dbhost 		= $dbhost; 
-			$mx_dbname 		= $dbname; 
-			$mx_dbuser 		= $dbuser; 
-			$mx_dbpasswd 	= $dbpasswd; 
-			$mx_table_prefix	= $table_prefix;
+			$dbms = !isset($dbms) ? $mx_dbms : $dbms;
+			$dbhost = !isset($dbhost) ? $mx_dbhost : $dbhost; 
+			$dbname = !isset($dbname) ? $mx_dbname : $dbname; 
+			$dbuser = !isset($dbuser) ? $mx_dbuser : $dbuser; 
+			$dbpasswd = !isset($dbpasswd) ? $mx_dbpasswd : $dbpasswd; 
+			$table_prefix = !isset($table_prefix) ? 'phpbb_' : $table_prefix;
 			
-			$dbms 			= $backend_info['dbms'];
-			$dbhost 			= $backend_info['dbhost'];
-			$dbname 		= $backend_info['dbname'];
-			$dbuser 			= $backend_info['dbuser'];
-			$dbpasswd 		= $backend_info['dbpasswd'];
-			$table_prefix 	= $backend_info['table_prefix'];
+			//Upgrade mx vars with the real phpbb vars
+			$dbms 			= !isset($backend_info['dbms']) ? $dbms : $backend_info['dbms'];
+			$dbhost 		= !isset($backend_info['dbhost']) ? $dbhost : $backend_info['dbhost']; 
+			$dbname 		= !isset($backend_info['dbname']) ? $dbname : $backend_info['dbname']; 
+			$dbuser 		= !isset($backend_info['dbuser']) ? $dbuser : $backend_info['dbuser']; 
+			$dbpasswd 	= !isset($backend_info['dbpasswd']) ? $dbpasswd : $backend_info['dbpasswd']; 
+			$table_prefix = !isset($backend_info['table_prefix']) ? $table_prefix : $backend_info['table_prefix'];
 			
 			if( !isset($backend_info['dbms']) || empty($backend_info['dbms']) || $backend_info['dbhost'] != $dbhost || $backend_info['dbname'] != $dbname || $backend_info['dbuser'] != $dbuser || $backend_info['dbpasswd'] != $dbpasswd || $backend_info['table_prefix'] != $table_prefix )
 			{
@@ -1334,12 +1351,12 @@ class mx_backend
 			//
 			if ($mx_dbms !== $dbms)
 			{
-				require($mx_root_path . INCLUDES . 'db/' . $dbms . '.' . $phpEx); // Load dbal and initiate class
+				//require($mx_root_path . INCLUDES . 'db/' . $dbms . '.' . $phpEx); // Load dbal and initiate class
 			}
 		
 			if (($mx_dbhost !== $dbhost) || ($mx_dbname !== $dbname))
 			{
-				if(!$db->sql_connect($dbhost, $dbuser, $dbpasswd, $dbname, false))
+				if (!$db->sql_connect($dbhost, $dbuser, $dbpasswd, $dbname, false))
 				{
 					mx_message_die(CRITICAL_ERROR, "Could not connect to the backend database");
 				}
@@ -1348,18 +1365,22 @@ class mx_backend
 			$sql = "SELECT config_value from " . $table_prefix . "config WHERE config_name = 'cookie_domain'";
 			if(!$_result = $db->sql_query($sql))
 			{
-				print('Configuration file opened but backend check query failed for backend: '. basename( __DIR__  ) .  ', line: ' . __LINE__ . ', file: ' . __FILE__ . '<br /><br />SQL Error : ' . $db->sql_error('')['code'] . ' ' . $db->sql_error('')['message']);
+				//For php 5.3.0 or less
+				$db_sql_error = $db->sql_error('');
+				print('Configuration file opened but backend check query failed for backend: '. basename( __DIR__  ) .  ', line: ' . __LINE__ . ', file: ' . __FILE__ . '<br /><br />SQL Error : ' . $db_sql_error['code'] . ' ' . $db_sql_error['message']);
 			}
+			
 			$portal_backend_valid_db = $db->sql_numrows($_result) != 0;
 		}
 		else
 		{			
-			print('Configuration file for this backend (config) ' . $phpbb_root_path . "config.$phpEx" . ' couldn\'t be opened.');
-
-			if ((include $phpbb_root_path . "config.$phpEx") === false)
+			//print('Configuration file for this backend 1st try (config) ' . $phpbb_root_path . "config.$phpEx" . ' couldn\'t be opened.');
+			if ((@include $phpbb_root_path . "config.$phpEx") === false)
 			{
-				print('Configuration file (config) ' . $phpbb_root_path . "/config.$phpEx" . ' couldn\'t be opened.');
+				//We are in a subdirectory ?
+				print('Configuration file 2nd try (config) ' . $phpbb_root_path . "config.$phpEx" . ' couldn\'t be opened.');
 			}
+			
 			//
 			// Validate db connection for backend
 			//
@@ -1526,7 +1547,111 @@ class mx_backend
 			}
 		}
 	}
-
+	
+	/** /
+	*
+	* Credit: https://stackoverflow.com/users/2456038/rafasashi
+	/**/
+	function file_exists($file_path = '')
+	{
+		// Assume failure.
+		 $file_exists = 0;
+		 $status = "unknown";
+		 $filename_ext = '';		 
+		
+		//$file_path = 'http://php.net/images/logos/php-logo.svg';
+		//clear cached results
+		//clearstatcache();
+		
+		//trim path
+		$file_dir = trim(dirname($file_path));
+		
+		//trim file name
+		$file_name = trim(basename($file_path));
+		
+		if (strpos($file_path, '.') !== false)
+		{
+			// Nested file
+			$filename_ext = substr(strrchr($file_path, '.'), 1);
+		}
+		
+		//rebuild path
+		$file_path = $file_dir . "/{$file_name}";
+		
+		global $mx_root_path, $phpbb_root_path, $phpEx ;
+		
+		//If you simply want to check that some file (not directory) exists, 
+		//and concerned about performance, try is_file() instead.
+		//It seems like is_file() is almost 2x faster when a file exists 
+		//and about the same when it doesn't.
+			
+		$file = $file_dir . '/' . $file_name;
+		
+		if (function_exists('is_file') && @is_file($file)) 
+		{
+			$status = "is_file";
+			$file_exists = true;
+		}
+		
+		if (function_exists('curl_init') && (!ini_get('safe_mode') || !strtolower(ini_get('safe_mode')) == 'on')) 
+		{
+			 // Assume failure.
+			 $data = -1;
+			 $ch = curl_init($file);
+			 // Issue a HEAD request and follow any redirects.
+			curl_setopt($ch, CURLOPT_NOBODY, true);
+			curl_setopt($ch, CURLOPT_HEADER, true);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+			curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win32; x86; rv:63.0) Gecko/20100101 Firefox/63.0.68');  
+			$data = curl_exec($ch);
+			
+			//error check 
+			if (curl_errno($ch))
+			{
+				$file_exists = false;
+				return $file_exists;
+			}
+			curl_close($ch);
+			
+			 if ($data) 
+			 {
+			    $content_length = "unknown";
+			    $status = "curl_init";
+				
+			    if(preg_match("/^HTTP\/1\.[01] (\d\d\d)/", $data, $matches))
+				{
+					$status = (int)$matches[1];
+					$file_exists = ($status == '200') ? true : (($status == '404') ? false : false);
+					
+				}
+			}
+		}
+		
+		if (function_exists('file_exists') && @file_exists(str_replace(array(PORTAL_URL, PHPBB_URL), array($mx_root_path, $phpbb_root_path), $file_path))) 
+		{
+			$status = "file_exists";
+			$file_exists = true;
+		}
+			
+		if (function_exists('filesize') && @filesize(str_replace(array(PORTAL_URL, PHPBB_URL), array($mx_root_path, $phpbb_root_path), $file_path))) 
+		{
+			$status = "filesize";
+			$file_exists = true;
+		}
+		
+		if ((ini_get('safe_mode') || strtolower(ini_get('safe_mode')) == 'on') && ($status == 'unknown') && !empty($filename_ext))
+		{
+			$status = "safe_mode";		
+			if (($filename_ext == $phpEx ) && ((@include $file) !== false))
+			{
+				$status = "safe_mode_include";
+				$file_exists = true;
+			}
+		}
+		return $file_exists;
+	}
+	
 	/**
 	 * load_file
 	 *
@@ -1595,7 +1720,7 @@ class mx_backend
 		//
 		if ((@include $config) === false)
 		{
-			die('Configuration file ' . $config . ' couldn\'t be opened.');
+			die('Configuration file (get_mxp_info) ' . $config . ' couldn\'t be opened.');
 		}
 		//	
 		
@@ -1675,7 +1800,7 @@ class mx_backend
 		//
 		if ((@include $config) === false)
 		{
-			die('Configuration file ' . $config . ' couldn\'t be opened.');
+			die('Configuration file (get_phpbb_info) ' . $config . ' couldn\'t be opened.');
 		}
 		//
 		
@@ -2152,7 +2277,7 @@ class mx_backend
 			{
 				if (!function_exists('mx_message_die'))
 				{
-					die("Couldnt query config information, Allso this hosting or server is using a cache optimizer not compatible with MX-Publisher or just lost connection to database wile query.");
+					die("Couldnt query config information, Allso this hosting or server is using a cache optimizer not compatible with MX-Publisher or just lost connection to database wile query." . $sql);
 				}
 				else
 				{
@@ -2313,17 +2438,16 @@ class mx_backend
 			{
 				global $table_prefix, $mx_root_path;
 				
-				require $mx_root_path. "includes/sessions/phpbb3/constants.$phpEx";
+				require $mx_root_path. "includes/sessions/olympus/constants.$phpEx";
 			}
 
 			$sql = "SELECT *
 				FROM " . CONFIG_TABLE;
-
 			if ( !( $result = $db->sql_query( $sql ) ) )
 			{
 				if (!function_exists('mx_message_die'))
 				{
-					die("Couldnt query config information, Allso this hosting or server is using a cache optimizer not compatible with MX-Publisher or just lost connection to database wile query.");
+					die("Couldnt query config information, Allso this hosting or server is using a cache optimizer not compatible with MX-Publisher or just lost connection to database wile query. ".$sql);
 				}
 				else
 				{
@@ -3055,11 +3179,11 @@ class mx_backend
 		$mx_info = $this->get_mxp_info($mx_root_path . "config.$phpEx");
 		// MXP x.x auto-generated config file
 		// Do not change anything in this file!
-		$mx_dbms 			= $mx_info['dbms'];
+		$mx_dbms 		= $mx_info['dbms'];
 		$mx_dbhost 		= $mx_info['dbhost'];
-		$mx_dbname 		= $mx_info['dbname'];
+		$mx_dbname 	= $mx_info['dbname'];
 		$mx_dbuser 		= $mx_info['dbuser'];
-		$mx_dbpasswd 	= $mx_info['dbpasswd'];
+		$mx_dbpasswd = $mx_info['dbpasswd'];
 		$mx_table_prefix 	= $mx_info['mx_table_prefix'];
 		
 		$backend_info = $this->get_phpbb_info($phpbb_root_path . "config.$phpEx");

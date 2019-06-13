@@ -21,58 +21,16 @@ function page_header_install($title, $instruction_text = '')
 	// Get the current Server URL.
 	$server_url = ($_SERVER['SERVER_PORT'] == 443 ? 'https' : 'http' ) . '://' . $_SERVER['HTTP_HOST'];
 	// Get the MX-Publisher Path in the URL (this might not be the same as the base path when using aliases).
-	$mx_self_path = substr($_SERVER['PHP_SELF'], 0, - strlen('install/'.basename(__FILE__)));
-	
-	// We have to generate a full HTTP/1.1 header here since we can't guarantee to have any of the information
-	// available as used by the redirect function
-	$server_name = (!empty($_SERVER['HTTP_HOST'])) ? strtolower($_SERVER['HTTP_HOST']) : ((!empty($_SERVER['SERVER_NAME'])) ? $_SERVER['SERVER_NAME'] : getenv('SERVER_NAME'));
-	$server_port = (!empty($_SERVER['SERVER_PORT'])) ? (int) $_SERVER['SERVER_PORT'] : (int) getenv('SERVER_PORT');
-	$secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 1 : 0;
-
-	if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
-	{
-		$secure = 1;
-		$server_port = 443;
-	}
-
-	$script_name = (!empty($_SERVER['PHP_SELF'])) ? $_SERVER['PHP_SELF'] : getenv('PHP_SELF');
-	if (!$script_name)
-	{
-		$script_name = (!empty($_SERVER['REQUEST_URI'])) ? $_SERVER['REQUEST_URI'] : getenv('REQUEST_URI');
-	}
-
-	// $phpbb_root_path accounts for redirects from e.g. /adm
-	$script_path = trim(dirname($script_name)) . '/'; //core/install/ 
-
-	// Replace any number of consecutive backslashes and/or slashes with a single slash
-	// (could happen on some proxy setups and/or Windows servers)
-	$script_path = preg_replace('#[\\\\/]{2,}#', '/', $script_path); //core/install/ 
-
-	$portal_url = (($secure) ? 'https://' : 'http://') . $server_name;
-
-	if ($server_port && (($secure && $server_port <> 443) || (!$secure && $server_port <> 80)))
-	{
-		// HTTP HOST can carry a port number...
-		if (strpos($server_name, ':') === false)
-		{
-			$portal_url .= ':' . $server_port;
-		}
-	}
+	$mx_self_path = substr($_SERVER['PHP_SELF'], 0, -strlen('install/'.basename(__FILE__)));
 
 	// Get the MX-Publisher URL.
-	$install_url = $portal_url . $script_path;
-	$portal_url = str_replace('install/', '', $install_url);
+	$portal_url = $server_url . $mx_self_path . '/';
 	$default_lang = guess_lang();
 	
-	//Base Style for Installation
-	$subtplEx = ($tplEx !== $phpEx) ? 'tpl' : $tplEx;
-	$protplEx = ($tplEx !== $phpEx) ? 'html' : $tplEx;
-
 	//Base Style for Installation
 	if ($mx_request_vars->is_get('style') )
 	{
 		$style = $mx_request_vars->request('style', MX_TYPE_NO_TAGS);
-		$tplEx = ($style !== 'prosilver') ? $subtplEx : $protplEx;
 		$theme = array('template_name' => ($style !== 'prosilver') ? 'subSilver' : 'prosilver');
 	}
 	else
@@ -84,36 +42,37 @@ function page_header_install($title, $instruction_text = '')
 	$board_config['smilies_path'] = 'includes/shared/phpbb2/images/smiles/';
 	$board_config['avatar_gallery_path'] = 'includes/shared/phpbb2/images/';
 
+
 	$template->set_filenames(array('header' => 'mx_install_header.'.$tplEx));
 
 	$template->assign_vars(array(
 		'L_PORTAL_NAME'			=> $mx_portal_name,
 		'L_PORTAL_VERSION'		=> $mx_portal_version,
-		'U_INSTALL_URL'			=> $install_url,
-		'L_INSTALLATION'			=> $title,
-		'U_INDEX'						=> $install_url . "mx_install.$phpEx",
-		'U_LOGO'						=> "{$portal_url}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme/images/logo.gif',
+		'U_INSTALL_URL'			=> $mx_root_path . 'install/',
+		'L_INSTALLATION'		=> $title,
+		'U_INDEX'				=> $mx_root_path . 'install/mx_install.'.$phpEx,
+		'U_LOGO'				=> $mx_root_path . 'install/templates/logo.gif',
 		'L_INSTRUCTION_TEXT'	=> $instruction_text,
 		
-		'T_ASSETS_VERSION'				=> INSTALLER_VERSION,
-		'T_ASSETS_PATH'					=> "{$portal_url}assets",
-		'T_THEME_PATH'					=> "{$portal_url}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme',
-		'T_TEMPLATE_PATH'				=> "{$portal_url}templates/" . rawurlencode($theme['template_name']) . '',
+		'T_ASSETS_VERSION'		=> INSTALLER_VERSION,
+		'T_ASSETS_PATH'			=> "{$portal_url}assets",
+		'T_THEME_PATH'			=> "{$portal_url}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme',
+		'T_TEMPLATE_PATH'		=> "{$portal_url}templates/" . rawurlencode($theme['template_name']) . '',
 		'T_SUPER_TEMPLATE_PATH'	=> "{$portal_url}templates/" . rawurlencode($theme['template_name']) . '/template',
 			
-		'T_IMAGES_PATH'					=> "{$portal_url}images/",
-		'T_SMILIES_PATH'					=> "{$portal_url}{$board_config['smilies_path']}/",
+		'T_IMAGES_PATH'			=> "{$portal_url}images/",
+		'T_SMILIES_PATH'		=> "{$portal_url}{$board_config['smilies_path']}/",
 		'T_AVATAR_GALLERY_PATH'	=> "{$portal_url}{$board_config['avatar_gallery_path']}/",
 		
-		'T_STYLESHEET_LINK'				=> "{$portal_url}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme/stylesheet.css',
-		'T_STYLESHEET_LANG_LINK'	=> "{$portal_url}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme/images/lang_' . $default_lang . '/stylesheet.css',
-		'T_FONT_AWESOME_LINK'		=> "{$portal_url}assets/css/font-awesome.min.css",
-		'T_FONT_IONIC_LINK'				=> "{$portal_url}assets/css/ionicons.min.css",
+		'T_STYLESHEET_LINK'		=> "{$portal_url}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme/stylesheet.css',
+		'T_STYLESHEET_LANG_LINK'=> "{$portal_url}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme/images/lang_' . $default_lang . '/stylesheet.css',
+		'T_FONT_AWESOME_LINK'	=> "{$portal_url}assets/css/font-awesome.min.css",
+		'T_FONT_IONIC_LINK'			=> "{$portal_url}assets/css/ionicons.min.css",
 
-		'T_JQUERY_LINK'					=> "{$portal_url}assets/javascript/jquery.min.js?assets_version=" . INSTALLER_VERSION,
-		'S_ALLOW_CDN'						=> false,
+		'T_JQUERY_LINK'			=> "{$portal_url}assets/javascript/jquery.min.js?assets_version=" . INSTALLER_VERSION,
+		'S_ALLOW_CDN'				=> false,
 		
-		'S_CONTENT_ENCODING'		=> 'UTF-8',
+		'S_CONTENT_ENCODING'	=> 'UTF-8',
 	));
 	$template->pparse('header');
 }
@@ -129,28 +88,18 @@ function page_footer_install($show_phpinfo = true)
 		'<a href="' . U_ONLINE_SUPPORT . '" target="_blank">', '</a>',
 		'<a href="' . U_TERMS_OF_USE . '" target="_blank">', '</a>'
 	);
-	
+
 	//Base Style for Installation
-	$subtplEx = ($tplEx !== $phpEx) ? 'tpl' : $tplEx;
-	$protplEx = ($tplEx !== $phpEx) ? 'html' : $tplEx;
+	$subSilver = ($tplEx !== $phpEx) ? '<a href="?style=subSilver">Classic Style</a>' : '';
+	$prosilver = ($tplEx !== $phpEx) ? '<a href="?style=prosilver">Normal Style</a>' : '';
 	
 	if ($mx_request_vars->is_get('style') )
 	{
 		$style = $mx_request_vars->request('style', MX_TYPE_NO_TAGS);
-		$tplEx = ($style !== 'prosilver') ? $subtplEx : $protplEx;
-		
-		//Base Style for Installation
-		$subSilver = ($tplEx !== $phpEx) ? '<a href="?style=subSilver">Classic Style</a>' : '';
-		$prosilver = ($tplEx !== $phpEx) ? '<a href="?style=prosilver">Normal Style</a>' : '';
-		
 		$install_theme = ($style == 'prosilver') ? $subSilver : $prosilver;
 	}
 	else
 	{
-		//Base Style for Installation
-		$subSilver = ($tplEx !== $phpEx) ? '<a href="?style=subSilver">Classic Style</a>' : '';
-		$prosilver = ($tplEx !== $phpEx) ? '<a href="?style=prosilver">Normal Style</a>' : '';
-		
 		$install_theme = ($tplEx == 'tpl') ? $subSilver : $prosilver;
 	}
 
@@ -163,7 +112,6 @@ function page_footer_install($show_phpinfo = true)
 		'U_INSTALL_THEME'		=> $install_theme,
 		'U_INSTALL_PHPINFO'	=> ( $show_phpinfo ? '<a href="?phpinfo" target="_blank">phpInfo</a>' : '' ),
 	));
-
 	$template->pparse('footer');
 
 	if( $db )
@@ -836,46 +784,46 @@ function guess_lang()
 	// me first - psoTFX
 	$match_lang = array(
 		'arabic'					=> 'ar([_-][a-z]+)?',
-		'bulgarian'					=> 'bg',
-		'catalan'					=> 'ca',
-		'czech'						=> 'cs',
-		'danish'					=> 'da',
-		'german'					=> 'de([_-][a-z]+)?',
-		'english'					=> 'en([_-][a-z]+)?',
-		'estonian'					=> 'et',
-		'finnish'					=> 'fi',
+		'bulgarian'			=> 'bg',
+		'catalan'				=> 'ca',
+		'czech'					=> 'cs',
+		'danish'				=> 'da',
+		'german'				=> 'de([_-][a-z]+)?',
+		'english'				=> 'en([_-][a-z]+)?',
+		'estonian'				=> 'et',
+		'finnish'				=> 'fi',
 		'french'					=> 'fr([_-][a-z]+)?',
-		'greek'						=> 'el',
-		'spanish_argentina'			=> 'es[_-]ar',
-		'spanish'					=> 'es([_-][a-z]+)?',
+		'greek'					=> 'el',
+		'spanish_argentina'	=> 'es[_-]ar',
+		'spanish'				=> 'es([_-][a-z]+)?',
 		'gaelic'					=> 'gd',
-		'galego'					=> 'gl',
-		'gujarati'					=> 'gu',
-		'hebrew'					=> 'he',
-		'hindi'						=> 'hi',
-		'croatian'					=> 'hr',
-		'hungarian'					=> 'hu',
-		'icelandic'					=> 'is',
-		'indonesian'				=> 'id([_-][a-z]+)?',
+		'galego'				=> 'gl',
+		'gujarati'				=> 'gu',
+		'hebrew'				=> 'he',
+		'hindi'					=> 'hi',
+		'croatian'				=> 'hr',
+		'hungarian'			=> 'hu',
+		'icelandic'				=> 'is',
+		'indonesian'			=> 'id([_-][a-z]+)?',
 		'italian'					=> 'it([_-][a-z]+)?',
-		'japanese'					=> 'ja([_-][a-z]+)?',
-		'korean'					=> 'ko([_-][a-z]+)?',
-		'latvian'					=> 'lv',
-		'lithuanian'				=> 'lt',
-		'macedonian'				=> 'mk',
-		'dutch'						=> 'nl([_-][a-z]+)?',
-		'norwegian'					=> 'no',
-		'punjabi'					=> 'pa',
+		'japanese'				=> 'ja([_-][a-z]+)?',
+		'korean'				=> 'ko([_-][a-z]+)?',
+		'latvian'				=> 'lv',
+		'lithuanian'			=> 'lt',
+		'macedonian'		=> 'mk',
+		'dutch'					=> 'nl([_-][a-z]+)?',
+		'norwegian'			=> 'no',
+		'punjabi'				=> 'pa',
 		'polish'					=> 'pl',
-		'portuguese_brazil'			=> 'pt[_-]br',
+		'portuguese_brazil'	=> 'pt[_-]br',
 		'portuguese'				=> 'pt([_-][a-z]+)?',
-		'romanian'					=> 'ro([_-][a-z]+)?',
+		'romanian'				=> 'ro([_-][a-z]+)?',
 		'russian'					=> 'ru([_-][a-z]+)?',
-		'slovenian'					=> 'sl([_-][a-z]+)?',
+		'slovenian'				=> 'sl([_-][a-z]+)?',
 		'albanian'					=> 'sq',
 		'serbian'					=> 'sr([_-][a-z]+)?',
 		'slovak'					=> 'sv([_-][a-z]+)?',
-		'swedish'					=> 'sv([_-][a-z]+)?',
+		'swedish'				=> 'sv([_-][a-z]+)?',
 		'thai'						=> 'th([_-][a-z]+)?',
 		'turkish'					=> 'tr([_-][a-z]+)?',
 		'ukranian'					=> 'uk([_-][a-z]+)?',
@@ -895,7 +843,7 @@ function guess_lang()
 			{
 				if (preg_match('#' . $match . '#i', trim($accept_lang_ary[$i])))
 				{
-					if (@file_exists($mx_root_path . 'language/lang_' . $lang))
+					if (@install_file_exists($mx_root_path . 'language/lang_' . $lang))
 					{
 						return $lang;
 					}
@@ -1763,7 +1711,7 @@ function get_install_schemas()
 		if ($database['LABEL'])
 		{
 			$db_type = $database['name'];
-			if (!file_exists($mx_root_path . 'install/schemas/' . $database['SCHEMA'] . '_schema_install.sql'))
+			if (!install_file_exists($mx_root_path . 'install/schemas/' . $database['SCHEMA'] . '_schema_install.sql'))
 			{			
 				$available_dbms[$dbms]['AVAILABLE'] = false;				
 			}
@@ -2201,6 +2149,36 @@ function format_error($message)
 	$message = '<b><span style="color:orange;">Warning:</span> ' . $message . '</b>';
 	return $message;
 }
+
+/**
+ * Get html select list - from array().
+ *
+ * This function generates and returns a html select list (name = $nameselect).
+ *
+ * @access public
+ * @param string $name_select select name
+ * @param array $row source data
+ * @param string $id needle
+ * @param boolean $full_list expanded or dropdown list
+ * @return unknown
+ */
+function install_list_static($name_select, $row, $id, $full_list = true)
+{
+	$rows_count = ( count($row) < '25' ) ? count($row) : '25';
+	$full_list_true = $full_list ? ' size="' . $rows_count . '"' : '';
+
+	$column_list = '<select name="' . $name_select .'" ' . $full_list_true . '>';
+	foreach( $row as $idfield => $namefield )
+	{
+		$selected = ( $idfield == $id ) ? ' selected="selected"' : '';
+		$column_list .= '<option value="' . $idfield . '"' . $selected . '>' . $namefield . "</option>\n";
+	}
+	$column_list .= '</select>';
+
+	unset($row);
+	return $column_list;
+}
+
 //
 // FYI: This is our easy workaround to the PHP realpath function, which might be disabled
 // on some servers (Lycos and maybe others) ...they say it's for "security" reasons, heh.
@@ -2246,6 +2224,110 @@ function mx_realpath($path, $errstr = false)
 	}
 	*/
 	return ( @function_exists('realpath') && @realpath(__FILE__) ? realpath($path) : $path );
+}
+
+/** /
+*
+* Credit: https://stackoverflow.com/users/2456038/rafasashi
+/**/
+function install_file_exists($file_path = '')
+{
+	// Assume failure.
+	$file_exists = 0;
+	$status = "unknown";
+	$filename_ext = '';		 
+		
+	//$file_path = 'http://php.net/images/logos/php-logo.svg';
+	//clear cached results
+	//clearstatcache();
+		
+	//trim path
+	$file_dir = trim(dirname($file_path));
+		
+	//trim file name
+	$file_name = trim(basename($file_path));
+		
+	if (strpos($file_path, '.') !== false)
+	{
+		// Nested file
+		$filename_ext = substr(strrchr($file_path, '.'), 1);
+	}
+		
+	//rebuild path
+	$file_path = $file_dir . "/{$file_name}";
+		
+	global $mx_root_path, $phpbb_root_path, $phpEx ;
+		
+	//If you simply want to check that some file (not directory) exists, 
+	//and concerned about performance, try is_file() instead.
+	//It seems like is_file() is almost 2x faster when a file exists 
+	//and about the same when it doesn't.
+			
+	$file = $file_dir . '/' . $file_name;
+		
+	if (function_exists('is_file') && @is_file($file)) 
+	{
+		$status = "is_file";
+		$file_exists = true;
+	}
+		
+	if (function_exists('curl_init') && (!ini_get('safe_mode') || !strtolower(ini_get('safe_mode')) == 'on')) 
+	{
+		// Assume failure.
+		$data = -1;
+		$ch = curl_init($file);
+		// Issue a HEAD request and follow any redirects.
+		curl_setopt($ch, CURLOPT_NOBODY, true);
+		curl_setopt($ch, CURLOPT_HEADER, true);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+		curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win32; x86; rv:63.0) Gecko/20100101 Firefox/63.0.68');  
+		$data = curl_exec($ch);
+			
+		//error check 
+		if (curl_errno($ch))
+		{
+			$file_exists = false;
+			return $file_exists;
+		}
+		curl_close($ch);
+			
+		if ($data) 
+		{
+			$content_length = "unknown";
+			$status = "curl_init";
+			
+			if (preg_match("/^HTTP\/1\.[01] (\d\d\d)/", $data, $matches))
+			{
+				$status = (int)$matches[1];
+				$file_exists = ($status == '200') ? true : (($status == '404') ? false : false);	
+			}
+		}
+	}
+		
+	if (function_exists('file_exists') && @file_exists(str_replace(array(PORTAL_URL, PHPBB_URL), array($mx_root_path, $phpbb_root_path), $file_path))) 
+	{
+		$status = "file_exists";
+		$file_exists = true;
+	}
+			
+	if (function_exists('filesize') && @filesize(str_replace(array(PORTAL_URL, PHPBB_URL), array($mx_root_path, $phpbb_root_path), $file_path))) 
+	{
+		$status = "filesize";
+		$file_exists = true;
+	}
+	
+	if ((ini_get('safe_mode') || strtolower(ini_get('safe_mode')) == 'on') && ($status == 'unknown') && !empty($filename_ext))
+	{
+		$status = "safe_mode";		
+		
+		if (($filename_ext == $phpEx ) && ((@include $file) !== false))
+		{
+			$status = "safe_mode_include";
+			$file_exists = true;
+		}
+	}
+	return $file_exists;
 }
 
 ?>

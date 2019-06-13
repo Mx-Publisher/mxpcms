@@ -23,7 +23,7 @@ if (!defined('IN_PORTAL'))
 //if (!defined('SQL_LAYER'))
 if (!is_object('dbal_mssql'))
 {
-	@define('SQL_LAYER', 'mssql');
+	define('SQL_LAYER', 'mssql');
 	include_once($mx_root_path . 'includes/db/dbal.' . $phpEx);
 	$sql_db = 'dbal_' . $dbms; // Repopulated for multiple db connections
 

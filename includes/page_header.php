@@ -85,6 +85,12 @@ if(!isset($mx_cache) || !is_object($mx_cache))
 	$cache = new mx_cache();
 }
 
+if(!isset($phpbb_auth) || !is_object($phpbb_auth))
+{
+	$phpbb_auth = new phpbb_auth();
+}
+$phpbb_auth->acl($mx_user->data);
+
 //
 // Load common language file from phpBB3
 //$mx_user->set_lang($mx_user->lang, $mx_user->help, 'common');
@@ -206,12 +212,6 @@ switch (PORTAL_BACKEND)
 	break;
 
 	default:
-	
-		if(!isset($phpbb_auth) || !is_object($phpbb_auth))
-		{
-			$phpbb_auth = new phpbb_auth();
-		}
-		$phpbb_auth->acl($mx_user->data);
 		
 		// Get referer to redirect user to the appropriate page after delete action
 		$redirect_url = mx_append_sid(PORTAL_URL . "index.$phpEx" . (isset($page_id) ? "?page={$page_id}" : "") . (isset($cat_nav) ? "&cat_nav={$cat_nav}" : ""));
@@ -600,7 +600,7 @@ if ( ($mx_user->data['session_logged_in']) && (PORTAL_BACKEND !== 'internal') &&
 	// SQL to pull appropriate message, prevents nosey people
 	// reading other peoples messages ... hopefully!
 	//
-	$privmsgs_id = $phpBB2->request_var(POST_POST_URL, $s_privmsg_new);
+	$privmsgs_id = $mx_request_vars->variable(POST_POST_URL, $s_privmsg_new);
 	$l_box_name = $lang['Inbox'];
 	
 	//
@@ -874,8 +874,8 @@ while( list($nav_item, $nav_array) = @each($nav_links) )
 	}
 }
 
-$forum_id = $phpBB2->request_var('f', (isset($forum_id) ? $forum_id : 0));
-$topic_id = $phpBB2->request_var('t', (isset($topic_id) ? $topic_id : 0));
+$forum_id = $mx_request_vars->variable('f', (isset($forum_id) ? $forum_id : 0));
+$topic_id = $mx_request_vars->variable('t', (isset($topic_id) ? $topic_id : 0));
 
 $s_feed_news = isset($s_feed_news) ? $s_feed_news : false;
 

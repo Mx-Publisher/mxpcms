@@ -44,7 +44,7 @@ function=+:106=+:135=+:Statistics=+:Website Statistics Function=+:mx_statistics.
 parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
 block=+:=+:Statistics=+:Demo block=+:135=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
 New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
-function=+:133=+:137=+:phpBB Login=+:Login in phpBB Block=+:mx__phpbb_login.php=+:
+function=+:133=+:137=+:phpBB Login=+:Login in phpBB Block=+:mx_phpbb_login.php=+:
 parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
 block=+:=+:phpBB Login=+:Login Demo block=+:137=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
 function=+:0=+:0=+:0=+:endoflist=+:0=+:0

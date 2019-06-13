@@ -21,18 +21,18 @@ class TwitterConnect extends SocialConnect
 	
     function __construct($network_name) 
 	{
-		global $phpbb_root_path, $board_config, $phpEx;
+		global $mx_root_path, $board_config, $phpEx;
 		
 		parent::__construct($network_name);
 		
-		require_once($phpbb_root_path . "includes/auth/twitter/SignatureMethod." . $phpEx);
-		require_once($phpbb_root_path . "includes/auth/twitter/HmacSha1." . $phpEx);
-		require_once($phpbb_root_path . "includes/auth/twitter/Token." . $phpEx);
-		require_once($phpbb_root_path . "includes/auth/twitter/Consumer." . $phpEx);
-		require_once($phpbb_root_path . "includes/auth/twitter/Util." . $phpEx);
-		require_once($phpbb_root_path . "includes/auth/twitter/Request." . $phpEx);
-		require_once($phpbb_root_path . "includes/auth/twitter/TwitterOAuthException." . $phpEx);
-		include_once($phpbb_root_path . "includes/auth/twitter/TwitterOAuth." . $phpEx);
+		require_once($mx_root_path . "includes/social_connect/twitter/SignatureMethod." . $phpEx);
+		require_once($mx_root_path . "includes/social_connect/twitter/HmacSha1." . $phpEx);
+		require_once($mx_root_path . "includes/social_connect/twitter/Token." . $phpEx);
+		require_once($mx_root_path . "includes/social_connect/twitter/Consumer." . $phpEx);
+		require_once($mx_root_path . "includes/social_connect/twitter/Util." . $phpEx);
+		require_once($mx_root_path . "includes/social_connect/twitter/Request." . $phpEx);
+		require_once($mx_root_path . "includes/social_connect/twitter/TwitterOAuthException." . $phpEx);
+		include_once($mx_root_path . "includes/social_connect/twitter/TwitterOAuth." . $phpEx);
 
 		
 		
@@ -84,7 +84,7 @@ class TwitterConnect extends SocialConnect
 			}
 			catch (Exception $e)
 			{
-				message_die(GENERAL_ERROR, $e->getMessage());
+				mx_message_die(GENERAL_ERROR, $e->getMessage());
 			}
 		}
 		else
@@ -151,7 +151,7 @@ class TwitterConnect extends SocialConnect
 			}
 			
 			/* If method is set change API call made. Test is called by default. */
-			$twitter_data = $this->client->get('account/verify_credentials', array('tweet_mode' => 'extended', 'include_entities' => 'true'));
+			$twitter_data = $this->client->get('account/verify_credentials', ['tweet_mode' => 'extended', 'include_entities' => 'true']);
 		}
 		catch (Exception $e)
 		{

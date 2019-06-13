@@ -165,7 +165,7 @@ class mx_Template extends Template
 			else
 			{
 				$moduleDefault = !empty($mx_user->loaded_default_styles[$module_root_path]) ? $mx_user->loaded_default_styles[$module_root_path] : $mx_user->default_template_name;
-			}
+			}			
 			
 			$this->debug_paths .= '<br>Module';
 			$fileSearch = array();
@@ -1366,9 +1366,10 @@ class mx_user extends mx_session
 			case 'olympus':
 			case 'ascraeus':
 			case 'rhea':
-			case 'proteus':	
+			case 'proteus':
+			default:
 				$shared_lang_path = $mx_root_path . 'includes/shared/phpbb2/language/';
-				//$template_path = 'styles/';
+				
 			break;
 				
 			case 'phpbb2':
@@ -1578,7 +1579,7 @@ class mx_user extends mx_session
 		global $mx_cache, $userdata, $board_config, $portal_config, $theme, $images;
 		global $template, $lang, $phpEx, $phpbb_root_path, $mx_root_path, $db;
 		global $mx_page, $mx_request_vars, $_GET, $_COOKIE, $phpBB3;
-
+		
 		if ( !empty($portal_config['default_style']) && !is_array($portal_config['default_style']) )
 		{
 			$portal_config = $mx_cache->obtain_mxbb_config();
@@ -1696,7 +1697,7 @@ class mx_user extends mx_session
 						FROM " . MX_THEMES_TABLE . " AS mxt, " . STYLES_TEMPLATE_TABLE . " AS stt, " . STYLES_TABLE . " AS bbt
 						WHERE bbt.style_active = 1 AND bbt.style_name = '$init_style'
 							AND bbt.style_name = mxt.style_name
-							AND mxt.portal_backend = 'phpbb3'
+							AND mxt.portal_backend <> 'phpbb2'
 							AND stt.template_id = bbt.template_id";
 				break;
 				
@@ -1716,7 +1717,7 @@ class mx_user extends mx_session
 			/*
 			* Query ed id for default_style, or for demostyle-style, style_name or themes_id from mxt.themes_id
 			*/	
-			if(($result = $db->sql_query($sql)) && ($row = $db->sql_fetchrow($result)))
+			if (($result = $db->sql_query($sql)) && ($row = $db->sql_fetchrow($result)))
 			{
 				$init_style = $row['themes_id']; //Portal Style Id i.e. 7
 			}
@@ -1731,6 +1732,7 @@ class mx_user extends mx_session
 							FROM " . MX_THEMES_TABLE . "
 							WHERE portal_backend = 'internal'";
 					break;
+					
 					case 'phpbb2':
 						$sql = "SELECT  themes_id, style_name
 							FROM " . MX_THEMES_TABLE . "
@@ -1738,6 +1740,11 @@ class mx_user extends mx_session
 					break;
 
 					case 'olympus':
+						$sql = "SELECT  themes_id, style_name
+							FROM " . MX_THEMES_TABLE . "
+							WHERE portal_backend <> 'phpbb2'";
+					break;
+					
 					case 'ascraeus':
 					case 'rhea':
 					case 'proteus':
@@ -1759,6 +1766,8 @@ class mx_user extends mx_session
 		}
 		else
 		{
+			//Style ID
+			$mx_themes_id = $init_style;
 			switch (PORTAL_BACKEND)
 			{
 				case 'internal':
@@ -1781,9 +1790,10 @@ class mx_user extends mx_session
 				case 'olympus':
 					$sql = "SELECT  mxt.themes_id, bbt.style_id, bbt.style_name
 						FROM " . MX_THEMES_TABLE . " AS mxt, " . STYLES_TEMPLATE_TABLE . " AS stt, " . STYLES_TABLE . " AS bbt
-						WHERE bbt.style_active = 1 AND mxt.themes_id = " . (int) $init_style . "
+						WHERE bbt.style_active = 1 
+							AND mxt.themes_id = " . (int) $init_style . "
 							AND bbt.style_name = mxt.style_name
-							AND mxt.portal_backend = 'phpbb3'
+							AND mxt.portal_backend <> 'phpbb2'
 							AND stt.template_id = bbt.template_id";
 				break;
 			
@@ -1793,7 +1803,8 @@ class mx_user extends mx_session
 				case 'phpbb3':
 					$sql = "SELECT  mxt.*, bbt.style_id, bbt.style_name
 						FROM " . MX_THEMES_TABLE . " AS mxt, " . STYLES_TABLE . " AS bbt
-						WHERE bbt.style_active = 1 AND bbt.style_id = " . (int) $init_style . "
+						WHERE bbt.style_active = 1 
+							AND bbt.style_id = " . (int) $init_style . "
 							AND bbt.style_name = mxt.style_name
 							AND mxt.portal_backend = 'phpbb3'
 							AND mxt.template_name = bbt.style_path";
@@ -1805,7 +1816,7 @@ class mx_user extends mx_session
 				$init_style = $row['themes_id']; //Portal Style Id
 			}
 			else
-			{
+			{			
 				switch (PORTAL_BACKEND)
 				{
 					case 'internal':
@@ -1815,20 +1826,23 @@ class mx_user extends mx_session
 							FROM " . MX_THEMES_TABLE . "
 							WHERE portal_backend = '" . 'internal' . "'";
 					break;
+					
 					case 'phpbb2':
 						$sql2 = "SELECT s.themes_id as style_id, mxt.themes_id, mxt.template_name as style_path
 							FROM " . MX_THEMES_TABLE . " mxt, " . THEMES_TABLE . " s
 								WHERE mxt.template_name = s.template_name
 								AND mxt.portal_backend = '" . PORTAL_BACKEND . "'";
 					break;
+					
 					case 'olympus':
 						$sql2 = "SELECT  mxt.themes_id, bbt.style_id, bbt.style_name, bbt.style_path
 							FROM " . MX_THEMES_TABLE . " AS mxt, " . STYLES_TEMPLATE_TABLE . " AS stt, " . STYLES_TABLE . " AS bbt
 							WHERE bbt.style_active = 1 
 								AND bbt.style_name = mxt.style_name
-								AND mxt.portal_backend = '" . 'phpbb3' . "'
+								AND mxt.portal_backend <> '" . 'phpbb2' . "'
 								AND stt.template_id = bbt.template_id";
 					break;
+					
 					case 'rhea':
 					case 'proteus':
 					case 'phpbb3':
@@ -1841,7 +1855,7 @@ class mx_user extends mx_session
 					break;
 				}
 				
-				if(($result = $db->sql_query_limit($sql2, 1)) && ($row = $db->sql_fetchrow($result)))
+				if (($result = $db->sql_query_limit($sql2, 1)) && ($row = $db->sql_fetchrow($result)))
 				{
 					$init_style = $row['themes_id']; //Portal Style Id
 				}
@@ -1855,12 +1869,18 @@ class mx_user extends mx_session
 							$sql = "SELECT  themes_id, style_name
 								FROM " . MX_THEMES_TABLE;
 						break;
+						
 						case 'phpbb2':
 							$sql = "SELECT s.themes_id as style_id, mxt.themes_id, mxt.template_name as style_path
 								FROM " . MX_THEMES_TABLE . " mxt, " . THEMES_TABLE . " s
 									WHERE mxt.template_name = s.template_name";
 						break;
+						
 						case 'olympus':
+							$sql = "SELECT  mxt.*, bbt.*, mxt.template_name as style_path
+								FROM " . MX_THEMES_TABLE . " AS mxt, " . STYLES_TEMPLATE_TABLE . " AS stt, " . STYLES_TABLE . " AS bbt";						
+						break;
+						
 						case 'rhea':
 						case 'proteus':
 						case 'phpbb3':
@@ -1871,18 +1891,37 @@ class mx_user extends mx_session
 						break;
 					}
 					
-					if(($result = $db->sql_query_limit($sql, 1)) && ($row = $db->sql_fetchrow($result)))
+					if (($result = $db->sql_query_limit($sql)) && ($row = $db->sql_fetchrowset($result)))
 					{
-						$init_style = $row['themes_id']; //Portal Style Id
+						$count = count($row);
+						
+						for ($i = 0; $i < $count; $i++)
+						{
+							if (strpos($row[$i]['style_name'], 'prosilver'))
+							{
+								$style_id = $row[$i]['style_id']; //Forum Style Id
+								$themes_id = $row[$i]['themes_id']; //Portal Style Id
+							}
+							else
+							{
+								$style_id = $row[$i]['style_id']; //Forum Style Id
+								$themes_id = $row[$i]['themes_id']; //Portal Style Id
+							}							
+						}
 					}
 					else
 					{
-						$init_style = 'prosilver'; //Portal Style Id
+						$init_style = 'prosilver';
+						$style_id = 1; //Forum Style Id
+						$themes_id = 1; //Portal Style Id
+					}	
+					// AdminCP
+					if (!defined('IN_ADMIN'))
+					{
+						//print('style_ids: ' . (($mx_themes_id !== $init_style)  ? $mx_themes_id . ', ' . $init_style : $mx_themes_id) . ', ' . $themes_id . ', no style with this id found ... wrong backend ? ' . $sql);
 					}
-					print('style_id: ' . $init_style . ', no style with this id found ... wrong backend ? ' . $sql);
 				}
-			}
-				
+			}				
 		}
 		
 		/*
@@ -4783,7 +4822,7 @@ class mx_language_file_loader
 		}
 
 		// The language file is not exist throw new language_file_not_found(
-		print_r('Language file ' . $language_file_path . ' couldn\'t be opened.');
+		print_r('Language file (get_language_file_path) ' . $language_file_path . ' couldn\'t be opened.');
 	}
 
 	/**

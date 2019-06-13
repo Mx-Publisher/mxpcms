@@ -738,7 +738,7 @@ else
 
 	$template->assign_vars(array(
 		'L_ADMIN_TITLE' => isset($lang['mxBB_adminCP']) ? $lang['mxBB_adminCP'] : $lang['Mx-Publisher_adminCP'],
-		'ADMIN_TITLE' => $lang['mxBB_adminCP'],
+		'ADMIN_TITLE' => isset($lang['mxBB_adminCP']) ? $lang['mxBB_adminCP'] : $lang['Mx-Publisher_adminCP'],
 		"S_FRAME_NAV" => mx_append_sid("index.$phpEx?pane=left"),
 		"S_FRAME_MAIN" => mx_append_sid("index.$phpEx?pane=right"))
 	);

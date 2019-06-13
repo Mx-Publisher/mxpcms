@@ -25,7 +25,7 @@ if (!defined('E_STRICT'))
 if (!defined('MX_ENVIRONMENT'))
 {
 	@define('MX_ENVIRONMENT', 'production');
-	//@define('MX_ENVIRONMENT', 'development');
+	@define('MX_ENVIRONMENT', 'development');
 }
 
 /*
@@ -339,18 +339,6 @@ require($mx_root_path . INCLUDES . 'mx_constants.' . $phpEx); // Also includes p
 require($mx_root_path . INCLUDES . 'db/' . $dbms . '.' . $phpEx); // Load dbal and initiate class
 require($mx_root_path . INCLUDES . 'utf/utf_tools.' . $phpEx); //Load UTF-8 Tools
 
-if (MX_ENVIRONMENT === 'development')
-{
-
-	//Report all errors, except notices and deprecation messages.  For nice error output.
-	include($mx_root_path . 'modules/mx_shared/ErrorHandler/prepend.' . $phpEx);
-
-}
-else
-{
-	set_error_handler(defined('MX_MSG_HANDLER') ? MX_MSG_HANDLER : 'mx_msg_handler');
-}
-
 /**
 * Minimum Requirement: PHP 5.3.0
 */
@@ -445,6 +433,19 @@ else
 	include_once($mx_root_path . INCLUDES . 'mx_functions_style.' . $phpEx); // Styling and sessions
 }
 
+if (MX_ENVIRONMENT === 'development')
+{
+
+	//Report all errors, except notices and deprecation messages.  For nice error output.
+	include($mx_root_path . 'modules/mx_shared/ErrorHandler/prepend.' . $phpEx);
+
+}
+else
+{
+	set_error_handler(defined('MX_MSG_HANDLER') ? MX_MSG_HANDLER : 'mx_msg_handler');
+}
+
+
 // We do not need this any longer, unset for safety purposes
 unset($dbpasswd);
 
@@ -455,8 +456,14 @@ $mx_cache->init_mod_rewrite();
 
 //
 // Instantiate the mx_auth class
-$mx_auth = $phpbb_auth =new phpbb_auth();
-
+if( class_exists('phpbb_auth'))
+{
+	$mx_auth = $phpbb_auth =new phpbb_auth();
+}
+elseif( class_exists('mx_auth'))
+{
+	$mx_auth = $phpbb_auth =new mx_auth();
+}
 //
 // Instantiate the mx_user class
 //

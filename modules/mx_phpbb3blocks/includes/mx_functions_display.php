@@ -175,7 +175,7 @@ function mx_display_forums($root_data = '', $display_moderators = true, $return_
 		// Category with no members
 		if ($row['forum_type'] == FORUM_CAT && ($row['left_id'] + 1 == $row['right_id']))
 		{
-			continue;
+			//continue;
 		}
 
 		// Skip branch
@@ -183,16 +183,16 @@ function mx_display_forums($root_data = '', $display_moderators = true, $return_
 		{
 			if ($row['left_id'] < $right_id)
 			{
-				continue;
+				//continue;
 			}
-			unset($right_id);
+			//unset($right_id);
 		}
 
 		if (!$phpbb_auth->acl_get('f_list', $forum_id))
 		{
 			// if the user does not have permissions to list this forum, skip everything until next branch
 			$right_id = $row['right_id'];
-			continue;
+			//continue;
 		}
 
 		$forum_ids[] = $forum_id;

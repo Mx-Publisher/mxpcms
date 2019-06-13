@@ -4832,6 +4832,8 @@ class mx_page
 			case 'olympus':
 			case 'ascraeus':
 			case 'rhea':
+			case 'proteus':
+			default:
 				global $phpbb_auth;
 				if (!isset($phpbb_auth) || !is_object($phpbb_auth))
 				{

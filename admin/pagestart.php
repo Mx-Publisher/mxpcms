@@ -56,9 +56,9 @@ switch (PORTAL_BACKEND)
 	case 'mybb':
 	case 'phpbb2':
 	case 'olympus':
-		if ( !$mx_user->data['session_logged_in'] )
+		if ( !$userdata['session_logged_in'] )
 		{
-			//mx_redirect(mx_append_sid("login.php?redirect=admin/index.$phpEx", true));
+			mx_redirect(mx_append_sid("login.php?redirect=admin/index.$phpEx", true));
 		}
 	break;
 
@@ -90,15 +90,15 @@ switch (PORTAL_BACKEND)
 			
 			//This will return: header('Location: ' . $phpbb_login_url);
 			//mx_redirect($phpbb_login_url, true);
-			//mx_redirect(mx_append_sid("login.php?redirect=admin/index.$phpEx", true));
+			mx_redirect(mx_append_sid("login.php?redirect=admin/index.$phpEx", true));
 		}
 	break;
 }
 
 
-if ( !($mx_user->data['user_level'] == ADMIN) )
+if ( !($userdata['user_level'] == ADMIN) )
 {
-	//mx_message_die(GENERAL_MESSAGE, $lang['Not_admin']);
+	mx_message_die(GENERAL_MESSAGE, $lang['Not_admin']);
 }
 
 // Ensure $mx_user->session_id is populated...
@@ -111,7 +111,7 @@ if ($mx_request_vars->get('sid', MX_TYPE_NO_TAGS) != $mx_user->session_id)
 	$url = preg_replace('/\?$/', '', $url);
 	$url .= ((strpos($url, '?')) ? '&' : '?') . 'sid=' . $mx_user->session_id;
 
-	//mx_redirect(PORTAL_URL . $url);
+	mx_redirect(PORTAL_URL . $url);
 }
 
 // Have they authenticated (again) as an admin for this session?
@@ -122,9 +122,9 @@ switch (PORTAL_BACKEND)
 	case 'mybb':
 	case 'phpbb2':
 	case 'olympus':
-		if (!$mx_user->data['session_admin'])
+		if (!$userdata['session_admin'])
 		{
-			//mx_redirect(mx_append_sid("login.php?redirect=admin/index.$phpEx&admin=1", true));
+			mx_redirect(mx_append_sid("login.php?redirect=admin/index.$phpEx&admin=1", true));
 		}
 	break;
 
