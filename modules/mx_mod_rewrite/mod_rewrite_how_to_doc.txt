@@ -1,0 +1,44 @@
+mod_rewrite for MX-Publisher
+-----------------------------------------------------------------------------------------------------
+
+"Despite the tons of examples and docs, mod_rewrite is voodoo. Damned cool voodoo, but still voodoo."
+
+-- Brian Moore
+bem@news.cmc.net
+
+Requirements
+------------
+
+You need Apache server with module mod_rewrite enabled.
+http://httpd.apache.org/docs/1.3/mod/mod_rewrite.html
+
+Setup instructions for MX-Publisher
+---------------------------
+
+Located in the contrib folder are located the files .htaccess and rewrite_custom_defs.php. These files should be moved as instructed:
+
+mxp_root/.htaccess (required)
+mxp_root/modules/mx_mod_rewrite/rewrite_custom_defs.php (optional)
+
+The preconfigured "rules" will transform any portal url (http://domain/index.php?page=x) to an SEO alternative (http://domain/pagex).
+All Navigation Menu urls will apply to these rules.
+
+Custom rules (defs)
+-------------------
+
+You may (optionally) define more rules, to make your site even more SEO and user friendly. Such additional rules are defined in
+rewrite_custom_defs.php (MX-Publisher side of things) and in the .htaccess file (server side of things).
+This distribution comes with a basic set of examples.
+
+To see a "live" example of mod_rewrite in action with MX-Publisher, visit www.samskolan.se
+
+Resources
+---------
+
+You'll need some knowledge of Apache and its .htaccess usage - and mod_rewrite itself. Further you need some regex skills.
+
+http://mpcon.org/apacheguide/
+
+http://www.ilovejackdaniels.com/cheat-sheets/mod_rewrite-cheat-sheet/
+
+http://httpd.apache.org/docs/1.3/mod/mod_rewrite.html

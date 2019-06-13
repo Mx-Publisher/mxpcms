@@ -1,0 +1,20 @@
+<form action="{S_SEARCH_ACTION}" method="post">
+<table class="forumline" width="100%" cellpadding="2" cellspacing="1" border="0" style="border-top:none;">
+	<tr>
+		<td class="cat" colspan="4" height="25" style="text-align: center; font-weight: bold;">{L_SEARCH_QUERY}</td>
+	</tr>
+	<tr>
+		<td class="row1" colspan="2" width="50%"><span class="gen">{L_SEARCH_KEYWORDS}:</span><br /><span class="gensmall">{L_SEARCH_KEYWORDS_EXPLAIN}</span></td>
+		<td class="row2" colspan="2" valign="top"><span class="genmed"><input type="text" style="width: 300px" class="post" name="search_keywords" size="30" /><br /><input type="radio" name="search_terms" value="any" checked="checked" /> {L_SEARCH_ANY_TERMS}<br /><input type="radio" name="search_terms" value="all" /> {L_SEARCH_ALL_TERMS}</span></td>
+	</tr>
+	<tr>
+		<td class="cat" colspan="4" align="center" height="28">{S_HIDDEN_FIELDS}<input class="liteoption" type="submit" value="{S_SEARCH}" /></td>
+	</tr>
+</table>
+
+<table width="100%" cellspacing="0" cellpadding="2" border="0" align="center">
+	<tr>
+		<td align="right" valign="middle"><span class="gensmall">{S_TIMEZONE}</span></td>
+	</tr>
+</table>
+</form>

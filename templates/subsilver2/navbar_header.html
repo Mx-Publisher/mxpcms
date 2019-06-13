@@ -1,0 +1,78 @@
+<div class="navbar">
+	<div class="inner">
+	<ul class="linklist navlinks">
+		<li class="small-icon responsive-menu dropdown-container">
+			<a href="{U_INDEX}" class="responsive-menu-link dropdown-trigger" title="{L_QUICK_LINKS}">&nbsp;</a>
+			<div class="panel dropdown hidden" style="position: absolute">
+				<ul>
+					<!-- EVENT navbar_header_quick_links_before -->
+					<!-- EVENT overall_header_breadcrumbs_before -->
+					<!-- IF U_SITE_HOME --><li class="post bg3"><a href="{U_SITE_HOME}">{L_SITE_HOME}</a></li><!-- ENDIF -->
+					<li class="post bg3"><a href="{U_INDEX}">{L_INDEX}</a></li>
+					<!-- EVENT overall_header_breadcrumbs_after -->
+					<!-- EVENT navbar_header_quick_links_after -->
+				</ul>
+				<!-- IF S_REGISTERED_USER -->
+				<!-- EVENT navbar_header_username_prepend -->
+				<ul>
+					<!-- EVENT navbar_header_profile_list_before -->
+					<!-- IF S_DISPLAY_SEARCH -->
+					<li class="post bg3"><a href="{U_SEARCH_SELF}">{L_SEARCH_SELF}</a></li>
+					<!-- IF S_LOAD_UNREADS --><li class="post bg3"><a href="{U_SEARCH_UNREAD}">{L_SEARCH_UNREAD}</a></li><!-- ENDIF -->
+					<!-- ENDIF -->
+					<!-- EVENT navbar_header_profile_list_after -->
+					<li class="post bg3"><a href="{U_LOGIN_LOGOUT}">{L_LOGIN_LOGOUT}</a></li>
+				</ul>
+				<!-- EVENT navbar_header_username_append -->
+				<!-- ENDIF -->
+			</div>
+		</li>
+		<!-- EVENT overall_header_navigation_prepend -->
+		<!-- IF S_DISPLAY_SEARCH -->
+		<li class="small-icon dropdown-container">
+		<a href="{U_SEARCH}" title="{L_SEARCH}" class="dropdown-trigger"><img src="{T_THEME_PATH}/images/icon_search.gif" alt=""/></a>
+			<div class="panel dropdown hidden" style="position: fixed">
+			<form action="{U_SEARCH}" method="get" id="search">
+				<a href="{U_SEARCH}">{L_SEARCH_ADV}</a>
+				<div class="post bg3">
+					<input name="keywords" id="keywords" type="search" maxlength="128" title="{L_SEARCH_KEYWORDS}" class="inputbox autowidth" size="20" value="{SEARCH_WORDS}" />
+					<input type="submit" class="button2" title="{L_SEARCH}" value="{L_SEARCH}">
+					{S_SEARCH_HIDDEN_FIELDS}
+				</div>
+			</form>
+			</div>
+		</li>
+		<!-- ENDIF -->
+		<!-- IF U_MCP -->
+		<li class="small-icon"><a href="{U_MCP}" title="{L_MCP_SHORT}"><img src="{T_THEME_PATH}/images/icon_mcp.gif" alt=""/></a></li><!-- ENDIF -->
+		<!-- IF U_ACP -->
+		<li class="small-icon"><a href="{U_ACP}" title="{L_ACP_SHORT}"><img src="{T_THEME_PATH}/images/icon_acp.gif" alt=""/></a></li><!-- ENDIF -->
+		<!-- EVENT overall_header_navigation_append -->
+		<!-- IF S_REGISTERED_USER -->
+			<!-- IF S_DISPLAY_PM -->
+			<li class="small-icon rightside"><a href="{U_PRIVATEMSGS}" title="{L_PRIVATE_MESSAGES}"><img src="{T_THEME_PATH}/images/icon_pm.gif" alt=""/><!-- IF PRIVATE_MESSAGE_COUNT --><i class="error">{PRIVATE_MESSAGE_COUNT}</i><!-- ENDIF --></a></li>
+			<!-- ENDIF -->
+			<!-- IF S_NOTIFICATIONS_DISPLAY -->
+			<li class="small-icon rightside"><a href="{U_VIEW_ALL_NOTIFICATIONS}" title="{L_NOTIFICATIONS}"><img src="{T_THEME_PATH}/images/icon_notification.gif" alt=""/><!-- IF NOTIFICATIONS_COUNT --><i class="error">{NOTIFICATIONS_COUNT}</i><!-- ENDIF --></a></li>
+			<!-- ENDIF -->
+		<!-- ELSE -->
+			<!-- IF S_REGISTER_ENABLED and not (S_SHOW_COPPA or S_REGISTRATION) -->
+			<li class="small-icon rightside"><a href="{U_REGISTER}" title="{L_REGISTER}"><img src="{T_THEME_PATH}/images/icon_register.gif" alt="" /></a></li><!-- ENDIF -->
+			<li class="small-icon rightside"><a href="{U_LOGIN_LOGOUT}" title="{L_LOGIN_LOGOUT}"><img src="{T_THEME_PATH}/images/icon_logout.gif" alt="" /></a></li>
+			<!-- EVENT navbar_header_logged_out_content -->
+		<!-- ENDIF -->
+	</ul>
+	</div>
+</div>
+
+<!-- IF SCRIPT_NAME == 'viewtopic' -->
+<p>
+<!-- EVENT overall_header_breadcrumb_prepend -->
+	<!-- BEGIN navlinks -->
+		<!-- EVENT overall_header_navlink_prepend -->
+		<!-- IF navlinks.S_ROW_COUNT > 0 --> &laquo; <!-- ENDIF --><a href="{navlinks.U_VIEW_FORUM}"<!-- IF navlinks.MICRODATA --> {navlinks.MICRODATA}<!-- ENDIF -->>{navlinks.FORUM_NAME}</a>
+		<!-- EVENT overall_header_navlink_append -->
+	<!-- END navlinks -->
+<!-- EVENT overall_header_breadcrumb_append -->
+</p>
+<!-- ENDIF -->

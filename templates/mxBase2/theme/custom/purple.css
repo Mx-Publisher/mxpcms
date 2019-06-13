@@ -1,0 +1,40 @@
+.headerbar {
+	background-color: #3C094F;
+	background-image: -webkit-linear-gradient(top, #63187E 0%, #3C094F 100%);
+	background-image: linear-gradient(to bottom, #63187E 0%,#3C094F 100%);
+}
+
+.forabg, .forumbg {
+	background-color: #3C094F;
+	background-image: -webkit-linear-gradient(top, #89529E 0%, #3C094F 35px, #3C094F 100%);
+	background-image: linear-gradient(to bottom, #89529E 0%,#3C094F 35px,#3C094F 100%);
+}
+
+.pollbar1, .pollbar2, .pollbar3, .pollbar4 {
+	background-color: #3C094F;
+}
+.pollbar5 { background-color: #89529E; }
+
+.action-bar .coloredbutton {
+	border-color: #3C094F;
+	background-color: #3C094F;
+	background-image: -webkit-linear-gradient(top, #89529E 0%, #3C094F 100%);
+	background-image: linear-gradient(to bottom, #89529E 0%,#3C094F 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#89529E', endColorstr='#3C094F',GradientType=0 );
+}
+.action-bar .coloredbutton:hover {
+	background-color: #3C094F;
+	background-image: -webkit-linear-gradient(top, #3C094F 0%, #89529E 100%);
+	background-image: linear-gradient(to bottom, #3C094F 0%,#89529E 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3C094F', endColorstr='#89529E',GradientType=0 );
+}
+
+.pagination li.active span {
+	background: #89529E;
+	border-color: #89529E;
+}
+
+.pagination li a:hover {
+	background: #89529E;
+	border-color: #89529E;
+}

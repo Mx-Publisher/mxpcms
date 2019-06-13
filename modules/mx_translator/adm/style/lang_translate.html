@@ -1,0 +1,110 @@
+{% INCLUDE 'overall_header.html' %}
+<style type="text/css">
+	.trans_info {
+		margin-top:19px;
+		margin-right:0px;
+		padding:0px;
+		position:absolute;
+		background-color: #fff;
+		border:solid 1px #000;
+		z-index: 1000;
+	}
+	.trans_google {
+		margin-top:14px;
+		margin-right:0px;
+		padding:0px;
+		position:absolute;
+		background-color: #fff;
+		border:solid 1px #000;
+		z-index: 1000;
+	}	
+	.trans_info_img {
+		background: url('{IMG_INFO}') no-repeat 0px 0px;
+		width:15px;
+		height:15px;
+	}
+	.trans_google_img {
+		background: url('{IMG_GOOGLE}') no-repeat 0px 0px;
+		width:15px;
+		height:15px;
+	}	
+	.trans_info_img:hover {
+		background-position: 0px -15px;
+	}
+	.trans_google_img:hover {
+		background-position: 0px -15px;
+	}	
+</style>
+<h1>{L_LANGUAGES_TOOLS}</h1>
+<p class="genmed">{L_TRANSLATE_DESCRIPTION}</p>
+<!-- INCLUDE selects.html -->
+<div id="translate_file">
+<form id="lang_translate" method="post" action="{{ S_ACTION }}">
+<!-- IF FILE_FULL_ROOT_PATH_ORIGINAL -->
+<h2 style="margin-bottom:0px;padding-bottom:0px;">{L_TRANSLATE}</h2>
+<p style="margin-top:0px;margin-bottom:3px;"><strong>{L_FILE}:</strong> {FILE_FULL_ROOT_PATH_TRANSLATE} &bull;
+<!-- IF FILE_IS_WRITABLE --><span style="color:Green">{L_FILE_IS_WRITABLE}</span>
+<!-- ELSE --><span style="color:Red">{L_FILE_IS_UNWRITABLE}</span><!-- ENDIF -->
+ &bull; {L_FILE_CHARSET}: {L_ENCODING}
+</p>
+<input type="hidden" name="language[into]" value="{I_LANGUAGE}" />
+<input type="hidden" name="translate[module]" value="{I_MODULE}" />
+<input type="hidden" name="translate[file]" value="{I_FILE}" />
+<table border="0" cellspacing="1" cellpadding="4" width="100%" class="forumline">
+	<thead>
+		<tr>
+			<th class="thCornerL" width="25%">{L_TRANSLATE_KEY}</th>
+			<th class="thCornerR" width="75%">{L_TRANSLATE_VALUE}</th>
+		</tr>
+	</thead>
+	<tbody>
+		<!-- BEGIN language_item -->
+		<tr>
+			<td class="row1" valign="top">
+					&nbsp;			
+				<span style="float:right"
+				 onmouseover="getObj('l_row_info_{language_item.COUNTER}').style.display='';"
+				 onmouseout="getObj('l_row_info_{language_item.COUNTER}').style.display='none';"
+				 class="trans_info_img"> 	
+				</span>	
+					&nbsp;
+				<span style="float:right"
+				 onmouseover="getObj('l_row_info_{language_item.COUNTER}').style.display='';"
+				 onmouseout="getObj('l_row_info_{language_item.COUNTER}').style.display='none';"
+				 class="trans_google_img"> 	
+				 </span>	
+					&nbsp;
+				<span>{language_item.U_KEY}</span>					
+			</td>
+			<td class="row2" valign="top">
+				<div id="l_row_info_{language_item.COUNTER}" class="trans_info" style="display:none">
+				<dd>
+				<span id="trans_info">{language_item.ORIGINAL_VALUE}</span></dd>
+				<p></p>
+				<dd>
+				<span id="trans_google">{language_item.GOOGLE_VALUE}</span></dd>
+				</div>							
+				<textarea id="trans_input" name="l[{language_item.KEY}]" style="width:100%" rows="3">{language_item.TRANSLATE_VALUE}</textarea>
+			</td>		
+		</tr>		
+		<!-- END language_item -->
+	</tbody>
+	<tfoot>
+		<tr>
+			<td colspan="2" align="right" class="row2">
+			<input type="hidden" name="set_file" value="{L_SUBMIT}" />
+			<!-- IF FILE_IS_WRITABLE -->
+			<input type="submit" name="save" value="{L_SAVE}" />
+			<!-- ENDIF -->
+			<input type="button" name="copy_selected" onclick="copySelected()" value="copy selected">
+			<input type="submit" name="download" value="{L_DOWNLOAD}" />
+			<input type="reset" value="{L_RESET}" />
+			</td>
+		</tr>
+	</tfoot>
+</table>
+<!-- ENDIF -->
+</form>
+</div>
+<p></p>
+{% INCLUDE 'overall_footer.html' %}

@@ -1,0 +1,98 @@
+
+<script type="text/javascript">
+function showParam(i) {
+    currentParam = i;
+    document.getElementById('paramHide').style.display = ''
+    document.getElementById('paramSpace').style.display = ''
+    document.getElementById('param').style.display = ''
+    document.getElementById('param').innerHTML = '<pre>' + document.getElementById('param' + i).innerHTML + '</pre>'
+}
+function hideParam() {
+    currentParam = -1;
+    document.getElementById('paramHide').style.display = 'none'
+    document.getElementById('paramSpace').style.display = 'none'
+    document.getElementById('param').style.display = 'none'
+}
+function showOrHideParam(i) {
+    if (currentParam == i) {
+        hideParam()
+    } else {
+        showParam(i)
+    }
+}
+function showFile(id) {
+    eval('display = document.getElementById("file' + id + '").style.display')
+    eval('if (display == "none") { document.getElementById("file' + id + '").style.display = "" } else { document.getElementById("file' + id + '").style.display = "none" } ');
+}
+function showDetails(cnt) {
+    for (i = 0; i < cnt; ++i) {
+        eval('document.getElementById("file' + i + '").style.display = ""')
+    }
+}
+function hideDetails(cnt) {
+    for (i = 0; i < cnt; ++i) {
+        eval('document.getElementById("file' + i + '").style.display = "none"')
+    }
+}
+var currentParam = -1;
+</script>
+
+<pre>
+<hr />
+
+<b>Error type:</b> Php Notice
+<b>Message:</b> Undefined variable:  show_error
+
+<span style="font-family: monospaced; font-size: 11px;">Trace: 7</span> <span style="font-family: monospaced; font-size: 11px; cursor: pointer;" onclick="showDetails(7)">[show details]</span> <span style="font-family: monospaced; font-size: 11px; cursor: pointer;" onclick="hideDetails(7)">[hide details]</span>
+
+<ul><li style="list-style-type: square;"><span onmouseover="this.style.color='#0000ff'" onmouseout="this.style.color='#0000A0'" style="color: #0000A0; cursor: pointer;" onclick="showFile(0)">_query</span> ()
+<span id="file0" style="display: none; color: gray;">FILE: <a onmouseout="this.style.color='#007700'" onmouseover="this.style.color='#FF6600'" style="color: #007700; text-decoration: none;" target="_blank" href="http://127.0.0.1/dev/showSource.php?file=d%3A%5Cpublic_html%5Cmygosudoc%5Cwww%5Cincludes%5CDb%5CMysql%5CMysql.php&line=70&prev=10&next=10">Mysql.php</a>
+LINE: <font color="#007700">70</font>
+DIR:  <font color="#007700">d:\public_html\mygosudoc\www\includes\Db\Mysql</font></span></li><li style="list-style-type: square;"><span onmouseover="this.style.color='#0000ff'" onmouseout="this.style.color='#0000A0'" style="color: #0000A0; cursor: pointer;" onclick="showFile(1)">dbmysql._query</span> (<span style="cursor: pointer; color: #404040;" onclick="showOrHideParam(2)" onmouseout="this.style.color='#404040'" onmouseover="this.style.color='#dd0000'">string[85]</span><span id="param2" style="display: none;">
+            SELECT *
+            FROM cat
+            WHERE id_cat = 22
+        </span>)
+<span id="file1" style="display: none; color: gray;">FILE: <a onmouseout="this.style.color='#007700'" onmouseover="this.style.color='#FF6600'" style="color: #007700; text-decoration: none;" target="_blank" href="http://127.0.0.1/dev/showSource.php?file=d%3A%5Cpublic_html%5Cmygosudoc%5Cwww%5Cincludes%5CDb%5CSql%5CSql.php&line=79&prev=10&next=10">Sql.php</a>
+LINE: <font color="#007700">79</font>
+DIR:  <font color="#007700">d:\public_html\mygosudoc\www\includes\Db\Sql</font></span></li><li style="list-style-type: square;"><span onmouseover="this.style.color='#0000ff'" onmouseout="this.style.color='#0000A0'" style="color: #0000A0; cursor: pointer;" onclick="showFile(2)">dbmysql.query</span> (<span style="cursor: pointer; color: #404040;" onclick="showOrHideParam(4)" onmouseout="this.style.color='#404040'" onmouseover="this.style.color='#dd0000'">string[85]</span><span id="param4" style="display: none;">
+            SELECT *
+            FROM cat
+            WHERE id_cat = 22
+        </span>)
+<span id="file2" style="display: none; color: gray;">FILE: <a onmouseout="this.style.color='#007700'" onmouseover="this.style.color='#FF6600'" style="color: #007700; text-decoration: none;" target="_blank" href="http://127.0.0.1/dev/showSource.php?file=d%3A%5Cpublic_html%5Cmygosudoc%5Cwww%5Cincludes%5CDb%5CSql%5CSql.php&line=271&prev=10&next=10">Sql.php</a>
+LINE: <font color="#007700">271</font>
+DIR:  <font color="#007700">d:\public_html\mygosudoc\www\includes\Db\Sql</font></span></li><li style="list-style-type: square;"><span onmouseover="this.style.color='#0000ff'" onmouseout="this.style.color='#0000A0'" style="color: #0000A0; cursor: pointer;" onclick="showFile(3)">dbmysql.execute</span> (<span style="cursor: pointer; color: #404040;" onclick="showOrHideParam(6)" onmouseout="this.style.color='#404040'" onmouseover="this.style.color='#dd0000'">string[84]</span><span id="param6" style="display: none;">
+            SELECT *
+            FROM cat
+            WHERE id_cat = ?
+        </span>, <span style="cursor: pointer; color: #404040;" onclick="showOrHideParam(7)" onmouseout="this.style.color='#404040'" onmouseover="this.style.color='#dd0000'">array[1]</span><span id="param7" style="display: none;">Array
+(
+    [0] => 22
+)
+</span>)
+<span id="file3" style="display: none; color: gray;">FILE: <a onmouseout="this.style.color='#007700'" onmouseover="this.style.color='#FF6600'" style="color: #007700; text-decoration: none;" target="_blank" href="http://127.0.0.1/dev/showSource.php?file=d%3A%5Cpublic_html%5Cmygosudoc%5Cwww%5Cincludes%5CDb%5CSql%5CSql.php&line=402&prev=10&next=10">Sql.php</a>
+LINE: <font color="#007700">402</font>
+DIR:  <font color="#007700">d:\public_html\mygosudoc\www\includes\Db\Sql</font></span></li><li style="list-style-type: square;"><span onmouseover="this.style.color='#0000ff'" onmouseout="this.style.color='#0000A0'" style="color: #0000A0; cursor: pointer;" onclick="showFile(4)">dbmysql.getrow</span> (<span style="cursor: pointer; color: #404040;" onclick="showOrHideParam(9)" onmouseout="this.style.color='#404040'" onmouseover="this.style.color='#dd0000'">string[84]</span><span id="param9" style="display: none;">
+            SELECT *
+            FROM cat
+            WHERE id_cat = ?
+        </span>, <span style="cursor: pointer; color: #800080;" onclick="showOrHideParam(10)" onmouseout="this.style.color='#800080'" onmouseover="this.style.color='#dd0000'">22</span><span id="param10" style="display: none;">22</span>)
+<span id="file4" style="display: none; color: gray;">FILE: <a onmouseout="this.style.color='#007700'" onmouseover="this.style.color='#FF6600'" style="color: #007700; text-decoration: none;" target="_blank" href="http://127.0.0.1/dev/showSource.php?file=d%3A%5Cpublic_html%5Cmygosudoc%5Cwww%5Cincludes%5CDao.php&line=129&prev=10&next=10">Dao.php</a>
+LINE: <font color="#007700">129</font>
+DIR:  <font color="#007700">d:\public_html\mygosudoc\www\includes</font></span></li><li style="list-style-type: square;"><span onmouseover="this.style.color='#0000ff'" onmouseout="this.style.color='#0000A0'" style="color: #0000A0; cursor: pointer;" onclick="showFile(5)">catdao.find</span> (<span style="cursor: pointer; color: #800080;" onclick="showOrHideParam(12)" onmouseout="this.style.color='#800080'" onmouseover="this.style.color='#dd0000'">22</span><span id="param12" style="display: none;">22</span>)
+<span id="file5" style="display: none; color: gray;">FILE: <a onmouseout="this.style.color='#007700'" onmouseover="this.style.color='#FF6600'" style="color: #007700; text-decoration: none;" target="_blank" href="http://127.0.0.1/dev/showSource.php?file=d%3A%5Cpublic_html%5Cmygosudoc%5Cwww%5Cadmin%5Cincludes%5Ccheck_id_cat.php&line=14&prev=10&next=10">check_id_cat.php</a>
+LINE: <font color="#007700">14</font>
+DIR:  <font color="#007700">d:\public_html\mygosudoc\www\admin\includes</font></span></li><li style="list-style-type: square;"><span onmouseover="this.style.color='#0000ff'" onmouseout="this.style.color='#0000A0'" style="color: #0000A0; cursor: pointer;" onclick="showFile(6)">check_id_cat</span> (<span style="cursor: pointer; color: #800080;" onclick="showOrHideParam(14)" onmouseout="this.style.color='#800080'" onmouseover="this.style.color='#dd0000'">22</span><span id="param14" style="display: none;">22</span>)
+<span id="file6" style="display: none; color: gray;">FILE: <a onmouseout="this.style.color='#007700'" onmouseover="this.style.color='#FF6600'" style="color: #007700; text-decoration: none;" target="_blank" href="http://127.0.0.1/dev/showSource.php?file=d%3A%5Cpublic_html%5Cmygosudoc%5Cwww%5Cadmin%5Cmanage%5Cindex.php&line=21&prev=10&next=10">index.php</a>
+LINE: <font color="#007700">21</font>
+DIR:  <font color="#007700">d:\public_html\mygosudoc\www\admin\manage</font></span></li></ul>
+<span id="paramHide" style="display: none; font-family: monospaced; font-size: 11px; cursor: pointer;" onclick="hideParam()">[hide param]</span><span id="paramSpace" style="display: none;">
+
+</span><div id="param" perm="0" style="background-color: #FFFFE1; padding: 2px; display: none;"></div><hr />
+
+Trick: click on a function's argument to see it fully
+Trick: click on a function to see the file & line
+Trick: click on the file name to see the source code
+
+</pre>

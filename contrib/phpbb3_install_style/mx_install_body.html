@@ -1,0 +1,207 @@
+<script language="javascript1.2" type="text/javascript"><!--
+
+function getObj(obj)
+{
+	return ( document.getElementById ? document.getElementById(obj) : ( document.all ? document.all[obj] : null ) );
+}
+
+function displayObj(obj, status)
+{
+	var x = getObj(obj);
+	if( x && x.style ) x.style.display = status;
+}
+
+function check_phpbb_path()
+{
+	if( document.forms['frmInstall'] && document.forms['frmInstall'].elements['select_phpbb_path'] )
+	{
+		var i = document.forms['frmInstall'].elements['select_phpbb_path'].value;
+		if (i == -1)
+		{
+			displayObj('phpbb', 'none');
+			displayObj('mxbb', 'block');
+		}
+		else
+		{
+			displayObj('phpbb', 'block');
+			displayObj('mxbb', 'none');
+		}
+		for( var x in pathinfo[i] )
+		{
+			document.forms['frmInstall'].elements[x].value = pathinfo[i][x];
+		}
+	}
+}
+var pathinfo = [];
+var i = -1;
+
+<!-- BEGIN datarow -->
+pathinfo[i] = [];
+pathinfo[i]['info'] = '{datarow.INFO}';
+pathinfo[i]['phpbb_path'] = '{datarow.PHPBB_PATH}';
+//pathinfo[i]['phpbb_url'] = '{datarow.PHPBB_URL}';
+pathinfo[i]['portal_backend'] = '{datarow.PORTAL_BACKEND}';
+pathinfo[i]['portal_url'] = '{datarow.PORTAL_URL}';
+pathinfo[i]['dbms'] = '{datarow.DBMS}';
+pathinfo[i]['dbhost'] = '{datarow.DB_HOST}';
+pathinfo[i]['dbhost_mxbb'] = '{datarow.DB_HOST}';
+pathinfo[i]['dbname'] = '{datarow.DB_NAME}';
+pathinfo[i]['dbuser'] = '{datarow.DB_USER}';
+pathinfo[i]['dbpasswd'] = '{datarow.DB_PASSWD}';
+pathinfo[i]['prefix'] = '{datarow.DB_PREFIX}';
+//pathinfo[i]['acm_type'] = '{datarow.ACM_TYPE}';
+pathinfo[i]['phpbb_root_path'] = '{datarow.PHPBB_ROOT}';
+i++;
+<!-- END datarow -->
+
+window.onload = check_phpbb_path;
+//--></script>
+<noscript>
+<div align="center" style="color:red;">{L_NOSCRIPT_WARNING}</div>
+</noscript>
+<form name="frmInstall" action="{S_FORM_ACTION}" method="post">
+<table cellpadding="2" cellspacing="1" border="0">
+	<tr>
+		<th colspan="2">{L_INITIAL_CONFIGURATION}</th>
+	</tr>
+	<!-- BEGIN switch_readonly_mode -->
+	<tr>
+		<td class="row1" align="right" width="50%"><span class="gen"><b>{L_Backend}:&nbsp;</b></span><br /><span class="gensmall">{L_Backend_explain}:&nbsp;</span></td>
+		<td class="row2">{S_PHPBB_PATH}</td>
+	</tr>
+	<!-- END switch_readonly_mode -->
+	<tr>
+		<td class="row1" align="right" width="50%"><span class="gen">{L_PORTAL_BACKEND}:&nbsp;</span></td>
+		<td class="row2"><input class="inputbox autowidth" type="text" name="portal_backend" value="{PORTAL_BACKEND}" {READONLY}/></td>
+	</tr>	
+	<tr>
+		<td class="row1" colspan="2" align="center"><input size="140" class="info" type="text" name="info" value="{INFO}" /></td></td>
+	</tr>
+	<tr>
+		<td class="row1" align="right"><span class="gen"><b>{L_MX_DB_PREFIX}:&nbsp;</b></span></td>
+		<td class="row2"><input class="inputbox autowidth" type="text" name="mx_prefix" value="{MX_DB_PREFIX}" /></td>
+	</tr>
+	<!--
+	<tr>
+		<td class="row1" align="right"><span class="gen"><b>{L_ACM_TYPE}:&nbsp;</b></span></td>
+		<td class="row2"><input class="inputbox autowidth" type="text" name="acm_type" value="{ACM_TYPE}" /></td>
+	</tr>
+	-->
+	<tr>
+		<th colspan="2">{L_PORTAL_CONFIGURATION}{READ_ONLY}</th>
+	</tr>
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_PORTAL_URL}:&nbsp;</span></td>
+		<td class="row2"><input class="inputbox autowidth" type="text" size="80" name="portal_url" value="{PORTAL_URL}" /></td>
+	</tr>
+
+	<tr><td colspan="2"><div id="phpbb" style="display:none;" class="genmed"><table width="100%" cellpadding="2" cellspacing="1" border="0">
+
+	<!--
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_PHPBB_URL}:&nbsp;</span></td>
+		<td class="row2"><input class="inputbox autowidth" type="text" size="80" name="phpbb_url" value="{PHPBB_URL}"{READONLY} /></td>
+	</tr>
+	-->
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_PHPBB_PATH}:&nbsp;</span></td>
+		<td class="row2"><input class="inputbox autowidth" type="text" size="80" name="phpbb_path" value="{PHPBB_PATH}"{READONLY} /></td>
+	</tr>
+	<tr>
+		<th colspan="2">{L_DATABASE_CONFIGURATION}{READ_ONLY}</th>
+	</tr>
+	<tr>
+		<td class="row1" align="right" width="50%"><span class="gen">{L_DBMS}:&nbsp;</span></td>
+		<td class="row2"><input class="inputbox autowidth" type="text" name="dbms" value="{DBMS}" {READONLY}/></td>
+	</tr>
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_DB_HOST}:&nbsp;</span></td>
+		<td class="row2"><input class="inputbox autowidth" type="text" name="dbhost" value="{DB_HOST}"{READONLY} /></td>
+	</tr>
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_DB_NAME}:&nbsp;</span></td>
+		<td class="row2"><input class="inputbox autowidth" type="text" name="dbname" value="{DB_NAME}"{READONLY} /></td>
+	</tr>
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_DB_USER}:&nbsp;</span></td>
+		<td class="row2"><input class="inputbox autowidth" type="text" name="dbuser" value="{DB_USER}"{READONLY} /></td>
+	</tr>
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_DB_PASSWORD}:&nbsp;</span></td>
+		<td class="row2"><input type="password" name="dbpasswd" value="{DB_PASSWD}"{READONLY} /></td>
+	</tr>
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_DB_PREFIX}:&nbsp;</span></td>
+		<td class="row2"><input class="inputbox autowidth" type="text" name="prefix" value="{DB_PREFIX}"{READONLY} /></td>
+	</tr>
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_MXP_ADMINNAME}:&nbsp;</span></td>
+		<td class="row2"><input class="inputbox autowidth" type="text" name="admin_name" value="" /></td>
+	</tr>
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_MXP_PASSWORD}:&nbsp;</span></td>
+		<td class="row2"><input class="inputbox autowidth" type="password" name="admin_pass1" value="" /></td>
+	</tr>
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_MXP_PASSWORD2}:&nbsp;</span></td>
+		<td class="row2"><input class="inputbox autowidth" type="password" name="admin_pass2" value="" /></td>
+	</tr>
+	<tr>
+		<td class="row1" colspan="2" align="center"><span class="gensmall"><font color="red">{L_MXP_ADMIN}</font></span></td></td>
+	</tr>
+	<tr>
+		<td class="catbottom" align="center" colspan="2">{S_HIDDEN_FIELDS}<input class="liteoption" type="submit" name="debug" value="Debug" /><input class="mainoption" name="phpbb" type="submit" value="{L_SUBMIT}" /></td>
+	</tr>
+
+
+	</table></div></td></tr>
+
+	<tr><td colspan="2"><div id="mxbb" style="display:none;" class="genmed"><table width="100%" cellpadding="2" cellspacing="1" border="0">
+
+	<tr>
+		<th colspan="2">{L_DATABASE_CONFIGURATION}</th>
+	</tr>
+	<tr>
+		<td class="row1" align="right" width="50%"><span class="gen">{L_DBMS}:&nbsp;</span></td>
+		<td class="row2"><select name="dbms_mxbb">{DBMS_SELECT}</select></td>
+	</tr>
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_DB_HOST}:&nbsp;</span></td>
+		<td class="row2"><input class="inputbox autowidth" type="text" name="dbhost_mxbb" value="{DB_HOST}" /></td>
+	</tr>
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_DB_NAME}:&nbsp;</span></td>
+		<td class="row2"><input class="inputbox autowidth" type="text" name="dbname_mxbb" value="{DB_NAME}" /></td>
+	</tr>
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_DB_USER}:&nbsp;</span></td>
+		<td class="row2"><input class="inputbox autowidth" type="text" name="dbuser_mxbb" value="{DB_USER}" /></td>
+	</tr>
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_DB_PASSWORD}:&nbsp;</span></td>
+		<td class="row2"><input type="password" name="dbpasswd_mxbb" value="{DB_PASSWD}" /></td>
+	</tr>
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_MXP_ADMINNAME}:&nbsp;</span></td>
+		<td class="row2"><input class="inputbox autowidth" type="text" name="admin_name_mxbb" value="" /></td>
+	</tr>
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_MXP_PASSWORD}:&nbsp;</span></td>
+		<td class="row2"><input class="inputbox autowidth" type="password" name="admin_pass1_mxbb" value="" /></td>
+	</tr>
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_MXP_PASSWORD2}:&nbsp;</span></td>
+		<td class="row2"><input class="inputbox autowidth" type="password" name="admin_pass2_mxbb" value="" /></td>
+	</tr>
+	<tr>
+		<td class="row1" colspan="2" align="center"><span class="gensmall"><font color="red">{L_MXP_ADMIN}</font></span></td></td>
+	</tr>
+	<tr>
+		<td class="catbottom" align="center" colspan="2">{S_HIDDEN_FIELDS}<input class="liteoption" type="submit" name="debug" value="Debug" /><input class="mainoption" name="mxbb" type="submit" value="{L_SUBMIT}" /></td>
+	</tr>
+
+	</table></div></td></tr>
+
+
+</table>
+</form>

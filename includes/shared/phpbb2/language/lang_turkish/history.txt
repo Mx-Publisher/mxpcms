@@ -1,0 +1,349 @@
+Türkçe Dil Paketi Geçmiþi
+
+v. 2.2.9   (23.03.2007|22:52)
+
+    * php dosyalarý baþlýk bilgi ve açýklamalarý CVS uyumlu yapýldý.
+
+v. 2.2.8   (10.02.2006|18:54)
+
+    * phpbb 2.0.23-pre güncellemesi yapýldý.
+
+v. 2.2.7   (16.12.2006|16:16)
+
+    * phpbb 2.0.22 güncellemesi yapýldý.
+
+v. 2.2.6   (19.10.2006|15:35)
+
+    * lang_faq dosyasýnda gereksiz birkaç týrnak iþareti deðiþtirildi.
+
+v. 2.2.5   (13.10.2006|16:25)
+
+    * lang_main
+          o $lang['Inbox_size'] bilgisi deðiþtirildi.
+          o $lang['Sentbox_size'] bilgisi deðiþtirildi.
+          o $lang['Savebox_size'] bilgisi deðiþtirildi.
+
+v. 2.2.4   (06.10.2006|11:34)
+
+    * lang_main
+          o $lang['Always_bbcode'] bilgisi deðiþtirildi.
+          o $lang['Always_smile'] bilgisi deðiþtirildi.
+          o $lang['Confirm_code_impaired'] bilgisi deðiþtirildi.
+          o $lang['Please_remove_install_contrib'] bilgisi deðiþtirildi.
+          o $lang['Board_lang'] bilgisi deðiþtirildi.
+          o $lang['Inbox_size'] bilgisi deðiþtirildi.
+          o $lang['Sentbox_size'] bilgisi deðiþtirildi.
+          o $lang['Savebox_size'] bilgisi deðiþtirildi.
+
+v. 2.2.3   (12.07.2006|10:41)
+
+    * tüm dosyalarda
+          o konu içindeki mesajlar ile ilgili kýzýmlardaki "mesaj" => ileti
+          o kiþisel mesaj => özel mesaj
+          o bazý ufak hatalar giderildi
+
+v. 2.2.2   (18.06.2006|10:57)
+
+    * lang_main
+          o $lang['Confirm_code_explain'] bilgisi deðiþtirildi.
+
+v. 2.2.1   (07.06.2006|23:56)
+
+    * lang_main
+          o $lang['Topic_post_not_exist'] bilgisi deðiþtirildi.
+          o $lang['Forum_not_exist'] bilgisi deðiþtirildi.
+          o Timezones kýsmýnda deðiþiklikler yapýldý.
+
+v. 2.2.0   (23.05.2006|07:22)
+
+    * lang_main
+          o $lang['TRANSLATION_INFO'] bilgisi deðiþtirildi.
+          o $lang['Found_search_match'] bilgisi deðiþtirildi.
+          o $lang['Found_search_matches'] bilgisi deðiþtirildi.
+
+v. 2.1.9   (17.05.2006|06:11)
+
+    * lang_faq dosyasýnda deðiþiklikler.
+    * lang_main
+          o $lang['Search_your_posts'] bilgisi deðiþtirildi.
+
+v. 2.1.8   (12.05.2006|06:29)
+
+    * temel search_synonyms.txt eklendi
+    * þifre => parola
+    * kullanýcý ismi => kullanýcý adý
+    * email/*.* dizinindeki dosyalarda iyileþtirme yapýldý.
+    * lang_main
+          o $lang['Search_author'] bilgisi deðiþtirildi.
+          o $lang['Search_keywords'] bilgisi deðiþtirildi.
+          o $lang['Record_online_users'] bilgisi deðiþtirildi.
+          o $lang['Send_password'] bilgisi deðiþtirildi.
+          o $lang['Password_mismatch'] bilgisi deðiþtirildi.
+          o $lang['Current_password_mismatch'] bilgisi deðiþtirildi.
+    * lang_admin
+          o $lang['Use_SMTP_explain'] bilgisi deðiþtirildi.
+          o $lang['Unwriteable_config'] bilgisi deðiþtirildi.
+
+v. 2.1.7   (30.04.2006|06:58)
+
+    * gülücük --> ifade
+    * lang_main
+          o $lang['Stored'] bilgisi deðiþtirildi.
+          o $lang['Deleted'] bilgisi deðiþtirildi.
+          o $lang['Poll_delete'] bilgisi deðiþtirildi.
+
+v. 2.1.6   (20.04.2006|08.35)
+
+    * Çalýþma adý "canver.net phpBB 2.0.x Türkçe Dil Paketi" olarak deðiþtirildi.
+    * beni oku dosyasý deðiþtirildi.
+    * 2.1.5 ile tekrar hatalý duruma gelen $lang['Forum_locked'] bilgisi deðiþtirildi.
+    * lang_faq dosyasýnda iyileþtirme yapýldý.
+    * search_stopwords.txt dosyasý eklendi.
+    * lang_main
+          o $lang['TRANSLATION_INFO'] bilgisine ekleme yapýldý.
+          o $lang['Search_Flood_Error'] bilgisi deðiþtirildi.
+          o $lang['Subscribe'] bilgisi deðiþtirildi.
+          o $lang['Unsubscribe'] bilgisi deðiþtirildi.
+          o $lang['bbcode_c_help'] bilgisi deðiþtirildi.
+          o $lang['bbcode_p_help'] bilgisi deðiþtirildi.
+          o $lang['bbcode_w_help'] bilgisi deðiþtirildi.
+          o $lang['Group_joined'] bilgisi deðiþtirildi.
+          o $lang['Profile_info'] bilgisi deðiþtirildi.
+          o $lang['Contact'] bilgisi deðiþtirildi.
+          o $lang['Website'] bilgisi deðiþtirildi.
+          o $lang['Interests'] bilgisi deðiþtirildi.
+          o $lang['Confirm_password'] bilgisi deðiþtirildi.
+    * lang_admin
+          o $lang['Flood_Interval_explain'] bilgisi deðiþtirildi.
+          o $lang['Search_Flood_Interval_explain'] bilgisi deðiþtirildi.
+          o $lang['Install_No_Ext'] bilgisi deðiþtirildi.
+          o $lang['No_mode'] bilgisi deðiþtirildi.
+          o $lang['Config_updated'] bilgisi deðiþtirildi.
+          o $lang['User_delete_explain'] bilgisi deðiþtirildi.
+          o $lang['Version_up_to_date'] bilgisi deðiþtirildi.
+          o $lang['Version_not_up_to_date'] bilgisi deðiþtirildi.
+          o $lang['Backup_download'] bilgisi deðiþtirildi.
+          o $lang['replace_existing'] bilgisi deðiþtirildi.
+          o $lang['keep_existing'] bilgisi deðiþtirildi.
+          o $lang['export_smiles'] bilgisi deðiþtirildi.
+          o $lang['continue_upgrade'] bilgisi deðiþtirildi.
+    * email/ dizininde bulunan aþaðýdaki dosyalarda iyileþtirme yapýldý.
+          o admin_send_email.tpl
+          o admin_welcome_activated.tpl
+          o admin_welcome_inactive.tpl
+          o group_added.tpl
+          o group_approved.tpl
+          o group_request.tpl
+          o privmsg_notify.tpl
+          o profile_send_email.tpl
+          o topic_notify.tpl
+          o user_activate.tpl
+          o user_activate_passwd.tpl
+          o user_welcome.tpl
+          o user_welcome_inactive.tpl
+
+v. 2.1.5   (07.04.2006|22.06)
+
+    * phpbb 2.0.20 deðiþiklik ve eklemeleri yapýldý. (Search Flood Control)
+    * lang_main
+          o $lang['Poster_rank'] bilgisi deðiþtirildi.
+    * lang_admin
+          o "Forum Yönetimi" kýsmýnda, açýklama ve Resync'de deðiþiklik yapýldý.
+          o "Kullanýcý sayýsý" --> "Üye sayýsý"
+          o "Günlük ortalama kullanýcý" --> "Günlük ortalama üye"
+          o $lang['Max_filesize_explain'] imla hatasý düzeltildi.
+          o $lang['Allow_BBCode'] bilgisi deðiþtirildi.
+          o $lang['Flood_Interval_explain'] bilgisi deðiþtirildi.
+          o $lang['Confirm_delete_style'] bilgisi deðiþtirildi.
+          o $lang['Allow_autologin'] sadece ilk harf büyük yapýldý.
+          o $lang['Server_name'] sadece ilk harf büyük yapýldý.
+          o $lang['Flood_Interval'] sadece ilk harf büyük yapýldý.
+          o $lang['System_timezone'] sadece ilk harf büyük yapýldý.
+          o $lang['Disable_privmsg'] sadece ilk harf büyük yapýldý.
+          o $lang['Avatar_storage_path'] sadece ilk harf büyük yapýldý.
+          o $lang['Avatar_gallery_path'] sadece ilk harf büyük yapýldý.
+          o $lang['COPPA_fax'] sadece ilk harf büyük yapýldý.
+          o $lang['Email_sig'] sadece ilk harf büyük yapýldý.
+          o $lang['SMTP_server'] sadece ilk harf büyük yapýldý.
+          o $lang['SMTP_username'] sadece ilk harf büyük yapýldý.
+          o $lang['COPPA_settings'] her kelimenin ilk harfi büyük yapýldý.
+
+v. 2.1.4   (25.03.2006|13:36)    yayýnlanmadý
+
+    * Pano saati => Sistem saati
+    * lang_main
+          o noktalama ve kelime deðiþiklikleri yapýldý.
+          o fazla olan $lang['Email'] satýrý silindi.
+          o TRANSLATION_INFO bilgisi sadeleþtirildi.
+          o $lang['Mod_CP_explain'] bilgileri düzenlendi
+    * Telif hakký Canver Software AWSS'ye devredildi.
+
+v. 2.1.3   (30.12.2005|19:40)
+
+    * phpbb 2.0.19 deðiþiklik ve eklemeleri yapýldý. (Login attempts configuration)
+    * Kiþisel sembol kontrol paneli => Sembol kontrol paneli
+    * Kiþisel sembol kontrol paneli => Sembol galerisi
+    * Dosyalardaki üst bilgiler kýsaltýldý
+
+v. 2.1.2-d   (22.12.2005|19:56)
+
+    * "!! beni oku !!.html" "Hata Oluþursa" kaldýrýldý
+
+v. 2.1.2-c   (16.12.2005|07:35)
+
+    * lang_faq dosyasýnda ufak bir deðiþiklik yapýldý.
+
+v. 2.1.2-b   (28.11.2005|12:44)
+
+    * "Translator credit" bölümünden sürüm bilgisi kaldýrýldý, linkler tekrar ayarlandý.
+
+v. 2.1.2-a   (07.11.2005|04:10)
+
+    * "Translator credit" bölümü biraz düzene sokuldu.
+
+v. 2.1.2   (30.10.2005|22:03)
+
+    * phpbb 2.0.18 deðiþiklik ve eklemeleri yapýldý.
+
+v. 2.1.1-a   (12.10.2005|17:56)
+
+    * Yeni mesajlar --> Yeni eklenen mesajlar
+
+v. 2.1.1   (07.10.2005|03:59)
+
+    * avatar --> kiþisel simge
+    * !! beni oku !!.html dosyasýnda bazý deðiþiklikler yapýldý, koþullar ile ilgili.
+
+v. 2.1.0   (09.06.2005|11:19)
+
+    * "junk mail" hakkýnda uyarý eklendi
+    * Dosyalar gözden geçirildi ve bazý deðiþikler yapýldý.
+
+v. 2.0.9   (19.09.2005|22:14)
+
+    * banlama --> yasaklama
+    * user_activate_passwd.tpl dosyasýnda ufak deðiþiklikler yapýldý
+    * user_activate.tpl dosyasýnda ufak deðiþiklikler yapýldý
+    * privmsg_notify.tpl dosyasýnda ufak deðiþiklikler yapýldý
+
+v. 2.0.8   (14.09.2005|03:02)
+
+    * lang_faq dosyasýnda ufak deðiþiklikler yapýldý
+
+v. 2.0.7   (01.09.2005|01:09)
+
+    * lang_admin Yönetici kullanýcý yaratýldý --> Yönetici kullanýcý oluþturuldu
+    * lang_main Komutlarý Sonlandýr --> Etiketleri kapat
+
+v. 2.0.6   (09.06.2005|11:19)
+
+    * lang_faq dosyasýnda eklemeler yapýldý.
+    * lang_main
+          o Son Gönderilen --> Son Mesaj
+          o Cevaplar --> Cevap
+          o Görüntüleme --> Gösterme
+
+v. 2.0.5   (31.05.2005|02:51)
+
+    * kelime deðiþiklikleri yapýldý
+    * lang_faq kayýt --> hesap
+
+v. 2.0.4-c   (08.05.2005|03:46)
+
+    * phpbb 2.0.15 deðiþiklik ve eklemeleri yapýldý.
+
+v. 2.0.4-a-b-b2   (23.04.2005|21:47)   yayýnlanmadý
+
+    * Bazý ufak hatalar giderildi.
+
+v. 2.0.4   (27.03.2005|07:17)
+
+    * Bazý ufak hatalar giderildi.
+
+v. 2.0.3   (23.03.2005|12:43)
+
+    * phpBB 2.0.12 sürümü ile gelen "Version Check" kýsmý eklendi.
+
+v. 2.0.1   (26.12.2004|15:59)
+
+    * 1.1.7 -> 2.0.0 arasýndaki sürümler kayýp, deðiþiklikler belirsiz...
+    * Tüm dosyalarda "kayýp 2.0.0 sürümüne ulaþmak için" deðiþiklikler yapýldý.
+
+v. 1.1.7   (15.09.2004|17:04)
+
+    * lang_admin'de "install" bölümünde iyileþtirmeler yapýldý.
+    * lang_main'de "bbcode" bölümünde iyileþtirmeler yapýldý.
+
+v. 1.1.6   (21.08.2004|11:49)    v. 1.1.5   (19.08.2004|14:18)
+
+    * lang_main'de iyileþtirmeler yapýldý.
+
+v. 1.1.4   (14.08.2004|22:08)    v. 1.1.3   (13.08.2004|19:32)
+
+    * lang_admin'de iyileþtirmeler yapýldý.
+
+v. 1.1.2   (10.08.2004|22:07)
+
+    * "Beni oku" dosyasý .html formatýna dönüþtürüldü ve bazý deðiþiklikler yapýldý.
+    * email/ dizinindeki dosyalarda ufak deðiþiklikler yapýldý.
+
+v. 1.1.1   (09.08.2004|02:27)
+
+    * email/ dizinindeki dosyalarda deðiþiklikler yapýldý ve dizine bir .htaccess dosyasý yerleþtirildi.
+    * "Beni oku" dosyasýnda küçük eklentiler ve düzenlemeler yapýldý, "Kullaným Koþullarý" kýsmý geliþtirildi.
+
+v. 1.1.0   (13.07.2004|12.57)
+
+    * "Visual Confirmation System" ile ilgili tanýmlar eklendi.
+    * "Stats block text" kýsmýnda deðiþiklik yapýldý.
+
+v. 1.0.9   (11.07.2004|01.39)
+
+    * lang_main
+          o Dosya gözden geçirildi ve bazý deðiþikler yapýldý.
+          o Giriþ kýsmý TR'leþtirildi.
+          o "Timezones" bölümününe önceki bir sürümde eklenen iki pasif zaman dilimi aktifleþtirildi.
+    * Daha önceden TR'leþtirilen dosyalardaki açýklama kýsýmlarý tekrar EN olarak düzeltildi.
+    * lang_bbcode ve lang_faq dosyalarýnda deðiþiklikler yapýldý.
+    * email/ dizinindeki dosyalarda ufak deðiþiklikler yapýldý.
+
+v. 1.0.8-a-b-c   (05.07.2004|22.01)
+
+    * email/ dizinindeki dosyalarda boþluk ayarý yapýldý.
+    * Dosyalar gözden geçirildi ve bazý deðiþikler yapýldý.
+
+v. 1.0.8   (17.06.2004|05.49)    v. 1.0.7   (05.06.2004|12.33)    v. 1.0.6   (31.05.2004|06.51)
+
+    * Dosyalar gözden geçirildi ve bazý deðiþikler yapýldý.
+
+v. 1.0.5   (16.05.2004|20.25)
+
+    * lang_main dosyasýnda "Çevirenler" kýsmý yeniden düzenlendi, sürüm bilgisi eklendi.
+
+v. 1.0.4-a-b   (13.05.2004|10.57)
+
+    * Dosyalar gözden geçirildi ve bazý deðiþikler yapýldý.
+    * lang_main dosyasý gözden geçirildi ve ufak deðiþikler yapýldý.
+    * email/ dizinindeki dosyalarda deðiþiklik yapýldý.
+
+v. 1.0.3   (15.04.2004|03.45)
+
+    * lang_main dosyasýnda "Copyright" kýsmý köklü bir biçimde deðiþtirildi.
+
+v. 1.0.2   (19.03.2004|18.51)
+
+    * Baþlýk kýsýmlarýndaki dosya adlarýnýn tarafýmýzdan yanlýþ yazýldýðý farkedildi.
+    * lang_main dýþýndaki dosyalardan "copyright" ve "GPL" uyarýsý çýkarýldý.
+    * Çevirenler kýsmý yeniden düzenlendi, "$lang['TRANSLATION_INFO']" bilgisi deðiþtirildi.
+
+v. 1.0.1-a-b   (12.03.2004|22.50)
+
+    * lang_main dosyasýnda "$lang['Post_new_pm']" bilgisi deðiþtirildi.
+    * lang_admin dosyasýnda yükleme ile ilgili birkaç kelime deðiþtirildi.
+    * Bazý gereksiz açýklama ve boþluklar silindi, kelimeler düzenlendi.
+    * lang_bbcode'de tarafýmýzdan yapýlan hatalý bir satýrbaþý düzeltildi.
+
+v. 1.0.0   (21.10.2003|n/a)
+
+    * Çeviriye baþlandý...
+

@@ -1,0 +1,75 @@
+.headerbar {
+	background-color: #12A3EB;
+	background-image: -webkit-linear-gradient(top, #6ACEFF 0%, #0076B1 2px, #12A3EB 92px, #12A3EB 100%);
+	background-image: linear-gradient(to bottom, #6ACEFF 0%,#0076B1 2px,#12A3EB 92px,#12A3EB 100%);
+	background-repeat: repeat-x;
+}
+
+.toplogo {
+	background-color: #094F0E;
+	/* text-align: center; */
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	line-height: 85%;
+	background: #ffffff url(/templates/prosilver/theme/images/top.gif) top left repeat-x;
+	/*background: #f0f0f0;*/	
+}
+
+.forabg, .forumbg {
+	background-color: #0076B1;
+	background-image: -webkit-linear-gradient(top, #6ACEFF 0%, #12A3EB 2px, #0076B1 92px, #0076B1 100%);
+	background-image: linear-gradient(to bottom, #6ACEFF 0%,#12A3EB 2px,#0076B1 92px,#0076B1 100%);
+	background-repeat: repeat-x;
+}
+
+.pollbar1 {
+	background-color: #AA2346;
+}
+
+.pollbar2 {
+	background-color: #BE1E4A;
+}
+
+.pollbar3 {
+	background-color: #D11A4E;
+}
+
+.button-search, 
+.button-search-end {	
+    border: 0.1em solid #7ba60d;
+}
+
+.pollbar4 {
+	background-color: #E41653;
+}
+
+.pollbar5 {
+	background-color: #F81157;
+}
+
+.action-bar .coloredbutton {
+	border-color: #12A3EB;
+	background-color: #12A3EB;
+	background-image: -webkit-linear-gradient(top, #89529E 0%, #12A3EB 100%);
+	background-image: linear-gradient(to bottom, #89529E 0%,#12A3EB 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#89529E', endColorstr='#12A3EB',GradientType=0 );
+}
+.action-bar .coloredbutton:hover {
+	background-color: #12A3EB;
+	background-image: -webkit-linear-gradient(top, #12A3EB 0%, #89529E 100%);
+	background-image: linear-gradient(to bottom, #12A3EB 0%,#89529E 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#12A3EB', endColorstr='#89529E',GradientType=0 );
+}
+
+.pagination li.active span {
+	background: #89529E;
+	border-color: #89529E;
+}
+
+.pagination li a:hover {
+	background: #89529E;
+	border-color: #89529E;
+}
+
+table.table1 td {
+    color: #e2e8f3;
+}

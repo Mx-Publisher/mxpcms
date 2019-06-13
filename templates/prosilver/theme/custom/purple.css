@@ -1,0 +1,60 @@
+.headerbar {
+    background-color: #3C094F;
+    background-image: -webkit-linear-gradient(top, #63187E 0%, #3C094F 100%);
+    background-image: linear-gradient(to bottom, #29202C 0%,#310242 100%);
+}
+
+.toplogo {
+	background-color: #094F0E;
+	/* text-align: center; */
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	line-height: 85%;
+	background: #ffffff url(/templates/prosilver/theme/images/top.gif) top left repeat-x;
+	/*background: #f0f0f0;*/	
+}
+
+.forabg, .forumbg {
+	background-color: #3C094F;
+	background-image: -webkit-linear-gradient(top, #89529E 0%, #3C094F 35px, #3C094F 100%);
+	background-image: linear-gradient(to bottom, #89529E 0%,#3C094F 35px,#3C094F 100%);
+}
+
+.pollbar1, .pollbar2, .pollbar3, .pollbar4 {
+	background-color: #0d386b;
+}
+.pollbar5 { background-color: #9cb6d7; }
+
+.button-search, 
+.button-search-end {	
+    border: 0.1em solid #7ba60d;
+}
+
+.pollbar5 { background-color: #89529E; }
+
+.action-bar .coloredbutton {
+	border-color: #3C094F;
+	background-color: #3C094F;
+	background-image: -webkit-linear-gradient(top, #89529E 0%, #3C094F 100%);
+	background-image: linear-gradient(to bottom, #89529E 0%,#3C094F 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#89529E', endColorstr='#3C094F',GradientType=0 );
+}
+.action-bar .coloredbutton:hover {
+	background-color: #3C094F;
+	background-image: -webkit-linear-gradient(top, #3C094F 0%, #89529E 100%);
+	background-image: linear-gradient(to bottom, #3C094F 0%,#89529E 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3C094F', endColorstr='#89529E',GradientType=0 );
+}
+
+.pagination li.active span {
+	background: #89529E;
+	border-color: #89529E;
+}
+
+.pagination li a:hover {
+	background: #89529E;
+	border-color: #89529E;
+}
+
+table.table1 td {
+	color: #d0d8e6;
+}

@@ -1,0 +1,107 @@
+# Directory Index
+DirectoryIndex index.php
+
+# Just in case, let's disable viewing of directory indexes.
+Options -Indexes
+Options +FollowSymLinks
+
+# Just in case, let's disable register globals (only valid for php4).
+# Do NOT enable this when running php5, or you may face internal server errors
+
+# PHP 4, Apache 1.
+# <IfModule mod_php4.c>
+#   php_value magic_quotes_gpc                0
+#   php_value session.use_trans_sid           0
+#   php_value register_globals                0
+#   php_value session.auto_start              0
+# </IfModule>
+
+# PHP 4, Apache 2.
+# <IfModule sapi_apache2.c>
+#   php_value magic_quotes_gpc                0
+#   php_value session.use_trans_sid           0
+#   php_value register_globals                0
+#   php_value session.auto_start              0
+# </IfModule>
+
+# PHP 5, Apache 1 and 2.
+# <IfModule mod_php5.c>
+#   php_value magic_quotes_gpc                0
+#   php_value session.use_trans_sid           0
+#   php_value register_globals                0
+#   php_value session.auto_start              0
+# </IfModule>
+
+# Just in case, let's disable register_globals (only valid for PHP4).
+# Do NOT enable this when running PHP5, or you may face internal server errors
+# To disable, remove the prepended # on the next line.
+# php_flag register_globals 0 
+
+# Disable EAccelerator
+# Do this if for some reason or another you have cache problems.
+# php_flag eaccelerator.enable 0
+
+# deny most common except .php 
+<FilesMatch "\.(inc|tpl|h|ihtml|sql|ini|conf|class|bin|spd|theme|module|exe)$"> 
+deny from all 
+</FilesMatch> 
+
+# Disable .htaccess viewing from browser 
+<Files ~ "^\.ht"> 
+    Order allow,deny 
+    Deny from all 
+    Satisfy All 
+</Files> 
+
+<Files ~ "\config.php$"> 
+deny from all 
+</Files> 
+
+
+<IfModule mod_rewrite.c> 
+	RewriteEngine on 
+	
+	#
+	# Mod_rewrite rules require mod_rewrite is enabled for MX-Publisher (config setting)
+	# Uncomment below, and consult the MX-Publisher mod_rewrite module documentation
+	#
+
+	# 
+	# Site Specific
+	#
+	
+	#RewriteRule ^support/catlink([0-9]*)(.*)$ index.php?page=53&cat_link=$1 [L]
+	#RewriteRule ^support(.*)$ index.php?page=53 [L]
+	#RewriteRule ^index.html$ index.php [L,NE]	
+	
+	#
+	# General
+	#
+	RewriteCond %{REQUEST_URI} ^(.*)/catlink([0-9]*)(.*)$
+	RewriteRule ^page([0-9]*)/catlink([0-9]*)(.*)$ index.php?page=$1&cat_link=$2 [L]
+		
+	RewriteCond %{REQUEST_URI} ^(.*)/sub([0-9]*)(.*)$
+	RewriteRule ^page([0-9]*)/sub([0-9]*)(.*)$ index.php?page=$1&dynamic_block=$2 [L]
+		
+	RewriteCond %{REQUEST_URI} ^/page([0-9]*)(.*)$
+	RewriteRule ^page([0-9]*)(.*)$ index.php?page=$1$2 [L]
+	
+	RewriteCond %{REQUEST_URI} ^/block([0-9]*)(.*)$
+	RewriteRule ^block([0-9]*)(.*)$ index.php?block=$1$2 [L]	
+	
+</IfModule>
+
+#
+# Error redirects - require the MX-Publisher ErrorDocs module to be installed
+# Uncomment below, and consult the MX-Publisher ErrorDocs module documentation
+#
+#ErrorDocument 400 /index.php?page=x&errno=400&errlog=yes
+#ErrorDocument 401 /index.php?page=x&errno=400&errlog=yes
+#ErrorDocument 402 /index.php?page=x&errno=400&errlog=yes
+#ErrorDocument 403 /index.php?page=x&errno=400&errlog=yes
+#ErrorDocument 404 /index.php?page=x&errno=400&errlog=yes
+#ErrorDocument 500 /index.php?page=x&errno=400&errlog=yes
+#ErrorDocument 501 /index.php?page=x&errno=400&errlog=yes
+#ErrorDocument 502 /index.php?page=x&errno=400&errlog=yes
+#ErrorDocument 503 /index.php?page=x&errno=400&errlog=yes
+#ErrorDocument 504 /index.php?page=x&errno=400&errlog=yes

@@ -1,0 +1,180 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+	<head>
+		<title>mxpcms Bridge Installation Guide</title>
+		<style type="text/css">
+			body
+			{
+				background-color: #E5E5E8;
+				margin: 0px;
+				padding: 0px;
+			}
+			body, td
+			{
+				color: #000000;
+				font-size: small;
+				font-family: verdana, sans-serif;
+			}
+			div#header
+			{
+				background-image: url('Themes/default/images/catbg.jpg');
+				background-repeat: repeat-x;
+				background-color: #88A6C0;
+				color: white;
+				font-family: Georgia, serif;
+				font-size: xx-large;
+				border-bottom: 1px solid black;
+				height: 40px; padding-left:4%; padding-right:4%; padding-top:22px; padding-bottom:12px
+			}
+			div#content
+			{
+				padding: 20px 30px;
+			}
+
+			div.panel
+			{
+				border: 1px solid gray;
+				background-color: #F6F6F6;
+				margin: 1ex 0 3ex 0;
+				padding: 1.2ex;
+			}
+			div.panel h2
+			{
+				margin: 0;
+				margin-bottom: 2ex;
+				padding-bottom: 3px;
+				border-bottom: 1px dashed black;
+				font-size: 14pt;
+				font-weight: normal;
+			}
+
+			dl
+			{
+				margin-left: 3ex;
+			}
+			dt
+			{
+				font-style: italic;
+			}
+			dd
+			{
+				margin-bottom: 1ex;
+			}
+
+			div.code
+			{
+				margin: 1ex 3ex 2ex 3ex;
+				padding: 3px;
+				background-color: #FAFAFA;
+				font-family: monospace;
+				overflow: auto;
+			}
+			div.code span.comment
+			{
+				font-style: italic;
+				color: #000066;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="header">
+			<div title="Millenia">SMF-Mx-Publisher CMS bridge</div>
+		</div>
+		<div id="content">
+			<div class="panel">
+				<h2 id="contents">Before you start</h2>
+
+				Make sure you have both MXP-CMS and Simple Machines Forum (SMF) installed. Realize that SMF is not a component, but a stand-alone forum. The bridge will only integrate your SMF-forum with your mxpcms site.<br />
+				<b>Please do not remove any of the copyrights of your SMF-forum.</b><br />
+				<br />
+				Always <b>back up your database</b> and site prior to installations and test any additions you make to your site locally first and do NOT add anything to your live site unless tested thoroughly, extensively, securely and wisely!
+				<br />
+				Make sure the following folders are writable (chmod 777) before installing the component:
+				<br />&nbsp;	/includes<br />&nbsp;	/modules
+				<br />&nbsp;	/includes&nbsp;
+				<br />&nbsp;    /templates<br />&nbsp;	/admin
+			</div>
+		</div>
+		<div id="content">
+			<div class="panel">
+				<h2 id="contents">Installing the SMF Bridge Component in MXP-CMS</h2>
+
+				<b>Install unpacking the zip and running the 
+                MX-Publisher-IWizard.</b><br /><br />
+				Go to your mxpcms admin cpanel.  Go to your Installer menu, and 
+                validate your "smf2" installation.<br />
+				...<br />
+			</div>
+		</div>
+		<div id="content">
+			<div class="panel">
+				<h2 id="contents">Configuring the SMF Core Blocks in MXP-CMS</h2>
+				<h2 id="contents">
+				<b>Change the values in the configuration via the mxpcms backend.</b><br /><br /> 
+				It is important you use the absolute path to your SMF installation.  This tells mxpcms where SMF is, so if you get this wrong, mxpcms will not be able to find SMF.<br /><br />
+				If you don't know your SMF path, you can find it by following these instructions:<br /><br />
+				
+				Go to your stand alone SMF forum.  Make sure you are logged in as the administrator.<br />
+				Go to the SMF admin panel.<br />
+				Click on "Server Settings".<br />
+				Your path to SMF will be in the field labelled "SMF Directory".  Copy it from here, and paste it into your bridge config.<br />
+				<br />
+				There are two formats to display your mxpcms/forum integration: </h2>
+				<ul type="none" style="list-style-type: none;">
+					<li>&raquo; <b>Wrapped</b><br />
+					You are using SMF through the mxpcms bridge. The Forum appears "wrapped" in the mxpcms tables. You might have to make some necessery changes in your theme and template files in order to show a fitting lay-out.</li>
+					<li>&raquo; <b>Unwrapped</b><br />
+					You are still using SMF through mxpcms, but it doesn't have the look of a wrapped forum. It looks stand-alone, but it is actually loading through mxpcms. This is set in the mxpcms config for the component.
+				</ul>
+				<br />
+				There are several options for the user registration form:  Bridge, SMF, mxpcms default, Community Builder, and mxpcmsCharge.  The bridge registration form looks very much like the default mxpcms registration, but functions quite differently.  If you choose to use this option, make sure to configure the registration component as well.  All registration types will register new users into both mxpcms and SMF, but some users may not appear in SMF until after their first login.
+				<br /><br />
+			</div>
+		</div>
+		<div id="content">
+			<div class="panel">
+				<h2 id="contents">Login Module Options in MXP-CMS</h2>								
+				MXP-CMS 4.6 provides a new alternative authentication method, which facilitates the use of the mxpcms default login module with the bridge.<br />
+				If you wish to use the mxpcms default login module with the bridge, all you need to do is make sure that the SMF_login mxpcmst is published.<br />
+				Despite the fact that if you choose to use the default mxpcms login module, you should still configure the mod_smf_login module.  Some of the options applied in the module's configuration are used elsewhere.<br />
+			</div>
+		</div>
+		<div id="content">
+			<div class="panel">
+				<h2 id="contents">Separate Databases:</h2>
+		
+				If you have installed mxpcms and SMF with Fantastico, or you installed them in separate databases intentionally, you will need to grant permission to the database users to access each others' databases.  If you have your forum and CMS installed in separate databases, and you have not granted access properly, you will most likely run into the "_LOGIN_INCOMPLETE" error in mxpcms.
+				<br /><br />
+				Here's how to grant database permissions:
+				<br /><br />
+				1) Go to your site's cPanel.  Click on MySQL databases. (Do not Proceed to PhpMyAdmin!)
+				<br /><br />
+				2) Near the bottom of the page, you will find two dropdown menus side-by-side.  One is labelled "User:" and the other "Db:".
+				<br /><br />
+				3) In the first dropdown, select your SMF database user, and in the second dropdown, select the  mxpcms database.  Click the button that is labelled "Add User to Db".
+				<br /><br />
+				4) Now go back to the same page again, and do the same, adding your mxpcms User to your SMF database.
+				<br /><br />
+				Now you are set up to run your forum and CMS in separate databases.
+				<br /><br />
+			</div>
+		</div>
+		<div id="content">
+			<div class="panel">
+				<h2 id="contents">3rd Party Developer Tabs in Admin Panel</h2>
+
+				This bridge comes with the capability for 3rd party developers to add their own tabs to the bridge config panel.
+				
+				This can be done by adding a tab file to include by the bridge, and defining it in the bridge config table appropriately.
+				
+				For example, if you have a component called com_example, and you want to have a tab in the bridge define something in the com_example component, you can create the tab in a file called example_tab.php.  You'll need to add that file to your com_example.xml installer, and also a query to let the bridge config know it's there:
+				
+				<div class="code">
+					INSERT INTO #__smf_config (`variable`, `value1`) VALUES ('3rdPartyTab', 'administrator/components/com_example/example_tab.php')
+				</div>
+				
+				And that's all!  It will be included in the SMF bridge component configuration.
+			</div>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,374 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" dir="ltr" lang="en"><head>
+
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta http-equiv="content-style-type" content="text/css" />
+<meta http-equiv="content-language" content="en" />
+<meta http-equiv="imagetoolbar" content="no" />
+<meta name="resource-type" content="document" />
+<meta name="distribution" content="global" />
+<meta name="copyright" content="2007 phpBB Group" />
+<meta name="keywords" content="" />
+<meta name="description" content="MXP 3.0.x Installation &amp; upgrade information." />
+
+
+<title>MXP • Installalation</title><link href="mxp.css" rel="stylesheet" type="text/css" media="screen, projection" /></head>
+
+<body id="phpbb" class="section-docs">
+
+<div id="wrap">
+	<a id="top" name="top" accesskey="t"></a>
+	<div id="page-header">
+		<div class="headerbar">
+			<div class="inner"><span class="corners-top"><span></span></span>
+
+			<div id="doc-description">
+				<a href="../index.php" id="logo"><img src="site_logo.gif" alt="" /></a>
+				<h1>MXP 3.0.x BETA.</h1>
+				
+				<p style="display: none;"><a href="#start_here">Skip</a></p>
+			</div>
+
+			<span class="corners-bottom"><span></span></span></div>
+		</div>
+	</div>
+
+	<a name="start_here"></a>
+
+	<div id="page-body">
+
+
+
+
+
+
+<!-- BEGIN DOCUMENT -->
+
+
+<p><strong>Please read through this document completely before you proceed to installation or upgrade.</strong></p><h1 id="sectionheader">
+	<img style="width: 237px; height: 39px;" src="/images/title_development.gif" alt="Development" />
+</h1>
+
+<div id="sectionsidebar">
+	<br />
+</div>
+
+
+
+	<h1>MXP3&nbsp;<em></em>Beta5</h1>
+	
+	<p>Welcome to our fifth public beta of the next-generation of MXP 
+after 2.8.x, MXP3! This beta release is intended for advanced users to
+ try out on dedicated development enviroments to help us finish creating
+ the best Opensource CMS solution available.</p>
+
+	<p><strong style="text-transform: uppercase;">Note:</strong> This release is <strong style="text-transform: uppercase;">not final</strong> and made available for testing purposes <strong style="text-transform: uppercase;">only</strong>.</p><p></p>
+
+	<h2>Quick Start Guide</h2>
+
+	<p>To give you some guidance while trying out the beta, we are making 
+an early version of our Quick Start Guide available. It will follow you 
+through the installation, the creation of your first forum and setting 
+permission.</p>
+		
+
+	<h2><br /></h2><h2>Support</h2>
+
+	<p>A dedicated forum at sf.net for MXP3 Beta support has been set-up. It is 
+only for general set-up questions, configuration problems and 
+determining common problems mostly related to bugs. It <strong style="text-transform: uppercase;">is not for</strong>
+support of modules, extensions or custom code/style additions or any
+users using it with phpBB2 or 3.x&nbsp;in a live enviroment.</p>
+	<p></p>
+
+
+
+<div class="paragraph menu">
+<div class="inner"><span class="corners-top"><span></span></span>
+<div class="content">
+
+<ol>
+	<li><a href="#require">Requirements</a></li>
+    <li><a href="#upload">Uploading the MXP Core</a></li>
+	<li><a href="#install">New installation</a></li>
+	<li><a href="#advance">Advanced Installation</a></li>
+	<li><a href="#upgrade">Upgrading the MXP Core</a></li>
+	<li><a href="#confirm">Confirmation</a></li>
+	<li><a href="#copyright">Copyright and Disclaimer</a></li>
+</ol>
+<hr />
+
+</div>
+<span class="corners-bottom"><span></span></span></div>
+</div>
+
+<a name="require"></a><h2>1. Requirements</h2>
+<div class="paragraph">
+<div class="inner"><span class="corners-top"><span></span></span>
+<div class="content">
+
+<p>MXP as a CMS tool does have some requirements which must be met before you are able to start your installation.</p>
+
+	<ul>
+		<li>A webserver or web hosting account running on any major Operating System with support for PHP.</li>
+		<li>mySQL3 or postgreSQL 7.1 Database (Latest mySQL4 or postgreSQL version recommended)</li>
+		<li>PHP 5.1.2 and later versions.</li>
+		<li>phpBB 2.0.x (Latest phpBB2 recommended) (Required in MX-Publisher 2.8.x. Optional in MX-Publisher 3.0.x)</li>
+		<li>phpBB 3.0.x (Latest phpBB3/Olympus recommended) (Optional in MX-Publisher 3.0.x)</li>
+		<br /><br />
+        <li>The
+following are optional items you may require depending on your local
+machines setup and/or your server or web-hosts control panel support
+and features. <ul>
+			<li>FTP Program</li>
+			<li>HTML Editor</li>
+		</ul>
+		</li>
+	</ul>
+
+</div>
+<hr />
+<div class="back2top"><a href="#wrap" class="top">Back to Top</a></div>
+<span class="corners-bottom"><span></span></span></div>
+</div>
+
+<a name="upload"></a><h2>2. Uploading the MXP Core</h2>
+<div class="paragraph">
+<div class="inner"><span class="corners-top"><span></span></span>
+<div class="content">
+
+<p>As a rule without exception MXP and phpBB must be installed in
+different directories. Do not mix the files up!! If phpBB is not
+installed on your system, please visit <a href="www.phpbb.com/">www.phpBB.com</a>
+for further instructions. When uploading the default directory
+structure which will cause you the least effort and quickest
+installation is as follows:</p> 
+
+<p><code>/your/path/to/public/html/YOUR_PORTAL_NAME/</code> (this is the place were all MXP files should be located)<br />
+<code>/your/path/to/public/html/YOUR_FORUM_NAME/</code> (this is the place where your working phpBB installation should be located)</p>
+
+<p>You can alternatively install MX-Publisher in your root directory
+(which can be accessed via http://www.yourdomain.com/ while your forum
+can be installed in a folder along with the MXP folders (ie it'd be
+located in <code>http://www.yourdomain.com/phpBB2/</code></p>
+
+<p>Using the default setup above, the install path variables should be: <strong>phpBB Relative Path: ../YOUR_FORUM_NAME/</strong></p>
+
+<strong><h4>Note #1</h4></strong> <p>If you move the phpBB folder into another one before installing MXP, the phpBB configuration <strong>(the <code>/phpbbroot/config.php</code> file)</strong> must also be modified to match the new phpB location.</p>
+
+<strong><h4>Note #2</h4></strong> <p>The MXP and phpBB installations use completely differing config.php files. <strong>Do not confuse them and mix them together! They are two different files.</strong></p>
+
+<strong><h4>Note #3</h4></strong><p> If you plan to switch to phpBB
+mode later (after a fresh standalone installation) you have to set the
+phpBB relative path manually in the MXP Admin Control Panel.
+</p><p>Unzip the distributed MXP files and upload<strong></strong></p> 
+
+<strong><h4>SPECIAL NOTE</h4> MX-Publisher needs write access/permissions to the cache folder and the mx_meta.inc file.</strong> 
+
+<p><strong>## CHMOD (0777) THE FOLLOWING FILES/DIRECTORIES:<br /><br /><code>## - mxroot/cache/</code><br /><code>## - mxroot/mx_meta.inc</code></strong></p>
+
+<p>For those with Windows servers, CHMOD 0777 gives read, write, and
+access permissions to all 3 auth types (commonly Owner, Group, and
+Other/Anonymous). You'll have to give the files/folders above these
+permissions; this depends from host to host, though usually you can do
+it via your hosting control panel (cPanel, DirectAdmin, etc.)
+</p></div>
+<hr />
+<div class="back2top"><a href="#wrap" class="top">Back to Top</a></div>
+<span class="corners-bottom"><span></span></span></div>
+</div>
+
+<a name="install"></a><h2>3. New installation</h2>
+<div class="paragraph">
+<div class="inner"><span class="corners-top"><span></span></span>
+<div class="content">
+
+<p>In your browser, call <code>http://www.yourdomain.com/mxproot/install/mx_install.php</code>
+Replace "mxproot" with whatever name you had for your MXP folder, which
+contains all of the MXP files and folders. You will now be presented
+with an installation page showing you some options, the first of which
+is the choice of MXP installtion, of which there are a possible 3
+seperate types of install which you can choose from, lets take a look
+at these below:</p>
+
+<h4>MXP - standalone (INTERNAL)</h4>
+<p>This option will allow you to get your MXP install up and running
+without any need of 3rd party software - usually phpBB forum - it'll
+get your demo default website up and running quickly without the forum
+part. At a later stage you can still choose from with the Admin Control
+Panel to select a type of phpBB forum software which you have installed
+- of which MXP supports two types; phpBB 2 and phpBB 3.</p>
+<h4>MXP - With phpBB2 / phpBB3</h4>
+<p>With the installer, all of the values should already be filled in,
+and you should be set up to go and click "Install." However, you should
+go over the information filled in. If you definitely need something
+changed, then go ahead and see this document for details on how to set
+the installer to allow you to enter your own settings. Note that you
+should only do this if you know what you are doing. </p><p>You then need to fill out the installation configuration form which consists of the following:</p> 
+
+<h4>MX-Publisher Prefix in DB (default: mx_)</h4>
+<p>This is the prefix name for the database - so when you browse
+through phpmyadmin you'll see it more clearly plus it prevents table
+mixups between other things in your database (such as phpBB) which has
+a database prefix of phpbb_. Also you may want to change this if you
+want several instances of MXP present within the same database; for
+example mx2_ - this is not something highly recommended due to export
+and backup functions, extraction of data however.</p>
+<h4>Database Type (default: mySQL)</h4>
+<p>You wont have to change this option.</p>
+<h4>Database Server Hostname/DSN</h4>
+<p> The default: localhost is normally all that is required if you need to fill this in.</p>
+<h4>Your Database Name</h4>
+<p>This will be either the database which phpBB already uses or if you
+are planning on an enttirely internal (standalone) install you'll need
+to create a new one with your prefered db management tool. Sometimes
+the database name here requries a prefix of the domain name - which for
+example might be <code>www.testsite.com</code> with a database named <code>data1</code>; so the database name entry here would be testsite_data1.</p>
+<h4>Database Username</h4>
+<p>You need to enter the database username which was auto-created when
+your database was created OR create a db user, with appropriate db
+permissions. Again this may require the website name as a prefix to the
+username.</p>
+<h4>Database Password</h4>
+<p>The password unlike the two previous entries which required your
+website as a prefix before either the database name or the database
+username <strong>DOES NOT</strong> need a prefix before it - enter this as per the normal password of the database user.
+</p><h4>MXP Admin Username</h4>
+<p>You may or may not want to consider keeping this the same as your
+phpBB forum install credentials for simplicity and to avoid confusion
+when switching around your website.</p>
+<h4>MXP Admin Password</h4>
+<p>Again - you may or may not want to consider keeping this the same as
+your phpBB forum install credentials for simplicity and to avoid
+confusion when switching around your website.</p> 
+<h4>Re-enter MXP Admin Password</h4>
+<p>Repeat the password you have just entered.</p> 
+
+<p>Now That you have the correct information present you can click the
+Install button to continue, at this stage you'll be told you can
+download the config.php for you to upload directly to your sever into
+the MXP directory so this is your next step - click the button to
+download the config.php file and place it on your server.</p>
+<p>You can now REFRESH the page and this will start the installation
+wizard placing entries into the database - the page will scroll showing
+you this, when finished you'll be presented with some instructions at
+the bottom fo the page.</p>
+<p>These will tell you that you need to now delete two directories on your server: <code>/contrib/</code> and <code>/install/</code> once done you can then login to your brand new MXP installation.</p>
+
+</div>
+<hr />
+<div class="back2top"><a href="#wrap" class="top">Back to Top</a></div>
+<span class="corners-bottom"><span></span></span></div>
+</div>
+
+<a name="advance"></a><h2>4. Advanced Installation</h2>
+<div class="paragraph">
+<div class="inner"><span class="corners-top"><span></span></span>
+<div class="content">
+<p>To choose your own configuration instead of the installer's default
+suggestions, open up the mx_install.php file in your favorite PHP or
+text editor and perform the following code changes to the file.<strong></strong></p>
+<strong><h4>Find</h4></strong> <code>define('INSTALL_READONLY', true);</code><strong>
+<h4>Replace With:</h4></strong> <code>// define('INSTALL_READONLY', true);</code>
+ 
+<p> The purpsoe of this is to 'comment out' the code line - meaning
+that it will stop working and in turn allow you to set up your own
+configuration. </p><h4><strong>Note</strong></h4>
+<p>The install script creates the MX-Publisher config.php file. If for
+some reason the install fails, you may need to remove the generated
+config.php manually before retrying the install. Also, if you feel like
+doing a fresh reinstallation, you will need to remove the previous
+MX-Publisher config.php file.</p>
+<h5>Failure to do this action will result in a failure to install MXP and your install script will not update correctly.</h5>
+
+Also, some webservers deny the installer the rights to edit the <code>config.php</code>
+file. In this case you'll need to CHMOD the config.php file to 0777.
+(CHMOD is overviewed above). If you have any other errors regarding
+config.php (you shouldn't), go here. 2) Don't forget to remove the
+install/ and contrib/ folders after a successful installation!
+Otherwise, this could mean a potential security hole. 3) Installation
+Complete! Now enter the MX-Publisher AdminCP and configure the portal.
+The user interface is intuitive. For further information, visit some of
+our documents and Knowledge Base articles on ours DOCS page at <a href="http://www.mx-publisher.com/page8/catlink8">www.mx-publisher.com</a>.
+</div>
+<hr /><div class="back2top"><a href="#wrap" class="top">Back to Top</a></div>
+<span class="corners-bottom"><span></span></span></div>
+</div>
+
+<a name="upgrade"></a>
+<h2>5. Upgrading the MXP Core</h2>
+
+	<div class="paragraph">
+		<div class="inner"><span class="corners-top"><span></span></span>
+
+		<div class="content">
+
+<p> Upgrading your installation is only a matter of a few steps to take and simple awareness of one or two facts.</p>
+
+<ul>
+		<li>Download the full package from the <a href="http://www.mx-publisher.com/page11/catlink11">Downloads Page</a> at www.mx-publisher.com.</li>
+		<li>Unzip/unrar the contents - making sure the directory integrity remains intact.</li>
+		<li>Open your FTP client and connect to your MXP directory</li>
+        <li>Upload all files and folders <strong>except for config.php</strong>.</li>
+		<li>Now visit the <code>mx_install.php</code>.</li>
+        <br />
+		<li>This will start the install wizard for your upgrade - follow all the steps then click Finish.</li>
+        <li>Remove the <code>/install/</code> and <code>/contrib/</code> directories and you are free to login to your new portal.
+	</li></ul>
+
+<p>Do not forget to also upgrade all the modules to make sure you have full MXP compatibility.</p></div>
+<hr /><div class="back2top"><a href="#wrap" class="top">Back to Top</a></div>
+<span class="corners-bottom"><span></span></span></div>
+</div>
+
+<a name="confirm"></a>
+<h2>6. Confirmation</h2>
+
+	<div class="paragraph">
+		<div class="inner"><span class="corners-top"><span></span></span>
+
+		<div class="content">
+
+	<p>After
+successful installation of the MXP db tables, you'll be forwarded to
+the confirmation page, from where you are directed to the MXP
+Administration Control Panel, to&nbsp;finalize the installation, eg </p>
+<ul>
+	<li>define board timezone and other localized settings</li>
+	<li>configure the server mail SMTP </li>
+</ul>
+<p>Further, in the MXP Administration Control Panel, additional modules can be installed. </p>
+
+   </div>
+<hr /><div class="back2top"><a href="#wrap" class="top">Back to Top</a></div>
+<span class="corners-bottom"><span></span></span></div>
+</div>
+
+<a name="copyright"></a>
+<h2>7. Copyright and Disclaimer</h2>
+
+<div class="paragraph">
+		<div class="inner"><span class="corners-top"><span></span></span>
+
+		<div class="content">
+<p>This CMS tool is opensource software released under the <a href="http://opensource.org/licenses/gpl-license.php">GPL</a>. Please see source code and the docs directory for more details.  MXP and its contents are Copyright (c) 2001 - 2018 <a href="http://www.mxpcms.sf.net/">MXP Homepage</a>, All Rights Reserved.</p>
+   <p> Install Version: 1.0</p>
+
+
+   </div>
+<hr /><div class="back2top"><a href="#wrap" class="top">Back to Top</a></div>
+<span class="corners-bottom"><span></span></span></div>
+</div>
+
+	
+
+<!-- END DOCUMENT -->
+
+	
+</div></div>
+
+<div>
+	<a id="bottom" name="bottom" accesskey="z"></a>
+</div>
+
+</body></html>

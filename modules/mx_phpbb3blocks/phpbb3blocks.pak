@@ -1,0 +1,50 @@
+module=+:106=+:phpBB3_Blocks=+:modules/mx_phpbb3blocks/=+:MXP phpBB3 Blocks=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:106=+:136=+:Website_Activity=+:Activity Stats Block=+:mx_activity_stats.php=+:
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Website_Activity=+:Demo block=+:136=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:106=+:133=+:phpBB3_Announcements=+:phpBB3 Announcements=+:mx_announce.php=+:
+parameter=+:133=+:30=+:announce_nbr_display=+:Number=+:1=+:=+:0=+:0
+parameter=+:133=+:31=+:announce_nbr_days=+:Number=+:31=+:=+:0=+:0
+parameter=+:133=+:32=+:announce_display=+:Boolean=+:TRUE=+:a:2:{i:0;s:5:"FALSE";i:1;s:4:"TRUE";}=+:0=+:0
+parameter=+:133=+:33=+:announce_display_sticky=+:Boolean=+:TRUE=+:a:2:{i:0;s:5:"FALSE";i:1;s:4:"TRUE";}=+:0=+:0
+parameter=+:133=+:34=+:announce_display_normal=+:Boolean=+:FALSE=+:a:2:{i:0;s:5:"FALSE";i:1;s:4:"TRUE";}=+:0=+:0
+parameter=+:133=+:35=+:announce_display_global=+:Boolean=+:TRUE=+:a:2:{i:0;s:4:"TRUE";i:1;s:5:"FALSE";}=+:0=+:0
+parameter=+:133=+:36=+:announce_img=+:Text=+:thumb_globe.gif=+:=+:0=+:0
+parameter=+:133=+:37=+:announce_img_sticky=+:Text=+:thumb_globe.gif=+:=+:0=+:0
+parameter=+:133=+:38=+:announce_img_normal=+:Text=+:thumb_globe.gif=+:=+:0=+:0
+parameter=+:133=+:39=+:announce_img_global=+:Text=+:thumb_globe.gif=+:=+:0=+:0
+parameter=+:133=+:40=+:announce_forum=+:Function=+:1=+:get_list_multiple("{parameter_id}[]", FORUMS_TABLE, 'forum_id', 'forum_name', "{parameter_value}", TRUE)=+:0=+:0
+parameter=+:133=+:217=+:announce_img_news=+:Text=+:thumb_news.gif=+:=+:0=+:0
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:phpBB3_Announcements=+:Demo block=+:133=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:106=+:134=+:phpBB3_Index=+:phpBB Index Block=+:mx_forum.php=+:
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:phpBB3_Index=+:Demo block=+:134=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:106=+:132=+:Last_Posts=+:phpBB Last Posts Function=+:mx_last_msg.php=+:
+parameter=+:132=+:18=+:msg_filter_date=+:Function=+:5=+:get_list_static("{parameter_id}[]",array("no limit", "1 day", "2 days", "3 days", "1 week", "2 weeks", "3 weeks", "1 month", "2 months", "3 months", "6 months", "1 year"),"{parameter_value}")=+:0=+:0
+parameter=+:132=+:19=+:Last_Msg_Auth_Read=+:Boolean=+:FALSE=+:a:2:{i:0;s:5:"FALSE";i:1;s:4:"TRUE";}=+:0=+:0
+parameter=+:132=+:20=+:Last_Msg_Display_Date=+:Boolean=+:TRUE=+:a:2:{i:0;s:4:"TRUE";i:1;s:5:"FALSE";}=+:0=+:0
+parameter=+:132=+:21=+:Last_Msg_Align=+:Values=+:left=+:=+:0=+:0
+parameter=+:132=+:22=+:Last_Msg_Target=+:Values=+:_blank=+:=+:0=+:0
+parameter=+:132=+:23=+:Last_Msg_Title_Length=+:Number=+:26=+:=+:0=+:0
+parameter=+:132=+:24=+:Last_Msg_Display_Forum=+:Boolean=+:TRUE=+:a:2:{i:0;s:5:"FALSE";i:1;s:4:"TRUE";}=+:0=+:0
+parameter=+:132=+:25=+:Last_Msg_forum=+:Function=+:1=+:get_list_multiple("{parameter_id}[]", FORUMS_TABLE, 'forum_id', 'forum_name', "{parameter_value}", TRUE)=+:0=+:0
+parameter=+:132=+:26=+:Last_Msg_Number_Title=+:Number=+:15=+:=+:0=+:0
+parameter=+:132=+:27=+:Last_Msg_Display_Icon_View=+:Boolean=+:TRUE=+:a:2:{i:0;s:5:"FALSE";i:1;s:4:"TRUE";}=+:0=+:0
+parameter=+:132=+:28=+:Last_Msg_Display_Author=+:Boolean=+:FALSE=+:=+:0=+:0
+parameter=+:132=+:29=+:Last_Msg_Display_Last_Author=+:Boolean=+:TRUE=+:a:2:{i:0;s:4:"TRUE";i:1;s:5:"FALSE";}=+:0=+:0
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Last_Posts=+:Demo block=+:132=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:106=+:135=+:Statistics=+:Website Statistics Function=+:mx_statistics.php=+:
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Statistics=+:Demo block=+:135=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:133=+:137=+:phpBB Login=+:Login in phpBB Block=+:mx_phpbb_login.php=+:
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:phpBB Login=+:Login Demo block=+:137=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+function=+:0=+:0=+:0=+:endoflist=+:0=+:0

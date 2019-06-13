@@ -1,0 +1,27 @@
+<div class="forabg block">
+	<div class="inner">
+		<ul class="topiclist forums">
+		<!-- BEGIN no_row -->
+			<li class="row bg1">{no_row.L_NO_ITEMS}</li>
+		<!-- END no_row -->
+		<!-- BEGIN msg_row -->
+			<li class="row<!-- IF msg_row.S_ROW_COUNT is even --> bg1<!-- ELSE --> bg2<!-- ENDIF --><!-- IF msg_row.S_POST_ANNOUNCE --> announce<!-- ENDIF --><!-- IF msg_row.S_POST_STICKY --> sticky<!-- ENDIF --><!-- IF msg_row.S_TOPIC_REPORTED --> reported<!-- ENDIF -->">
+				<dl class="icon" style="width:100%">
+					<dt  style="background: transparent url('{msg_row.FOLDER_IMG}') no-repeat 3px 50%;padding-left: 40px;width:75%">
+						<a href="{msg_row.U_LAST_MSG}" class="topictitle">{msg_row.LAST_MSG}</a>
+						<br />
+						<span class="gensmall"><a href="{msg_row.U_FORUM}" title="{msg_row.FORUM_NAME_ALT}" class="gensmall">{msg_row.FORUM_NAME}</a></span>
+					</dt>
+					<dd class="lastpost" nowrap="nowrap" style=" white-space:nowrap;clear:both;width:99%;text-align:right;padding-right:5px;border-left: none">
+						{msg_row.LAST_MSG_DATE}
+						<br />
+						{msg_row.TOPIC_AUTHOR_FULL} {msg_row.LAST_POSTER_FULL}
+					</dd>
+				</dl>
+			</li>
+		<!-- END msg_row -->
+		</ul>
+	</div>
+	<div class="bg1">{PAGINATION}</div>
+	<span class="corners-bottom"><span></span></span>
+</div>

@@ -1,0 +1,37 @@
+<div class="clear"></div>
+<div class="forabg block">
+	<div id="p1" class="post bg2 online">
+		<div class="inner"><span class="corners-top"><span></span></span>
+			<!-- BEGIN switch_toc -->
+			<dl class="textbody">
+				<dt>
+					<br />
+					<span class="topictitle">{L_TOC}</span><br /><hr />
+					<span class="nav">
+					<!-- BEGIN pages -->
+					{switch_toc.pages.TOC_ITEM}
+					<!-- END pages -->
+					</span>
+				</dt>
+			</dl>
+			<!-- END switch_toc -->
+			<dl class="textbody">
+				<dt class="content" id="message">{U_TEXT}</dt>
+			</dl>
+			<!-- BEGIN switch_pages  -->
+			<dl class="textbody">
+				<dt>
+					<br />
+					<span class="topictitle"></span><br /><hr />{L_GOTO_PAGE}
+					<span class="nav">
+					<!-- BEGIN pages -->
+					{switch_pages.pages.PAGE_LINK}
+					<!-- END pages -->
+					</span>
+				</dt>
+			</dl>
+			<!-- END switch_pages -->
+		</div>
+	</div>
+	<span class="corners-bottom"><span></span></span>
+</div>

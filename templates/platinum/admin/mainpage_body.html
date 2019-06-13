@@ -1,0 +1,93 @@
+<script type="text/javascript">
+// <![CDATA[
+
+var menu_state = 'shown';
+/**
+* Hiding/Showing the side menu
+*/
+function switch_menu()
+{
+	var menu = document.getElementById('menu');
+	var main = document.getElementById('main');
+	var toggle = document.getElementById('toggle');
+	var handle = document.getElementById('toggle-handle');
+
+	switch (menu_state)
+	{
+		// hide
+		case 'shown':
+			main.style.width = '93%';
+			menu_state = 'hidden';
+			menu.style.display = 'none';
+			toggle.style.width = '20px';
+			handle.style.backgroundImage = 'url({U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}admin/images/toggle.gif)';
+			handle.style.backgroundRepeat = 'no-repeat';
+
+			<!-- IF S_CONTENT_DIRECTION eq 'rtl' -->
+				handle.style.backgroundPosition = '0% 50%';
+				toggle.style.left = '96%';
+			<!-- ELSE -->
+				handle.style.backgroundPosition = '100% 50%';
+				toggle.style.left = '0';
+			<!-- ENDIF -->
+		break;
+
+		// show
+		case 'hidden':
+			main.style.width = '76%';
+			menu_state = 'shown';
+			menu.style.display = 'block';
+			toggle.style.width = '5%';
+			handle.style.backgroundImage = 'url({U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}admin/images/toggle.gif)';
+			handle.style.backgroundRepeat = 'no-repeat';
+
+			<!-- IF S_CONTENT_DIRECTION eq 'rtl' -->
+				handle.style.backgroundPosition = '100% 50%';
+				toggle.style.left = '75%';
+			<!-- ELSE -->
+				handle.style.backgroundPosition = '0% 50%';
+				toggle.style.left = '15%';
+			<!-- ENDIF -->
+		break;
+	}
+}
+
+// ]]>
+</script>
+<div id="page-body">
+	<div id="tabs">
+		<ul>
+		<!-- BEGIN tab -->
+		<li id="{tab.ACTIVE_TAB}"><a href="{U_PORTAL_ADMIN_INDEX}&cat={tab.CATEGORY}{tab.PARAMS}"><span>{tab.L_TAB}</span></a></li>
+		<!-- END tab -->
+		</ul>
+	</div>
+	<div id="acp">
+	<div class="panel">
+		<span class="corners-top"><span></span></span>
+			<div id="content">
+				<div id="toggle">
+					<a id="toggle-handle" accesskey="m" title="{L_MENU_TOGGLE}" onclick="switch_menu(); return false;" href="#"></a>
+				</div>
+				<div id="menu" style="width:20%">
+					<p>{L_LOGGED_IN_AS}<br /><strong>{USERNAME}</strong> [&nbsp;<a href="{U_LOGOUT}">{L_LOGOUT}</a>&nbsp;]</p>
+					<ul>
+					<!-- BEGIN category -->
+						<li class="header"><div>{category.ADMIN_CATEGORY}</div></li>
+					<!-- BEGIN panel -->
+						<li id="{category.panel.A_PANEL}"><a href="{category.panel.U_PANEL}"><span>{category.panel.L_PANEL}</span></a></li>
+					<!-- END panel -->
+					<!-- END category -->
+					</ul>
+				</div>
+				<div id="main">
+				<!-- iframe src="" name="main" id="main_frame" width="100%" SCROLLING="no" style="border:none;margin:0px;padding:0px;"></iframe-->
+				<!--div>{ACTION_SCRIPT}</div-->
+				{CONTENT_ACP}
+
+				</div>
+			</div>
+		<span class="corners-bottom"><span></span></span>
+	</div>
+	</div>
+</div>

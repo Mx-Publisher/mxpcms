@@ -1,0 +1,35 @@
+.portal-body-wrapper {
+	width: 100%;
+	float: left;
+	display: block;
+}
+
+.rtl .portal-body-wrapper {
+	float: right;
+}
+
+#portal-page-body {
+	clear: both;
+	margin: 4px 0;
+}
+
+#page-body {
+	float: left;
+	width: 100%;
+}
+
+ul.topiclist dt .list-inner {
+	margin-right: 440px;
+}
+
+ul.topiclist dt {
+	margin-right: -440px;
+}
+
+.rtl ul.topiclist dt .list-inner {
+	margin-left: 440px;
+}
+
+.rtl ul.topiclist dt {
+	margin-left: -440px;
+}

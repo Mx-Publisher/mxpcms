@@ -1,0 +1,406 @@
+				<!-- BEGIN switch_bbcodes -->
+				<script language="JavaScript" type="text/javascript">
+				<!--
+				// bbCode control by
+				// subBlue design
+				// www.subBlue.com
+
+				// Startup variables
+				var imageTag = false;
+				var theSelection = false;
+
+				// Check for Browser & Platform for PC & IE specific bits
+				// More details from: http://www.mozilla.org/docs/web-developer/sniffer/browser_type.html
+				var clientPC = navigator.userAgent.toLowerCase(); // Get client info
+				var clientVer = parseInt(navigator.appVersion); // Get browser version
+
+				var is_ie = ((clientPC.indexOf("msie") != -1) && (clientPC.indexOf("opera") == -1));
+				var is_nav = ((clientPC.indexOf('mozilla')!=-1) && (clientPC.indexOf('spoofer')==-1)
+				                && (clientPC.indexOf('compatible') == -1) && (clientPC.indexOf('opera')==-1)
+				                && (clientPC.indexOf('webtv')==-1) && (clientPC.indexOf('hotjava')==-1));
+				var is_moz = 0;
+
+				var is_win = ((clientPC.indexOf("win")!=-1) || (clientPC.indexOf("16bit") != -1));
+				var is_mac = (clientPC.indexOf("mac")!=-1);
+
+				// Helpline messages
+				b_help = "{L_BBCODE_B_HELP}";
+				i_help = "{L_BBCODE_I_HELP}";
+				u_help = "{L_BBCODE_U_HELP}";
+				q_help = "{L_BBCODE_Q_HELP}";
+				c_help = "{L_BBCODE_C_HELP}";
+				l_help = "{L_BBCODE_L_HELP}";
+				o_help = "{L_BBCODE_O_HELP}";
+				p_help = "{L_BBCODE_P_HELP}";
+				w_help = "{L_BBCODE_W_HELP}";
+				a_help = "{L_BBCODE_A_HELP}";
+				s_help = "{L_BBCODE_S_HELP}";
+				f_help = "{L_BBCODE_F_HELP}";
+
+				// Define the bbCode tags
+				bbcode = new Array();
+				bbtags = new Array('[b]','[/b]','[i]','[/i]','[u]','[/u]','[fa]','[/fa]','[quote]','[/quote]','[code]','[/code]','[html]','[/html]','[list]','[/list]','[list=]','[/list]','[img]','[/img]','[url]','[/url]');
+				imageTag = false;
+				
+				// Shows the help messages in the helpline window
+				function helpline(help) {
+					document.post.helpbox.value = eval(help + "_help");
+				}
+
+
+				// Replacement for arrayname.length property
+				function getarraysize(thearray) {
+					for (i = 0; i < thearray.length; i++) {
+						if ((thearray[i] == "undefined") || (thearray[i] == "") || (thearray[i] == null))
+							return i;
+						}
+					return thearray.length;
+				}
+
+				// Replacement for arrayname.push(value) not implemented in IE until version 5.5
+				// Appends element to the array
+				function arraypush(thearray,value) {
+					thearray[ getarraysize(thearray) ] = value;
+				}
+
+				// Replacement for arrayname.pop() not implemented in IE until version 5.5
+				// Removes and returns the last element of an array
+				function arraypop(thearray) {
+					thearraysize = getarraysize(thearray);
+					retval = thearray[thearraysize - 1];
+					delete thearray[thearraysize - 1];
+					return retval;
+				}
+
+
+				function checkForm() {
+
+					formErrors = false;
+
+					if (document.post.{SELECT_NAME}.value.length < 2) {
+						formErrors = "{L_EMPTY_MESSAGE}";
+					}
+
+					if (formErrors) {
+						alert(formErrors);
+						return false;
+					} else {
+						bbstyle(-1);
+						//formObj.preview.disabled = true;
+						//formObj.submit.disabled = true;
+						return true;
+					}
+				}
+
+				function emoticon(text) {
+					var txtarea = document.post.{SELECT_NAME};
+					text = ' ' + text + ' ';
+					if (txtarea.createTextRange && txtarea.caretPos) {
+						var caretPos = txtarea.caretPos;
+						caretPos.text = caretPos.text.charAt(caretPos.text.length - 1) == ' ' ? caretPos.text + text + ' ' : caretPos.text + text;
+						txtarea.focus();
+					} else {
+						txtarea.value  += text;
+						txtarea.focus();
+					}
+				}
+
+				function bbfontstyle(bbopen, bbclose) {
+					var txtarea = document.post.{SELECT_NAME};
+
+					if ((clientVer >= 4) && is_ie && is_win) {
+						theSelection = document.selection.createRange().text;
+						if (!theSelection) {
+							txtarea.value += bbopen + bbclose;
+							txtarea.focus();
+							return;
+						}
+						document.selection.createRange().text = bbopen + theSelection + bbclose;
+						txtarea.focus();
+						return;
+					}
+					else if (txtarea.selectionEnd && (txtarea.selectionEnd - txtarea.selectionStart > 0))
+					{
+						mozWrap(txtarea, bbopen, bbclose);
+						return;
+					}
+					else
+					{
+						txtarea.value += bbopen + bbclose;
+						txtarea.focus();
+					}
+					storeCaret(txtarea);
+				}
+
+
+				function bbstyle(bbnumber) {
+					var txtarea = document.post.{SELECT_NAME};
+
+					txtarea.focus();
+					donotinsert = false;
+					theSelection = false;
+					bblast = 0;
+
+					if (bbnumber == -1) { // Close all open tags & default button names
+						while (bbcode[0]) {
+							butnumber = arraypop(bbcode) - 1;
+							txtarea.value += bbtags[butnumber + 1];
+							buttext = eval('document.post.addbbcode' + butnumber + '.value');
+							eval('document.post.addbbcode' + butnumber + '.value ="' + buttext.substr(0,(buttext.length - 1)) + '"');
+						}
+						imageTag = false; // All tags are closed including image tags :D
+						txtarea.focus();
+						return;
+					}
+
+					if ((clientVer >= 4) && is_ie && is_win)
+					{
+						theSelection = document.selection.createRange().text; // Get text selection
+						if (theSelection) {
+							// Add tags around selection
+							document.selection.createRange().text = bbtags[bbnumber] + theSelection + bbtags[bbnumber+1];
+							txtarea.focus();
+							theSelection = '';
+							return;
+						}
+					}
+					else if (txtarea.selectionEnd && (txtarea.selectionEnd - txtarea.selectionStart > 0))
+					{
+						mozWrap(txtarea, bbtags[bbnumber], bbtags[bbnumber+1]);
+						return;
+					}
+
+					// Find last occurance of an open tag the same as the one just clicked
+					for (i = 0; i < bbcode.length; i++) {
+						if (bbcode[i] == bbnumber+1) {
+							bblast = i;
+							donotinsert = true;
+						}
+					}
+
+					if (donotinsert) {		// Close all open tags up to the one just clicked & default button names
+						while (bbcode[bblast]) {
+								butnumber = arraypop(bbcode) - 1;
+								txtarea.value += bbtags[butnumber + 1];
+								buttext = eval('document.post.addbbcode' + butnumber + '.value');
+								eval('document.post.addbbcode' + butnumber + '.value ="' + buttext.substr(0,(buttext.length - 1)) + '"');
+								imageTag = false;
+							}
+							txtarea.focus();
+							return;
+					} else { // Open tags
+
+						if (imageTag && (bbnumber != 14)) {		// Close image tag before adding another
+							txtarea.value += bbtags[15];
+							lastValue = arraypop(bbcode) - 1;	// Remove the close image tag from the list
+							document.post.addbbcode14.value = "Img";	// Return button back to normal state
+							imageTag = false;
+						}
+
+						// Open tag
+						txtarea.value += bbtags[bbnumber];
+						if ((bbnumber == 14) && (imageTag == false)) imageTag = 1; // Check to stop additional tags after an unclosed image tag
+						arraypush(bbcode,bbnumber+1);
+						eval('document.post.addbbcode'+bbnumber+'.value += "*"');
+						txtarea.focus();
+						return;
+					}
+					storeCaret(txtarea);
+				}
+
+				// From http://www.massless.org/mozedit/
+				function mozWrap(txtarea, open, close)
+				{
+					var selLength = txtarea.textLength;
+					var selStart = txtarea.selectionStart;
+					var selEnd = txtarea.selectionEnd;
+					if (selEnd == 1 || selEnd == 2)
+						selEnd = selLength;
+
+					var s1 = (txtarea.value).substring(0,selStart);
+					var s2 = (txtarea.value).substring(selStart, selEnd)
+					var s3 = (txtarea.value).substring(selEnd, selLength);
+					txtarea.value = s1 + open + s2 + close + s3;
+					return;
+				}
+
+				// Insert at Claret position. Code from
+				// http://www.faqts.com/knowledge_base/view.phtml/aid/1052/fid/130
+				function storeCaret(textEl) {
+					if (textEl.createTextRange) textEl.caretPos = document.selection.createRange().duplicate();
+				}
+
+				//-->
+				</script>
+				<!-- END switch_bbcodes -->
+
+				<!-- BEGIN tinyMCE_admin -->
+				<script language="javascript" type="text/javascript" src="{U_PORTAL_ROOT_PATH}modules/mx_shared/tinymce/jscripts/tiny_mce/tiny_mce.js"></script>
+				<script language="javascript" type="text/javascript">
+				   tinyMCE.init({ 
+				      	mode : "textareas",
+				      	theme : "advanced",
+						language : "{tinyMCE_admin.LANG}",
+                        docs_language : "{tinyMCE_admin.LANG}",
+				      	plugins : "table,advhr,advimage,advlink,emotions,insertdatetime,preview,zoom,flash,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable",
+						theme_advanced_buttons1_add_before : "newdocument,separator",
+						theme_advanced_buttons1_add : "fontselect,fontsizeselect",
+						theme_advanced_buttons2_add : "separator,insertdate,inserttime,preview,separator,forecolor,backcolor",
+						theme_advanced_buttons2_add_before: "cut,copy,paste,pastetext,pasteword,separator,search,replace,separator",
+						theme_advanced_buttons3_add_before : "tablecontrols,separator",
+						theme_advanced_buttons3_add : "emotions,flash,advhr,separator,print,separator,ltr,rtl,separator,fullscreen",
+						theme_advanced_toolbar_location : "top",
+						theme_advanced_toolbar_align : "left",
+						theme_advanced_path_location : "bottom",
+				        // Example content CSS (should be your site CSS) 
+				      	content_css : "{tinyMCE_admin.TEMPLATE}",
+				      	
+						theme_advanced_styles : "Tiny Text=copyright;Small Text=gensmall;Normal Text=genmed;Big Text=gen;Code=code;Quote=quote",
+
+						table_styles : "Layout=forumline",
+						table_cell_styles : "Table cell 1=row1;Table cell 2=row2;Table cell 3=row3",
+						table_row_styles : "Table row 1=oddrow",
+						table_default_border : "0",
+
+				      	document_base_url : "{tinyMCE_admin.PATH}index.php",
+				      	relative_urls : "true",
+
+				      	extended_valid_elements : "a[*],img[*],table[*],tr[*],td[*],div[*],form[*],input[*]"
+				   });
+				</script>
+				<!-- END tinyMCE_admin -->
+				
+				<!-- BEGIN tinyMCE -->
+				<script type="text/javascript" src="{U_PORTAL_ROOT_PATH}modules/mx_shared/tinymce/jscripts/tiny_mce/tiny_mce.js"></script> 
+				<script type="text/javascript"> 
+				tinyMCE.init({ 
+				        // General options 
+				        mode : "textareas", 
+				        theme : "advanced", 
+						language : "{tinyMCE.LANG}",
+                        docs_language : "{tinyMCE.LANG}",						
+				        plugins : "autolink,lists,spellchecker,pagebreak,style,layer,table,save,advhr,advimage,advlink,emotions,iespell,inlinepopups,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template", 
+				 
+				        // Theme options 
+						theme_advanced_buttons1_add_before : "newdocument,separator",
+						theme_advanced_buttons1_add : "fontselect,fontsizeselect",
+						theme_advanced_buttons2_add : "separator,insertdate,inserttime,preview,separator,forecolor,backcolor",
+						theme_advanced_buttons2_add_before: "cut,copy,paste,pastetext,pasteword,separator,search,replace,separator",
+						theme_advanced_buttons3_add_before : "tablecontrols,separator",
+						theme_advanced_buttons3_add : "emotions,flash,advhr,separator,print,separator,ltr,rtl,separator,fullscreen",
+						theme_advanced_toolbar_location : "top",
+						theme_advanced_toolbar_align : "left",
+						theme_advanced_path_location : "bottom",
+						
+						theme_advanced_buttons1 : "save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect", 
+				        theme_advanced_buttons2 : "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,backcolor", 
+				        theme_advanced_buttons3 : "tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,iespell,media,advhr,|,print,|,ltr,rtl,|,fullscreen", 
+				        theme_advanced_buttons4 : "insertlayer,moveforward,movebackward,absolute,|,styleprops,spellchecker,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,blockquote,pagebreak,|,insertfile,insertimage", 
+				        theme_advanced_toolbar_location : "top", 
+				        theme_advanced_toolbar_align : "left", 
+				        theme_advanced_statusbar_location : "bottom", 
+				        theme_advanced_resizing : true, 
+				 
+				        // Skin options 
+				        skin : "o2k7", 
+				        skin_variant : "silver", 
+				 
+				        // Example content CSS (should be your site CSS) 
+				      	content_css : "{tinyMCE.TEMPLATE}", 
+				 
+				        // Drop lists for link/image/media/template dialogs 
+				        template_external_list_url : "js/template_list.js", 
+				        external_link_list_url : "js/link_list.js", 
+				        external_image_list_url : "js/image_list.js", 
+				        media_external_list_url : "js/media_list.js", 
+				 
+				        // Replace values for the template plugin 
+				        template_replace_values : { 
+				                username : "Some User", 
+				                staffid : "991234" 
+				        } 
+				}); 
+				</script> 
+				 
+				<form method="post" action="somepage"> 
+				        <textarea name="content" style="width:100%"></textarea> 
+				</form>
+				<!-- END tinyMCE -->				
+
+				<!-- Module Block Parameter -->
+				<!-- BEGIN preview -->
+				<p></p>
+				<div class="panel bg1" id="preview">
+					<div class="inner"><span class="corners-top"><span></span></span>
+					<div class="postbody">
+						<table width="70%" border="0" cellspacing="0" cellpadding="1" class="table3">
+							<tr>
+								<th class="row3 cat" align="center" >&nbsp;{L_PREVIEW}&nbsp;</th>
+							</tr>
+							<tr>
+								<td  align="left" ><span class="genmed">{TEXT}</span></td>
+							</tr>
+						</table>
+					</div>
+					<span class="corners-bottom"><span></span></span></div>
+				</div>
+				<p></p>
+				<!-- END preview -->
+
+<!-- BEGIN switch_bbcodes -->
+<fieldset class="fields1">
+<!-- END switch_bbcodes -->			
+<div id="smiley-box">
+	<!-- BEGIN switch_smilies -->
+	<h3>{L_EMOTICONS}</h3>
+	<!-- END switch_smilies -->
+	<!-- BEGIN smilies_row -->
+	<!-- BEGIN smilies_col -->
+	<a href="javascript:emoticon('{smilies_row.smilies_col.SMILEY_CODE}')"><img src="{smilies_row.smilies_col.SMILEY_IMG}" alt="{smilies_row.smilies_col.SMILEY_DESC}" title="{smilies_row.smilies_col.SMILEY_DESC}" /></a>
+	<!-- END smilies_col -->
+	<!-- END smilies_row -->
+	<br />
+	<!-- BEGIN switch_smilies_extra -->
+	<a href="{U_MORE_SMILIES}" onclick="window.open('{U_MORE_SMILIES}', '_phpbbsmilies', 'HEIGHT=300,resizable=yes,scrollbars=yes,WIDTH=250');return false;" target="_phpbbsmilies" class="nav">{L_MORE_SMILIES}</a>
+	<!-- END switch_smilies_extra -->
+	<hr />
+	{BBCODE_STATUS}<br />
+	{HTML_STATUS}<br />
+	{SMILIES_STATUS}
+</div>
+	<div id="message-box">
+  		<!-- BEGIN textblock -->
+		<h3>{textblock.PARAMETER_TITLE}</h3>
+		{textblock.PARAMETER_TYPE}<br />
+		{textblock.PARAMETER_TYPE_EXPLAIN}
+		<div id="format-buttons">
+			<input type="button" class="button2" accesskey="b" name="addbbcode0" value=" B " style="font-weight:bold; width: 30px" onclick="bbstyle(0)" onMouseOver="helpline('b')" title="{L_BBCODE_B_HELP}" />
+			<input type="button" class="button2" accesskey="i" name="addbbcode2" value=" i " style="font-style:italic; width: 30px" onclick="bbstyle(2)" title="{L_BBCODE_I_HELP}" />
+			<input type="button" class="button2" accesskey="u" name="addbbcode4" value=" u " style="text-decoration: underline; width: 30px" onclick="bbstyle(4)" title="{L_BBCODE_U_HELP}" />
+			<input type="button" class="button2" accesskey="q" name="addbbcode6" value="Quote" style="width: 50px" onclick="bbstyle(6)" title="{L_BBCODE_Q_HELP}" />
+			<input type="button" class="button2" accesskey="c" name="addbbcode8" value="Code" style="width: 40px" onclick="bbstyle(8)" title="{L_BBCODE_C_HELP}" />
+			<input type="button" class="button2" accesskey="l" name="addbbcode10" value="List" style="width: 40px" onclick="bbstyle(10)" title="{L_BBCODE_L_HELP}" />
+			<input type="button" class="button2" accesskey="o" name="addbbcode12" value="List=" style="width: 40px" onclick="bbstyle(12)" title="{L_BBCODE_O_HELP}" />
+			<input type="button" class="button2" accesskey="p" name="addbbcode14" value="Img" style="width: 40px" onclick="bbstyle(14)" title="{L_BBCODE_P_HELP}" />
+			<input type="button" class="button2" accesskey="w" name="addbbcode16" value="URL" style="text-decoration: underline; width: 40px" onclick="bbstyle(16)" title="{L_BBCODE_W_HELP}" />
+			&nbsp;{L_FONT_SIZE}:
+			<select name="addbbcode20" onchange="bbfontstyle('[size=' + this.form.addbbcode20.options[this.form.addbbcode20.selectedIndex].value + ']', '[/size]');this.form.addbbcode20.selectedIndex = 2;" title="{L_FONT_SIZE}">
+				<option value="7">{L_FONT_TINY}</option>
+				<option value="9">{L_FONT_SMALL}</option>
+				<option value="12" selected="selected">{L_FONT_NORMAL}</option>
+				<option value="18">{L_FONT_LARGE}</option>
+				<option value="24">{L_FONT_HUGE}</option>
+			</select>
+		</div>
+		<br />
+		<textarea name="{SELECT_NAME}" rows="20" cols="35" wrap="virtual" style="width:550px" tabindex="3" class="post" {TEXTAREA_BBCODES_XTRA}>{textblock.TEXT}</textarea>
+		<!-- END textblock -->
+</div>
+</fieldset>
+	<div>
+		<div class="inner">
+		<fieldset class="submit-buttons">
+		<input type="submit" tabindex="5" name="preview" class="button2" value="{L_PREVIEW}" />
+		</fieldset>
+		</div>
+	</div>

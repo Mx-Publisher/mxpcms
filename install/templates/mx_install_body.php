@@ -1,0 +1,239 @@
+<script language="javascript1.2" type="text/javascript"><!--
+function getObj(obj)
+{
+	return ( document.getElementById ? document.getElementById(obj) : ( document.all ? document.all[obj] : null ) );
+}
+function displayObj(obj, status)
+{
+	var x = getObj(obj);
+	if( x && x.style ) x.style.display = status;
+}
+function check_backend_path()
+{
+	if( document.forms['frmInstall'] && document.forms['frmInstall'].elements['select_backend_path'] )
+	{
+		var i = document.forms['frmInstall'].elements['select_backend_path'].value;
+		if (i == -1)
+		{
+			displayObj('backend', 'none');			
+			displayObj('mxbb', 'block');
+			displayObj('dbms_mxbb', 'block');				
+		}
+		else
+		{
+			displayObj('backend', 'block');		
+			displayObj('mxbb', 'none');
+			displayObj('dbms_mxbb', 'none');			
+		}		
+		for( var x in pathinfo[i] )
+		{
+			document.forms['frmInstall'].elements[x].value = pathinfo[i][x];
+		}	
+	}	
+}
+function check_database_type()
+{
+	if( document.forms['frmInstall'] && document.forms['frmInstall'].elements['dbms_mxbb'] )
+	{
+		var i = document.forms['frmInstall'].elements['dbms_mxbb'].value;		
+		for( var x in pathinfo[i] )
+		{
+			document.forms['frmInstall'].elements[x].value = pathinfo[i][x];
+		}	
+	}	
+}
+var pathinfo = [];
+var i = -1;
+
+<!-- BEGIN datarow -->
+pathinfo[i] = [];
+pathinfo[i]['info'] = '{datarow.INFO}';
+pathinfo[i]['backend_path'] = '{datarow.BACKEND_PATH}';
+pathinfo[i]['backend_url'] = '{datarow.BACKEND_URL}';
+pathinfo[i]['portal_backend'] = '{datarow.PORTAL_BACKEND}'; //Display selected Backend
+pathinfo[i]['portal_url'] = '{datarow.PORTAL_URL}';
+pathinfo[i]['dbms'] = '{datarow.DBMS}';
+//pathinfo[i]['dbms_mxbb'] = '{datarow.DBMS_SELECT}';
+pathinfo[i]['dbms_mxbb'] = '{datarow.S_DBMS_TYPE}';
+pathinfo[i]['dbhost'] = '{datarow.DB_HOST}';
+pathinfo[i]['dbhost_mxbb'] = '{datarow.DB_HOST}';
+pathinfo[i]['dbname'] = '{datarow.DB_NAME}';
+pathinfo[i]['dbuser'] = '{datarow.DB_USER}';
+pathinfo[i]['dbpasswd'] = '{datarow.DB_PASSWD}';
+pathinfo[i]['dbcharacter_set'] = '{datarow.DB_CHARACTER_SET}';
+pathinfo[i]['dbcharacter_set_mxbb'] = '{datarow.DB_CHARACTER_SET}';
+pathinfo[i]['dbprefix'] = '{datarow.DB_PREFIX}';
+pathinfo[i]['mx_prefix'] = '{datarow.MX_DB_PREFIX}';
+//pathinfo[i]['acm_type'] = '{datarow.ACM_TYPE}';
+//pathinfo[i]['backend_root'] = '{datarow.BACKEND_ROOT}';
+i++;
+<!-- END datarow -->
+window.onload = check_backend_path;
+//--></script>
+<noscript><div align="center" style="color:red;">{L_NOSCRIPT_WARNING}</div></noscript>
+<form name="frmInstall" action="{S_FORM_ACTION}" method="post">
+<table cellpadding="2" cellspacing="1" border="0">
+	<tr>
+		<th colspan="2">{L_INITIAL_CONFIGURATION}</th>
+	</tr>
+	<!-- BEGIN switch_readonly_mode -->
+	<tr>
+		<td class="row1" align="right" width="50%"><span class="gen"><b>{L_BACKEND}:&nbsp;</b></span><br /><span class="gensmall">{L_Backend_explain}:&nbsp;</span></td>
+		<td class="row2">{S_BACKEND_PATH}</td>
+	</tr>
+	<!-- END switch_readonly_mode -->	
+	<tr>
+		<td class="row1" align="right" width="50%"><span class="gen">{L_PORTAL_BACKEND}:&nbsp;</span></td>
+		<td class="row2"><input class="inputbox autowidth" type="text" name="portal_backend" value="{PORTAL_BACKEND}" {READONLY} /></td>
+	</tr>
+	<!-- BEGIN switch_readonly_mode -->	
+	<tr>
+		<td class="row1" colspan="2" align="center"><input size="140" class="info" type="text" name="info" value="{INFO}" {READONLY} /></td></td>
+	</tr>
+	<!-- END switch_readonly_mode -->		
+	<!--
+	<tr>
+		<td class="row1" align="right"><span class="gen"><b>{L_ACM_TYPE}:&nbsp;</b></span></td>
+		<td class="row2"><input class="inputbox autowidth" type="text" name="acm_type" value="{ACM_TYPE}" /></td>
+	</tr>
+	-->
+	<tr>
+		<th colspan="2">{L_PORTAL_CONFIGURATION}{READ_ONLY}</th>
+	</tr>
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_PORTAL_URL}:&nbsp;</span></td>
+		<td class="row2"><input class="inputbox autowidth" type="text" size="80" name="portal_url" value="{PORTAL_URL}" /></td>
+	</tr>
+	<tr><td colspan="2"><div id="backend" style="display:none;" class="genmed"><table width="100%" cellpadding="2" cellspacing="1" border="0">
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_BACKEND_URL}:&nbsp;</span></td>
+		<td class="row2"><input class="inputbox autowidth" type="text" size="80" name="backend_url" value="{BACKEND_URL}" /></td>
+	</tr>
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_BACKEND_PATH}:&nbsp;</span></td>
+		<td class="row2"><input type="text" size="80" name="backend_path" value="{BACKEND_PATH}" /></td>
+	</tr>		
+	<!-- BEGIN switch_readonly_mode -->
+	<tr>
+		<th colspan="2">{L_DATABASE_CONFIGURATION}{READ_ONLY}</th>
+	</tr>
+	<tr>
+		<td class="row1" align="right" width="50%"><span class="gen">{L_DBMS}:&nbsp;</span></td>
+		<td class="row2"><input class="inputbox autowidth" type="text" name="dbms" value="{DBMS}" {READONLY}/></td>
+	</tr>
+	<!-- END switch_readonly_mode -->
+	<tr>
+		<td class="row1" align="right"><span class="gen"><b>{L_MX_DB_PREFIX}:&nbsp;</b></span></td>
+		<td class="row2"><input class="inputbox autowidth" type="text" name="mx_prefix" value="{MX_DB_PREFIX}" /></td>
+	</tr>
+	<!-- BEGIN switch_readonly_mode -->	
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_DB_CHARACTER_SET}:&nbsp;</span></td>
+		<td class="row2"><input class="inputbox autowidth" type="text" name="dbcharacter_set" value="{DB_CHARACTER_SET}" {READONLY} /></td>
+	</tr>	
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_DB_HOST}:&nbsp;</span></td>
+		<td class="row2"><input class="inputbox autowidth" type="text" name="dbhost" value="{DB_HOST}" {READONLY} /></td>
+	</tr>
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_DB_NAME}:&nbsp;</span></td>
+		<td class="row2"><input class="inputbox autowidth" type="text" name="dbname" value="{DB_NAME}" {READONLY} /></td>
+	</tr>
+	<!-- END switch_readonly_mode -->	
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_DB_USER}:&nbsp;</span></td>
+		<td class="row2"><input class="inputbox autowidth" type="text" name="dbuser" value="{DB_USER}" /></td>
+	</tr>
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_DB_PASSWORD}:&nbsp;</span></td>
+		<td class="row2"><input type="password" name="dbpasswd" value="{DB_PASSWD}" /></td>
+	</tr>
+	<!-- BEGIN switch_readonly_mode -->	
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_DB_PREFIX}:&nbsp;</span></td>
+		<td class="row2"><input class="inputbox autowidth" type="text" name="dbprefix" value="{DB_PREFIX}" {READONLY} /></td>
+	</tr>
+	<!-- END switch_readonly_mode -->	
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_MXP_ADMINNAME}:&nbsp;</span></td>
+		<td class="row2"><input class="inputbox autowidth" type="text" name="admin_name" value="" /></td>
+	</tr>
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_MXP_PASSWORD}:&nbsp;</span></td>
+		<td class="row2"><input class="inputbox autowidth" type="password" name="admin_pass1" value="" /></td>
+	</tr>
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_MXP_PASSWORD2}:&nbsp;</span></td>
+		<td class="row2"><input class="inputbox autowidth" type="password" name="admin_pass2" value="" /></td>
+	</tr>
+	<tr>
+		<td class="row1" colspan="2" align="center"><span class="gensmall"><font color="red">{L_MXP_ADMIN}</font></span></td></td>
+	</tr>
+	<tr>
+		<td class="catbottom" align="center" colspan="2">{S_HIDDEN_FIELDS}<input class="liteoption" type="submit" name="debug" value="Debug" /><input class="mainoption" name="BACKEND" type="submit" value="{L_SUBMIT}" /></td>
+	</tr>
+
+
+	</table></div></td></tr>
+
+	<tr><td colspan="2"><div id="mxbb" style="display:none;" class="genmed"><table width="100%" cellpadding="2" cellspacing="1" border="0">
+
+	<tr>
+		<th colspan="2">{L_DATABASE_CONFIGURATION}</th>
+	</tr>
+	<!--tr>
+		<td class="row1" align="right" width="50%"><span class="gen">{L_DBMS}:&nbsp;</span></td>
+		<td class="row2"><select name="dbms_mxbb">{DBMS_SELECT}</select></td>
+	</tr-->
+	<tr>
+		<td class="row1" align="right" width="50%"><span class="gen">{L_DBMS}:&nbsp;</span></td>
+		<td class="row2">{S_DBMS_TYPE}</td>
+	</tr>
+	<tr>
+		<td class="row1" align="right"><span class="gen"><b>{L_MX_DB_PREFIX}:&nbsp;</b></span></td>
+		<td class="row2"><input class="inputbox autowidth" type="text" name="mx_prefix" value="{MX_DB_PREFIX}" /></td>
+	</tr>
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_DB_CHARACTER_SET}:&nbsp;</span></td>
+		<td class="row2"><input class="inputbox autowidth" type="text" name="dbcharacter_set_mxbb" value="{DB_CHARACTER_SET}" /></td>
+	</tr>	
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_DB_HOST}:&nbsp;</span></td>
+		<td class="row2"><input class="inputbox autowidth" type="text" name="dbhost_mxbb" value="{DB_HOST}" /></td>
+	</tr>
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_DB_NAME}:&nbsp;</span></td>
+		<td class="row2"><input class="inputbox autowidth" type="text" name="dbname_mxbb" value="{DB_NAME}" /></td>
+	</tr>
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_DB_USER}:&nbsp;</span></td>
+		<td class="row2"><input class="inputbox autowidth" type="text" name="dbuser_mxbb" value="{DB_USER}" /></td>
+	</tr>
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_DB_PASSWORD}:&nbsp;</span></td>
+		<td class="row2"><input type="password" name="dbpasswd_mxbb" value="{DB_PASSWD}" /></td>
+	</tr>	
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_MXP_ADMINNAME}:&nbsp;</span></td>
+		<td class="row2"><input class="inputbox autowidth" type="text" name="admin_name_mxbb" value="" /></td>
+	</tr>
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_MXP_PASSWORD}:&nbsp;</span></td>
+		<td class="row2"><input class="inputbox autowidth" type="password" name="admin_pass1_mxbb" value="" /></td>
+	</tr>
+	<tr>
+		<td class="row1" align="right"><span class="gen">{L_MXP_PASSWORD2}:&nbsp;</span></td>
+		<td class="row2"><input class="inputbox autowidth" type="password" name="admin_pass2_mxbb" value="" /></td>
+	</tr>
+	<tr>
+		<td class="row1" colspan="2" align="center"><span class="gensmall"><font color="red">{L_MXP_ADMIN}</font></span></td></td>
+	</tr>
+	<tr>
+		<td class="catbottom" align="center" colspan="2">{S_HIDDEN_FIELDS}<input class="liteoption" type="submit" name="debug" value="Debug" /><input class="mainoption" name="mxbb" type="submit" value="{L_SUBMIT}" /></td>
+	</tr>
+
+	</table></div></td></tr>
+
+
+</table>
+</form>

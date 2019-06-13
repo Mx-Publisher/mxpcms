@@ -1,0 +1,70 @@
+
+<!-- IF S_DISPLAY_ONLINE_LIST -->
+	<br clear="all" />
+
+	<table class="tablebg" width="100%" cellspacing="1">
+	<tr>
+		<td class="cat" colspan="2"><!-- IF U_VIEWONLINE --><h4><a href="{U_VIEWONLINE}">{L_WHO_IS_ONLINE}</a></h4><!-- ELSE --><h4>{L_WHO_IS_ONLINE}</h4><!-- ENDIF --></td>
+	</tr>
+	<tr>
+	<!-- IF LEGEND -->
+		<td class="row1" rowspan="3" align="center" valign="middle"><img src="{ONLINE_IMG}" alt="{L_WHO_IS_ONLINE}" /></td>
+	<!-- ELSE -->
+		<td class="row1" align="center" valign="middle"><img src="{ONLINE_IMG}" alt="{L_WHO_IS_ONLINE}" /></td>
+	<!-- ENDIF -->
+		<td class="row1" width="100%"><span class="genmed">{TOTAL_USERS_ONLINE} ({L_ONLINE_EXPLAIN})<br />{RECORD_USERS}<br /><br />{LOGGED_IN_USER_LIST}</span></td>
+	</tr>
+	<!-- IF not S_IS_BOT -->
+		<tr>
+			<td class="row1">{USERS_24HOUR_TOTAL}: <!-- BEGIN lastvisit -->{lastvisit.USERNAME_FULL}<!-- IF not lastvisit.S_LAST_ROW -->, <!-- ENDIF --><!-- END lastvisit --></td>
+		</tr>
+	<!-- ENDIF -->	
+	<!-- IF LEGEND -->
+		<tr>
+			<td class="row1"><b class="gensmall">{L_LEGEND} :: {LEGEND}</b></td>
+		</tr>
+	<!-- ENDIF -->
+	</table>
+<!-- ENDIF -->
+
+<!-- IF S_DISPLAY_BIRTHDAY_LIST -->
+	<br clear="all" />
+
+	<table class="tablebg" width="100%" cellspacing="1">
+	<tr>
+		<td class="cat" colspan="2"><h4>{L_BIRTHDAYS}</h4></td>
+	</tr>
+	<tr>
+		<td class="row1" align="center" valign="middle"><img src="{ONLINE_IMG}" alt="{L_BIRTHDAYS}" /></td>
+		<td class="row1" width="100%"><p class="genmed"><!-- IF BIRTHDAY_LIST -->{L_CONGRATULATIONS}: <b>{BIRTHDAY_LIST}</b><!-- ELSE -->{L_NO_BIRTHDAYS}<!-- ENDIF --></p></td>
+	</tr>
+	</table>
+<!-- ENDIF -->
+
+<br clear="all" />
+
+
+<br clear="all" />
+
+<table class="tablebg" width="100%" cellspacing="1">
+<tr>
+	<td class="cat" colspan="2"><h4>{L_STATISTICS}</h4></td>
+</tr>
+<tr>
+	<td class="row1"><img src="{ONLINE_IMG}" alt="{L_STATISTICS}" /></td>
+	<td class="row1" width="100%" valign="middle"><p class="genmed">{TOTAL_POSTS} | {TOTAL_TOPICS} | {TOTAL_USERS} | {NEWEST_USER}</p></td>
+</tr>
+</table>
+
+	<!-- IF not S_IS_BOT -->
+	<br clear="all" />
+	<table class="tablebg" width="100%" cellspacing="1">
+	<tr>
+		<td class="cat" colspan="2"><h4>{L_24HOUR_STATS}</h4></td>
+	</tr>
+	<tr>
+		<td class="row1"><img src="{ONLINE_IMG}" alt="{L_STATISTICS}" /></td>
+		<td class="row1" width="100%" valign="middle"><p class="genmed">{24HOUR_POSTS} | {24HOUR_TOPICS} | {24HOUR_USERS}</p></td>
+	</tr>
+	</table>
+<!-- ENDIF -->

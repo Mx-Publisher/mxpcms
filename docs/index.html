@@ -1,0 +1,3140 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+<meta content="text/html; charset=windows-1252" http-equiv="CONTENT-TYPE">
+<meta content="text/css" http-equiv="Content-Style-Type">
+<meta content="mxpcms.sf.net" name="title">
+<meta content="The MX-Publisher (MXP) Development Team" name="author">
+<meta content="The MX-Publisher (MXP) Development Team" name="copyright">
+<link type="image/gif" href="../favicon.gif" rel="icon">
+<meta content="IE=edge" http-equiv="X-UA-Compatible" name="browser">
+<meta content="width=device-width, initial-scale=1" name="viewport">
+<meta content="yes" name="apple-mobile-web-app-capable">
+<meta content="blue" name="apple-mobile-web-app-status-bar-style">
+<meta http-equiv="Content-Type" charset="UTF-8" content="text/html">
+<meta content="Kompozer, OpenOffice.org 1.1.1 (Win32)" name="GENERATOR">
+<meta content="20040708;12280200" name="CREATED">
+<meta content="20040709;10181231" name="CHANGED">
+<style>
+@page { size: 21.59cm 27.94cm; margin: 2cm }
+P { margin-bottom: 0.21cm }
+H1 { margin-top: 0cm; margin-bottom: 0cm }
+H1.western { font-family: "Arial", sans-serif; font-size: 14pt; font-weight: medium }
+H1.cjk { font-family: "Lucida Sans Unicode"; font-size: 14pt; font-weight: medium }
+H1.ctl { font-family: "Tahoma"; font-size: 12pt; font-weight: medium }
+A:link { color: #0000ff }
+.mx_icon
+{
+vertical-align: middle;
+background-color:;
+background-image: url(/images/theme/icon_bg.gif);
+background-repeat: no-repeat;
+}
+.mx_icon_hot {
+vertical-align: middle;
+background-color:;
+background-image: url(/images/theme/icon_bg.gif);
+background-repeat: no-repeat;
+}
+</style>
+<link rel="stylesheet" href="../assets/css/font-awesome.min.css">
+<link rel="stylesheet" href="../templates/prosilver/theme/stylesheet.css">
+<link rel="stylesheet" href="../templates/prosilver/theme/images/lang_romanian/stylesheet.css">
+<link rel="stylesheet" href="../templates/prosilver/theme/bidi.css?assets_version=3.0.5">
+<link rel="stylesheet" href="../templates/prosilver/theme/plupload.css?assets_version=3.0.5">
+<link rel="stylesheet" href="../assets/cookieconsent/cookieconsent.min.css?assets_version=3.0.5">
+<script type="text/javascript"><!--
+if( )
+{
+window.open('', '_phpbbprivmsg', 'HEIGHT=225,resizable=yes,WIDTH=400');
+}
+// --></script>
+<script type="text/javascript"><!--
+function checkSearch()
+{
+if (document.search_block.search_engine.value == 'google')
+{
+window.open('http://www.google.com/search?q=' + document.search_block.search_keywords.value, '_google', '');
+return false;
+}
+else if (document.search_block.search_engine.value == 'site')
+{
+window.open('&search_keywords=' + document.search_block.search_keywords.value, '_self', '');
+return false;
+}
+else if (document.search_block.search_engine.value == 'kb')
+{
+window.open('&search_keywords=' + document.search_block.search_keywords.value, '_self', '');
+return false;
+}
+else if (document.search_block.search_engine.value == 'pafiledb')
+{
+window.open('&search_keywords=' + document.search_block.search_keywords.value, '_self', '');
+return false;
+}
+else
+{
+return true;
+}
+}
+// --></script>
+<script language="javascript" type="text/javascript" src="js/Common.js"></script>
+<script language="javascript" type="text/javascript" src="js/Toggle.js"></script><title>MX-Publisher CMS Documntation</title>
+
+<link href="../modules/mx_navmenu/templates/prosilver/prosilver.css" rel="stylesheet" type="text/css" media="screen">
+<!-- ENDIF --><!-- IF S_PLUPLOAD -->
+<!-- ENDIF --><!-- IF S_COOKIE_NOTICE --><!-- ENDIF --><!--[if lte IE 9]>
+<link href="../templates/prosilver/theme/tweaks.css?assets_version=3.0.5" rel="stylesheet" />
+<![endif]--><!-- IF ENABLE_PM_POPUP --><!-- ENDIF -->
+</head>
+<body style="direction: ltr;" lang="en-US" link="#0000ff">
+<a name="top"></a>
+<div id="container"><!-- ...or put contents on background top image -->
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody>
+<tr height="101">
+<td background="images/theme/top.jpg" width="750">
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody>
+<tr height="80">
+<td align="left" valign="top" width="25%">
+<!--<a href="http://mxpcms.sourceforge.net/index.php"><img src="http://mxpcms.sourceforge.net/templates/subSilver/images/logo.gif" border="0" alt="MX-Publisher" vspace="1"/></a>--><a href="http://mxpcms.sourceforge.net/index.php"><img src="images/theme/spacer.gif" alt="MX-Publisher" title="MX-Publisher" border="0" height="75" width="210"></a> </td>
+<td align="center" valign="middle" width="50%"><!--<img valign="middle" src="http://mxpcms.sourceforge.net/templates/subSilver/images/page_icons/icon_home.gif" alt="" />&nbsp;&nbsp;<span class="pagetitle">Home</span>-->
+</td>
+<td align="right" valign="top" width="25%"><span class="sitetitle">&nbsp;</span></td>
+</tr>
+<tr height="21">
+<td colspan="3" align="left" valign="middle" width="100%"> <img src="images/theme/spacer.gif" border="0" height="1" width="5"><!--<span class="sitetitle_desc">The home of MXP the modular CMS</span>-->
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<!-- End --><!-- ...or use Generated Navigation Menu -->
+<div class="inner headernavbar">
+<div id="navbar" class="sitebar" role="navigation" style="padding-top: 4px; padding-bottom: 10px; width: auto;">
+<div class="navbar" role="navigation" style="clear: left; float: left;">
+<div class="inner"><!-- EVENT navbar_header_quick_links_before -->
+<ul id="nav-main" class="linklist bulletin" role="menubar">
+<li id="c_1" class="button-current" onmouseover="showMenuRows('1');" onmouseout="hideMenuRows('1')" type="submit"> <span><a class="nav" href="http://mxpcms.sourceforge.net/index.php?page=1&amp;cat_link=1" target=""><span class="nav">Home</span></a></span>
+<ul id="cat_1" onmouseover="showMenuRows('1');" style="margin: 0px; padding: 0px; display: none; background-color: rgb(255, 255, 255); position: absolute; z-index: 160;">
+<li class="button mnu-ov"> <a href="http://mxpcms.sourceforge.net/index.php?page=37" style="background-image: url();"> <span>News</span>
+</a> </li>
+<li class="button mnu-ov"> <a href="http://mxpcms.sourceforge.net/index.php?page=42" style="background-image: url();"> <span>Features</span>
+</a> </li>
+<li class="button mnu-ov"> <a href="http://mxpcms.sourceforge.net/index.php?page=16" style="background-image: url();"> <span>About</span>
+</a> </li>
+<li class="button mnu-ov"> <a href="http://mxpcms.sourceforge.net/index.php?page=19" style="background-image: url();"> <span>Terms of Use</span>
+</a> </li>
+<li class="button mnu-ov"> <a href="http://mxpcms.sourceforge.net/index.php?page=5" style="background-image: url();"> <span>Site Search</span>
+</a> </li>
+</ul>
+</li>
+<li id="c_8" class="button" onmouseover="showMenuRows('8');" onmouseout="hideMenuRows('8')" type="submit"> <span><a class="nav" href="http://mxpcms.sourceforge.net/index.php?page=8&amp;cat_link=8" target=""><span class="nav">Docs</span></a></span>
+<ul id="cat_8" onmouseover="showMenuRows('8');" style="margin: 0px; padding: 0px; display: none; background-color: rgb(255, 255, 255); position: absolute; z-index: 160;">
+<li class="button mnu-ov"> <a href="http://mxpcms.sourceforge.net/index.php?page=13" style="background-image: url();"> <span>Main
+Documentation</span> </a> </li>
+<li class="button mnu-ov"> <a href="http://mxpcms.sourceforge.net/index.php?page=12" style="background-image: url();"> <span>Knowledge Base</span>
+</a> </li>
+<li class="button mnu-ov"> <a href="http://mxpcms.sourceforge.net/index.php?page=35" style="background-image: url();"> <span>Technical
+Code Reference</span> </a> </li>
+<li class="button mnu-ov"> <a href="http://mxpcms.sourceforge.net/index.php?page=38" style="background-image: url();"> <span>MXP Plan</span>
+</a> </li>
+</ul>
+</li>
+<li id="c_2" class="button" onmouseover="showMenuRows('2');" onmouseout="hideMenuRows('2')" type="submit"> <span><a class="nav" href="http://mxpcms.sourceforge.net/index.php?page=2&amp;cat_link=2" target=""><span class="nav">Forum</span></a></span>
+<ul id="cat_2" onmouseover="showMenuRows('2');" style="margin: 0px; padding: 0px; display: none; background-color: rgb(255, 255, 255); position: absolute; z-index: 160;">
+</ul>
+</li>
+<li id="c_39" class="button" onmouseover="showMenuRows('39');" onmouseout="hideMenuRows('39')" type="submit"> <span><a class="nav" href="http://mxpcms.sourceforge.net/index.php?page=39&amp;cat_link=39" target=""><span class="nav">Demo</span></a></span>
+<ul id="cat_39" onmouseover="showMenuRows('39');" style="margin: 0px; padding: 0px; display: none; background-color: rgb(255, 255, 255); position: absolute; z-index: 160;">
+</ul>
+</li>
+<li id="c_11" class="button" onmouseover="showMenuRows('11');" onmouseout="hideMenuRows('11')" type="submit"> <span><a class="nav" href="http://mxpcms.sourceforge.net/index.php?page=11&amp;cat_link=11" target=""><span class="nav">Download</span></a></span>
+<ul id="cat_11" onmouseover="showMenuRows('11');" style="margin: 0px; padding: 0px; display: none; background-color: rgb(255, 255, 255); position: absolute; z-index: 160;">
+<li class="button mnu-ov"> <a href="http://mxpcms.sourceforge.net/index.php?page=29" style="background-image: url();"> <span>Stable
+Release (MXP 2.8.x)</span> </a>
+</li>
+<li class="button mnu-ov"> <a href="http://mxpcms.sourceforge.net/index.php?page=30" style="background-image: url();"> <span>Development
+Release (MXP 3.0.x)</span> </a>
+</li>
+</ul>
+</li>
+<li id="c_10" class="button" onmouseover="showMenuRows('10');" onmouseout="hideMenuRows('10')" type="submit"> <span><a class="nav" href="http://mxpcms.sourceforge.net/index.php?page=10&amp;cat_link=10" target=""><span class="nav">Contribute</span></a></span>
+<ul id="cat_10" onmouseover="showMenuRows('10');" style="margin: 0px; padding: 0px; display: none; background-color: rgb(255, 255, 255); position: absolute; z-index: 160;">
+<li class="button mnu-ov"> <a href="http://mxpcms.sourceforge.net/index.php?page=14" style="background-image: url();"> <span>Hall of Fame</span>
+</a> </li>
+<li class="button mnu-ov"> <a href="http://mxpcms.sourceforge.net/index.php?page=15" style="background-image: url();"> <span>Donations</span>
+</a> </li>
+</ul>
+</li>
+<li id="c_6" class="button" onmouseover="showMenuRows('6');" onmouseout="hideMenuRows('6')" type="submit"> <span><a class="nav" href="http://mxpcms.sourceforge.net/index.php?page=6&amp;cat_link=6" target=""><span class="nav">MXP Internal</span></a></span>
+<ul id="cat_6" onmouseover="showMenuRows('6');" style="margin: 0px; padding: 0px; display: none; background-color: rgb(255, 255, 255); position: absolute; z-index: 160;">
+<li class="button mnu-ov"> <a href="http://mxpcms.sourceforge.net/index.php?page=20" style="background-image: url();"> <span>General</span>
+</a> </li>
+<li class="button mnu-ov"> <a href="http://mxpcms.sourceforge.net/index.php?page=22" style="background-image: url();"> <span>SiteTeam Area</span>
+</a> </li>
+<li class="button mnu-ov"> <a href="http://mxpcms.sourceforge.net/index.php?page=25" style="background-image: url();"> <span>MXP Tools</span>
+</a> </li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<script type="text/javascript">
+function getObj(obj)
+{
+return ( document.getElementById ? document.getElementById(obj) : ( document.all ? document.all[obj] : null ) );
+}
+var qeuedMenuSteps = new Array();
+var qeuedMenuCurrentStep = 0;
+var qeuedMenuTime = 1000;
+function objOffSet()
+{
+this.left = 0;
+this.top = 0;
+}
+function calOffset( obj, obj2)
+{
+obj.left = obj.left + obj2.offsetLeft;
+obj.top = obj.left + obj2.offsetTop;
+if ( obj2.nodeName != 'HTML') {
+obj = calOffset( obj, obj2.parentNode);
+}
+return obj;
+}
+/**
+*
+* @access public
+* @return void
+**/
+function proceedMenuSteps( proceed)
+{
+if ( qeuedMenuCurrentStep < qeuedMenuSteps.length || proceed)
+{
+while( qeuedMenuCurrentStep < qeuedMenuSteps.length )
+{
+eval( qeuedMenuSteps[qeuedMenuCurrentStep]);
+qeuedMenuCurrentStep ++;
+}
+}
+setTimeout( 'proceedMenuSteps()', qeuedMenuTime);
+}
+setTimeout( 'proceedMenuSteps()', qeuedMenuTime);
+/**
+*
+* @access public
+* @return void
+**/
+function hideMenuRows( objID)
+{
+qeuedMenuSteps[qeuedMenuSteps.length] = "getObj('"+ 'cat_' + objID + "').style.border='none';";
+qeuedMenuSteps[qeuedMenuSteps.length] = "getObj('"+ 'cat_' + objID + "').style.display='none';";
+}
+function showMenu( objID)
+{
+cat_obj = getObj( 'cat_' + objID);
+if ( cat_obj.innerHTML.replace( '#^\s*|\s*$#', '') != '' )
+{
+cat_obj.style.display = 'block';
+cat_obj.style.border = 'solid 1px Black';
+cat_obj.style.borderTop = 'none';
+}
+}
+/**
+*
+* @access public
+* @return void
+**/
+function showMenuRows( objID)
+{
+qeuedMenuSteps[qeuedMenuSteps.length] = "showMenu( '" + objID + "');";
+proceedMenuSteps( true);
+}
+//alert(getObj( 'menu_rows'));
+</script> </div>
+</div>
+<div id="outer">
+<div id="inner">
+<div id="middlecol">
+<div class="blockcontainer">
+<p style="margin-bottom: 0cm;" align="center"> <font face="Arial, sans-serif"> <font style="font-size: 16pt;" size="4"> </font></font></p>
+<p class="wrap" style="margin-bottom: 0cm;" align="center"><font face="Arial, sans-serif"><font style="font-size: 16pt;" size="4"><u>MX-Publisher
+CMS: <b>Documentation</b> </u> </font> </font>
+</p>
+<div class="block" id="block_88">
+<p style="margin-bottom: 0cm;" align="center"><font face="Arial, sans-serif"><font size="4"> </font></font></p>
+<p style="margin-bottom: 0cm;" align="center"></p>
+<p class="signature" style="margin-bottom: 0cm;" align="center"><font face="Arial, sans-serif"><font size="4"><i>Documentation for the only fully modular
+CMS for phpBB</i></font></font></p>
+<h1 class="western"><b>Table of Contents</b> </h1>
+<small> </small><small> </small><small>
+</small><small> </small><small> </small>
+<table class="forumline online" style="border-top: medium none;" border="0" cellpadding="0" cellspacing="1" width="100%">
+<tbody>
+<tr>
+<td class="row1" colspan="2" align="left"><small>
+</small>
+<p style="font-style: italic;"><small>We
+provide Online Documentation, Knowledge Base and Support Forums to help
+you use our system. </small></p>
+<p><small><span style="font-style: italic;">Please
+visit our project site to learn more.</span> </small></p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<ol style="text-align: left; margin-left: 80px;">
+<li><big>
+</big>
+<p class="content" style="margin-bottom: 0cm;"><font face="Arial, sans-serif"> <font size="3"><a href="#introduction_contents"><b>Introduction</b></a>
+</font> </font> </p>
+</li>
+</ol>
+<div style="margin-left: 80px;"></div>
+<ol class="content" style="list-style-type: lower-alpha; text-align: left; margin-left: 80px;">
+<li>
+<p style="margin-bottom: 0cm;"> <font face="Arial, sans-serif"> <font size="3"> <a href="#introduction_overview">About MXP</a> </font>
+</font> </p>
+</li>
+<li>
+<p style="margin-bottom: 0cm;"> <font face="Arial, sans-serif"> <font size="3"> <a href="#introduction_why_mxp">What is MXP for?</a> </font>
+</font> </p>
+</li>
+<li>
+<p style="margin-bottom: 0cm;"> <font face="Arial, sans-serif"> <font size="3"> <a href="#introduction_why_not_mxp">Why not MXP?</a> </font>
+</font> </p>
+</li>
+</ol>
+<div style="margin-left: 80px;"></div>
+<ol style="text-align: left; margin-left: 80px;" class="content" start="2">
+<li>
+<p style="margin-bottom: 0cm;"> <font face="Arial, sans-serif"> <font size="3"> <br>
+</font></font></p>
+<h1 class="western"><font face="Arial, sans-serif"><font size="3"><b><b>Installing, Upgrading, Unistalling</b></b></font></font></h1>
+<font face="Arial, sans-serif"><font size="3">
+<span style="font-weight: bold;"> </span></font></font></li>
+</ol>
+<div style="margin-left: 80px;"></div>
+<ol class="content" style="list-style-type: lower-alpha; text-align: left; margin-left: 80px;">
+<li>
+<p style="margin-bottom: 0cm;"> <font face="Arial, sans-serif"> <font size="3"> <a href="#installing_contents"><b>Installing MXP</b></a>
+</font> </font> </p>
+</li>
+<li>
+<p style="margin-bottom: 0cm;"> <font face="Arial, sans-serif"> <font size="3"> <a href="#installing_requirements">Requirements</a> </font>
+</font> </p>
+</li>
+<li>
+<p style="margin-bottom: 0cm;"> <font face="Arial, sans-serif"> <font size="3"> <a href="#installing_download_packages">Download Packages</a>
+</font> </font> </p>
+</li>
+<li>
+<p style="margin-bottom: 0cm;"> <font face="Arial, sans-serif"> <font size="3"> <a href="#installing_uploading">Uploading MXP</a> </font>
+</font> </p>
+</li>
+<li>
+<p style="margin-bottom: 0cm;"> <font face="Arial, sans-serif"> <font size="3"> <a href="#installing_the_installation_wizard">MXP iWizard</a>
+</font> </font> </p>
+</li>
+<li>
+<p style="margin-bottom: 0cm;"> <font face="Arial, sans-serif"> <font size="3"> <a href="#installing_confirmation">Advanced Installation</a>
+</font> </font> </p>
+</li>
+<li>
+<p style="margin-bottom: 0cm;"> <font face="Arial, sans-serif"> <font size="3"> <a href="#upgrading_contents"><b>Upgrading MXP</b></a>
+</font> </font> </p>
+</li>
+<li>
+<p style="margin-bottom: 0cm;"> <font face="Arial, sans-serif"> <font size="3"> <a href="#upgrading_introduction">Upgrading Introduction</a>
+<br>
+<b>Methods of Upgrading</b> </font> </font>
+</p>
+</li>
+<li>
+<p style="margin-bottom: 0cm;"> <font face="Arial, sans-serif"> <font size="3"> <a href="#upgrading_full">Full Package Upgrade</a> </font>
+</font> </p>
+</li>
+<li>
+<p style="margin-bottom: 0cm;"> <font face="Arial, sans-serif"> <font size="3"> <a href="#upgrading_changed_files">Changed files</a> </font>
+</font> </p>
+</li>
+<li>
+<p style="margin-bottom: 0cm;"> <font face="Arial, sans-serif"> <font size="3"> <a href="#upgrading_code_changes">Code Changes</a> </font>
+</font> </p>
+</li>
+<li>
+<p style="margin-bottom: 0cm;"> <font face="Arial, sans-serif"> <font size="3"> <a href="#uninstalling_contents"><b>Uninstalling</b></a>
+</font> </font> </p>
+</li>
+<li>
+<p style="margin-bottom: 0cm;"> <font face="Arial, sans-serif"> <font size="3"> <a href="#uninstalling_backup_data">Backup Data</a> </font>
+</font> </p>
+</li>
+<li>
+<p style="margin-bottom: 0cm;"> <font face="Arial, sans-serif"> <font size="3"> <a href="#uninstalling">Uninstalling</a> </font> </font>
+</p>
+</li>
+<li>
+<p style="margin-bottom: 0cm;"> <font face="Arial, sans-serif"> <font size="3"> <a href="#upgrading_confirmation">Confirmation</a> </font>
+</font> </p>
+</li>
+</ol>
+<div style="margin-left: 80px;"></div>
+<ol style="text-align: left; margin-left: 80px;" class="content" start="3">
+<li>
+<p style="margin-bottom: 0cm;"> <font face="Arial, sans-serif"> <font size="3"> <a href="#administration"><b>Administration Control Pannel</b></a>
+</font> </font> </p>
+</li>
+</ol>
+<div style="margin-left: 80px;"></div>
+<ol class="content" style="list-style-type: lower-alpha; text-align: left; margin-left: 80px;">
+<li>
+<p style="margin-bottom: 0cm;"> <font face="Arial, sans-serif"> <font size="3"> <a href="#administration_introduction">Introduction to ACP</a>
+</font> </font> </p>
+</li>
+<li>
+<p style="margin-bottom: 0cm;"> <font face="Arial, sans-serif"> <font size="3"> <a href="#configuring">Configuring the Portal for your needs</a>
+</font> </font> </p>
+</li>
+<li>
+<p style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font size="3">Administration
+Control Panel</font></font></p>
+</li>
+<li>
+<p style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font size="3">ACP-General</font></font></p>
+</li>
+<li>
+<p style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font size="3">ACP-Management</font></font></p>
+</li>
+<li>
+<p style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font size="3">Page
+Settings</font></font></p>
+</li>
+<li>
+<p style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font size="3">Size of
+Columns</font></font></p>
+</li>
+<li>
+<p style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font size="3">Adding
+a Block to an MXP Page</font></font></p>
+</li>
+<li>
+<p style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font size="3">Page
+Administration</font></font></p>
+</li>
+<p style="margin-left: 2.54cm; margin-bottom: 0cm;"><font face="Arial, sans-serif"> <font size="3">1.
+Adding a new CMS Page</font></font></p>
+<p style="margin-left: 2.54cm; margin-bottom: 0cm;"><font face="Arial, sans-serif"> <font size="3">2.
+Navigation Menu- Creating a category</font></font></p>
+<li>
+<p style="margin-bottom: 0cm;"><font face="Arial, sans-serif"> <font size="3">Portal-Modules</font></font></p>
+</li>
+<li>
+<p style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font size="3">Block
+Administration</font></font></p>
+<p style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font size="3">What is
+it?</font></font></p>
+<p style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font size="3">Adding
+a block</font></font></p>
+</li>
+<li>
+<p style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font size="3">Module
+Administration</font></font></p>
+<p style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font size="3">What is
+a module?</font></font></p>
+<p style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font size="3">Installing
+a module</font></font></p>
+<p style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font size="3">Using a
+module</font></font></p>
+<p style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font size="3">Deleting
+a module</font></font></p>
+<p style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font size="3">Upgrading</font></font></p>
+<p style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font size="3">Where
+can I find modules?</font></font></p>
+</li>
+<li>
+<p style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font size="3">Content-Management-System</font></font></p>
+<p style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font size="3">Generate
+Cache</font></font></p>
+<p style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font size="3">What is
+it?</font></font></p>
+<p style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font size="3">How do
+I use it?</font></font></p>
+</li>
+<li>
+<p style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font size="3">Meta
+Tags</font></font></p>
+<p style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font size="3">What is
+it?</font></font></p>
+<p style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font size="3">How do
+I use it?</font></font></p>
+</li>
+<li>
+<p style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font size="3">Objects
+Integrity Check</font></font></p>
+<p style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font size="3">What is
+it?</font></font></p>
+</li>
+<li>
+<p style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font size="3">phpInfo</font></font></p>
+<p style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font size="3">What is
+it, and how can it help me?</font></font></p>
+</li>
+<li>
+<p style="text-indent: 1.27cm; margin-bottom: 0cm;"><font face="Arial, sans-serif"><font size="3">Themes</font></font></p>
+<p style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font size="3">Introduction
+to Themes</font></font></p>
+<p style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font size="3">Installing
+a PhpBB-based theme</font></font></p>
+<p style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font size="3">Installing
+an MX-based theme</font></font></p>
+<p style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font size="3">Non
+prosilver or subSilver themes</font></font></p>
+</li>
+</ol>
+<div style="margin-left: 80px;"></div>
+<ol style="text-align: left; margin-left: 80px;" class="content" start="4">
+<li>
+<p style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font size="3"> <a href="#credits_and_special_thanks"><b>Credits and
+Special Thanks</b></a> </font></font> </p>
+</li>
+</ol>
+<div style="margin-left: 80px;"></div>
+<ol start="5">
+<li>
+<p class="content" style="margin-bottom: 0cm; text-align: left; margin-left: 80px;"></p>
+<div style="margin-left: 80px;"><font face="Arial, sans-serif"><font size="3"> <a href="#copyright_info"><b>Copyright Info</b></a></font></font></div>
+<p class="content" style="margin-bottom: 0cm;">
+</p>
+</li>
+</ol>
+<p style="margin-bottom: 0cm;"><br>
+</p>
+<p style="margin-bottom: 0cm;"><br>
+</p>
+<a name="introduction_contents"></a>
+<p class="content" style="margin-bottom: 0cm; page-break-before: always;"><font face="Arial, sans-serif"><font size="5"><b>1.
+INTRODUCTION</b></font></font>
+</p>
+<p class="content" style="margin-bottom: 0cm;"><br>
+</p>
+<a class="content" name="introduction_overview"></a>
+<p class="content" style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font style="font-size: 16pt;" size="4"><i><b>1a. <small>About MXP-CMS</small></b></i></font></font>
+</p>
+<p class="posts_portal top tab" style="margin-bottom: 0cm;"><big><strong class="text-strong">MX-Publisher Portal-CMS</strong>
+is a fully modular portal and Content Management System for phpBB. It
+features dynamic pages/blocks/themes by means of a powerful yet
+flexible&nbsp;Administration Control Panel (ACP). MXP's former name
+MX-System since 2001&nbsp;a popular open-source bulletin board
+community solution written for <strong class="text-strong">phpBB
+</strong>in PHP.<br>
+<br>
+Our C.M.S. solution works standalone or with phpBB2/phpBB3 by using
+integrated features and functions. MX-Publisher currently supports the
+MySQL and PostgreSQL databases. MX-Publisher CMS is the classical phpBB
+portal add-on, improved and enhanced for every&nbsp;version
+released since 2001<font face="Arial, sans-serif">.</font></big></p>
+<p style="margin-bottom: 0cm;"><br>
+</p>
+<a name="introduction_why_mxp"></a>
+<p class="content" style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font style="font-size: 16pt;" size="4"><i><b>1b.
+<small>What is MXP for?</small></b></i></font></font></p>
+<p style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font style="font-size: 16pt;" size="4"> </font><font size="3">The
+MX-Publisher is a
+script standalone from your comunity solution&nbsp;that
+gathers/fetches, and manages,
+your domain information. If you want a site based around your phpBB
+forums, MXP still can maintain all of your present domain info, as
+a portal in the root of domain. Thus, you have wisely chosen MXP.</font></font></p>
+<a name="introduction_why_not_mxp"></a>
+<p><big><big class="content"><big><big><span style="font-weight: bold; font-style: italic;">1c. Why
+not&nbsp;MXP?</span></big></big></big></big><br>
+<br>
+</p>
+<p class="content" style="margin-bottom: -1px;"><big><big><big>
+<font size="3">
+MXP is not a phpBB extension that can be installed inside the comunity solution but
+in a separate folder usualy in the top of the domain.&nbsp;
+</font></big></big></big></p>
+<p class="content" style="margin-bottom: -1px;"><big><big><big>
+<font size="3">
+Also, MXP is meant as a content management
+system (CMS), with pages that contain blocks. If you require a system
+that allows special posting (and you do not wish to use portal
+blocks to parse data from the phpBB forum side of your site), then MXP
+may not be for you; you may want to look up alternative
+systems that specialize in your needs. For example, MXP is not
+meant as a blogging tool.
+</font>
+</big></big></big></p>
+<p></p>
+<br>
+<p><br>
+</p>
+<p class="content"><font size="5"><b>2.<small>
+INSTALLATION</small></b></font></p>
+<p><br>
+<br>
+</p>
+<a name="installing_requirements"></a>
+<p class="content" style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font style="font-size: 16pt;" size="4"><i><b>2b. Requirements</b></i></font></font></p>
+<big><big><span class="content">MXP as a CMS
+tool does have some requirements which must be met before
+you are able to start your installation.<br>
+</span></big></big>
+<ul class="content">
+<li><big><big>A
+webserver or web hosting account running on any major
+Operating System with support for PHP.</big></big></li>
+<li><big><big><br>
+</big></big></li>
+<li><big><big>mySQL4 or mySQL5+
+or postgreSQL 7.1 Database (Latest mySQL5 or
+postgreSQL version recommended)</big></big></li>
+<li><big><big><br>
+</big></big></li>
+<li><big><big>PHP
+5.4.0 and later versions </big></big><big><big>(Latest
+PHP 5.6.xx recommended)</big></big><big><big>.</big></big></li>
+<li><big><big><br>
+</big></big></li>
+<li><big><big>phpBB
+2.0.x (Latest phpBB2 recommended) (Required in
+MX-Publisher 2.8.x. Optional in MX-Publisher 3.0.x)</big></big></li>
+<li><big><big>phpBB
+3.0.x (Latest phpBB3/Olympus recommended) (Optional
+in MX-Publisher 3.0.x)</big></big></li>
+<li><big><big><br>
+</big></big></li>
+<li><big><big>The
+following are optional items you may require depending
+on your local machines setup and/or your server or web-hosts control
+panel support and features.
+</big></big>
+<ul>
+<li><big><big>FTP
+Program</big></big></li>
+<li><big><big>a
+HTML (Hypertext Markup Language) Editor</big></big></li>
+</ul>
+</li>
+</ul>
+<a name="installing_download_packages"></a><a name="installing_requirements"></a>
+<p><br>
+</p>
+<a name="installing_contents"></a>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>2c.
+<small>Download Packages</small></b></i></font></p>
+<p><big> Now, before you attempt installing anything, make
+sure you
+have
+downloaded the most recent version of MXP. You can always find it here:</big></p>
+<p><font color="#0000ff"><u><a href="http://mxpcms.sf.net/forum/viewtopic.php?t=10949">http://www.mxpcms.sf.net/forum/viewtopic.php?t=10949</a></u></font></p>
+<p><big>If you are sure you have done that, then download
+this, if you
+haven't already, to your computer. Make sure that you know which
+directory on your computer you have uploaded it to.</big></p>
+<a name="installing_uploading"></a>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>2d.
+Uploading</b></i></font></p>
+<p><big> Now, once you have downloaded the whole MXP Core
+archives,
+unzip
+it using 7ZIP or some other file decompression utility onto your
+hard drive. Now, you must upload the folder /Core/, wherever it's on
+you hard drive, into the web. To do this you need an FTP client such
+as SCP, WinSCP, AceFTP, CuteFTP, or WS_FTP. I recommend WinSCP for its
+features to save sessions and TotalCMD for its ease of use. Whenever
+you've picked which one, open up your FTP client. Make sure you have
+the upload settings to
+"auto-detect" if it has it. PHP, INC, TXT, and HTML files
+should be uploaded in ASCII mode, while TPL, JPG, GIF, and other
+graphics files should be uploaded in binary mode.</big></p>
+<p><big> In the following screen shots of an FTP client, I
+will be
+using
+AceFTP freeware. This does not mean that this is the only FTP client,
+it just means it's the one I'm using. Below are some links to FTP
+clients:</big></p>
+<p>www.visicommedia.com (AceFTP, freeware- register first)</p>
+<p>www.cuteftp.com (CuteFTP, shareware 30-day)</p>
+<p>www.ipswitch.com (WS_FTP LE, freeware for educational purposes)</p>
+<p><big>
+For portable use of WinSCP see
+http://winscp.net/eng/docs/portable
+The package includes two executables, .exe and .com. For details see
+http://winscp.net/eng/docs/executables
+WinSCP homepage is http://winscp.net/
+<br>
+</big></p>
+<p style="text-indent: 1.27cm;"><big>Okay, if you've
+set your
+FTP client
+upload mode to auto, so that all PHP, INC, TXT, and HTML files are
+uploaded in ASCII mode, while TPL, JPG, GIF, and other graphics files
+are uploaded in BINARY mode, you're set to go.&nbsp;</big></p>
+<p><br>
+<br>
+</p>
+<big>As a rule without exception MXP and phpBB must be installed
+in
+different directories. Do not mix the files up!! If phpBB is not
+installed on your system, please visit <a href="http://www.phpbb.com/" class="postlink">www.phpBB.com</a>
+for further instructions. When uploading the default directory
+structure which will cause you the least effort and quickest
+installation is as follows:</big>
+<dl class="codebox">
+<dt>Code: <a href="http://mxpcms.sourceforge.net/forum/viewtopic.php?f=99&amp;t=10987#" onclick="selectCode(this); return false;">Select all</a></dt>
+<dd><big><code>/your/path/to/public/html/YOUR_PORTAL_NAME/</code></big></dd>
+</dl>
+<big>(<span style="font-style: italic;">this is the
+place were all MXP files should be located</span>)</big><br>
+<dl class="codebox">
+<dt>Code: <a href="http://mxpcms.sourceforge.net/forum/viewtopic.php?f=99&amp;t=10987#" onclick="selectCode(this); return false;">Select all</a></dt>
+<dd><big><code>/your/path/to/public/html/YOUR_FORUM_NAME/</code></big></dd>
+</dl>
+<big>(this is the place where your working phpBB installation
+should be
+located)<br>
+You can alternatively install MX-Publisher in your root directory
+(which can be accessed via <a href="http://www.yourdomain.com/" class="postlink">http://www.yourdomain.com/</a> while
+your forum can be installed in a folder along with the MXP folders (ie
+it'd be located in).</big>
+<dl class="codebox">
+<dt>Code: <a href="http://mxpcms.sourceforge.net/forum/viewtopic.php?f=99&amp;t=10987#" onclick="selectCode(this); return false;">Select all</a></dt>
+<dd><big><code>http://www.yourdomain.com/phpBB2/</code></big></dd>
+</dl>
+<big>Here's a picture of
+where you're supposed to be:</big><br>
+<p>(look at the next page for this screenshot)</p>
+<p style="text-indent: 1.27cm;"><br>
+<br>
+<br>
+<br>
+<br>
+</p>
+<img style="border: 0px solid ; width: 798px; height: 530px; float: left;" alt="" src="mxdoc1_html_m21a6e4c9.png" name="Graphic1" hspace="12">
+<br>
+<p style="text-indent: 1.27cm;">
+As you can see you should highlight, on the computer/local side, the
+/MXP/ folder, wherever it's located on your Hard Disk. So, simply
+click on the button that's circled in the screen shot, or wherever it
+is for your FTP client. It's a pretty big upload (a little more than
+1MB) so depending on your connection, you'll have to wait a while.
+Once you're done, you should see the index of the location, on the
+right hand side (that's been uploaded), of the /MXP/ folder. If this
+is confirmed, then double click on /MXP/ to go into it. Now, you must
+CHMOD two things: the /MXP/cache/ directory and the MX_meta.inc file.
+What this means is you're giving read/write access to the MX Portal,
+which is required. Note: no security hazard exists with this. First,
+we're going to CHMOD the /MXP/cache directory. So, to do this,
+depending on your FTP client, you must right click on the folder
+/MXP/cache/, click on Properties, and put in the CHMOD value of 777.
+If a number text box doesn't exist, simply check off all "Read",
+"Write", and "Execute" under all users ("Owner",
+"Group", "Everyone"). Of course the user names
+vary from FTP client, but try to find something similar. So, if it's
+done, your little log box (if you have one) should say something like
+"SITE CHMOD SUCCESSFUL - 777". After that, follow the same
+steps to CHMOD mx_meta.inc. And you're done uploading things to your
+site onto the Internet.</p>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<big>If you move the phpBB folder into another one before
+installing MXP,
+the phpBB configuration <br>
+<strong>(the</strong><strong> file)</strong>
+must also be modified to match the
+new phpB location.</big>
+<dl class="codebox">
+<dt>Code: <a href="http://mxpcms.sourceforge.net/forum/viewtopic.php?f=99&amp;t=10987#" onclick="selectCode(this); return false;">Select all</a></dt>
+<dd><big><code>/phpbbroot/config.php</code></big></dd>
+</dl>
+<strong></strong><br>
+<big>Note #2<br>
+The MXP and phpBB installations use completely differing config.php
+files. <strong>Do not confuse them and mix them together! They
+are two different files.<br>
+<br>
+</strong>Note #3<br>
+If you plan to switch to phpBB mode later (after a fresh standalone
+installation) you have to set the phpBB relative path manually in the
+MXP Admin Control Panel.<br>
+Unzip the distributed MXP files and upload.<br>
+<br>
+SPECIAL NOTE<br>
+<strong>MX-Publisher needs write access/permissions to the cache
+folder and the mx_meta.inc file.</strong></big>
+<br>
+<strong>## CHMOD (0777) THE FOLLOWING FILES/DIRECTORIES:<br>
+<br>
+</strong>
+<dl class="codebox">
+<dt>Code: <a href="http://mxpcms.sourceforge.net/forum/viewtopic.php?f=99&amp;t=10987#" onclick="selectCode(this); return false;">Select all</a></dt>
+<dd><big><code>## - mxroot/cache/</code></big></dd>
+</dl>
+<dl class="codebox">
+<dt>Code: <a href="http://mxpcms.sourceforge.net/forum/viewtopic.php?f=99&amp;t=10987#" onclick="selectCode(this); return false;">Select all</a></dt>
+<dd><big><code>## - mxroot/mx_meta.inc</code></big></dd>
+</dl>
+<big>For those with Windows servers, CHMOD 0777 gives read,
+write, and
+access permissions to all 3 auth types (commonly Owner, Group, and
+Other/Anonymous). You'll have to give the files/folders above these
+permissions; this depends from host to host, though usually you can do
+it via your hosting control panel (cPanel, DirectAdmin, etc.)</big>
+<p><br>
+<br>
+</p>
+<a name="installing_the_installation_wizard"></a>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>2e.
+Configuring Install</b></i></font></p>
+<p><big>Now,
+to
+install MXP, you must visit the link in your favorite browser. Go to
+the URL (web address) http://www.example.com/ or
+http://www.example.com/mxproot/ . From there it will redirect you to
+the MX Install iWizard page. Replace "mxproot" with whatever name you
+had for your MXP folder, which contains all of the MXP files and
+folders.&nbsp;</big></p>
+<p><big>If this fails go in your browser, and call:</big>
+</p>
+<dl class="codebox">
+<dt>Code: <a href="http://mxpcms.sourceforge.net/forum/viewtopic.php?f=99&amp;t=10987#" onclick="selectCode(this); return false;">Select all</a></dt>
+<dd><big><code>http://www.yourdomain.com/install/mx_install.php</code></big></dd>
+</dl>
+<p lang="">
+<img style="border: 0px solid ; width: 800px; height: 880px; float: left;" alt="MX iWizard" src="mxdoc1_html_4b944d03.png" name="Graphic2" hspace="12"><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p style="text-indent: 1.27cm;"></p>
+<p style="text-indent: 1.27cm;"></p>
+<p style="text-indent: 1.27cm;"></p>
+<p style="text-indent: 1.27cm;"></p>
+<p style="text-indent: 1.27cm;"></p>
+<p style="text-indent: 1.27cm;"></p>
+<p style="text-indent: 1.27cm;"></p>
+<p style="text-indent: 1.27cm;">&nbsp;</p>
+<p style="text-indent: 1.27cm;"></p>
+<p style="text-indent: 1.27cm;"></p>
+<p style="text-indent: 1.27cm;"></p>
+<p style="text-indent: 1.27cm;"><br>
+</p>
+<big>You will now be presented with an installation page showing
+you some
+options, the first of which is the choice of MXP installation, of which
+there are a possible 3 seperate types of install which you can choose
+from, lets take a look at these below:</big><br>
+<br>
+<span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;<big>&nbsp;</big></span><big><br>
+<span style="font-weight: bold;">&nbsp;&nbsp; <br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+&nbsp;MXP - With phpBB2 / phpBB3</span><br>
+&nbsp;&nbsp;&nbsp; With the installer, all of the values
+should already be filled in, and
+you should be set up to go and click "Install." However, you should go
+over the information filled in. If you definitely need something
+changed, then go ahead and see this document for details on how to set
+the installer to allow you to enter your own settings. Note that you
+should only do this if you know what you are doing.<br>
+<br>
+&nbsp;&nbsp;&nbsp; <br>
+<br>
+</big><span style="font-weight: bold;"><big><br>
+</big></span><img style="border: 0px solid ; width: 731px; height: 828px; float: left;" alt="Advanced iWizard" src="mxdoc1_html_009_22052019_095157.png" name="Graphic2" hspace="12"><br>
+<span style="font-weight: bold;"><big><br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+MXP - standalone
+(INTERNAL)</big></span><big><br>
+&nbsp;&nbsp;&nbsp; This option will allow you to get your
+MXP install up and running
+without any need of 3rd party software - usually phpBB forum - it'll
+get your demo default website up and running quickly without the forum
+part. At a later stage you can still choose from with the Admin Control
+Panel to select a type of phpBB forum software which you have installed
+- of which MXP supports two types; phpBB 2 and phpBB 3.</big><br>
+<big><br>
+<br>
+The text fields are filled
+out with
+the descriptions of the info you're supposed to put in. At the top
+(it's not in the screens hot) you should select "install"
+if you're installing MX for the first time. Then, pick which DB
+software your server uses (mySQL or postgreSQL). Then, fill in the
+info.<br>
+<br>
+You then need to fill out the installation configuration form which
+consists of the following:<br>
+<br>
+</big>
+<p><big><b>Database Server Hostname/DSN:</b></big></p>
+<p><big><i>This is the hostname of your DB server.
+Most of the
+time this
+is "localhost" (without the quotations), so type in that.</i></big></p>
+<p><br>
+<br>
+</p>
+<p><big><b>Your Database Name</b></big></p>
+<p><big><i>This is pretty much self-explanatory. If
+you have
+mySQL, you
+probably have a DB name. Fill in the blank with the DB name.</i></big></p>
+<big>This will be either the database which phpBB already uses or
+if you are
+planning on an entirely internal (standalone) install you'll need to
+create a new one with your preferred db management tool. Sometimes the
+database name here requires a prefix of the domain name - which for
+example might be</big>
+<dl class="codebox">
+<dt>Code: <a href="http://mxpcms.sourceforge.net/forum/viewtopic.php?f=99&amp;t=10987#" onclick="selectCode(this); return false;">Select all</a></dt>
+<dd><big><code>www.testsite.com</code></big></dd>
+</dl>
+with a database named <big>data1; so the database name entry
+here would be testsite_data1.</big>
+<dl class="codebox">
+<dt>Code: <a href="http://mxpcms.sourceforge.net/forum/viewtopic.php?f=99&amp;t=10987#" onclick="selectCode(this); return false;">Select all</a></dt>
+<dd><big><code>data1</code></big></dd>
+</dl>
+<br>
+<p><big><b>Database Username</b></big></p>
+<p><i>This usually is the username you use for your web
+hosting/server. Fill this out correctly... casing probably counts.</i></p>
+<big>You need to enter the database username which was
+auto-created when
+your database was created OR create a db user, with appropriate db
+permissions. Again this may require the website name as a prefix to the
+username.</big><br>
+<br>
+<p><big><b>Database Password</b></big></p>
+<p><i>This is basically just the password to your DB
+username.</i></p>
+<big>The password unlike the two previous entries which required
+your
+website as a prefix before either the database name or the database
+username <strong>DOES NOT</strong> need a prefix before it
+- enter this as per the normal password of the database user.</big><br>
+<br>
+<p><big><b>MXP Prefix in DB</b></big></p>
+<p><i>This is the table prefix that will appear in your DB.
+ie
+MX_blahblah. By default it should be mx_, so type that in.</i></p>
+<big>This is the prefix name for the database - so when you
+browse through
+phpmyadmin you'll see it more clearly plus it prevents table mixups
+between other things in your database (such as phpBB) which has a
+database prefix of phpbb_. Also you may want to change this if you want
+several instances of MXP present within the same database; for example
+mx2_ - this is not something highly recommended due to export and
+backup functions, extraction of data however.<br>
+<br>
+</big>
+<p style="font-weight: bold;"><big>phpBB prefix in DB</big></p>
+<p><big><i>Now, this is very important. You must
+figure out what
+prefix
+your phpBB forums used, and fill it out. In most cases it's phpbb_,
+so use that, unless you know otherwise. MXP will search in all tables
+preceded by "phpbb_", where it will get its info.</i></big><br>
+<br>
+<br>
+</p>
+<p><big><b>phpBB relative path</b></big></p>
+<p><big><i>This is the directory path to /phpBB/ (or
+wherever
+your forums
+are located), relative from /MXP/. This should be ../phpBB (or
+wherever your forums are located). Note the two periods. This tells
+MXP to go back a folder, then into /yourforums/.</i></big></p>
+<p><br>
+</p>
+<p><big><b>Full Portal URL</b></big></p>
+<p><big>This is pretty much self-explanatory. Type in the
+whole URL
+location of your /MXP/ folder. It should be something like
+<font color="#0000ff"><u><a href="www.example.com/MXP">www.example.com/MXP</a></u></font>.</big></p>
+<p><br>
+</p>
+<p><big><b>Full PhpBB URL</b></big></p>
+<p><big><i>This is again pretty much
+self-explanatory. Type in
+the whole
+URL location of your /yourforums/ folder. It should be something like
+</i><font color="#0000ff"><u><a href="www.example.com/phpBB/">www.example.com/phpBB/</a></u></font><i>.</i></big></p>
+<p><big><br>
+</big><br>
+</p>
+<p><big><span style="text-decoration: underline;">Note</span>:
+<span style="font-style: italic;">if you are unsure about
+any of the above settings check
+your
+phpBB config file.</span></big></p>
+<big><span style="font-weight: bold;">MXP Admin
+Username</span><br>
+You may or may not want to consider keeping this the same as your phpBB
+forum install credentials for simplicity and to avoid confusion when
+switching around your website.<br>
+MXP Admin Password<br>
+Again - you may or may not want to consider keeping this the same as
+your phpBB forum install credentials for simplicity and to avoid
+confusion when switching around your website.<br>
+<br>
+<span style="font-weight: bold;">Re-enter MXP Admin
+Password</span><br>
+Repeat the password you have just entered.<br>
+Now That you have the correct information present you can click the
+Install button to continue, at this stage you'll be told you can
+download the config.php for you to upload directly to your sever into
+the MXP directory so this is your next step - click the button to
+download the config.php file and place it on your server.</big>
+<br>
+<p style="text-indent: 1.27cm;"><big>And that's
+pretty much
+all. At the
+bottom, click on "install". You should be brought up to a
+page confirming your configuration info. Green words next to the text
+box means it's fine, but if there are red words with an error
+message, you must correct it. If you got an error, click on
+"Revalidate Settings." If everything is fine and dandy, now
+click on "install". The page'll load up, and you'll see a
+gray page with a plain text message on top saying something about
+writing to config.php, now write-protecting it. If it says that, do
+whatever it says. If everything worked, then it'll say at the bottom
+"please delete the /install and /contrib directories".
+Delete these folders from /MXP/, to prevent any security
+hazards/mess-ups, using the FTP client you used earlier to upload MXP.
+And now, you're done! Good job. You've just installed the MXP CMS
+Portal. Now, continue on reading on how to configure MXP for your uses.</big></p>
+<br>
+<big>These will tell you that you need to now delete two
+directories on your
+server:</big>
+<dl class="codebox">
+<dt>Code: <a href="http://mxpcms.sourceforge.net/forum/viewtopic.php?f=99&amp;t=10987#" onclick="selectCode(this); return false;">Select all</a></dt>
+<dd><big><code>/contrib/</code></big></dd>
+</dl>
+<big>and</big>
+<dl class="codebox">
+<dt>Code: <a href="http://mxpcms.sourceforge.net/forum/viewtopic.php?f=99&amp;t=10987#" onclick="selectCode(this); return false;">Select all</a></dt>
+<dd><big><code>/install/</code></big></dd>
+</dl>
+<big>Once done you can then login to your brand new MXP
+installation.</big>
+<p><br>
+<a name="installing_confirmation"></a><span class="content">
+</span><font class="content" style="font-size: 16pt;" size="4"><i><b>2f.
+Advanced Installation</b></i>
+</font><br>
+<br>
+<big>To choose your own configuration instead of the installer's
+default
+suggestions, open up the install/mx_install.php file in your favorite
+PHP or source code editor and perform the following code changes to the
+file:</big><br>
+Find<br>
+</p>
+<dl class="codebox">
+<dt>Code: <a href="http://mxpcms.sourceforge.net/forum/viewtopic.php?f=99&amp;t=10987#" onclick="selectCode(this); return false;">Select all</a></dt>
+<dd><big><code>define('INSTALL_READONLY', true);</code></big></dd>
+</dl>
+Replace With:<br>
+<dl class="codebox">
+<dt>Code: <a href="http://mxpcms.sourceforge.net/forum/viewtopic.php?f=99&amp;t=10987#" onclick="selectCode(this); return false;">Select all</a></dt>
+<dd><big><code>//define('INSTALL_READONLY', true);</code></big></dd>
+</dl>
+<big>The purpose of this is to 'comment out' the code line -
+meaning that it
+will stop working and in turn allow you to set up your own
+configuration</big>.<br>
+<code></code>
+<p lang=""><img style="border: 0px solid ; width: 800px; height: 880px; float: left;" alt="Advanced iWizard" src="mxdoc1_html_4b944483.png" name="Graphic2" hspace="12"><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p style="text-indent: 1.27cm;"></p>
+<p style="text-indent: 1.27cm;"></p>
+<p class="content" style="text-indent: 1.27cm;"></p>
+<p class="content" style="text-indent: 1.27cm;"><big>The
+text fields are filled
+out with
+the descriptions of the info you're supposed to put in. At the top
+(it's not in the screens hot) you should select "install"
+if you're installing MX for the first time. Then, pick which DB
+software your server uses (mySQL or postgreSQL). Then, fill in the
+info. Here's a description of each:</big></p>
+<br>
+<br>
+<big><strong><span style="text-decoration: underline;">Note</span>:
+</strong>The install script creates the MX-Publisher config.php
+file. If for
+some reason the install fails, you may need to remove the generated
+config.php manually before retrying the install. Also, if you feel like
+doing a fresh reinstallation, you will need to remove the previous
+MX-Publisher config.php file.<br>
+Failure to do this action will result in a failure to install MXP and
+your install script will not update correctly.<br>
+Also, some webservers deny the installer the rights to edit the</big>
+<dl class="codebox">
+<dt>Code: <a href="http://mxpcms.sourceforge.net/forum/viewtopic.php?f=99&amp;t=10987#" onclick="selectCode(this); return false;">Select all</a></dt>
+<dd><big><code>config.php</code></big></dd>
+</dl>
+<big>file. In this case you'll need to CHMOD the config.php file
+to 0777.
+(CHMOD is overviewed above). <br>
+If you have any other errors regarding
+config.php (you shouldn't), go here. 2d) <br>
+<br>
+Don't forget to remove the install/ and contrib/ folders after a
+successful installation! Otherwise, this could mean a potential
+security hole. <br>
+<br>
+3). Installation Complete! Now enter the MX-Publisher
+ACP and configure the portal. The user interface is intuitive. For
+further information, visit some of our documents and Knowledge Base
+articles on ours DOCS page at <a href="http://www.mxpcms.sourceforge.net/page8/catlink8" class="postlink">www.mxpcms.sourceforge.net</a>.</big>
+<p></p>
+<p><br>
+<br>
+</p>
+<a name="upgrading_contents"></a>
+<br>
+<p></p>
+<p><br>
+<br>
+</p>
+<a name="upgrading_introduction"></a>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>2g. Upgrading</b></i></font></p>
+<p align="justify">
+<span style="font-size: 11pt;"><u>Note</u>:
+If upgrading from&nbsp;MXP-System 2.704, the&nbsp;development
+team
+has renamed most of the core images and moved them to the template's
+folder. This will affect navigation images in the menu, and Page
+Administration. You have to update image names manually!! There is a
+PSD template file in the MXP Download area with all MXP graphics
+if you want to develop your own styles.</span>
+</p>
+<p align="justify">
+<span style="font-size: 11pt;"><u>Note</u>:
+If you are upgrading from MX-Portal 2.7.x upgrade at least to mxBB
+2.7.7 or
+MXP 2.7.8 and You can try to MXP 2.8.4, beafore next spep, backup and
+keep config.php and modules that are not included in
+the core.</span>
+</p>
+<br>
+<big><span style="text-decoration: underline;">
+<br>
+</span><big><a name="uninstalling_contents"></a>
+<small>Upgrading your installation is only a matter of a few
+steps to take and
+simple
+awareness of one or two facts.
+</small></big></big>
+<ul>
+<li><big>Download the full package from the <a href="http://mxpcms.sourceforge.net/index.php?page=30" class="postlink">Downloads Page</a> at <a href="http://mxpcms.sourceforge.net/" class="postlink">http://mxpcms.sourceforge.net/</a></big></li>
+<li><big>Unzip/unrar the contents - making sure the
+directory
+integrity remains intact.</big></li>
+<li><big>Open your FTP client and connect to your MXP
+directory</big></li>
+<li><big>Upload all files and folders <strong>except
+for
+config.php</strong>.</big></li>
+<li><big><big><br>
+</big></big></li>
+<li><big>Now visit the</big>
+<dl class="codebox">
+<dt>Code: <a href="http://mxpcms.sourceforge.net/forum/viewtopic.php?f=99&amp;t=10987#" onclick="selectCode(this); return false;">Select all</a></dt>
+<dd><big><code>mx_install.php</code></big></dd>
+</dl>
+.</li>
+<li><big>This will start the install wizard for your
+upgrade -
+follow all the steps then click Finish.</big></li>
+<li><big>Remove the</big>
+<dl class="codebox">
+<dt>Code: <a href="http://mxpcms.sourceforge.net/forum/viewtopic.php?f=99&amp;t=10987#" onclick="selectCode(this); return false;">Select all</a></dt>
+<dd><big><code>/install/</code></big></dd>
+</dl>
+<big>and</big>
+<dl class="codebox">
+<dt>Code: <a href="http://mxpcms.sourceforge.net/forum/viewtopic.php?f=99&amp;t=10987#" onclick="selectCode(this); return false;">Select all</a></dt>
+<dd><big><code>/contrib/</code></big></dd>
+</dl>
+<big>directories and you are free to login to your new portal.</big></li>
+</ul>
+<big>Do not forget to also upgrade all the modules to make sure
+you have
+full MXP compatibility.</big>
+<p><br>
+</p>
+<a name="uninstalling_backup_data"></a>
+<p><br>
+</p>
+<a class="content" name="uninstalling_backup_data"></a>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>2l.
+Uninstalling</b></i></font></p>
+<p><big> We're sad to see you don't want to use MXP
+anymore! But, if
+you
+must, here are the steps you must take in order to successfully
+delete all MXP-related content.</big><br>
+<br>
+</p>
+<ol>
+<li><big>
+</big>
+<p><big>In your favorite FTP client, delete the whole
+folder /MXP/
+and everything in it.</big></p>
+</li>
+<li><big>
+</big>
+<p><big>Go into your database administration client
+(usually if
+you have mySQL, it'll be phpMyAdmin) and delete ALL tables preceded by
+mx_, or whatever beginning you specified when you installed MXP.</big></p>
+</li>
+<li><big>
+</big>
+<p><big>You're done.</big></p>
+</li>
+</ol>
+<p><br>
+<br>
+</p>
+<small class="content"><a name="administration"></a></small>
+<p class="content" style="page-break-before: always;"><small><font size="5"><small><b>3.
+CONFIGURING THE PORTAL FOR YOUR NEEDS</b></small></font></small></p>
+<a name="configuring"></a>
+<p><br>
+</p>
+<a name="administration_introduction"></a>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>3a.
+Administration Panel<br></b></i></font></p><p class="content"><font style="font-size: 16pt;" size="4"><i><b><small><small><small><small>.</small></small></small></small></b></i></font></p><big>The General Administration will
+allow you to perform general portal administra­tion tasks. This
+includes at the moment general portal configuration, management and
+system tool.</big><p class="content"><font style="font-size: 16pt;" size="4"><i><b></b></i></font></p>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>
+3a1.&nbsp;General - Configuration</b></i></font></p><big><big class="content"><big class="content"><big class="content"><big class="content"><big class="content"><big class="content"><big>There are more tabs used for General Configuration</big></big></big><big class="content" style="font-weight: bold;"><big class="content"><big>: <span style="font-weight: bold;">General Settings</span></big></big></big><big class="content"><big class="content"><big>,</big></big></big><big class="content" style="font-weight: bold;"><big class="content"><big> </big></big><big>Session </big></big><big><span style="font-weight: bold;">Backend</span>, <span style="font-weight: bold;">Cookie-Session </span></big></big><big><span style="font-weight: bold;">Settings</span>, <span style="font-weight: bold;">Style </span></big></big><big><span style="font-weight: bold;">Settings</span>, <span style="font-weight: bold;">EMail </span></big></big><big><span style="font-weight: bold;">Settings</span>, <span style="font-weight: bold;">Info</span>.<br><br class="content"></big></big></big><big><big class="content"><big class="content"><big class="content"><big class="content"><big class="content" style="font-weight: bold;"><big class="content"><big><span style="font-weight: bold;">General Settings<br></span></big></big></big></big></big></big></big></big><big><big></big></big><p style="text-indent: 1.27cm;"><big><span style="font-weight: bold;">Portal Name&nbsp;</span></big><big>is called</big><big><span style="font-weight: bold;"> </span></big><big>the first
+field because
+the text which you
+put in here will display to all your site visitors on the top bar of
+any browser visiting your site. This is simply a way of personalizing
+your site and has no other real function other than to give all the
+pages under your portal or site a name.The General Administration will
+allow you to perform general portal administra­tion tasks. This
+includes at the moment general portal configuration, management and
+system tools</big></p><p style="text-indent: 1.27cm;"><big><span style="font-weight: bold;">Portal Description <big>- </big></span>A little text to describe your website.</big></p><p style="text-indent: 1.27cm;"><big><span style="font-weight: bold;">Enable portal</span>
+- Handy switch, when reconstructing the site. Only admin is able to
+view pages and browse around normally. While disabled, the message
+below is displayed. Portal disabled message We are currently upgrading
+this site with latest MXP software.&nbsp;</big></p><p style="text-indent: 1.27cm;"><big><span style="font-weight: bold;">Portal disabled message </span><big>-</big><span style="font-weight: bold;"><big> </big></span>A little&nbsp;</big><big>message</big><big> to show when the </big><big>portal is &nbsp;disabled</big><big>.</big></p><p style="text-indent: 1.27cm;"><big><span style="font-weight: bold;">Domain Name</span> - </big><big>The Domain Name</big><big> of your website.</big></p><p style="text-indent: 1.27cm;"><big><span style="font-weight: bold;">Server Port</span> -&nbsp;<span class="explain">The port your server is running on, usually 80. Only change if different.</span></big></p><p style="text-indent: 1.27cm;"><big><span style="font-weight: bold;">Script path</span> -&nbsp;<span class="explain">The </span><span class="explain">path where MXP is located relative to the domain name.&nbsp;</span></big></p><p style="text-indent: 1.27cm;"><big><span style="font-weight: bold;">MXPDate Format</span><big style="font-weight: bold;"> <small>-&nbsp;<span class="explain"></span></small></big><span class="explain">The syntax used is identical to the PHP <a href="http://www.php.net/date" target="_other">date()</a> function.&nbsp;</span></big></p><p style="text-indent: 1.27cm;"><big><span style="font-weight: bold;">MXP System Timezone</span><big style="font-weight: bold;"> <small>-&nbsp;<span class="explain"></span></small></big><span class="explain">The CMS's Timezone.&nbsp;</span></big></p><p style="text-indent: 1.27cm;"><big><span class="explain"><span style="font-weight: bold;">Enable GZip Compression</span> - Enable&nbsp;GZip Compression in MXP.</span></big></p><p style="text-indent: 1.27cm;"><big><span style="font-weight: bold;">Use&nbsp;Block Cache</span>
+- Block data is cached to individual cache/block_*.xml/php files. Block
+cache files are created/updated when blocks are edited. <br></big></p><p style="text-indent: 1.27cm;"><big><span style="font-weight: bold;">Use mod_rewrite</span>
+-If you're running on an Apache server and have mod_rewrite activated,
+you may rewrite URLS; for example, you can rewrite pages like 'page=x'
+with more intuitive alternatives. Please read further documentation for
+the mx_mod_rewrite module. <br></big></p><br><p class="content"><img src="mxdoc1_html_23052019151217.png" alt=""></p>
+<p class="content"><big><big><br></big></big></p><p class="content"><big><big class="content"><big class="content"><big class="content"><big class="content"><big class="content" style="font-weight: bold;"><big>Session </big></big><big><span style="font-weight: bold;">Backend</span></big></big></big></big></big></big></p><p class="content"><big><big class="content"><big class="content"><big class="content"><big class="content"><big><span style="font-weight: bold;">Cookie-Session </span></big></big><big><span style="font-weight: bold;">Settings</span> <span style="font-weight: bold;"></span></big></big></big></big></big></p><p class="content"><big><big class="content"><big class="content"><big class="content"><big><span style="font-weight: bold;">Style </span></big></big><big><span style="font-weight: bold;">Settings</span><span style="font-weight: bold;"></span></big></big></big></big></p><p class="content"><big><big class="content"><big class="content"><big><span style="font-weight: bold;">EMail </span></big></big><big><span style="font-weight: bold;">Settings</span><span style="font-weight: bold;"></span></big></big></big></p><p class="content"><big><big class="content"><big><span style="font-weight: bold;">Info</span><br></big></big></big></p><p class="content"><font style="font-size: 16pt;" size="4"><i><b>
+3a1a. Management</b></i></font></p>
+<p><b><i> </i></b><big>This page
+offers you a
+way of configuring the
+location of the main contents of your website, such as the URL to
+your forum and the full URL of your portal.</big></p><p><big>This panel is where the modules, portal pages and blocks can be managed: <br>&nbsp; <br>To
+add new pages go to pageCP (Page Control Panel), it's important to
+chose a page template with the numbers or colons or you can add them
+manually later. <br><br>Then to add content to the pages you go to
+BlockCP before and create some new blocks or use the demo blocks that
+are generated with the modules .pak files or when you first install the
+portal.<br><br>You may need for blocks to install new modules and you
+have an option to do that automatically in Modules Setup section or you
+can add parameters and create tables manually, this for modules
+developers.<br>&nbsp; <br>To use this panels, you need to have JavaScript and cookies enabled in your browser!&nbsp;</big></p><p><big> <br>3.1. Modules Setup - Use this form to manage modules: installation, upgrading and module development.<br><br>&nbsp;<br>3.2. Module Control Panel - Use this form to manage modules: block functions (parameters) and portal blocks.<br><br>&nbsp;<br>3.3. Block Control Panel (BlockCP) - Use this form to manage portal blocks.<br>&nbsp; <br>3.4.
+Page Control Panel (PageCP)&nbsp; - Use this form to add, delete and
+change the settings for Portal Pages and Page Templates.</big><br></p><br><p style="text-indent: 1.27cm;"><big><img style="width: 221px; height: 370px;" alt="" src="mxdoc1_html_017_23052019_014525.png"></big></p>
+<p><br>
+<br>
+</p>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>3a.
+Administration
+Panel</b></i></font></p>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>
+3a1. Portal- General</b></i></font></p>
+<p class="content" style="margin-left: 1.27cm; text-indent: 1.27cm;"><font style="font-size: 16pt;" size="4"><i><b>3a1b.
+Page Setting</b></i></font></p>
+<p class="content" style="margin-left: 2.54cm; text-indent: 1.27cm;"><font style="font-size: 16pt;" size="4"><i><b>3a1b1.
+Size of Columns</b></i></font></p>
+<p><big><span style="text-decoration: underline;">Note</span>:
+This option was included in the Core MXP only for older versions and is
+decribed here for educational porposes only.&nbsp;</big></p>
+<p><big>The purpose of Page Setting is to give you direct
+access to
+all
+of your pages, their content, and the configuration of the content.<br>
+For each page, you can have a certain number of
+columns (not
+rows). A common choice for using columns is to have the navigation
+menu, on the far-left side, to move from each MXP Page to the next.
+Then, the custom/varying content on the other columns depend on your
+choice.</big></p>
+<p style="text-indent: 1.27cm;"><big>The size of the
+columns
+can be edited.
+To do this, you must click on the "<span style="font-weight: bold;">Page
+Setting</span>"
+under the
+category "Portal- General" in the administration control
+panel. Then, at the top of the page, right below the heading "Page
+Administration," select from the drop down box the page you want
+to edit. Then, click the button marked "<span style="font-weight: bold;">Change Now</span>". You
+should wait until the page loads. Next, you should pick the column
+(if it is already created) you want to edit, and in that row, select
+"<span style="font-weight: bold;">Edit</span>". From
+there you can choose the name of the column,
+for your own purposes to distinct one column from another. Now, to
+change the column size. The column size can be determined by either
+the percentage of the page, or in pixels. If you choose to use
+percentage, make sure the total percentages of all the page's columns
+add up to 100%. The column's size in pixels can be anything you wish.
+When you're finished, click "<span style="font-weight: bold;">Update
+Now</span>".</big></p>
+<p><br>
+</p>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>3a.
+Administration
+Panel</b></i></font></p>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>
+3a1. Portal- General</b></i></font></p>
+<p class="content" style="margin-left: 1.27cm; text-indent: 1.27cm;"><font style="font-size: 16pt;" size="4"><i><b>3a1b.
+Page Setting</b></i></font></p>
+<p class="content" style="margin-left: 2.54cm; text-indent: 1.27cm;"><font style="font-size: 16pt;" size="4"><i><b>3a1b2.
+Adding a block to an MXP Page</b></i></font></p>
+<big>The Administration Control Panel (ACP) in MXP 3.0.x contains
+all five options of&nbsp;</big><big style="color: rgb(8, 8, 8); font-weight: bold;">Page
+Administration</big>&nbsp;<big>in <span style="font-weight: bold;">Page Control Pannel</span></big><big>.
+For prosilver style there are five round colored buttons that You can
+use to <span style="font-weight: bold;">Preview</span>,
+<span style="font-weight: bold;">Edit</span>, <span style="font-weight: bold;">Configure Settings</span>, <span style="font-weight: bold;">Set Permissions</span>, and
+<span style="font-weight: bold;">Delete a Page</span>.<br>
+<br>
+</big><big>So,
+if
+you have already created an MXP Page under <span style="font-weight: bold;">New Page Administration</span>,
+you
+must want to put content on that page now. To do this, you must first
+start off in the ACP. From there, click on the "</big><big><span style="font-weight: bold;">Page Control Pannel</span></big><big>"
+under the "<span style="font-weight: bold;">Portal -
+General</span>" category in left page or in category tab
+depending on the ACP version. <br>
+<br>
+You should be here:</big><br>
+<p lang=""><img style="border: 0px solid ; width: 745px; height: 845px; float: left;" alt="" src="mxdoc1_html_db62c38.png" name="Graphic3" hspace="12"><br>
+<br>
+</p>
+&nbsp;&nbsp;&nbsp; <big>Now, in that picture, you
+probably
+will notice the red oval circle, around the drop-down box. From that
+selection box, pick the page you want to add content to. When you are
+done with this, click the "<span style="font-weight: bold;">Update</span>"
+or "Change Now" button besides it.<br>
+</big>
+<p style="text-indent: 1.27cm;"><big>You should now
+see the
+above
+screenshot, only with no columns, or any content for that matter.
+Now, before you add a "block," or a special content
+section, you must add a column(s) to input it into. To do this,
+scroll to the bottom, and type in the textbox located directly to the
+left of the button "<span style="font-weight: bold;">Add
+New Column</span>" the name of the column.
+This will not show up to anyone other than admins... as this is
+solely for your identification purposes. When done, click on the
+button "<span style="font-weight: bold;">Add New Column</span>."
+You will be brought up to a page
+asking the size of the column. Follow the instructions above about
+how to edit a column size. Then, click on the "<span style="font-weight: bold;">Submit</span>"
+button.</big></p>
+<p style="text-indent: 1.27cm;"><big>Now, under a
+drop-down
+selection box,
+select a module and a block you want to add. Highlight it, then click
+on it.&nbsp;<br>
+&nbsp;&nbsp;&nbsp; Then,
+click on "<span style="font-weight: bold;">Add New Block</span>".
+You've just added a new block to
+your MX Page. Now, if you want to edit the settings of this block, if
+you haven't already, click on the "Click here to go back to
+<span style="font-weight: bold;">Portal Configuration</span>."
+Then, find the block name and click on
+"<span style="font-weight: bold;">Settings</span>"
+if it applies. If it isn't there, most likely
+you will have to go to the MXP Page containing that block, and there
+should be an "<span style="font-weight: bold;">Edit</span>"
+button similar to the "<span style="font-weight: bold;">Edit</span>"
+button for the page located somewhere on that tab with the block name.
+</big></p>
+<p></p>
+<p></p>
+<p><br>
+</p>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>3a.
+Administration
+Panel</b></i></font></p>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>
+3a1. Portal- General</b></i></font></p>
+<p class="content" style="margin-left: 1.27cm; text-indent: 1.27cm;"><font style="font-size: 16pt;" size="4"><i><b>3a1c.
+Page Administration</b></i></font></p>
+<p><big> The Page Administration area of MXP ACP allows
+you full
+control
+over each and every individual page you have setup using MXP. From
+here you will be able to see at a glance from left to right the image
+you decided to use / not use as the case may be and the set name for
+your pages which can be changed from within the <span style="font-weight: bold;">Edit</span> feature. Using
+the <span style="font-weight: bold;">Edit</span>
+feature allows you to manipulate you page to much greater
+extent.</big></p>
+<p> </p>
+<p><br>
+</p>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>3a.
+Administration
+Panel</b></i></font></p>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>
+3a1. Portal- General</b></i></font></p>
+<p class="content" style="margin-left: 1.27cm; text-indent: 1.27cm;"><font style="font-size: 16pt;" size="4"><i><b>3a1c.
+Page Administration</b></i></font></p>
+<p class="content" style="margin-left: 2.54cm; text-indent: 1.27cm;"><font style="font-size: 16pt;" size="4"><i><b>3a1c1.
+Adding a new MXP Page</b></i></font></p>
+<p><big> The MXP&nbsp;has the feature to create more
+than one page,
+allowing various content within the portal, while still maintaining
+the "portal look" and navigation.</big></p>
+<p style="text-indent: 1.27cm;"><big>To add a new
+page to MXP,
+first start
+out from the <span style="font-weight: bold;">Administration
+Control Panel</span></big><big> (ACP)</big><big>.
+Then, under the "Portal-
+General" category, click on the link "<span style="font-weight: bold;">Page Administration</span>"
+to go to it.&nbsp;</big></p>
+<p style="text-indent: 1.27cm;"><big>You should see
+this:</big></p>
+<p><img style="border: 0px solid ; width: 658px; height: 708px;" alt="" src="mxdoc1_html_34da6168.png" name="Graphic4" hspace="12"><br>
+<br>
+<big>In MXP 3.0.x pages can be created an&nbsp;under <span style="font-weight: bold;">New Page Administration</span>,
+as we can see in </big><font style="font-size: 16pt;" size="4"><i><b><small><small>3a1b2</small></small>
+</b></i></font><big>and you
+can skip this picture to </big><small><small><font style="font-size: 16pt;" size="4"><small><small><i><b>3a1c1&nbsp;</b></i></small></small></font></small></small><big>were
+there is "Add New Page" or "Update" if the page has been&nbsp;</big><big>already
+created</big><big>. </big><br>
+<br>
+</p>
+<p><br>
+<big>You may notice some
+blurred text in
+the screenshot. This is because <span style="font-style: italic;">MXP
+Documentation Team</span> takes the
+screenshots from a test portal, and we have a lot of different pages.
+The blurring assures you that it is okay even if you don't have a
+certain element on the page.</big></p>
+<br>
+<br>
+<p><img alt="" style="border: 0px solid ; width: 534px; height: 994px; float: left;" src="mxdoc1_html_34da6176.png" name="Graphic4" hspace="12"></p>
+<p style="text-indent: 1.27cm;"></p>
+<p style="text-indent: 1.27cm;"><big>From there, at
+the bottom
+there is an
+empty text box, with a button denoted as "Add New Page."
+Type in the name of the page you desire in that text box, then click
+the "Add New Page" button. You should be at the page
+administration page, with the configuration of the page. Some
+included on this page are, but not limited to: Page ID, Page, Icon,
+and Permissions. You should fill in all of this info. Info about each
+of these are below:</big></p>
+<p><big><b>Page</b></big></p>
+<p><big><i>This is the name of the page. If you
+followed the
+instructions
+above, it should already be filled in.</i></big></p>
+<p><big><b>Page ID</b></big></p>
+<p><big><i>This is the page ID URL. This shouldn't
+concern you
+too much,
+and by default it already specifies it an ID number. Don't change
+this number unless you know what you are doing.</i></big></p>
+<p><big><b>Page Icon</b></big></p>
+<p><big><i>Most MX pages commonly are located within
+the
+Navigation Menu.
+To distinct each page and make it aesthetic, you can specify a small
+icon to it. This can be any image (though only JPG and GIF are
+recommended). By default, the icon directory should be under the
+directory /MX/templates/subSilver/images/. If you use a different
+template/theme, then you should change this accordingly.</i></big></p>
+<p><big><b>Page Header</b></big></p>
+<p><big><i>This is the name of the file that appears
+on top of
+every page.
+By default it is overall_header.tpl, which is located under
+/MX/templates/subSilver/. You should not change this unless you have
+created your own header file. If this applies to you, then upload
+your custom header file into /MX/templates/subSilver/, then change
+the Page Header file here.</i></big></p>
+<p><big><b>Permissions</b></big></p>
+<p><big><i>This section is for you, the
+administrator, to decide
+who has
+access and/or power to this page. I recommend you to leave the "View"
+category to giving permission to ALL people, registered or not. But,
+the "Private" group is the one that is up to you. These
+people can do anything you let them do, such as managing the page,
+etc. You should change this to "Admin" so that only you,
+not moderators, can edit it. If you already have created a usergroup
+(s) for specific control to this (for my forum I created a "Knowledge
+Base" usergroup so that they can only control the Knowledge
+Base), then you can choose to have the "Private" group be
+assigned to this usergroup.</i></big></p>
+<p style="text-indent: 1.27cm;"><big>After filling
+all of this
+info, if not
+already, then you are done! Double check all of your info, then click
+the button "Update." You're done adding a new MX Page to
+your portal. Now, if you want to add your newly added MX Page to the
+Navigation Menu on your portal index, you can do so by adding the
+columns for the new page. Column 1 is where you should add the
+Navigation menu. Column 2 is where you want to add a block such as:
+calendar, photo album or text blocks.</big></p>
+<p style="text-indent: 1.27cm;"><big>Take a look
+from the
+previous
+screenshot. Once you've created a new page, you should click on that
+icon, which will take you to a new window. There is where you add
+your columns, and for each column you add the blocks.</big></p>
+<p style="text-indent: 1.27cm;"><big>Now, say you
+added the
+photo album to
+your newly created page and put it in Column 2, and you added the
+link to the Navigation menu, which you added to Column 1. Now, you'll
+want to edit the link in the Navigation Menu for the photo Album. You
+can do this by using the edit button on the main portal page.</big></p>
+<p style="text-indent: 1.27cm;"><big>You want to
+make sure that
+whatever
+the page ID is matches the menu URL link to external page. The way
+you find the "menu URL link to external page" is after
+hitting the edit button, click edit for the, we'll say for example:
+"photo album". About middle way down that window, you'll
+see the following:</big></p>
+<p style="text-indent: 1.27cm;"><big><br>
+</big></p>
+<p><big><u><b>Menu URL</b></u></big></p>
+<p style="text-indent: 1.27cm;"><big><i>- link
+to
+external page</i></big></p>
+<p style="text-indent: 1.27cm;"><big>If the Page ID
+is 3,
+you'll want to
+type in "index.php?page=3" (without the quotes).</big></p>
+<p style="text-indent: 1.27cm;"><big>Also, in that
+window, the
+only thing
+that you need to be concerned with is:</big></p>
+<p><big><b>Menu Name </b>
+</big></p>
+<p style="text-indent: 1.27cm;"><big>Name this what
+you want.
+Whatever name
+you give it will show up in the Navigation menu</big></p>
+<p><big><b>Menu Icon</b></big></p>
+<p style="text-indent: 1.27cm;"><big>An example is:
+icon_links.gif; or
+whatever icon you choose to use.</big></p>
+<p><big><b>Menu URL</b></big></p>
+<ul>
+<li><big>
+</big>
+<p><big><i>link to external page </i> </big></p>
+</li>
+</ul>
+<p style="text-indent: 1.27cm;"><big>(see above
+example for
+this.)</big></p>
+<big>The Administration Control Panel (ACP) in MXP 3.0.x contains
+all five options of&nbsp;</big><big style="color: rgb(8, 8, 8); font-weight: bold;">Page
+Administration</big>&nbsp;<big>in <span style="font-weight: bold;">Page Control Pannel</span></big><big>.
+For prosilver style there are five round colored buttons that You can
+use to <span style="font-weight: bold;">Preview</span>,
+<span style="font-weight: bold;">Edit</span>, <span style="font-weight: bold;">Configure Settings</span>, <span style="font-weight: bold;">Set Permissions</span>, and
+<span style="font-weight: bold;">Delete a Page</span>.<br>
+<br>
+We can see in the bellow picture&nbsp;</big><small><small><font style="font-size: 16pt;" size="4"><small><small><i><b>3a1c1</b></i></small></small></font></small></small>
+<big>that the option to add or update a MXP Page&nbsp;under <span style="font-weight: bold;">New Page Administration</span>,
+that in older versions of ACP as we ca see in picure </big><font style="font-size: 16pt;" size="4"><i><b><small><small>3a1b2</small></small>&nbsp;</b></i></font><big>was
+in "<span style="font-weight: bold;">Page Settings</span>"
+</big><big>were there is "<span style="font-weight: bold;">Add New Page</span>" or "<span style="font-weight: bold;">Update</span>" if the page
+has been&nbsp;</big><big>already created and in latest
+version we have them in "<span style="font-weight: bold;">Page
+Control Pannel</span>".</big><br>
+<big><br>
+</big>
+<p><img alt="" style="border: 0px solid ; width: 635px; height: 1751px; float: left;" src="mxdoc1_html_34da2205.png" name="Graphic4" hspace="12"></p>
+<p class="content"></p>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>3a.
+Administration
+Panel</b></i></font></p>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>
+3a1. Portal- General</b></i></font></p>
+<p class="content" style="margin-left: 1.27cm; text-indent: 1.27cm;"><font style="font-size: 16pt;" size="4"><i><b>3a1c.
+Page Administration</b></i></font></p>
+<p class="content" style="margin-left: 5.08cm; text-indent: -1.27cm;"><font style="font-size: 16pt;" size="4"><i><b>3a1c2.
+Navigation Menu- creating a category</b></i></font></p>
+<p><big> The Navigation Menu block should be on the front
+page of your
+portal, to let your users/site browsers to get around your portal.
+Now, let's say you have a lot of MXP pages. You want to have all of
+these linked in the Navigation Menu so that people can see them, yet
+you want to organize them more. You can achieve this by categorizing
+these pages. Doing this allows for separate categories of pages. Make
+sure that you have the MXP pages created. To do this, start out at the
+front portal page. Then, on the Navigation Menu block, click on the
+"<span style="font-weight: bold;">Edit</span>"
+button.&nbsp;</big></p>
+<p><big>You should then be at this page:</big></p>
+<img style="width: 532px; height: 740px;" src="mxdoc1_html_019_23052019_030321.png" alt=""><br>
+<br>
+<p><img style="border: 0px solid ; width: 877px; height: 611px; float: left;" alt="" src="mxdoc1_html_325bec41.png" name="Graphic5" hspace="12"><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<big>This is the Navigation Menu admin index. From here you can
+edit
+what pages are in this nav menu block, and what category. Go to the
+bottom of the page, until you see this:</big><br>
+<p><br>
+<br>
+</p>
+<p lang=""><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<img style="border: 0px solid ; width: 795px; height: 705px; float: left;" alt="" src="mxdoc1_html_001_23052019_120202.png" name="Graphic6" hspace="12"><br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p><big>Type in the name of the category you want in the
+text box,
+located
+near the "Add new category" button. You probably also have
+noticed a drop-down selection box with the word "unfolded."
+In short, since you have more than one category in the navigation
+menu, you will want to either a) see all the page links, under the
+category, or b) see the category, but you will have to click on a
+button to see all the pages. Choice a) looks like this:</big></p>
+<p lang=""><img style="border: 0px solid ; width: 229px; height: 111px; float: left;" alt="" src="mxdoc1_html_m5e02815.png" name="Graphic7" hspace="12"><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<big>or like choice b), this:<br>
+</big>
+<p lang=""><img style="border: 0px solid ; width: 229px; height: 111px; float: left;" alt="" src="mxdoc1_html_79fc0929.png" name="Graphic8" hspace="12"><br>
+<br>
+</p>
+<p><br>
+<br>
+<br>
+<br>
+<br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><big>The first picture showed a category, with pages
+under it,
+unfolded. This means the category, with all of its pages, are shown.
+The second picture shows a folded category. You can see the category
+name, but not the pages within it. Do you see the red circle in the
+second picture? This is the button used to either fold or unfold the
+category. Now that you know the difference between the two, take your
+pick of either having this new category folded, or unfolded. When
+you're done with that, click on the button "Add new category."
+You should have been brought to a redirecting page with the text
+"Menu and Category information updated successfully" and
+below that, "Click Here to return to the Index." Then it
+will automatically go to the Index page. You've completed adding a
+new category. Now, you will have to add your MXP Page (s) under this
+category if applicable.</big></p>
+<p><br>
+<br>
+</p>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>3a.
+Administration
+Panel</b></i></font></p>
+<p class="content" style="text-indent: 1.27cm;"><font style="font-size: 16pt;" size="4"><i><b>3a2.
+Portal-Modules</b></i></font></p>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>3a2a.
+Block Administration</b></i></font></p>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>3a2a1. What is it?</b></i></font></p>
+<p><big> The Block Administration in the administration
+control panel
+allows you, the administrator, to view all of the blocks that are
+part of your portal. Blocks are literally blocks that you can control
+to be on which MX Page. Blocks are named whatever you want, but when
+you do this, you must assign a function to the block. For example, if
+you wanted a "Random Daily Quote" block, then you would
+create a block named "Random Daily Quote," but the MX
+function that it would use would be "MX-Quotations." The
+blocks your portal can have depends on what modules you have
+installed.</big></p>
+<p><br>
+<br>
+<br>
+</p>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>3a.
+Administration
+Panel</b></i></font></p>
+<p class="content" style="text-indent: 1.27cm;"><font style="font-size: 16pt;" size="4"><i><b>3a2.
+Portal-Modules</b></i></font></p>
+<p class="content" style="margin-left: 1.27cm; text-indent: 1.27cm;"><font style="font-size: 16pt;" size="4"><i><b>3a2a.
+Block Administration</b></i></font></p>
+<p class="content" style="margin-left: 2.54cm; text-indent: 1.27cm;"><font style="font-size: 16pt;" size="4"><i><b>3a2a2.
+Adding a block</b></i></font></p>
+<p><big> So, you want to add a block now? Well, first, you
+must make
+sure
+that you have whatever modules you want this block to be for,
+installed. If you're sure it is, start by going into the
+<span style="font-weight: bold;">Administration Control
+Panel</span> (ACP). Then, under the category "<span style="font-weight: bold;">Management</span>" click on
+"<span style="font-weight: bold;">Block Control Pannel</span>"
+You should
+be here:</big><br>
+<br>
+</p>
+<p style="text-indent: 1.27cm;"><big><img style="width: 221px; height: 370px;" alt="" src="mxdoc1_html_017_23052019_014525.png"></big></p>
+<big>Then, scroll down to the bottom. You should see
+this:<br>
+</big>
+<p><img style="border: 0px solid ; width: 866px; height: 704px; float: left;" alt="" src="mxdoc1_html_a1f3121.png" name="Graphic9" hspace="12"><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p lang=""><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+</p>
+<p><big><br>
+</big></p>
+<p><br>
+<br>
+</p>
+<p lang=""><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><big>In the textbox, type in what you want the block's
+name to be.
+This
+is the heading that's going to appear on the MXP Page you put this on.
+When you're done with this, click on the button labeled "<span style="font-weight: bold;">Create New Block</span>".
+You now should be at a page with labels, and text
+boxes. Below are descriptions of each.</big></p>
+<p><br>
+<br>
+</p>
+<p></p>
+<p></p>
+<p><big><b>Title</b></big></p>
+<p><big><i>This is the name of the block. It should
+already be
+filled in
+with what you wanted if you followed the instructions above. If for
+any reason you want to change it now, do so.</i></big></p>
+<p><big><br>
+<br>
+</big></p>
+<p><big><b>Description</b></big></p>
+<p><big><i>This is a short description of the block,
+which only
+admins can
+view from the ACP. It is for you to distinguish between other blocks.
+Fill it in with the information you will remember it by, and the
+function it does.</i></big></p>
+<p><big><br>
+<br>
+</big></p>
+<p><big><b>Function</b></big></p>
+<p><big><i>This is the function that this block
+performs. Choose
+the
+function you want it to perform from the drop-down selection box.
+Make sure you have picked the correct one. If a function you want,
+that you know is there, isn't, then it must mean that you haven't
+installed it's corresponding module. You must install the module,
+then restart this process. Do not continue until you have installed
+the desired module.</i></big></p>
+<p><br>
+<br>
+</p>
+<p><big><b>Permissions (Sub-Category View)</b></big></p>
+<p><big><i>This is the permissions control for this
+block. This
+controls
+which type (s) of users can view this block. By default it is
+"anonymous," which means anyone, registered or not, can see
+it. It is recommended that you leave it at this, so new people who
+are viewing your site can see it. They can register later.</i></big></p>
+<p><big><br>
+<br>
+</big></p>
+<p><big><b>Permissions (Sub-Category Edit)</b></big></p>
+<p><big><i>This is the permissions control for block
+editing.
+Whoever has
+permission to this can edit the block the page is located in. By
+default it is "anonymous" which means anyone can edit it.
+This is obviously not what you want. You should change it to Admin,
+so that only you can change it. Though, if you have created a
+usergroup (s) designated for this block... then choose that
+usergroup's name.</i></big></p>
+<p><big><br>
+<br>
+</big></p>
+<p style="text-indent: 1.27cm;"><big>So, if you have
+filled in
+all of the
+above, click on "Create New Block." You've just created a
+new block. Good job. Now, you must add this block to an MX Page, so
+that you can actually see it. Go to under the category "Page
+Setting" to figure out how to add a block to an existing MXP
+Page.</big></p>
+<p><br>
+<br>
+</p>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>3a.
+Administration
+Panel</b></i></font></p>
+<p class="content" style="text-indent: 1.27cm;"><font style="font-size: 16pt;" size="4"><i><b>3a2.
+Portal-Modules</b></i></font></p>
+<p class="content" style="margin-left: 1.27cm; text-indent: 1.27cm;"><font style="font-size: 16pt;" size="4"><i><b>3a2b.
+Module Administration</b></i></font></p>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>
+3a2b1. What is a
+module?</b></i></font></p>
+<p style="text-indent: 1.27cm;"><big>The MXP CMS is
+a&nbsp;modular
+</big><big>extreme </big><big>content
+management system. This means it's made up of modules; each module is
+designed
+to do something specific. For example, the mx_links module provides
+the site with a way to add and organize links to other sites, as well
+as allowing users to submit their own links. Chances are you have
+already used at least two modules that come with the core: these are
+the Last Message and Text Blocks modules. You can add and download
+modules from www.mx-system.com or from a range of third parties and
+there are plenty to choose from.</big></p>
+<img style="border: 0px solid ; width: 839px; height: 571px; float: left;" alt="" src="mxdoc1_html_m7647fe38.png" name="Graphic10" hspace="12">
+<p class="content"></p>
+<p class="content"></p>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>3a.
+Administration
+Panel</b></i></font></p>
+<p class="content" style="text-indent: 1.27cm;"><font style="font-size: 16pt;" size="4"><i><b>3a2.
+Portal-Modules</b></i></font></p>
+<p class="content" style="margin-left: 1.27cm; text-indent: 1.27cm;"><font style="font-size: 16pt;" size="4"><i><b>3a2b.
+Module Administration</b></i></font></p>
+<p class="content" style="margin-left: 2.54cm; text-indent: 1.27cm;"><font style="font-size: 16pt;" size="4"><i><b>3a2b2.
+Installing a Module</b></i></font></p>
+<p><big> Installation of a module is designed to be simple.
+Once you
+have
+downloaded the module you wish to use, simply place the module folder
+in the folder called modules. You will already see some modules that
+come with the core in there. Once the module has been copied to the
+folder, access the MX administration control panel followed by module
+administration. You should be here:</big></p>
+<big>To
+install a module, click ‘<span style="font-weight: bold;">Install
+Module</span>’ button.&nbsp;</big>
+<p><big>A list
+of modules that are in the /MX/module/ folder will appear select the
+module you wish to install and click submit.&nbsp;</big></p>
+<p><img style="border: 0px solid ; width: 368px; height: 707px; float: left;" alt="" src="mxdoc1_html_3d772f2d.png" name="Graphic11" hspace="12"></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p><big>By hitting submit, MXP is
+adding the module information to the database, as well as adding new
+tables the module may need, a list of these changes will
+appear.&nbsp;</big></p>
+<span class="gen"><big><br>
+If you get some Errors, Already Added or Updated messages,
+relax, this is normal when updating mods</big></span>
+<p><big>Here
+is where you should be before hitting "Submit":</big></p>
+<b>Progress report</b><span style="font-weight: bold;"><br>
+<br>
+</span>- <font color="#dd1144">add</font>
+module (51, Forum Module, modules/mx_forum/) <br>
+<font color="#00ff00">[db...ok]</font><br>
+<br>
+----------------------------<br>
+- <font color="#dd1144">add</font> function (51,
+53, FAQ (Forum)) <br>
+<font color="#00ff00">[db...ok]</font><br>
+<br>
+<br>
+&nbsp;&nbsp; ---&gt; Now get blocks_ids: <br>
+<font color="#00ff00"> [db...ok] </font> <br>
+- <font color="#dd1144">add</font> block (33, FAQ
+(Forum), Demo block) <br>
+<font color="#00ff00">[db...ok]</font><br>
+<br>
+<br>
+&nbsp;&nbsp; ---&gt; Now get blocks_ids: <br>
+<font color="#00ff00"> [db...ok] </font> <br>
+<br>
+----------------------------<br>
+- <font color="#dd1144">add</font> function (51,
+54, GroupCP) <br>
+<font color="#00ff00">[db...ok]</font><br>
+<br>
+<br>
+&nbsp;&nbsp; ---&gt; Now get blocks_ids: <br>
+<font color="#00ff00"> [db...ok] </font> <br>
+- <font color="#dd1144">add</font> block (34,
+GroupCP, Demo block) <br>
+<font color="#00ff00">[db...ok]</font><br>
+<br>
+<br>
+&nbsp;&nbsp; ---&gt; Now get blocks_ids: <br>
+<font color="#00ff00"> [db...ok] </font> <br>
+<br>
+----------------------------<br>
+- <font color="#dd1144">add</font> function (51,
+55, phpBB) <br>
+<font color="#00ff00">[db...ok]</font><br>
+- <font color="#dd1144">add</font> parameter (55,
+103, Source_phpBB_Forums) <br>
+<font color="#00ff00">[db...ok]</font><br>
+<br>
+<br>
+&nbsp;&nbsp; ---&gt; Now get blocks_ids: <br>
+<font color="#00ff00"> [db...ok] </font> <br>
+- <font color="#dd1144">add</font> block (35,
+Index, Demo block) <br>
+<font color="#00ff00">[db...ok]</font><br>
+<br>
+<br>
+&nbsp;&nbsp; ---&gt; Now get blocks_ids: <br>
+<font color="#00ff00"> [db...ok] </font><br>
++ (Source_phpBB_Forums, 103, 35), <br>
+<br>
+----------------------------<br>
+- <font color="#dd1144">add</font> function (51,
+56, Login) <br>
+<font color="#00ff00">[db...ok]</font><br>
+<br>
+<br>
+&nbsp;&nbsp; ---&gt; Now get blocks_ids: <br>
+<font color="#00ff00"> [db...ok] </font> <br>
+- <font color="#dd1144">add</font> block (36,
+Login, Demo block) <br>
+<font color="#00ff00">[db...ok]</font><br>
+<br>
+<br>
+&nbsp;&nbsp; ---&gt; Now get blocks_ids: <br>
+<font color="#00ff00"> [db...ok] </font> <br>
+<br>
+----------------------------<br>
+- <font color="#dd1144">add</font> function (51,
+57, Memberlist) <br>
+<font color="#00ff00">[db...ok]</font><br>
+<br>
+<br>
+&nbsp;&nbsp; ---&gt; Now get blocks_ids: <br>
+<font color="#00ff00"> [db...ok] </font> <br>
+- <font color="#dd1144">add</font> block (37,
+Memberlist, Demo block) <br>
+<font color="#00ff00">[db...ok]</font><br>
+<br>
+<br>
+&nbsp;&nbsp; ---&gt; Now get blocks_ids: <br>
+<font color="#00ff00"> [db...ok] </font> <br>
+<br>
+----------------------------<br>
+- <font color="#dd1144">add</font> function (51,
+58, ModCP) <br>
+<font color="#00ff00">[db...ok]</font><br>
+<br>
+<br>
+&nbsp;&nbsp; ---&gt; Now get blocks_ids: <br>
+<font color="#00ff00"> [db...ok] </font> <br>
+- <font color="#dd1144">add</font> block (38,
+ModCP, Demo block) <br>
+<font color="#00ff00">[db...ok]</font><br>
+<br>
+<br>
+&nbsp;&nbsp; ---&gt; Now get blocks_ids: <br>
+<font color="#00ff00"> [db...ok] </font> <br>
+<br>
+----------------------------<br>
+- <font color="#dd1144">add</font> function (51,
+59, Posting) <br>
+<font color="#00ff00">[db...ok]</font><br>
+<br>
+<br>
+&nbsp;&nbsp; ---&gt; Now get blocks_ids: <br>
+<font color="#00ff00"> [db...ok] </font> <br>
+- <font color="#dd1144">add</font> block (39,
+Posting, Demo block) <br>
+<font color="#00ff00">[db...ok]</font><br>
+<br>
+<br>
+&nbsp;&nbsp; ---&gt; Now get blocks_ids: <br>
+<font color="#00ff00"> [db...ok] </font> <br>
+<br>
+----------------------------<br>
+- <font color="#dd1144">add</font> function (51,
+60, Private Messages) <br>
+<font color="#00ff00">[db...ok]</font><br>
+<br>
+<br>
+&nbsp;&nbsp; ---&gt; Now get blocks_ids: <br>
+<font color="#00ff00"> [db...ok] </font> <br>
+- <font color="#dd1144">add</font> block (40,
+Private Messages, Demo block) <br>
+<font color="#00ff00">[db...ok]</font><br>
+<br>
+<br>
+&nbsp;&nbsp; ---&gt; Now get blocks_ids: <br>
+<font color="#00ff00"> [db...ok] </font> <br>
+<br>
+----------------------------<br>
+- <font color="#dd1144">add</font> function (51,
+61, Profile) <br>
+<font color="#00ff00">[db...ok]</font><br>
+<br>
+<br>
+&nbsp;&nbsp; ---&gt; Now get blocks_ids: <br>
+<font color="#00ff00"> [db...ok] </font> <br>
+- <font color="#dd1144">add</font> block (41,
+Profile, Demo block) <br>
+<font color="#00ff00">[db...ok]</font><br>
+<br>
+<br>
+&nbsp;&nbsp; ---&gt; Now get blocks_ids: <br>
+<font color="#00ff00"> [db...ok] </font> <br>
+<br>
+----------------------------<br>
+- <font color="#dd1144">add</font> function (51,
+62, Search) <br>
+<font color="#00ff00">[db...ok]</font><br>
+<br>
+<br>
+&nbsp;&nbsp; ---&gt; Now get blocks_ids: <br>
+<font color="#00ff00"> [db...ok] </font> <br>
+- <font color="#dd1144">add</font> block (42,
+Search, Demo block) <br>
+<font color="#00ff00">[db...ok]</font><br>
+<br>
+<br>
+&nbsp;&nbsp; ---&gt; Now get blocks_ids: <br>
+<font color="#00ff00"> [db...ok] </font> <br>
+<br>
+----------------------------<br>
+- <font color="#dd1144">add</font> function (51,
+63, ViewForum) <br>
+<font color="#00ff00">[db...ok]</font><br>
+- <font color="#dd1144">add</font> parameter (63,
+104, Source_ViewForum) <br>
+<font color="#00ff00">[db...ok]</font><br>
+<br>
+<br>
+&nbsp;&nbsp; ---&gt; Now get blocks_ids: <br>
+<font color="#00ff00"> [db...ok] </font> <br>
+- <font color="#dd1144">add</font> block (43,
+ViewForum, Demo block) <br>
+<font color="#00ff00">[db...ok]</font><br>
+<br>
+<br>
+&nbsp;&nbsp; ---&gt; Now get blocks_ids: <br>
+<font color="#00ff00"> [db...ok] </font><br>
++ (Source_ViewForum, 104, 43), <br>
+<br>
+----------------------------<br>
+- <font color="#dd1144">add</font> function (51,
+64, ViewOnline) <br>
+<font color="#00ff00">[db...ok]</font><br>
+<br>
+<br>
+&nbsp;&nbsp; ---&gt; Now get blocks_ids: <br>
+<font color="#00ff00"> [db...ok] </font> <br>
+- <font color="#dd1144">add</font> block (44,
+ViewOnline, Demo block) <br>
+<font color="#00ff00">[db...ok]</font><br>
+<br>
+<br>
+&nbsp;&nbsp; ---&gt; Now get blocks_ids: <br>
+<font color="#00ff00"> [db...ok] </font> <br>
+<br>
+----------------------------<br>
+- <font color="#dd1144">add</font> function (51,
+65, ViewTopic) <br>
+<font color="#00ff00">[db...ok]</font><br>
+- <font color="#dd1144">add</font> parameter (65,
+105, Source_ViewTopic) <br>
+<font color="#00ff00">[db...ok]</font><br>
+<br>
+<br>
+&nbsp;&nbsp; ---&gt; Now get blocks_ids: <br>
+<font color="#00ff00"> [db...ok] </font> <br>
+- <font color="#dd1144">add</font> block (45,
+ViewTopic, Demo block) <br>
+<font color="#00ff00">[db...ok]</font><br>
+<br>
+<br>
+&nbsp;&nbsp; ---&gt; Now get blocks_ids: <br>
+<font color="#00ff00"> [db...ok] </font><br>
++ (Source_ViewTopic, 105, 45), <br>
+<br>
+<b><font color="#00ff00">[import succesfull]</font></b><br>
+<br>
+<br>
+<table style="width: 1090px; height: 633px;" class="forumline" align="center" border="0" cellpadding="4" cellspacing="1">
+<tbody>
+<tr>
+<th style="text-align: left;" class="thHead">Module
+Installation/Upgrading/Uninstalling Information - module specific db
+tables</th>
+</tr>
+<tr>
+<td class="row1" align="left"><span class="gen"><b>This is a fresh install!</b><br>
+<br>
+<b>This is the result list of the SQL queries needed for
+the install/upgrade</b><br>
+<br>
+<b><font color="#0000ff">[Added/Updated]</font></b>
+line: 1 , DROP TABLE IF EXISTS mx_phpbb_plugin_config<br>
+<b><font color="#0000ff">[Added/Updated]</font></b>
+line: 2 , CREATE TABLE mx_phpbb_plugin_config (
+config_name VARCHAR(255) NOT NULL default '', config_value varchar(255)
+NOT NULL default '',
+PRIMARY KEY (config_name)
+) <br>
+<b><font color="#0000ff">[Added/Updated]</font></b>
+line: 3 , INSERT INTO mx_phpbb_plugin_config VALUES
+('override_default_pages', '0')<br>
+<b><font color="#0000ff">[Added/Updated]</font></b>
+line: 4 , INSERT INTO mx_phpbb_plugin_config VALUES ('enable_module',
+'1')<br>
+<b><font color="#0000ff">[Added/Updated]</font></b>
+line: 5 , INSERT INTO mx_phpbb_plugin_config VALUES ('faq', '2')<br>
+<b><font color="#0000ff">[Added/Updated]</font></b>
+line: 6 , INSERT INTO mx_phpbb_plugin_config VALUES ('groupcp', '2')<br>
+<b><font color="#0000ff">[Added/Updated]</font></b>
+line: 7 , INSERT INTO mx_phpbb_plugin_config VALUES ('index', '2')<br>
+<b><font color="#0000ff">[Added/Updated]</font></b>
+line: 8 , INSERT INTO mx_phpbb_plugin_config VALUES ('login', '2')<br>
+<b><font color="#0000ff">[Added/Updated]</font></b>
+line: 9 , INSERT INTO mx_phpbb_plugin_config VALUES ('memberlist', '2')<br>
+<b><font color="#0000ff">[Added/Updated]</font></b>
+line: 10 , INSERT INTO mx_phpbb_plugin_config VALUES ('modcp', '2')<br>
+<b><font color="#0000ff">[Added/Updated]</font></b>
+line: 11 , INSERT INTO mx_phpbb_plugin_config VALUES ('posting', '2')<br>
+<b><font color="#0000ff">[Added/Updated]</font></b>
+line: 12 , INSERT INTO mx_phpbb_plugin_config VALUES ('privmsg', '2')<br>
+<b><font color="#0000ff">[Added/Updated]</font></b>
+line: 13 , INSERT INTO mx_phpbb_plugin_config VALUES ('profile', '2')<br>
+<b><font color="#0000ff">[Added/Updated]</font></b>
+line: 14 , INSERT INTO mx_phpbb_plugin_config VALUES ('search', '2')<br>
+<b><font color="#0000ff">[Added/Updated]</font></b>
+line: 15 , INSERT INTO mx_phpbb_plugin_config VALUES ('viewforum', '2')<br>
+<b><font color="#0000ff">[Added/Updated]</font></b>
+line: 16 , INSERT INTO mx_phpbb_plugin_config VALUES ('viewonline', '2')<br>
+<b><font color="#0000ff">[Added/Updated]</font></b>
+line: 17 , INSERT INTO mx_phpbb_plugin_config VALUES ('viewtopic', '2')<br>
+<b><font color="#0000ff">[Added/Updated]</font></b>
+line: 18 , INSERT INTO mx_phpbb_plugin_config VALUES ('other', '2')<br>
+<b><font color="#0000ff">[Added/Updated]</font></b>
+line: 19 , CREATE TABLE mx_topic_add_type (
+topic_type_name varchar(64) NOT NULL default '',
+topic_type_id tinyint(4) NOT NULL default '0',
+topic_type_auth tinyint(1) NOT NULL default '-1',
+topic_type_active tinyint(1) NOT NULL default '0',
+topic_type_order tinyint(3) NOT NULL default '0',
+topic_type_color varchar(6) NOT NULL default '0',
+topic_type_image varchar(255) default NULL,
+topic_type_image_new varchar(255) default NULL
+) <br>
+<b><font color="#0000ff">[Added/Updated]</font></b>
+line: 20 , INSERT INTO mx_topic_add_type VALUES ('announce', 0, -1, 0,
+-1, 'FF0000', '', '')<br>
+<b><font color="#0000ff">[Added/Updated]</font></b>
+line: 21 , INSERT INTO mx_topic_add_type VALUES ('sticky', 0, -1, 0,
+-1, 'FAD400', '', '')<br>
+<b><font color="#0000ff">[Added/Updated]</font></b>
+line: 22 , ALTER TABLE phpbb_topics ADD topic_type_active TINYINT(1)
+NOT NULL DEFAULT '0' AFTER topic_type<br>
+<b><font color="#0000ff">[Added/Updated]</font></b>
+line: 23 , UPDATE mx_module
+SET module_version = '3.0.3',
+module_copy = 'phpBB Integration Module. Based on <a href="http://www.phpbb.com/" target="_phpbb">phpBB</a>'
+WHERE module_id = '51'
+</span></td>
+</tr>
+</tbody><tbody>
+</tbody>
+</table>
+<p></p>
+<big><big>If all has gone well all of these changes should
+have a
+blue
+"OK"
+at the beginning.&nbsp;</big></big>
+<p><big><big>Here is what the screen should look like
+if
+everything went perfectly:</big></big><br>
+<br>
+</p>
+<p lang=""><img style="border: 0px solid ; width: 796px; height: 542px; float: left;" alt="" src="mxdoc1_html_m4701d175.png" name="Graphic13" hspace="12"><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<big><big>Occasionally a module or part of a module may
+not
+install
+correctly and this will appear in red. It is still fine, and it will
+probably look something like this:</big></big>
+<p><br>
+<br>
+</p>
+<p lang=""><img style="border: 0px solid ; width: 798px; height: 367px; float: left;" alt="" src="mxdoc1_html_5189f868.png" name="Graphic14" hspace="12"><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<small><br>
+</small>
+<p><big>The module should now be installed; if it has
+an
+Admin Control
+Panel component then you may need to hit refresh in your browser to
+see the new menus.</big></p>
+<p><big><br>
+</big><br>
+</p>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>3a.
+Administration
+Panel</b></i></font></p>
+<p class="content" style="text-indent: 1.27cm;"><font style="font-size: 16pt;" size="4"><i><b>3a2.
+Portal-Modules</b></i></font></p>
+<p class="content" style="margin-left: 1.27cm; text-indent: 1.27cm;"><font style="font-size: 16pt;" size="4"><i><b>3a2b.
+Module Administration</b></i></font></p>
+<p class="content" style="margin-left: 2.54cm; text-indent: 1.27cm;"><font style="font-size: 16pt;" size="4"><i><b>3a2b3.
+Using a module</b></i></font></p>
+<p><big> While each module is different, they do tend
+to
+have certain
+things in common. Modules are not normally used directly but rather
+through blocks. During the install the blocks that come with the
+module will also be installed and should be available in Block
+Administration. These blocks act just like normal, and can have
+privileges assigned to them, as well as being added and deleted to a
+page. Often block settings can be changed, on the block itself on the
+page it was set to. This is to allow non-admins with correct
+permissions to be able to edit blocks. Modules may also have a
+general administrative section; this will appear in the
+administrative area under "MX Modules". Changes to these
+may require a regeneration of the cache.</big></p>
+<p><big><span class="postbody"></span></big></p>
+<h3 class="content"><a name="top"></a><font style="font-size: 16pt;" size="4"><i><b>3a2b4.
+</b></i></font><big><big><big>Porting
+phpBB EXTENSIONS</big></big></big></h3>
+­
+<p><big>Found a phpBB Extension, but think its too
+complicate­d to
+install for phpBB, or youd rather have it for MXP, modularize­d, and
+cool?&nbsp;­&nbsp;;<br>
+Well, heres&nbsp;­&nbsp;;some simple guidelines for porting
+phpBB Exrensions to be MXP modules.<br>
+<br>
+<strong><span style="font-size: x-small;">Requiremen­ts:
+<br>
+<br>
+</span></strong><strong><span style="font-size: x-small;">1:</span></strong> A
+PHP Editor is <span style="text-decoration: underline;">preferred</span>
+and usually better because its syntax highlighti­ng can give you a
+warning on some accidental omitted code.&nbsp;­&nbsp;;<br>
+Click <a href="http://phpb.com/" target="_blank">HERE</a>
+or <a href="http://mxpcms.souceforge.net/download" target="_blank">HERE</a> for&nbsp;<strong>N­otepad++
+for phpBB and MX-Publish­er <br>
+</strong>or Search google.com for <strong>"</strong><strong>Notepad++
+for phpBB</strong><strong>"</strong> <br>
+Click <a href="http://www.waterproof.fr/" target="_blank">HERE</a>
+for <strong>PHPEdit </strong>Click <a href="http://www.mpsoftware.dk/phpdesigner.php" target="_blank">HERE</a>
+for <strong>PHPDesigne­r</strong>&nbsp;<br>
+Both are free PHP editors. We recommend PHPDesigne­r for its many
+features.<br>
+&nbsp;<br>
+<span style="font-size: x-small;"><strong>2:</strong></span>
+At least SOME basic PHP knowledge, if youre just learning PHP, then try
+to learn all the basic about functions and classes, and porting the
+phpBB Extension will be teaching you in itself. <br>
+<strong><span style="font-size: x-small;">3:</span></strong>
+A test site, preferably on your own computer to save bandwidth and
+time. Click <a href="http://github.com/orynider/" target="_blank">HERE</a> for
+Wampee&amp;nbs­p;which is a good example. Click <a href="http://www.easyphp.org/telechargements.php3" target="_blank">HERE</a> for EasyPHP. Also make sure
+any errors that may occur during this process will not affect anything
+else on the server, so if youre trying out this on your main site, be
+aware of anything that could happen. Back up <span style="text-decoration: underline;">EVERYTHING</span>
+in that case. <br>
+<strong><span style="font-size: x-small;">4:</span></strong>
+Overall knowledge and experience over MXP and phpBB. This will simplify
+your troublesho­oting. <br>
+<strong><span style="font-size: x-small;">5:</span></strong>
+Having read the&nbsp;M­odule Developmen­t Guides <a href="http://mxpcms.souceforge.net/index.php?page=108&amp;mode=cat&amp;cat=3" target="_blank">HERE</a>, &nbsp;<strong>espe­cially
+</strong>the paths and directory structure portions; if you
+don't
+understand something then refer to that.&nbsp;­&nbsp;;<br>
+<strong><span style="font-size: x-small;">6:</span></strong>&nbsp;Ti­me
+and patience.&amp;­nbsp; If you think you will be easily confused,
+or get barely through the first couple of paragraphs and already are
+confused, dont give up, just dont use this guide as a restraint;
+everyone has their own methods of coding. If you think that too much
+code will make you dizzy, either get your Tylenol out, or press the
+back button now.<br>
+<br>
+<strong>Finding the perfect Extension or OLD
+ADD-ON&amp;nbs­p;MOD<br>
+</strong>Be aware that&nbsp;­not all phpBB MODs can be
+modularize­d. Modularizi­ng phpBB MODs is only a good idea for add-on
+MODs and extension for phpBB 3.1+ which add features, not edit the base
+core files. So, for example, the National Flags by Rich McGirr
+(RMcGirr83­&nbsp;) would not be ideal to modularize because its
+features are too heavily integrated into specific phpBB addon files;
+however, for example, the Knowledge Base extension here would be easier
+and more ideal to modularize­&nbsp;, because its more of an add-on,
+and the code changes to phpBB do not affect phpBBs internal workings
+but loads the addon controller files via app.php. You'll have a VERY
+easy time deciding if a phpBB extension is ideal to modularize or not.
+If you're not sure feel free to post your question on whether or not
+porting a certain extension is ideal or not in the Module Developmen­t
+and Beta Release forums.<br>
+<br>
+<strong><span style="font-size: xx-small;">Analyzing
+the phpBB Extension:</span></strong> First, you must
+analyze this extension.­&nbsp; Why modularize it if you've never
+seen the code before? &nbsp;Anal­yzing this extension involves
+actually installing it onto a clean, mostly un-MODded
+board.&amp;nbs­p;Again, if you're doing this on your localhost
+webserver, this simplifies things a lot.<br>
+<br>
+A. So, let's take as example an extension in developmen­t named
+mx_transla­tor. <br>
+<span style="font-style: italic;">Note: You are
+required
+to download and install some modules mentioned in this example.</span><br>
+<br>
+copy <span style="font-weight: bold;">/www/Rhea/ext/orynider/mx_translator</span>
+to<span style="font-weight: bold;">
+/www/modules/mx_translator</span><br>
+<br>
+<span style="font-weight: bold;">mkdir admin</span><br>
+copy <span style="font-weight: bold;">modules/mx_dev_startkit</span><span style="font-weight: bold;">/admin/admin_devstartkit.php</span>
+to <span style="font-weight: bold;">modules/mx_translator/admin/admin_translato­r_module.php</span><br>
+<br style="font-weight: bold;">
+<span style="font-weight: bold;">mkdir templates</span><br>
+copy <span style="font-weight: bold;">mx_translator/styles</span>
+to <span style="font-weight: bold;">mx_translator/templates</span><br>
+You can keep styles directory.<br>
+<br>
+copy <span style="font-weight: bold;">modules/mx_coreblocks/db_install.php</span>
+to <span style="font-weight: bold;">modules/mx_translator/db_install.php</span><br>
+copy <span style="font-weight: bold;">modules/mx_pafiledb/db_uninstall.php</span>
+to <span style="font-weight: bold;">modules/mx_translator/db_uninstall.php</span><br>
+copy <span style="font-weight: bold;">modules/mx_coreblocks/db_upgrade.php</span>
+to <span style="font-weight: bold;">modules/mx_translator/db_upgrade.php</span><br>
+<br>
+Rename every language directory as this:<br>
+copy <span style="font-weight: bold;">modules/mx_translator/language/en</span>
+to <span style="font-weight: bold;">modules/mx_translator/language/lang_english</span><br>
+You can keep old iso language directorie­s.<br>
+<br>
+Use Your PHP Knowledge and skills to edit this files and rebuild the
+ported files so thta they can work.<br>
+<br>
+B. Install the custom code by hand, namely, do the code changes
+yourself to the phpBB core or extensions files.<br>
+&nbsp;<br>
+So, if the custom code said to add a line to the constants.php file
+that includes the constant, you would create a new <span style="font-weight: bold;">modules/mx_modulename/includes</span>/mx_constants.php
+file based in this example on <span style="font-weight: bold;">modules/mx_dev_startkit/includes/startkit_constants.php</span>,
+insert whatever it says.<br>
+For exmplae edit Your extension constants and new tables prefixing them
+with "mx_".<br>
+<br>
+//
+----------­----------­----------­----------­----------­----------­---------START<br>
+// This file defines specific constants for the module<br>
+//
+----------­----------­----------­----------­----------­----------­----------­---<br>
+define( 'STARTKIT_CONFIG_TABLE', $mx_table_prefix .
+'dev_startkit_config' );<br>
+<br>
+<span style="font-style: italic;">Note that </span><span style="font-weight: bold; font-style: italic;">mx_translator</span><span style="font-style: italic;"> taken here as example does not
+require any tables.</span><br>
+<br>
+Note that You can rename or move a include controller folder or core
+phpBB extension folder to modules or addons or to use the extemsion
+name: a. For orynider/pafiledb/controller/ we use
+modules/mx_pafiledb/pafiledb/modules/ For orynider/pafiledb/co­re/
+we use modules/mx_pafiledb/pafiledb/includes/ <br>
+<span style="font-style: italic;">Note that </span><span style="font-weight: bold; font-style: italic;">mx_translator</span><span style="font-style: italic;"> taken here as example does not
+require include folders to be rename or move.</span></big></p>
+<br>
+<font class="content" style="font-size: 16pt;" size="4"><i><b>3a.
+Administration
+Panel</b></i></font>
+<p class="content" style="text-indent: 1.27cm;"><font style="font-size: 16pt;" size="4"><i><b>3a2.
+Portal-Modules</b></i></font></p>
+<p class="content" style="margin-left: 1.27cm; text-indent: 1.27cm;"><font style="font-size: 16pt;" size="4"><i><b>3a2b.
+Module Administration</b></i></font></p>
+<p class="content" style="margin-left: 2.54cm; text-indent: 1.27cm;"><font style="font-size: 16pt;" size="4"><i><b>3a2b4.
+Deleting a module</b></i></font></p>
+<p><big> Sometimes it may be necessary to delete a
+module.
+This is done by first going to the Administration Control Panel (ACP),
+then to Module Administration. Here you will find a list of all
+installed modules.
+To delete the module simply click delete next to the module. Delete
+happens instantly but you will be asked if you want to permanently
+delete the module tables: by doing so you will lose the data that the
+module held. For example, all the links will be deleted from the
+mx_linksdb module. Once the module database information has been
+removed, you may simply delete the folder held in the module folder:
+for this example you would delete the folder /modules/mx_linksdb to
+finish the deletion of this module.</big></p>
+<p><br>
+<br>
+</p>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>3a. Administration Panel</b></i></font></p>
+<p class="content" style="text-indent: 1.27cm;"><font style="font-size: 16pt;" size="4"><i><b>3a2.
+Portal-Modules</b></i></font></p>
+<p class="content" style="margin-left: 1.27cm; text-indent: 1.27cm;"><font style="font-size: 16pt;" size="4"><i><b>3a2b.
+Module Administration</b></i></font></p>
+<p class="content" style="margin-left: 2.54cm; text-indent: 1.27cm;"><font style="font-size: 16pt;" size="4"><i><b>3a2b5.
+Upgrading</b></i></font></p>
+<p><big> Modules can be upgraded, and it is always
+advised
+that a user
+should use the most up to date module. While module upgrades will
+vary, the usual procedure is to overwrite the current module files in
+the module folder. Followed by Administration Control Panel (ACP), then
+to Module Administration, and pressing the "Upgrade Module" button, the
+procedure for upgrading is similar to installation. A list of modules
+will appear. Select the module you are upgrading and hit enter. As with
+installing a module the data which is being added to or changed in the
+database will appear. However unlike
+Installation some lines should appear Red warnings, this is normal
+with an upgrade and simply means the line was already in the
+database. The module should now be upgraded, however as certain
+modules may have specific upgrade instructions always read the help
+files accompanying the module.</big></p>
+<p><br>
+<br>
+</p>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>3a. Administration Panel</b></i></font></p>
+<p class="content" style="text-indent: 1.27cm;"><font style="font-size: 16pt;" size="4"><i><b>3a2.
+Portal-Modules</b></i></font></p>
+<p class="content" style="margin-left: 1.27cm; text-indent: 1.27cm;"><font style="font-size: 16pt;" size="4"><i><b>3a2b.
+Module Administration</b></i></font></p>
+<p style="text-indent: 1.27cm;"><font class="content" style="font-size: 16pt;" size="4"><i><b>3a2b6.
+Where can I find modules?</b></i></font><br>
+</p>
+<p style="text-indent: 1.27cm;"><big>You can
+find
+all released modules at the mxpcms.sf.net website. If you want to go
+directly to the
+download location, go here:</big></p>
+<p><font color="#0000ff"><u><a href="http://mxpcms.sf.net/index.php?page=4&amp;action=category&amp;cat_id=4">http://mxpcms.sf.net/index.php?page=4&amp;action=category&amp;cat_id=4</a></u></font></p>
+<p><br>
+<br>
+</p>
+<p><big>This page usually is updated.</big></p>
+<p><br>
+<br>
+</p>
+<p><big>Third party modules, that are released at the
+MXP
+Website, can
+be
+found here, in this forum:</big></p>
+<p><font color="#0000ff"><u><a href="http://mxpcms.sf.net/forum/viewforum.php?f=31">http://mxpcms.sf.net/forum/viewforum.php?f=31</a></u></font>
+.</p>
+<p><br>
+<br>
+</p>
+<p><big>You may be able to get modules from different
+locations, but
+it's
+advised that you get modules from this official MXP Site. This is just
+to assure that you are installing a safe module, with no security
+holes. And you also can get great support from the MXP forums!</big></p>
+<p><br>
+<br>
+</p>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>3a.
+Administration
+Panel</b></i></font></p>
+<p class="content" style="text-indent: 1.27cm;"><font style="font-size: 16pt;" size="4"><i><b>3a3.
+Portal- System</b></i></font></p>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>
+3a3a. Generate Cache</b></i></font></p>
+<p class="content"> <b><i><font style="font-size: 16pt;" size="4">3a3a1. What is it?</font></i></b></p>
+<p style="margin-bottom: 0cm;"> <font size="3"><font face="Arial, sans-serif">The
+cache is one of the central features of MXP CMS and provides
+a massive boost in speed by accessing commonly used queries from a
+series of XML files, rather then the database. The cache is currently
+on by default but cannot be run automatically. The cache should
+therefore be regenerated after each alteration to a block, or a block
+parameter.</font></font></p>
+<p style="margin-bottom: 0cm;"><br>
+</p>
+<p style="margin-bottom: 0cm;"><br>
+</p>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>3a. Administration Panel</b></i></font></p>
+<p class="content" style="text-indent: 1.27cm;"><font style="font-size: 16pt;" size="4"><i><b>3a3.
+Portal-CMS</b></i></font></p>
+<p class="content" style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font style="font-size: 16pt;" size="4"><i><b> 3a3a. Generate Cache</b></i></font></font></p>
+<p class="content" style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font style="font-size: 16pt;" size="4"><i><b> 3a3a2. How do I use it?</b></i></font></font></p>
+<p style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font size="3"> To
+generate the cache, simply enter the Administration Control Panel
+(ACP),
+then the Generate Cache link. In the left frame, click the button.
+The cache is held in a folder called cache and is a series of XML
+documents. On some Unix/Linux systems this folder will need to be
+given permissions of CHMOD 666. This is done through the CHMOD command
+either in an FTP client, or through the shell. Sometimes it maybe
+necessary to stop the cache, in such cases the portal will suffer a
+drop in performance. To stop the cache simply means to rename or
+delete the folder.</font></font></p>
+<p style="margin-bottom: 0cm;"><br>
+</p>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>3a. Administration Panel</b></i></font></p>
+<p class="content" style="text-indent: 1.27cm; margin-bottom: 0cm;"><font face="Arial, sans-serif"><font style="font-size: 16pt;" size="4"><i><b>3a3.
+Portal-CMS</b></i></font></font></p>
+<p class="content" style="text-indent: 1.27cm; margin-bottom: 0cm;"><font face="Arial, sans-serif"><font style="font-size: 16pt;" size="4"><i><b> 3a3b.
+Meta Tag</b></i></font></font></p>
+<p class="content" style="text-indent: 1.27cm; margin-bottom: 0cm;"><font face="Arial, sans-serif"><font style="font-size: 16pt;" size="4"><i><b> 3a3b1.
+What is it?</b></i></font></font></p>
+<p><big> Meta Tags are used by search engines and
+spiders
+to determine
+what the site is about. By default MXP sites have Meta Tags enabled,
+but without any site specific information.</big></p>
+<p style="margin-bottom: 0cm;"><br>
+</p>
+<p class="content" style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font style="font-size: 16pt;" size="4"><i><b>3a.
+Administration Panel</b></i></font></font></p>
+<p class="content" style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font style="font-size: 16pt;" size="4"><i><b> 3a3.
+Portal-System</b></i></font></font></p>
+<p class="content" style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font style="font-size: 16pt;" size="4"><i><b> 3a3b.
+Meta Tag</b></i></font></font></p>
+<p class="content" style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font style="font-size: 16pt;" size="4"><i><b> 3a3b1.
+How do I use it?</b></i></font></font></p>
+<p style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font size="3"> To
+add your own information to Meta Tags you will first need to set
+permissions in a Unix/Linux system. This means setting the CHMOD
+value of the file MX_meta.inc to 666. In windows, setting it to have
+write access would do the trick. The file can be found in the root of
+the MX site. Once the permissions are set to change the Meta Tags
+simply enter MX Administration then Meta tags. Filling in the
+appropriate fields and hit submit. One feature found in MX is the
+ability to have a favicon, most browsers now recognise these small
+icons which allow you to brand your site. The default favicon is MX
+own, but this can be changed, with any image 32 pixels by 32 saved
+with the icon extension. By default such icons should be in the root
+directory of MX and not the theme images. </font></font>
+</p>
+<p style="margin-bottom: 0cm;"><br>
+</p>
+<p class="content" style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font style="font-size: 16pt;" size="4"><i><b>3a.
+Administration Panel</b></i></font></font></p>
+<p class="content" style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font style="font-size: 16pt;" size="4"><i><b> 3a3.
+Portal- System</b></i></font></font></p>
+<p class="content" style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font style="font-size: 16pt;" size="4"><i><b> 3a3c.
+Objects Integrity Check</b></i></font></font></p>
+<p class="content" style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font style="font-size: 16pt;" size="4"><i><b> 3a3c1.
+What is it?</b></i></font></font></p>
+<p style="text-indent: 1.27cm; margin-bottom: 0cm;"><font face="Arial, sans-serif"><font size="3">This
+tool is a simple diagnostic tool that checks that there are no
+conflicts in the MX tables in the database. Very occasionally
+modules, functions, or blocks may conflict with each over. This tool
+looks at the core tables within MX and shows what data is in each
+table, allowing quickly diagnose any problems with conflicts. Most
+users are unlikely to ever need this utility, and others will most
+likely only use it under supervision from a support team. However it
+does provide an interesting look at how MX plugs together, and may be
+useful to module developers as well.</font></font></p>
+<p class="content" style="margin-bottom: 0cm;"><br>
+</p>
+<p class="content" style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font style="font-size: 16pt;" size="4"><i><b>3a.
+Administration Panel</b></i></font></font></p>
+<p class="content" style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font style="font-size: 16pt;" size="4"><i><b> 3a3.
+Portal- System</b></i></font></font></p>
+<p class="content" style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font style="font-size: 16pt;" size="4"><i><b> 3a3d.
+phpInfo</b></i></font></font></p>
+<p class="content" style="margin-bottom: 0cm;"><font face="Arial, sans-serif"><font style="font-size: 16pt;" size="4"><i><b> 3a3d1.
+What is it, and how can it help me?</b></i></font></font></p>
+<p><big> This is a simple diagnostic printout
+generated by
+PHP. It can
+be
+useful for determining certain system requirements and other general
+information. This utility is again only likely to be used in an event
+of something going wrong with the system.</big></p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>3b.
+Themes</b></i></font></p>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>
+3b1. Introduction to
+Themes</b></i></font></p>
+<p style="text-indent: 1.27cm;"><big>One of
+the
+nicest features
+of phpBB is
+the ability to install new themes quickly and easily. MXP continues
+this same tradition. But, before we begin, it is worth looking at
+where templates and styles are held.</big></p>
+<p style="text-indent: 1.27cm;"><big>phpBB
+styles
+are held in
+the folder phpBB/styles/, and similarly MXP styles are held
+in&nbsp;/templates.
+However, modules can also be adapted, and those templates are held in
+the module folder /modules/module name/templates. When first
+installing a style you do not need to worry about the module
+templates, as they have a default template, which takes it
+information from MXP.</big></p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>3b.
+Styles and Themes</b></i></font></p>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>
+3b2. Installing a phpBB-based styles and themes</b></i></font></p>
+<p><big> This presumes you have just downloaded a
+suitable
+phpB theme,
+though the order you do things does not matter too much. The
+following is just the basic installation. For little modifications
+and twists see "Non-subSilver themes". Finally this install
+presumes that the style you are installing is based on ‘subSilver’
+and uses the same .css naming conventions. See "non-subSilver
+themes" for more details if this is not the case.</big></p>
+<p><big><br>
+<br>
+</big></p>
+<p><big><b>Step 1</b></big></p>
+<p><big><i>Download the style from appropriate
+location
+including
+PhpBB.com.</i></big></p>
+<p><big><br>
+<br>
+</big></p>
+<p><big><b>Step 2</b></big></p>
+<p><big><i>Unzip the file and copy the
+directory to
+your phpB
+template
+folder. In many cases this will be phpBB/templates/</i></big></p>
+<p><big><br>
+<br>
+</big></p>
+<p><big><b>Step 3</b></big></p>
+<p><big><i>Go into the /templates folder and
+copy the
+"prosilver" or "subSilver"
+folder including content.</i></big></p>
+<p><big><br>
+<br>
+</big></p>
+<p><big><i>/templates/prosilver or subSilver</i></big></p>
+<p><big><i>/templates/copy of prosilver or
+subSilver</i></big></p>
+<p><big><br>
+<br>
+</big></p>
+<p><big><i>Rename this copy to be exactly the
+same
+name as the
+folder you
+placed in phpBB/styles/; so in the example of "LiteBook"
+this would be</i></big></p>
+<p><big><br>
+<br>
+</big></p>
+<p><big><i>phpBB/styles/LiteBook</i></big></p>
+<p><big><i>/templates/LiteBook</i></big></p>
+<p><big><br>
+<br>
+</big></p>
+<p><big><b>Step 4</b></big></p>
+<p><big><i>Go into the /templates/LiteBook/
+folder
+you have
+created and rename the
+"overall_header.html"</i> as "overall_header_phpbb.html"</big></p>
+<p><big><i>Next copy original
+"overall_header.html"
+from MXP
+prosilver:</i></big></p>
+<p><big><i>/templates/prosilver/overall_header.html</i></big></p>
+<p><big><i>to:</i></big></p>
+<p><big><i>/templates/LiteBook/overall_header.html</i></big></p>
+<p><big><br>
+<br>
+</big></p>
+<p><big><i>Next copy original
+"overall_header_navigation.html"
+from MXP prosilver:</i></big></p>
+<p><big><i>/templates/prosilver/overall_header_navigation.html</i></big></p>
+<p><big><i>to:</i></big></p>
+<p><big><i>/templates/LiteBook/overall_header_navigation.html</i></big></p>
+<p></p>
+<p><big><i>Next find any HTML tags with a
+comparation
+tool such
+as WinMerge
+searching tags that themselves are diffrent for a prosilver based style
+between :</i></big></p>
+<p><big><i>phpBB/styles/prosilver/overall_header.html</i></big></p>
+<p><big><i>and in this examaple:</i></big></p>
+<p><big><i>phpBB/styles/LiteBook/overall_header.html</i></big></p>
+<p><big><i>Next merge fany HTML tags found with
+a
+comparation
+tool such as WinMerge
+that themselves are diffrent from the base style and aply this changes
+with a souce code editor to:</i></big></p>
+<p><big><i>/templates/LiteBook/overall_header.html</i></big></p>
+<p><big><i>and:</i></big></p>
+<p><big><i>/templates/LiteBook/overall_header_navigation.html</i>.</big></p>
+<p><big><br>
+<br>
+</big></p>
+<p><big><b>Step 5</b></big></p>
+<p><big><i>Optionaly copy into the
+/templates/LiteBook/ the
+admin/ folder you have
+in /templates/prosilver/admin/</i>.</big></p>
+<p></p>
+<p><big><b>Step 6</b></big></p>
+<p><big><i>Go into the Administration Control
+Panel
+and click
+"Add
+new styles." Presuming that the above steps went well, you
+should now see your style in a list with the option to install. Click
+the install button, and your style should be installed.</i></big></p>
+<p><big><br>
+<br>
+</big></p>
+<p><big><i>While the theme is installed it may
+need a
+little
+adapting. For
+a series of tips and hints look at "non-subSilver themes"
+and follow some of its basic guidelines.</i></big></p>
+<p><br>
+<br>
+</p>
+<p><br>
+<br>
+</p>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>3b.
+Styles</b></i></font></p>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>
+3b3. Installing an
+MXP-based theme</b></i></font></p>
+<p><big> As more people use MX and adapt the default
+layout, you will
+find
+more and more "dual" themes. As for phpBB themes, these
+will come zipped up in either 1 or 2 parts; most likely it will come
+with a PhpBB zip and an MXP zip. Certain themes may just have a single
+zip. In either case simply uninstall the zip(s) into their respective
+folders. In the Administration Control Panel, click "add styles"
+followed by install. The style should work and many of the
+adaptations may have been done for you.</big></p>
+<p><br>
+<br>
+</p>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>3b.
+Themes</b></i></font></p>
+<p class="content"><font style="font-size: 16pt;" size="4"><i><b>
+3b4. non-prosilver nor subSilver
+themes</b></i></font></p>
+<p><big> Some theme designers have gone the whole
+hog, and
+have
+created
+themes from scratch often this means that they change the names in
+the .css file for the theme. In such cases MX may not look quite
+right, with many blocks having large areas of white. In such case you
+do not have much choice but to go through by hand, either adding your
+own classes into the .css, or using the author’s classes and
+renaming the templates.</big></p>
+<a name="credits_and_special_thanks"></a>
+<p class="content"><b><font size="5">4.
+<small>CREDITS AND SPECIAL
+THANKS</small></font></b></p>
+<p><big>MXP CMS is developed and maintained by a
+group of
+volunteers
+and maintained by FlorinCB aka orynider.</big></p>
+<p><big>The Dev team are Haplo (Jon Olson), Drift,
+Jaime,
+Markus
+Petrux,
+Nativemind, Snake, DCZ, CulpritCZ (Jan Kalah), MHewitson, orynider
+(Florin C. Bodin), Horace, Selven, MoonWalker.</big></p>
+<p><big>But they are part of a larger team of bug
+trackers,
+documentation
+writers, support and web site team, and language teams. We wish to
+thank and in no paticular order:</big></p>
+<p><big>AI, CreatixEA, Lwq, Ms.Mohd, ST,
+computerboy234,
+darlin, kk,
+TheSquire, jerome.herrman, alter knacker, selven, we_scooter, gfc,
+gxz, Banaeweizen, MHobbit </big></p>
+<p><big>This document was compiled by</big></p>
+<p><big>Drift, AI, darlin, and MennoniteHobbit</big></p>
+<p><big>and edited by MHobbit and Drift and FlorinCB.</big></p>
+<p><big><br>
+</big></p>
+<p><big>Contribute - Hall of Fame: <font color="#0000ff"><u><a href="http://mxpcms.sf.net/index.php?page=14">http://mxpcms.sf.net/index.php?page=14</a></u></font>
+.</big></p>
+<big><br>
+</big>
+<p></p>
+<p><big>Lastly a big thankyou to marcmoris who's
+original
+project has
+turned into MXP.</big></p>
+<p><br>
+<br>
+</p>
+<a class="content" name="copyright_info"></a>
+<p class="content"><font size="5"><b>5.
+<small>COPYRIGHT INFO</small></b></font></p>
+<p class="content"> E<big>verything in this
+guide is
+Copyrighted © 2004-2019 by the
+MX-Publisher Development Team. Failure to respect this copyright is
+against the
+law, and violators will be prosecuted. </big></p>
+<p class="content"><big>Thanks for using the
+MX-Publisher CMS, and have a nice day.</big></p>
+<p><br>
+<br>
+</p>
+<div id="subheader">
+<div class="left">
+<table border="0" cellpadding="2" cellspacing="0">
+<tbody>
+<tr>
+<td style="border: medium none ;" class="" onmouseout="this.className='';" onmouseover="this.className='nav-button-current';" valign="center"> <img class="mx_icon" src="images/theme/icon_notify.gif" alt="Home" align="middle" border="0">&nbsp;<span class="menu-button"><a href="http://mxpcms.sourceforge.net/news" target="" class="genmed" title="Home">News</a></span>
+</td>
+<td style="border: medium none ;" class="" onmouseout="this.className='';" onmouseover="this.className='nav-button-current';" valign="center"> <img class="mx_icon" src="images/theme/icon_message.gif" alt="Home" align="middle" border="0">&nbsp;<span class="menu-button"><a href="http://mxpcms.sourceforge.net/features" target="" class="genmed" title="Features">Features</a></span>
+</td>
+<td style="border: medium none ;" class="" onmouseout="this.className='';" onmouseover="this.className='nav-button-current';" valign="center"> <img class="mx_icon" src="images/theme/icon_message.gif" alt="About the Project" align="middle" border="0">&nbsp;<span class="menu-button"><a href="http://mxpcms.sourceforge.net/about" target="" class="genmed" title="About the Project">About</a></span>
+</td>
+<td style="border: medium none ;" class="" onmouseout="this.className='';" onmouseover="this.className='nav-button-current';" valign="center"> <img class="mx_icon" src="images/theme/icon_message.gif" alt="About - Terms of Use" align="middle" border="0">&nbsp;<span class="menu-button"><a href="http://mxpcms.sourceforge.net/toe" target="" class="genmed" title="About - Terms of Use">Terms of
+Use</a></span> </td>
+<!-- Generated Navigation Menu --> </tr>
+</tbody>
+</table>
+</div>
+</div>
+<p></p>
+</div>
+</body></html>

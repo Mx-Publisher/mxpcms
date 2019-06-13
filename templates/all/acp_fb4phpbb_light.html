@@ -1,0 +1,60 @@
+<!-- INCLUDE overall_header.html -->
+<script type="text/javascript">
+// <![CDATA[
+/**
+* Change language
+*/
+function fb4phpbb_light_language_select(ll_CC)
+{
+  document.forms['fb4phpbb_light'].fb4phpbb_light_lang.value = ll_CC;
+}
+// ]]>
+</script>
+<a name="maincontent"></a>
+<form method="post" action="{U_ACTION}" id="fb4phpbb_light">
+	<fieldset>
+		<legend style="text-decoration:none;color:white !important;background-color: rgb(70,102,167);width:100%;padding:5px;height:14px;"><img src="./images/fb4phpbb_light_logo.png" style="float:left;margin-top:-47px;overflow:visible;" /></legend>
+		<dl>
+			<dt><br /><br /><br />
+				<label  style="color:rgb(70,102,167);"  for="fb4phpbb_light_mod_enabled">{L_FB4PHPBB_LIGHT_ENABLE}</label>
+			</dt>
+			<dd><br /><br /><br />
+				<label style="color:rgb(70,102,167);" for="fb4phpbb_light_mod_enabled">{L_YES}</label>
+				<input type="radio" style="margin:5px;margin-left:-8px;cursor:pointer;" name="fb4phpbb_light_mod_enabled" value="yes" {FB4PHPBB_LIGHT_MOD_ENABLED_YES}/>
+				<label  style="color:rgb(70,102,167);"  for="fb4phpbb_light_mod_enabled">{L_NO}</label>
+				<input type="radio" style="margin:5px;margin-left:-8px;cursor:pointer;" name="fb4phpbb_light_mod_enabled" value="no" {FB4PHPBB_LIGHT_MOD_ENABLED_NO}/>
+			</dd>
+		</dl>
+		<dl>
+			<dt>
+				<label  style="color:rgb(70,102,167);"  for="fb4phpbb_light_app_id">{L_FB4PHPBB_LIGHT_APP_ID}</label>
+			</dt>
+			<dd>
+				<input type="text" id="fb4phpbb_light_app_id" name="fb4phpbb_light_app_id" value="{FB4PHPBB_LIGHT_APP_ID}" />
+			</dd>
+		</dl>
+		<dl>
+			<dt>
+				<label  style="color:rgb(70,102,167);"  for="fb4phpbb_light_secret">{L_FB4PHPBB_LIGHT_SECRET}</label>
+			</dt>
+			<dd>
+				<input type="text" id="fb4phpbb_light_secret" name="fb4phpbb_light_secret" value="{FB4PHPBB_LIGHT_SECRET}" />
+			</dd>
+		</dl>
+		<dl>
+			<dt>
+				<label  style="color:rgb(70,102,167);"  for="lang">{L_FB4PHPBB_LIGHT_LANG}</label>
+			</dt>
+			<dd>
+				<select name="lang" id="lang" onchange="fb4phpbb_light_language_select(this.value); return false;" title="{L_FB4PHPBB_LIGHT_LANG}">{FB4PHPBB_LIGHT_LANG}</select>
+				<input type="hidden" id="fb4phpbb_light_lang" name="fb4phpbb_light_lang"></input>
+			</dd>
+		</dl>		
+		<p class="submit-buttons" style="display:inline-block;width:100%;">
+			<input class="mts mts commentBtn stat_elem optimistic_submit uiButton uiButtonConfirm" style="margin-right:6px;margin-top:2px;padding:0px;color:white;" type="submit" id="submit" name="submit" value="{L_SUBMIT}" />&nbsp;
+			<input class="mts mts commentBtn stat_elem optimistic_submit uiButton uiButtonConfirm" style="margin-right:6px;margin-top:2px;padding:0px;color:white;" type="reset" id="reset" name="reset" value="{L_RESET}" />
+		</p>
+  </fieldset>
+  {S_FORM_TOKEN}
+</form>
+<!-- INCLUDE overall_footer.html -->
