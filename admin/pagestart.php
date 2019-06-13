@@ -56,7 +56,7 @@ switch (PORTAL_BACKEND)
 	case 'mybb':
 	case 'phpbb2':
 	case 'olympus':
-		if ( !$userdata['session_logged_in'] )
+		if ( !$mx_user->data['session_logged_in'] )
 		{
 			mx_redirect(mx_append_sid("login.php?redirect=admin/index.$phpEx", true));
 		}
@@ -89,14 +89,14 @@ switch (PORTAL_BACKEND)
 			$phpbb_login_url = mx_append_sid("{$phpbb_root_path}ucp.php?mode=login&redirect=$redirect_url");
 			
 			//This will return: header('Location: ' . $phpbb_login_url);
-			//mx_redirect($phpbb_login_url, true);
-			mx_redirect(mx_append_sid("login.php?redirect=admin/index.$phpEx", true));
+			mx_redirect($phpbb_login_url, true);
+			//mx_redirect(mx_append_sid("login.php?redirect=admin/index.$phpEx", true));
 		}
 	break;
 }
 
 
-if ( !($userdata['user_level'] == ADMIN) )
+if ( !($mx_user->data['user_level'] == ADMIN) )
 {
 	mx_message_die(GENERAL_MESSAGE, $lang['Not_admin']);
 }
@@ -122,7 +122,7 @@ switch (PORTAL_BACKEND)
 	case 'mybb':
 	case 'phpbb2':
 	case 'olympus':
-		if (!$userdata['session_admin'])
+		if (!$mx_user->data['session_admin'])
 		{
 			mx_redirect(mx_append_sid("login.php?redirect=admin/index.$phpEx&admin=1", true));
 		}
@@ -134,10 +134,10 @@ switch (PORTAL_BACKEND)
 	case 'phpbb3':
 		if (!isset($mx_user->data['session_admin']) || !$mx_user->data['session_admin'])
 		{
-			//define('IN_LOGIN', true);
-			//mx_redirect(mx_append_sid(PHPBB_URL ."ucp.php?mode=login&redirect=" . PORTAL_URL . "admin/index.$phpEx&admin=1", true));
+			@define('IN_LOGIN', true);
+			mx_redirect(mx_append_sid(PHPBB_URL ."ucp.php?mode=login&redirect=" . PORTAL_URL . "admin/index.$phpEx&admin=1", true));
 			//mx_login_box('', $mx_user->lang['LOGIN_ADMIN_CONFIRM'], $mx_user->lang['LOGIN_ADMIN_SUCCESS'], true, false);
-			mx_redirect(mx_append_sid("login.php?redirect=admin/index.$phpEx&admin=1", true));
+			//mx_redirect(mx_append_sid("login.php?redirect=admin/index.$phpEx&admin=1", true));
 		}
 	break;
 }

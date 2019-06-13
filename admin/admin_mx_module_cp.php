@@ -180,7 +180,50 @@ $admin_icon['module'] = $module_nav_icon_url . 'icon_module.gif';
 $admin_icon['function'] = $module_nav_icon_url . 'icon_function.gif';
 $admin_icon['parameter'] = $module_nav_icon_url . 'icon_parameter.gif';
 $admin_icon['block'] = $module_nav_icon_url . 'icon_block.gif';
+
 $admin_icon['edit_block'] = $module_nav_icon_url . 'icon_edit.gif';
+
+if (mx_file_exists($mx_root_path . $images['mx_graphics']['admin_icons'] . '/'.'icon_edit.gif'))
+{
+	$button_edit_block_img = '<img src="'.$admin_icon["edit_block"].'" align="absmiddle" />';
+}
+else
+{
+	$button_edit_block_img = '';
+}
+
+$admin_icon['upgrade_block'] = $module_nav_icon_url . 'icon_upgrade.gif';
+
+if (mx_file_exists($mx_root_path . $images['mx_graphics']['admin_icons'] . '/'.'icon_upgrade.gif'))
+{
+	$button_upgrade_block_img = '<img src="'.$admin_icon["upgrade_block"].'" align="absmiddle" />';
+}
+else
+{
+	$button_upgrade_block_img = '';
+}
+
+$admin_icon['export_block'] = $module_nav_icon_url . 'icon_export.gif';
+
+if (mx_file_exists($mx_root_path . $images['mx_graphics']['admin_icons'] . '/'.'icon_export.gif'))
+{
+	$button_export_block_img = '<img src="'.$admin_icon["export_block"].'" align="absmiddle" />';
+}
+else
+{
+	$button_export_block_img = '';
+}
+
+$admin_icon['delete_block'] = $module_nav_icon_url . 'icon_delete.gif';
+
+if (mx_file_exists($mx_root_path . $images['mx_graphics']['admin_icons'] . '/'.'icon_delete.gif'))
+{
+	$button_delete_block_img = '<img src="'.$admin_icon['delete_block'].'" align="absmiddle" />';
+}
+else
+{
+	$button_delete_block_img = '';
+}
 
 //
 // Send to template
@@ -205,8 +248,6 @@ $template->assign_vars(array(
 	'L_VIEW' => $lang['View'],
 	"L_EDIT" => $lang['Edit'],
 	"L_ADD" => $lang['Create_parameter'],
-	'L_YES' => $lang['Yes'],
-	'L_NO' => $lang['No'],
 
 	'L_CREATE_BLOCK' => ( !empty($lang['Create_block']) ) ? $lang['Create_block'] : 'Create new block',
 	'L_MOVE_UP' => $lang['Move_up'],
@@ -258,14 +299,14 @@ $template->assign_vars(array(
 	'L_AUTH_TITLE_EXPLAIN' => $lang['Auth_Block_explain'],
 	'L_BLOCK_TITLE' => $lang['Block_title'],
 	'L_BLOCK_DESC' => $lang['Block_desc'],
-	'L_SHOW_BLOCK' 		=> $lang['Show_block'],
+	'L_SHOW_BLOCK' => $lang['Show_block'],
 	'L_SHOW_BLOCK_EXPLAIN' => $lang['Show_block_explain'],
-	'L_SHOW_TITLE' 		=> $lang['Show_title'],
+	'L_SHOW_TITLE' => $lang['Show_title'],
 	'L_SHOW_TITLE_EXPLAIN' => $lang['Show_title_explain'],
-	'L_SHOW_STATS' 		=> $lang['Show_stats'],
+	'L_SHOW_STATS' => $lang['Show_stats'],
 	'L_SHOW_STATS_EXPLAIN' => $lang['Show_stats_explain'],
-	'L_GROUPS' 					=> $lang['Usergroups'],
-	'L_IS_MODERATOR' 			=> $lang['Is_Moderator'],
+	'L_GROUPS' => $lang['Usergroups'],
+	'L_IS_MODERATOR' => $lang['Is_Moderator'],
 
 	//
 	// Graphics
@@ -273,11 +314,20 @@ $template->assign_vars(array(
 	'IMG_URL_CONTRACT' => $admin_icon['contract'],
 	'IMG_URL_EXPAND' => $admin_icon['expand'],
 
+	'IMG_ICON_EDIT_BLOCK' => $admin_icon['edit_block'],
+	'IMG_EDIT_BLOCK' => $button_edit_block_img,
+	'IMG_ICON_UPDRADE' => $admin_icon['upgrade_block'],
+	'IMG_UPDRADE_BLOCK' => $button_upgrade_block_img,
+	'IMG_ICON_EXPORT' => $admin_icon['export_block'],
+	'IMG_EXPORT_BLOCK' => $button_export_block_img,
+	'IMG_ICON_DELETE' => $admin_icon['delete_block'],
+	'IMG_DELETE_BLOCK' => $button_delete_block_img,
+
 	'IMG_ICON_MODULE' => $admin_icon['module'],
 	'IMG_ICON_FUNCTION' => $admin_icon['function'],
 	'IMG_ICON_PARAMETER' => $admin_icon['parameter'],
 	'IMG_ICON_BLOCK' => $admin_icon['block'],
-	'IMG_ICON_EDIT_BLOCK' => $admin_icon['edit_block'],
+
 
 	//
 	// Cookies
@@ -473,6 +523,8 @@ for( $module_count = 0; $module_count < $total_modules; $module_count++ )
 	//
 	$visible = in_array('adminModule_' . $module_id, $cookie_states);
 
+	$u_module_edit = mx_append_sid(PORTAL_URL . "admin/admin_mx_module.$phpEx?module_id=" . $module_rows[$module_count]['module_id']);
+
 	$template->assign_block_vars('module', array(
 		'L_TITLE' => $lang['Module_admin'],
 		'L_MODULE' => $lang['Module'],
@@ -484,7 +536,7 @@ for( $module_count = 0; $module_count < $total_modules; $module_count++ )
 		'MODULE_TITLE' => $module_rows[$module_count]['module_name'],
 		'MODULE_DESC' => ( $module_rows[$module_count]['module_desc'] != '' ) ? ' - ' . $module_rows[$module_count]['module_desc'] : '',
 
-		'U_MODULE_EDIT' => mx_append_sid(PORTAL_URL . "admin/admin_mx_module.$phpEx?module_id=" . $module_rows[$module_count]['module_id']),
+		'U_MODULE_EDIT' => $u_module_edit,
 
 		//
 		// Module subpanel - edit

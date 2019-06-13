@@ -40,58 +40,58 @@ if( !empty($mode) )
 		mx_message_die(GENERAL_ERROR, "Failed to update portal configuration, you didn't specified valid values or your admin templates are incompatible with this version of MXP.");
 	}
 
-	$new['portal_name'] 			= utf8_normalize_nfc($mx_request_vars->post('portal_name', MX_TYPE_NO_TAGS, 'MX-Publisher'));
+	$new['portal_name'] 		= utf8_normalize_nfc($mx_request_vars->post('portal_name', MX_TYPE_NO_TAGS, 'MX-Publisher'));
 	$new['portal_desc'] 			= utf8_normalize_nfc($mx_request_vars->post('portal_desc', MX_TYPE_NO_TAGS, 'Modular system'));
-	$new['portal_status'] 			= $mx_request_vars->post('portal_status', MX_TYPE_INT, '0');
-	$new['disabled_message'] 		= $mx_request_vars->post('disabled_message', MX_TYPE_NO_TAGS, 'Site disabled.');
-	$new['server_name'] 			= $mx_request_vars->post('server_name', MX_TYPE_NO_TAGS, '');
-	$new['server_name'] 			= str_replace('http://', '', $new['server_name']);
+	$new['portal_status'] 		= $mx_request_vars->post('portal_status', MX_TYPE_INT, '0');
+	$new['disabled_message'] = $mx_request_vars->post('disabled_message', MX_TYPE_NO_TAGS, 'Site disabled.');
+	$new['server_name'] 		= $mx_request_vars->post('server_name', MX_TYPE_NO_TAGS, '');
+	$new['server_name'] 		= str_replace('http://', '', $new['server_name']);
 	$new['script_path'] 			= $mx_request_vars->post('script_path', MX_TYPE_NO_TAGS, '');
 	$new['server_port'] 			= $mx_request_vars->post('server_port', MX_TYPE_NO_TAGS, '');
-	$new['default_dateformat'] 		= $mx_request_vars->post('default_dateformat', MX_TYPE_NO_TAGS, '');
-	$new['board_timezone'] 			= $mx_request_vars->post('board_timezone', MX_TYPE_NO_TAGS, '');
-	$new['gzip_compress'] 			= $mx_request_vars->post('gzip_compress', MX_TYPE_INT, '');
-	$new['mx_use_cache'] 			= $mx_request_vars->post('mx_use_cache', MX_TYPE_INT, '1');
-	$new['mod_rewrite'] 			= $mx_request_vars->post('mod_rewrite', MX_TYPE_INT, '0');
+	$new['default_dateformat'] = $mx_request_vars->post('default_dateformat', MX_TYPE_NO_TAGS, '');
+	$new['board_timezone'] 	= $mx_request_vars->post('board_timezone', MX_TYPE_NO_TAGS, '');
+	$new['gzip_compress'] 		= $mx_request_vars->post('gzip_compress', MX_TYPE_INT, '');
+	$new['mx_use_cache'] 		= $mx_request_vars->post('mx_use_cache', MX_TYPE_INT, '1');
+	$new['mod_rewrite'] 		= $mx_request_vars->post('mod_rewrite', MX_TYPE_INT, '0');
 
 	$new['portal_backend'] 	= $mx_request_vars->post('portal_backend', MX_TYPE_NO_TAGS, 'internal');
-	$new['portal_backend_path'] 	= $mx_request_vars->post('portal_backend_path', MX_TYPE_NO_TAGS, '');
+	$new['portal_backend_path'] = $mx_request_vars->post('portal_backend_path', MX_TYPE_NO_TAGS, '');
 
-	$new['cookie_domain'] 			= $mx_request_vars->post('cookie_domain', MX_TYPE_NO_TAGS, '');
-	$new['cookie_name'] 			= $mx_request_vars->post('cookie_name', MX_TYPE_NO_TAGS, '');
-	$new['cookie_name'] 			= str_replace('.', '_', $new['cookie_name']);
+	$new['cookie_domain'] 	= $mx_request_vars->post('cookie_domain', MX_TYPE_NO_TAGS, '');
+	$new['cookie_name'] 		= $mx_request_vars->post('cookie_name', MX_TYPE_NO_TAGS, '');
+	$new['cookie_name'] 		= str_replace('.', '_', $new['cookie_name']);
 	$new['cookie_path'] 			= $mx_request_vars->post('cookie_path', MX_TYPE_NO_TAGS, '');
-	$new['cookie_secure'] 			= $mx_request_vars->post('cookie_secure', MX_TYPE_INT, '');
-	$new['session_length'] 			= $mx_request_vars->post('session_length', MX_TYPE_NO_TAGS, '');
-	$new['allow_autologin'] 		= $mx_request_vars->post('allow_autologin', MX_TYPE_INT, '');
-	$new['max_autologin_time'] 		= $mx_request_vars->post('max_autologin_time', MX_TYPE_NO_TAGS, '');
-	$new['max_login_attempts'] 		= $mx_request_vars->post('max_login_attempts', MX_TYPE_NO_TAGS, '');
-	$new['login_reset_time'] 		= $mx_request_vars->post('login_reset_time', MX_TYPE_NO_TAGS, '');
+	$new['cookie_secure'] 		= $mx_request_vars->post('cookie_secure', MX_TYPE_INT, '');
+	$new['session_length'] 		= $mx_request_vars->post('session_length', MX_TYPE_NO_TAGS, '');
+	$new['allow_autologin'] 	= $mx_request_vars->post('allow_autologin', MX_TYPE_INT, '');
+	$new['max_autologin_time'] = $mx_request_vars->post('max_autologin_time', MX_TYPE_NO_TAGS, '');
+	$new['max_login_attempts'] 	= $mx_request_vars->post('max_login_attempts', MX_TYPE_NO_TAGS, '');
+	$new['login_reset_time'] 	= $mx_request_vars->post('login_reset_time', MX_TYPE_NO_TAGS, '');
 
-//	$new['portal_url'] 				= $mx_request_vars->post('portal_url', MX_TYPE_NO_TAGS, '');
-//	$new['portal_phpbb_url'] 		= $mx_request_vars->post('portal_phpbb_url', MX_TYPE_NO_TAGS, '');
+	//	$new['portal_url'] 				= $mx_request_vars->post('portal_url', MX_TYPE_NO_TAGS, '');
+	//	$new['portal_phpbb_url'] 	= $mx_request_vars->post('portal_phpbb_url', MX_TYPE_NO_TAGS, '');
 
-	$new['default_lang'] 			= $mx_request_vars->post('default_lang', MX_TYPE_NO_TAGS, '-1');
-	$new['default_style'] 			= $mx_request_vars->post('mx_default_style', MX_TYPE_NO_TAGS, '-1');
-	$new['override_user_style'] 	= $mx_request_vars->post('mx_override_user_style', MX_TYPE_NO_TAGS, '1');
-	$new['default_admin_style'] 	= $mx_request_vars->post('mx_default_admin_style', MX_TYPE_NO_TAGS, '-1');
-	$new['overall_header'] 			= $mx_request_vars->post('overall_header', MX_TYPE_NO_TAGS, 'overall_header.tpl');
-	$new['overall_footer'] 			= $mx_request_vars->post('overall_footer', MX_TYPE_NO_TAGS, 'overall_footer.tpl');
+	$new['default_lang'] 		= $mx_request_vars->post('default_lang', MX_TYPE_NO_TAGS, '-1');
+	$new['default_style'] 		= $mx_request_vars->post('mx_default_style', MX_TYPE_NO_TAGS, '-1');
+	$new['override_user_style'] = $mx_request_vars->post('mx_override_user_style', MX_TYPE_NO_TAGS, '1');
+	$new['default_admin_style'] = $mx_request_vars->post('mx_default_admin_style', MX_TYPE_NO_TAGS, '-1');
+	$new['overall_header'] 		= $mx_request_vars->post('overall_header', MX_TYPE_NO_TAGS, 'overall_header.tpl');
+	$new['overall_footer'] 		= $mx_request_vars->post('overall_footer', MX_TYPE_NO_TAGS, 'overall_footer.tpl');
 	$new['main_layout'] 			= $mx_request_vars->post('main_layout', MX_TYPE_NO_TAGS, 'mx_main_layout.tpl');
-	$new['navigation_block'] 		= $mx_request_vars->post('navigation_block', MX_TYPE_INT, '0');
-	$new['top_phpbb_links'] 		= $mx_request_vars->post('top_phpbb_links', MX_TYPE_INT, '0');
-	$new['allow_html'] 				= $mx_request_vars->post('allow_html', MX_TYPE_INT, '1');
-	$new['allow_html_tags'] 		= $mx_request_vars->post('allow_html_tags', MX_TYPE_NO_TAGS, '1');
-	$new['allow_bbcode'] 			= $mx_request_vars->post('allow_bbcode', MX_TYPE_INT, '1');
-	$new['allow_smilies'] 			= $mx_request_vars->post('allow_smilies', MX_TYPE_INT, '1');
+	$new['navigation_block'] 	= $mx_request_vars->post('navigation_block', MX_TYPE_INT, '0');
+	$new['top_phpbb_links'] 	= $mx_request_vars->post('top_phpbb_links', MX_TYPE_INT, '0');
+	$new['allow_html'] 			= $mx_request_vars->post('allow_html', MX_TYPE_INT, '1');
+	$new['allow_html_tags'] 	= $mx_request_vars->post('allow_html_tags', MX_TYPE_NO_TAGS, '1');
+	$new['allow_bbcode'] 		= $mx_request_vars->post('allow_bbcode', MX_TYPE_INT, '1');
+	$new['allow_smilies'] 		= $mx_request_vars->post('allow_smilies', MX_TYPE_INT, '1');
 	$new['smilies_path'] 			= $mx_request_vars->post('smilies_path', MX_TYPE_NO_TAGS, '');
 
-	$new['board_email'] 			= $mx_request_vars->post('board_email', MX_TYPE_NO_TAGS, '0');
-	$new['board_email_sig'] 		= $mx_request_vars->post('board_email_sig', MX_TYPE_NO_TAGS, '0');
-	$new['smtp_delivery'] 			= $mx_request_vars->post('smtp_delivery', MX_TYPE_INT, '0');
-	$new['smtp_host'] 				= $mx_request_vars->post('smtp_host', MX_TYPE_NO_TAGS, '0');
-	$new['smtp_username'] 			= $mx_request_vars->post('smtp_username', MX_TYPE_NO_TAGS, '0');
-	$new['smtp_password'] 			= $mx_request_vars->post('smtp_password', MX_TYPE_NO_TAGS, '0');
+	$new['board_email'] 		= $mx_request_vars->post('board_email', MX_TYPE_NO_TAGS, '0');
+	$new['board_email_sig'] 	= $mx_request_vars->post('board_email_sig', MX_TYPE_NO_TAGS, '0');
+	$new['smtp_delivery'] 		= $mx_request_vars->post('smtp_delivery', MX_TYPE_INT, '0');
+	$new['smtp_host'] 			= $mx_request_vars->post('smtp_host', MX_TYPE_NO_TAGS, '0');
+	$new['smtp_username'] 	= $mx_request_vars->post('smtp_username', MX_TYPE_NO_TAGS, '0');
+	$new['smtp_password'] 	= $mx_request_vars->post('smtp_password', MX_TYPE_NO_TAGS, '0');
 	
 	$sql = "UPDATE  " . PORTAL_TABLE . " SET " . $db->sql_build_array('UPDATE', utf8_normalize_nfc($new));
 	
@@ -99,7 +99,8 @@ if( !empty($mode) )
 	{
 		mx_message_die(GENERAL_ERROR, "Failed to update portal configuration ", "", __LINE__, __FILE__, $sql);
 	}
-	//print_r("Portal configuration update " . "<br />" . $sql);
+	
+	//Portal configuration update
 	$message = update_portal_backend($new['portal_backend']) ? "The CMS configuration file was upgraded ...<br /><br />" : update_portal_backend($new['portal_backend']);
 	
 	//

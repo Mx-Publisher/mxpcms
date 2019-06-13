@@ -51,7 +51,7 @@ if ((@include $phpbb_root_path . "language/lang_" . $language . "/lang_phpbbmyad
 } 
 /* ENDS Include language file */
 // Main Admin or not?
-if ($userdata['user_id'] != 2)
+if (!isset($mx_user->data['session_admin']) || !$mx_user->data['session_admin'])
 {
 	mx_message_die(GENERAL_MESSAGE, $lang['SQL_Admin_No_Access']);
 }
