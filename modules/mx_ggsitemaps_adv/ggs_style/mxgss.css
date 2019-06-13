@@ -1,0 +1,156 @@
+/* 
+	Ultimate Google Sitmaps Stylesheets
+	(C) 2006 dcz - http://www.phpbb-seo.com/
+*/
+* {
+	margin: 0px;
+	padding: 0px;
+	border: 0px;
+}
+
+body {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 90%;
+	height:100%;
+	padding: 10px 20px 10px 20px;
+	margin: 30px 40px 30px 40px;
+	background-color: #FFFFFF;
+}
+h1 { 
+	font-weight: bold; 
+	font-size: 22px; 
+	font-family: "Trebuchet MS",Verdana, Arial, Helvetica, sans-serif;
+	text-decoration: none; 
+	line-height : 120%; 
+	color : #000000;
+	margin-bottom:0px; 
+	margin-top:1px;
+}
+h2 { 
+	font-family: "Trebuchet MS",Verdana, Arial, Helvetica, sans-serif;
+	font-weight:bold;
+	font-size:16px;
+	margin-bottom:0px; 
+	color:#707070;
+	margin-top:1px;
+}
+h3 {
+	font-family: "Trebuchet MS",Verdana, Arial, Helvetica, sans-serif;
+	float: right;
+	font-weight:bold;
+	font-size:16px;
+	margin-bottom:0px; 
+	color:#707070;
+	margin-top:1px;
+}
+table.bodytable{ 
+	position:center top;
+	width:100%;
+	background-color:#FFFFFF; 
+	border: 1px #98AAB1 solid;
+
+}
+#mxgssLogo {
+	background: url(logo.gif) no-repeat;
+	margin-top:10px;
+	line-height: 95px;
+	text-indent: 210px;
+}
+
+p.sml { 
+	font-size:0.8em;
+	margin-top:0px; 
+}
+td {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	line-height : 120%;
+}
+
+td.thHead {
+	margin:1px;
+	height: 28px;
+	color: #FFA34F; font-size: 11px; font-weight : bold;
+	background-color: #006699;
+}
+.forumline { 
+	border-collapse:collapse;
+	background-color: #FFFFFF; 
+	border: 2px #006699 solid;
+	margin-top:3px;
+}
+.forumline td {
+	border-bottom:1px solid #98AAB1;
+	text-align:left;
+	padding:5px;
+	margin:1px;
+}
+.header {
+	font-weight: bold;
+	font-size: 16px;
+	color : #FF9601;
+	background-color: #00599B; 
+	line-height : 150%;
+}
+TD.header_cell {
+	background: transparent; 
+	border: 1px #FF9601 solid;
+}
+a:link,a:active,a:visited { 
+	color : #006699;
+	text-decoration: none; 
+}
+a:hover { 
+	text-decoration: underline; 
+	color : #DD6900; 
+}
+.link {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 90%;
+	color: #006699;
+	background-color: transparent;
+	padding:0px 0px;
+	text-decoration: none;
+	border: none;
+	cursor: pointer;
+}
+.row1 {
+	background-color: #EFEFEF;
+	border: solid 1px #FFF;
+	border-right-color: #D6D6D6;
+	border-bottom-color: #D6D6D6;
+}
+.row2 {
+	background-color: #DEE3E7;
+	border: solid 1px #FFF;
+	border-right-color: #D6D6D6;
+	border-bottom-color: #D6D6D6;
+}
+.row3 {
+	background-color: #EFEFEF;
+	border: solid 1px #FFF;
+	border-right-color: #D6D6D6;
+	border-bottom-color: #D6D6D6;
+}
+.row4 {
+	background-color: #D1D7DC;
+	border: solid 1px #FFF;
+	border-right-color: #D6D6D6;
+	border-bottom-color: #D6D6D6;
+}
+
+DIV.copyright {
+	background-color: #F2F4F8;
+	padding:2px;
+	border:1px solid #98AAB1;
+	text-align:center;
+	font-size : 10px; 
+}
+a.copyright {
+	font-color :#636531;
+	text-decoration: none; 
+}
+a.copyright:hover {
+	text-decoration: underline; 
+	font-color : #DD6900; 
+}

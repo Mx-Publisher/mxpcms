@@ -1,11 +1,17 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
 <html dir="{S_CONTENT_DIRECTION}" lang="{S_USER_LANG}">
 <head>
-<meta charset="utf-8" />
+<!-- INCLUDE theme_conf.html -->
+<meta http-equiv="Content-Type" content="text/html"; charset="{S_CONTENT_ENCODING}">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- BEGIN switch_set_base -->
+<base href="{U_PORTAL_ROOT_PATH}" >
+<!-- END switch_set_base -->
 {META}
-<title><!-- IF UNREAD_NOTIFICATIONS_COUNT -->({UNREAD_NOTIFICATIONS_COUNT}) <!-- ENDIF --><!-- IF not S_VIEWTOPIC and not S_VIEWFORUM -->{SITENAME} - <!-- ENDIF --><!-- IF S_IN_MCP -->{L_MCP} - <!-- ELSEIF S_IN_UCP -->{L_UCP} - <!-- ENDIF -->{PAGE_TITLE}<!-- IF S_VIEWTOPIC or S_VIEWFORUM --> - {SITENAME}<!-- ENDIF --></title>
+{NAV_LINKS}
+<title>{SITENAME} :: {PAGE_TITLE}</title>
 
 <!-- IF S_ENABLE_FEEDS -->
 	<!-- IF S_ENABLE_FEEDS_OVERALL --><link rel="alternate" type="application/atom+xml" title="{L_FEED} - {SITENAME}" href="{{ path('phpbb_feed_index') }}"><!-- ENDIF -->
@@ -23,9 +29,9 @@
 <!-- ENDIF -->
 
 <!--
-	phpBB style name: prosilver
-	Based on style:   prosilver (this is the default phpBB3 style)
-	Original author:  Tom Beddard ( http://www.subBlue.com/ )
+	phpBB style name: mxp
+	Based on style:   original mxp style by Jon, and some elements based on prosilver (the default phpBB3 style) by Tom Beddard ( http://www.subBlue.com/ )
+	Original author: FlorinCB aka orynider 
 	Modified by:
 -->
 
@@ -45,9 +51,18 @@
 	})(document);
 </script>
 <!-- ENDIF -->
-<link href="{T_FONT_AWESOME_LINK}" rel="stylesheet">
-<link href="{T_STYLESHEET_LINK}" rel="stylesheet">
-<link href="{T_STYLESHEET_LANG_LINK}" rel="stylesheet">
+
+<!-- First load standard template *.css definition, located in the the phpbb template folder -->
+<link rel="stylesheet" href="{U_PHPBB_ROOT_PATH}{TEMPLATE_ROOT_PATH}{T_PHPBB_STYLESHEET}" type="text/css" />
+
+<!-- Load mxBB template *.css definition for mx, located in the the portal template folder -->
+<link href="{T_FONT_AWESOME_LINK}" rel="stylesheet" />
+<link href="{T_FONT_IONIC_LINK}" rel="stylesheet" />
+<link href="{T_STYLESHEET_LINK}" rel="stylesheet" />
+<link href="{T_STYLESHEET_LANG_LINK}" rel="stylesheet" />
+
+<!-- Optionally, redefine some defintions for gecko browsers -->
+<!-- BEGIN switch_gecko --><link rel="stylesheet" href="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}{T_GECKO_STYLESHEET}" type="text/css" /><!-- END switch_gecko -->
 
 <!-- IF S_CONTENT_DIRECTION eq 'rtl' -->
 	<link href="{T_THEME_PATH}/bidi.css?assets_version={T_ASSETS_VERSION}" rel="stylesheet">
@@ -61,71 +76,152 @@
 	<link href="{T_ASSETS_PATH}/cookieconsent/cookieconsent.min.css?assets_version={T_ASSETS_VERSION}" rel="stylesheet">
 <!-- ENDIF -->
 
-<!--[if lte IE 9]>
-	<link href="{T_THEME_PATH}/tweaks.css?assets_version={T_ASSETS_VERSION}" rel="stylesheet">
-<![endif]-->
-
 <!-- EVENT overall_header_head_append -->
 
 {$STYLESHEETS}
+{MX_ADDITIONAL_CSS_FILES}
+{MX_ICON_CSS}
 
 <!-- EVENT overall_header_stylesheets_after -->
 
+<!-- BEGIN switch_enable_pm_popup -->
+<script language="javascript" type="text/javascript"><!--
+	if( {PRIVATE_MESSAGE_NEW_FLAG} )
+	{
+		window.open('{U_PRIVATEMSGS_POPUP}', '_phpbbprivmsg', 'HEIGHT=225,resizable=yes,WIDTH=400');
+	}
+// --></script>
+<!-- END switch_enable_pm_popup -->
+
+<script language="javascript" type="text/javascript"><!--
+
+function checkSearch()
+{
+	if (document.search_block.search_engine.value == 'google')
+	{
+		window.open('http://www.google.com/search?q=' + document.search_block.search_keywords.value, '_google', '');
+		return false;
+	}
+	else if (document.search_block.search_engine.value == 'site')
+	{
+		window.open('{U_SEARCH_SITE}&search_keywords=' + document.search_block.search_keywords.value, '_self', '');
+		return false;
+	}
+	else if (document.search_block.search_engine.value == 'kb')
+	{
+		window.open('{U_SEARCH_KB}&search_keywords=' + document.search_block.search_keywords.value, '_self', '');
+		return false;
+	}
+	else if (document.search_block.search_engine.value == 'pafiledb')
+	{
+		window.open('{U_SEARCH_PAFILEDB}&search_keywords=' + document.search_block.search_keywords.value, '_self', '');
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+}
+// --></script>
+
+<script type="text/javascript">
+//this will disable proxi's in AdminCP
+if (top.location != self.location) top.location = self.location.href;
+</script>
+
+<script language="javascript" type="text/javascript" src="{U_PORTAL_ROOT_PATH}modules/mx_shared/lib/Common.js"></script>
+<script language="javascript" type="text/javascript" src="{U_PORTAL_ROOT_PATH}modules/mx_shared/lib/Toggle.js"></script>
+{MX_ADDITIONAL_JS_FILES}
+{MX_ADDITIONAL_HEADER_TEXT}
+
 </head>
-<body id="phpbb" class="nojs notouch section-{SCRIPT_NAME} {S_CONTENT_DIRECTION} {BODY_CLASS}">
+<body id="mxp" class="nojs notouch section-{SCRIPT_NAME} {S_CONTENT_DIRECTION} {BODY_CLASS}">
 
+
+
+<a name="top"></a>
 <!-- EVENT overall_header_body_before -->
+<div id="container">
 
-<div id="wrap" class="wrap">
-	<a id="top" class="top-anchor" accesskey="t"></a>
-	<div id="page-header">
-		<div class="headerbar" role="banner">
-		<!-- EVENT overall_header_headerbar_before -->
-			<div class="inner">
+	<!-- Either Simple top image ...
+	<img src="{THEME_GRAPHICS}/header.jpg">
+	End -->
+	<!-- EVENT overall_header_headerbar_before -->
+	<!-- ...or put contents on background top image -->
+	<table border="0" cellspacing="0" cellpadding="0" width="750" align="center">
+		<tr height="101">
+			<td background="{THEME_GRAPHICS}/top.jpg" width="750">
+				<table border="0" cellspacing="0" cellpadding="0" width="100%">
+					<tr height="80">
+						<td width="25%" align="left" valign="top">
+							<!--<a href="{U_INDEX}"><img src="{LOGO}" border="0" alt="{L_INDEX}" vspace="1"/></a>-->
+							<a href="{U_INDEX}"><img width="210" height="75" src="{THEME_GRAPHICS}spacer.gif" border=0 alt="{L_INDEX}" title="{L_INDEX}"></a>
+						</td>
+						<td width="50%" align="center" valign="middle">
+							<!--{PAGE_ICON}<span class="pagetitle">{PAGE_TITLE}</span>-->
+						</td>
+						<td width="25%" align="right" valign="top"><span class="sitetitle">&nbsp;</td>
+					</tr>
+					<tr height="21">
+						<td width="100%" align="left" valign="middle" colspan="3">
+							<img width="5" height="1" src="{THEME_GRAPHICS}spacer.gif" border=0>
+							<!--<span class="sitetitle_desc">{SITE_DESCRIPTION}</span>-->
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+	<!-- End -->
+	<!-- EVENT overall_header_headerbar_after -->
+	
+	<!-- EVENT overall_header_navbar_before -->
+	
+	<!-- ...or use Generated Navigation Menu -->
+	{OVERALL_NAVIGATION}
+	<!-- Generated Navigation Menu -->
 
-			<div id="site-description" class="site-description">
-				<a id="logo" class="logo" href="<!-- IF U_SITE_HOME -->{U_SITE_HOME}<!-- ELSE -->{U_INDEX}<!-- ENDIF -->" title="<!-- IF U_SITE_HOME -->{L_SITE_HOME}<!-- ELSE -->{L_INDEX}<!-- ENDIF -->"><span class="site_logo"></span></a>
-				<h1>{SITENAME}</h1>
-				<p>{SITE_DESCRIPTION}</p>
-				<p class="skiplink"><a href="#start_here">{L_SKIP}</a></p>
-			</div>
+								<td align="center" valign="middle" nowrap>
+									<a href="{U_INDEX_FORUM}" class="mainmenu"><img src="{NAV_IMAGES_FORUM}" class="mx_icon" border="0" alt="" hspace="1" align="middle" /></a><span class="mainmenu"><a href="{U_INDEX_FORUM}" class="mainmenu">{L_FORUM}</a></span>
+								</td>
+								<td align="center" valign="middle" nowrap>
+									<!-- BEGIN switch_user_logged_in -->
+									<a href="{U_PROFILE}" class="mainmenu"><img src="{NAV_IMAGES_PROFILE}" class="mx_icon" border="0" alt="" hspace="1" align="middle" /></a><span class="mainmenu"><a href="{U_PROFILE}" class="mainmenu">{L_PROFILE}</a></span>
+									<!-- END switch_user_logged_in -->
+								</td>
+								<td align="center" valign="middle" nowrap>
+									<a href="{U_FAQ}" class="mainmenu"><img src="{NAV_IMAGES_FAQ}" class="mx_icon" border="0" alt="" hspace="1" align="middle" /></a><span class="mainmenu"><a href="{U_FAQ}" class="mainmenu">{L_FAQ}</a></span>
+								</td>
+								<td align="center" valign="middle" nowrap>
+									<a href="{U_MEMBERLIST}" class="mainmenu"><img src="{NAV_IMAGES_MEMBERS}" class="mx_icon" border="0" alt="" hspace="1" align="middle" /></a><span class="mainmenu"><a href="{U_MEMBERLIST}" class="mainmenu">{L_MEMBERLIST}</a></span>
+								</td>
+								<td align="center" valign="middle" nowrap>
+									<a href="{U_GROUP_CP}" class="mainmenu"><img src="{NAV_IMAGES_GROUPS}" class="mx_icon" border="0" alt="" hspace="1" align="middle" /></a><span class="mainmenu"><a href="{U_GROUP_CP}" class="mainmenu">{L_USERGROUPS}</a></span>
+								</td>
+								<td align="center" valign="middle" nowrap>
+								<!-- BEGIN switch_user_logged_in -->
+									<a href="{U_PRIVATEMSGS}" class="mainmenu"><img src="{NAV_IMAGES_PRIVMSG}" class="mx_icon" border="0" alt="" hspace="1" align="middle" /></a><span class="mainmenu"><a href="{U_PRIVATEMSGS}" class="mainmenu">{L_PRIVATEMSGS}</a></span>
+									<!-- END switch_user_logged_in -->
+								</td>
+								<td align="center" valign="middle" nowrap>
+									<a href="{U_SEARCH}" class="mainmenu"><img src="{NAV_IMAGES_SEARCH}" class="mx_icon" border="0" alt="" hspace="1" align="middle" /></a><span class="mainmenu"><a href="{U_SEARCH}" class="mainmenu">{L_SEARCH}</a></span>
+								</td>
+				</tr>
+			</table>
 
-			<!-- EVENT overall_header_searchbox_before -->
-			<!-- IF S_DISPLAY_SEARCH and not S_IN_SEARCH -->
-			<div id="search-box" class="search-box search-header" role="search">
-				<form action="{U_SEARCH}" method="get" id="search">
-				<fieldset>
-					<input name="keywords" id="keywords" type="search" maxlength="128" title="{L_SEARCH_KEYWORDS}" class="inputbox search tiny" size="20" value="{SEARCH_WORDS}" placeholder="{L_SEARCH_MINI}" />
-					<button class="button button-search" type="submit" title="{L_SEARCH}">
-						<i class="icon fa-search fa-fw" aria-hidden="true"></i><span class="sr-only">{L_SEARCH}</span>
-					</button>
-					<a href="{U_SEARCH}" class="button button-search-end" title="{L_SEARCH_ADV}">
-						<i class="icon fa-cog fa-fw" aria-hidden="true"></i><span class="sr-only">{L_SEARCH_ADV}</span>
-					</a>
-					{S_SEARCH_HIDDEN_FIELDS}
-				</fieldset>
-				</form>
-			</div>
-			<!-- ENDIF -->
-			<!-- EVENT overall_header_searchbox_after -->
-
-			</div>
-			<!-- EVENT overall_header_headerbar_after -->
-		</div>
-		<!-- EVENT overall_header_navbar_before -->
-		<!-- INCLUDE navbar_header.html -->
 	</div>
 
 	<!-- EVENT overall_header_page_body_before -->
+	
+	<div class="right">
+			<span class="genmed"><a href="{U_LOGIN_LOGOUT}" class="genmed">{L_LOGIN_LOGOUT}</a></span>
+			<!-- BEGIN switch_user_logged_out -->
+			| <span class="genmed"><a href="{U_REGISTER}" class="genmed">{L_REGISTER}</a></span>
+			<!-- END switch_user_logged_out -->
+	</div>
 
-	<a id="start_here" class="anchor"></a>
-	<div id="page-body" class="page-body" role="main">
-		<!-- IF S_BOARD_DISABLED and S_USER_LOGGED_IN and (U_MCP or U_ACP) -->
-		<div id="information" class="rules">
-			<div class="inner">
-				<strong>{L_INFORMATION}{L_COLON}</strong> {L_BOARD_DISABLED}
-			</div>
-		</div>
-		<!-- ENDIF -->
+	</div>
 
-		<!-- EVENT overall_header_content_before -->
+
+
+	<!-- EVENT overall_header_content_before -->

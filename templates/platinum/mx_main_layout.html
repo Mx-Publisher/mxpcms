@@ -2,7 +2,7 @@
 <tbody>
 <tr>
 	<!-- BEGIN layout_column -->
-	<td style="width: <!-- IF layout_column.BLOCK_SIZE neq '100%' -->{layout_column.BLOCK_SIZE}px<!-- ENDIF -->; " valign="top">
+	<td class="main_table" style="width: <!-- IF layout_column.BLOCK_SIZE neq '100%' -->{layout_column.BLOCK_SIZE}px<!-- ENDIF -->; " valign="top">
 		<!-- BEGIN blocks -->
 		<!-- BEGIN sub_start -->
 		<div border="0" cellspacing="0" cellpadding="0" width="<!-- IF layout_column.BLOCK_SIZE neq '100%' -->{layout_column.BLOCK_SIZE}px<!-- ENDIF -->">
@@ -27,14 +27,14 @@
 									<li id="edit" class="post-buttons editCP_switch" role="edit" style="float:right;margin-bottom:2px;padding-bottom:1px;font-size:8px;display: {layout_column.blocks.edit.EDITCP_SHOW};">
 									
 										<form action="{layout_column.blocks.edit.EDIT_ACTION}" method="post" class="forum-title submit-buttons">
-										<fieldset>										
+										<fieldset>	
 										<!-- {layout_column.blocks.edit.EDIT_IMG} --> 
 										<button class="button{catrow.CURRENT} editCP_switch" type="submit" title="{L_Block_Edit} :: {layout_column.blocks.edit.EDIT_BLOCK_TITLE} :: {layout_column.blocks.edit.EDIT_BLOCK_DESC}" style="font-size:9px;">
 										<i class="fa fa-star-o" style="float:top;vertical-align: 25%;whitespace: false;" aria-hidden="false"></i>
 										{L_EDIT}
 										</button>
 										{layout_column.blocks.edit.S_HIDDEN_FORM_FIELDS}
-										</fieldset>										
+										</fieldset>
 										</form>
 									</li>
 									<!-- BEGIN hidden_block -->

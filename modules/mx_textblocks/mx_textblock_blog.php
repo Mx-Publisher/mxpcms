@@ -2,28 +2,28 @@
 /**
 *
 * @package mxBB Portal Module - mx_textblocks
-* @version $Id: mx_textblock_blog.php,v 1.16 2013/07/07 02:41:02 orynider Exp $
+* @version $Id: mx_textblock_blog.php,v 1.14 2006/08/30 19:15:44 jonohlsson Exp $
 * @copyright (c) 2002-2006 [Jon Ohlsson] mxBB Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 *
 */
 
 //
-// NOTE: This script is NOT updated for MXP3
+// NOTE: This script is NOT updated for mxBB 2.8
 //
 if( !defined('IN_PORTAL') || !is_object($mx_block))
 {
 	die("Hacking attempt");
 }
 
-if( isset($_POST['u']) || isset($_GET['u']) )
+if( isset($HTTP_POST_VARS['u']) || isset($HTTP_GET_VARS['u']) )
 {
-	$sub_id = ( isset($_POST['u']) ) ? intval($_POST['u']) : intval($_GET['u']);
+	$sub_id = ( isset($HTTP_POST_VARS['u']) ) ? intval($HTTP_POST_VARS['u']) : intval($HTTP_GET_VARS['u']);
 	$blog_mode = 'user';
 }
-else if( isset($_POST['g']) || isset($_GET['g']) )
+else if( isset($HTTP_POST_VARS['g']) || isset($HTTP_GET_VARS['g']) )
 {
-	$sub_id = ( isset($_POST['g']) ) ? intval($_POST['g']) : intval($_GET['g']);
+	$sub_id = ( isset($HTTP_POST_VARS['g']) ) ? intval($HTTP_POST_VARS['g']) : intval($HTTP_GET_VARS['g']);
 	$blog_mode = 'group';
 }
 else
@@ -36,10 +36,10 @@ else
 }
 
 $block_config = read_block_config($block_id, false, $sub_id);
-$title = $mx_block->block_info['block_title'];
+$title = $block_config[$block_id]['block_title'];
 
-$message = $mx_block->get_parameters('Blog');
-$blog_id = $mx_block->get_parameters('blog_id');
+$message = $block_config[$block_id]['Blog']['parameter_value'];
+$blog_id = $block_config[$block_id]['blog_id']['parameter_value'];
 
 // **********************************************************************
 // Read language definition
@@ -56,9 +56,9 @@ else
 //
 // Block Pages/toc
 //
-if( isset($_POST['page_num']) || isset($_GET['page_num']) )
+if( isset($HTTP_POST_VARS['page_num']) || isset($HTTP_GET_VARS['page_num']) )
 {
-	$page_num = ( isset($_POST['page_num']) ) ? $_POST['page_num'] : $_GET['page_num'];
+	$page_num = ( isset($HTTP_POST_VARS['page_num']) ) ? $HTTP_POST_VARS['page_num'] : $HTTP_GET_VARS['page_num'];
 	$page_num = $page_num - 1;
 }
 else
@@ -89,8 +89,8 @@ if( $blog_validate || $iss_auth_ary['auth_edit'] )
 	$ss_hidden_fields .= '<input type="hidden" name="block_id" value="' . $block_id . '" />';
 	$ss_hidden_fields .= '<input type="hidden" name="portalpage" value="' . $page_id . '" />';
 	$ss_hidden_fields .= '<input type="hidden" name="mode" value="editblog" />';
-	//$ss_hidden_fields .= '<input type="hidden" name="u" value="' . intval($_GET['u']) . '" />';
-	//$ss_hidden_fields .= '<input type="hidden" name="g" value="' . intval($_GET['g']) . '" />';
+	//$ss_hidden_fields .= '<input type="hidden" name="u" value="' . intval($HTTP_GET_VARS['u']) . '" />';
+	//$ss_hidden_fields .= '<input type="hidden" name="g" value="' . intval($HTTP_GET_VARS['g']) . '" />';
 	$ss_hidden_fields .= '<input type="hidden" name="u" value="' . $sub_id. '" />';
 	$ss_hidden_fields .= '<input type="hidden" name="g" value="' . $sub_id. '" />';
 	$ss_hidden_fields .= '<input type="hidden" name="sub_id" value="' . $sub_id . '" />';
@@ -132,9 +132,6 @@ if( $show_title == 'TRUE' )
 
 $block_style = ( ( $block_style == '' ) || ( $block_style == 'FALSE' ) ) ? '' : 'forumline';
 $text_style = ( ( $text_style == '' ) || ( $text_style == 'none' ) ) ? 'genmed' : $text_style;
-
-$s_hidden_fields = '<input type="hidden" name="sid" value="' . $userdata['session_id'] . '" />';
-$s_hidden_fields .= '<input type="hidden" name="block_id" value="' . $block_id . '" />';
 
 if( !empty($blog_id) && $userdata['session_logged_in'] && $blog_mode == 'user' )
 {

@@ -1,8 +1,8 @@
 // COOKIES
 	// Switch state
-    var buttonswitch = $.cookie('platinumprofile');
-	var stickybuttonswitch = $.cookie('platinumsticky');
-	var nightmodeswitch = $.cookie('platinumnightmode');
+    var buttonswitch = $.cookie('profile');
+	var stickybuttonswitch = $.cookie('sticky');
+	var nightmodeswitch = $.cookie('nightmode');
 	// Set the user's selection
 	if (buttonswitch == 'leftprofile') {
 		$('.profilebuttonon').css("background-position","-0px -0px");
@@ -44,7 +44,7 @@ $(document).ready(function() {
 		$('.online').css("background-position","16% 0");
 		$('.rtl .online').css("background-position","85% 0");
 		$('.rtl .has-profile .post-buttons').css("right","auto");
-		$.cookie('platinumprofile', 'leftprofile', { expires: 365, path: '/' });
+		$.cookie('profile', 'leftprofile', { expires: 365, path: '/' });
     });
 	// When buttonon is clicked:
     $('.profilebuttonon').click(function() {
@@ -57,7 +57,7 @@ $(document).ready(function() {
 		$('.online').css("background-position","100% 0");
 		$('.rtl .online').css("background-position","-15px 0");
 		$('.rtl .has-profile .post-buttons').css("left","0").css("right","auto");
-		$.cookie('platinumprofile', null, { path: '/' });
+		$.cookie('profile', null, { path: '/' });
     });
 	
 // STICKYBUTTON:
@@ -66,14 +66,14 @@ $(document).ready(function() {
 		$('.sticky').css("display","block");
 		$('.stickybuttonoff').css("display","none");
 		$('.stickybuttonon').css("display","block");
-		$.cookie('platinumsticky', null, { path: '/' });
+		$.cookie('sticky', null, { path: '/' });
     });
 	// When buttonon is clicked:
     $('.stickybuttonon').click(function() {
 		$('.sticky').css("display","none");
 		$('.stickybuttonoff').css("display","block");
 		$('.stickybuttonon').css("display","none");
-		$.cookie('platinumsticky', 'stickyoff', { expires: 365, path: '/' });
+		$.cookie('sticky', 'stickyoff', { expires: 365, path: '/' });
     });
 	
 // NIGHTMODE:
@@ -85,7 +85,7 @@ $(document).ready(function() {
 		$('.copyright').css("color","#555555").css("-webkit-transition","color 1s").css("-moz-transition","color 1s").css("-o-transition","color 1s").css("transition","color 1s");
 		$('.panel, .post').css("border","1px dashed #CCCCCC");
 		$('#overlay').css("display","none");
-		$.cookie('platinumnightmode', null, { path: '/' });
+		$.cookie('nightmode', null, { path: '/' });
     });
 	// When nightmodeoff is clicked:
     $('.nightmodeoff').click(function() {
@@ -95,6 +95,6 @@ $(document).ready(function() {
 		$('.copyright').css("color","#393939").css("-webkit-transition","color 1s").css("-moz-transition","color 1s").css("-o-transition","color 1s").css("transition","color 1s");
 		$('.panel, .post').css("border","1px solid transparent");
 		$('#overlay').css("display","block");
-		$.cookie('platinumnightmode', 'nightmodeon', { expires: 365, path: '/' });
+		$.cookie('nightmode', 'nightmodeon', { expires: 365, path: '/' });
     });
 });

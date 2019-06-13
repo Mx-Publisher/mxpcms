@@ -33,17 +33,9 @@ if ($mx_page->is_virtual)
 //
 // Read Block Settings
 //
-$show_title = $mx_block->block_info['show_title'];
 $title = $mx_block->block_info['block_title'];
-$desc = $mx_block->block_info['block_desc'];
+$message = $mx_block->get_parameters( 'Text' );
 
-$block_style = $mx_block->block_parameters['block_style'];
-$text_style = $mx_block->block_parameters['text_style'];
-$title_style = $mx_block->block_parameters['title_style'];
-
-/** Debug Block Configuration in MXP 2.7 **/
-$message = $mx_block->get_parameters('Text');
-/** **/
 $block_style = $mx_block->get_parameters( 'block_style' );
 $text_style = $mx_block->get_parameters( 'text_style' );
 $title_style = $mx_block->get_parameters( 'title_style' );
@@ -110,9 +102,6 @@ if( $show_title == 'TRUE' )
 
 $block_style = ( ( $block_style == '' ) || ( $block_style == 'FALSE' ) ) ? '' : 'forumline';
 $text_style = ( ( $text_style == '' ) || ( $text_style == 'none' ) ) ? 'genmed' : $text_style;
-
-$s_hidden_fields = '<input type="hidden" name="sid" value="' . $userdata['session_id'] . '" />';
-$s_hidden_fields .= '<input type="hidden" name="block_id" value="' . $block_id . '" />';
 
 $template->assign_vars(array(
 	'BLOCK_SIZE' => ( !empty($block_size) ? $block_size : '100%' ),

@@ -2,7 +2,7 @@
 /**
 *
 * @package phpBB3
-* @version $Id: functions.php,v 1.28 2014/05/16 18:02:39 orynider Exp $
+* @version $Id: functions.php,v 1.27 2013/06/05 14:05:59 orynider Exp $
 * @copyright (c) 2005 phpBB Group
 * @license http://opensource.org/licenses/gpl-license.php GNU Public License
 *
@@ -266,7 +266,7 @@ class phpBB3_top
 
 	/**
 	*
-	* @version Version 0.1 / $Id: functions.php,v 1.28 2014/05/16 18:02:39 orynider Exp $
+	* @version Version 0.1 / $Id: functions.php,v 1.27 2013/06/05 14:05:59 orynider Exp $
 	*
 	* Portable PHP password hashing framework.
 	*
@@ -930,225 +930,201 @@ if (!function_exists('stripos'))
 	}
 }
 
-/**
-* Checks if a path ($path) is absolute or relative
-*
-* @param string $path Path to check absoluteness of
-* @return boolean
-*/
-function phpbb_is_absolute($path)
+//
+// Renaming this for now...
+//
+if (!function_exists('realpath'))
 {
-	return (isset($path[0]) && $path[0] == '/' || preg_match('#^[a-z]:[/\\\]#i', $path)) ? true : false;
-}
-
-/**
-* @author Chris Smith <chris@project-minerva.org>
-* @copyright 2006 Project Minerva Team
-* @param string $path The path which we should attempt to resolve.
-* @return mixed
-*/
-function phpbb_own_realpath($path)
-{
-	global $request;
-
-	// Now to perform funky shizzle
-
-	// Switch to use UNIX slashes
-	$path = str_replace(DIRECTORY_SEPARATOR, '/', $path);
-	$path_prefix = '';
-
-	// Determine what sort of path we have
-	if (phpbb_is_absolute($path))
+	if (DIRECTORY_SEPARATOR != '\\' && !(bool) ini_get('safe_mode') && function_exists('shell_exec') && trim(`realpath .`))
 	{
-		$absolute = true;
-
-		if ($path[0] == '/')
+		/**
+		* @author Chris Smith <chris@project-minerva.org>
+		* @copyright 2006 Project Minerva Team
+		* @param string $path The path which we should attempt to resolve.
+		* @return mixed
+		* @ignore
+		*/
+		function phpbb3_realpath($path)
 		{
-			// Absolute path, *NIX style
-			$path_prefix = '';
-		}
-		else
-		{
-			// Absolute path, Windows style
-			// Remove the drive letter and colon
-			$path_prefix = $path[0] . ':';
-			$path = substr($path, 2);
+			$arg = escapeshellarg($path);
+			return trim(`realpath '$arg'`);
 		}
 	}
 	else
 	{
-		// Relative Path
-		// Prepend the current working directory
-		if (function_exists('getcwd'))
+		/**
+		* Checks if a path ($path) is absolute or relative
+		*
+		* @param string $path Path to check absoluteness of
+		* @return boolean
+		*/
+		function is_absolute($path)
 		{
-			// This is the best method, hopefully it is enabled!
-			$path = str_replace(DIRECTORY_SEPARATOR, '/', getcwd()) . '/' . $path;
-			$absolute = true;
-			if (preg_match('#^[a-z]:#i', $path))
+			return ($path[0] == '/' || (DIRECTORY_SEPARATOR == '\\' && preg_match('#^[a-z]:/#i', $path))) ? true : false;
+		}
+
+		/**
+		* @author Chris Smith <chris@project-minerva.org>
+		* @copyright 2006 Project Minerva Team
+		* @param string $path The path which we should attempt to resolve.
+		* @return mixed
+		*/
+		function phpbb3_realpath($path)
+		{
+			// Now to perform funky shizzle
+
+			// Switch to use UNIX slashes
+			$path = str_replace(DIRECTORY_SEPARATOR, '/', $path);
+			$path_prefix = '';
+
+			// Determine what sort of path we have
+			if (is_absolute($path))
 			{
-				$path_prefix = $path[0] . ':';
-				$path = substr($path, 2);
+				$absolute = true;
+
+				if ($path[0] == '/')
+				{
+					// Absolute path, *NIX style
+					$path_prefix = '';
+				}
+				else
+				{
+					// Absolute path, Windows style
+					// Remove the drive letter and colon
+					$path_prefix = $path[0] . ':';
+					$path = substr($path, 2);
+				}
 			}
 			else
 			{
-				$path_prefix = '';
-			}
-		}
-		else if ($request->server('SCRIPT_FILENAME'))
-		{
-			// Warning: If chdir() has been used this will lie!
-			// Warning: This has some problems sometime (CLI can create them easily)
-			$filename = htmlspecialchars_decode($request->server('SCRIPT_FILENAME'));
-			$path = str_replace(DIRECTORY_SEPARATOR, '/', dirname($filename)) . '/' . $path;
-			$absolute = true;
-			$path_prefix = '';
-		}
-		else
-		{
-			// We have no way of getting the absolute path, just run on using relative ones.
-			$absolute = false;
-			$path_prefix = '.';
-		}
-	}
-
-	// Remove any repeated slashes
-	$path = preg_replace('#/{2,}#', '/', $path);
-
-	// Remove the slashes from the start and end of the path
-	$path = trim($path, '/');
-
-	// Break the string into little bits for us to nibble on
-	$bits = explode('/', $path);
-
-	// Remove any . in the path, renumber array for the loop below
-	$bits = array_values(array_diff($bits, array('.')));
-
-	// Lets get looping, run over and resolve any .. (up directory)
-	for ($i = 0, $max = sizeof($bits); $i < $max; $i++)
-	{
-		// @todo Optimise
-		if ($bits[$i] == '..' )
-		{
-			if (isset($bits[$i - 1]))
-			{
-				if ($bits[$i - 1] != '..')
+				// Relative Path
+				// Prepend the current working directory
+				if (function_exists('getcwd'))
 				{
-					// We found a .. and we are able to traverse upwards, lets do it!
-					unset($bits[$i]);
-					unset($bits[$i - 1]);
-					$i -= 2;
-					$max -= 2;
-					$bits = array_values($bits);
+					// This is the best method, hopefully it is enabled!
+					$path = str_replace(DIRECTORY_SEPARATOR, '/', getcwd()) . '/' . $path;
+					$absolute = true;
+					if (preg_match('#^[a-z]:#i', $path))
+					{
+						$path_prefix = $path[0] . ':';
+						$path = substr($path, 2);
+					}
+					else
+					{
+						$path_prefix = '';
+					}
+				}
+				else if (isset($_SERVER['SCRIPT_FILENAME']) && !empty($_SERVER['SCRIPT_FILENAME']))
+				{
+					// Warning: If chdir() has been used this will lie!
+					// Warning: This has some problems sometime (CLI can create them easily)
+					$path = str_replace(DIRECTORY_SEPARATOR, '/', dirname($_SERVER['SCRIPT_FILENAME'])) . '/' . $path;
+					$absolute = true;
+					$path_prefix = '';
+				}
+				else
+				{
+					// We have no way of getting the absolute path, just run on using relative ones.
+					$absolute = false;
+					$path_prefix = '.';
 				}
 			}
-			else if ($absolute) // ie. !isset($bits[$i - 1]) && $absolute
+
+			// Remove any repeated slashes
+			$path = preg_replace('#/{2,}#', '/', $path);
+
+			// Remove the slashes from the start and end of the path
+			$path = trim($path, '/');
+
+			// Break the string into little bits for us to nibble on
+			$bits = explode('/', $path);
+
+			// Remove any . in the path, renumber array for the loop below
+			$bits = array_values(array_diff($bits, array('.')));
+
+			// Lets get looping, run over and resolve any .. (up directory)
+			for ($i = 0, $max = sizeof($bits); $i < $max; $i++)
 			{
-				// We have an absolute path trying to descend above the root of the filesystem
-				// ... Error!
+				// @todo Optimise
+				if ($bits[$i] == '..' )
+				{
+					if (isset($bits[$i - 1]))
+					{
+						if ($bits[$i - 1] != '..')
+						{
+							// We found a .. and we are able to traverse upwards, lets do it!
+							unset($bits[$i]);
+							unset($bits[$i - 1]);
+							$i -= 2;
+							$max -= 2;
+							$bits = array_values($bits);
+						}
+					}
+					else if ($absolute) // ie. !isset($bits[$i - 1]) && $absolute
+					{
+						// We have an absolute path trying to descend above the root of the filesystem
+						// ... Error!
+						return false;
+					}
+				}
+			}
+
+			// Prepend the path prefix
+			array_unshift($bits, $path_prefix);
+
+			$resolved = '';
+
+			$max = sizeof($bits) - 1;
+
+			// Check if we are able to resolve symlinks, Windows cannot.
+			$symlink_resolve = (function_exists('readlink')) ? true : false;
+
+			foreach ($bits as $i => $bit)
+			{
+				if (@is_dir("$resolved/$bit") || ($i == $max && @is_file("$resolved/$bit")))
+				{
+					// Path Exists
+					if ($symlink_resolve && is_link("$resolved/$bit") && ($link = readlink("$resolved/$bit")))
+					{
+						// Resolved a symlink.
+						$resolved = $link . (($i == $max) ? '' : '/');
+						continue;
+					}
+				}
+				else
+				{
+					// Something doesn't exist here!
+					// This is correct realpath() behaviour but sadly open_basedir and safe_mode make this problematic
+					// return false;
+				}
+				$resolved .= $bit . (($i == $max) ? '' : '/');
+			}
+
+			// @todo If the file exists fine and open_basedir only has one path we should be able to prepend it
+			// because we must be inside that basedir, the question is where...
+			// @internal The slash in is_dir() gets around an open_basedir restriction
+			if (!@file_exists($resolved) || (!is_dir($resolved . '/') && !is_file($resolved)))
+			{
 				return false;
 			}
+
+			// Put the slashes back to the native operating systems slashes
+			$resolved = str_replace('/', DIRECTORY_SEPARATOR, $resolved);
+
+			return $resolved; // We got here, in the end!
 		}
 	}
-
-	// Prepend the path prefix
-	array_unshift($bits, $path_prefix);
-
-	$resolved = '';
-
-	$max = sizeof($bits) - 1;
-
-	// Check if we are able to resolve symlinks, Windows cannot.
-	$symlink_resolve = (function_exists('readlink')) ? true : false;
-
-	foreach ($bits as $i => $bit)
-	{
-		if (@is_dir("$resolved/$bit") || ($i == $max && @is_file("$resolved/$bit")))
-		{
-			// Path Exists
-			if ($symlink_resolve && is_link("$resolved/$bit") && ($link = readlink("$resolved/$bit")))
-			{
-				// Resolved a symlink.
-				$resolved = $link . (($i == $max) ? '' : '/');
-				continue;
-			}
-		}
-		else
-		{
-			// Something doesn't exist here!
-			// This is correct realpath() behaviour but sadly open_basedir and safe_mode make this problematic
-			// return false;
-		}
-		$resolved .= $bit . (($i == $max) ? '' : '/');
-	}
-
-	// @todo If the file exists fine and open_basedir only has one path we should be able to prepend it
-	// because we must be inside that basedir, the question is where...
-	// @internal The slash in is_dir() gets around an open_basedir restriction
-	if (!@file_exists($resolved) || (!@is_dir($resolved . '/') && !is_file($resolved)))
-	{
-		return false;
-	}
-
-	// Put the slashes back to the native operating systems slashes
-	$resolved = str_replace('/', DIRECTORY_SEPARATOR, $resolved);
-
-	// Check for DIRECTORY_SEPARATOR at the end (and remove it!)
-	if (substr($resolved, -1) == DIRECTORY_SEPARATOR)
-	{
-		return substr($resolved, 0, -1);
-	}
-
-	return $resolved; // We got here, in the end!
 }
-
-/*
-* A wrapper for realpath
-*/
-if (!function_exists('realpath'))
+else
 {
 	/**
 	* A wrapper for realpath
 	* @ignore
 	*/
-	function phpbb_realpath($path)
+	function phpbb3_realpath($path)
 	{
-		return phpbb_own_realpath($path);
+		return realpath($path);
 	}
-}
-elseif (!function_exists('phpbb_realpath'))
-{
-	/**
-	* A wrapper for realpath
-	*/
-	function phpbb_realpath($path)
-	{
-		$realpath = realpath($path);
-
-		// Strangely there are provider not disabling realpath but returning strange values. :o
-		// We at least try to cope with them.
-		if ($realpath === $path || $realpath === false)
-		{
-			return phpbb_own_realpath($path);
-		}
-
-		// Check for DIRECTORY_SEPARATOR at the end (and remove it!)
-		if (substr($realpath, -1) == DIRECTORY_SEPARATOR)
-		{
-			$realpath = substr($realpath, 0, -1);
-		}
-
-		return $realpath;
-	}
-}
-
-/**
-* Renaming this for now...
-* for compatibility with phpBB 3.0.x Olympus.
-* @ignore
-*/
-function phpbb3_realpath($path)
-{
-	return phpbb_realpath($path);
 }
 
 if (!function_exists('htmlspecialchars_decode'))
@@ -4081,15 +4057,6 @@ class phpBB3 extends phpBB3_top
 			break;
 
 			case 'url':
-				// generated with regex_idn.php file in the develop folder
-				return "[a-z][a-z\d+\-.]*(?<!javascript):/{2}(?:(?:[^\p{C}\p{Z}\p{S}\p{P}\p{Nl}\p{No}\p{Me}\x{1100}-\x{115F}\x{A960}-\x{A97C}\x{1160}-\x{11A7}\x{D7B0}-\x{D7C6}\x{20D0}-\x{20FF}\x{1D100}-\x{1D1FF}\x{1D200}-\x{1D24F}\x{0640}\x{07FA}\x{302E}\x{302F}\x{3031}-\x{3035}\x{303B}]*[\x{00B7}\x{0375}\x{05F3}\x{05F4}\x{30FB}\x{002D}\x{06FD}\x{06FE}\x{0F0B}\x{3007}\x{00DF}\x{03C2}\x{200C}\x{200D}\pL0-9\-._~!$&'()*+,;=:@|]+|%[\dA-F]{2})+|[0-9.]+|\[[a-z0-9.]+:[a-z0-9.]+:[a-z0-9.:]+\])(?::\d*)?(?:/(?:[^\p{C}\p{Z}\p{S}\p{P}\p{Nl}\p{No}\p{Me}\x{1100}-\x{115F}\x{A960}-\x{A97C}\x{1160}-\x{11A7}\x{D7B0}-\x{D7C6}\x{20D0}-\x{20FF}\x{1D100}-\x{1D1FF}\x{1D200}-\x{1D24F}\x{0640}\x{07FA}\x{302E}\x{302F}\x{3031}-\x{3035}\x{303B}]*[\x{00B7}\x{0375}\x{05F3}\x{05F4}\x{30FB}\x{002D}\x{06FD}\x{06FE}\x{0F0B}\x{3007}\x{00DF}\x{03C2}\x{200C}\x{200D}\pL0-9\-._~!$&'()*+,;=:@|]+|%[\dA-F]{2})*)*(?:\?(?:[^\p{C}\p{Z}\p{S}\p{P}\p{Nl}\p{No}\p{Me}\x{1100}-\x{115F}\x{A960}-\x{A97C}\x{1160}-\x{11A7}\x{D7B0}-\x{D7C6}\x{20D0}-\x{20FF}\x{1D100}-\x{1D1FF}\x{1D200}-\x{1D24F}\x{0640}\x{07FA}\x{302E}\x{302F}\x{3031}-\x{3035}\x{303B}]*[\x{00B7}\x{0375}\x{05F3}\x{05F4}\x{30FB}\x{002D}\x{06FD}\x{06FE}\x{0F0B}\x{3007}\x{00DF}\x{03C2}\x{200C}\x{200D}\pL0-9\-._~!$&'()*+,;=:@/?|]+|%[\dA-F]{2})*)?(?:\#(?:[^\p{C}\p{Z}\p{S}\p{P}\p{Nl}\p{No}\p{Me}\x{1100}-\x{115F}\x{A960}-\x{A97C}\x{1160}-\x{11A7}\x{D7B0}-\x{D7C6}\x{20D0}-\x{20FF}\x{1D100}-\x{1D1FF}\x{1D200}-\x{1D24F}\x{0640}\x{07FA}\x{302E}\x{302F}\x{3031}-\x{3035}\x{303B}]*[\x{00B7}\x{0375}\x{05F3}\x{05F4}\x{30FB}\x{002D}\x{06FD}\x{06FE}\x{0F0B}\x{3007}\x{00DF}\x{03C2}\x{200C}\x{200D}\pL0-9\-._~!$&'()*+,;=:@/?|]+|%[\dA-F]{2})*)?";
-			break;
-
-			case 'url_http':
-				// generated with regex_idn.php file in the develop folder
-				return "http[s]?:/{2}(?:(?:[^\p{C}\p{Z}\p{S}\p{P}\p{Nl}\p{No}\p{Me}\x{1100}-\x{115F}\x{A960}-\x{A97C}\x{1160}-\x{11A7}\x{D7B0}-\x{D7C6}\x{20D0}-\x{20FF}\x{1D100}-\x{1D1FF}\x{1D200}-\x{1D24F}\x{0640}\x{07FA}\x{302E}\x{302F}\x{3031}-\x{3035}\x{303B}]*[\x{00B7}\x{0375}\x{05F3}\x{05F4}\x{30FB}\x{002D}\x{06FD}\x{06FE}\x{0F0B}\x{3007}\x{00DF}\x{03C2}\x{200C}\x{200D}\pL0-9\-._~!$&'()*+,;=:@|]+|%[\dA-F]{2})+|[0-9.]+|\[[a-z0-9.]+:[a-z0-9.]+:[a-z0-9.:]+\])(?::\d*)?(?:/(?:[^\p{C}\p{Z}\p{S}\p{P}\p{Nl}\p{No}\p{Me}\x{1100}-\x{115F}\x{A960}-\x{A97C}\x{1160}-\x{11A7}\x{D7B0}-\x{D7C6}\x{20D0}-\x{20FF}\x{1D100}-\x{1D1FF}\x{1D200}-\x{1D24F}\x{0640}\x{07FA}\x{302E}\x{302F}\x{3031}-\x{3035}\x{303B}]*[\x{00B7}\x{0375}\x{05F3}\x{05F4}\x{30FB}\x{002D}\x{06FD}\x{06FE}\x{0F0B}\x{3007}\x{00DF}\x{03C2}\x{200C}\x{200D}\pL0-9\-._~!$&'()*+,;=:@|]+|%[\dA-F]{2})*)*(?:\?(?:[^\p{C}\p{Z}\p{S}\p{P}\p{Nl}\p{No}\p{Me}\x{1100}-\x{115F}\x{A960}-\x{A97C}\x{1160}-\x{11A7}\x{D7B0}-\x{D7C6}\x{20D0}-\x{20FF}\x{1D100}-\x{1D1FF}\x{1D200}-\x{1D24F}\x{0640}\x{07FA}\x{302E}\x{302F}\x{3031}-\x{3035}\x{303B}]*[\x{00B7}\x{0375}\x{05F3}\x{05F4}\x{30FB}\x{002D}\x{06FD}\x{06FE}\x{0F0B}\x{3007}\x{00DF}\x{03C2}\x{200C}\x{200D}\pL0-9\-._~!$&'()*+,;=:@/?|]+|%[\dA-F]{2})*)?(?:\#(?:[^\p{C}\p{Z}\p{S}\p{P}\p{Nl}\p{No}\p{Me}\x{1100}-\x{115F}\x{A960}-\x{A97C}\x{1160}-\x{11A7}\x{D7B0}-\x{D7C6}\x{20D0}-\x{20FF}\x{1D100}-\x{1D1FF}\x{1D200}-\x{1D24F}\x{0640}\x{07FA}\x{302E}\x{302F}\x{3031}-\x{3035}\x{303B}]*[\x{00B7}\x{0375}\x{05F3}\x{05F4}\x{30FB}\x{002D}\x{06FD}\x{06FE}\x{0F0B}\x{3007}\x{00DF}\x{03C2}\x{200C}\x{200D}\pL0-9\-._~!$&'()*+,;=:@/?|]+|%[\dA-F]{2})*)?";
-			break;
-
 			case 'url_inline':
 				$inline = ($mode == 'url') ? ')' : '';
 				$scheme = ($mode == 'url') ? '[a-z\d+\-.]' : '[a-z\d+]'; // avoid automatic parsing of "word" in "last word.http://..."
@@ -4098,37 +4065,15 @@ class phpBB3 extends phpBB3_top
 			break;
 
 			case 'www_url':
-				// generated with regex_idn.php file in the develop folder
-				return "www\.(?:[^\p{C}\p{Z}\p{S}\p{P}\p{Nl}\p{No}\p{Me}\x{1100}-\x{115F}\x{A960}-\x{A97C}\x{1160}-\x{11A7}\x{D7B0}-\x{D7C6}\x{20D0}-\x{20FF}\x{1D100}-\x{1D1FF}\x{1D200}-\x{1D24F}\x{0640}\x{07FA}\x{302E}\x{302F}\x{3031}-\x{3035}\x{303B}]*[\x{00B7}\x{0375}\x{05F3}\x{05F4}\x{30FB}\x{002D}\x{06FD}\x{06FE}\x{0F0B}\x{3007}\x{00DF}\x{03C2}\x{200C}\x{200D}\pL0-9\-._~!$&'()*+,;=:@|]+|%[\dA-F]{2})+(?::\d*)?(?:/(?:[^\p{C}\p{Z}\p{S}\p{P}\p{Nl}\p{No}\p{Me}\x{1100}-\x{115F}\x{A960}-\x{A97C}\x{1160}-\x{11A7}\x{D7B0}-\x{D7C6}\x{20D0}-\x{20FF}\x{1D100}-\x{1D1FF}\x{1D200}-\x{1D24F}\x{0640}\x{07FA}\x{302E}\x{302F}\x{3031}-\x{3035}\x{303B}]*[\x{00B7}\x{0375}\x{05F3}\x{05F4}\x{30FB}\x{002D}\x{06FD}\x{06FE}\x{0F0B}\x{3007}\x{00DF}\x{03C2}\x{200C}\x{200D}\pL0-9\-._~!$&'()*+,;=:@|]+|%[\dA-F]{2})*)*(?:\?(?:[^\p{C}\p{Z}\p{S}\p{P}\p{Nl}\p{No}\p{Me}\x{1100}-\x{115F}\x{A960}-\x{A97C}\x{1160}-\x{11A7}\x{D7B0}-\x{D7C6}\x{20D0}-\x{20FF}\x{1D100}-\x{1D1FF}\x{1D200}-\x{1D24F}\x{0640}\x{07FA}\x{302E}\x{302F}\x{3031}-\x{3035}\x{303B}]*[\x{00B7}\x{0375}\x{05F3}\x{05F4}\x{30FB}\x{002D}\x{06FD}\x{06FE}\x{0F0B}\x{3007}\x{00DF}\x{03C2}\x{200C}\x{200D}\pL0-9\-._~!$&'()*+,;=:@/?|]+|%[\dA-F]{2})*)?(?:\#(?:[^\p{C}\p{Z}\p{S}\p{P}\p{Nl}\p{No}\p{Me}\x{1100}-\x{115F}\x{A960}-\x{A97C}\x{1160}-\x{11A7}\x{D7B0}-\x{D7C6}\x{20D0}-\x{20FF}\x{1D100}-\x{1D1FF}\x{1D200}-\x{1D24F}\x{0640}\x{07FA}\x{302E}\x{302F}\x{3031}-\x{3035}\x{303B}]*[\x{00B7}\x{0375}\x{05F3}\x{05F4}\x{30FB}\x{002D}\x{06FD}\x{06FE}\x{0F0B}\x{3007}\x{00DF}\x{03C2}\x{200C}\x{200D}\pL0-9\-._~!$&'()*+,;=:@/?|]+|%[\dA-F]{2})*)?";
-			break;
-
 			case 'www_url_inline':
 				$inline = ($mode == 'www_url') ? ')' : '';
 				return "www\.(?:[a-z0-9\-._~!$&'($inline*+,;=:@|]+|%[\dA-F]{2})+(?::\d*)?(?:/(?:[a-z0-9\-._~!$&'($inline*+,;=:@|]+|%[\dA-F]{2})*)*(?:\?(?:[a-z0-9\-._~!$&'($inline*+,;=:@/?|]+|%[\dA-F]{2})*)?(?:\#(?:[a-z0-9\-._~!$&'($inline*+,;=:@/?|]+|%[\dA-F]{2})*)?";
 			break;
 
 			case 'relative_url':
-				// generated with regex_idn.php file in the develop folder
-				return "(?:[^\p{C}\p{Z}\p{S}\p{P}\p{Nl}\p{No}\p{Me}\x{1100}-\x{115F}\x{A960}-\x{A97C}\x{1160}-\x{11A7}\x{D7B0}-\x{D7C6}\x{20D0}-\x{20FF}\x{1D100}-\x{1D1FF}\x{1D200}-\x{1D24F}\x{0640}\x{07FA}\x{302E}\x{302F}\x{3031}-\x{3035}\x{303B}]*[\x{00B7}\x{0375}\x{05F3}\x{05F4}\x{30FB}\x{002D}\x{06FD}\x{06FE}\x{0F0B}\x{3007}\x{00DF}\x{03C2}\x{200C}\x{200D}\pL0-9\-._~!$&'()*+,;=:@|]+|%[\dA-F]{2})*(?:/(?:[^\p{C}\p{Z}\p{S}\p{P}\p{Nl}\p{No}\p{Me}\x{1100}-\x{115F}\x{A960}-\x{A97C}\x{1160}-\x{11A7}\x{D7B0}-\x{D7C6}\x{20D0}-\x{20FF}\x{1D100}-\x{1D1FF}\x{1D200}-\x{1D24F}\x{0640}\x{07FA}\x{302E}\x{302F}\x{3031}-\x{3035}\x{303B}]*[\x{00B7}\x{0375}\x{05F3}\x{05F4}\x{30FB}\x{002D}\x{06FD}\x{06FE}\x{0F0B}\x{3007}\x{00DF}\x{03C2}\x{200C}\x{200D}\pL0-9\-._~!$&'()*+,;=:@|]+|%[\dA-F]{2})*)*(?:\?(?:[^\p{C}\p{Z}\p{S}\p{P}\p{Nl}\p{No}\p{Me}\x{1100}-\x{115F}\x{A960}-\x{A97C}\x{1160}-\x{11A7}\x{D7B0}-\x{D7C6}\x{20D0}-\x{20FF}\x{1D100}-\x{1D1FF}\x{1D200}-\x{1D24F}\x{0640}\x{07FA}\x{302E}\x{302F}\x{3031}-\x{3035}\x{303B}]*[\x{00B7}\x{0375}\x{05F3}\x{05F4}\x{30FB}\x{002D}\x{06FD}\x{06FE}\x{0F0B}\x{3007}\x{00DF}\x{03C2}\x{200C}\x{200D}\pL0-9\-._~!$&'()*+,;=:@/?|]+|%[\dA-F]{2})*)?(?:\#(?:[^\p{C}\p{Z}\p{S}\p{P}\p{Nl}\p{No}\p{Me}\x{1100}-\x{115F}\x{A960}-\x{A97C}\x{1160}-\x{11A7}\x{D7B0}-\x{D7C6}\x{20D0}-\x{20FF}\x{1D100}-\x{1D1FF}\x{1D200}-\x{1D24F}\x{0640}\x{07FA}\x{302E}\x{302F}\x{3031}-\x{3035}\x{303B}]*[\x{00B7}\x{0375}\x{05F3}\x{05F4}\x{30FB}\x{002D}\x{06FD}\x{06FE}\x{0F0B}\x{3007}\x{00DF}\x{03C2}\x{200C}\x{200D}\pL0-9\-._~!$&'()*+,;=:@/?|]+|%[\dA-F]{2})*)?";
-			break;
-
 			case 'relative_url_inline':
 				$inline = ($mode == 'relative_url') ? ')' : '';
 				return "(?:[a-z0-9\-._~!$&'($inline*+,;=:@|]+|%[\dA-F]{2})*(?:/(?:[a-z0-9\-._~!$&'($inline*+,;=:@|]+|%[\dA-F]{2})*)*(?:\?(?:[a-z0-9\-._~!$&'($inline*+,;=:@/?|]+|%[\dA-F]{2})*)?(?:\#(?:[a-z0-9\-._~!$&'($inline*+,;=:@/?|]+|%[\dA-F]{2})*)?";
-			break;
-
-			case 'table_prefix':
-				return '#^[a-zA-Z][a-zA-Z0-9_]*$#';
-			break;
-
-			// Matches the predecing dot
-			case 'path_remove_dot_trailing_slash':
-				return '#^(?:(\.)?)+(?:(.+)?)+(?:([\\/\\\])$)#';
-			break;
-
-			case 'semantic_version':
-				// Regular expression to match semantic versions by http://rgxdb.com/
-				return '/(?<=^[Vv]|^)(?:(?<major>(?:0|[1-9](?:(?:0|[1-9])+)*))[.](?<minor>(?:0|[1-9](?:(?:0|[1-9])+)*))[.](?<patch>(?:0|[1-9](?:(?:0|[1-9])+)*))(?:-(?<prerelease>(?:(?:(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?|(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?)|(?:0|[1-9](?:(?:0|[1-9])+)*))(?:[.](?:(?:(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?|(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?)|(?:0|[1-9](?:(?:0|[1-9])+)*)))*))?(?:[+](?<build>(?:(?:(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?|(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?)|(?:(?:0|[1-9])+))(?:[.](?:(?:(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?|(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?)|(?:(?:0|[1-9])+)))*))?)$/';
 			break;
 		}
 
@@ -4378,8 +4323,8 @@ class phpBB3 extends phpBB3_top
 				if (strpos($errfile, 'cache') === false && strpos($errfile, 'template.') === false)
 				{
 					// remove complete path to installation, with the risk of changing backslashes meant to be there
-					$errfile = str_replace(array(self::phpbb_realpath($phpbb_root_path), '\\'), array('', '/'), $errfile);
-					$msg_text = str_replace(array(self::phpbb_realpath($phpbb_root_path), '\\'), array('', '/'), $msg_text);
+					$errfile = str_replace(array(phpBB2::phpbb_realpath($phpbb_root_path), '\\'), array('', '/'), $errfile);
+					$msg_text = str_replace(array(phpBB2::phpbb_realpath($phpbb_root_path), '\\'), array('', '/'), $msg_text);
 
 					echo '<b>[phpBB Debug] PHP Notice</b>: in file <b>' . $errfile . '</b> on line <b>' . $errline . '</b>: <b>' . $msg_text . '</b><br />' . "\n";
 				}
@@ -5198,40 +5143,57 @@ class bitfield
 	}
 }
 
-//
-//This file is sometime included for build_hidden_fields() function 
-//and so we keep it here with this check for new for phpBB2 Tablet-PC and SmartPhone Edition Backend
-//
-if (!function_exists('_build_hidden_fields'))
+
+/**
+* Little helper for the build_hidden_fields function
+*/
+function _build_hidden_fields($key, $value, $specialchar, $stripslashes)
 {
-	/**
-	* Little helper for the build_hidden_fields function
-	*/
-	function _build_hidden_fields3($key, $value, $specialchar, $stripslashes)
+	$hidden_fields = '';
+
+	if (!is_array($value))
 	{
-		$hidden_fields = '';
+		$value = ($stripslashes) ? stripslashes($value) : $value;
+		$value = ($specialchar) ? htmlspecialchars($value, ENT_COMPAT, 'UTF-8') : $value;
 
-		if (!is_array($value))
+		$hidden_fields .= '<input type="hidden" name="' . $key . '" value="' . $value . '" />' . "\n";
+	}
+	else
+	{
+		foreach ($value as $_key => $_value)
 		{
-			$value = ($stripslashes) ? stripslashes($value) : $value;
-			$value = ($specialchar) ? htmlspecialchars($value, ENT_COMPAT, 'UTF-8') : $value;
+			$_key = ($stripslashes) ? stripslashes($_key) : $_key;
+			$_key = ($specialchar) ? htmlspecialchars($_key, ENT_COMPAT, 'UTF-8') : $_key;
 
-			$hidden_fields .= '<input type="hidden" name="' . $key . '" value="' . $value . '" />' . "\n";
+			$hidden_fields .= _build_hidden_fields($key . '[' . $_key . ']', $_value, $specialchar, $stripslashes);
 		}
-		else
-		{
-			foreach ($value as $_key => $_value)
-			{
-				$_key = ($stripslashes) ? stripslashes($_key) : $_key;
-				$_key = ($specialchar) ? htmlspecialchars($_key, ENT_COMPAT, 'UTF-8') : $_key;
-
-				$hidden_fields .= _build_hidden_fields($key . '[' . $_key . ']', $_value, $specialchar, $stripslashes);
-			}
-		}
-
-		return $hidden_fields;
 	}
 
+	return $hidden_fields;
+}
+
+/**
+* Build simple hidden fields from array
+*
+* @param array $field_ary an array of values to build the hidden field from
+* @param bool $specialchar if true, keys and values get specialchared
+* @param bool $stripslashes if true, keys and values get stripslashed
+*
+* @return string the hidden fields
+*/
+function build_hidden_fields($field_ary, $specialchar = false, $stripslashes = false)
+{
+	$s_hidden_fields = '';
+
+	foreach ($field_ary as $name => $vars)
+	{
+		$name = ($stripslashes) ? stripslashes($name) : $name;
+		$name = ($specialchar) ? htmlspecialchars($name, ENT_COMPAT, 'UTF-8') : $name;
+
+		$s_hidden_fields .= _build_hidden_fields($name, $vars, $specialchar, $stripslashes);
+	}
+
+	return $s_hidden_fields;
 }
 
 ?>

@@ -10,22 +10,22 @@
 <title><!-- IF UNREAD_NOTIFICATIONS_COUNT -->({UNREAD_NOTIFICATIONS_COUNT}) <!-- ENDIF --><!-- IF not S_VIEWTOPIC and not S_VIEWFORUM -->{SITENAME} - <!-- ENDIF --><!-- IF S_IN_MCP -->{L_MCP} - <!-- ELSEIF S_IN_UCP -->{L_UCP} - <!-- ENDIF -->{PAGE_TITLE}<!-- IF S_VIEWTOPIC or S_VIEWFORUM --> - {SITENAME}<!-- ENDIF --></title>
 
 <!-- IF S_ENABLE_FEEDS -->
-	<!-- IF S_ENABLE_FEEDS_OVERALL --><link rel="alternate" type="application/atom+xml" title="{L_FEED} - {SITENAME}" href="{{ path('phpbb_feed_index') }}"><!-- ENDIF -->
-	<!-- IF S_ENABLE_FEEDS_NEWS --><link rel="alternate" type="application/atom+xml" title="{L_FEED} - {L_FEED_NEWS}" href="{{ path('phpbb_feed_news') }}"><!-- ENDIF -->
-	<!-- IF S_ENABLE_FEEDS_FORUMS --><link rel="alternate" type="application/atom+xml" title="{L_FEED} - {L_ALL_FORUMS}" href="{{ path('phpbb_feed_forums') }}"><!-- ENDIF -->
-	<!-- IF S_ENABLE_FEEDS_TOPICS --><link rel="alternate" type="application/atom+xml" title="{L_FEED} - {L_FEED_TOPICS_NEW}" href="{{ path('phpbb_feed_topics') }}"><!-- ENDIF -->
-	<!-- IF S_ENABLE_FEEDS_TOPICS_ACTIVE --><link rel="alternate" type="application/atom+xml" title="{L_FEED} - {L_FEED_TOPICS_ACTIVE}" href="{{ path('phpbb_feed_topics_active') }}"><!-- ENDIF -->
-	<!-- IF S_ENABLE_FEEDS_FORUM and S_FORUM_ID --><link rel="alternate" type="application/atom+xml" title="{L_FEED} - {L_FORUM} - {FORUM_NAME}" href="{{ path('phpbb_feed_forum', { forum_id : S_FORUM_ID } ) }}"><!-- ENDIF -->
-	<!-- IF S_ENABLE_FEEDS_TOPIC and S_TOPIC_ID --><link rel="alternate" type="application/atom+xml" title="{L_FEED} - {L_TOPIC} - {TOPIC_TITLE}" href="{{ path('phpbb_feed_topic', { topic_id : S_TOPIC_ID } ) }}"><!-- ENDIF -->
+	<!-- IF S_ENABLE_FEEDS_OVERALL --><link rel="alternate" type="application/atom+xml" title="{L_FEED} - {SITENAME}" href="{{ path('phpbb_feed_index') }}" /><!-- ENDIF -->
+	<!-- IF S_ENABLE_FEEDS_NEWS --><link rel="alternate" type="application/atom+xml" title="{L_FEED} - {L_FEED_NEWS}" href="{{ path('phpbb_feed_news') }}" /><!-- ENDIF -->
+	<!-- IF S_ENABLE_FEEDS_FORUMS --><link rel="alternate" type="application/atom+xml" title="{L_FEED} - {L_ALL_FORUMS}" href="{{ path('phpbb_feed_forums') }}" /><!-- ENDIF -->
+	<!-- IF S_ENABLE_FEEDS_TOPICS --><link rel="alternate" type="application/atom+xml" title="{L_FEED} - {L_FEED_TOPICS_NEW}" href="{{ path('phpbb_feed_topics') }}" /><!-- ENDIF -->
+	<!-- IF S_ENABLE_FEEDS_TOPICS_ACTIVE --><link rel="alternate" type="application/atom+xml" title="{L_FEED} - {L_FEED_TOPICS_ACTIVE}" href="{{ path('phpbb_feed_topics_active') }}" /><!-- ENDIF -->
+	<!-- IF S_ENABLE_FEEDS_FORUM and S_FORUM_ID --><link rel="alternate" type="application/atom+xml" title="{L_FEED} - {L_FORUM} - {FORUM_NAME}" href="{{ path('phpbb_feed_forum', { forum_id : S_FORUM_ID } ) }}" /><!-- ENDIF -->
+	<!-- IF S_ENABLE_FEEDS_TOPIC and S_TOPIC_ID --><link rel="alternate" type="application/atom+xml" title="{L_FEED} - {L_TOPIC} - {TOPIC_TITLE}" href="{{ path('phpbb_feed_topic', { topic_id : S_TOPIC_ID } ) }}" /><!-- ENDIF -->
 	<!-- EVENT overall_header_feeds -->
 <!-- ENDIF -->
 
 <!-- IF U_CANONICAL -->
-	<link rel="canonical" href="{U_CANONICAL}">
+	<link rel="canonical" href="{U_CANONICAL}" />
 <!-- ENDIF -->
 
 <!--
-	phpBB style name: Platinum
+	phpBB style name: Prosilver
 	Based on style:   Prosilver (this is the default phpBB3 style)
 	Original author:  Tom Beddard ( http://www.subBlue.com/ )
 	Modified by: John Olson ( https://www.phpbb.com/community/viewtopic.php?f=596&t=2426926 )
@@ -47,32 +47,35 @@
 	})(document);
 </script>
 <!-- ENDIF -->
-<link href="{T_FONT_AWESOME_LINK}" rel="stylesheet">
-<link href="{T_STYLESHEET_LINK}" rel="stylesheet">
-<link href="{T_STYLESHEET_LANG_LINK}" rel="stylesheet">
+
+<link href="{T_FONT_AWESOME_LINK}" rel="stylesheet" />
+<link href="{T_STYLESHEET_LINK}" rel="stylesheet" />
+<link href="{T_STYLESHEET_LANG_LINK}" rel="stylesheet" />
+
 <!-- IF not $P_COLOR_SWITCHER -->
-<!-- IF $P_DEFAULT_COLOR eq 'green' --><link href="{T_THEME_PATH}/custom/green.css" rel="stylesheet"><!-- ENDIF -->
-<!-- IF $P_DEFAULT_COLOR eq 'pink' --><link href="{T_THEME_PATH}/custom/pink.css" rel="stylesheet"><!-- ENDIF -->
-<!-- IF $P_DEFAULT_COLOR eq 'black' --><link href="{T_THEME_PATH}/custom/black.css" rel="stylesheet"><!-- ENDIF -->
-<!-- IF $P_DEFAULT_COLOR eq 'purple' --><link href="{T_THEME_PATH}/custom/purple.css" rel="stylesheet"><!-- ENDIF -->
-<!-- IF $P_DEFAULT_COLOR eq 'red' --><link href="{T_THEME_PATH}/custom/red.css" rel="stylesheet"><!-- ENDIF -->
-<!-- IF $P_DEFAULT_COLOR eq 'teal' --><link href="{T_THEME_PATH}/custom/teal.css" rel="stylesheet"><!-- ENDIF -->
-<!-- IF $P_DEFAULT_COLOR eq 'blue' --><link href="{T_THEME_PATH}/custom/blue.css" rel="stylesheet"><!-- ENDIF -->
+<!-- IF $P_DEFAULT_COLOR eq 'green' --><link href="{T_THEME_PATH}/custom/green.css" rel="stylesheet" /><!-- ENDIF -->
+<!-- IF $P_DEFAULT_COLOR eq 'pink' --><link href="{T_THEME_PATH}/custom/pink.css" rel="stylesheet" /><!-- ENDIF -->
+<!-- IF $P_DEFAULT_COLOR eq 'black' --><link href="{T_THEME_PATH}/custom/black.css" rel="stylesheet" /><!-- ENDIF -->
+<!-- IF $P_DEFAULT_COLOR eq 'purple' --><link href="{T_THEME_PATH}/custom/purple.css" rel="stylesheet" /><!-- ENDIF -->
+<!-- IF $P_DEFAULT_COLOR eq 'red' --><link href="{T_THEME_PATH}/custom/red.css" rel="stylesheet" /><!-- ENDIF -->
+<!-- IF $P_DEFAULT_COLOR eq 'teal' --><link href="{T_THEME_PATH}/custom/teal.css" rel="stylesheet" /><!-- ENDIF -->
+<!-- IF $P_DEFAULT_COLOR eq 'blue' --><link href="{T_THEME_PATH}/custom/blue.css" rel="stylesheet" /><!-- ENDIF -->
 <!-- ENDIF -->
 <!-- IF S_CONTENT_DIRECTION eq 'rtl' -->
-	<link href="{T_THEME_PATH}/bidi.css?assets_version={T_ASSETS_VERSION}" rel="stylesheet">
+
+	<link href="{T_THEME_PATH}/bidi.css?assets_version={T_ASSETS_VERSION}" rel="stylesheet" />
 <!-- ENDIF -->
 
 <!-- IF S_PLUPLOAD -->
-	<link href="{T_THEME_PATH}/plupload.css?assets_version={T_ASSETS_VERSION}" rel="stylesheet">
+	<link href="{T_THEME_PATH}/plupload.css?assets_version={T_ASSETS_VERSION}" rel="stylesheet" />
 <!-- ENDIF -->
 
 <!-- IF S_COOKIE_NOTICE -->
-	<link href="{T_ASSETS_PATH}/cookieconsent/cookieconsent.min.css?assets_version={T_ASSETS_VERSION}" rel="stylesheet">
+	<link href="{T_ASSETS_PATH}/cookieconsent/cookieconsent.min.css?assets_version={T_ASSETS_VERSION}" rel="stylesheet" />
 <!-- ENDIF -->
 
 <!--[if lte IE 9]>
-	<link href="{T_THEME_PATH}/tweaks.css?assets_version={T_ASSETS_VERSION}" rel="stylesheet">
+	<link href="{T_THEME_PATH}/tweaks.css?assets_version={T_ASSETS_VERSION}" rel="stylesheet" />
 <![endif]-->
 
 <!-- EVENT overall_header_head_append -->
@@ -148,26 +151,26 @@ function checkSearch()
 		<div class="headerbar" role="banner">
 		<!-- EVENT overall_header_headerbar_before -->
 		<div class="inner">
-					<div style="float:right;text-align:top;padding-top:1px;padding-bottom:10px;width:auto;">					
-					<img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}theme/images/top.gif" alt="{L_INDEX}" /></a>								
+					<div style="float:right;text-align:top;padding-top:1px;padding-bottom:10px;width:auto;">
+					<img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}theme/images/top.gif" alt="{L_INDEX}" /></a>
 					</div>
 			
 			<div id="site-description">
 				
-								
-					
+				
+				
 					<a id="logo" class="logo" href="<!-- IF U_SITE_HOME -->{U_SITE_HOME}<!-- ELSE -->{U_INDEX}<!-- ENDIF -->" title="<!-- IF U_SITE_HOME -->{L_SITE_HOME}<!-- ELSE -->{L_INDEX}<!-- ENDIF -->">
 						<img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/logo.gif" alt="{L_INDEX}" /></a>
 					</a>
-					
+				
 					<h1>
 						{SITENAME}
-					</h1>			
+					</h1>
 					<p>
-						{SITE_DESCRIPTION}			
-					</p>					
+						{SITE_DESCRIPTION}	
+					</p>
 					<p class="skiplink">
-					<a href="#start_here">					
+					<a href="#start_here">
 						{L_SKIP}
 					</a>
 					</p>
@@ -182,9 +185,9 @@ function checkSearch()
 					</h1>				
 					<p>
 						{PAGE_DESCRIPTION}
-					</p>				
-					</div>						
-									
+					</p>
+					</div>
+				
 			</div>
 		
 			<div id="navbar" class="sitebar" role="navigation" style="padding-top:4px;padding-bottom:10px;width:auto;">

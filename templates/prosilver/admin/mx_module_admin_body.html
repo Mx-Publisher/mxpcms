@@ -226,24 +226,73 @@ window.onload = doOnLoadMenuACP;
 	<div>{RESULT_MESSAGE}</div>
 	<!-- BEGIN module -->
 		<div class="clear blockColapse">
+
 			<div class="header">
+			
 				<!-- BEGIN settings -->
 				<div class="buttons">
-					<a href="{module.U_MODULE}" title="{L_SETTINGS}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_edit.gif" align="absmiddle"></a>
-					<a href="javascript:onMenuCatClick('{module.MODULE_ID}','adminModuleUpgrade_');" title="{L_UPGRADE_PACK}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_upgrade.gif" align="absmiddle"></a>
-					<a href="javascript:onMenuCatClick('{module.MODULE_ID}','adminModuleExport_');" title="{L_EXPORT_PACK}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_export.gif" align="absmiddle"></a>
-					<a href="javascript:onMenuCatClick('{module.MODULE_ID}','adminModuleDelete_');" title="{L_UNINSTALL}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_delete.gif" align="absmiddle"></a>
-				</div>
-				<!-- END settings -->
-				<div>
+
+					<!-- IF IMG_EDIT_BLOCK -->
+					
+						<a href="{module.U_MODULE}" title="{L_SETTINGS}" role="menuitem">{IMG_EDIT_BLOCK}</a>
+					
+					<!-- ELSE -->
+					
+						<a href="{module.U_MODULE}" title="{L_SETTINGS}" role="menuitem">
+							<img src="{IMG_URL_EXPAND}" border="0" align="absmiddle" />&nbsp;<span>{L_SETTINGS}</span>
+						</a>
+					
+					<!-- ENDIF -->
+					
+					<!-- IF IMG_UPDRADE_BLOCK -->
+					
+						<a href="javascript:onMenuCatClick('{module.MODULE_ID}','adminModuleUpgrade_');" title="{L_UPGRADE_PACK}">{IMG_UPDRADE_BLOCK}</a>
+					
+					<!-- ELSE -->
+					
+						<a href="javascript:onMenuCatClick('{module.MODULE_ID}','adminModuleUpgrade_');" title="{L_UPGRADE_PACK}" role="menuitem">
+							<img src="{IMG_URL_EXPAND}" border="0" align="absmiddle" />&nbsp;<span>{L_UPGRADE_PACK}</span>
+						</a>
+					
+					<!-- ENDIF -->
+					
+					<!-- IF IMG_EXPORT_BLOCK -->
+					
+						<a href="javascript:onMenuCatClick('{module.MODULE_ID}','adminModuleExport_');" title="{L_EXPORT_PACK}">{IMG_EXPORT_BLOCK}</a>
+					
+					<!-- ELSE -->
+					
+						<a href="javascript:onMenuCatClick('{module.MODULE_ID}','adminModuleExport_');" title="{L_EXPORT_PACK}" role="menuitem">
+							<img src="{IMG_URL_EXPAND}" border="0" align="absmiddle" />&nbsp;<span>{L_EXPORT_PACK}</span>
+						</a>
+					
+					<!-- ENDIF -->
+					
+					<!-- IF IMG_DELETE_BLOCK -->
+	
+						<a href="javascript:onMenuCatClick('{module.MODULE_ID}','adminModuleDelete_');" title="{L_UNINSTALL}">{IMG_DELETE_BLOCK}</a>
+
+					<!-- ELSE -->
+
+						<a href="javascript:onMenuCatClick('{module.MODULE_ID}','adminModuleDelete_');" title="{L_UNINSTALL}" role="menuitem">
+							<img src="{IMG_URL_EXPAND}" border="0" align="absmiddle" />&nbsp;<span>{L_UNINSTALL}</span>
+						</a>
+
+					<!-- ENDIF -->
+
+			</div>
+			<!-- END settings -->
+
+			<div>
 					<img name="adminModule_image_{module.MODULE_ID}" id="adminModule_image_{module.MODULE_ID}" src="{module.IMG_URL}"/>
 					<span style="cursor:pointer" onclick="onMenuCatClick('{module.MODULE_ID}','adminModule_');"><img src="{IMG_ICON_MODULE}" alt="" /></span>
-				<span class="title"><a href="javascript:onMenuCatClick('{module.MODULE_ID}','adminModule_');">{module.MODULE_TITLE}</a></span>
+					<span class="title"><a href="javascript:onMenuCatClick('{module.MODULE_ID}','adminModule_');">{module.MODULE_TITLE}</a></span>
 					<!-- IF module.MODULE_DESCRIPTION neq '' --><br/>
 					<span class="explain" style="padding-left:30px;">{module.MODULE_DESCRIPTION}</span>
-					<i>{module.MODULE_VERSION}</i><!-- ENDIF -->
-				</div>
+					<i>{module.MODULE_VERSION}</i>
+					<!-- ENDIF -->
 			</div>
+		</div>
 			
 			<!-- MODUL Delete -->
 			<div id="adminModuleDelete_{module.MODULE_ID}" class="settings" style="display:{module.VISIBLE_DELETE};">

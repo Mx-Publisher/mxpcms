@@ -41,7 +41,6 @@ if ( !defined('IN_PORTAL') )
 !defined('PAGE_PROFILE') ? define('PAGE_PROFILE', -4) : false;
 
 @define('PAGE_UCP', -4);
-@define('PAGE_ACP', -400);
 
 !defined('PAGE_VIEWONLINE') ? define('PAGE_VIEWONLINE', -6) : false;
 !defined('PAGE_VIEWMEMBERS') ? define('PAGE_VIEWMEMBERS', -7) : false;

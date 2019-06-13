@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Module - mx_navmenu
-* @version $Id: mx_module_defs.php,v 1.42 2014/05/18 06:25:07 orynider Exp $
+* @version $Id: mx_module_defs.php,v 1.41 2013/07/02 02:24:04 orynider Exp $
 * @copyright (c) 2002-2008 [Jon Ohlsson] MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://mxpcms.sourceforge.net
+* @link http://www.mx-publisher.com
 *
 */
 
@@ -73,11 +73,11 @@ class mx_module_defs
 		{
 			case 'nav_menu':
 				$parameter_value = addslashes(serialize($parameter_value));
-			break;
+				break;
 				
 			case 'site_menu':
 				// Nothing special to do for this simple integer
-			break;
+				break;
 		}
 		return array('parameter_value' => $parameter_value, 'parameter_opt' => $parameter_opt);
 	}
@@ -237,14 +237,13 @@ class mx_module_defs
 				FROM " . GROUPS_TABLE . "
 				WHERE group_single_user <> " . TRUE . "
 				ORDER BY group_name ASC";
-			break;
+				break;
 			case 'phpbb3':
-			default:
 			$sql = "SELECT group_id, group_name
 				FROM " . GROUPS_TABLE . "
 				WHERE group_name NOT IN ('BOTS', 'GUESTS')
 				ORDER BY group_name ASC";
-			break;
+				break;
 		}
 		
 		if( !($result = $db->sql_query($sql)) )
@@ -375,10 +374,9 @@ class mx_module_defs
 			$cat_id = $new_cat ? 'new_cat' : $cat_rows[$cat_count]['cat_id'];
 			
 			$mode = MX_MENU_CAT_TYPE;
-			
 			$action = $new_cat ? MX_DO_INSERT : MX_DO_UPDATE;
-			
 			$deletemode = '?panel_mode=' . $mode . '&amp;panel_action=' . MX_DO_DELETE . '&amp;id=' . $cat_id . '&amp;block_id=' . $block_id . '&amp;portalpage=' . $portalpage. '&amp;dynamic_block=' . $dynamic_block_id;
+			
 			$upmode = '?panel_mode=' . $mode . '&amp;panel_action=' . MX_DO_MOVE . '&amp;id=' . $cat_id . '&amp;block_id=' . $block_id . '&amp;block_order=' . $block_order . '&amp;move=-15' . '&amp;portalpage=' . $portalpage. '&amp;dynamic_block=' . $dynamic_block_id;
 			$downmode = '?panel_mode=' . $mode . '&amp;panel_action=' . MX_DO_MOVE . '&amp;id=' . $cat_id . '&amp;block_id=' . $block_id . '&amp;block_order=' . $block_order . '&amp;move=15' . '&amp;portalpage=' . $portalpage. '&amp;dynamic_block=' . $dynamic_block_id;
 			
@@ -743,8 +741,7 @@ class mx_module_defs
 		include_once( $mx_root_path . 'modules/mx_navmenu/includes/navmenu_functions.' . $phpEx );
 
 		$parameter_id = $parameter_data['parameter_id'];
-		$block_order = $parameter_data['parameter_order'];
-		
+
 		//
 		// Load states
 		//
@@ -779,10 +776,8 @@ class mx_module_defs
 		$submit = $mx_request_vars->is_post('submit');
 		$cancel = $mx_request_vars->is_post('cancel');
 		$preview = $mx_request_vars->is_post('preview');
-		$refresh = $preview || isset($submit_search);
-		
-		$s_hidden_fields = '';
-		
+		$refresh = $preview || $submit_search;
+
 		//
 		// SUBMIT?
 		//
@@ -975,7 +970,7 @@ class mx_module_defs
 			{
 				$menu_active_select = '<select name="menu_active"><option value="1">' . ( !empty($lang['Menu_active']) ? $lang['Menu_active'] : 'Menu_active' ) . '</option><option value="0" selected="selected">' . ( !empty($lang['Menu_not_active']) ? $lang['Menu_not_active'] : 'Menu_not_active' ) . '</option></select>';
 			}
-			$menuicon = $cat_rows[$cat_count]['menu_icon'];
+
 			$menuicons = post_icons('menu_icons/', $cat_rows[$cat_count]['menu_icon']);
 			$menu_alt_icon = $cat_rows[$cat_count]['menu_alt_icon'];
 			$menu_alt_icon_hot = $cat_rows[$cat_count]['menu_alt_icon_hot'];
@@ -987,7 +982,7 @@ class mx_module_defs
 				'CAT_ID' 					=> $cat_id,
 
 				'VISIBLE' 					=> $visible_cat ? 'block' : 'none',
-				'VISIBLE_EDIT' 				=> $visible_cat_edit || isset($new_page) ? 'block' : 'none',
+				'VISIBLE_EDIT' 				=> $visible_cat_edit || $new_page ? 'block' : 'none',
 
 				'IMG_URL' 					=> $visible_cat ? $admin_icon['contract'] : $admin_icon['expand'],
 				'IMG_URL_EDIT' 				=> $visible_cat_edit ? $admin_icon['contract'] : $admin_icon['expand'],
@@ -1020,7 +1015,7 @@ class mx_module_defs
 
 			));
 			
-			$num_of_menus = count($cat_rows);
+			$num_of_menus = count($catData);
 			
 			//$menu_info = mx_get_info(MENU_NAV_TABLE, 'cat_id', $cat_id);
 			

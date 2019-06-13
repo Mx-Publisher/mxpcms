@@ -19,16 +19,21 @@ if ( !empty( $setmodules ) )
 $mx_root_path = './../../../';
 $module_root_path = "./../";
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
-
-// **********************************************************************
-// Includes
-// **********************************************************************
 require( $mx_root_path . '/admin/pagestart.' . $phpEx );
 
 include_once( $mx_root_path . 'admin/page_header_admin.' . $phpEx );
 
+// **********************************************************************
 // Read language definition
-include($module_root_path . 'includes/users_constants.' . $phpEx);
+// **********************************************************************
+if ( !file_exists( $module_root_path . 'language/lang_' . $board_config['default_lang'] . '/lang_admin.' . $phpEx ) )
+{
+	include( $module_root_path . 'language/lang_english/lang_admin.' . $phpEx );
+}
+else
+{
+	include( $module_root_path . 'language/lang_' . $board_config['default_lang'] . '/lang_admin.' . $phpEx );
+}
 
 //
 // Set mode
@@ -129,7 +134,7 @@ if ($mx_request_vars->is_request('alphanum'))
 }
 else
 {
-	$alphanum = '';
+	$alpahnum = '';
 	$alpha_where = '';
 }
 
@@ -213,14 +218,13 @@ switch( $mode )
 							WHERE ug.user_id = $user_id
 								AND g.group_id = ug.group_id
 								AND g.group_single_user = 1";
-					break;
-					default:
+						break;
 						$sql = "SELECT u.username, g.group_id
 							FROM " . USERS_TABLE . " u, " . USER_GROUP_TABLE . " ug, " . GROUPS_TABLE . " g
 							WHERE ug.user_id = $user_id
 								AND g.group_id = ug.group_id
 								AND g.group_name IN ('BOTS', 'GUESTS')";
-					break;
+						break;
 				}
 
 				if( !($result = $db->sql_query($sql)) )
@@ -246,37 +250,17 @@ switch( $mode )
 					mx_message_die(GENERAL_ERROR, 'Could not update topics for this user', '', __LINE__, __FILE__, $sql);
 				}
 
-				switch (PORTAL_BACKEND)
+				$sql = "UPDATE " . VOTE_USERS_TABLE . "
+					SET vote_user_id = " . DELETED . "
+					WHERE vote_user_id = $user_id";
+				if( !$db->sql_query($sql) )
 				{
-					case 'internal':
-					case 'phpbb2':
-						$sql = "UPDATE " . VOTE_USERS_TABLE . "
-							SET vote_user_id = " . DELETED . "
-							WHERE vote_user_id = $user_id";
-						if( !$db->sql_query($sql) )
-						{
-							mx_message_die(GENERAL_ERROR, 'Could not update votes for this user', '', __LINE__, __FILE__, $sql);
-						}
-						$sql = "SELECT group_id
-							FROM " . GROUPS_TABLE . "
-							WHERE group_moderator = $user_id";
-					break;
-					case 'olympus':
-						$sql = 'SELECT group_id
-							FROM ' . GROUPS_TABLE . "
-							WHERE group_name IN ('GLOBAL_MODERATORS', 'GROUP_SPECIAL')";
-					break;
-					default:
-						$sql = "SELECT g.group_id, g.group_name, ug.user_id
-							FROM " . USER_GROUP_TABLE . " ug, " . GROUPS_TABLE . " g
-							WHERE ug.user_id = $user_id
-								AND g.group_id = ug.group_id
-								AND g.group_id <> $group_id
-								AND g.group_type = " . GROUP_SPECIAL . "
-							ORDER BY ug.user_id, g.group_id";
-					break;
+					mx_message_die(GENERAL_ERROR, 'Could not update votes for this user', '', __LINE__, __FILE__, $sql);
 				}
 
+				$sql = "SELECT group_id
+					FROM " . GROUPS_TABLE . "
+					WHERE group_moderator = $user_id";
 				if( !($result = $db->sql_query($sql)) )
 				{
 					mx_message_die(GENERAL_ERROR, 'Could not select groups where user was moderator', '', __LINE__, __FILE__, $sql);
@@ -290,40 +274,13 @@ switch( $mode )
 				if ( count($group_moderator) )
 				{
 					$update_moderator_id = implode(', ', $group_moderator);
-					
-					switch (PORTAL_BACKEND)
-					{
-						case 'internal':
-						case 'phpbb2':
-							$sql = "UPDATE " . GROUPS_TABLE . "
-								SET group_moderator = " . $userdata['user_id'] . "
-								WHERE group_moderator IN ($update_moderator_id)";
-							if( !$db->sql_query($sql) )
-							{
-								mx_message_die(GENERAL_ERROR, 'Could not update group moderators', '', __LINE__, __FILE__, $sql);
-							}
-						break;
-						
-						default:
-							$user_ary = array();
-							$sql_ary = array(
-								'group_name'			=> (string) $row_group['group_name'],
-								'group_desc'			=> (string) $row_group['group_desc'],
-								'group_desc_uid'		=> '',
-								'group_desc_bitfield'	=> '',
-								'group_type'			=> (int) GROUP_SPECIAL,
-							); 
-							$sql = 'UPDATE ' . GROUPS_TABLE . '
-								SET ' . $db->sql_build_array('UPDATE', $sql_ary) . "
-								WHERE group_id = $group_id";
-							$db->sql_query($sql);
 
-							// Since we may update the name too, we need to do this on other tables too...
-							$sql = 'UPDATE ' . MODERATOR_CACHE_TABLE . "
-								SET group_name = '" . $db->sql_escape($sql_ary['group_name']) . "'
-								WHERE group_id = $group_id";
-							$db->sql_query($sql); 
-						break;
+					$sql = "UPDATE " . GROUPS_TABLE . "
+						SET group_moderator = " . $userdata['user_id'] . "
+						WHERE group_moderator IN ($update_moderator_id)";
+					if( !$db->sql_query($sql) )
+					{
+						mx_message_die(GENERAL_ERROR, 'Could not update group moderators', '', __LINE__, __FILE__, $sql);
 					}
 				}
 
@@ -340,7 +297,7 @@ switch( $mode )
 				{
 					mx_message_die(GENERAL_ERROR, 'Could not delete user from user_group table', '', __LINE__, __FILE__, $sql);
 				}
-				$row['group_id'] = isset($row['group_id']) ? $row['group_id'] : $user_id;
+
 				$sql = "DELETE FROM " . GROUPS_TABLE . "
 					WHERE group_id = " . $row['group_id'];
 				if( !$db->sql_query($sql) )
@@ -348,21 +305,8 @@ switch( $mode )
 					mx_message_die(GENERAL_ERROR, 'Could not delete group for this user', '', __LINE__, __FILE__, $sql);
 				}
 
-				// Delete auth entries from the groups table
-				switch (PORTAL_BACKEND)
-				{
-					case 'internal':
-					case 'phpbb2':
-						$sql = "DELETE FROM " . AUTH_ACCESS_TABLE . "
-							WHERE group_id = " . $row['group_id'];
-					break;
-
-					default:
-						$sql = 'DELETE FROM ' . ACL_GROUPS_TABLE . "
-							WHERE group_id = " . $row['group_id'];
-					break;
-				}
-					
+				$sql = "DELETE FROM " . AUTH_ACCESS_TABLE . "
+					WHERE group_id = " . $row['group_id'];
 				if( !$db->sql_query($sql) )
 				{
 					mx_message_die(GENERAL_ERROR, 'Could not delete group for this user', '', __LINE__, __FILE__, $sql);
@@ -382,75 +326,40 @@ switch( $mode )
 					mx_message_die(GENERAL_ERROR, 'Could not delete user from banlist table', '', __LINE__, __FILE__, $sql);
 				}
 
-
-				/* Delete notifications from the database */
-				switch (PORTAL_BACKEND)
+				$sql = "SELECT privmsgs_id
+					FROM " . PRIVMSGS_TABLE . "
+					WHERE privmsgs_from_userid = $user_id
+						OR privmsgs_to_userid = $user_id";
+				if ( !($result = $db->sql_query($sql)) )
 				{
-					case 'internal':
-					case 'phpbb2':
-						$sql = "SELECT privmsgs_id
-							FROM " . PRIVMSGS_TABLE . "
-							WHERE privmsgs_from_userid = $user_id
-								OR privmsgs_to_userid = $user_id";
-						if ( !($result = $db->sql_query($sql)) )
-						{
-							mx_message_die(GENERAL_ERROR, 'Could not select all users private messages', '', __LINE__, __FILE__, $sql);
-						}
-						
-						// This little bit of code directly from the private messaging section.
-						while ( $row_privmsgs = $db->sql_fetchrow($result) )
-						{
-							$mark_list[] = $row_privmsgs['privmsgs_id'];
-						}
-
-						if (@count($mark_list) )
-						{
-							$delete_sql_id = implode(', ', $mark_list);
-
-							$delete_text_sql = "DELETE FROM " . PRIVMSGS_TEXT_TABLE . "
-								WHERE privmsgs_text_id IN ($delete_sql_id)";
-							$delete_sql = "DELETE FROM " . PRIVMSGS_TABLE . "
-								WHERE privmsgs_id IN ($delete_sql_id)";
-
-							if ( !$db->sql_query($delete_sql) )
-							{
-								mx_message_die(GENERAL_ERROR, 'Could not delete private message info', '', __LINE__, __FILE__, $delete_sql);
-							}
-
-							if ( !$db->sql_query($delete_text_sql) )
-							{
-								mx_message_die(GENERAL_ERROR, 'Could not delete private message text', '', __LINE__, __FILE__, $delete_text_sql);
-							}
-						}
-					break;
-					
-					case 'olympus':
-						// Clean the private messages tables from the user
-						if (!function_exists('phpbb_delete_user_pms'))
-						{
-							include_once($phpbb_root_path . 'includes/functions_privmsgs.' . $phpEx);
-						}
-						phpbb_delete_user_pms($user_id);
-					break;
-					
-					case 'ascraeus':
-						// Clean the private messages tables from the user
-						if (!function_exists('phpbb_delete_user_pms'))
-						{
-							include_once($phpbb_root_path . 'includes/functions_privmsgs.' . $phpEx);
-						}
-						phpbb_delete_users_pms($user_id);
-					break;
-					
-					default:
-						group_update_listings($row['group_id']);
-
-						$phpbb_notifications = $phpbb_container->get('notification_manager');
-
-						$phpbb_notifications->delete_notifications('notification.type.group_request', $user_id, $row['group_id']);
-					break;
+					mx_message_die(GENERAL_ERROR, 'Could not select all users private messages', '', __LINE__, __FILE__, $sql);
 				}
-				/* */
+
+				// This little bit of code directly from the private messaging section.
+				while ( $row_privmsgs = $db->sql_fetchrow($result) )
+				{
+					$mark_list[] = $row_privmsgs['privmsgs_id'];
+				}
+
+				if ( count($mark_list) )
+				{
+					$delete_sql_id = implode(', ', $mark_list);
+
+					$delete_text_sql = "DELETE FROM " . PRIVMSGS_TEXT_TABLE . "
+						WHERE privmsgs_text_id IN ($delete_sql_id)";
+					$delete_sql = "DELETE FROM " . PRIVMSGS_TABLE . "
+						WHERE privmsgs_id IN ($delete_sql_id)";
+
+					if ( !$db->sql_query($delete_sql) )
+					{
+						mx_message_die(GENERAL_ERROR, 'Could not delete private message info', '', __LINE__, __FILE__, $delete_sql);
+					}
+
+					if ( !$db->sql_query($delete_text_sql) )
+					{
+						mx_message_die(GENERAL_ERROR, 'Could not delete private message text', '', __LINE__, __FILE__, $delete_text_sql);
+					}
+				}
 
 				unset($user_id);
 				$i++;
@@ -614,14 +523,13 @@ switch( $mode )
 						FROM " . GROUPS_TABLE . "
 						WHERE group_single_user <> " . TRUE . "
 						ORDER BY group_name ASC";
-				break;
-					
+					break;
 				case 'phpbb3':
 					$sql = "SELECT group_id, group_name
 						FROM " . GROUPS_TABLE . "
 						WHERE group_name NOT IN ('BOTS', 'GUESTS')
 						ORDER BY group_name ASC";
-				break;
+					break;
 			}
 
 			if( !($result = $db->sql_query($sql)) )
@@ -825,7 +733,7 @@ switch( $mode )
 		$alpha_letters = range('A','Z');
 		$alpha_start = array($lang['All'], '#');
 		$alpha_range = array_merge($alpha_start, $alpha_letters);
-		$temp = '';
+
 		$i = 0;
 		while( $i < count($alpha_range) )
 		{
@@ -955,15 +863,13 @@ switch( $mode )
 					{
 						case USER_AVATAR_UPLOAD:
 							$avatar_img = ( $board_config['allow_avatar_upload'] ) ? '<img src="' . $phpbb_root_path . $board_config['avatar_path'] . '/' . $row['user_avatar'] . '" alt="" border="0" />' : '';
-						break;
-						
+							break;
 						case USER_AVATAR_REMOTE:
 							$avatar_img = ( $board_config['allow_avatar_remote'] ) ? '<img src="' . $row['user_avatar'] . '" alt="" border="0" />' : '';
-						break;
-						
+							break;
 						case USER_AVATAR_GALLERY:
 							$avatar_img = ( $board_config['allow_avatar_local'] ) ? '<img src="' . $phpbb_root_path . $board_config['avatar_gallery_path'] . '/' . $row['user_avatar'] . '" alt="" border="0" />' : '';
-						break;
+							break;
 					}
 				}
 
@@ -1044,8 +950,8 @@ switch( $mode )
 				'I_RANK' => $rank_image,
 				'I_AVATAR' => $avatar_img,
 
-				'JOINED' => mx_create_date('d M Y', $row['user_regdate'], $board_config['board_timezone']),
-				'LAST_ACTIVITY' => ( !empty($row['user_session_time']) ) ? mx_create_date('d M Y', $row['user_session_time'], $board_config['board_timezone']) : $lang['Never'],
+				'JOINED' => phpBB2::create_date('d M Y', $row['user_regdate'], $board_config['board_timezone']),
+				'LAST_ACTIVITY' => ( !empty($row['user_session_time']) ) ? phpBB2::create_date('d M Y', $row['user_session_time'], $board_config['board_timezone']) : $lang['Never'],
 
 				'POSTS' => ( $row['user_posts'] ) ? $row['user_posts'] : 0,
 				'U_SEARCH' => mx_append_sid($phpbb_root_path . 'search.'.$phpEx.'?search_author=' . urlencode(strip_tags($row['username'])) . '&amp;showresults=posts'),
@@ -1074,14 +980,13 @@ switch( $mode )
 						WHERE ug.user_id = " . $row['user_id'] . "
 						 AND g.group_single_user <> 1
 						 AND g.group_id = ug.group_id";
-				break;
-				
-				default:
+					break;
+				case 'phpbb3':
 					$group_sql = "SELECT * FROM " . USER_GROUP_TABLE . " ug, " . GROUPS_TABLE . " g
 						WHERE ug.user_id = " . $row['user_id'] . "
 						 AND g.group_name NOT IN ('BOTS', 'GUESTS')
 						 AND g.group_id = ug.group_id";
-				break;
+					break;
 			}
 
 			if( !($group_result = $db->sql_query($group_sql)) )
@@ -1139,7 +1044,7 @@ switch( $mode )
 		{
 			$total_members = $total['total'];
 
-			$pagination = mx_generate_pagination($module_root_path . "admin/admin_userlist.$phpEx?sort=$sort&amp;order=$sort_order&amp;show=$show" . ( ( isset($alphanum) ) ? "&amp;alphanum=$alphanum" : '' ), $total_members, $show, $start);
+			$pagination = phpBB2::generate_pagination($module_root_path . "admin/admin_userlist.$phpEx?sort=$sort&amp;order=$sort_order&amp;show=$show" . ( ( isset($alphanum) ) ? "&amp;alphanum=$alphanum" : '' ), $total_members, $show, $start);
 		}
 
 		$template->assign_vars(array(

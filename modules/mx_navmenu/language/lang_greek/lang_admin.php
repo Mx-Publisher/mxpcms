@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Module - mx_navmenu
-* @version $Id: lang_admin.php,v 1.4 2014/05/18 06:25:16 orynider Exp $
+* @version $Id: lang_admin.php,v 1.3 2013/07/02 02:24:04 orynider Exp $
 * @copyright (c) 2002-2008 [Jon Ohlsson] MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://mxpcms.sourceforge.net
+* @link http://www.mx-publisher.com
 *
 */
 

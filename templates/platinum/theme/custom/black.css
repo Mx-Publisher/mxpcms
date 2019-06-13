@@ -1,17 +1,32 @@
 .headerbar {
     background-color: #3C094F;
     background-image: -webkit-linear-gradient(top, #63187E 0%, #3C094F 100%);
-    background-image: linear-gradient(to bottom, #29202C 0%,#310242 100%);
+    background-image: linear-gradient(to bottom, #050006 0%,#59525c 100%);
+}
+
+.toplogo {
+	background-color: #094F0E;
+	/* text-align: center; */
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	line-height: 85%;
+	background: #ffffff url(/templates/prosilver/theme/images/top.gif) top left repeat-x;
+	/*background: #f0f0f0;*/	
 }
 
 .forabg, .forumbg {
 	background-color: #3C094F;
 	background-image: -webkit-linear-gradient(top, #89529E 0%, #3C094F 35px, #3C094F 100%);
-	background-image: linear-gradient(to bottom, #89529E 0%,#3C094F 35px,#3C094F 100%);
+	background-image: linear-gradient(to bottom, #968C9B 0%,#0A0A0B 35px,#08000B 100%);
 }
 
 .pollbar1, .pollbar2, .pollbar3, .pollbar4 {
-	background-color: #3C094F;
+	background-color: #0d386b;
+}
+.pollbar5 { background-color: #9cb6d7; }
+
+.button-search, 
+.button-search-end {	
+    border: 0.1em solid #7ba60d;
 }
 .pollbar5 { background-color: #89529E; }
 
@@ -40,5 +55,101 @@
 }
 
 table.table1 td {
+    color: #83b36d;
+}
+
+table.table2 td {
 	color: #d0d8e6;
+}
+
+td {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+}
+
+pre {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+}
+
+.example1 {
+	font-weight: bold;
+	font-size: 14px
+}
+
+.example2 {
+	font-weight: bold;
+	font-size: 12px;
+	color: #FF0000
+}
+
+.tablerow1 {
+	background-color: #BBBBBB;
+}
+
+thead {
+	background-color: #FFBBBB;
+}
+
+tfoot {
+	background-color: #BBBBFF;
+}
+
+th {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 13px;
+}
+
+/* Basic formats */
+
+.bold {
+	font-weight: bold;
+}
+
+.italic {
+	font-style: italic;
+}
+
+.underline {
+	text-decoration: underline;
+}
+
+/* Global align classes */
+
+.left {
+	text-align: inherit;
+}
+
+.center {
+	text-align: center;
+}
+
+.right {
+	text-align: right;
+}
+
+.full {
+	text-align: justify
+}
+
+/* Image and table specific aligns */
+
+img.left, table.left {
+	float: left;
+	text-align: inherit;
+}
+
+img.center, table.center {
+	margin-left: auto;
+	margin-right: auto;
+	text-align: inherit;
+}
+
+img.center {
+	display: block;
+}
+
+img.right, table.right {
+	float: right;
+	text-align: inherit;
 }

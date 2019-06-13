@@ -175,11 +175,11 @@ table.table1 tbody tr:hover, table.table1 tbody tr.hover {
 }
 
 table.table1 td {
-	color: #536482;
+	color: #386483;
 }
 
 table.table1 tbody td {
-	border-top-color: #FAFAFA;
+	border-top-color: #3A3A3A;
 }
 
 table.table1 tbody th {

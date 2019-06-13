@@ -1,0 +1,33 @@
+<html><head></head><body>
+
+<script type="text/javascript" language="JavaScript">
+//IE Code
+document.write ('<OBJECT ID=MediaPlayer '); 
+document.write (' CLASSID=CLSID:22d6f312-b0f6-11d0-94ab-0080c74c7e95');
+document.write (' CODEBASE=http://activex.microsoft.com/activex/controls/mplayer/en/nsmp2inf.cab#Version=6,4,5,715 '); 
+document.write (' standby="Loading Microsoft Windows Media Player components..."'); 
+document.write (' TYPE="application/x-oleobject" width="290" height="320">');
+document.write (' <PARAM NAME="FileName" VALUE="http://67.15.50.243:10040">'); 
+document.write ('<PARAM NAME="url" VALUE="http://67.15.50.243:10040"> '); 
+document.write ('<PARAM NAME="AutoStart" VALUE="1">'); 
+document.write ('<PARAM NAME="ShowControls" VALUE="1">'); 
+
+//Firefox code
+document.write ('    <Embed type="application/x-mplayer2"');
+document.write ('        pluginspage="http://www.microsoft.com/isapi/redir.dll?prd=windows&sbp=mediaplayer&ar=Media&sba=Plugin&"');
+document.write ('        filename="http://67.15.50.243:10040"');
+document.write ('        src="http://67.15.50.243:10040"');
+document.write ('        Name="MediaPlayer"');
+document.write ('        ShowControls="1"');
+document.write ('        ShowDisplay="1"');
+document.write ('        ShowStatusBar="1"');
+document.write ('        AUTOSTART="true"');
+document.write ('        width="290"');
+document.write ('        height="320">');
+document.write ('    </embed>');
+
+document.write ('</OBJECT>'); 
+</script>
+
+</body>
+</html>

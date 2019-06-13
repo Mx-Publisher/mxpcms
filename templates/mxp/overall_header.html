@@ -1,51 +1,39 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" dir="{S_CONTENT_DIRECTION}" xml:lang="{S_USER_LANG}">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html dir="{S_CONTENT_DIRECTION}">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset={S_CONTENT_ENCODING}" />
-<meta http-equiv="Content-Style-Type" content="text/css" />
-<!-- IF SET_BASE --><base href="{U_PORTAL_ROOT_PATH}" /><!-- ENDIF -->
+<meta http-equiv="Content-Type" content="text/html; charset={S_CONTENT_ENCODING}">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<!-- BEGIN switch_set_base -->
+<base href="{U_PORTAL_ROOT_PATH}" >
+<!-- END switch_set_base -->
 {META}
 {NAV_LINKS}
 <title>{SITENAME} :: {PAGE_TITLE}</title>
 
-<!-- This should not be included direct from phpBB but later from MXP template folder wich means can be ported to internal backend with no change in this file -->
-<!-- IF PHPBB -->
-<!-- link rel="stylesheet" href="{U_PHPBB_ROOT_PATH}styles/prosilver/theme/stylesheet.css" type="text/css" / -->
-<!-- ENDIF -->
+<!-- First load standard template *.css definition, located in the the phpbb template folder -->
+<link rel="stylesheet" href="{U_PHPBB_ROOT_PATH}{TEMPLATE_ROOT_PATH}{T_PHPBB_STYLESHEET}" type="text/css" />
 
-<!-- This force template reloading in ie7 like CTRL+F5 does and is not very nice
-<script type="text/javascript" src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}styleswitcher.js"></script>
--->
-<script type="text/javascript" src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}forum_fn.js"></script>
+<!-- Load mxBB template *.css definition for mx, located in the the portal template folder -->
+<link href="{T_FONT_AWESOME_LINK}" rel="stylesheet" />
+<link href="{T_FONT_IONIC_LINK}" rel="stylesheet" />
+<link href="{T_STYLESHEET_LINK}" rel="stylesheet" />
+<link href="{T_STYLESHEET_LANG_LINK}" rel="stylesheet" />
 
-<link href="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}theme/print.css" rel="stylesheet" type="text/css" media="print" title="printonly" />
-<link href="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}{T_MXBB_STYLESHEET}" rel="stylesheet" type="text/css" media="screen, projection" />
-
-<link href="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}theme/normal.css" rel="stylesheet" type="text/css" title="A" />
-<link href="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}theme/medium.css" rel="alternate stylesheet" type="text/css" title="A+" />
-<link href="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}theme/large.css" rel="alternate stylesheet" type="text/css" title="A++" />
-
-<!-- IF S_CONTENT_DIRECTION eq 'rtl' -->
-	<link href="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}theme/bidi.css" rel="stylesheet" type="text/css" media="screen, projection" />
-<!-- ENDIF -->
-
-<!-- IF GECKO -->
 <!-- Optionally, redefine some defintions for gecko browsers -->
-<link rel="stylesheet" href="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}{T_GECKO_STYLESHEET}" type="text/css" />
-<!-- ENDIF -->
+<!-- BEGIN switch_gecko --><link rel="stylesheet" href="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}{T_GECKO_STYLESHEET}" type="text/css" /><!-- END switch_gecko -->
 
-{MX_ADDITIONAL_CSS}
 {MX_ADDITIONAL_CSS_FILES}
 {MX_ICON_CSS}
 
-<!-- IF ENABLE_PM_POPUP -->
+<!-- BEGIN switch_enable_pm_popup -->
 <script language="javascript" type="text/javascript"><!--
 	if( {PRIVATE_MESSAGE_NEW_FLAG} )
 	{
 		window.open('{U_PRIVATEMSGS_POPUP}', '_phpbbprivmsg', 'HEIGHT=225,resizable=yes,WIDTH=400');
 	}
 // --></script>
-<!-- ENDIF -->
+<!-- END switch_enable_pm_popup -->
 
 <script language="javascript" type="text/javascript"><!--
 
@@ -76,75 +64,70 @@ function checkSearch()
 		return true;
 	}
 }
-
 // --></script>
 
 <script language="javascript" type="text/javascript" src="{U_PORTAL_ROOT_PATH}modules/mx_shared/lib/Common.js"></script>
 <script language="javascript" type="text/javascript" src="{U_PORTAL_ROOT_PATH}modules/mx_shared/lib/Toggle.js"></script>
-<script language="javascript" type="text/javascript" src="{U_PORTAL_ROOT_PATH}modules/mx_shared/tinymce/jscripts/tiny_mce/tinymce.min.js"></script>
-
 {MX_ADDITIONAL_JS_FILES}
 {MX_ADDITIONAL_HEADER_TEXT}
 
 </head>
-<body id="mxbb" class="section-index {S_CONTENT_DIRECTION}">
+<body>
 
-<div id="wrap">
+<a name="top"></a>
+<!-- EVENT overall_header_body_before -->
+<div id="container">
 
-<a name="top" id="top"></a>
-	<div id="page-header">
-		<div class="headerbar">
-			<div class="inner"><span class="corners-top"><span></span></span>
-			<div id="site-description">
-				<a href="{U_INDEX}" title="{L_INDEX}" id="logo"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/logo.gif" alt="{L_INDEX}" vspace="1"/></a>
-				<h1>{SITENAME}</h1>
-				<p>{SITE_DESCRIPTION}</p>
-				<p style="display: none;"><a href="#start_here">{L_SKIP}</a></p>
-			</div>
-			<div id="search-box">
-				<form action="{U_SEARCH}" method="get" id="search">
-				<fieldset>
-					<input name="keywords" id="keywords" type="text" maxlength="128" title="{L_SEARCH_KEYWORDS}" class="inputbox search" value="{L_SEARCH}..." onclick="if(this.value=='{L_SEARCH}...')this.value='';" onblur="if(this.value=='')this.value='{L_SEARCH}...';" />
-					<input class="button2" value="{L_SEARCH}" type="submit" /><br />
-					<!-- a href="{U_SEARCH}" title="{L_SEARCH_ADV_EXPLAIN}">{L_SEARCH_ADV}</a -->
-					{S_SEARCH_HIDDEN_FIELDS}
-				</fieldset>
-				</form>
-			</div>
-			<span class="corners-bottom"><span></span></span></div>
-		</div>
-			<div class="navbar">
-					<div class="inner"><span class="corners-top"><span></span></span>
-								<ul class="linklist navlinks">
-								<!-- IF USER_LOGGED_OUT -->
-								<li class="linklist">
-								<a href="{U_REGISTER}" class="mainmenu"><img src="{NAV_IMAGES_REGISTER}" class="mx_icon" alt="" hspace="1" /></a><span class="mainmenu"><a href="{U_REGISTER}" class="mainmenu">{L_REGISTER}</a>&nbsp;
-								</li>
-								<!-- ENDIF -->
-								<li class="icon-logout">
-								<span class="mainmenu"><a href="{U_LOGIN_LOGOUT}" class="mainmenu">{L_LOGIN_LOGOUT}</a></span>
-								</li>
-								</ul>
-								<span class="corners-bottom"><span></span></span>
-							</div>
-					</div>
-			<!-- BEGIN phpbb_stats -->
-				<ul class="linklist">
-				<!-- IF USER_LOGGED_IN -->
-				<li class="rightside">{LAST_VISIT_DATE}</li>
-				<!-- ENDIF -->
-				<li class="leftside">{CURRENT_TIME}</li>
-				</ul>
-				<ul class="linklist">
-					<li class="rightside">
-						<!-- IF USER_LOGGED_IN -->
-						<a href="{U_SEARCH_NEW}" class="gensmall">{L_SEARCH_NEW}</a> &bull; <a href="{U_SEARCH_SELF}" class="gensmall">{L_SEARCH_SELF}</a> &bull;
-						<!-- ENDIF -->
-						<a href="{U_SEARCH_UNANSWERED}" class="gensmall">{L_SEARCH_UNANSWERED}</a>
-					</li>
-					<!--<li class="rightside"><a href="{U_MARK_FORUMS}" accesskey="m">{L_MARK_FORUMS_READ}</a></li> -->
-				</ul>
-			<!-- END phpbb_stats -->
+	<!-- Either Simple top image ...
+	<img src="{THEME_GRAPHICS}/header.jpg">
+	End -->
+	<!-- EVENT overall_header_headerbar_before -->
+	<!-- ...or put contents on background top image -->
+	<table border="0" cellspacing="0" cellpadding="0" width="100%">
+		<tr height="101">
+			<td background="{THEME_GRAPHICS}/top.jpg" width="750">
+				<table border="0" cellspacing="0" cellpadding="0" width="100%">
+					<tr height="80">
+						<td width="25%" align="left" valign="top">
+							<!--<a href="{U_INDEX}"><img src="{LOGO}" border="0" alt="{L_INDEX}" vspace="1"/></a>-->
+							<a href="{U_INDEX}"><img width="210" height="75" src="{THEME_GRAPHICS}spacer.gif" border=0 alt="{L_INDEX}" title="{L_INDEX}"></a>
+						</td>
+						<td width="50%" align="center" valign="middle">
+							<!--{PAGE_ICON}<span class="pagetitle">{PAGE_TITLE}</span>-->
+						</td>
+						<td width="25%" align="right" valign="top"><span class="sitetitle">&nbsp;</td>
+					</tr>
+					<tr height="21">
+						<td width="100%" align="left" valign="middle" colspan="3">
+							<img width="5" height="1" src="{THEME_GRAPHICS}spacer.gif" border=0>
+							<!--<span class="sitetitle_desc">{SITE_DESCRIPTION}</span>-->
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+	<!-- End -->
+	<!-- EVENT overall_header_headerbar_after -->
+	
+	<!-- EVENT overall_header_navbar_before -->
+	
+	<!-- ...or use Generated Navigation Menu -->
+	{OVERALL_NAVIGATION}
+	<!-- Generated Navigation Menu -->
+	
+	<!-- EVENT overall_header_navbar_after -->
+				</tr>
+			</table>
+		
+</div>
+	
+	<!-- EVENT overall_header_page_body_before -->
+	<div class="right">
+			<span class="genmed"><a href="{U_LOGIN_LOGOUT}" class="genmed">{L_LOGIN_LOGOUT}</a></span>
+			<!-- BEGIN switch_user_logged_out -->
+			| <span class="genmed"><a href="{U_REGISTER}" class="genmed">{L_REGISTER}</a></span>
+			<!-- END switch_user_logged_out -->
 	</div>
-	<a name="start_here"></a>
-	<div id="page-body">
+	</div>
+	<!-- EVENT overall_header_content_before -->

@@ -53,7 +53,7 @@ $message = $mx_text->display($message);
 // Start output of page
 //
 $template->set_filenames(array(
-	'body_block' => 'mx_textblock_html.tpl')
+	'body_block' => 'mx_textblock_html.'.$tplEx)
 );
 
 $template->assign_vars(array(

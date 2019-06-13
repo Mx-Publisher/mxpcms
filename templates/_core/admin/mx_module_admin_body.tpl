@@ -214,7 +214,9 @@ window.onload = doOnLoadMenuACP;
 	<tr>
       <td class="catBottom" colspan="5" align="center">
       	<form action="{S_ACTION}" method="post">
-      		{S_MODULE_INSTALL_LIST}{S_HIDDEN_MODULE_INSTALL_FIELDS}<input class="mainoption" type="submit" name="import_pack" value="{L_IMPORT_PACK}">
+      		{S_MODULE_INSTALL_LIST}
+			{S_HIDDEN_MODULE_INSTALL_FIELDS}
+			<input class="mainoption" type="submit" name="import_pack" value="{L_IMPORT_PACK}">
       	</form>
       </td>
    </tr>

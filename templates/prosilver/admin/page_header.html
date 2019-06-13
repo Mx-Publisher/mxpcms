@@ -1,18 +1,41 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" dir="{S_CONTENT_DIRECTION}" lang="{S_USER_LANG}" xml:lang="{S_USER_LANG}">
 <head>
+<!-- INCLUDE mx_config.html -->
 <meta http-equiv="content-type" content="text/html; charset={S_CONTENT_ENCODING}" />
 <meta http-equiv="Content-Style-Type" content="text/css" />
 {META}
+{NAV_LINKS}
 <title>{SITENAME} - {L_MX_ADMIN}</title>
 <link href="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}admin/admin.css" rel="stylesheet" type="text/css" media="screen" />
+
 <script type="text/javascript"></script>
 <script language="javascript" type="text/javascript" src="{U_PORTAL_ROOT_PATH}modules/mx_shared/lib/Common.js"></script>
 <script language="javascript" type="text/javascript" src="{U_PORTAL_ROOT_PATH}modules/mx_shared/lib/Toggle.js"></script>
+
+<!-- IF not $P_COLOR_SWITCHER -->
+<!-- IF $P_DEFAULT_COLOR eq 'green' --><link href="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}theme/custom/green.css" rel="stylesheet"><!-- ENDIF -->
+<!-- IF $P_DEFAULT_COLOR eq 'pink' --><link href="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}theme/custom/pink.css" rel="stylesheet"><!-- ENDIF -->
+<!-- IF $P_DEFAULT_COLOR eq 'black' --><link href="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}theme/custom/black.css" rel="stylesheet"><!-- ENDIF -->
+<!-- IF $P_DEFAULT_COLOR eq 'purple' --><link href="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}theme/custom/purple.css" rel="stylesheet"><!-- ENDIF -->
+<!-- IF $P_DEFAULT_COLOR eq 'red' --><link href="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}theme/custom/red.css" rel="stylesheet"><!-- ENDIF -->
+<!-- ENDIF -->
+
+<!-- IF S_CONTENT_DIRECTION eq 'rtl' -->
+	<link href="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}theme/bidi.css?assets_version={T_ASSETS_VERSION}" rel="stylesheet">
+<!-- ENDIF -->
+
 {MX_ADDITIONAL_CSS}
+{MX_ADDITIONAL_CSS_FILES}
 {MX_ICON_CSS}
+{$STYLESHEETS}
+
+{MX_ADDITIONAL_JS_FILES}
+{MX_ADDITIONAL_HEADER_TEXT}
 </head>
 <body class="{S_CONTENT_DIRECTION}">
+<script language="javascript" type="text/javascript" src="{U_PORTAL_ROOT_PATH}modules/mx_shared/tinymce/jscripts/tiny_mce/tiny_mce.js"></script>
+
 <div id="wrap">
 	<div id="page-body">
 		<div id="acp">

@@ -1,0 +1,151 @@
+<!-- $Id: ustimesclock.html,v 1.1 2013/04/26 14:12:19 orynider Exp $ //-->
+<div class="clear" style="text-align: center; vertical-align:top; margin: 0 auto; width:{BLOCK_SIZE}; display:block"></div>
+<div class="forabg block">
+	<div id="p1" class="post bg2 online">
+	<div class="inner"><span class="corners-top"><span>&nbsp;{BLOCK_TITLE}&nbsp;</span></span>
+<!-- Clock Code: Start -->
+	<dl class="textbody" align="center" id="clock" style="margin:15px 0px 0px 0px" style="background:{WMODE};">		
+		<ul align="center" id="title" class="linklist navlinks" style="text-align:center;font-weight:normal;width:140px;border:1px solid #ccc;background:#fff ;color: #fff ;font-weight:bold">
+			<a style="padding:2px 1px;margin:2px 1px;font-size:13px;line-height:16px;font-family:arial;text-decoration:none;color:#A0l3200" href="http://localtimes.info/{COMUNITY}/{COUNTRY}/{STATE}/{CITY}/"><img src="http://localtimes.info/images/countries/us.png" border=0 style="border:0;margin:0;padding:0">&nbsp;&nbsp;{CITY}</a>
+		</ul>		
+	<div class="row1" align="center" valign="middle">	
+	<div id="flashplayer" align="center" style="background:{WMODE};">
+<!-- Local Time Clock widget - HTML code - localtimes.info -->
+	<div align="center" style="margin:15px 0px 0px 0px">
+	<script type="text/javascript" src="http://localtimes.info/clock.php?continent={COMUNITY}&country={COUNTRY}&province={STATE}&city={CITY}&widget_number={WIDGET_NUMBER}&cp3_Hex={GF3}&cp2_Hex={GF2}&cp1_Hex={GF1}&fwdt={FLASH_WIDTH}"></script>
+	<!--script type="text/javascript">
+	function AC_AddExtension(src, ext)
+	{
+	  if (src.indexOf('?') != -1)
+	    return src.replace(/\?/, ext+'?'); 
+	  else
+	    return src + ext;
+	}
+	function AC_Generateobj(objAttrs, params, embedAttrs, parElement) 
+	{ 
+	  var str = '<object ';
+	  for (var i in objAttrs)
+	    str += i + '="' + objAttrs[i] + '" ';
+	  str += '>';
+	  for (var i in params)
+	    str += '<param name="' + i + '" value="' + params[i] + '" /> ';
+	  str += '<embed ';
+	  for (var i in embedAttrs)
+		str += i + '="' + embedAttrs[i] + '" ';	
+		str += '></embed></object>';
+		if( parElement == "" ) 
+		{
+			document.write(str);
+		}
+		else
+		{
+			if( document.getElementById(parElement) ) document.getElementById(parElement).innerHTML = str;
+		}
+	}
+	function loadFlash() 
+	{
+	  var ret = 
+	    AC_GetArgs
+	    (  arguments, ".swf", "movie", "clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"
+	     , "application/x-shockwave-flash"
+	    );
+	  AC_Generateobj(ret.objAttrs, ret.params, ret.embedAttrs, '');
+	}
+	function AC_GetArgs(args, ext, srcParamName, classid, mimeType)
+	{
+		var ret = new Object();
+		ret.embedAttrs = new Object();
+		ret.params = new Object();
+		ret.objAttrs = new Object();
+		for (var i=0; i < args.length; i=i+2)
+		{
+			var currArg = args[i].toLowerCase();    
+			switch (currArg)
+			{	
+				case "classid":
+				break;
+				case "pluginspage":
+					ret.embedAttrs[args[i]] = args[i+1];
+				break;
+				case "src":
+				case "movie":	
+					args[i+1] = AC_AddExtension(args[i+1], ext);
+					ret.embedAttrs["src"] = args[i+1];
+					ret.params[srcParamName] = args[i+1];
+				break;
+				case "onafterupdate":
+				case "onbeforeupdate":
+				case "onblur":
+				case "oncellchange":
+				case "onclick":
+				case "ondblClick":
+				case "ondrag":
+				case "ondragend":
+				case "ondragenter":
+				case "ondragleave":
+				case "ondragover":
+				case "ondrop":
+				case "onfinish":
+				case "onfocus":
+				case "onhelp":
+				case "onmousedown":
+				case "onmouseup":
+				case "onmouseover":
+				case "onmousemove":
+				case "onmouseout":
+				case "onkeypress":
+				case "onkeydown":
+				case "onkeyup":
+				case "onload":
+				case "onlosecapture":
+				case "onpropertychange":
+				case "onreadystatechange":
+				case "onrowsdelete":
+				case "onrowenter":
+				case "onrowexit":
+				case "onrowsinserted":
+				case "onstart":
+				case "onscroll":
+				case "onbeforeeditfocus":
+				case "onactivate":
+				case "onbeforedeactivate":
+				case "ondeactivate":
+				case "type":
+				case "codebase":
+					ret.objAttrs[args[i]] = args[i+1];
+		        break;
+				case "width":
+				case "height":
+				case "align":
+				case "vspace": 
+				case "hspace":
+				case "class":
+				case "title":
+				case "accesskey":
+				case "name":
+				case "id":
+				case "tabindex":
+					ret.embedAttrs[args[i]] = ret.objAttrs[args[i]] = args[i+1];
+		        break;
+		      default:
+		        ret.embedAttrs[args[i]] = ret.params[args[i]] = args[i+1];
+		    }
+		}
+		ret.objAttrs["classid"] = classid;
+		if (mimeType) ret.embedAttrs["type"] = mimeType;
+		return ret;
+	}
+	loadFlash('codebase','http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,19,0', 'width','{FLASH_WIDTH}','height','{FLASH_HEIGHT}', 'src','{CLOCK_URL}', 'allowScriptAccess','always','quality','high','wmode','transparent','pluginspage','http://www.macromedia.com/go/getflashplayer', 'movie','{CLOCK_URL}');
+	</script-->
+	</div>
+<!-- Local Time Clock widget - HTML code - localtimes.info -->
+	</div> 
+	</div>		
+	<div align="center"><hr align="center" /></div>
+	</dl>
+	<br /> 
+<!-- Clock Code: End -->
+	</div></div>     
+   <span class="corners-bottom"><span></span></span>
+</div>
+<br style="clear:both" />

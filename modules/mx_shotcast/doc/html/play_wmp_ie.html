@@ -1,0 +1,52 @@
+<html><head></head><body>
+
+<SCRIPT LANGUAGE="VBScript">
+<!--
+On Error Resume Next
+lngMP70 = IsObject(CreateObject("WMPlayer.OCX"))
+
+' Windows Media Player 7 Code
+If (lngMP70) Then
+  document.write "<OBJECT ID=MediaPlayer "
+  document.write " CLASSID=CLSID:6BF52A52-394A-11D3-B153-00C04F79FAA6"
+  document.write " standby=""Loading Microsoft Windows Media Player components..."" "
+  document.write " TYPE=""application/x-oleobject"" width=""332"" height=""64"">"
+  document.write "<PARAM NAME=""url"" VALUE=""http://67.15.50.243:10040"">"
+  document.write "<PARAM NAME=""AutoStart"" VALUE=""true"">"
+  document.write "<param name=""AllowScan"" value=""-1"">"
+  document.write "<param name=""AllowChangeDisplaySize"" value=""-1"">"
+  document.write "<param name=""AutoRewind"" value=""0"">"
+  document.write "<PARAM NAME=""ShowControls"" VALUE=""0"">"
+  document.write "<param name=""ShowStatusBar"" value=""-1"">"
+  document.write "<param name=""BufferingTime"" value=""5"">"
+  document.write "<param name=""DisplayForeColor"" value=""16777215"">"
+  document.write "<param name=""Rate"" value=""1"">"
+  document.write "<PARAM NAME=""uiMode"" VALUE=""mini"">"
+  document.write "</OBJECT>"
+
+' Windows Media Player 6.4 Code
+Else
+  document.write "<OBJECT ID=MediaPlayer "
+  document.write " CLASSID=CLSID:22d6f312-b0f6-11d0-94ab-0080c74c7e95"
+  document.write "CODEBASE=http://activex.microsoft.com/"
+  document.write "activex/controls/mplayer/en/nsmp2inf.cab#Version=6,4,5,715"
+  document.write " standby=""Loading Microsoft Windows Media Player components..."" "
+  document.write " TYPE=""application/x-oleobject"" width=""332"" height=""54"">"
+  document.write "<PARAM NAME=""FileName"" VALUE=""http://67.15.50.243:10040"">"
+  document.write "<PARAM NAME=""AutoStart"" VALUE=""true"">"
+  document.write "<param name=""AllowScan"" value=""-1"">"
+  document.write "<param name=""AllowChangeDisplaySize"" value=""-1"">"
+  document.write "<param name=""AutoRewind"" value=""0"">"
+  document.write "<PARAM NAME=""ShowControls"" VALUE=""0"">"
+  document.write "<param name=""ShowStatusBar"" value=""-1"">"
+  document.write "<param name=""BufferingTime"" value=""5"">"
+  document.write "<param name=""Rate"" value=""1"">"
+  document.write "<EMBED TYPE=""application/x-mplayer2"" SRC=""http://67.15.50.243:10040"" NAME=""MediaPlayer"" AUTOSTART=""True""></EMBED>"
+  document.write "</OBJECT>"
+End If
+
+-->
+</SCRIPT>
+
+</body>
+</html>

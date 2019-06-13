@@ -6,7 +6,7 @@
     copyright            : (C) 2001 The phpBB Group
     email                : support@phpbb.com
 
-    $Id: emailer.php,v 1.7 2014/05/09 07:52:17 orynider Exp $
+    $Id: emailer.php,v 1.6 2010/01/06 19:40:39 orynider Exp $
 
 ***************************************************************************/
 
@@ -257,12 +257,8 @@ class emailer
 					break;
 					
 					case 'internal':
-					case 'smf2':
-					case 'mybb':
 					case 'phpbb3':
-					case 'olympus':
-					case 'ascraeus':
-					case 'rhea':
+
 						if (!$board_config['board_email'])
 						{
 							mx_message_die(GENERAL_ERROR, 'The is no default email adress configured were to notify the admin.', '', __LINE__, __FILE__, '');

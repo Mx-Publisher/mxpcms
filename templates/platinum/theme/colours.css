@@ -182,6 +182,10 @@ table.table1 tbody tr:hover, table.table1 tbody tr.hover {
 }
 
 table.table1 td {
+    color: #0b1a33;
+}
+
+table.table2 td {
 	color: #536482;
 }
 

@@ -1,0 +1,18 @@
+module=+:162=+:Last News and Topics=+:modules/mx_glance/=+:Glance Module=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:162=+:173=+:Last News and Topics=+:Last News and Topics=+:mx_glance.php=+:
+parameter=+:173=+:137=+:Glance_news_forum_id=+:Function=+:=+:get_list_multiple("{parameter_id}[]", FORUMS_TABLE, 'forum_id', 'forum_name', "{parameter_value}", TRUE)=+:0=+:0
+parameter=+:173=+:138=+:Glance_num_news=+:Number=+:3=+:=+:0=+:50
+parameter=+:173=+:139=+:Glance_recent_ignore=+:Function=+:=+:get_list_multiple("{parameter_id}[]", FORUMS_TABLE, 'forum_id', 'forum_name', "{parameter_value}", TRUE)=+:0=+:0
+parameter=+:173=+:140=+:Glance_num_recent=+:Number=+:5=+:=+:1=+:0
+parameter=+:173=+:141=+:Glance_table_width=+:Number=+:200=+:=+:0=+:0
+parameter=+:173=+:142=+:Glance_title_length=+:Number=+:0=+:=+:0=+:0
+parameter=+:173=+:143=+:Glance_show_new_bullets=+:Boolean=+:TRUE=+:=+:0=+:0
+parameter=+:173=+:143=+:Glance_show_user_color=+:Boolean=+:TRUE=+:=+:0=+:0
+parameter=+:173=+:143=+:Glance_show_user_bold=+:Boolean=+:TRUE=+:=+:0=+:0
+parameter=+:173=+:144=+:Glance_track=+:Boolean=+:TRUE=+:=+:0=+:0
+parameter=+:173=+:145=+:Glance_auth_read=+:Boolean=+:FALSE=+:=+:0=+:0
+parameter=+:173=+:146=+:Glance_use_large=+:Radio_single_select=+:vertical=+:a:2:{i:0;s:8:"vertical";i:1;s:10:"horizontal";}=+:0=+:20
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Last News and Topics=+:Demo - Vertical block=+:173=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0

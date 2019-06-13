@@ -310,10 +310,13 @@ function preFormCheck()
 					 	<td class="row1" width="50%" align="right"><b>{L_BLOCK_TITLE}</b></td>
 					 	<td class="row1"><input type="text" size="65" name="block_title" value="" class="post" /></td>
 					</tr>
-
 					<tr>
 					 	<td class="row1" width="50%" align="right"><b>{L_BLOCK_DESC}</b></td>
 					 	<td class="row1"><input type="text" size="65" name="block_desc" value="" class="post" /></td>
+					</tr>
+					<tr>
+					 	<td class="row1" width="50%" align="right"><b>{L_BLOCK_SIZE}</b></td>
+					 	<td class="row1"><input type="text" size="20" name="block_size" value="" class="post" /></td>
 					</tr>
 					<tr>
 						<td class="row1" width="50%" align="right"><b>{L_SHOW_TITLE}</b><br /><span class="gensmall">{L_SHOW_TITLE_EXPLAIN}</span></td>
@@ -380,10 +383,13 @@ function preFormCheck()
 					 	<td class="row1" width="50%" align="right"><b>{L_BLOCK_TITLE}</b></td>
 					 	<td class="row1"><input type="text" size="65" name="block_title" value="{E_BLOCK_TITLE}" class="post" /></td>
 					</tr>
-
 					<tr>
 					 	<td class="row1" width="50%" align="right"><b>{L_BLOCK_DESC}</b></td>
 					 	<td class="row1"><input type="text" size="65" name="block_desc" value="{E_BLOCK_DESC}" class="post" /></td>
+					</tr>
+					<tr>
+					 	<td class="row1" width="50%" align="right"><b>{L_BLOCK_SIZE}</b></td>
+					 	<td class="row1"><input type="text" size="30" name="block_sizes" value="{E_BLOCK_SIZE}" class="post" /></td>
 					</tr>
 					<!-- BEGIN is_mod -->
 					<tr>

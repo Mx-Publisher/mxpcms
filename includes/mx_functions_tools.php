@@ -353,14 +353,14 @@ class mx_text
 	 */
 	function encode_username($username)
 	{
-		global $board_config, $userdata, $lang, $phpEx, $phpbb_root_path, $phpBB2;
+		global $board_config, $userdata, $lang, $phpEx, $phpbb_root_path;
 
 		//
 		// Check username
 		//
 		if (!empty($username))
 		{
-			$username = $phpBB2->phpbb_clean_username($username);
+			$username = phpBB2::phpbb_clean_username($username);
 
 			if (!$userdata['session_logged_in'] || ($userdata['session_logged_in'] && $username != $userdata['username']))
 			{
@@ -1080,26 +1080,26 @@ class mx_form
 				case "text": // text form
 					$item_label = $item[1];
 					$item_field = '<input type="text" name="' . $this->arrayname . '[' . $item[2] . ']" size="' . $item[3] . '" value="' . $item[4] . '" class="post">';
-				break;
+					break;
 				case "textarea": // textarea
 					$item_label = $item[1];
 					$item_field = '<textarea name="' . $this->arrayname . '[' . $item[2] . ']" class="post" wrap="on" cols="' . $item[3] . '" rows="' . $item[4] . '">' . $item[5] . '</textarea>';
-				break;
+					break;
 				case "password": // password
 					$item_label = $item[1];
 					$item_field = '<input type="password" name="' . $this->arrayname . '[' . $item[2] . ']" size="' . $item[3] . '" value="' . $item[4] . '" class="post">';
-				break;
+					break;
 				case "checkbox": // checkbox button
 					$item_label = $item[1];
 					if ( isset( $item[3] ) )
 						$item_field = '<input type="checkbox" name="' . $this->arrayname . '[' . $item[2] . ']" value="1" checked>';
 					else
 						$item_field = '<input type="checkbox" name="' . $this->arrayname . '[' . $item[2] . ']" value="1"';
-				break;
+					break;
 				case "select":
 					$item_label = $item[1];
 					$item_field = $item[2];
-				break;
+					break;
 				case "file": // file upload field
 					$item_label = $item[1];
 					$item_field = '<input type="file" name="' . $item[2] . '" size="' . $item[3] . '" class="post">';
@@ -1109,7 +1109,7 @@ class mx_form
 				case "hidden": // hidden fields
 					$item_label = '';
 					$item_field = '<input type="hidden" name="' . $this->arrayname . '[' . $item[1] . ']" value="' . $item[2] . '">';
-				break;
+					break;
 				case "submit": // defining the label for submit button
 					$submit = $item[1];
 					$submitname = $item[2];
@@ -1117,14 +1117,14 @@ class mx_form
 				case "delete": // delete button
 					$item_label = $item[1];
 					$item_field = $item[2];
-				break;
+					break;
 			}
 
 			if ( ! empty( $item_field ) )
 			{
 				$template->assign_block_vars( "rows", array( 'LABEL' => $item_label,
 						'FIELD' => $item_field,
-				));
+						));
 			}
 		}
 		$template->pparse( "body" );
@@ -1334,32 +1334,31 @@ class mx_text_formatting
 	{
 		global $board_config;
 		// $url = stripslashes($url);
-		if ($url)
+		if ( $url )
 		{
 			$server_protocol = ( $board_config['cookie_secure'] ) ? 'https://' : 'http://';
 			$server_port = ( $board_config['server_port'] <> 80 ) ? ':' . trim( $board_config['server_port'] ) . '/' : '/';
 
 			$match = array();
 			$replace = array();
-
 			// relative urls for this board
 			$match[] = '#(^|[\n ])' . $server_protocol . trim( $board_config['server_name'] ) . $server_port . preg_replace( '/^\/?(.*?)(\/)?$/', '$1', trim( $board_config['script_path'] ) ) . '/([^ \t\n\r <"\']+)#i';
 			$replace[] = '<a href="$1" target="_blank">$1</a>';
 			// matches a xxxx://aaaaa.bbb.cccc. ...
-			$match[] = '#(^|[\n ])([\w]+?://.*?[^ \t\n\r<"]*)#i';
+			$match[] = '#(^|[\n ])([\w]+?://.*?[^ \t\n\r<"]*)#ie';
 			$replace[] = "'\$1<a href=\"\$2\" target=\"_blank\">' . ((strlen('\$2') > 25) ? substr(str_replace('http://','','\$2'), 0, 17) . '...' : '\$2') . '</a>'";
 			// $replace[] = "'\$1<a href=\"\$2\" target=\"_blank\">' . ((strlen('\$2') > 25) ? substr(str_replace('http://','','\$2'), 0, 12) . ' ... ' . substr('\$2', -3) : '\$2') . '</a>'";
 			// matches a "www.xxxx.yyyy[/zzzz]" kinda lazy URL thing
-			$match[] = '#(^|[\n ])(www\.[\w\-]+\.[\w\-.\~]+(?:/[^ \t\n\r<"]*)?)#i';
+			$match[] = '#(^|[\n ])(www\.[\w\-]+\.[\w\-.\~]+(?:/[^ \t\n\r<"]*)?)#ie';
 			$replace[] = "'\$1<a href=\"http://\$2\" target=\"_blank\">' . ((strlen('\$2') > 25) ? substr(str_replace(' ', '%20', str_replace('http://','', '\$2')), 0, 17) . '...' : '\$2') . '</a>'";
 			// $replace[] = "'\$1<a href=\"http://\$2\" target=\"_blank\">' . ((strlen('\$2') > 25) ? substr(str_replace(' ', '%20', str_replace('http://','', '\$2')), 0, 12) . ' ... ' . substr('\$2', -3) : '\$2') . '</a>'";
 			// matches an email@domain type address at the start of a line, or after a space.
-			$match[] = '#(^|[\n ])([a-z0-9&\-_.]+?@[\w\-]+\.([\w\-\.]+\.)?[\w]+)#i';
+			$match[] = '#(^|[\n ])([a-z0-9&\-_.]+?@[\w\-]+\.([\w\-\.]+\.)?[\w]+)#ie';
 			$replace[] = "'\$1<a href=\"mailto:\$2\">' . ((strlen('\$2') > 25) ? substr('\$2', 0, 15) . ' ... ' . substr('\$2', -5) : '\$2') . '</a>'";
 
-			$url = preg_replace($match, $replace, $url);
+			$url = preg_replace( $match, $replace, $url );
 			// Also fix already tagged links
-			$url = preg_replace( "/<a href=(.*?)>(.*?)<\/a>/i", "(strlen(\"\\2\") > 25 && !stristr(\"\\2\", \"<\") ) ? '<a href='.stripslashes(\"\\1\").'>'.substr(str_replace(\"http://\",\"\",\"\\2\"), 0, 17) . '...</a>' : '<a href='.stripslashes(\"\\1\").'>'.\"\\2\".'</a>'", $url );
+			$url = preg_replace( "/<a href=(.*?)>(.*?)<\/a>/ie", "(strlen(\"\\2\") > 25 && !stristr(\"\\2\", \"<\") ) ? '<a href='.stripslashes(\"\\1\").'>'.substr(str_replace(\"http://\",\"\",\"\\2\"), 0, 17) . '...</a>' : '<a href='.stripslashes(\"\\1\").'>'.\"\\2\".'</a>'", $url );
 			// $url = preg_replace("/<a href=(.*?)>(.*?)<\/a>/ie", "(strlen(\"\\2\") > 25 && !eregi(\"<\", \"\\2\") ) ? '<a href='.stripslashes(\"\\1\").'>'.substr(str_replace(\"http://\",\"\",\"\\2\"), 0, 12) . ' ... ' . substr(\"\\2\", -3).'</a>' : '<a href='.stripslashes(\"\\1\").'>'.\"\\2\".'</a>'", $url);
 			return $url;
 		}
@@ -1386,7 +1385,7 @@ class mx_text_formatting
 		{
 			// Also fix already tagged links
 			// $img = preg_replace("/<img src=(.*?)(|border(.*?)|alt(.*?))>/ie", "'<br /><br /><center><img src='.stripslashes(\"\\1\").' width=\"'.makeImgWidth(trim(stripslashes(\"\\1\"))).'\" ></center><br />'", $img);
-			$img = preg_replace( "/<img src=(.*?)>/i", "(substr_count(\"\\1\", \"smiles\") > 0 ) ? '<img src='.stripslashes(\"\\1\").'>' :
+			$img = preg_replace( "/<img src=(.*?)>/ie", "(substr_count(\"\\1\", \"smiles\") > 0 ) ? '<img src='.stripslashes(\"\\1\").'>' :
 
 			'<div style=\" overflow: hidden; margin: 0px; padding: 0px; float: left; \">
 			<img class=\"noenlarge\" src='.stripslashes(\"\\1\").' border=\"0\"  OnLoad=\"if(this.width > $image_size) { this.width = $image_size }\" onclick = \"full_img( this.src )\" alt=\" Click to enlarge \">
@@ -3342,22 +3341,22 @@ class mx_custom_field
 				{
 					case INPUT:
 						$this->display_edit_input( $file_id, $field_id, $field_data );
-					break;
+						break;
 					case TEXTAREA:
 						$this->display_edit_textarea( $file_id, $field_id, $field_data );
-					break;
+						break;
 					case RADIO:
 						$this->display_edit_radio( $file_id, $field_id, $field_data );
-					break;
+						break;
 					case SELECT:
 						$this->display_edit_select( $file_id, $field_id, $field_data );
-					break;
+						break;
 					case SELECT_MULTIPLE:
 						$this->display_edit_select_multiple( $file_id, $field_id, $field_data );
-					break;
+						break;
 					case CHECKBOX:
 						$this->display_edit_checkbox( $file_id, $field_id, $field_data );
-					break;
+						break;
 				}
 
 				$return = true;
@@ -5755,13 +5754,13 @@ class mx_comments extends phpbb_posts
 				{
 					case USER_AVATAR_UPLOAD:
 						$poster_avatar = ( $board_config['allow_avatar_upload'] ) ? '<img src="' . $phpbb_root_path . $board_config['avatar_path'] . '/' . $this->comments_row['user_avatar'] . '" alt="" border="0" />' : '';
-					break;
+						break;
 					case USER_AVATAR_REMOTE:
 						$poster_avatar = ( $board_config['allow_avatar_remote'] ) ? '<img src="' . $this->comments_row['user_avatar'] . '" alt="" border="0" />' : '';
-					break;
+						break;
 					case USER_AVATAR_GALLERY:
 						$poster_avatar = ( $board_config['allow_avatar_local'] ) ? '<img src="' . $phpbb_root_path . $board_config['avatar_gallery_path'] . '/' . $this->comments_row['user_avatar'] . '" alt="" border="0" />' : '';
-					break;
+						break;
 				}
 			}
 
@@ -6024,13 +6023,13 @@ class mx_comments extends phpbb_posts
 				{
 					case USER_AVATAR_UPLOAD:
 						$poster_avatar = ( $board_config['allow_avatar_upload'] ) ? '<img src="' . $phpbb_root_path . $board_config['avatar_path'] . '/' . $this->comments_row['user_avatar'] . '" alt="" border="0" />' : '';
-					break;
+						break;
 					case USER_AVATAR_REMOTE:
 						$poster_avatar = ( $board_config['allow_avatar_remote'] ) ? '<img src="' . $this->comments_row['user_avatar'] . '" alt="" border="0" />' : '';
-					break;
+						break;
 					case USER_AVATAR_GALLERY:
 						$poster_avatar = ( $board_config['allow_avatar_local'] ) ? '<img src="' . $phpbb_root_path . $board_config['avatar_gallery_path'] . '/' . $this->comments_row['user_avatar'] . '" alt="" border="0" />' : '';
-					break;
+						break;
 				}
 			}
 

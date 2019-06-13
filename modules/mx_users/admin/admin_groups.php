@@ -31,17 +31,21 @@ if ( !empty( $setmodules ) )
 $mx_root_path = './../../../';
 $module_root_path = "./../";
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
-
-
-// **********************************************************************
-// Includes
-// **********************************************************************
 require( $mx_root_path . '/admin/pagestart.' . $phpEx );
 
 include_once( $mx_root_path . 'admin/page_header_admin.' . $phpEx );
 
+// **********************************************************************
 // Read language definition
-include($module_root_path . 'includes/users_constants.' . $phpEx);
+// **********************************************************************
+if ( !file_exists( $module_root_path . 'language/lang_' . $board_config['default_lang'] . '/lang_admin.' . $phpEx ) )
+{
+	include( $module_root_path . 'language/lang_english/lang_admin.' . $phpEx );
+}
+else
+{
+	include( $module_root_path . 'language/lang_' . $board_config['default_lang'] . '/lang_admin.' . $phpEx );
+}
 
 if ($mx_request_vars->is_request(POST_GROUPS_URL))
 {
@@ -83,19 +87,20 @@ if ($mx_request_vars->is_post('edit') || $mx_request_vars->is_post('new'))
 					FROM " . GROUPS_TABLE . "
 					WHERE group_single_user <> " . TRUE . "
 					AND group_id = $group_id";
-			break;
+				break;
 			case 'phpbb3':
-			default:
 				$sql = "SELECT *
 					FROM " . GROUPS_TABLE . "
 					WHERE group_name NOT IN ('BOTS', 'GUESTS')
 					AND group_id = $group_id";
-			break;
+				break;
 		}
+
 		if ( !($result = $db->sql_query($sql)) )
 		{
 			mx_message_die(GENERAL_ERROR, 'Error getting group information', '', __LINE__, __FILE__, $sql);
 		}
+
 		if ( !($group_info = $db->sql_fetchrow($result)) )
 		{
 			mx_message_die(GENERAL_MESSAGE, $lang['Group_not_exist']);
@@ -293,6 +298,7 @@ else if ($mx_request_vars->is_post('group_update') )
 		{
 			mx_message_die(GENERAL_MESSAGE, $lang['No_group_moderator']);
 		}
+
 		if( $mode == "editgroup" )
 		{
 			switch (PORTAL_BACKEND)
@@ -303,23 +309,25 @@ else if ($mx_request_vars->is_post('group_update') )
 						FROM " . GROUPS_TABLE . "
 						WHERE group_single_user <> " . TRUE . "
 						AND group_id = $group_id";
-				break;
+					break;
 				case 'phpbb3':
-				default:
 					$sql = "SELECT *
 						FROM " . GROUPS_TABLE . "
 						WHERE group_name NOT IN ('BOTS', 'GUESTS')
 						AND group_id = $group_id";
-				break;
+					break;
 			}
+
 			if ( !($result = $db->sql_query($sql)) )
 			{
 				mx_message_die(GENERAL_ERROR, 'Error getting group information', '', __LINE__, __FILE__, $sql);
 			}
+
 			if( !($group_info = $db->sql_fetchrow($result)) )
 			{
 				mx_message_die(GENERAL_MESSAGE, $lang['Group_not_exist']);
 			}
+
 			if ( $group_info['group_moderator'] != $group_moderator )
 			{
 				if ( $delete_old_moderator )
@@ -373,13 +381,13 @@ else if ($mx_request_vars->is_post('group_update') )
 				case 'phpbb2':
 					$sql = "INSERT INTO " . GROUPS_TABLE . " (group_type, group_name, group_description, group_moderator, group_single_user)
 						VALUES ($group_type, '" . str_replace("\'", "''", $group_name) . "', '" . str_replace("\'", "''", $group_description) . "', $group_moderator,	'0')";
-				break;
+					break;
 				case 'phpbb3':
-				default:
 					$sql = "INSERT INTO " . GROUPS_TABLE . " (group_type, group_name, group_description, group_moderator)
 						VALUES ($group_type, '" . str_replace("\'", "''", $group_name) . "', '" . str_replace("\'", "''", $group_description) . "', $group_moderator)";
-				break;
+					break;
 			}
+
 			if ( !$db->sql_query($sql) )
 			{
 				mx_message_die(GENERAL_ERROR, 'Could not insert new group', '', __LINE__, __FILE__, $sql);
@@ -414,19 +422,20 @@ else
 				FROM " . GROUPS_TABLE . "
 				WHERE group_single_user <> " . TRUE . "
 				ORDER BY group_name ASC";
-		break;
+			break;
 		case 'phpbb3':
-		default:
 			$sql = "SELECT group_id, group_name
 				FROM " . GROUPS_TABLE . "
 				WHERE group_name NOT IN ('BOTS', 'GUESTS')
 				ORDER BY group_name ASC";
-		break;
+			break;
 	}
-	if (!($result = $db->sql_query($sql)))
+
+	if ( !($result = $db->sql_query($sql)) )
 	{
 		mx_message_die(GENERAL_ERROR, 'Could not obtain group list', '', __LINE__, __FILE__, $sql);
 	}
+
 	$select_list = '';
 	if ( $row = $db->sql_fetchrow($result) )
 	{
@@ -438,6 +447,7 @@ else
 		while ( $row = $db->sql_fetchrow($result) );
 		$select_list .= '</select>';
 	}
+
 	$template->set_filenames(array(
 		'body' => 'admin/group_select_body.tpl')
 	);

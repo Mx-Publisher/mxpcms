@@ -22,16 +22,21 @@ if ( !empty( $setmodules ) )
 $mx_root_path = './../../../';
 $module_root_path = "./../";
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
-
-// **********************************************************************
-// Includes
-// **********************************************************************
 require( $mx_root_path . '/admin/pagestart.' . $phpEx );
 
 include_once( $mx_root_path . 'admin/page_header_admin.' . $phpEx );
 
+// **********************************************************************
 // Read language definition
-include($module_root_path . 'includes/users_constants.' . $phpEx);
+// **********************************************************************
+if ( !file_exists( $module_root_path . 'language/lang_' . $board_config['default_lang'] . '/lang_admin.' . $phpEx ) )
+{
+	include( $module_root_path . 'language/lang_english/lang_admin.' . $phpEx );
+}
+else
+{
+	include( $module_root_path . 'language/lang_' . $board_config['default_lang'] . '/lang_admin.' . $phpEx );
+}
 
 	if ($mx_request_vars->is_post('submit'))
 	{
@@ -48,15 +53,14 @@ include($module_root_path . 'includes/users_constants.' . $phpEx);
 							WHERE ug.user_id = $user_id
 								AND g.group_id = ug.group_id
 								AND g.group_single_user = 1";
-				break;
+					break;
 				case 'phpbb3':
-				default:
 					$sql = "SELECT g.group_id
 							FROM " . USER_GROUP_TABLE . " ug, " . GROUPS_TABLE . " g
 							WHERE ug.user_id = $user_id
 								AND g.group_id = ug.group_id
 								AND g.group_name IN ('BOTS', 'GUESTS')";
-				break;
+					break;
 			}
 
 				if( !($result = $db->sql_query($sql)) )

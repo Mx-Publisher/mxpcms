@@ -1,0 +1,37 @@
+- - - - - - - - - - - - - - - - - - - - - - -
+ - - - - - - - - RADIO PLAYER  - - - - - - -
+- - - - - - - - - - - - - - - - - - - - - - -
+
+
+History:
+- Verion 1.00 by: Niklas Pull
+May 17, 2006
+
+- Version 1.01 fixed by OryNider for Firefox
+October 7, 2006
+---------------------------------------------
+
+This is a popup radio player for SHOUTcast
+servers. The embed's are hidden in iframes
+with autostarts, so the pricipal is very
+simple. It also uses an ajax script to update
+the song title.
+
+It can switch between real player and wmp
+mode, however the real player version did not
+worked with Firefox and Netscape. Fixed for
+Firefox by OryNider - http://pubory.uv.ro/
+
+Feel free to use it however you want, all I 
+want is that you keep the author meta tag.
+
+
+---------------------------------------------
+
+             Instructions:
+
+All you have to do is to edit config.php to
+your ip adress, port and SHOUTcast password. 
+Everythings done in 1 min, :)
+
+

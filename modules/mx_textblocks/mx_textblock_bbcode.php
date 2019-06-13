@@ -16,7 +16,7 @@ if( !defined('IN_PORTAL') || !is_object($mx_block))
 
 //
 // Virtual Blog Mode
-//die($msg_text);
+//
 if ($mx_page->is_virtual)
 {
 	if ($mx_request_vars->is_request('virtual'))

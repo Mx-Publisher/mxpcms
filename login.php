@@ -13,41 +13,14 @@
 // Allow people to reach login page if
 // board is shut down
 //
-define("IN_LOGIN", true);
-define('IN_PHPBB', true);
-define('IN_SOCIAL_CONNECT', true);
+define('IN_LOGIN', true);
 
+define('IN_PORTAL', true);
 $mx_root_path = './';
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
 if (!defined('PHP_EXT')) define('PHP_EXT', $phpEx);
 define('CMS_PAGE_HOME', 'index.' . PHP_EXT);
-
-//phpBB Stuff
-define('PHPBB_PAGE_ERRORS', $mx_root_path . 'errors.' . $phpEx);
-define('PHPBB_PAGE_FORUM', $phpbb_root_path . 'viewforum.' . $phpEx);
-define('PHPBB_PAGE_LOGIN', ((PORTAL_BACKEND !== 'internal') ? $phpbb_root_path : $mx_root_path) . 'login.' . $phpEx);
-define('PHPBB_PAGE_PROFILE', $phpbb_root_path . 'profile.' . $phpEx);
-define('LOGIN_REDIRECT_PAGE', $mx_root_path . 'index.' . $phpEx);
-
-//Common
 include($mx_root_path . 'common.'.$phpEx);
-
-//Temporary Social Connect Code
-//This has to be added in the database
-$board_config['enable_social_connect'] = IN_SOCIAL_CONNECT;
-
-$board_config['enable_facebook_login'] = IN_SOCIAL_CONNECT;
-$board_config['facebook_app_id'] = '1923638584362290';
-$board_config['facebook_app_secret'] = '93613186a2da77f4e2fec0a1b527f4c70';
-
-$board_config['enable_google_login'] = IN_SOCIAL_CONNECT;
-$board_config['google_app_id'] = '0000000000000000000000';
-$board_config['google_app_secret'] = '000000000000000000000';
-
-$board_config['enable_twitter_login'] = IN_SOCIAL_CONNECT;
-$board_config['twitter_app_id'] = '0000000000000000000000';
-$board_config['twitter_app_secret'] = '000000000000000000000';
-//Temporary Social Connect Code
 
 //
 // Page selector
@@ -88,7 +61,6 @@ if (strstr($redirect_url, "\n") || strstr($redirect_url, "\r") || strstr($redire
 {
 	mx_message_die(GENERAL_ERROR, 'Tried to redirect to potentially insecure url.');
 }
-
 if($mx_request_vars->is_request('login') || $mx_request_vars->is_request('logout'))
 {
 	include($mx_root_path . 'includes/sessions/'.PORTAL_BACKEND.'/login.'.$phpEx);

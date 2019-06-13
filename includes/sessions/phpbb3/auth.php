@@ -2,17 +2,18 @@
 /**
 *
 * @package Auth
-* @version $Id: auth.php,v 1.1 2014/09/15 21:14:56 orynider Exp $
+* @version $Id: auth.php,v 1.6 2013/06/28 15:33:47 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
 *
-namespace phpbb\phpbb_auth;
 */
+
 if ( !defined( 'IN_PORTAL' ) )
 {
 	die( "Hacking attempt" );
 }
+
 
 /**
 * Permission/Auth class for phpBB3 forums
@@ -40,10 +41,7 @@ class phpbb_auth_base
 			$sql = 'SELECT auth_option_id, auth_option, is_global, is_local
 				FROM ' . ACL_OPTIONS_TABLE . '
 				ORDER BY auth_option_id';
-			if (!$result = $db->sql_query($sql))
-			{
-				mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-			}
+			$result = $db->sql_query($sql);
 
 			$global = $local = 0;
 			$this->acl_options = array();
@@ -174,10 +172,7 @@ class phpbb_auth_base
 				{
 					$sql .= ' WHERE ' . $db->sql_in_set('forum_id', array_keys($this->acl), true);
 				}
-				if (!$result = $db->sql_query($sql))
-				{
-					mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-				}
+				$result = $db->sql_query($sql);
 
 				$this->acl_forum_ids = array();
 				while ($row = $db->sql_fetchrow($result))
@@ -371,10 +366,7 @@ class phpbb_auth_base
 				SET user_permissions = '" . $db->sql_escape($userdata['user_permissions']) . "',
 					user_perm_from = 0
 				WHERE user_id = " . $userdata['user_id'];
-				if (!$db->sql_query($sql))
-				{
-					mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-				}
+			$db->sql_query($sql);
 		}
 
 		return;
@@ -454,10 +446,7 @@ class phpbb_auth_base
 		$sql = 'SELECT *
 			FROM ' . ACL_ROLES_DATA_TABLE . '
 			ORDER BY role_id ASC';
-			if (!$result = $db->sql_query($sql))
-			{
-				mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-			}
+		$result = $db->sql_query($sql);
 
 		$this->role_cache = array();
 		while ($row = $db->sql_fetchrow($result))
@@ -487,10 +476,7 @@ class phpbb_auth_base
 			SET user_permissions = '',
 				user_perm_from = 0
 			$where_sql";
-			if (!$db->sql_query($sql))
-			{
-				mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-			}
+		$db->sql_query($sql);
 
 		return;
 	}
@@ -517,10 +503,7 @@ class phpbb_auth_base
 				$sql_ug
 				$sql_forum
 			ORDER BY r.role_order ASC";
-		if (!$result = $db->sql_query($sql))
-		{
-			mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-		}
+		$result = $db->sql_query($sql);
 
 		while ($row = $db->sql_fetchrow($result))
 		{
@@ -573,10 +556,7 @@ class phpbb_auth_base
 
 		foreach ($sql_ary as $sql)
 		{
-			if (!$result = $db->sql_query($sql))
-			{
-				mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-			}
+			$result = $db->sql_query($sql);
 
 			while ($row = $db->sql_fetchrow($result))
 			{
@@ -612,10 +592,7 @@ class phpbb_auth_base
 
 		foreach ($sql_ary as $sql)
 		{
-			if (!$result = $db->sql_query($sql))
-			{
-				mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-			}
+			$result = $db->sql_query($sql);
 
 			while ($row = $db->sql_fetchrow($result))
 			{
@@ -689,10 +666,7 @@ class phpbb_auth_base
 
 		foreach ($sql_ary as $sql)
 		{
-			if (!$result = $db->sql_query($sql))
-			{
-				mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-			}
+			$result = $db->sql_query($sql);
 
 			while ($row = $db->sql_fetchrow($result))
 			{
@@ -743,10 +717,7 @@ class phpbb_auth_base
 
 		foreach ($sql_ary as $sql)
 		{
-			if (!$result = $db->sql_query($sql))
-			{
-				mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-			}
+			$result = $db->sql_query($sql);
 
 			while ($row = $db->sql_fetchrow($result))
 			{
@@ -775,10 +746,7 @@ class phpbb_auth_base
 			$sql = 'SELECT *
 				FROM ' . ACL_ROLES_DATA_TABLE . '
 				ORDER BY role_id ASC';
-			if (!$result = $db->sql_query($sql))
-			{
-				mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-			}
+			$result = $db->sql_query($sql);
 
 			while ($row = $db->sql_fetchrow($result))
 			{
@@ -800,10 +768,7 @@ class phpbb_auth_base
 		$sql = 'SELECT forum_id, auth_option_id, auth_role_id, auth_setting
 			FROM ' . ACL_USERS_TABLE . '
 			WHERE user_id = ' . $user_id;
-		if (!$result = $db->sql_query($sql))
-		{
-			mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-		}
+		$result = $db->sql_query($sql);
 
 		while ($row = $db->sql_fetchrow($result))
 		{
@@ -825,10 +790,7 @@ class phpbb_auth_base
 			WHERE a.group_id = ug.group_id
 				AND ug.user_pending = 0
 				AND ug.user_id = ' . $user_id;
-		if (!$result = $db->sql_query($sql))
-		{
-			mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-		}
+		$result = $db->sql_query($sql);
 
 		while ($row = $db->sql_fetchrow($result))
 		{
@@ -883,21 +845,11 @@ class phpbb_auth_base
 	*/
 	function login($username, $password, $autologin = false, $viewonline = 1, $admin = 0)
 	{
-		global $board_config, $db, $mx_user, $mx_root_path, $phpbb_root_path, $phpEx;
+		global $board_config, $db, $mx_user, $phpbb_root_path, $phpEx;
 
-		// Check whether the session is still valid if we have one
-		$method = basename(trim($board_config['auth_method']));
+		$method = trim(basename($board_config['auth_method']));
+		include_once($phpbb_root_path . 'includes/auth/auth_' . $method . '.' . $phpEx);
 
-		//phpBB3 Rhea Provider
-		//if ((@include_once $mx_root_path . "includes/session/rhea/provider/" . $method . ".$phpEx") === false)
-		//{
-		//Fall to phpBB3 Olympus Auth Provider 
-		if ((@include_once $mx_root_path . "includes/shared/phpbb3/includes/auth/auth_" . $method . ".$phpEx") === false)
-		{
-			mx_message_die(CRITICAL_ERROR, 'File ' . $mx_root_path . "includes/shared/phpbb3/auth/provider/" . $method . ".$phpEx" . ' couldn\'t be opened.');
-		}
-		//}
-		//$provider = $phpbb_container->get('auth.provider.' . $method);
 		$method = 'login_' . $method;
 		if (function_exists($method))
 		{
@@ -917,10 +869,7 @@ class phpbb_auth_base
 				$sql = 'SELECT user_id, username, user_password, user_passchg, user_email, user_type
 					FROM ' . USERS_TABLE . "
 					WHERE username_clean = '" . $db->sql_escape(utf8_clean_string($username)) . "'";
-				if (!$result = $db->sql_query($sql))
-				{
-					mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-				}
+				$result = $db->sql_query($sql);
 				$row = $db->sql_fetchrow($result);
 				$db->sql_freeresult($result);
 
@@ -970,10 +919,7 @@ class phpbb_auth_base
 						$sql = 'DELETE FROM ' . SESSIONS_TABLE . "
 							WHERE session_id = '" . $db->sql_escape($old_session_id) . "'
 							AND session_user_id = {$login['user_row']['user_id']}";
-						if (!$db->sql_query($sql))
-						{
-							mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
-						}
+						$db->sql_query($sql);
 					}
 
 					return array(

@@ -29,7 +29,7 @@ ul.topiclist dt, ul.topiclist dd {
 ul.topiclist dt {
 	width: 100%;
 	margin-right: -440px;
-	font-size: 1.1em;
+	font-size: 0.9em;
 }
 
 ul.topiclist.missing-column dt {
@@ -95,10 +95,7 @@ li.row {
 
 li.row strong {
 	font-weight: normal;
-	font-size: 10px;
 }
-
-.subforum {font-size: 10px;}
 
 li.header dt, li.header dd {
 	line-height: 1em;
@@ -201,8 +198,7 @@ dl.row-item dt li {
 }
 
 dd.lastpost, dd.redirect, dd.moderation, dd.time, dd.info {
-	width: 250px;
-	font-size: 1.1em;
+	font-size: 0.8em;
 }
 
 dd.redirect {

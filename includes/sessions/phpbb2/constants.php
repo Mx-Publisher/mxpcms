@@ -32,11 +32,6 @@ if ( !defined('IN_PHPBB') )
 @define('ADMIN', 1);
 @define('MOD', 2);
 
-@define('USER_NORMAL', 0);
-@define('USER_INACTIVE', 1);
-@define('USER_IGNORE', 2);
-@define('USER_FOUNDER', 3);
-
 // User related
 @define('USER_ACTIVATION_NONE', 0);
 @define('USER_ACTIVATION_SELF', 1);
@@ -136,16 +131,10 @@ if ( !defined('IN_PHPBB') )
 @define('AUTH_VOTE', 10);
 @define('AUTH_ATTACH', 11);
 
-// ACL
-@define('ACL_NEVER', 0);
-@define('ACL_YES', 1);
-@define('ACL_NO', -1);
-
 // Table names
 @define('CONFIRM_TABLE', $table_prefix.'confirm');
 @define('AUTH_ACCESS_TABLE', $table_prefix.'auth_access');
 @define('BANLIST_TABLE', $table_prefix.'banlist');
-@define('BBCODES_TABLE', $table_prefix . 'bbcodes');
 @define('CATEGORIES_TABLE', $table_prefix.'categories');
 @define('CONFIG_TABLE', $table_prefix.'config');
 @define('DISALLOW_TABLE', $table_prefix.'disallow');

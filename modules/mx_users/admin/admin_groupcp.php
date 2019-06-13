@@ -37,14 +37,19 @@ if ( !empty( $setmodules ) )
 $mx_root_path = './../../../';
 $module_root_path = "./../";
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
+require( $mx_root_path . '/admin/pagestart.' . $phpEx );
 
 // **********************************************************************
-// Includes
-// **********************************************************************
-require($mx_root_path . '/admin/pagestart.' . $phpEx);
 // Read language definition
-include($module_root_path . 'includes/users_constants.' . $phpEx);
-
+// **********************************************************************
+if ( !file_exists( $module_root_path . 'language/lang_' . $board_config['default_lang'] . '/lang_admin.' . $phpEx ) )
+{
+	include( $module_root_path . 'language/lang_english/lang_admin.' . $phpEx );
+}
+else
+{
+	include( $module_root_path . 'language/lang_' . $board_config['default_lang'] . '/lang_admin.' . $phpEx );
+}
 
 $board_config['topics_per_page'] = isset($board_config['topics_per_page']) ? $board_config['topics_per_page'] : 15;
 
@@ -774,14 +779,13 @@ else if ( $group_id )
 				FROM " . GROUPS_TABLE . "
 				WHERE group_id = $group_id
 					AND group_single_user = 0";
-		break;
+			break;
 		case 'phpbb3':
-		default:
 			$sql = "SELECT *
 				FROM " . GROUPS_TABLE . "
 				WHERE group_id = $group_id
 					AND group_name NOT IN ('BOTS', 'GUESTS')";
-		break;
+			break;
 	}
 
 	if ( !($result = $db->sql_query($sql)) )
@@ -1200,16 +1204,15 @@ else
 						AND ug.group_id = g.group_id
 						AND g.group_single_user <> " . TRUE . "
 					ORDER BY g.group_name, ug.user_id";
-			break;
+				break;
 			case 'phpbb3':
-			default:
 				$sql = "SELECT g.group_id, g.group_name, g.group_type, ug.user_pending
 					FROM " . GROUPS_TABLE . " g, " . USER_GROUP_TABLE . " ug
 					WHERE ug.user_id = " . $userdata['user_id'] . "
 						AND ug.group_id = g.group_id
 						AND group_name NOT IN ('BOTS', 'GUESTS')
 					ORDER BY g.group_name, ug.user_id";
-			break;
+				break;
 		}
 
 		if ( !($result = $db->sql_query($sql)) )
@@ -1256,15 +1259,14 @@ else
 				WHERE group_single_user <> " . TRUE . "
 					$ignore_group_sql
 				ORDER BY g.group_name";
-		break;
+			break;
 		case 'phpbb3':
-		default:
 			$sql = "SELECT group_id, group_name, group_type
 				FROM " . GROUPS_TABLE . " g
 				WHERE group_name NOT IN ('BOTS', 'GUESTS')
 					$ignore_group_sql
 				ORDER BY g.group_name";
-		break;
+			break;
 	}
 
 	if ( !($result = $db->sql_query($sql)) )

@@ -85,12 +85,6 @@ if(!isset($mx_cache) || !is_object($mx_cache))
 	$cache = new mx_cache();
 }
 
-if(!isset($phpbb_auth) || !is_object($phpbb_auth))
-{
-	$phpbb_auth = new phpbb_auth();
-}
-$phpbb_auth->acl($mx_user->data);
-
 //
 // Load common language file from phpBB3
 //$mx_user->set_lang($mx_user->lang, $mx_user->help, 'common');
@@ -212,6 +206,12 @@ switch (PORTAL_BACKEND)
 	break;
 
 	default:
+	
+		if(!isset($phpbb_auth) || !is_object($phpbb_auth))
+		{
+			$phpbb_auth = new phpbb_auth();
+		}
+		$phpbb_auth->acl($mx_user->data);
 		
 		// Get referer to redirect user to the appropriate page after delete action
 		$redirect_url = mx_append_sid(PORTAL_URL . "index.$phpEx" . (isset($page_id) ? "?page={$page_id}" : "") . (isset($cat_nav) ? "&cat_nav={$cat_nav}" : ""));

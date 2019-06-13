@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Module - mx_navmenu
-* @version $Id: mx_menu_nav.php,v 1.39 2014/05/09 07:53:11 orynider Exp $
+* @version $Id: mx_menu_nav.php,v 1.38 2013/06/02 12:56:34 orynider Exp $
 * @copyright (c) 2002-2008 [Jon Ohlsson] MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://www.mx-publisher.com
@@ -17,8 +17,8 @@ if( !defined('IN_PORTAL') || !is_object($mx_block))
 //
 // Read Block Settings
 //
-$menu_title = $mx_block->block_info['block_title'];
-$menu_desc = $mx_block->block_info['block_desc'];
+$title = $mx_block->block_info['block_title'];
+$b_description = $mx_block->block_info['block_desc'];
 
 //
 // Includes
@@ -27,17 +27,11 @@ include_once( $module_root_path . 'includes/navmenu_constants.' . $phpEx );
 include_once( $module_root_path . 'includes/navmenu_functions.' . $phpEx );
 
 //
-// Pass Multilanguage Block Vars
-//
-$title = ((mb_strlen($lang[str_replace(' ', '_', $menu_title)]) !== 0) ? $lang[str_replace(' ', '_', $menu_title)] : $language->lang($menu_title));
-$description = $b_description = (isset($lang[$menu_desc]) ? $lang[$menu_desc] : $menu_desc);
-
-//
 // Setup config parameters
 //
 $config_name = array('menu_display_style', 'menu_display_mode', 'menu_page_sync', 'menu_page_parent', 'menu_custom_tpl');
 
-for ($i = 0; $i < count($config_name); $i++)
+for( $i = 0; $i < count($config_name); $i++ )
 {
 	$config_value = $mx_block->get_parameters( $config_name[$i] );
 	$mx_menu_config[$config_name[$i]] = $config_value;
@@ -72,9 +66,9 @@ if ( defined($nav_def_key) )
 }
 define($nav_def_key, true);
 
-/*
-* Get the current MX page.
-**/
+//
+// Get the current MX page.
+//
 $page_id = $mx_request_vars->request('page', MX_TYPE_INT, 1);
 $virtual_id = $mx_request_vars->request('virtual', MX_TYPE_INT, '');
 
@@ -94,17 +88,17 @@ else
 	{
 		case 'Classic':
 			$template_tmp = $menu_display_mode == 'Horizontal' ? array('body' => 'mx_menu_classic_hor.tpl') : array('body' => 'mx_menu_classic_ver.tpl');
-		break;
+			break;
 		case 'Advanced':
 			$template_tmp = $menu_display_mode == 'Horizontal' ? array('body' => 'mx_menu_advanced_hor.tpl') : array('body' => 'mx_menu_advanced_ver.tpl');
 			$kick_js = $menu_display_mode == 'Horizontal' ? 'adv_hor.js' : 'adv_ver.js';
 			$mx_page->add_footer_text( 'includes/js/' . $kick_js, true );
-		break;
+			break;
 		case 'Simple_CSS_menu':
 			$template_tmp = $menu_display_mode == 'Horizontal' ? array('body' => 'mx_menu_simple_CSS_hor.tpl') : array('body' => 'mx_menu_simple_CSS_ver.tpl');
 			$kick_js = $menu_display_mode == 'Horizontal' ? 'simple_CSS_hor.js' : 'simple_CSS_ver.js';
 			$mx_page->add_footer_text( 'includes/js/' . $kick_js, true );
-		break;
+			break;
 		case 'Advanced_CSS_menu':
 			$template_tmp = $menu_display_mode == 'Horizontal' ? array('body' => 'mx_menu_advanced_CSS_hor.tpl') : array('body' => 'mx_menu_advanced_CSS_ver.tpl');
 			$kick_js = $menu_display_mode == 'Horizontal' ? 'adv_CSS_hor.js' : 'adv_CSS_ver.js';
@@ -112,13 +106,13 @@ else
 			break;
 		case 'Simple_x':
 			$template_tmp = $menu_display_mode == 'Horizontal' ? array('body' => 'mx_menu_simple_x_hor.tpl') : array('body' => 'mx_menu_simple_x_ver.tpl');
-		break;			
+			break;			
 		case 'Overall_navigation':
 			$template_tmp = array('body' => 'mx_menu_overall_standard.tpl');
-		break;			
+			break;			
 		default:
 			$template_tmp = $menu_display_mode == 'Horizontal' ? array('body' => 'mx_menu_classic_hor.tpl') : array('body' => 'mx_menu_classic_ver.tpl');
-		break;
+			break;
 	}
 	
 	switch( $menu_display_mode )
@@ -134,9 +128,9 @@ else
 
 $template->set_filenames($template_tmp);
 
-/*
-* Get menu data
-**/
+//
+// Get menu data
+//
 if ( $mx_cache->_exists( '_menu_' . $block_id ) )
 {
 	$mx_nav_data = $mx_cache->get( '_menu_' . $block_id );
@@ -196,55 +190,29 @@ foreach($navCategory as $cat_id => $catData)
 			}
 			$hasCurrentMenu = $catData[$key]['is_current'];
 		}
+
 	}
 
 	if(!$menuIsCat)
 	{
 		continue;
 	}
-
 	// Define the global bbcode bitfield, will be used to load bbcodes
 	$bbcode_uid = $catData[0]['bbcode_uid'];
-	$bbcode_bitfield = 'cA==';
-	// Setup $mx_bbcode->
-	if (!class_exists('mx_bbcode'))
-	{
-		include($mx_root_path . 'includes/mx_functions_bbcode.' . $phpEx);
-	}
+	$bbcode_bitfield = 'cA==';	
 	//$bbcode_bitfield = $bbcode_bitfield | base64_decode($catData[0]['bbcode_bitfield']);	
 	// Instantiate BBCode if need be
 	if ($bbcode_bitfield !== '')
 	{
-		switch (PORTAL_BACKEND)
-		{
-			case 'internal':
-			case 'phpbb2':
-			case 'smf2':
-			case 'mybb':
-				$mx_bbcode = new mx_bbcode();
-			break;
-			
-			case 'olympus':
-				$mx_bbcode = new mx_bbcode(base64_encode($bbcode_bitfield));
-			break;
-			
-			case 'phpbb3':
-			case 'ascraeus':
-			default:
-				$mx_bbcode = new mx_bbcode(base64_encode($bbcode_bitfield));
-			break;
-		}
+		$mx_bbcode = new mx_bbcode(base64_encode($bbcode_bitfield));
 	}
-
 	//$depth = 0;
 	$cat_title = $catData[0]['cat_title'];
-	$cat = ( isset($lang[$cat_title]) ? $lang[$cat_title] : $cat_title );
-	//$cat = $mx_bbcode->decode($cat, $bbcode_uid, false, $bbcode_bitfield);
-	$cat = $mx_bbcode->decode($cat, $bbcode_uid, false);
-
+	$cat = ( !empty($lang[$cat_title]) ? $lang[$cat_title] : $cat_title );
+	$cat = $mx_bbcode->decode($cat, $bbcode_uid, false, $bbcode_bitfield);
+	
 	$cat_desc = '';
 	$cat_desc = $catData[0]['cat_desc'];
-	$cat_desc = ( isset($lang[$cat_desc]) ? $lang[$cat_desc] : $cat_desc );
 	$cat_desc = $mx_bbcode->decode($cat_desc, $bbcode_uid, false);
 
 	//
@@ -428,12 +396,12 @@ foreach($navCategory as $cat_id => $catData)
 $cat_width = $num_of_cats > 0 ? ceil(100 / $num_of_cats) . '%' : '100%';
 
 $template->assign_vars(array(
-	'BLOCK_SIZE'					=> isset($mx_block->block_info['block_size']) ? $mx_block->block_info['block_size'] : '100%',
-	'L_TITLE'						=> $title,
-	'L_DESC'						=> $b_description,
-	'NUM_OF_CATS'				=> $num_of_cats,
+	'BLOCK_SIZE'			=> ( !empty($block_size) ? $block_size : '100%' ),
+	'L_TITLE'				=> $title,
+	'L_DESC'				=> $b_description,
+	'NUM_OF_CATS'			=> $num_of_cats,
 	'NUM_OF_CATS_EDIT'		=> $num_of_cats - 1,
-	'CAT_WIDTH'					=> $cat_width,
+	'CAT_WIDTH'				=> $cat_width,
 
 	//+ mxp
 	'U_PORTAL_ROOT_PATH' 	=> PORTAL_URL,

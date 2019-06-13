@@ -13,7 +13,7 @@
  *     copyright 2          : (C) Bogdan Toma
  *     email     2          : bogdan@phpbb.ro
  *
- *     $Id: lang_main.php,v 1.6 2013/08/25 18:21:04 orynider Exp $
+ *     $Id: lang_main.php,v 1.5 2008/10/04 07:04:25 orynider Exp $
  *
  ****************************************************************************/
 
@@ -38,7 +38,6 @@
 // varies ... give it your best guess!
 //
 
-$lang['USER_LANG'] = 'ro';
 $lang['ENCODING'] = 'UTF-8';
 $lang['DIRECTION'] = 'ltr';
 $lang['LEFT'] = 'left';
@@ -51,7 +50,6 @@ $lang['DATE_FORMAT'] =  'd/M/Y'; // This should be changed to the default date f
 // please add it here.
 
 $lang['TRANSLATION_INFO'] = 'Varianta în limba română: <a href="http://www.phpbb.ro" target="_blank">Romanian phpBB online community</a>';
-
 
 //
 // Common, these terms are used
@@ -69,7 +67,7 @@ $lang['Posted'] = 'Trimis';
 $lang['Username'] = 'Utilizator';
 $lang['Password'] = 'Parola';
 $lang['Email'] = 'Email';
-$lang['Poster'] = 'Trimis de';
+$lang['Poster'] = 'Autor';
 $lang['Author'] = 'Autor';
 $lang['Time'] = 'Timp';
 $lang['Hours'] = 'Ore';
@@ -96,30 +94,6 @@ $lang['No'] = 'Nu';
 $lang['Enabled'] = 'Activat';
 $lang['Disabled'] = 'Dezactivat';
 $lang['Error'] = 'Eroare';
-
-// -------------------------------------------------
-$lang['Goto_page'] = 'Goto page';
-
-$lang['Post_by_author'] = 'by';
-$lang['Posted_on_date'] = 'on';
-$lang['In'] = 'in';
-
-$lang['Statistics'] = 'Statistics';
-$lang['Legend'] = 'Legend: ';
-$lang['Posted_articles_zero_total'] = 'No post'; // Number of posts
-$lang['Posted_articles_total'] = 'Total posts <strong>%d</strong>'; // Number of posts
-$lang['Posted_article_total'] = 'Total posts <strong>%d</strong>'; // Number of posts
-$lang['Registered_users_zero_total'] = 'No member'; // # registered users
-$lang['Registered_users_total'] = 'Total members <strong>%d</strong>'; // # registered users
-$lang['Registered_user_total'] = 'Total members <strong>%d</strong>'; // # registered users
-$lang['Newest_user'] = 'Our newest member <strong>%s%s%s</strong>'; // a href, username, /a  
-
-$lang['Rules_moderate'] = '%sModerate this forum%s'; // %s replaced by a href links, do not remove!
-
-$lang['Quick_mod'] = 'Quick-mod tools:';
-
-$lang['Search_forums'] = 'Search within';
-// -------------------------------------------------
 
 $lang['Next'] = 'Următoare';
 $lang['Previous'] = 'Anterioară';
@@ -195,15 +169,11 @@ $lang['Usergroups'] = 'Grupuri';
 $lang['Last_Post'] = 'Ultimul mesaj';
 $lang['Moderator'] = 'Moderator';
 $lang['Moderators'] = 'Moderatori';
-$lang['Post_by_author'] = 'de ';
-$lang['Posted_on_date'] = 'pe';
-$lang['In'] = 'in';
+
 
 //
 // Stats block text
 //
-$lang['Statistics'] = 'Statistice';
-$lang['Legend'] = 'Legendă: ';
 $lang['Posted_articles_zero_total'] = 'Utilizatorii noştri au scris un număr de <b>0</b> articole'; // Number of posts
 $lang['Posted_articles_total'] = 'Utilizatorii noştri au scris un număr de <b>%d</b> articole'; // Number of posts
 $lang['Posted_article_total'] = 'Utilizatorii noştri au scris un număr de <b>%d</b> articol'; // Number of posts
@@ -604,7 +574,7 @@ $lang['Current_password'] = 'Parola curentă';
 $lang['New_password'] = 'Parola nouă';
 $lang['Confirm_password'] = 'Confirmaţi parola';
 $lang['Confirm_password_explain'] = 'Trebuie să confirmaţi parola curentă dacă vreţi să o schimbaţi sau vreţi să aveţi altă adresă de email';
-$lang['password_if_changed'] = 'Este necesar să specificaţi parola dacă vreţi să o schimbaţi.<br />Atenţie dacă browserul ţine în cache parola să o ştergeţi când trimiteţi formularul paginii.';
+$lang['password_if_changed'] = 'Este necesar să specificaţi parola dacă vreţi să o schimbaţi';
 $lang['password_confirm_if_changed'] = 'Este necesar să confirmaţi parola dacă aţi schimbat-o anterior';
 
 $lang['Avatar'] = 'Imagine asociată (Avatar)';
@@ -1052,17 +1022,8 @@ $lang['General_Error'] = 'Eroare generală';
 $lang['Critical_Error'] = 'Eroare primejdioasă';
 $lang['An_error_occured'] = 'A apărut o eroare';
 $lang['A_critical_error'] = 'A apărut o eroare primejdioasă';
-// Login
-$lang['Enter_password'] = 'Please enter your username and password to log in.';
-$lang['Login'] = 'Log in';
-$lang['Logout'] = 'Log out';
-$lang['Forgotten_password'] = 'I forgot my password';
-$lang['AUTOLOGIN'] = 'Log me on automatically each visit';
-$lang['Error_login'] = 'You have specified an incorrect or inactive username, or an invalid password.'; 
 
 $lang['Admin_reauthenticate'] = 'Pentru a administra forumul trebuie să vă autentificaţi din nou.';
-$lang['Login_attempts_exceeded'] = 'The maximum number of %s login attempts has been exceeded. You are not allowed to login for the next %s minutes.';
-$lang['Please_remove_install_contrib'] = 'Please ensure both the install/ and contrib/ directories are deleted';
 
 // Start add - Bin Mod
 $lang['Move_bin'] = 'Move this topic to bin';
@@ -1094,15 +1055,8 @@ $lang['youtube_link'] = 'Link';
 $lang['Subforums'] = 'Subforumuri';
 // End Simple Subforums MOD
 
-$lang['SOCIAL_CONNECT'] = 'You can login using your social network accounts:';
-$lang['SOCIAL_CONNECT_LOGIN'] = 'Login with my %s account';
-$lang['SOCIAL_CONNECT_REGISTER_INFO'] = 'Your profile will be automatically filled with the information retrieved from your profile in the social network.';
-$lang['SOCIAL_CONNECT_LINK_ACCOUNT'] = 'Please login to link your social network account to your account';
-$lang['SOCIAL_CONNECT_LINK_ACCOUNT_MSG'] = 'We couldn\'t find any social network account linked with your %s account. You can either register or link an existing account with your %s account.<br /><br />Click %shere%s if you already have an account.<br/ ><br />Click %shere%s to create a new account.';
- 
-
 //
-// That's all, Folks!
+// That's all Folks!
 // -------------------------------------------------
 
 ?>

@@ -1,0 +1,2 @@
+INSERT INTO `mx_shotcast_config` VALUES ('show_listen_select', '1');
+INSERT INTO `mx_shotcast_config` VALUES ('play_list', 'listen.pls');

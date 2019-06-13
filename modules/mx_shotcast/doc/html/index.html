@@ -1,0 +1,28 @@
+<html>
+<head>
+<SCRIPT language=javascript>
+// Author: Eric King Url: http://redrival.com/eak/index.shtml
+// This script is free to use as long as this info is left in
+// Courtesy of SimplytheBest.net - http://simplythebest.net/scripts/
+var win = null;
+function NewWindow(mypage,myname,w,h,scroll){
+LeftPosition = (screen.width) ? (screen.width-w)/2 : 0;
+TopPosition = (screen.height) ? (screen.height-h)/2 : 0;
+settings =
+'height='+h+',width='+w+',top='+TopPosition+',left='+LeftPosition+',scrollbars='+scroll+',resizable=no'
+win = window.open(mypage,myname,settings)
+}
+</SCRIPT>
+<title>Radio Player</title>
+</head>
+<body>
+<center>
+<br><br>
+<p align="center" style="margin: 0 -1">
+&nbsp;<td align="center" valign="midle" nowrap><a href="wmpx.html" class="bodylink" onclick="NewWindow(this.href,'name','332','360','no');return false">Radio Live</a></td>
+</p>
+</center>
+</table>
+</body>
+</html>
+

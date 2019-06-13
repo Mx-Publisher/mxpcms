@@ -1,0 +1,18 @@
+[b]MOD Title[/b]: mx_shotcast 
+
+[b]MOD Description[/b]: 
+This is the shotcast version of mx_radio. The player can play one stream brotcasted by a shotcast server that can be configured in AdminCP (host, port and password). The embed's are hidden in iframes with autostarts, so the pricipal is very simple. It also uses an ajax script to update the song title. Users most have instaled the latest media player (Windows Media Player 10+) or Real One Player, but Real player version doesnt not work with Firefox and Netscape.
+
+[b]MOD Version[/b]: 1.0 
+
+[b]Designed for[/b]: mxBB-portal 2.8.x
+
+[b]Author[/b]: Niklas Pull and OryNider
+
+[b]Test Site[/b]: http://mxBB.lx.ro/
+
+[b]Mx_ShotCast Front ScreenShot[/b]:
+
+Upgrade:
+
+INSERT INTO `mx_shotcast_config` VALUES ('show_listen_select', '1');

@@ -1,0 +1,43 @@
+<!-- $Id: localtimesclock.html,v 1.2 2013/07/04 00:38:34 orynider Exp $ //-->
+<div class="clear" style="text-align: center; vertical-align:top; margin: 0 auto; width:{BLOCK_SIZE}; display:block"></div>
+<div class="forabg block">
+	<div id="p1" class="post bg2 online">
+	<div class="inner"><span class="corners-top"><span>&nbsp;{BLOCK_TITLE}&nbsp;</span></span>
+
+	<dl class="textbody" align="center" id="clock" style="margin:15px 0px 0px 0px" style="background:{WMODE};">		
+		<ul align="center" id="title" class="linklist navlinks" style="text-align:center;font-weight:normal;width:140px;border:1px solid #ccc;background:#fff ;color: #fff ;font-weight:bold">
+			<a style="padding:2px 1px;margin:2px 1px;font-size:13px;line-height:16px;font-family:arial;text-decoration:none;color:#A0l3200 ;" href="http://localtimes.info/{COMUNITY}/{COUNTRY}/{CITY}/"><img src="http://localtimes.info/images/countries/{FLAGCODE}.png" border=0 style="border:0;margin:0;padding:0">&nbsp;&nbsp;{CITY} Time</a>
+		</ul>						
+	<div class="row1" align="center" valign="middle">	
+	<div id="local_clock" align="center" style="background:{WMODE};">
+
+	<div align="center" id="clock" style="margin:15px 0px 0px 0px" style="background:{WMODE};">
+		<!--script type="text/javascript" src="http://localtimes.info/clock.php?continent={COMUNITY}&country={COUNTRY}&province={STATE}&city={CITY}&rnd=0&gha=0&fna=&ghb=0&ghf=0&gbc=0x4C2100&gfc=0xFFF6F0&gtc=0x000080&cp3_Hex=4C2100&cp2_Hex=FFF6F0&cp1_Hex=000080&fwdt={FLASH_WIDTH}&widget_number=119"></script-->
+		<!--script type="text/javascript" src="http://localtimes.info/clock.php?continent={COMUNITY}&country={COUNTRY}&province={STATE}&city={CITY}&fwdt={FLASH_WIDTH}&color=black-white&cp6_Hex=FFB200&cp5_Hex=FFFFFF&cp4_Hex=000080&cp3_Hex=0082ED&cp2_Hex=D1DAFC&cp1_Hex=00A5FF&ham=1&hbg=0&hfg=0&mon=&wek=&wkf=&sep=&sid="></script-->
+
+		<span class="nav" style="text-align: center;">			
+			<div align="center" id="clock" style="background:{WMODE};">
+				<span class="nav" style="text-align: center;">			
+					<script language="JavaScript">
+						document.writeln("<object classid=\"clsid:D27CDB6E-AE6D-11cf-96B8-444553540000\" codebase=\"http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=5,0,0,0\" width=\"{FLASH_WIDTH}\" height=\"{FLASH_HEIGHT}\">");
+						document.writeln("<param name=movie value=\"{CLOCK_URL}&fwdt={FLASH_WIDTH}\">");
+						document.writeln("<param name={COLOR_MODE} value=\"{WMODE}\">");
+						document.writeln("<param name=quality value=high>");
+						document.writeln("<embed src=\"{CLOCK_URL}&fwdt={FLASH_WIDTH}\" {COLOR_MODE}=\"{WMODE}\" quality=high pluginspage=\"http://www.macromedia.com/shockwave/download/index.cgi?P1_Prod_Version=ShockwaveFlash\" type=\"application/x-shockwave-flash\" width=\"{FLASH_WIDTH}\" height=\"{FLASH_HEIGHT}\">");
+						document.writeln("</embed>");
+						document.writeln("</object>");
+					</script>
+				</span>				
+			</div>			
+		</span>				
+	</div> 
+
+	</div> 
+	</div>		
+	<div align="center"><hr align="center" /></div>
+	</dl>
+	<br /> 	
+	</div></div>	
+   <span class="corners-bottom"><span></span></span>
+</div>
+<br style="clear:both" />

@@ -1,0 +1,34 @@
+<html><head></head><body>
+
+<SCRIPT LANGUAGE="JavaScript">
+
+     //IE Code
+     document.write ('<OBJECT ID=MediaPlayer ');
+     document.write ('CLASSID=CLSID:22d6f312-b0f6-11d0-94ab-0080c74c7e95 ');
+     document.write ('CODEBASE=http://activex.microsoft.com/activex/controls/mplayer/en/nsmp2inf.cab#Version=6,4,5,715 ');
+     document.write ('standby="Loading Microsoft Windows Media Player components..." ');
+     document.write ('TYPE="application/x-oleobject" width="286" height="225">');
+     document.write ('<PARAM NAME="FileName" VALUE="http://67.15.50.243:10040">');
+     document.write ('<PARAM NAME="AutoStart" VALUE="true">');
+     document.write ('<PARAM NAME="ShowControls" VALUE="1">');
+
+     //Netscape code
+     document.write ('    <Embed type="application/x-mplayer2"');
+     document.write ('        pluginspage="http://www.microsoft.com/windows/windowsmedia/"');
+     document.write ('        filename="http://67.15.50.243:10040"');
+     document.write ('        src="http://67.15.50.243:10040"');
+     document.write ('        Name=MediaPlayer');
+     document.write ('        ShowControls=1');
+     document.write ('        ShowDisplay=1');
+     document.write ('        ShowStatusBar=1');
+     document.write ('        width=290');
+     document.write ('        height=320>');
+     document.write ('    </embed>');
+
+     document.write ('</OBJECT>');
+
+</SCRIPT>
+
+
+</body>
+</html>

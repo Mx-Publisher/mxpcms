@@ -85,8 +85,8 @@ class bbcode_base
 	{
 		global $document_id, $access_key, $height, $width;
 		global $lang;
+
 		$bbcode_tpl['olist_open'] = str_replace('{LIST_TYPE}', '\\1', $bbcode_tpl['olist_open']);
-		//$bbcode_tpl['mlist_open'] = str_replace('{LIST_TYPE}', '\\1', $bbcode_tpl['mlist_open']);
 		$bbcode_tpl['color_open'] = str_replace('{COLOR}', '\\1', $bbcode_tpl['color_open']);
 		$bbcode_tpl['size_open'] = str_replace('{SIZE}', '\\1', $bbcode_tpl['size_open']);
 		$bbcode_tpl['quote_open'] = str_replace('{L_QUOTE}', $lang['Quote'], $bbcode_tpl['quote_open']);		
@@ -112,35 +112,14 @@ class bbcode_base
 		$bbcode_tpl['email'] = str_replace('{EMAIL}', '\\1', $bbcode_tpl['email']);
 		
 		// bbcode_box Mod 
-		// $bbcode_tpl['stream'] = str_replace('{URL}', '\\1', $bbcode_tpl['stream']); 
+        $bbcode_tpl['align_open'] = str_replace('{ALIGN}', '\\1', $bbcode_tpl['align_open']); 
+       // $bbcode_tpl['stream'] = str_replace('{URL}', '\\1', $bbcode_tpl['stream']); 
         $bbcode_tpl['ram'] = str_replace('{URL}', '\\1', $bbcode_tpl['ram']); 
         $bbcode_tpl['marq_open'] = str_replace('{MARQ}', '\\1', $bbcode_tpl['marq_open']); 
-
-        // table 	
-        $bbcode_tpl['table_open'] = str_replace('{TABLE}', '\\1', $bbcode_tpl['table_open']);
-		// tr  		
-        $bbcode_tpl['tr_open'] = str_replace('{TR}', '\\1', $bbcode_tpl['tr_open']);               
-		// th  		
-        $bbcode_tpl['th_open'] = str_replace('{TH}', '\\1', $bbcode_tpl['th_open']);     
-		// td 	
-        $bbcode_tpl['td_open'] = str_replace('{TD}', '\\1', $bbcode_tpl['td_open']);        		      
-		// cell 
-		$bbcode_tpl['cell_open'] = str_replace('{CELL}', '\\1', $bbcode_tpl['cell_open']);		  
-		// thead 		
-        $bbcode_tpl['thead_open'] = str_replace('{THEAD}', '\\1', $bbcode_tpl['thead_open']);         
-		// tbody		
-        $bbcode_tpl['tbody_open'] = str_replace('{TBODY}', '\\1', $bbcode_tpl['tbody_open']);		
-		// center       
-	    $bbcode_tpl['center_open'] = str_replace('{CENTER}', '\\1', $bbcode_tpl['center_open']); 			
-		// align
-        $bbcode_tpl['align_open'] = str_replace('{ALIGN}', '\\1', $bbcode_tpl['align_open']);       
-		// float 
-        $bbcode_tpl['float_open'] = str_replace('{FLOAT}', '\\1', $bbcode_tpl['float_open']);
-		// fa 
-        $bbcode_tpl['fa_open'] = str_replace('{TEXT}', '\\1', $bbcode_tpl['fa_open']);		
-        
-		$bbcode_tpl['web'] = str_replace('{URL}', '\\1', $bbcode_tpl['web']);
-
+        $bbcode_tpl['table_open'] = str_replace('{TABLE}', '\\1', $bbcode_tpl['table_open']); 
+        $bbcode_tpl['cell_open'] = str_replace('{CELL}', '\\1', $bbcode_tpl['cell_open']); 
+        $bbcode_tpl['web'] = str_replace('{URL}', '\\1', $bbcode_tpl['web']);
+	    //$bbcode_tpl['center_open'] = str_replace('{CENTER}', '\\1', $bbcode_tpl['center_open']); 	
         //$bbcode_tpl['flash'] = str_replace('{WIDTH}', '\\1', $bbcode_tpl['flash']); 
         //$bbcode_tpl['flash'] = str_replace('{HEIGHT}', '\\2', $bbcode_tpl['flash']); 
         //$bbcode_tpl['flash'] = str_replace('{URL}', '\\3', $bbcode_tpl['flash']); 
@@ -197,21 +176,6 @@ class bbcode_base
 	 * a thread. Assumes the message is already first-pass encoded, and we are given the
 	 * correct UID as used in first-pass encoding.
 	 * This a temporary function
-	
-	Creating an BBcode List with a custom bullet character. 
-	For example to list your favorite colors you could use:
-
-	    [list=square]
-	    [*]Red
-	    [*]Blue
-	    [*]Yellow
-	    [/list]
-
-	The question is how to specify a custom list’s bullet such as [b]?[/b] for a Features BBcode List ?
-
-	    [b]√[/b][color=#FF0000]Red[/color]
-	    [b]√[/b][color=#0040FF]Blue[/color]
-	    [b]√[/b][color=#FFFF00]Yellow[/color]	 
 	 */
 	function bbencode_second_pass($text, $uid = '', $bitfield = false)
 	{
@@ -236,8 +200,8 @@ class bbcode_base
 			$this->bbcode_second_pass($text, $uid, $bitfield);
 		}
 		
-		$text = str_replace(array("\n", "\r"), array('<br />', "\n"), $text);
-				
+		//$text = str_replace(array("\n", "\r"), array('<br />', "\n"), $text);
+		$text = str_replace(array("\n", "\r"), array('<br />', ""), $text);			
 		$text = preg_replace('#(script|about|applet|activex|chrome):#is', "\\1&#058;", $text);
 
 		// pad it with a space so we can distinguish between FALSE and matching the 1st char (index 0).
@@ -279,23 +243,14 @@ class bbcode_base
 		// [list] and [list=x] for (un)ordered lists.
 		// unordered lists
 		$text = str_replace("[list:$uid]", $bbcode_tpl['ulist_open'], $text);
-		
 		// li tags
 		$text = str_replace("[*:$uid]", $bbcode_tpl['listitem'], $text);
-		
 		// ending tags
 		$text = str_replace("[/list:u:$uid]", $bbcode_tpl['ulist_close'], $text);
 		$text = str_replace("[/list:o:$uid]", $bbcode_tpl['olist_close'], $text);
-		//$text = str_replace("[/list:m:$uid]", $bbcode_tpl['mlist_close'], $text);	
-		// Ordered lists		
-		$text = preg_replace("/\[list=([a1]):$uid\]/si", $bbcode_tpl['olist_open'], $text);	
-		//$text = preg_replace("/\[list=([disc]):$uid\]/si", $bbcode_tpl['olist_open'], $text);	
-		//$text = preg_replace("/\[list=([circle]):$uid\]/si", $bbcode_tpl['olist_open'], $text);	
-		//$text = preg_replace("/\[list=([square]):$uid\]/si", $bbcode_tpl['olist_open'], $text);	
-		//$text = preg_replace("/\[list=([radical]):$uid\]/si", $bbcode_tpl['olist_open'], $text);	
-		//$text = preg_replace("/\[list=([none]):$uid\]/si", $bbcode_tpl['olist_open'], $text);			
-		//$text = preg_replace("/\[list=([^\[]+):$uid\][\n]/si", $bbcode_tpl['mlist_open'], $text);
-		
+		// Ordered lists
+		$text = preg_replace("/\[list=([a1]):$uid\]/si", $bbcode_tpl['olist_open'], $text);
+
 		// colours
 		$text = preg_replace("/\[color=(\#[0-9A-F]{6}|[a-z]+):$uid\]/si", $bbcode_tpl['color_open'], $text);
 		$text = str_replace("[/color:$uid]", $bbcode_tpl['color_close'], $text);
@@ -307,13 +262,7 @@ class bbcode_base
 		// [b] and [/b] for bolding text.
 		$text = str_replace("[b:$uid]", $bbcode_tpl['b_open'], $text);
 		$text = str_replace("[/b:$uid]", $bbcode_tpl['b_close'], $text);
-		
-		// [fa] and [/fa] for bolding text.
-		$text = str_replace("[fa:$uid]", $bbcode_tpl['fa_open'], $text);
-		$text = str_replace("[fa_logo:$uid]", $bbcode_tpl['fa_logo_open'], $text);		
-		$text = str_replace("[/fa:$uid]", $bbcode_tpl['fa_close'], $text);
-		$text = str_replace("[/fa_logo:$uid]", $bbcode_tpl['fa_logo_close'], $text);		
-		
+
 		// [u] and [/u] for underlining text.
 		$text = str_replace("[u:$uid]", $bbcode_tpl['u_open'], $text);
 		$text = str_replace("[/u:$uid]", $bbcode_tpl['u_close'], $text);
@@ -331,8 +280,8 @@ class bbcode_base
 		// [img]image_url_here[/img] code..
 		// This one gets first-passed..
 		$patterns[] = "#\[img:$uid\]([^?](?:[^\[]+|\[(?!url))*?)\[/img:$uid\]#i";
-		$replacements[] = $bbcode_tpl['img'];		
-		
+		$replacements[] = $bbcode_tpl['img'];
+
 		// matches a [url]xxxx://www.phpbb.com[/url] code..
 		$patterns[] = "#\[url\]([\w]+?://([\w\#$%&~/.\-;:=,?@\]+]+|\[(?!url=))*?)\[/url\]#is";
 		$replacements[] = $bbcode_tpl['url1'];
@@ -348,13 +297,10 @@ class bbcode_base
 		// [url=www.phpbb.com]phpBB[/url] code.. (no xxxx:// prefix).
 		$patterns[] = "#\[url=((www|ftp)\.[\w\#$%&~/.\-;:=,?@\[\]+]*?)\]([^?\n\r\t].*?)\[/url\]#is";
 		$replacements[] = $bbcode_tpl['url4'];
-		
+
 		// [email]user@domain.tld[/email] code..
 		$patterns[] = "#\[email\]([a-z0-9&\-_.]+?@[\w\-]+\.([\w\-\.]+\.)?[\w]+)\[/email\]#si";
-		$replacements[] = $bbcode_tpl['email'];		
-
-		$patterns[] = "#\[ram\]([a-z0-9&\-_.]+?@[\w\-]+\.([\w\-\.]+\.)?[\w]+)\[/ram\]#si";
-		$replacements[] = $bbcode_tpl['ram'];
+		$replacements[] = $bbcode_tpl['email'];
 
 		//Strat more bbcode
         $text = preg_replace($patterns, $replacements, $text);
@@ -364,39 +310,16 @@ class bbcode_base
         // marquee 
         $text = preg_replace("/\[marq=(left|right|up|down):$uid\]/si", $bbcode_tpl['marq_open'], $text); 
         $text = str_replace("[/marq:$uid]", $bbcode_tpl['marq_close'], $text); 
-        // html 
-		$text = $this->bbencode_second_pass_html($text, $uid, $bbcode_tpl);
         // table 
-		$text = str_replace("[table:$uid]", $bbcode_tpl['table_open'], $text);
-		$text = str_replace("[/table:$uid]", $bbcode_tpl['table_close'], $text);		
-        // tr 
-		$text = str_replace("[tr:$uid]", $bbcode_tpl['tr_open'], $text);
-		$text = str_replace("[/tr:$uid]", $bbcode_tpl['tr_close'], $text);
-        // th 
-        $text = preg_replace("[th:$uid]", $bbcode_tpl['th_open'], $text); 
-        $text = str_replace("[/th:$uid]", $bbcode_tpl['th_close'], $text); 
-        // td 
-        $text = preg_replace("[td:$uid]", $bbcode_tpl['td_open'], $text); 
-        $text = str_replace("[/td:$uid]", $bbcode_tpl['td_close'], $text); 		
+        $text = preg_replace("/\[table=(.*?):$uid\]/si", $bbcode_tpl['table_open'], $text); 
+        $text = str_replace("[/table:$uid]", $bbcode_tpl['table_close'], $text); 
         // cell 
         $text = preg_replace("/\[cell=(.*?):$uid\]/si", $bbcode_tpl['cell_open'], $text); 
         $text = str_replace("[/cell:$uid]", $bbcode_tpl['cell_close'], $text); 
-        // thead 
-        $text = preg_replace("[thead:$uid]", $bbcode_tpl['thead_open'], $text); 
-        $text = str_replace("[/thead:$uid]", $bbcode_tpl['thead_close'], $text); 
-        // tbody 
-        $text = preg_replace("[tbody:$uid]", $bbcode_tpl['tbody_open'], $text); 
-        $text = str_replace("[/tbody:$uid]", $bbcode_tpl['tbody_close'], $text);		
         // center 
         $text = preg_replace("/\[center:$uid\]/si", $bbcode_tpl['center_open'], $text); 
         $text = str_replace("[/center:$uid]", $bbcode_tpl['center_close'], $text); 
-        // align
-        $text = preg_replace("/\[align:$uid\]/si", $bbcode_tpl['align_open'], $text); 
-        $text = str_replace("[/align:$uid]", $bbcode_tpl['align_close'], $text); 
-        // float 
-        $text = preg_replace("/\[float:$uid\]/si", $bbcode_tpl['float_open'], $text); 
-        $text = str_replace("[/float:$uid]", $bbcode_tpl['float_close'], $text);
-		// font 
+       // font 
         $text = preg_replace("/\[font=(.*?):$uid\]/si", $bbcode_tpl['font_open'], $text); 
         $text = str_replace("[/font:$uid]", $bbcode_tpl['font_close'], $text); 
         // poet 
@@ -478,6 +401,7 @@ class bbcode_base
 	function replace_listitems($text, $uid)
 	{
 		$text = str_replace("[*]", "[*:$uid]", $text);
+
 		return $text;
 	}
 	
@@ -511,7 +435,7 @@ class bbcode_base
 
 		// [ipaper] and [/ipaper] for posting scribd embed bbcode in your posts.
 		$text = $this->bbencode_first_pass_pda($text, $uid, '[ipaper]', '[/ipaper]', '', true, '');	
-
+		
 		// [scribd] and [/scribd] for posting scribd embed bbcode in your posts.		
 		$text = $this->bbencode_first_pass_pda($text, $uid, '[scribd]', '[/scribd]', '', false, '');
 		$text = $this->bbencode_first_pass_pda($text, $uid, '/\[scribd\\\\id=([0-9A-Za-z-_]{8})\\\\key=([0-9A-Za-z-_]{24})\](.*?)\]/is', '[/scribd]', '', false, '', "[scribd:$uid=\\\id=\\1\\\key=\\2\\\]");
@@ -522,15 +446,10 @@ class bbcode_base
 
 		// unordered..
 		$text = $this->bbencode_first_pass_pda($text, $uid, $open_tag, "[/list]", "[/list:u]", false, 'replace_listitems');
-		
+
 		$open_tag[0] = "[list=1]";
 		$open_tag[1] = "[list=a]";
-		//$open_tag[0] = "[list=disc]";
-		//$open_tag[0] = "[list=circle]";
-		//$open_tag[0] = "[list=square]";
-		//$open_tag[0] = "[list=radical]";
-		//$open_tag[0] = "[list=none]";		
-		
+
 		// ordered.
 		$text = $this->bbencode_first_pass_pda($text, $uid, $open_tag, "[/list]", "[/list:o]",  false, 'replace_listitems');
 
@@ -542,11 +461,7 @@ class bbcode_base
 
 		// [b] and [/b] for bolding text.
 		$text = preg_replace("#\[b\](.*?)\[/b\]#si", "[b:$uid]\\1[/b:$uid]", $text);
-		
-		// [fa] and [/fa] for simple text.
-		$text = preg_replace("#\[fa\](.*?)\[/fa\]#si", "[fa:$uid]\\1[/fa:$uid]", $text);		
-		$text = preg_replace("#\[fa_logo\](.*?)\[/fa_logo\]#si", "[fa_logo:$uid]\\1[/fa_logo:$uid]", $text);
-	
+
 		// [u] and [/u] for underlining text.
 		$text = preg_replace("#\[u\](.*?)\[/u\]#si", "[u:$uid]\\1[/u:$uid]", $text);
 
@@ -554,17 +469,13 @@ class bbcode_base
 		$text = preg_replace("#\[i\](.*?)\[/i\]#si", "[i:$uid]\\1[/i:$uid]", $text);
 
 		// [img]image_url_here[/img] code..
-		$text = preg_replace("#\[img\]((http|ftp|https|ftps)://)([^ \?&=\#\"\n\r\t<]*?(\.(jpg|jpeg|gif|png)))\[/img\]#si", "'[img:$uid]\\1' . str_replace(' ', '%20', '\\3') . '[/img:$uid]'", $text);
-	
+		$text = preg_replace("#\[img\]((http|ftp|https|ftps)://)([^ \?&=\#\"\n\r\t<]*?(\.(jpg|jpeg|gif|png)))\[/img\]#sie", "'[img:$uid]\\1' . str_replace(' ', '%20', '\\3') . '[/img:$uid]'", $text);
+
 		//Start more bbcode
 		$text = str_replace('url:' . $uid, 'url', $text);
 		
 		// [stream]Sound URL[/stream] code..
 		$text = preg_replace("#\[stream\](.*?)\[/stream\]#si", "[stream:$uid]\\1[/stream:$uid]", $text);
-		
-		// [html width=X height=X] [/html] code..
-		$text = $this->bbencode_first_pass_pda($text, $uid, '[html]', '[/html]', '', true, '');
-						
 		
 		// [scribd width=X height=X]Scribd URL[/scribd] code..
 		$text = preg_replace("#\[scribd width=([0-6]?[0-9]?[0-9]) height=([0-4]?[0-9]?[0-9])\](([a-z]+?)://([^, \n\r]+))\[\/scribd\]#si","[scribd width=\\1 height=\\2:$uid\]\\3[/scribd:$uid]", $text);
@@ -578,7 +489,7 @@ class bbcode_base
 		//Stop more bbcode
 
 		// Remove our padding from the string..
-		return substr($text, 1);
+		return substr($text, 1);;
 
 	} // bbencode_first_pass()	
 
@@ -773,18 +684,24 @@ class bbcode_base
 							$after_end_tag = substr($text, $curr_pos + $close_tag_length);
 
 							// Mark the lowest nesting level if needed.
-							if (!$mark_lowest_level && ($curr_nesting_depth !== 1))
+							if ($mark_lowest_level && ($curr_nesting_depth == 1))
+							{
+								if ($open_tag[0] == '[code]')
+								{
+									$code_entities_match = array('#<#', '#>#', '#"#', '#:#', '#\[#', '#\]#', '#\(#', '#\)#', '#\{#', '#\}#');
+									$code_entities_replace = array('&lt;', '&gt;', '&quot;', '&#58;', '&#91;', '&#93;', '&#40;', '&#41;', '&#123;', '&#125;');
+									$between_tags = preg_replace($code_entities_match, $code_entities_replace, $between_tags);
+								}
+								$text = $before_start_tag . substr($start_tag, 0, $start_length - 1) . ":$curr_nesting_depth:$uid]";
+								$text .= $between_tags . substr($close_tag_new, 0, $close_tag_new_length - 1) . ":$curr_nesting_depth:$uid]";
+							}
+							else
 							{
 								if ($open_tag[0] == '[code]')
 								{
 									$text = $before_start_tag . '&#91;code&#93;';
 									$text .= $between_tags . '&#91;/code&#93;';
 								}
-								elseif ($open_tag[0] == '[html]')
-								{
-									$text = $before_start_tag . '&#91; &#93;';
-									$text .= $between_tags . '&#91; &#93;';
-								}									
 								else
 								{
 									if ($open_is_regexp)
@@ -798,23 +715,7 @@ class bbcode_base
 									$text .= $between_tags . substr($close_tag_new, 0, $close_tag_new_length - 1) . ":$uid]";
 								}
 							}
-							elseif ($mark_lowest_level && ($curr_nesting_depth == 1))
-							{
-								if ($open_tag[0] == '[code]')
-								{
-									$code_entities_match = array('#<#', '#>#', '#"#', '#:#', '#\[#', '#\]#', '#\(#', '#\)#', '#\{#', '#\}#');
-									$code_entities_replace = array('&lt;', '&gt;', '&quot;', '&#58;', '&#91;', '&#93;', '&#40;', '&#41;', '&#123;', '&#125;');
-									$between_tags = preg_replace($code_entities_match, $code_entities_replace, $between_tags);
-								}								
-								if ($open_tag[0] == '[html]') 
-								{
-									$code_entities_match = array('#<#', '#>#', '#"#', '#:#', '#\[#', '#\]#', '#\(#', '#\)#', '#\{#', '#\}#');
-									$code_entities_replace = array('&lt;', '&gt;', '&quot;', '&#58;', '&#91;', '&#93;', '&#40;', '&#41;', '&#123;', '&#125;');
-									$between_tags = preg_replace($code_entities_match, $code_entities_replace, $between_tags);
-								}								
-								$text = $before_start_tag . substr($start_tag, 0, $start_length - 1) . ":$curr_nesting_depth:$uid]";
-								$text .= $between_tags . substr($close_tag_new, 0, $close_tag_new_length - 1) . ":$curr_nesting_depth:$uid]";
-							}
+
 							$text .= $after_end_tag;
 
 							// Now.. we've screwed up the indices by changing the length of the string.
@@ -903,56 +804,7 @@ class bbcode_base
 		return $text;
 
 	} // bbencode_second_pass_code()
-	
-	/**
-	 * Rewritten by Florin C Bodin - August 2, 2018.	
-	 */
-	function bbencode_second_pass_html($text, $uid, $bbcode_tpl)
-	{
-		global $lang;
-		
-		$html_start_html = $bbcode_tpl['html_open'];
-		$html_end_html =  $bbcode_tpl['html_close'];
-		
-		// First, do all the 1st-level matches. These need an htmlspecialchars() run,
-		// so they have to be handled differently.
-		$match_count = preg_match_all("#\[html:1:$uid\](.*?)\[/html:1:$uid\]#si", $text, $matches);
-		
-		for ($i = 0; $i < $match_count; $i++)
-		{
-			$before_replace = $matches[1][$i];
-			$after_replace = $matches[1][$i];
 
-			// Replace 2 spaces with "&nbsp; " so non-tabbed table indents without making huge long lines.
-			$after_replace = str_replace("  ", "&nbsp; ", $after_replace);
-			// now Replace 2 spaces with " &nbsp;" to catch odd #s of spaces.
-			$after_replace = str_replace("  ", " &nbsp;", $after_replace);
-
-			// Replace tabs with "&nbsp; &nbsp;" so tabbed table indents sorta right without making huge long lines.
-			$after_replace = str_replace("\t", "&nbsp; &nbsp;", $after_replace);
-
-			// now Replace space occurring at the beginning of a line
-			$after_replace = preg_replace("/^ {1}/m", '&nbsp;', $after_replace);
-
-			$str_to_match = "[html:1:$uid]" . $before_replace . "[/html:1:$uid]";
-			
-			$replacement = $html_start_html;
-
-			$replacement .= $after_replace;
-	
-			$replacement .= $html_end_html;
-			
-			$text = str_replace($str_to_match, $replacement, $text);
-		}
-		
-		// Now, do all the non-first-level matches. These are simple.
-		$text = str_replace("[html:$uid]", $html_start_html, $text);
-		$text = str_replace("[/html:$uid]", $html_end_html, $text);				
-
-		return $text;
-
-	} // bbencode_second_pass_html()
-	
 	//phpBB Temporary code ends
 	
 	/**

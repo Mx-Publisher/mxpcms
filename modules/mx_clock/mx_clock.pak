@@ -1,0 +1,36 @@
+module=+:86=+:Mx Clock=+:modules/mx_clock/=+:Clock for MXP-CMS=+:
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:86=+:145=+:Local Times Clock=+:Local Times Block=+:localtimesclock.php=+:
+parameter=+:145=+:182=+:flv_file=+:Text=+:design11.swf=+:=+:1=+:10
+parameter=+:145=+:183=+:flv_img=+:Text=+:clock.png=+:=+:1=+:20
+parameter=+:145=+:179=+:flash_width=+:Number=+:200=+:=+:0=+:30
+parameter=+:145=+:180=+:flash_height=+:Number=+:200=+:=+:0=+:40
+parameter=+:145=+:254=+:country_code=+:Text=+:ro=+:=+:1=+:50
+parameter=+:145=+:245=+:localtimes=+:Radio_single_select=+:local=+:a:2:{i:0;s:5:"local";i:1;s:2:"us";}=+:0=+:60
+parameter=+:145=+:252=+:digest_time_zone=+:Radio_single_select=+:system=+:a:2:{i:0;s:6:"system";i:1;s:6:"server";}=+:0=+:70
+parameter=+:145=+:187=+:design=+:Text=+:design11=+:=+:1=+:80
+parameter=+:145=+:181=+:flash_wmode_trasparent=+:Radio_single_select=+:trasparent=+:a:2:{i:0;s:10:"trasparent";i:1;s:6:"normal";}=+:1=+:90
+parameter=+:145=+:184=+:comunity=+:Text=+:Europe=+:=+:1=+:100
+parameter=+:145=+:185=+:country=+:Text=+:Romania=+:=+:1=+:110
+parameter=+:145=+:186=+:city=+:Text=+:Bucharest=+:=+:1=+:120
+parameter=+:145=+:244=+:province=+:Text=+:Ilfov=+:=+:1=+:130
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Local Times Clock=+:Demo block=+:145=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:86=+:95=+:Flash Clock=+:Clock Block=+:mx_clock.php=+:
+parameter=+:95=+:177=+:flv_file=+:Text=+:clock.swf=+:=+:1=+:10
+parameter=+:95=+:178=+:flv_img=+:Text=+:clock.png=+:=+:1=+:20
+parameter=+:95=+:128=+:flash_width=+:Number=+:200=+:=+:0=+:30
+parameter=+:95=+:129=+:flash_height=+:Number=+:200=+:=+:0=+:40
+parameter=+:95=+:255=+:country_code=+:Text=+:il=+:=+:1=+:50
+parameter=+:95=+:246=+:localtimes=+:Radio_single_select=+:local=+:a:2:{i:0;s:5:"local";i:1;s:2:"us";}=+:0=+:60
+parameter=+:95=+:253=+:digest_time_zone=+:Radio_single_select=+:system=+:a:2:{i:0;s:6:"system";i:1;s:6:"server";}=+:0=+:70
+parameter=+:95=+:251=+:design=+:Text=+:design01=+:=+:1=+:80
+parameter=+:95=+:130=+:flash_wmode_trasparent=+:Radio_single_select=+:trasparent=+:a:2:{i:0;s:10:"trasparent";i:1;s:6:"normal";}=+:1=+:90
+parameter=+:95=+:247=+:comunity=+:Text=+:Asia=+:=+:1=+:100
+parameter=+:95=+:248=+:country=+:Text=+:Israel=+:=+:1=+:110
+parameter=+:95=+:249=+:province=+:Text=+:Jerusalem=+:=+:1=+:120
+parameter=+:95=+:250=+:city=+:Text=+:Jerusalem=+:=+:1=+:130
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Flash Clock=+:Demo block=+:95=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+function=+:0=+:0=+:0=+:endoflist=+:0=+:0

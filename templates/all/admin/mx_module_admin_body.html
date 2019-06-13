@@ -219,101 +219,108 @@ window.onload = doOnLoadMenuACP;
 	</div>
 </div>
 <p style="clear:both"></p>
+<div class="acp">
 <div class="panel">
 	<span class="corners-top"><span></span></span>
-	<div class="acp">
-	<div class="inner bg3" style="margin:1.0em;">
+	<div class="content">
 	<div>{RESULT_MESSAGE}</div>
 	<!-- BEGIN module -->
-		<div style="display:block;border-top:solid 1px #CCCCCC;clear:both;margin-top:0.1em;">
-			<div style="display:block;clear:both;margin-top:2px;">
-				<div style="float:left;width:40%;margin-top:0.3em;">
-					<div style="float:left">
-					<img name="adminModule_image_{module.MODULE_ID}" id="adminModule_image_{module.MODULE_ID}" src="{module.IMG_URL}" border="0" align="middle">
-					<span style="cursor:pointer" onclick="onMenuCatClick('{module.MODULE_ID}','adminModule_');"><img src="{IMG_ICON_MODULE}" border="0" align="middle" alt="" /></span>
-					</div>
-					<div style="float:left;margin-left:6px;">
-					<a href="javascript:onMenuCatClick('{module.MODULE_ID}','adminModule_');">{module.MODULE_TITLE}</a><br/>
-					<span class="explain">{module.MODULE_DESCRIPTION}</span> &nbsp;
-					<i>{module.MODULE_VERSION}</i>
-					</div>
-				</div>
-				<div style="float:right;width:50%;margin-top:0.3em;text-align:right;">
-					<!-- BEGIN settings -->
-					<span style="display:none">
-						<img src="{IMG_URL_EXPAND}" border="0" align="middle">&nbsp;
-						<a href="{module.U_MODULE}">{L_SETTING}</a>
-					</span>
-					<a href="{module.U_MODULE}" title="{L_SETTINGS}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_edit.gif" align="absmiddle"></a>
-					<!-- END settings -->
-					<!-- BEGIN settings -->
-					<span style="display:none">
-						<span style="cursor:pointer;" onclick="onMenuCatClick('{module.MODULE_ID}','adminModuleUpgrade_');">
-						<img name="adminModuleUpgrade_image_{module.MODULE_ID}" src="{module.IMG_URL_UPGRADE}" border="0" align="middle">
-						</span>
-						<a href="javascript:onMenuCatClick('{module.MODULE_ID}','adminModuleUpgrade_');">{L_UPGRADE_PACK}</a>
-					</span>
-					<a href="javascript:onMenuCatClick('{module.MODULE_ID}','adminModuleUpgrade_');" title="{L_UPGRADE_PACK}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_upgrade.gif" align="absmiddle"></a>
-					<!-- END settings -->
-					<!-- BEGIN settings -->
-					<span style="display:none">
-						<span style="cursor:pointer;" onclick="onMenuCatClick('{module.MODULE_ID}','adminModuleExport_');">
-						<img name="adminModuleExport_image_{module.MODULE_ID}" src="{module.IMG_URL_EXPORT}" border="0" align="middle">
-						</span>
-						<a href="javascript:onMenuCatClick('{module.MODULE_ID}','adminModuleExport_');">{L_EXPORT_PACK}</a>
-					</span>
-					<a href="javascript:onMenuCatClick('{module.MODULE_ID}','adminModuleExport_');" title="{L_EXPORT_PACK}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_export.gif" align="absmiddle"></a>
-					<!-- END settings -->
-					<!-- BEGIN settings -->
-					<span style="display:none">
-						<span style="cursor:pointer" onclick="onMenuCatClick('{module.MODULE_ID}','adminModuleDelete_');">
-						<img name="adminModuleDelete_image_{module.MODULE_ID}" src="{module.IMG_URL_DELETE}" border="0" align="middle">
-						</span>
-						<a href="javascript:onMenuCatClick('{module.MODULE_ID}','adminModuleDelete_');">{L_UNINSTALL}</a>
-					</span>
-					<a href="javascript:onMenuCatClick('{module.MODULE_ID}','adminModuleDelete_');" title="{L_UNINSTALL}"><img src="{U_PORTAL_ROOT_PATH}{TEMPLATE_ROOT_PATH}images/admin_icons/icon_delete.gif" align="absmiddle"></a>
-					<!-- END settings -->
-				</div>
+		<div class="clear blockColapse">
+
+			<div class="header">
+			
+				<!-- BEGIN settings -->
+				<div class="buttons">
+
+					<!-- IF IMG_EDIT_BLOCK -->
+					
+						<a href="{module.U_MODULE}" title="{L_SETTINGS}" role="menuitem">{IMG_EDIT_BLOCK}</a>
+					
+					<!-- ELSE -->
+					
+						<a href="{module.U_MODULE}" title="{L_SETTINGS}" role="menuitem">
+							<img src="{IMG_URL_EXPAND}" border="0" align="absmiddle" />&nbsp;<span>{L_SETTINGS}</span>
+						</a>
+					
+					<!-- ENDIF -->
+					
+					<!-- IF IMG_UPDRADE_BLOCK -->
+					
+						<a href="javascript:onMenuCatClick('{module.MODULE_ID}','adminModuleUpgrade_');" title="{L_UPGRADE_PACK}">{IMG_UPDRADE_BLOCK}</a>
+					
+					<!-- ELSE -->
+					
+						<a href="javascript:onMenuCatClick('{module.MODULE_ID}','adminModuleUpgrade_');" title="{L_UPGRADE_PACK}" role="menuitem">
+							<img src="{IMG_URL_EXPAND}" border="0" align="absmiddle" />&nbsp;<span>{L_UPGRADE_PACK}</span>
+						</a>
+					
+					<!-- ENDIF -->
+					
+					<!-- IF IMG_EXPORT_BLOCK -->
+					
+						<a href="javascript:onMenuCatClick('{module.MODULE_ID}','adminModuleExport_');" title="{L_EXPORT_PACK}">{IMG_EXPORT_BLOCK}</a>
+					
+					<!-- ELSE -->
+					
+						<a href="javascript:onMenuCatClick('{module.MODULE_ID}','adminModuleExport_');" title="{L_EXPORT_PACK}" role="menuitem">
+							<img src="{IMG_URL_EXPAND}" border="0" align="absmiddle" />&nbsp;<span>{L_EXPORT_PACK}</span>
+						</a>
+					
+					<!-- ENDIF -->
+					
+					<!-- IF IMG_DELETE_BLOCK -->
+	
+						<a href="javascript:onMenuCatClick('{module.MODULE_ID}','adminModuleDelete_');" title="{L_UNINSTALL}">{IMG_DELETE_BLOCK}</a>
+
+					<!-- ELSE -->
+
+						<a href="javascript:onMenuCatClick('{module.MODULE_ID}','adminModuleDelete_');" title="{L_UNINSTALL}" role="menuitem">
+							<img src="{IMG_URL_EXPAND}" border="0" align="absmiddle" />&nbsp;<span>{L_UNINSTALL}</span>
+						</a>
+
+					<!-- ENDIF -->
+
 			</div>
+			<!-- END settings -->
+
+			<div>
+					<img name="adminModule_image_{module.MODULE_ID}" id="adminModule_image_{module.MODULE_ID}" src="{module.IMG_URL}"/>
+					<span style="cursor:pointer" onclick="onMenuCatClick('{module.MODULE_ID}','adminModule_');"><img src="{IMG_ICON_MODULE}" alt="" /></span>
+					<span class="title"><a href="javascript:onMenuCatClick('{module.MODULE_ID}','adminModule_');">{module.MODULE_TITLE}</a></span>
+					<!-- IF module.MODULE_DESCRIPTION neq '' --><br/>
+					<span class="explain" style="padding-left:30px;">{module.MODULE_DESCRIPTION}</span>
+					<i>{module.MODULE_VERSION}</i>
+					<!-- ENDIF -->
+			</div>
+		</div>
+			
 			<!-- MODUL Delete -->
-			<div id="adminModuleDelete_{module.MODULE_ID}" style="clear:both;padding-top:1.0em;display:{module.VISIBLE_DELETE};">
+			<div id="adminModuleDelete_{module.MODULE_ID}" class="settings" style="display:{module.VISIBLE_DELETE};">
 			 	<fieldset>
-					<legend style="cursor:pointer;" onclick="onMenuCatClick('{module.MODULE_ID}','adminModuleDelete_');">
-						<img src="{IMG_URL_CONTRACT}" border="0" align="left">&nbsp;{L_UNINSTALL}
-					</legend>
-					<p>
-						{module.MESSAGE_DELETE}
-					</p>
+					<legend onclick="onMenuCatClick('{module.MODULE_ID}','adminModuleDelete_');">{L_UNINSTALL}</legend>
+					<p>{module.MESSAGE_DELETE}</p>
 				</fieldset>
 			</div>
 			<!-- MODUL Export -->
-			<div id="adminModuleExport_{module.MODULE_ID}" style="clear:both;padding-top:1.0em;display:{module.VISIBLE_EXPORT};">
+			<div id="adminModuleExport_{module.MODULE_ID}" class="settings" style="display:{module.VISIBLE_EXPORT};">
 			 	<fieldset>
-					<legend style="cursor:pointer" onclick="onMenuCatClick('{module.MODULE_ID}','adminModuleExport_');">
-					  	<img src="{IMG_URL_CONTRACT}" border="0" align="middle">&nbsp;{L_EXPORT_PACK}
-					</legend>
-					<p>
-						{module.MESSAGE_EXPORT}
-					</p>
+					<legend onclick="onMenuCatClick('{module.MODULE_ID}','adminModuleExport_');">{L_EXPORT_PACK}</legend>
+					<p>{module.MESSAGE_EXPORT}</p>
 				</fieldset>
 			</div>
 			<!-- MODUL Update -->
-			<div id="adminModuleUpgrade_{module.MODULE_ID}" style="clear:both;padding:1.0em;display:{module.VISIBLE_UPGRADE};">
+			<div id="adminModuleUpgrade_{module.MODULE_ID}" class="settings" style="display:{module.VISIBLE_UPGRADE};">
 			 	<fieldset>
-					<legend style="cursor:pointer;" onclick="onMenuCatClick('{module.MODULE_ID}','adminModuleUpgrade_');">
-						<img src="{IMG_URL_CONTRACT}" border="0" align="middle">&nbsp;{L_UPGRADE_PACK}
-					</legend>
-					<p>
-						{module.MESSAGE_UPGRADE}
-					</p>
+					<legend onclick="onMenuCatClick('{module.MODULE_ID}','adminModuleUpgrade_');">{L_UPGRADE_PACK}</legend>
+					<p>{module.MESSAGE_UPGRADE}</p>
 				</fieldset>
 			</div>
 			<!-- MODUL Settings -->
-			<div id="adminModule_{module.MODULE_ID}" style="clear:both;padding:1.0em;padding-top:0.2em;display:{module.VISIBLE};">
+			<div id="adminModule_{module.MODULE_ID}" class="settings" style="display:{module.VISIBLE};">
 				<form action="{S_ACTION}" onsubmit="return checkForm(this)" name="post" method="post">
 				<fieldset>
-					<legend style="cursor:pointer;" onclick="onMenuCatClick('{module.MODULE_ID}','adminModule_');">
-					 <img src="{IMG_URL_CONTRACT}" border="0" align="middle">&nbsp;{module.L_TITLE}
+					<legend onclick="onMenuCatClick('{module.MODULE_ID}','adminModule_');">
+					 {module.L_TITLE}
 					</legend>
 					<dl>
 						<dt><label for="module_name_{module.MODULE_ID}">{L_MODULE_NAME}</label></dt>
@@ -341,5 +348,6 @@ window.onload = doOnLoadMenuACP;
 	<!-- END module -->
 	</div>
 	<span class="corners-bottom"><span></span></span>
+</div>
 </div>
 <p></p>

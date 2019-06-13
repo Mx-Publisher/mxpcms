@@ -1,0 +1,6 @@
+module=+:75=+:mx_counter=+:modules/mx_counter/=+:Portal Counter=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:75=+:93=+:Portal Counter=+:Counter Block=+:mx_counter.php=+:
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Portal Counter=+:Demo block=+:93=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+function=+:0=+:0=+:0=+:endoflist=+:0=+:0

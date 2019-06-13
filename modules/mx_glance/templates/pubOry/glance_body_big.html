@@ -1,0 +1,116 @@
+<div class="clear"></div>
+<div class="forabg block" style="vertical-align:top; width:{BLOCK_SIZE};">
+<div class="inner">
+	<!-- BEGIN no_glance_news_and_recent -->
+	<dl>
+		<dt class="row1" style="text-align:left;">{no_glance_news_and_recent.L_NO_ITEMS}</dt>
+	</dl>
+	<!-- END no_glance_news_and_recent -->
+	<!-- BEGIN switch_glance_news -->
+	<div class="blockbody bg2" style="display:block;">
+		<ul class="topiclist topics">
+			<li class="header">
+				<dl class="icon">
+					<dt>{NEWS_HEADING} {L_TOPICS}</dt>
+					<dd class="posts">{L_REPLIES}</dd>
+					<dd class="views">{L_VIEWS}</dd>
+					<dd class="lastpost">
+						<table width="100%" valign="middle" cellpadding="0" cellspacing="0" border="0">
+            	  				<tr>
+							<td valign="middle" class="lastpost"><span nowrap="nowrap">
+							<span style="color:#FFFFFF;">{L_LAST_POST}</span>
+							</span></td>
+							<!-- IF latest_news.SWITCH_RECENT_NEWS eq 1 -->
+							<td valign="middle" align="right">
+							<span style="font-family: Flash; color: #FFFFFF;">
+                    					{latest_news.PREV_URL}&nbsp;&nbsp;{latest_news.NEXT_URL}&nbsp;&nbsp;
+                					</span></td>
+							<!-- ENDIF -->
+						</tr>
+            					</table>
+                			</dd>
+				</dl>
+			</li>
+		</ul>
+		<ul class="topiclist topics">
+	<!-- END switch_glance_news -->
+		<!-- BEGIN latest_news -->
+		<li class="row<!-- IF latest_news.S_ROW_COUNT is even --> bg1<!-- ELSE --> bg2<!-- ENDIF --><!-- IF latest_news.S_POST_ANNOUNCE --> announce<!-- ENDIF --><!-- IF latest_news.S_POST_STICKY --> sticky<!-- ENDIF --><!-- IF latest_news.S_TOPIC_REPORTED --> reported<!-- ENDIF -->">
+			<dl class="icon" style="background-image: url({latest_news.TOPIC_FOLDER_IMG_SRC}); background-repeat: no-repeat;">
+				<dt style="background-repeat: no-repeat;" title="">
+					<a href="{latest_news.U_VIEW_TOPIC}"><!-- IF not latest_news.TOPIC_FOLDER_IMG_SRC -->{latest_news.NEWEST_POST_IMG}<!-- ENDIF --></a> <a href="{latest_news.U_VIEW_TOPIC}" class="topictitle">{latest_news.TOPIC_TITLE}</a></br />
+					{L_POST_BY_AUTHOR} {latest_news.TOPIC_AUTHOR_FULL} {L_POSTED_ON_DATE} {latest_news.TOPIC_TIME} </br />
+					<!-- IF latest_news.PAGINATION --><strong class="pagination"><span>{latest_news.PAGINATION}</span></strong><!-- ENDIF -->
+					<!-- IF not latest_news.S_TOPIC_GLOBAL -->{L_IN} <a href="{latest_news.U_VIEW_FORUM}">{latest_news.FORUM_TITLE}</a><!-- ELSE --> ({L_GLOBAL})<!-- ENDIF -->
+				</dt>
+				<dd class="posts">{latest_news.TOPIC_REPLIES} <dfn>{L_REPLIES}</dfn></dd>
+				<dd class="views">{latest_news.TOPIC_VIEWS} <dfn>{L_VIEWS}</dfn></dd>
+				<dd class="lastpost"><span><dfn>{L_LAST_POST} </dfn>{L_POST_BY_AUTHOR} {latest_news.LAST_POSTER_FULL}
+					<a href="{latest_news.U_LAST_POST}">{LAST_POST_IMG}</a> <br />{L_POSTED_ON_DATE} {latest_news.LAST_POST_TIME}</span>
+				</dd>
+			</dl>
+		</li>
+		<!-- END latest_news -->
+	<!-- BEGIN switch_glance_news -->
+		<dl style="vertical-align:middle;">
+			<dt style="text-align:right" class="cat"><span class="gensmall">{switch_glance_news.PREV_URL}&nbsp;&nbsp;{switch_glance_news.NEXT_URL}&nbsp;&nbsp;</span></dt>
+		</dl>
+		</div>
+	</ul>
+	<!-- END switch_glance_news -->
+	<!-- BEGIN switch_glance_recent -->
+	<div class="blockbody bg2" style="display:block;">
+		<ul class="topiclist topics">
+			<li class="header">
+				<dl class="icon">
+					<dt>{RECENT_HEADING} {L_TOPICS}</dt>
+					<dd class="posts">{L_REPLIES}</dd>
+					<dd class="views">{L_VIEWS}</dd>
+					<dd class="lastpost">
+						<table width="100%" valign="middle" cellpadding="0" cellspacing="0" border="0">
+            	  				<tr>
+							<td valign="middle" class="lastpost"><span nowrap="nowrap">
+							<span style="color:#FFFFFF;">{L_LAST_POST}</span>
+							</span></td>
+							<!-- IF latest_topics.SWITCH_RECENT_POSTS eq 1 -->
+							<td valign="middle" align="right">
+							<span style="font-family: Flash; color: #FFFFFF;">
+                    					{latest_topics.PREV_URL}&nbsp;&nbsp;{latest_topics.NEXT_URL}&nbsp;&nbsp;
+                					</span></td>
+							<!-- ENDIF -->
+						</tr>
+            					</table>
+                			</dd>
+				</dl>
+			</li>
+		</ul>
+		<ul class="topiclist topics">
+	<!-- END switch_glance_recent -->
+	<!-- BEGIN latest_topics -->
+		<li class="row<!-- IF latest_topics.S_ROW_COUNT is even --> bg1<!-- ELSE --> bg2<!-- ENDIF --><!-- IF latest_topics.S_POST_ANNOUNCE --> announce<!-- ENDIF --><!-- IF latest_topics.S_POST_STICKY --> sticky<!-- ENDIF --><!-- IF latest_topics.S_TOPIC_REPORTED --> reported<!-- ENDIF -->">
+			<dl class="icon" style="background-image: url({latest_topics.TOPIC_FOLDER_IMG_SRC}); background-repeat: no-repeat;">
+				<dt style="background-repeat: no-repeat; title="">
+					<a href="{latest_topics.U_VIEW_TOPIC}"><!-- IF not latest_topics.TOPIC_FOLDER_IMG_SRC -->{latest_topics.NEWEST_POST_IMG}<!-- ENDIF --></a> <a href="{latest_topics.U_VIEW_TOPIC}" class="topictitle">{latest_topics.TOPIC_TITLE}</a><br />
+					{L_POST_BY_AUTHOR} {latest_topics.TOPIC_AUTHOR_FULL} {L_POSTED_ON_DATE} {latest_topics.TOPIC_TIME} </br /> 
+					<!-- IF latest_topics.PAGINATION --><strong class="pagination"><span>{latest_topics.PAGINATION}</span></strong><!-- ENDIF -->
+					<!-- IF not latest_topics.S_TOPIC_GLOBAL -->{L_IN} <a href="{latest_topics.U_VIEW_FORUM}">{latest_topics.FORUM_TITLE}</a><!-- ELSE --> ({L_GLOBAL})<!-- ENDIF -->
+				</dt>
+				<dd class="posts">{latest_topics.TOPIC_REPLIES} <dfn>{L_REPLIES}</dfn></dd>
+				<dd class="views">{latest_topics.TOPIC_VIEWS} <dfn>{L_VIEWS}</dfn></dd>
+				<dd class="lastpost"><span><dfn>{L_LAST_POST} </dfn>{L_POST_BY_AUTHOR} {latest_topics.LAST_POSTER_FULL}
+					<a href="{latest_topics.U_LAST_POST}">{LAST_POST_IMG}</a> <br />{L_POSTED_ON_DATE} {latest_topics.LAST_POST_TIME}</span>
+				</dd>
+			</dl>
+		</li>
+	<!-- END latest_topics -->
+	<!-- BEGIN switch_glance_recent -->
+		<dl valign="middle">
+			<dt style="text-align:right" class="cat"><span class="gensmall">{switch_glance_recent.PREV_URL}&nbsp;&nbsp;{switch_glance_recent.NEXT_URL}&nbsp;&nbsp;</span></dt>
+		</dl>
+		</div>
+	</ul>
+	<!-- END switch_glance_recent -->
+	</div>
+	<span class="corners-bottom"><span></span></span>
+</div>
+<br clear="all" />

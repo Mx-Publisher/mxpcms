@@ -1,46 +1,58 @@
-ï»¿<?php
-/**
- * Language file [lang_admin.php]
+<?php
+/** ------------------------------------------------------------------------
+ *		Subject				: mxBB - a fully modular portal and CMS (for phpBB) 
+ *		Author				: Jon Ohlsson and the mxBB Team
+ *		Credits				: The phpBB Group & Marc Morisette
+ *		Copyright          	: (C) 2002-2005 mxBB Portal
+ *		Email             	: jon@mxbb-portal.com
+ *		Project site		: www.mxbb-portal.com
+ * -------------------------------------------------------------------------
  * 
- * @package language
- * @author admin
- * @version d: lang_admin.php,v 1.0 2018/03/30 03:21:25 admin Exp $
- * @copyright (c) phpBB Limited <https://www.phpbb.com>
- * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
- * @link http://www.phpbb.com
- * Encoding: UTF-8
- * 1 tab = 4 spaces
+ *    $Id: lang_admin.php,v 1.2 2005/10/01 14:10:46 jonohlsson Exp $
  */
 
-if ( !isset($lang) )
-{
-	$lang = array();
-}
+/**
+ * This program is free software; you can redistribute it and/or modify
+ *    it under the terms of the GNU General Public License as published by
+ *    the Free Software Foundation; either version 2 of the License, or
+ *    (at your option) any later version.
+ */
+
+// 
+// The format of this file is: 
+// 
+// ---> $lang["message"] = "text"; 
+// 
+// Specify your language character encoding... [optional]
+// 
+setlocale(LC_ALL, "ro");
+
 //
 // Parameter Types
 //
-$lang = array_merge( $lang, array( // #
-	'ParType_phpBBTextBlock'			=> 'Standard phpBB TextBlock',
-	'ParType_phpBBTextBlock_info'		=> 'Aceasta	este un Standard phpBB TextBlock, parsare bbcodes, html och smilies aÈ™a cum este definit de setÄƒrile phpBB Config.',
-	'ParType_CustomizedTextBlock'		=> 'TextBlock Personalizat',
-	'ParType_CustomizedTextBlock_info'	=> 'Acesta este un TextBlock Personalizat, parsare bbcodes, html och smilies aÈ™a cum este definit de aceastÄƒ setÄƒrile de bloc',
-	'ParType_WysiwygTextBlock'			=> 'Wysiwyg TextBlock',
-	'ParType_WysiwygTextBlock_info'		=> 'Acesta este un Wysiwyg TextBlock, care conÈ›ine un editor html',
+$lang['ParType_phpBBTextBlock'] = "BlocText Standard phpBB";
+$lang['ParType_phpBBTextBlock_info'] = "Acesta este un BlocText Standard phpBB, analizezã bbcod-uri, html au zâmbete cum este definit de setãrile phpbb.";
+$lang['ParType_CustomizedTextBlock'] = "BlocText Customizat";
+$lang['ParType_CustomizedTextBlock_info'] = "Acesta este un BlocText Customizat, analizezã bbcod-uri, html au zâmbete cum este definit de setãrile acestui bloc";
+$lang['ParType_WysiwygTextBlock'] = "BlocText Wysiwyg";
+$lang['ParType_WysiwygTextBlock_info'] = "Acesta este un BlocText Wysiwyg, fiind caracterizat de un editor html";
+
 //
 // Parameter Names
 //
-	'block_style'						=> 'Margine Block:',
-	'title_style'						=> 'Titlu Stil Antet:',
-	'allow_bbcode'						=> 'Permite BBCodes:',
-	'allow_html'						=> 'Permite Html:',
-	'allow_smilies'						=> 'Permite ZÃ¢mbetele:',
-	'html_tags'							=> 'Etichete Html permise:',
-	
-	'block_style_explain'				=> 'AfiÈ™aÈ›i marginea Ã®n jurul textului:',
-	'title_style_explain'				=> 'UtilizaÈ›i stil CSS pentru rÃ¢ndul de titlu:',
-));
+$lang['block_style'] = "Bordura Bloc:";
+$lang['title_style'] = "Titlu Stil Header:";
+$lang['allow_bbcode'] = "Permite BBCod-uri:";
+$lang['allow_html'] = "Permite Html:";
+$lang['allow_smilies'] = "Permite zâmbete:";
+$lang['html_tags'] = "Permite taguri Html:";
+
+$lang['block_style_explain'] = "Aratã bordura în jurul bloctextului:";
+$lang['title_style_explain'] = "Foloseºte stil css pentru titlu rând:";
 
 //
-// That's all Folks!
-// -------------------------------------------------
+// Translated from english to romanian by OryNider
+// orynider@rdslink.ro // http://pubory.uv.ro/
+//
+
 ?>

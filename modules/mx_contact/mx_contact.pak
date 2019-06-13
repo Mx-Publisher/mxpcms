@@ -1,0 +1,10 @@
+module=+:52=+:Contact Module=+:modules/mx_contact/=+:mx_contact=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:52=+:54=+:Contact=+:Contact block=+:mx_contact.php=+:
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Demo - Contact=+:Demo block=+:54=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:52=+:55=+:NewsLetter=+:NewsLetter block=+:mx_newsletter.php=+:
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Demo - NewsLetter=+:Demo block=+:55=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+function=+:0=+:0=+:0=+:endoflist=+:0=+:0

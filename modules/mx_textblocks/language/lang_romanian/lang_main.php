@@ -1,28 +1,40 @@
 <?php
-/**
- *
- * @package MX-Publisher Module - mx_textblocks
- * @version $Id: lang_main.php,v 1.13 2013/06/28 15:39:28 orynider Exp $
- * @copyright (c) 2002-2008 [Jon Ohlsson] MX-Publisher Project Team
- * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
- * @link http://mxpcms.sourceforge.net/
- *
- * Encoding: UTF-8
- * 1 tab = 4 spaces
+/** ------------------------------------------------------------------------
+ *		Subject				: mxBB - a fully modular portal and CMS (for phpBB) 
+ *		Author				: Jon Ohlsson and the mxBB Team
+ *		Credits				: The phpBB Group & Marc Morisette
+ *		Copyright          	: (C) 2002-2005 mxBB Portal
+ *		Email             	: jon@mxbb-portal.com
+ *		Project site		: www.mxbb-portal.com
+ * -------------------------------------------------------------------------
+ * 
+ *    $Id: lang_main.php,v 1.6 2005/10/01 14:10:46 jonohlsson Exp $
  */
 
-if ( !isset($lang) )
-{
-	$lang = array();
-}
+/**
+ * This program is free software; you can redistribute it and/or modify
+ *    it under the terms of the GNU General Public License as published by
+ *    the Free Software Foundation; either version 2 of the License, or
+ *    (at your option) any later version.
+ */
 
-$lang = array_merge( $lang, array( // #
-	'Toc_title'	=> 'ConÅ£ine:',
-	'Goto_page'	=> 'Mergi la pagina:',
-	'Blog_id'	=> 'Blog id:<br />- "%s" este Ã®nlocuit de username.',
-));
+// 
+// The format of this file is: 
+// 
+// ---> $lang["message"] = "text"; 
+// 
+// Specify your language character encoding... [optional]
+// 
+setlocale(LC_ALL, "ro");
+
+$lang['Toc_title'] = "Conþinut:";
+$lang['Goto_page'] = "Dute la pagina:";
+
+$lang['Blog_id'] = "ID Blog:<br />- \"%s\" este înlocuit de utilizatorul.";
 
 //
-// That's all Folks!
-// -------------------------------------------------
+// Translated from english to romanian by OryNider
+// orynider@rdslink.ro // http://pubory.uv.ro/
+//
+
 ?>

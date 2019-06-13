@@ -4,8 +4,8 @@ Colours and backgrounds for common.css
 -------------------------------------------------------------- */
 
 html, body {
-	color: #536482;
-	background-color: #F5F7FA;
+	color: #50736c;
+	background-color: #f4f9f8;
 }
 
 h1 {
@@ -13,12 +13,24 @@ h1 {
 }
 
 h2 {
-	color: #28313F;
+	color: #253631;
 }
 
 h3 {
 	border-bottom-color: #CCCCCC;
-	color: #115098;
+	color: #178157;
+}
+
+h4 {
+	color: #FFFFFF;
+}
+
+h5 {
+	color: #FFFFFF;
+}
+
+h6 {
+	color: #FFFFFF;
 }
 
 hr {
@@ -31,8 +43,8 @@ hr {
 Colours and backgrounds for links.css
 -------------------------------------------------------------- */
 
-a { color: #105289; }
-a:hover { color: #D31141; }
+a { color: #326030; }
+a:hover { color: #309307; }
 
 /* Links on gradient backgrounds */
 .forumbg .header a, .forabg .header a, th a {
@@ -40,28 +52,28 @@ a:hover { color: #D31141; }
 }
 
 .forumbg .header a:hover, .forabg .header a:hover, th a:hover {
-	color: #A8D8FF;
+	color: #a6f9d1;
 }
 
 /* Notification mark read link */
 .dropdown-extended a.mark_read {
-	background-color: #FFFFFF;
+
 }
 
 /* Post body links */
 .postlink {
-	border-bottom-color: #368AD2;
-	color: #368AD2;
+	border-bottom-color: #37c07f;
+	color: #37c07f;
 }
 
 .postlink:visited {
-	border-bottom-color: #5D8FBD;
-	color: #5D8FBD;
+	border-bottom-color: #58b289;
+	color: #58b289;
 }
 
 .postlink:hover {
-	background-color: #D0E4F6;
-	color: #0D4473;
+	background-color: #cef2e2;
+	color: #11603b;
 }
 
 .signature a, .signature a:hover {
@@ -70,46 +82,48 @@ a:hover { color: #D31141; }
 
 /* Back to top of page */
 .top i {
-	color: #999999;
+
 }
 
 /* Arrow links  */
 .arrow-left:hover, .arrow-right:hover {
-	color: #368AD2;
+	color: #37c07f;
 }
 
 /* Round cornered boxes and backgrounds
 ---------------------------------------- */
 .wrap {
-	background-color: #FFF;
-	border-color: #E6E9ED;
+
 }
 
 .headerbar {
-	color: #FFFFFF;
+
 }
 
 .headerbar, .forumbg {
-	background-color: #12A3EB;
-	background-image: -webkit-linear-gradient(top, #6ACEFF 0%, #0076B1 2px, #12A3EB 92px, #12A3EB 100%);
-	background-image: linear-gradient(to bottom, #6ACEFF 0%,#0076B1 2px,#12A3EB 92px,#12A3EB 100%);
-	background-repeat: repeat-x;
+	background-color: #094F0E;
+	/* text-align: center; */
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	line-height: 85%;
+	background: #ffffff url(/templates/mxp/images/theme/bg.gif) top left repeat-x;
+	/*background: #f0f0f0;*/	
+	/**/background-image: -webkit-linear-gradient(top, #187E1F 0%, #094F0E 100%);/**/
+	/**/background-image: linear-gradient(to bottom, #AAC9AB 0%,#19451D 100%);/**/
 }
 
-.forabg {
-	background-color: #0076B1;
-	background-image: -webkit-linear-gradient(top, #6ACEFF 0%, #12A3EB 2px, #0076B1 92px, #0076B1 100%);
-	background-image: linear-gradient(to bottom, #6ACEFF 0%,#12A3EB 2px,#0076B1 92px,#0076B1 100%);
-	background-repeat: repeat-x;
+.forabg, .forumbg {
+	background-color: #094F0E;
+	background-image: -webkit-linear-gradient(top, #529E57 0%, #094F0E 35px, #094F0E 100%);
+	background-image: linear-gradient(to bottom, #AAC9AB 0%,#094F0E 35px,#19451D 100%);
 }
 
 .navbar {
-	background-color: #CADCEB;
+	background-color: #c8e7d8;
 }
 
 .panel {
-	background-color: #ECF1F3;
-	color: #28313F;
+	background-color: #ebf1ed;
+	color: #253631;
 }
 
 .post:target .content {
@@ -121,35 +135,44 @@ a:hover { color: #D31141; }
 }
 
 .bg1 {
-	background-color: #ECF3F7;
+	background-color: #ebf5f0;
 }
 
 table.zebra-list tr:nth-child(odd) td, ul.zebra-list li:nth-child(odd) {
-	background-color: #ECF3F7;
+	background-color: #ebf5f0;
 }
 
 .bg2 {
-	background-color: #E1EBF2;
+	background-color: #dff0e7;
 }
 
 table.zebra-list tr:nth-child(even) td, ul.zebra-list li:nth-child(even) {
-	background-color: #E1EBF2;
+	background-color: #dff0e7;
 }
 
 .bg3	{
-	background-color: #CADCEB;
+	background-color: #c8e7d8;
 }
 
 .ucprowbg {
-	background-color: #DCDEE2;
+	background-color: #dadfde;
 }
 
 .fieldsbg {
-	background-color: #E7E8EA;
+	background-color: #e5e8e8;
 }
 
 .site_logo {
 	background-image: url("./images/site_logo.gif");
+}
+
+.toplogo {
+	background-color: #094F0E;
+	/* text-align: center; */
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	line-height: 85%;
+	background: #ffffff url("./images/top.gif") top left repeat-x;
+	/*background: #f0f0f0;*/	
 }
 
 /* Horizontal lists
@@ -166,16 +189,16 @@ table.table1 thead th {
 }
 
 table.table1 tbody tr {
-	border-color: #BFC1CF;
+	border-color: #bdc5cc;
 }
 
 table.table1 tbody tr:hover, table.table1 tbody tr.hover {
-	background-color: #CFE1F6;
+	background-color: #cdf2e4;
 	color: #000;
 }
 
 table.table1 td {
-	color: #536482;
+	color: #50736c;
 }
 
 table.table1 tbody td {
@@ -199,17 +222,17 @@ dl.details dt {
 }
 
 dl.details dd {
-	color: #536482;
+	color: #50736c;
 }
 
 .sep {
-	color: #1198D9;
+	color: #1cbd5b;
 }
 
 /* Icon styles
 ---------------------------------------- */
 .icon.icon-blue, a:hover .icon.icon-blue {
-	color: #196db5;
+	color: #209d62;
 }
 
 .icon.icon-green, a:hover .icon.icon-green{
@@ -217,15 +240,15 @@ dl.details dd {
 }
 
 .icon.icon-red, a:hover .icon.icon-red{
-	color: #BC2A4D;
+	color: #348b11;
 }
 
 .icon.icon-orange, a:hover .icon.icon-orange{
-	color: #FF6600;
+	color: #e78a06;
 }
 
 .icon.icon-bluegray, a:hover .icon.icon-bluegray{
-	color: #536482;
+	color: #50736c;
 }
 
 .icon.icon-gray, a:hover .icon.icon-gray{
@@ -250,35 +273,35 @@ dl.details dd {
 }
 
 .jumpbox-cat-link {
-	background-color: #0076b1;
-	border-top-color: #0076B1;
+	background-color: #0a9642;
+	border-top-color: #0a9642;
 	color: #FFFFFF;
 }
 
 .jumpbox-cat-link:hover {
-	background-color: #12A3EB;
-	border-top-color: #12A3EB;
+	background-color: #1ece64;
+	border-top-color: #1ece64;
 	color: #FFFFFF;
 }
 
 .jumpbox-forum-link {
-	background-color: #E1EBF2;
+	background-color: #dff0e7;
 }
 
 .jumpbox-forum-link:hover {
-	background-color: #F6F4D0;
+	background-color: #ecf6d0;
 }
 
 .jumpbox .dropdown .pointer-inner {
-	border-color: #E1EBF2 transparent;
+	border-color: #dff0e7 transparent;
 }
 
 .jumpbox-sub-link {
-	background-color: #E1EBF2;
+	background-color: #dff0e7;
 }
 
 .jumpbox-sub-link:hover {
-	background-color: #F1F8FF;
+	background-color: #f1fef8;
 }
 
 /* Miscellaneous styles
@@ -289,27 +312,27 @@ dl.details dd {
 }
 
 .error {
-	color: #BC2A4D;
+	color: #348b11;
 }
 
 .reported {
-	background-color: #F7ECEF;
+	background-color: #e8f9e0;
 }
 
 li.reported:hover {
-	background-color: #ECD5D8 !important;
+	background-color: #c3f0ba !important;
 }
 .sticky, .announce {
 	/* you can add a background for stickies and announcements*/
 }
 
 div.rules {
-	background-color: #ECD5D8;
-	color: #BC2A4D;
+	background-color: #c3f0ba;
+	color: #348b11;
 }
 
 p.post-notice {
-	background-color: #ECD5D8;
+	background-color: #c3f0ba;
 	background-image: none;
 }
 
@@ -319,14 +342,14 @@ Colours and backgrounds for content.css
 -------------------------------------------------------------- */
 
 ul.forums {
-	background-color: #EEF5F9; /* Old browsers */ /* FF3.6+ */
-	background-image: -webkit-linear-gradient(top, #D2E0EB 0%, #EEF5F9 100%);
-	background-image: linear-gradient(to bottom, #D2E0EB 0%,#EEF5F9 100%); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#D2E0EB', endColorstr='#EEF5F9',GradientType=0 ); /* IE6-9 */
+	background-color: #edf8f2; /* Old browsers */ /* FF3.6+ */
+	background-image: -webkit-linear-gradient(top, #d0e7dc 0%, #edf8f2 100%);
+	background-image: linear-gradient(to bottom, #d0e7dc 0%,#edf8f2 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d0e7dc', endColorstr='#edf8f2',GradientType=0 ); /* IE6-9 */
 }
 
 ul.topiclist li {
-	color: #4C5D77;
+	color: #486a60;
 }
 
 ul.topiclist dd {
@@ -340,7 +363,7 @@ ul.topiclist dd {
 
 li.row {
 	border-top-color:  #FFFFFF;
-	border-bottom-color: #00608F;
+	border-bottom-color: #087834;
 }
 
 li.row strong {
@@ -348,7 +371,7 @@ li.row strong {
 }
 
 li.row:hover {
-	background-color: #F6F4D0;
+	background-color: #ecf6d0;
 }
 
 li.row:hover dd {
@@ -377,7 +400,7 @@ li.header dt, li.header dd {
 }
 
 .content h2, .panel h2 {
-	color: #115098;
+	color: #178157;
 	border-bottom-color:  #CCCCCC;
 }
 
@@ -386,8 +409,8 @@ dl.faq dt {
 }
 
 .posthilit {
-	background-color: #F3BFCC;
-	color: #BC2A4D;
+	background-color: #b9f59f;
+	color: #348b11;
 }
 
 .announce, .unreadpost {
@@ -408,24 +431,24 @@ dl.faq dt {
 ----------------------------------------*/
 /* Quote block */
 blockquote {
-	background-color: #EBEADD;
-	border-color:#DBDBCE;
+	background-color: #e8ebdd;
+	border-color:#d7dbce;
 }
 
 blockquote blockquote {
 	/* Nested quotes */
-	background-color:#EFEED9;
+	background-color:#e9efd9;
 }
 
 blockquote blockquote blockquote {
 	/* Nested quotes */
-	background-color: #EBEADD;
+	background-color: #e8ebdd;
 }
 
 /* Code block */
 .codebox {
 	background-color: #FFFFFF;
-	border-color: #C9D2D8;
+	border-color: #c5d4cc;
 }
 
 .codebox p {
@@ -440,15 +463,15 @@ blockquote blockquote blockquote {
 ----------------------------------------*/
 .attachbox {
 	background-color: #FFFFFF;
-	border-color:  #C9D2D8;
+	border-color:  #c5d4cc;
 }
 
 .pm-message .attachbox {
-	background-color: #F2F3F3;
+	background-color: #f1f2f1;
 }
 
 .attachbox dd {
-	border-top-color: #C9D2D8;
+	border-top-color: #c5d4cc;
 }
 
 .attachbox p {
@@ -483,14 +506,14 @@ dl.thumbnail dt a:hover {
 }
 
 dl.thumbnail dt a:hover img {
-	border-color: #368AD2;
+	border-color: #37c07f;
 }
 
 /* Post poll styles
 ----------------------------------------*/
 
 fieldset.polls dl {
-	border-top-color: #DCDEE2;
+	border-top-color: #dadfde;
 	color: #666666;
 }
 
@@ -507,53 +530,53 @@ fieldset.polls dd div {
 }
 
 .pollbar1 {
-	background-color: #AA2346;
-	border-bottom-color: #74162C;
-	border-right-color: #74162C;
+	background-color: #2e760d;
+	border-bottom-color: #184307;
+	border-right-color: #184307;
 }
 
 .rtl .pollbar1 {
-	border-left-color: #74162C;
+	border-left-color: #184307;
 }
 
 .pollbar2 {
-	background-color: #BE1E4A;
-	border-bottom-color: #8C1C38;
-	border-right-color: #8C1C38;
+	background-color: #33860c;
+	border-bottom-color: #215909;
+	border-right-color: #215909;
 }
 
 .rtl .pollbar2 {
-	border-left-color: #8C1C38;
+	border-left-color: #215909;
 }
 
 .pollbar3 {
-	background-color: #D11A4E;
-	border-bottom-color: #AA2346;
-	border-right-color: #AA2346;
+	background-color: #39970a;
+	border-bottom-color: #2e760d;
+	border-right-color: #2e760d;
 }
 
 .rtl .pollbar3 {
-	border-left-color: #AA2346;
+	border-left-color: #2e760d;
 }
 
 .pollbar4 {
-	background-color: #E41653;
-	border-bottom-color: #BE1E4A;
-	border-right-color: #BE1E4A;
+	background-color: #40a809;
+	border-bottom-color: #33860c;
+	border-right-color: #33860c;
 }
 
 .rtl .pollbar4 {
-	border-left-color: #BE1E4A;
+	border-left-color: #33860c;
 }
 
 .pollbar5 {
-	background-color: #F81157;
-	border-bottom-color: #D11A4E;
-	border-right-color: #D11A4E;
+	background-color: #45be03;
+	border-bottom-color: #39970a;
+	border-right-color: #39970a;
 }
 
 .rtl .pollbar5 {
-	border-left-color: #D11A4E;
+	border-left-color: #39970a;
 }
 
 /* Poster profile block
@@ -576,7 +599,7 @@ fieldset.polls dd div {
 }
 
 dd.profile-warnings {
-	color: #BC2A4D;
+	color: #348b11;
 }
 
 /*
@@ -584,24 +607,24 @@ dd.profile-warnings {
 Colours and backgrounds for buttons.css
 -------------------------------------------------------------- */
 .button {
-	border-color: #C7C3BF;
+	border-color: #c7c5bf;
 	background-color: #E9E9E9; /* Old browsers */ /* FF3.6+ */
 	background-image: -webkit-linear-gradient(top, #FFFFFF 0%, #E9E9E9 100%);
 	background-image: linear-gradient(to bottom, #FFFFFF 0%,#E9E9E9 100%); /* W3C */
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#FFFFFF', endColorstr='#E9E9E9',GradientType=0 ); /* IE6-9 */
 	box-shadow: 0 0 0 1px #FFFFFF inset;
 	-webkit-box-shadow: 0 0 0 1px #FFFFFF inset;
-	color: #D31141;
+	color: #309307;
 }
 
 .button:hover,
 .button:focus {
-	border-color: #0A8ED0;
+	border-color: #15b455;
 	background-color: #FFFFFF; /* Old browsers */ /* FF3.6+ */
 	background-image: -webkit-linear-gradient(top, #E9E9E9 0%, #FFFFFF 100%);
 	background-image: linear-gradient(to bottom, #E9E9E9 0%,#FFFFFF 100%); /* W3C */
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#E9E9E9', endColorstr='#FFFFFF',GradientType=0 ); /* IE6-9 */
-	text-shadow: 1px 1px 0 #FFFFFF, -1px -1px 0 #FFFFFF, -1px -1px 0 rgba(188, 42, 77, 0.2);
+	text-shadow: 1px 1px 0 #FFFFFF, -1px -1px 0 #FFFFFF, -1px -1px 0 rgba(52, 139, 17,  0.2);
 }
 
 
@@ -614,30 +637,30 @@ Colours and backgrounds for buttons.css
 .button-secondary:hover,
 .button:focus .icon,
 .button:hover .icon {
-	color: #0A8ED0;
+	color: #15b455;
 }
 
 .button-search:hover,
 .button-search-end:hover {
-	border-color: #C7C3BF;
+	border-color: #c7c5bf;
 }
 
 .caret	{ border-color: #DADADA; }
-.caret	{ border-color: #C7C3BF; }
+.caret	{ border-color: #c7c5bf; }
 
 .contact-icons a		{ border-color: #DCDCDC; }
-.contact-icons a:hover	{ background-color: #F2F6F9; }
+.contact-icons a:hover	{ background-color: #f1f8f5; }
 
 /* Pagination
 ---------------------------------------- */
 
 .pagination li a {
-	background: #ECEDEE;
+	background: #eaeceb;
 	filter: none;
-	border-color: #B4BAC0;
+	border-color: #afbab5;
 	box-shadow: none;
 	-webkit-box-shadow: none;
-	color: #5C758C;
+	color: #587f6d;
 }
 
 .pagination li.ellipsis span {
@@ -646,14 +669,14 @@ Colours and backgrounds for buttons.css
 }
 
 .pagination li.active span {
-	background: #4692BF;
-	border-color: #4692BF;
+	background: #46ae74;
+	border-color: #46ae74;
 	color: #FFFFFF;
 }
 
 .pagination li a:hover, .pagination li a:hover .icon, .pagination .dropdown-visible a.dropdown-trigger, .nojs .pagination .dropdown-container:hover a.dropdown-trigger {
-	background: #368AD2;
-	border-color: #368AD2;
+	background: #37c07f;
+	border-color: #37c07f;
 	filter: none;
 	color: #FFFFFF;
 	text-shadow: none;
@@ -665,11 +688,11 @@ Colours and backgrounds for buttons.css
 .search-box .inputbox,
 .search-box .inputbox:hover,
 .search-box .inputbox:focus {
-	border-color: #C7C3BF;
+	border-color: #c7c5bf;
 }
 
 .search-header {
-	box-shadow: 0 0 10px #0075B0;
+	box-shadow: 0 0 10px #0a9542;
 }
 
 /* Icon images
@@ -754,16 +777,16 @@ Colours and backgrounds for cp.css
 ----------------------------------------*/
 
 .panel-container h3, .panel-container hr, .cp-menu hr {
-	border-color: #A4B3BF;
+	border-color: #9eb8ab;
 }
 
 .panel-container .panel li.row {
-	border-bottom-color: #B5C1CB;
+	border-bottom-color: #b0c5bb;
 	border-top-color: #F9F9F9;
 }
 
 ul.cplist {
-	border-top-color: #B5C1CB;
+	border-top-color: #b0c5bb;
 }
 
 .panel-container .panel li.header dd, .panel-container .panel li.header dt {
@@ -776,30 +799,30 @@ ul.cplist {
 }
 
 .cp-main .pm-message {
-	border-color: #DBDEE2;
+	border-color: #d8dfdd;
 	background-color: #FFFFFF;
 }
 
 /* CP tabbed menu
 ----------------------------------------*/
 .tabs .tab > a {
-	background: #BACCD9;
-	color: #536482;
+	background: #b6d4c4;
+	color: #50736c;
 }
 
 .tabs .tab > a:hover {
-	background: #DDEDFB;
-	color: #D31141;
+	background: #dcf9eb;
+	color: #309307;
 }
 
 .tabs .activetab > a,
 .tabs .activetab > a:hover {
-	background-color: #CADCEB; /* Old browsers */ /* FF3.6+ */
-	background-image: -webkit-linear-gradient(top, #E2F2FF 0%, #CADCEB 100%);
-	background-image: linear-gradient(to bottom, #E2F2FF 0%,#CADCEB 100%); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#E2F2FF', endColorstr='#CADCEB',GradientType=0 ); /* IE6-9 */
-	border-color: #CADCEB;
-	box-shadow: 0 1px 1px #F2F9FF inset;
+	background-color: #c8e7d8; /* Old browsers */ /* FF3.6+ */
+	background-image: -webkit-linear-gradient(top, #e1fdf0 0%, #c8e7d8 100%);
+	background-image: linear-gradient(to bottom, #e1fdf0 0%,#c8e7d8 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e1fdf0', endColorstr='#c8e7d8',GradientType=0 ); /* IE6-9 */
+	border-color: #c8e7d8;
+	box-shadow: 0 1px 1px #f2fef8 inset;
 	color: #333333;
 }
 
@@ -810,7 +833,7 @@ ul.cplist {
 /* Mini tabbed menu used in MCP
 ----------------------------------------*/
 .minitabs .tab > a {
-	background-color: #E1EBF2;
+	background-color: #dff0e7;
 }
 
 .minitabs .activetab > a,
@@ -822,11 +845,11 @@ ul.cplist {
 /* Responsive tabs
 ----------------------------------------*/
 .responsive-tab .responsive-tab-link:before {
-	border-color: #536482;
+	border-color: #50736c;
 }
 
 .responsive-tab .responsive-tab-link:hover:before {
-	border-color: #D31141;
+	border-color: #309307;
 }
 
 /* UCP navigation menu
@@ -835,39 +858,39 @@ ul.cplist {
 /* Link styles for the sub-section links */
 .navigation a {
 	color: #333;
-	background: #CADCEB; /* Old browsers */ /* FF3.6+ */
-	background: -webkit-linear-gradient(left, #B4C4D1 50%, #CADCEB 100%);
-	background: linear-gradient(to right, #B4C4D1 50%,#CADCEB 100%); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#B4C4D1', endColorstr='#CADCEB',GradientType=1 ); /* IE6-9 */
+	background: #c8e7d8; /* Old browsers */ /* FF3.6+ */
+	background: -webkit-linear-gradient(left, #b0cbbe 50%, #c8e7d8 100%);
+	background: linear-gradient(to right, #b0cbbe 50%,#c8e7d8 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#b0cbbe', endColorstr='#c8e7d8',GradientType=1 ); /* IE6-9 */
 }
 
 .rtl .navigation a {
-	background: #B4C4D1; /* Old browsers */ /* FF3.6+ */
-	background: -webkit-linear-gradient(left, #CADCEB 50%, #B4C4D1 100%);
-	background: linear-gradient(to right, #CADCEB 50%,#B4C4D1 100%); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#CADCEB', endColorstr='#B4C4D1',GradientType=1 ); /* IE6-9 */
+	background: #b0cbbe; /* Old browsers */ /* FF3.6+ */
+	background: -webkit-linear-gradient(left, #c8e7d8 50%, #b0cbbe 100%);
+	background: linear-gradient(to right, #c8e7d8 50%,#b0cbbe 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#c8e7d8', endColorstr='#b0cbbe',GradientType=1 ); /* IE6-9 */
 }
 
 .navigation a:hover {
-	background: #AABAC6;
-	color: #BC2A4D;
+	background: #a5bfb2;
+	color: #348b11;
 	filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
 }
 
 .navigation .active-subsection a {
 	background: #F9F9F9;
-	color: #D31141;
+	color: #309307;
 	filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
 }
 
 .navigation .active-subsection a:hover {
-	color: #D31141;
+	color: #309307;
 }
 
 @media only screen and (max-width: 900px), only screen and (max-device-width: 900px)
 {
 	#navigation a, .rtl #navigation a {
-		background: #B2C2CF;
+		background: #adc9bc;
 	}
 }
 
@@ -887,11 +910,11 @@ ul.cplist {
 
 /* Friends list */
 .cp-mini {
-	background-color: #EEF5F9;
+	background-color: #edf8f2;
 }
 
 dl.mini dt {
-	color: #425067;
+	color: #3e5a53;
 }
 
 /* PM Styles
@@ -903,20 +926,20 @@ dl.mini dt {
 
 /* PM marking colours */
 .pmlist li.pm_message_reported_colour, .pm_message_reported_colour {
-	border-left-color: #BC2A4D;
-	border-right-color: #BC2A4D;
+	border-left-color: #348b11;
+	border-right-color: #348b11;
 }
 
 .pmlist li.pm_marked_colour, .pm_marked_colour {
-	border-color: #FF6600;
+	border-color: #e78a06;
 }
 
 .pmlist li.pm_replied_colour, .pm_replied_colour {
-	border-color: #A9B8C2;
+	border-color: #a4bbaf;
 }
 
 .pmlist li.pm_friend_colour, .pm_friend_colour {
-	border-color: #5D8FBD;
+	border-color: #58b289;
 }
 
 .pmlist li.pm_foe_colour, .pm_foe_colour {
@@ -947,7 +970,7 @@ select {
 }
 
 label {
-	color: #425067;
+	color: #3e5a53;
 }
 
 option.disabled-option {
@@ -975,7 +998,7 @@ fieldset.fields2 dl:hover dt label {
 
 /* Quick-login on index page */
 fieldset.quick-login input.inputbox {
-	background-color: #F2F3F3;
+	background-color: #f1f2f1;
 }
 
 /* Posting page styles
@@ -990,14 +1013,14 @@ fieldset.quick-login input.inputbox {
 }
 
 .message-box textarea.drag-n-drop-highlight {
-	outline-color: rgba(17, 163, 234, 0.5);
+	outline-color: rgba(29, 205, 98,  0.5);
 }
 
 /* Input field styles
 ---------------------------------------- */
 .inputbox {
 	background-color: #FFFFFF;
-	border-color: #B4BAC0;
+	border-color: #afbab5;
 	color: #333333;
 }
 
@@ -1010,11 +1033,11 @@ fieldset.quick-login input.inputbox {
 }
 
 .inputbox:hover {
-	border-color: #11A3EA;
+	border-color: #1dcd62;
 }
 
 .inputbox:focus {
-	border-color: #11A3EA;
+	border-color: #1dcd62;
 }
 
 .inputbox:focus:-moz-placeholder {
@@ -1057,8 +1080,8 @@ a.button1, a.button2 {
 
 /* Hover states */
 a.button1:hover, input.button1:hover, a.button2:hover, input.button2:hover, input.button3:hover {
-	border-color: #D31141;
-	color: #D31141;
+	border-color: #309307;
+	color: #309307;
 	background-color: #D2D2D2; /* Old browsers */ /* FF3.6+ */
 	background-image: -webkit-linear-gradient(top, #EFEFEF 0%, #D2D2D2 100%);
 	background-image: linear-gradient(to bottom, #EFEFEF 0%,#D2D2D2 100%); /* W3C */
@@ -1067,8 +1090,8 @@ a.button1:hover, input.button1:hover, a.button2:hover, input.button2:hover, inpu
 
 /* Focus states */
 input.button1:focus, input.button2:focus, input.button3:focus {
-	border-color: #11A3EA;
-	color: #0F4987;
+	border-color: #1dcd62;
+	color: #14724b;
 }
 
 input.disabled {
@@ -1095,7 +1118,7 @@ input.disabled {
 }
 
 .dropdown-extended ul li:hover {
-	background-color: #CFE1F6;
+	background-color: #cdf2e4;
 	color: #000000;
 }
 
@@ -1110,10 +1133,10 @@ input.disabled {
 }
 
 .dropdown-extended .header {
-	background-color: #F1F8FF; /* Old browsers */ /* FF3.6+ */
-	background-image: -webkit-linear-gradient(top, #F1F8FF 0%, #CADCEB 100%);
-	background-image: linear-gradient(to bottom, #F1F8FF 0%,#CADCEB 100%); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#F1F8FF', endColorstr='#CADCEB',GradientType=0 ); /* IE6-9 */
+	background-color: #f1fef8; /* Old browsers */ /* FF3.6+ */
+	background-image: -webkit-linear-gradient(top, #f1fef8 0%, #c8e7d8 100%);
+	background-image: linear-gradient(to bottom, #f1fef8 0%,#c8e7d8 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f1fef8', endColorstr='#c8e7d8',GradientType=0 ); /* IE6-9 */
 }
 
 .dropdown .pointer {
@@ -1125,7 +1148,7 @@ input.disabled {
 }
 
 .dropdown-extended .pointer-inner {
-	border-color: #F1F8FF transparent;
+	border-color: #f1fef8 transparent;
 }
 
 .dropdown .dropdown-contents {
@@ -1150,14 +1173,14 @@ input.disabled {
 ---------------------------------------- */
 
 .notification_list p.notification-time {
-	color: #4C5D77;
+	color: #486a60;
 }
 
 li.notification-reported strong, li.notification-disapproved strong {
-	color: #D31141;
+	color: #309307;
 }
 
 .badge {
-	background-color: #D31141;
+	background-color: #309307;
 	color: #ffffff;
 }

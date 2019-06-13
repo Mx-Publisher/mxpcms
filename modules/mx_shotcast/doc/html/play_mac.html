@@ -1,0 +1,39 @@
+<html><head></head><body>
+
+<SCRIPT LANGUAGE="JavaScript"> 
+var WMP7; 
+var Mac; 
+var Win;
+var Unix; 
+
+Win = navigator.userAgent.indexOf("Win") > -1; 
+Mac = navigator.userAgent.indexOf("Mac") > -1;
+Unix = navigator.appVersion.indexOf("(X11") > -1; 
+ 
+
+//if (Mac){
+
+if ( navigator.appName == "Netscape" ){ 
+     //Netscape code
+     document.write ('    <Embed id="wmp" name="wmp" type="audio/mpeg"');
+     document.write ('        pluginspage="http://www.microsoft.com/windows/windowsmedia/"');
+     document.write ('        filename="http://67.15.50.243:10040"');
+     document.write ('        src="http://67.15.50.243:10040"');
+     document.write ('        Name=MediaPlayer');
+     document.write ('        ShowControls=1');
+     document.write ('        ShowDisplay=1');
+     document.write ('        ShowStatusBar=1');
+     document.write ('        AUTOSTART=1');
+     document.write ('        width=290');
+     document.write ('        height=320>');
+     document.write ('    </Embed>'); } 
+
+if ( navigator.appName != "Netscape" ){ 
+document.write(' <embed id="wmp" name="wmp" type="audio/mpeg" width="290" height="320" ShowTracker="0" ShowDisplay="0" ShowGotoBar="0" ShowStatusBar="1" ShowCaptioning="0" AUTOSTART="1" src="http://67.15.50.243:10040" ></embed>'); } 
+// }
+  
+
+</SCRIPT>
+
+</body>
+</html>

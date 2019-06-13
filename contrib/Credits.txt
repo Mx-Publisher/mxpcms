@@ -1,0 +1,39 @@
+
+	
+FontAwesome
+	Description: General icons for UI
+	Location: Font files in applications/core/interface/font and CSS in development in applications/core/dev/css/global/framework/fonts.css (mixed with other CSS and modified to use correct path to font files)
+	Included version: 4.7.0
+	Website: http://fortawesome.github.com/Font-Awesome
+	License: http://fortawesome.github.com/Font-Awesome/#license
+
+	
+jQuery imagesLoaded plugin
+	Description: Plugin that can defer script execution until specified images have loaded
+	Location: dev/js/library/jquery/jquery.imagesloaded.js
+	Included version: 4.4.1
+	Website: http://desandro.github.io/imagesloaded/
+	License: http://opensource.org/licenses/MIT
+
+Normalize.css
+	Description: Sets base CSS styles for consistency across browsers
+	Location: applications/core/dev/css/global/framework/normalize.css
+	Included version: 6.0.0
+	Website: http://necolas.github.io/normalize.css/
+	License: http://opensource.org/licenses/MIT
+	
+Noto font package
+	Description: Provides unicode font files for many of the world's languages
+	Note: We do not include all of the font files available in the Noto package
+	Location: system/3rd_party/Fonts
+	Website: https://www.google.com/get/noto
+	License: SIL OFL 1.1 (http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL)
+
+
+world-flags-sprite
+	Description: Flag icons for UI
+	Location: In development: Image files at applications/core/dev/resources/global, facilitated by custom CSS at applications/core/dev/css/global/flags.css
+	Included version: Last Updated Oct 2015
+	Website: https://github.com/lafeber/world-flags-sprite/
+	License: https://github.com/lafeber/world-flags-sprite/blob/master/LICENSE
+

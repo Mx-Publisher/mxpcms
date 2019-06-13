@@ -1,0 +1,33 @@
+<!-- $Id: clock_body.html,v 1.4 2013/06/25 10:08:07 orynider Exp $ //-->
+<div class="clear" style="text-align: center; vertical-align:top; margin: 0 auto; width:{BLOCK_SIZE}; display:block"></div>
+<div class="forabg block">
+	<div id="p1" class="post bg2 online">
+		<div class="inner"><span class="corners-top"><span>&nbsp;{BLOCK_TITLE}&nbsp;</span></span>
+		<dl class="textbody" align="center" id="clock" style="margin:15px 0px 0px 0px" style="background:{WMODE};">		
+			<ul id="title" class="linklist navlinks" style="text-align:center;font-weight:normal;">			
+				<h1><span>{CLOCK_NAME}</span></h1>
+			</ul>		
+			<div align="center" id="clock" style="background:{WMODE};">
+				<span class="nav" style="text-align: center;">
+		<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" width="{FLASH_WIDTH}" height="{FLASH_WIDTH}" id="clock" codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,0,0">
+			<param name="movie" value="{CLOCK_SWF}" />
+			<param name="file" value="{CLOCK_SWF}" />
+			<param name="backcolor" value="0xcadceb" />
+			<param name="frontcolor" value="0x007677" />
+			<param name="lightcolor" value="0xFFD3A6" />
+			<param name="displayheight" value="100" />
+			<param name="height" value="{FLASH_WIDTH}" />  
+			<param name="width" value="{FLASH_WIDTH}" />  	 
+			<param name="wmode" value="{WMODE}" />				
+			<embed src="{CLOCK_SWF}" wmode="{WMODE}" width="{FLASH_WIDTH}" height="{FLASH_HEIGHT}" name="clock" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" />
+		</object>				
+				</span>				
+			</div> 
+			<div align="center"></div>
+			<br />
+		<div align="center"><hr align="center" /></div>
+		</dl>
+		<br /> 	
+	</div></div>	
+   <span class="corners-bottom"><span></span></span>
+</div><br style="clear:both" />

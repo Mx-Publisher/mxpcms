@@ -1,0 +1,55 @@
+<div class="clear"></div>
+<div id="phpbb-login-bg" class="phpbb-login-bg"></div>
+<div class="forabg block panel" id="phpbb-login-panel">
+	<div class="inner">
+		<ul class="topiclist forums">
+<form method="post" action="{S_LOGIN_ACTION}">
+		<div class="content">
+			<a href="#" class="close"></a>
+			<h3><a href="{U_LOGIN_LOGOUT}">{L_LOGIN_LOGOUT}</a><!-- IF not S_ADMIN_AUTH and S_REGISTER_ENABLED -->&nbsp; &bull; &nbsp;<a href="{U_REGISTER}">{L_REGISTER}</a><!-- ENDIF --></h3>
+
+			<fieldset>
+				<dl class="ql-username">
+					<dt><label for="ql-username">{L_USERNAME}{L_COLON}</label></dt>
+					<dd class="input-container"><input type="text" tabindex="1" name="username" id="ql-username" size="25" value="{USERNAME}" class="inputbox autowidth" /></dd>
+				</dl>
+				<dl class="ql-password">
+					<dt><label for="ql-password">{L_PASSWORD}{L_COLON}</label></dt>
+					<dd class="input-container"><input type="password" tabindex="2" id="ql-password" name="password" size="25" class="inputbox autowidth" /></dd>
+					<!-- IF U_SEND_PASSWORD_EXT --><dd class="input-link"><a href="{U_SEND_PASSWORD_EXT}">{L_FORGOT_PASS}</a></dd><!-- ENDIF -->
+				</dl>
+				<!-- IF CAPTCHA_TEMPLATE and S_CONFIRM_CODE -->
+					<!-- DEFINE $CAPTCHA_TAB_INDEX = 3 -->
+					<!-- INCLUDE {CAPTCHA_TEMPLATE} -->
+				<!-- ENDIF -->
+			</fieldset>
+
+			<fieldset class="ql-options">
+				<!-- IF S_AUTOLOGIN_ENABLED -->
+				<label for="ql-autologin">
+				<input type="checkbox" name="autologin" id="ql-autologin" tabindex="4" />
+				<span>{L_LOG_ME_IN}</span>
+				</label>
+				<br />
+				<!-- ENDIF -->
+				<label for="ql-viewonline">
+				<input type="checkbox" name="viewonline" id="ql-viewonline" tabindex="5" />
+				<span>{L_HIDE_ME}</span>
+				</label>
+			</fieldset>
+
+			<fieldset class="submit-buttons">
+				<input type="submit" name="login" tabindex="6" value="{L_LOGIN}" class="button1" />
+				{S_LOGIN_REDIRECT}{S_HIDDEN_FIELDS}
+			</fieldset>
+
+			{% for mode in loops.ql_oauth %}
+				{% if loop.first %}<hr /><p class="ql-oauth">{% endif %}
+					<a href="{{ mode.REDIRECT_URL }}">{{ mode.SERVICE_NAME }}</a>
+				{% if loop.last %}</p>{% else %}&nbsp;&bull;&nbsp;{% endif %}
+			{% endfor %}
+		</div>
+</form>
+	</div>
+</div>
+

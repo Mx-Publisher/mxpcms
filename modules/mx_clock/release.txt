@@ -1,0 +1,13 @@
+[b][Release]: Mx Clock - Simple Flash Clock Block[/b] 
+
+[b][Authors]:[/b] Drumstix42, OryNider 
+
+[b][Version]: 2.9.0[/b]
+
+[b]Designed for MXP Version: 2.9.0/3.0.0[/b]
+
+[b][Support]:[/b] [URL=http://www.mx-publisher.com/forum/viewtopic.php?t=9674]Here[/URL] 
+
+[b]Author's Notes:[/b] The "Mx Clock" block is a block that will display a flash clock on your portal.
+
+[b][Download]:[/b][URL=http://www.mx-publisher.com/index.php?page=2&t=9674&phpbb_script=viewtopic]MXP-Module-Clock.zip[/URL]

@@ -1,0 +1,23 @@
+[b][Release]: Mx-Publisher Contact - Module[/b]
+
+[b][Authors]: darkassasin93, marcus.smith, OryNider[/b]
+
+[b][Version]: 2.9.0[/b]
+
+[b]Designed for Mx-Publisher Version: 2.8.3 / 3.0.0b2[/b]
+
+[b][Support]:[/b] [URL=http://www.mx-publisher.com/]post here[/URL]
+
+[b]Author's Notes:[/b]
+
+Description:
+Contact block - Allows guests to contact the site Admin via a Contact Form.
+Files can also be attached and sent if is alowed (12/12/2007)
+
+NewsLetter block - Allows guests to to subcribe or contact Admin via a NewsLetter Form.
+The Admin can send Mass NewsLetters to subcribers from AdminCP. (02/10/2008)
+
+
+[b]ScreenShots: [/b] [IMG]http://img146.imageshack.us/img146/2414/Mx-Publishercontactxl1.png[/IMG]
+
+[b][Download]: [/b][URL=http://www.mx-publisher.com/index.php?page=34&action=file&file_id=432]MXP-Module-Contact-2.9.0.zip[/URL]

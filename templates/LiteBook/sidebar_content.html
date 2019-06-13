@@ -1,0 +1,32 @@
+<div class="chatsidebarheader">{L_NOTIFICATIONS}{L_PRIVATE_MESSAGES}</div>
+
+<div id="sidebar_notification_list" class="notification_list">
+	<div class="chatsidebarcontent">
+		<ul>
+			<!-- IF not .notifications -->
+				<li class="no_notifications">
+					{L_NO_NOTIFICATIONS}{L_NO} {L_PRIVATE_MESSAGES}
+				</li>
+			<!-- ENDIF -->
+			<!-- BEGIN notifications -->	
+			<!-- IF notifications.URL -->
+				<a class="notification-block" href="{notifications.URL}">
+			<!-- ENDIF -->
+				<li class="sidebarli<!-- IF notifications.STYLING --> {notifications.STYLING}<!-- ENDIF --><!-- IF not notifications.URL --> no-url<!-- ENDIF -->">
+						<div class="sidebartime">{notifications.TIME}</div>
+						<!-- IF notifications.AVATAR -->{notifications.AVATAR}<!-- ELSE --><img src="{T_THEME_PATH}/images/no_avatar.gif" alt="" /><!-- ENDIF -->
+						<div class="notification_text">
+							<p class="notification-title">{notifications.FORMATTED_TITLE}</p>
+							<!-- IF notifications.REFERENCE --><p class="notification-reference">{notifications.REFERENCE}</p><!-- ENDIF -->
+							<!-- IF notifications.FORUM --><p class="notification-forum">{notifications.FORUM}</p><!-- ENDIF -->
+							<!-- IF notifications.REASON --><p class="notification-reason">{notifications.REASON}</p><!-- ENDIF -->
+						</div>
+				</li>
+			<!-- IF notifications.URL --></a><!-- ENDIF -->
+			<!-- END notifications -->
+		</ul>
+	</div>
+<div class="chatsidebarfooter">
+	<a href="{U_VIEW_ALL_NOTIFICATIONS}{U_PRIVATEMSGS}"><span>{L_SEE_ALL}</span></a>
+</div>
+</div>

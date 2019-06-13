@@ -1,0 +1,21 @@
+module=+:55=+:Simple news manager=+:modules/mx_news/=+:News Manager module=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:55=+:67=+:News=+:News Manager=+:mx_news.php=+:
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Demo - News=+:Demo block=+:67=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:55=+:73=+:News List=+:Adds a latest news kind of block=+:mx_news_list.php=+:
+parameter=+:73=+:156=+:target_block=+:Function=+:0=+:get_list_formatted("block_list","{parameter_value}","{parameter_id}[]", "mx_news.php")=+:0=+:0
+parameter=+:73=+:157=+:toplist_pagination=+:Number=+:3=+:=+:0=+:0
+parameter=+:73=+:158=+:toplist_use_pagination=+:Boolean=+:TRUE=+:=+:1=+:0
+parameter=+:73=+:159=+:split_key=+:Text=+:split=+:=+:1=+:0
+parameter=+:73=+:160=+:max_title_characters=+:Number=+:25=+:=+:0=+:0
+parameter=+:73=+:161=+:max_characters=+:Number=+:200=+:=+:0=+:0
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:News Feed=+:Demo block=+:73=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:55=+:74=+:News=+:News Feed=+:mx_feed_list.php=+:
+parameter=+:74=+:162=+:url_file=+:Text=+:=+:=+:1=+:0
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:News Feed=+:Demo block=+:74=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+function=+:0=+:0=+:0=+:endoflist=+:0=+:0

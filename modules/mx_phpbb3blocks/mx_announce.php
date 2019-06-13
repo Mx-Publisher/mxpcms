@@ -43,7 +43,7 @@ $announce_truncate			= $mx_block->get_parameters('announce_truncate');
 
 
 if ( empty($announce_nbr_display) ) $announce_nbr_display = 10;
-if ( empty($announce_nbr_days) ) $announce_nbr_days = 365;
+if ( empty($announce_nbr_days) ) $announce_nbr_days = 0;
 if ( empty($announce_truncate) ) $announce_truncate = 16777215;
 
 //
@@ -85,13 +85,13 @@ $phpbb_auth->acl($mx_user->data); // Do only once, in user_init // Move later
 $auth_data_sql = $phpbb_auth->get_auth_forum();
 
 //Forums list authorization  failed, let's get  
-if ( (!intval($auth_data_sql)) && ($announce_nbr_display > 0) )
+if ((!intval($auth_data_sql)))
 {
 	$sql = 'SELECT forum_id 
 	FROM ' . FORUMS_TABLE . ' 
 		WHERE forum_type = ' . FORUM_POST;
 	
-	if(!($result = $db->sql_query_limit($sql, '1')))
+	if (!($result = $db->sql_query_limit($sql, '1')))
 	{
 		die('Could not get a list of forums and query auth forum information error');
 	}
@@ -154,11 +154,13 @@ if( $announce_display_normal == 'TRUE' )
 {
 	$topic_type[] = POST_NORMAL;
 }
+$announce_nbr_display_sql = ($announce_nbr_display > 0) ? " LIMIT $start, " . $announce_nbr_display : '';
 $topic_type = ( empty($topic_type) ? 0 : implode(', ', $topic_type) );
 $sql = "SELECT t.*, u.username, u.user_id, u2.username as user2, u2.user_id as id2, p.*, pt.post_text, pt.post_subject, pt.bbcode_uid, p2.post_time AS last_post_time
 		FROM " . TOPICS_TABLE . " t, " . USERS_TABLE . " u, " . POSTS_TABLE . " p, " . POSTS_TABLE . " p2, " . USERS_TABLE . " u2, " . POSTS_TABLE . " pt
-		WHERE p.topic_id = t.topic_id
-			AND t.topic_type IN ( " . $topic_type . " )
+		WHERE ((t.topic_type IN ( " . $topic_type . " ))
+			OR topic_type = ' . POST_ANNOUNCE . ')
+			AND p.topic_id = t.topic_id
 			AND p.post_id = t.topic_first_post_id
 		  	AND pt.post_id = p.post_id
 			AND u.user_id = p.poster_id
@@ -167,8 +169,9 @@ $sql = "SELECT t.*, u.username, u.user_id, u2.username as user2, u2.user_id as i
 			AND t.forum_id IN ( $announce_forum )
 			AND p2.post_id = t.topic_last_post_id
 			AND u2.user_id = p2.poster_id
+			AND topic_moved_id = 0
 		ORDER BY p.post_time $post_time_order
-		LIMIT $start, " . $announce_nbr_display;
+		" . $announce_nbr_display_sql;
 if ( !($result = $db->sql_query($sql)) )
 {
 	mx_message_die(GENERAL_ERROR, 'Could not obtain announce information', '', __LINE__, __FILE__, $sql);
@@ -178,6 +181,7 @@ $postrow = array();
 
 while($row = $db->sql_fetchrow($result))
 {
+	print_r($row);
 	if ($phpbb_auth->acl_get('f_read', $row['forum_id']) || $row['forum_id'] == 0)
 	{
 		// Do post have an attachment? If so, add them to the list /
@@ -196,26 +200,26 @@ while($row = $db->sql_fetchrow($result))
 		
 		// store all data for now //
 		$rowset[$row['post_id']] = array(
-			'post_id'				=> $row['post_id'],
+			'post_id'			=> $row['post_id'],
 			'post_text'			=> $row['post_text'],
-			'topic_id'				=> $row['topic_id'],
+			'topic_id'			=> $row['topic_id'],
 			'forum_id'			=> $row['forum_id'],
-			'post_id'				=> $row['post_id'],
+			'post_id'			=> $row['post_id'],
 			'poster_id'			=> $row['poster_id'],
-			'topic_replies'		=> $row['topic_replies'],
-			'topic_title'			=> $row['topic_title'],
-			'topic_type'			=> $row['topic_type'],
-			'topic_status'		=> $row['topic_status'],
-			'username'			=> $row['username'],
+			'topic_replies'	=> $row['topic_replies'],
+			'topic_title'		=> $row['topic_title'],
+			'topic_type'		=> $row['topic_type'],
+			'topic_status'	=> $row['topic_status'],
+			'username'		=> $row['username'],
 			'user_colour'		=> $row['user_colour'],
 			'poll_title'			=> ($row['poll_title']) ? true : false,
-			'post_time'			=> $mx_user->format_date($row['post_time']),
-			'topic_time'			=> $mx_user->format_date($row['topic_time']),
-			'post_approved'		=> $row['post_approved'],
+			'post_time'		=> $mx_user->format_date($row['post_time']),
+			'topic_time'		=> $mx_user->format_date($row['topic_time']),
+			'post_approved'	=> $row['post_approved'],
 			'post_attachment'	=> $row['post_attachment'],
 			'bbcode_bitfield'	=> $row['bbcode_bitfield'],
 			'bbcode_uid'		=> $row['bbcode_uid'],
-			'enable_bbcode'		=> $row['enable_bbcode'],
+			'enable_bbcode'	=> $row['enable_bbcode'],
 			'bbcode_options'	=> (($row['enable_bbcode']) ? OPTION_FLAG_BBCODE : 0) + (($row['enable_smilies']) ? OPTION_FLAG_SMILIES : 0) + (($row['enable_magic_url']) ? OPTION_FLAG_LINKS : 0),
 		);
 

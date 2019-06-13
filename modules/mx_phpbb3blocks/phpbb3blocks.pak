@@ -2,7 +2,7 @@ module=+:106=+:phpBB3_Blocks=+:modules/mx_phpbb3blocks/=+:MXP phpBB3 Blocks=+:1
 New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
 function=+:106=+:136=+:Website_Activity=+:Activity Stats Block=+:mx_activity_stats.php=+:
 parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
-block=+:=+:Website_Activity=+:Demo block=+:136=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+block=+:=+:Demo - Website_Activity=+:Demo block=+:136=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
 New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
 function=+:106=+:133=+:phpBB3_Announcements=+:phpBB3 Announcements=+:mx_announce.php=+:
 parameter=+:133=+:30=+:announce_nbr_display=+:Number=+:1=+:=+:0=+:0
@@ -18,11 +18,11 @@ parameter=+:133=+:39=+:announce_img_global=+:Text=+:thumb_globe.gif=+:=+:0=+:0
 parameter=+:133=+:40=+:announce_forum=+:Function=+:1=+:get_list_multiple("{parameter_id}[]", FORUMS_TABLE, 'forum_id', 'forum_name', "{parameter_value}", TRUE)=+:0=+:0
 parameter=+:133=+:217=+:announce_img_news=+:Text=+:thumb_news.gif=+:=+:0=+:0
 parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
-block=+:=+:phpBB3_Announcements=+:Demo block=+:133=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+block=+:=+:Demo - phpBB3_Announcements=+:Demo block=+:133=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
 New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
 function=+:106=+:134=+:phpBB3_Index=+:phpBB Index Block=+:mx_forum.php=+:
 parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
-block=+:=+:phpBB3_Index=+:Demo block=+:134=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+block=+:=+:Demo - phpBB3_Index=+:Demo block=+:134=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
 New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
 function=+:106=+:132=+:Last_Posts=+:phpBB Last Posts Function=+:mx_last_msg.php=+:
 parameter=+:132=+:18=+:msg_filter_date=+:Function=+:5=+:get_list_static("{parameter_id}[]",array("no limit", "1 day", "2 days", "3 days", "1 week", "2 weeks", "3 weeks", "1 month", "2 months", "3 months", "6 months", "1 year"),"{parameter_value}")=+:0=+:0
@@ -38,13 +38,9 @@ parameter=+:132=+:27=+:Last_Msg_Display_Icon_View=+:Boolean=+:TRUE=+:a:2:{i:0;s:
 parameter=+:132=+:28=+:Last_Msg_Display_Author=+:Boolean=+:FALSE=+:=+:0=+:0
 parameter=+:132=+:29=+:Last_Msg_Display_Last_Author=+:Boolean=+:TRUE=+:a:2:{i:0;s:4:"TRUE";i:1;s:5:"FALSE";}=+:0=+:0
 parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
-block=+:=+:Last_Posts=+:Demo block=+:132=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+block=+:=+:Demo - Last_Posts=+:Demo block=+:132=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
 New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
 function=+:106=+:135=+:Statistics=+:Website Statistics Function=+:mx_statistics.php=+:
 parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
-block=+:=+:Statistics=+:Demo block=+:135=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
-New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
-function=+:133=+:137=+:phpBB Login=+:Login in phpBB Block=+:mx_phpbb_login.php=+:
-parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
-block=+:=+:phpBB Login=+:Login Demo block=+:137=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+block=+:=+:Demo - Statistics=+:Demo block=+:135=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
 function=+:0=+:0=+:0=+:endoflist=+:0=+:0

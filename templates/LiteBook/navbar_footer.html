@@ -1,0 +1,109 @@
+<div class="navbar navbar-bottom" role="navigation">
+	<div class="inner">
+
+	<ul id="nav-footer" class="nav-footer linklist" role="menubar">
+
+		<!-- EVENT overall_footer_timezone_before -->
+		<!-- EVENT overall_footer_timezone_after -->
+		
+		<!-- IF not S_IS_BOT -->
+			<li class="rightside">
+				<a href="{U_DELETE_COOKIES}" data-ajax="true" data-refresh="true" role="menuitem" title="{L_DELETE_COOKIES}">
+					<i class="icon fa-trash fa-fw" aria-hidden="true"></i>
+				</a>
+			</li>
+			<!-- IF S_DISPLAY_MEMBERLIST -->
+				<li class="rightside">
+					<a href="{U_MEMBERLIST}" title="{L_MEMBERLIST_EXPLAIN}" role="menuitem">
+						<i class="icon fa-group fa-fw" aria-hidden="true"></i>
+					</a>
+				</li>
+			<!-- ENDIF -->
+		<!-- ENDIF -->
+		<!-- EVENT overall_footer_teamlink_before -->
+		<!-- IF U_TEAM -->
+			<li class="rightside">
+				<a href="{U_TEAM}" role="menuitem" title="{L_THE_TEAM}">
+					<i class="icon fa-shield fa-fw" aria-hidden="true"></i>
+				</a>
+			</li>
+		<!-- ENDIF -->
+		<!-- EVENT overall_footer_teamlink_after -->
+		<!-- IF U_CONTACT_US -->
+			<li class="rightside" data-last-responsive="true">
+				<a href="{U_CONTACT_US}" role="menuitem" title="{L_CONTACT_US}">
+					<i class="icon fa-envelope fa-fw" aria-hidden="true"></i>
+				</a>
+			</li>
+		<!-- ENDIF -->
+		<li class="rightside" <!-- IF not S_USER_LOGGED_IN -->data-skip-responsive="true"<!-- ENDIF -->>
+			<a href="{U_FAQ}" rel="help" title="{L_FAQ_EXPLAIN}" role="menuitem" title="{L_FAQ}">
+				<i class="icon fa-question-circle fa-fw" aria-hidden="true"></i>
+			</a>
+		</li>
+		<!-- IF U_WATCH_FORUM_LINK and not S_IS_BOT -->
+			<li class="rightside" data-last-responsive="true">
+				<a href="{U_WATCH_FORUM_LINK}" title="{S_WATCH_FORUM_TITLE}" data-ajax="toggle_link" data-toggle-class="icon <!-- IF S_WATCHING_FORUM -->fa-check-square-o<!-- ELSE -->fa-square-o<!-- ENDIF --> fa-fw" data-toggle-text="{S_WATCH_FORUM_TOGGLE}" data-toggle-url="{U_WATCH_FORUM_TOGGLE}">
+					<i class="icon <!-- IF S_WATCHING_FORUM -->fa-square-o<!-- ELSE -->fa-check-square-o<!-- ENDIF --> fa-fw" aria-hidden="true"></i>
+				</a>
+			</li>
+		<!-- ENDIF -->
+
+		<!-- EVENT overall_footer_breadcrumb_prepend -->
+		
+		<!-- IF $CUSTOM1_BUTTON -->
+			<li data-last-responsive="true">
+				<a href="{$CUSTOM1_URL}" title="{$CUSTOM1_ICON}" role="menuitem">
+					<i class="icon fa-{$CUSTOM1_ICON} fa-fw" aria-hidden="true"></i>
+				</a>
+			</li>
+		<!-- ENDIF -->
+		<!-- IF $FACEBOOK_BUTTON -->
+			<li data-last-responsive="true">
+				<a href="{$FACEBOOK_URL}" title="Facebook" role="menuitem">
+					<i class="icon fa-facebook-official fa-fw" aria-hidden="true"></i>
+				</a>
+			</li>
+		<!-- ENDIF -->
+		<!-- IF $YOUTUBE_BUTTON -->
+			<li data-last-responsive="true">
+				<a href="{$YOUTUBE_URL}" title="YouTube" role="menuitem">
+					<i class="icon fa-youtube fa-fw" aria-hidden="true"></i>
+				</a>
+			</li>
+		<!-- ENDIF -->
+		<!-- IF $INSTAGRAM_BUTTON -->
+			<li data-last-responsive="true">
+				<a href="{$INSTAGRAM_URL}" title="Instagram" role="menuitem">
+					<i class="icon fa-instagram fa-fw" aria-hidden="true"></i>
+				</a>
+			</li>
+		<!-- ENDIF -->
+		<!-- IF $TWITTER_BUTTON -->
+			<li data-last-responsive="true">
+				<a href="{$TWITTER_URL}" title="Twitter" role="menuitem">
+					<i class="icon fa-twitter fa-fw" aria-hidden="true"></i>
+				</a>
+			</li>
+		<!-- ENDIF -->
+		<!-- IF $GOOGLE_PLUS_BUTTON -->
+			<li data-last-responsive="true">
+				<a href="{$GOOGLE_PLUS_URL}" title="Google+" role="menuitem">
+					<i class="icon fa-google-plus-official fa-fw" aria-hidden="true"></i>
+				</a>
+			</li>
+		<!-- ENDIF -->
+		<!-- IF $CUSTOM2_BUTTON -->
+			<li data-last-responsive="true">
+				<a href="{$CUSTOM2_URL}" title="{$CUSTOM2_ICON}" role="menuitem">
+					<i class="icon fa-{$CUSTOM2_ICON} fa-fw" aria-hidden="true"></i>
+				</a>
+			</li>
+		<!-- ENDIF -->
+		
+		<!-- EVENT overall_footer_breadcrumb_append -->
+		
+	</ul>
+
+	</div>
+</div>

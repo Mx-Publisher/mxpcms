@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Module - mx_navmenu
-* @version $Id: db_install.php,v 1.11 2014/05/18 06:24:56 orynider Exp $
+* @version $Id: db_install.php,v 1.10 2008/02/16 21:42:41 jonohlsson Exp $
 * @copyright (c) 2002-2008 [Jon Ohlsson] MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://mxpcms.sourceforge.net
+* @link http://www.mx-publisher.com
 *
 */
 
@@ -32,7 +32,7 @@ if ( !defined( 'IN_ADMIN' ) )
 }
 
 $mx_module_version = 'MX-Publisher Core Module';
-$mx_module_copy = 'Original MX-Publisher <i>navigation menu</i> module by [Jon Ohlsson] <a href="http://mxpcms.sourceforge.net" target="_blank">The MX-Publisher Development Team</a>';
+$mx_module_copy = 'Original MX-Publisher <i>navigation menu</i> module by [Jon Ohlsson] <a href="http://www.mx-publisher.com" target="_blank">The MX-Publisher Development Team</a>';
 
 $message = "<b>" . $lang['fresh_install'] . "!</b><br/><br/>";
 

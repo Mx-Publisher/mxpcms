@@ -1,0 +1,5 @@
+//
+// Formular de Contact
+//
+$lang['Viewing_contact_form'] = 'Vizualizare Modul de Contact';
+$lang['Contact_form'] = 'Formular de Contact';

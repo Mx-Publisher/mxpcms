@@ -1,6 +1,6 @@
 // COOKIES
 	// Switch state
-	var colorswitch = $.cookie('platinumcolor');
+	var colorswitch = $.cookie('color');
 	
 	// Set the user's selection
 	if (colorswitch == 'green') {
@@ -60,25 +60,6 @@
 		});
     };
 	
-	if (colorswitch == 'black') {
-		$('.headerbar').css("background-color","#3C094F").css("background-image","-webkit-linear-gradient(top, #89529E 0%, #3C094F 100%)").css("background-image","linear-gradient(to bottom, #63187E 0%,#3C094F 100%)");
-		$('.forabg, .forumbg').css("background-color","#3C094F").css("background-image","-webkit-linear-gradient(top, #89529E 0%, #3C094F 35px, #3C094F 100%)").css("background-image","linear-gradient(to bottom, #89529E 0%,#3C094F 35px,#3C094F 100%)");
-		$('.pollbar1, .pollbar2, .pollbar3, .pollbar4').css("background-color","#3C094F");
-		$('.pollbar5').css("background-color","#89529E");
-		$('.action-bar .coloredbutton').css("border-color","#3C094F").css("background-color","#3C094F").css("background-image","-webkit-linear-gradient(top, #89529E 0%, #3C094F 100%)").css("background-image","linear-gradient(to bottom, #89529E 0%,#3C094F 100%)").css("filter","progid:DXImageTransform.Microsoft.gradient( startColorstr='#89529E', endColorstr='#3C094F',GradientType=0 )");
-		$('.action-bar .coloredbutton').mouseenter(function() {
-			$(this).css("background-color","#3C094F").css("background-image","-webkit-linear-gradient(top, #3C094F 0%, #89529E 100%)").css("background-image","linear-gradient(to bottom, #3C094F 0%,#89529E 100%)").css("filter","progid:DXImageTransform.Microsoft.gradient( startColorstr='#3C094F', endColorstr='#89529E',GradientType=0 )");
-		}).mouseleave(function() {
-			$(this).css("border-color","#3C094F").css("background-color","#3C094F").css("background-image","-webkit-linear-gradient(top, #89529E 0%, #3C094F 100%)").css("background-image","linear-gradient(to bottom, #89529E 0%,#3C094F 100%)").css("filter","progid:DXImageTransform.Microsoft.gradient( startColorstr='#89529E', endColorstr='#3C094F',GradientType=0 )");
-		});
-		$('.pagination li.active span').css("background","#89529E").css("border-color","#89529E");
-		$('.pagination li a').mouseenter(function() {
-			$(this).css("background","#89529E").css("border-color","#89529E");
-		}).mouseleave(function() {
-			$(this).css("background","#ECEDEE").css("border-color","#B4BAC0");
-		});
-    };	
-	
 	if (colorswitch == 'red') {
 		$('.headerbar').css("background-color","#4F0E09").css("background-image","-webkit-linear-gradient(top, #7E1F18 0%, #4F0E09 100%)").css("background-image","linear-gradient(to bottom, #7E1F18 0%,#4F0E09 100%)");
 		$('.forabg, .forumbg').css("background-color","#4F0E09").css("background-image","-webkit-linear-gradient(top, #9E5752 0%, #4F0E09 35px, #4F0E09 100%)").css("background-image","linear-gradient(to bottom, #9E5752 0%,#4F0E09 35px,#4F0E09 100%)");
@@ -119,7 +100,7 @@ $(document).ready(function() {
 		}).mouseleave(function() {
 			$(this).css("background","#ECEDEE").css("border-color","#B4BAC0");
 		});
-		$.cookie('platinumcolor', null, { path: '/' });
+		$.cookie('color', null, { path: '/' });
     });
 	
 	// When green is clicked:
@@ -140,7 +121,7 @@ $(document).ready(function() {
 		}).mouseleave(function() {
 			$(this).css("background","#ECEDEE").css("border-color","#B4BAC0");
 		});
-		$.cookie('platinumcolor', 'green', { expires: 365, path: '/' });
+		$.cookie('color', 'green', { expires: 365, path: '/' });
     });
 	
 	// When pink is clicked:
@@ -161,7 +142,7 @@ $(document).ready(function() {
 		}).mouseleave(function() {
 			$(this).css("background","#ECEDEE").css("border-color","#B4BAC0");
 		});
-		$.cookie('platinumcolor', 'pink', { expires: 365, path: '/' });
+		$.cookie('color', 'pink', { expires: 365, path: '/' });
     });
 	
 	// When purple is clicked:
@@ -182,7 +163,7 @@ $(document).ready(function() {
 		}).mouseleave(function() {
 			$(this).css("background","#ECEDEE").css("border-color","#B4BAC0");
 		});
-		$.cookie('platinumcolor', 'purple', { expires: 365, path: '/' });
+		$.cookie('color', 'purple', { expires: 365, path: '/' });
     });
 	
 	// When red is clicked:
@@ -203,6 +184,6 @@ $(document).ready(function() {
 		}).mouseleave(function() {
 			$(this).css("background","#ECEDEE").css("border-color","#B4BAC0");
 		});
-		$.cookie('platinumcolor', 'red', { expires: 365, path: '/' });
+		$.cookie('color', 'red', { expires: 365, path: '/' });
     });
 });

@@ -2,7 +2,7 @@
 /**
 *
 * @package Style
-* @version $Id: session.php,v 1.1 2014/07/07 20:38:17 orynider Exp $
+* @version $Id: session.php,v 1.63 2014/07/07 22:06:50 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team & (C) 2005 The phpBB Group
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
@@ -56,16 +56,6 @@ class mx_nothing
 */
 class session
 {
-	/** @var \phpbb\cache\driver\driver_interface */
-	protected $cache;
-	protected $mx_cache;
-	protected $language;
-	protected $request;
-	/** @var \phpbb\config\config */
-	protected $config;
-	/** @var \phpbb\db\driver\driver_interface */
-	protected $db; 
-	
 	var $cookie_data = array();
 	var $page = array();
 	var $data = array();
@@ -74,8 +64,6 @@ class session
 	var $host = '';
 	var $session_id = '';
 	var $ip = '';
-	var $page_id = '';
-	var $user_ip = '';	
 	var $load = 0;
 	var $time_now = 0;
 	var $update_session_page = true;
@@ -83,106 +71,16 @@ class session
 	var $lang = array();
 	var $help = array();
 	var $theme = array();
-	var $style = 1;
 	var $date_format;
 	var $timezone;
 	var $dst;
-
-	/**
-	 * @var string	ISO code of the default board language
-	 */
-	var $default_language;
-	var $default_language_name;
-	
-	var	$default_template_name = 'subsilver2';
-	var	$cloned_template_name = 'subSilver';
-	
-	var	$cloned_template_path;	
-	var	$default_template_path;
-	
-	/**
-	 * @var string	ISO code of the User's language
-	 */
-	var $user_language;
-	var $user_language_name;
-	
-	var $lang_iso = 'en';	
-	var $lang_dir = 'lang_english';
-	
-	protected $common_language_files_loaded;
-	
-	var $img_lang_dir = 'en';
-	var $lang_english_name = 'English';	
-	var $lang_local_name = 'English United Kingdom';
-	var $language_list = array();
-	var $debug_paths;
 
 	var $lang_name;
 	var $lang_id = false;
 	var $lang_path;
 	var $img_lang;
 	var $img_array = array();
-	
-	/**
-	 * Load sessions
-	 * @access public
-	 *
-	 */	
-	function __construct()
-	{
-		global $mx_cache, $board_config, $db, $phpbb_root_path, $mx_root_path, $phpEx;
-		global $mx_request_vars, $template, $language;
-		
-		$this->cache				= $mx_cache;
-		$this->config				= $board_config;
-		$this->db                 	= $db;
-		$this->user               	= $this;
-		$this->service_providers = array('user_id' => 1, 'session_id' => 0, 'provider'	=> '', 'oauth_token' => '');
-		$this->phpbb_root_path = $phpbb_root_path;
-		$this->mx_root_path	= $mx_root_path;
-		$this->php_ext			= $phpEx;
-		$this->lang_path			= $mx_root_path . 'language/';
-		$this->request				= $mx_request_vars;
-		$this->template			= $template;
-		$this->language			= $language;
 
-		// Setup $this->db_tools
-		if (!class_exists('mx_db_tools') && !class_exists('tools'))
-		{
-			include_once($mx_root_path . 'includes/db/db_tools.' . $phpEx);
-		}
-		if (class_exists('mx_db_tools'))
-		{
-			$this->db_tools = new mx_db_tools($this->db);
-		}
-		elseif (class_exists('tools'))
-		{
-			$this->db_tools = new tools($this->db);
-		}
-		
-		$this->service_providers = array('user_id' => 1, 'session_id' => 0, 'provider' => '', 'oauth_token' => '');
-		$this->phpbb_root_path = $phpbb_root_path;
-		$this->php_ext = $phpEx;
-	
-		$this->lang_path = $mx_root_path . 'language/';
-		/*
-        $this->crawlers = new Crawlers();
-        $this->exclusions = new Exclusions();
-        $this->uaHttpHeaders = new Headers();
-
-        $this->compiledRegex = $this->compileRegex($this->crawlers->getAll());
-        $this->compiledExclusions = $this->compileRegex($this->exclusions->getAll());
-
-        $this->setHttpHeaders($headers);
-        $this->userAgent = $this->setUserAgent($userAgent);
-		*/
-		$this->lang_path = $phpbb_root_path . 'language/';
-		$this->load();
-		$this->setup();
-		$this->setup_style();
-
-	}
-	
 	/**
 	 * Load sessions
 	 * @access public
@@ -209,21 +107,13 @@ class session
 		{
 			case 3:
 				$this->data['user_level'] = 1;
-				$this->data['user_active'] = 1;
-			break;
+				break;
 			case 0:
-				$this->data['user_level'] = 0;
-				$this->data['user_active'] = 1;
-			break;
-			case 1:
-			case 2:
-				$this->data['user_level'] = 0;
-				$this->data['user_active'] = 0;
-			break;
+				$this->data['user_level'] = 2;
+				break;
 			default:
 				$this->data['user_level'] = 0;
-				$this->data['user_active'] = 1;
-			break;
+				break;
 		}
 
 		$this->data['session_id'] = $this->session_id;
@@ -237,8 +127,6 @@ class session
 	*/
 	function extract_current_page($root_path)
 	{
-		global $phpBB2;
-		
 		$page_array = array();
 
 		// First of all, get the request uri...
@@ -275,8 +163,8 @@ class session
 		$page_name = urlencode(htmlspecialchars($page_name));
 
 		// current directory within the phpBB root (for example: adm)
-		$root_dirs = explode('/', str_replace('\\', '/', $phpBB2->phpbb_realpath($root_path)));
-		$page_dirs = explode('/', str_replace('\\', '/', $phpBB2->phpbb_realpath('./')));
+		$root_dirs = explode('/', str_replace('\\', '/', phpBB2::phpbb_realpath($root_path)));
+		$page_dirs = explode('/', str_replace('\\', '/', phpBB2::phpbb_realpath('./')));
 		$intersection = array_intersect_assoc($root_dirs, $page_dirs);
 
 		$root_dirs = array_diff_assoc($root_dirs, $intersection);
@@ -309,8 +197,6 @@ class session
 		$script_path .= (substr($script_path, -1, 1) == '/') ? '' : '/';
 		$root_script_path .= (substr($root_script_path, -1, 1) == '/') ? '' : '/';
 
-		$forum_id = (isset($_REQUEST['f']) && $_REQUEST['f'] > 0 && $_REQUEST['f'] < 16777215) ? (int) $_REQUEST['f'] : 0;
-
 		$page_array += array(
 			'page_name'			=> $page_name,
 			'page_dir'			=> $page_dir,
@@ -319,65 +205,10 @@ class session
 			'script_path'		=> str_replace(' ', '%20', htmlspecialchars($script_path)),
 			'root_script_path'	=> str_replace(' ', '%20', htmlspecialchars($root_script_path)),
 
-			'page'				=> $page,
-			'forum'				=> $forum_id,
+			'page'				=> $page
 		);
 
 		return $page_array;
-	}
-
-	/**
-	* Get valid hostname/port. HTTP_HOST is used, SERVER_NAME if HTTP_HOST not present.
-	*/
-	function extract_current_hostname()
-	{
-		global $config;
-
-		// Get hostname
-		$host = (!empty($_SERVER['HTTP_HOST'])) ? $_SERVER['HTTP_HOST'] : ((!empty($_SERVER['SERVER_NAME'])) ? $_SERVER['SERVER_NAME'] : getenv('SERVER_NAME'));
-
-		// Should be a string and lowered
-		$host = (string) strtolower($host);
-
-		// If host is equal the cookie domain or the server name (if config is set), then we assume it is valid
-		if ((isset($config['cookie_domain']) && $host === $config['cookie_domain']) || (isset($config['server_name']) && $host === $config['server_name']))
-		{
-			return $host;
-		}
-
-		// Is the host actually a IP? If so, we use the IP... (IPv4)
-		if (long2ip(ip2long($host)) === $host)
-		{
-			return $host;
-		}
-
-		// Now return the hostname (this also removes any port definition). The http:// is prepended to construct a valid URL, hosts never have a scheme assigned
-		$host = @parse_url('http://' . $host);
-		$host = (!empty($host['host'])) ? $host['host'] : '';
-
-		// Remove any portions not removed by parse_url (#)
-		$host = str_replace('#', '', $host);
-
-		// If, by any means, the host is now empty, we will use a "best approach" way to guess one
-		if (empty($host))
-		{
-			if (!empty($config['server_name']))
-			{
-				$host = $config['server_name'];
-			}
-			else if (!empty($config['cookie_domain']))
-			{
-				$host = (strpos($config['cookie_domain'], '.') === 0) ? substr($config['cookie_domain'], 1) : $config['cookie_domain'];
-			}
-			else
-			{
-				// Set to OS hostname or localhost
-				$host = (function_exists('php_uname')) ? php_uname('n') : 'localhost';
-			}
-		}
-
-		// It may be still no valid host, but for sure only a hostname (we may further expand on the cookie domain... if set)
-		return $host;
 	}
 
 	/**
@@ -395,17 +226,17 @@ class session
 	*/
 	function session_begin($update_session_page = true)
 	{
-		global $phpEx, $SID, $_SID, $phpBB3, $_EXTRA_URL, $db, $board_config, $phpbb_root_path, $page_id;
+		global $phpEx, $SID, $_SID, $_EXTRA_URL, $db, $board_config, $phpbb_root_path, $page_id;
 
 		// Give us some basic information
-		$this->time_now					= time();
-		$this->cookie_data				= array('u' => 0, 'k' => '');
+		$this->time_now				= time();
+		$this->cookie_data			= array('u' => 0, 'k' => '');
 		$this->update_session_page	= $update_session_page;
-		$this->browser					= (!empty($_SERVER['HTTP_USER_AGENT'])) ? htmlspecialchars((string) $_SERVER['HTTP_USER_AGENT']) : '';
-		$this->referer						= (!empty($_SERVER['HTTP_REFERER'])) ? htmlspecialchars((string) $_SERVER['HTTP_REFERER']) : '';		
-		$this->forwarded_for				= (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) ? (string) $_SERVER['HTTP_X_FORWARDED_FOR'] : '';
-		$this->host							= (!empty($_SERVER['HTTP_HOST'])) ? (string) $_SERVER['HTTP_HOST'] : 'localhost';
-		$this->page						= $this->extract_current_page($phpbb_root_path);
+		$this->browser				= (!empty($_SERVER['HTTP_USER_AGENT'])) ? htmlspecialchars((string) $_SERVER['HTTP_USER_AGENT']) : '';
+		$this->referer				= (!empty($_SERVER['HTTP_REFERER'])) ? htmlspecialchars((string) $_SERVER['HTTP_REFERER']) : '';		
+		$this->forwarded_for		= (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) ? (string) $_SERVER['HTTP_X_FORWARDED_FOR'] : '';
+		$this->host					= (!empty($_SERVER['HTTP_HOST'])) ? (string) $_SERVER['HTTP_HOST'] : 'localhost';
+		$this->page					= $this->extract_current_page($phpbb_root_path);
 
 		// if the forwarded for header shall be checked we have to validate its contents
 		if ($board_config['forwarded_for_check'])
@@ -415,8 +246,8 @@ class session
 			// Whoa these look impressive!
 			// The code to generate the following two regular expressions which match valid IPv4/IPv6 addresses
 			// can be found in the develop directory
-			$ipv4 = $phpBB3->get_preg_expression('ipv4'); //'#^(?:(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$#';
-			$ipv6 = $phpBB3->get_preg_expression('ipv6'); //'#^(?:(?:(?:[\dA-F]{1,4}:){6}(?:[\dA-F]{1,4}:[\dA-F]{1,4}|(?:(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])))|(?:::(?:[\dA-F]{1,4}:){5}(?:[\dA-F]{1,4}:[\dA-F]{1,4}|(?:(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])))|(?:(?:[\dA-F]{1,4}:):(?:[\dA-F]{1,4}:){4}(?:[\dA-F]{1,4}:[\dA-F]{1,4}|(?:(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])))|(?:(?:[\dA-F]{1,4}:){1,2}:(?:[\dA-F]{1,4}:){3}(?:[\dA-F]{1,4}:[\dA-F]{1,4}|(?:(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])))|(?:(?:[\dA-F]{1,4}:){1,3}:(?:[\dA-F]{1,4}:){2}(?:[\dA-F]{1,4}:[\dA-F]{1,4}|(?:(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])))|(?:(?:[\dA-F]{1,4}:){1,4}:(?:[\dA-F]{1,4}:)(?:[\dA-F]{1,4}:[\dA-F]{1,4}|(?:(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])))|(?:(?:[\dA-F]{1,4}:){1,5}:(?:[\dA-F]{1,4}:[\dA-F]{1,4}|(?:(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])))|(?:(?:[\dA-F]{1,4}:){1,6}:[\dA-F]{1,4})|(?:(?:[\dA-F]{1,4}:){1,7}:))$#i';
+			$ipv4 = phpBB3::get_preg_expression('ipv4'); //'#^(?:(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$#';
+			$ipv6 = phpBB3::get_preg_expression('ipv6'); //'#^(?:(?:(?:[\dA-F]{1,4}:){6}(?:[\dA-F]{1,4}:[\dA-F]{1,4}|(?:(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])))|(?:::(?:[\dA-F]{1,4}:){5}(?:[\dA-F]{1,4}:[\dA-F]{1,4}|(?:(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])))|(?:(?:[\dA-F]{1,4}:):(?:[\dA-F]{1,4}:){4}(?:[\dA-F]{1,4}:[\dA-F]{1,4}|(?:(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])))|(?:(?:[\dA-F]{1,4}:){1,2}:(?:[\dA-F]{1,4}:){3}(?:[\dA-F]{1,4}:[\dA-F]{1,4}|(?:(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])))|(?:(?:[\dA-F]{1,4}:){1,3}:(?:[\dA-F]{1,4}:){2}(?:[\dA-F]{1,4}:[\dA-F]{1,4}|(?:(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])))|(?:(?:[\dA-F]{1,4}:){1,4}:(?:[\dA-F]{1,4}:)(?:[\dA-F]{1,4}:[\dA-F]{1,4}|(?:(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])))|(?:(?:[\dA-F]{1,4}:){1,5}:(?:[\dA-F]{1,4}:[\dA-F]{1,4}|(?:(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])))|(?:(?:[\dA-F]{1,4}:){1,6}:[\dA-F]{1,4})|(?:(?:[\dA-F]{1,4}:){1,7}:))$#i';
 			
 			// split the list of IPs
 			$ips = explode(', ', $this->forwarded_for);
@@ -441,9 +272,9 @@ class session
 
 		if (isset($_COOKIE[$board_config['cookie_name'] . '_sid']) || isset($_COOKIE[$board_config['cookie_name'] . '_u']))
 		{
-			$this->cookie_data['u'] = $phpBB3->request_var($board_config['cookie_name'] . '_u', 0, false, true);
-			$this->cookie_data['k'] = $phpBB3->request_var($board_config['cookie_name'] . '_k', '', false, true);
-			$this->session_id 		= $phpBB3->request_var($board_config['cookie_name'] . '_sid', '', false, true);
+			$this->cookie_data['u'] = phpBB3::request_var($board_config['cookie_name'] . '_u', 0, false, true);
+			$this->cookie_data['k'] = phpBB3::request_var($board_config['cookie_name'] . '_k', '', false, true);
+			$this->session_id 		= phpBB3::request_var($board_config['cookie_name'] . '_sid', '', false, true);
 
 			// original code: $SID = (defined('NEED_SID')) ? 'sid=' . $this->session_id : 'sid=';
 			$SID = (defined('NEED_SID')) ? 'sid=' . $this->session_id : '';
@@ -451,19 +282,18 @@ class session
 
 			if (empty($this->session_id))
 			{
-				$this->session_id = $_SID = $phpBB3->request_var('sid', '');
+				$this->session_id = $_SID = phpBB3::request_var('sid', '');
 				$SID = 'sid=' . $this->session_id;
 				$this->cookie_data = array('u' => 0, 'k' => '');
 			}
 		}
 		else
 		{
-			$this->session_id = $_SID = $phpBB3->request_var('sid', '');
+			$this->session_id = $_SID = phpBB3::request_var('sid', '');
 			$SID = 'sid=' . $this->session_id;
 		}
-
+		$session_id = $this->session_id;
 		$_EXTRA_URL = array();
-
 		// Why no forwarded_for et al? Well, too easily spoofed. With the results of my recent requests
 		// it's pretty clear that in the majority of cases you'll at least be left with a proxy/cache ip.
 		$this->ip = (!empty($_SERVER['REMOTE_ADDR'])) ? htmlspecialchars($_SERVER['REMOTE_ADDR']) : '';
@@ -478,7 +308,7 @@ class session
 		foreach ($ips as $ip)
 		{
 			// check IPv4 first, the IPv6 is hopefully only going to be used very seldomly
-			if (!empty($ip) && !preg_match($phpBB3->get_preg_expression('ipv4'), $ip) && !preg_match($phpBB3->get_preg_expression('ipv6'), $ip))
+			if (!empty($ip) && !preg_match(phpBB3::get_preg_expression('ipv4'), $ip) && !@preg_match(phpBB3::get_preg_expression('ipv6'), $ip))
 			{
 				// Just break
 				break;
@@ -489,7 +319,7 @@ class session
 			{
 				$ipv4 = substr($ip, 7);
 
-				if (preg_match($phpBB3->get_preg_expression('ipv4'), $ipv4))
+				if (preg_match(phpBB3::get_preg_expression('ipv4'), $ipv4))
 				{
 					$ip = $ipv4;
 				}
@@ -526,7 +356,7 @@ class session
 			$result = $db->sql_query($sql);
 			$this->data = $db->sql_fetchrow($result);
 			$db->sql_freeresult($result);
-
+			
 			// Did the session exist in the DB?
 			if (isset($this->data['user_id']))
 			{
@@ -640,45 +470,11 @@ class session
 								$this->leave_newly_registered();
 							}
 						}
-						
-						// Redefine some MXP stylish userdata
-						//$this->data['session_logged_in'] = $this->data['user_id'] != ANONYMOUS ? 1 : 0;
 
-						if ( $this->data['user_id'] == ANONYMOUS )
-						{
-							$this->data['user_type'] = -1;
-						}
-
-						switch ($this->data['user_type'])
-						{
-							case 3:
-								$this->data['user_level'] = 1;
-								$this->data['user_active'] = 1;
-							break;
-							case 0:
-								$this->data['user_level'] = 0;
-								$this->data['user_active'] = 1;
-							break;
-							case 1:
-							case 2:
-								$this->data['user_level'] = 0;
-								$this->data['user_active'] = 0;
-							break;
-							default:
-								global $phpbb_auth;
-								$this->data['user_level'] = $phpbb_auth->acl_get('a_') ? 1 : ($phpbb_auth->acl_get('m_') ? 2 : 0);
-								$this->data['user_active'] = 1;
-							break;
-						}
-
-						$this->data['session_id'] = $this->session_id;
-						$this->data['user_session_page'] = $this->data['session_page'];
-						// Redefine some MXP stylish userdata
-						$this->data['session_logged_in'] = $this->data['user_id'] != ANONYMOUS ? 1 : 0;
 						$this->data['is_registered'] = ($this->data['user_id'] != ANONYMOUS && ($this->data['user_type'] == USER_NORMAL || $this->data['user_type'] == USER_FOUNDER)) ? true : false;
 						$this->data['is_bot'] = (!$this->data['is_registered'] && $this->data['user_id'] != ANONYMOUS) ? true : false;
 						$this->data['user_lang'] = basename($this->data['user_lang']);
-						
+
 						return true;
 					}
 				}
@@ -715,7 +511,7 @@ class session
 	*/
 	function session_create($user_id = false, $set_admin = false, $persist_login = false, $viewonline = true)
 	{
-		global $SID, $_SID, $phpBB2, $phpBB3, $db, $board_config, $cache, $phpbb_root_path, $phpEx, $mx_backend;
+		global $SID, $_SID, $db, $board_config, $cache, $phpbb_root_path, $phpEx, $mx_backend;
 
 		$this->data = array();
 
@@ -857,13 +653,7 @@ class session
 
 		// Force user id to be integer...
 		$this->data['user_id'] = (int) $this->data['user_id'];
-		$this->data['session_id'] = $this->session_id;
-		$this->data['user_session_page'] = $this->data['session_page'];
-		// Redefine some MXP stylish userdata
-		$this->data['session_logged_in'] = $this->data['user_id'] != ANONYMOUS ? 1 : 0;
-		$this->data['is_registered'] = ($this->data['user_id'] != ANONYMOUS && ($this->data['user_type'] == USER_NORMAL || $this->data['user_type'] == USER_FOUNDER)) ? true : false;
-		$this->data['is_bot'] = (!$this->data['is_registered'] && $this->data['user_id'] != ANONYMOUS) ? true : false;
-		$this->data['user_lang'] = basename($this->data['user_lang']);
+
 		// At this stage we should have a filled data array, defined cookie u and k data.
 		// data array should contain recent session info if we're a real user and a recent
 		// session exists in which case session_id will also be set
@@ -994,7 +784,7 @@ class session
 			}
 		}
 
-		$this->session_id = $this->data['session_id'] = md5($phpBB3->unique_id());
+		$this->session_id = $this->data['session_id'] = md5(phpBB3::unique_id());
 
 		$sql_ary['session_id'] = (string) $this->session_id;
 		$sql_ary['session_page'] = (string) substr($this->page['page'], 0, 199);
@@ -1195,11 +985,7 @@ class session
 	/**
 	* Sets a cookie
 	*
-	* Sets a cookie of the given name with the specified data for the given length of time. If no time is specified, a session cookie will be set.
-	*
-	* @param string $name		Name of the cookie, will be automatically prefixed with the phpBB cookie name. track becomes [cookie_name]_track then.
-	* @param string $cookiedata	The data to hold within the cookie
-	* @param int $cookietime	The expiration time as UNIX timestamp. If 0 is provided, a session cookie is set.
+	* Sets a cookie of the given name with the specified data for the given length of time.
 	*/
 	function set_cookie($name, $cookiedata, $cookietime)
 	{
@@ -1489,13 +1275,13 @@ class session
 	*/
 	function set_login_key($user_id = false, $key = false, $user_ip = false)
 	{
-		global $phpBB3, $board_config, $db;
+		global $board_config, $db;
 
 		$user_id = ($user_id === false) ? $this->data['user_id'] : $user_id;
 		$user_ip = ($user_ip === false) ? $this->ip : $user_ip;
 		$key = ($key === false) ? (($this->cookie_data['k']) ? $this->cookie_data['k'] : false) : $key;
 
-		$key_id = $phpBB3->unique_id(hexdec(substr($this->session_id, 0, 8)));
+		$key_id = phpBB3::unique_id(hexdec(substr($this->session_id, 0, 8)));
 
 		$sql_ary = array(
 			'key_id'		=> (string) md5($key_id),
@@ -1620,60 +1406,17 @@ class session
 	*/
 	function setup($lang_set = false, $style = false)
 	{
-		global $db, $mx_cache, $template, $board_config, $phpbb_auth, $phpEx, $phpbb_root_path, $mx_root_path;
-		global $mx_request_vars, $portal_config, $shared_lang_path; //added for mxp
-		global $lang, $userdata; //temp vars
-		global $phpBB2, $phpBB3; //temp vars for comp with phpbb2 and phpbb3 session files
-		
-		global $theme, $images, $nav_links;
-		
-		if (!empty($this->data['user_id'])) 
-		{
-			$cache = new mx_nothing();
-			$this->session_begin();  
-		}
-		
-		$this->cache = is_object($mx_cache) ? $mx_cache : new base();
-		
-		if (preg_match('/bot|crawl|curl|dataprovider|search|get|spider|find|java|majesticsEO|google|yahoo|teoma|contaxe|yandex|libwww-perl|facebookexternalhit/i', $_SERVER['HTTP_USER_AGENT'])) 
-		{
-		    $this->data['is_bot'] = true;
-		}
-		else
-		{
-		    $this->data['is_bot'] = false;
-		}
-		
-		switch ($this->data['user_type'])
-		{
-			case 3:
-				$this->data['user_level'] = 1;
-				$this->data['user_active'] = 1;
-			break;
-			case 0:
-				$this->data['user_level'] = 0;
-				$this->data['user_active'] = 1;
-			break;
-			case 1:
-			case 2:
-				$this->data['user_level'] = 0;
-				$this->data['user_active'] = 0;
-			break;
-			default:
-				global $phpbb_auth;
-				$this->data['user_level'] = $phpbb_auth->acl_get('a_') ? 1 : ($phpbb_auth->acl_get('m_') ? 2 : 0);
-				$this->data['user_active'] = 1;
-			break;
-		}
+		global $db, $template, $board_config, $userdata, $phpbb_auth, $phpEx, $phpbb_root_path, $mx_root_path, $mx_cache;
+		global $mx_request_vars, $portal_config; //added for mxp
+		global $lang; //added for mxp
 		
 		$session_lang = '';
-		
 		/*
 		* Added here for reference and future implementation of a lang block in mx_coreblocks were board_config can be taken from portal_config 
 		*
 		if ($board_config['lang_select_enable'] || $board_config['lang_click_enable'])
 		{
-			$session_lang_save = $phpBB3->request_var('session_lang_save', false);
+			$session_lang_save = phpBB3::request_var('session_lang_save', false);
 			if (isset($session_lang_save) && $session_lang_save && $this->data['session_lang'])
 			{
 				$sql = 'UPDATE ' . USERS_TABLE . "
@@ -1682,14 +1425,14 @@ class session
 				$db->sql_query($sql);
 			}
 
-			$session_lang_reset = $phpBB3->request_var('session_lang_reset', false);
+			$session_lang_reset = phpBB3::request_var('session_lang_reset', false);
 			if (isset($session_lang_reset) && $session_lang_reset)
 			{
 				$session_lang = '';
 			}
 			else
 			{
-				$session_lang = $phpBB3->request_var('session_lang', '');
+				$session_lang = phpBB3::request_var('session_lang', '');
 			}
 
 			if ((isset($session_lang) && $session_lang) || $session_lang_reset)
@@ -1724,75 +1467,9 @@ class session
 			}
 		}		
 		*/
-		
-		//
-		// Populate session_id
-		//
-		$this->session_id = $this->data['session_id'];
-
-		$this->lang_path = $shared_lang_path;
-		$this->lang_name = isset($this->data['user_lang']) ? $this->data['user_lang'] : $board_config['default_lang'];
-		
 		$lang_set = !$lang_set ? (defined('IN_ADMIN') ? 'acp/common' : 'common') : $lang_set;
-		//
-		// Grab MXP global variables, re-cache if necessary
-		// - optional parameter to enable/disable cache for config data. If enabled, remember to refresh the MX-Publisher cache whenever updating MXP config settings
-		// - true: enable cache, false: disable cache
-		if (empty($portal_config['portal_status']))
-		{
-			$portal_config = $this->obtain_mxbb_config(false);
-		}		
-		//
-		// Grab phpBB global variables, re-cache if necessary
-		// - optional parameter to enable/disable cache for config data. If enabled, remember to refresh the MX-Publisher cache whenever updating phpBB config settings
-		// - true: enable cache, false: disable cache
-		if (empty($board_config['script_path']))
-		{
-			$board_config = $mx_cache->obtain_config(false);
-		}
-		$board_config['avatar_gallery_path'] = 'includes/shared/phpbb2/images/avatar/'; 
-		$board_config['user_timezone'] = !empty($board_config['user_timezone']) ? $board_config['user_timezone'] : $board_config['board_timezone'];
-		$this->data['user_dst'] = !empty($this->data['user_dst']) ? $this->data['user_dst'] : $this->data['user_timezone'];
-		$board_config['require_activation'] = 0;
-		$this->date_format = $board_config['default_dateformat'];
-		$this->timezone = $board_config['user_timezone'] * 3600;
-		$this->dst = $this->data['user_timezone'] * 3600;
-		
-		$sign = ($board_config['board_timezone'] < 0) ? '-' : '+';
-		$time_offset = abs($board_config['board_timezone']);
 
-		$offset_seconds	= $time_offset % 3600;
-		$offset_minutes	= $offset_seconds / 60;
-		$offset_hours	= ($time_offset - $offset_seconds) / 3600;		
-		
-		// Zone offset
-		$zone_offset = $this->timezone + $this->dst;
-		
-		$offset_string = sprintf($board_config['default_dateformat'], $sign, $offset_hours, $offset_minutes);
-				
-		$s_date = gmdate("Y-m-d\TH:i:s", time() + $zone_offset) . $offset_string;
-		
-		// Format Timezone. We are unable to use array_pop here, because of PHP3 compatibility
-		$l_timezone = explode('.', $board_config['board_timezone']);
-		$l_timezone = (count($l_timezone) > 1) ? $this->lang(sprintf('%.1f', $board_config['board_timezone'])) : $offset_string;
-
-		$server_name = !empty($board_config['server_name']) ? preg_replace('/^\/?(.*?)\/?$/', "\\1", trim($board_config['server_name'])) : 'localhost';
-		$server_protocol = ($board_config['cookie_secure'] ) ? 'http://' : 'http://';
-		$server_port = (($board_config['server_port']) && ($board_config['server_port'] <> 80)) ? ':' . trim($board_config['server_port']) . '/' : '/';
-		$script_name_phpbb = preg_replace('/^\/?(.*?)\/?$/', "\\1", trim($board_config['script_path'])) . '/';		
-		$server_url = $server_protocol . str_replace("//", "/", $server_name . $server_port . '/'); //On some server the slash is not added and this trick will fix it	
-		$corrected_url = $server_protocol . $server_name . $server_port . $script_name_phpbb;
-		$board_url = PORTAL_URL;
-		$web_path = (defined('PORTAL_URL')) ? $board_url : $corrected_url;
-	
-		@define('PHPBB_URL', $board_url);
-		
-		//
-		// Send a proper content-language to the output
-		//
-		$img_lang = $default_lang = $this->lang['default_lang'] = ($this->data['user_lang']) ? $this->data['user_lang'] : $board_config['default_lang'];
-
-		if ($this->data['user_id'] != ANONYMOUS)
+		if ($this->data['session_logged_in'])
 		{
 			$this->lang_name = (file_exists($phpbb_root_path . 'language/' . $this->encode_lang($this->data['user_lang']) . "/common.$phpEx")) ? $this->encode_lang($this->data['user_lang']) : ((file_exists($phpbb_root_path . 'language/' . $this->encode_lang($this->lang['default_lang']) . "/common.$phpEx")) ? $this->encode_lang($this->lang['default_lang']) : 'en');
 			$this->lang_path = $phpbb_root_path . 'language/' . $this->lang_name . '/';
@@ -1800,21 +1477,6 @@ class session
 			$this->date_format = $this->data['user_dateformat'];
 			$this->timezone = $this->data['user_timezone'] * 3600;
 			$this->dst = $this->data['user_dst'] * 3600;
-			
-			if (!empty($this->data['user_lang']))
-			{
-				$default_lang = mx_ltrim(basename(mx_rtrim($this->data['user_lang'])), "'");
-			}
-
-			if (!empty($this->data['user_dateformat']))
-			{
-				$board_config['default_dateformat'] = $this->data['user_dateformat'];
-			}
-
-			if (isset($userdata['user_timezone']))
-			{
-				$board_config['board_timezone'] = $this->data['user_timezone'];
-			}
 		}
 		else
 		{
@@ -1823,9 +1485,6 @@ class session
 			$this->date_format = $board_config['default_dateformat'];
 			$this->timezone = $board_config['board_timezone'] * 3600;
 			$this->dst = $board_config['board_dst'] * 3600;
-			
-			$default_lang = mx_ltrim(basename(mx_rtrim($board_config['default_lang'])), "'");
-	
 			
 			/**
 			* If a guest user is surfing, we try to guess his/her language first by obtaining the browser language
@@ -1845,7 +1504,7 @@ class session
 
 				while ($row = $db->sql_fetchrow($result))
 				{
-					if (@is_file($phpbb_root_path . 'language/' . $row['lang_iso'] . "/common.$phpEx"))
+					if (file_exists($phpbb_root_path . 'language/' . $row['lang_iso'] . "/common.$phpEx"))
 					{
 						$lang_iso_xx_yy[] = $row['lang_iso'];
 						if (strlen($row['lang_iso']) > 4)
@@ -1890,139 +1549,22 @@ class session
 				}
 				$this->data['user_lang'] = $this->lang_name;
 			}
-			/*	
-			*/	
+			/*			
+			*/			
 		}
-		
-		// Shared phpBB2 lang files dir
-		// Load vanilla phpBB2 lang files if is possible
-		$shared_phpbb2_path 	= $mx_root_path . 'includes/shared/phpbb2/';
-		$shared_phpbb3_path 	= $mx_root_path . 'includes/shared/phpbb3/';
-		$shared_lang_path 		= $mx_root_path . 'includes/shared/phpbb2/';
-		$lang_path 				= $mx_root_path . 'includes/shared/phpbb2/';
-		/** /
-		if (!file_exists($phpBB2->phpbb_realpath($shared_phpbb2_path . 'language/lang_' . $default_lang . '/lang_main.'.$phpEx)) && !file_exists(@phpbb_realpath($shared_lang_path . 'language/lang_' . $default_lang . '/lang_main.'.$phpEx)))
-		{
-			if ($userdata['user_id'] !== ANONYMOUS)
-			{
-				// For logged in users, try the board default language next
-				// Just in case we do fallback on $board_config['phpbb_lang']  
-				// Since $board_config['default_lang'] has been overwiten in function $mx_user->_init_userprefs()				
-				$default_lang = mx_ltrim(basename(mx_rtrim($board_config['phpbb_lang'])), "'");			
-			}
-			else
-			{
-				// For guests it means the default language is not present, try english
-				// This is a long shot since it means serious errors in the setup to reach here,
-				// but english is part of a new install so it's worth us trying
-				$default_lang = 'english';
-			}
-			
-			if (!file_exists(@phpbb_realpath($shared_phpbb2_path . 'language/lang_' . $default_lang . '/lang_main.'.$phpEx)))
-			{
-				mx_message_die(CRITICAL_ERROR, 'Could not locate valid phpBB2 language pack in $mx_user->setup() for: ' . $default_lang);
-			}
-		}
-		/**/
-		// If we've had to change the value in any way then let's write it back to the database
-		// before we go any further since it means there is something wrong with it
-		if ($this->data['user_id'] != ANONYMOUS && $this->data['user_lang'] !== $default_lang)
-		{
-			/* * /
-			$sql = 'UPDATE ' . USERS_TABLE . "
-				SET user_lang = '" . $this->decode_lang($this->lang['default_lang']) . "'
-				WHERE user_lang = '" . $this->decode_lang($this->data['user_lang']) . "'";
-			if (!($result = $db->sql_query($sql)))
-			{
-				mx_message_die(CRITICAL_ERROR, 'Could not update user language info in setup');
-			}
-			/* */
-			$this->data['user_lang'] = $default_lang;
-		}
-		elseif ($this->data['user_id'] == ANONYMOUS && $board_config['default_lang'] !== $default_lang)
-		{
-			$sql = "UPDATE " . PORTAL_TABLE . " SET
-				default_lang = '" . $this->decode_lang($this->lang['default_lang']) . "'
-				WHERE portal_id = '1'";				
-
-			if (!($result = $db->sql_query($sql)))
-			{
-				mx_message_die(CRITICAL_ERROR, 'Could not update user language info');
-			}
-		}
-		
-		// 
-		//
-		// We setup common language file here to not load it every time a custom language file is included
-		//
-		//$lang = &$this->lang;
-		$this->lang = &$lang;
-		//print_r($this->lang);
-		$user_lang = $this->user_lang = !empty($this->lang['USER_LANG']) ? $this->lang['USER_LANG'] : $this->encode_lang($this->lang_name);
-		
-		$this->user_language		= $this->encode_lang($this->lang_name);
-		$this->default_language		= $this->encode_lang($board_config['default_lang']);
-		
-		$this->user_language_name		= $this->decode_lang($this->lang_name);
-		$this->default_language_name	= $this->decode_lang($board_config['default_lang']);
-		
-		$counter = 0; //First language pack lang_id		
-		$lang_ids = array();
-		$lang_list = $this->get_lang_list();
-		
-		if (is_array($lang_list))
-		{		
-			foreach ($lang_list as $lang_english_name => $lang_local_name)
-			{
-				$lang_ids[$lang_english_name] = $counter;
-				$counter++;	
-			}	
-		}	
-		
-		$lang_entries = array(
-			'lang_id' => !empty($lang_ids['lang_' . $this->user_language_name]) ? $lang_ids['lang_' . $this->user_language_name] : $counter,
-			'lang_iso' => !empty($lang['USER_LANG']) ? $lang['USER_LANG'] : $this->encode_lang($this->lang_name),
-			'lang_dir' => 'lang_' . $this->lang_name,
-			'lang_english_name' => $this->user_language_name,
-			'lang_local_name' => $this->ucstrreplace('lang_', '', $this->lang_name),
-			'lang_author' => !empty($lang['TRANSLATION_INFO']) ? $lang['TRANSLATION_INFO'] : 'Language pack author not set in ACP.'
-		);
-		
-		//this line is issued on backend		
-		// Core Main Translation after shared phpBB keys so we can overwrite some settings
-		include($mx_root_path . 'language/lang_' . str_replace('lang_', '', $lang_english_name) . '/lang_main.' . $phpEx);
-		
-		$board_config['default_lang'] = $default_lang;
-		$portal_config['default_lang'] = $default_lang;
-		
-		//
-		// Finishing setting language variables to ouput
-		//
-		$this->lang_iso = $lang_iso = $lang_entries['lang_iso'];
-		$this->lang_dir = $lang_dir = $lang_entries['lang_dir'];
-		$this->lang_english_name = $lang_english_name = $lang_entries['lang_english_name'];
-		$this->lang_local_name = $lang_local_name = $lang_entries['lang_local_name'];
-		
-		$this->lang_name = $this->lang['default_lang'] = $default_lang;
-		$this->lang_path = $shared_phpbb2_path . 'language/lang_' . $board_config['default_lang'] . '/';
 		
 		/* We include common language file here to not load it every time a custom language file is included
 		$lang = &$this->lang;
 		*/
 		$include_result = (defined('DEBUG_EXTRA')) ?  "" : "@"; // Do not suppress error if in DEBUG_EXTRA mode
-		//this line is issued on backend		
-		/**/
-		if (("$include_result".include $shared_phpbb3_path . "language/lang_" . $lang_english_name . "/common.$phpEx") === false)
+		if (("$include_result".include $this->lang_path . "common.$phpEx") === false)
 		{
-			//$this->set_lang($this->lang, $this->help, 'common');
-			
 			//this will fix the path for anonymouse users
-			if ((@include $phpbb_root_path . $this->lang_path . '/common.'.$phpEx) === false)
+			if ((@include $phpbb_root_path . $this->lang_path . "common.$phpEx") === false)
 			{
-				die('Language file (_init_userprefs) ' . $phpbb_root_path . $this->lang_path . '/common.'.$phpEx . ' couldn\'t be opened by _init_userprefs().');
-			}			
+				die('Language file ' . $this->lang_path . "common.$phpEx" . ' couldn\'t be opened.');
+			}
 		}
-		/**/
 
 		//
 		// We include common language file here to not load it every time a custom language file is included
@@ -2039,12 +1581,12 @@ class session
 	function setup_style()
 	{
 		global $db, $template, $board_config, $userdata, $phpbb_auth, $phpEx, $phpbb_root_path, $mx_root_path, $mx_cache;
-		global $mx_request_vars, $portal_config, $board_config, $mx_backend, $phpBB2, $phpBB3; //added for mxp
+		global $mx_request_vars, $portal_config, $board_config, $mx_backend; //added for mxp
 
 		if (!empty($_GET['style']) && $phpbb_auth->acl_get('a_styles'))
 		{
 			global $SID, $_EXTRA_URL;
-			$style = $phpBB3->request_var('style', 0);
+			$style = phpBB3::request_var('style', 0);
 			// BEGIN Styles_Demo MOD for phpBB Block
 			$style_value = '';			
 			$SID .= '&amp;style=' . $style;
@@ -2106,7 +1648,7 @@ class session
 		
 		if (isset($_GET['demostyle']))
 		{
-			$style_value = $phpBB3->request_var('demostyle', '');
+			$style_value = phpBB3::request_var('demostyle', '');
 			if (intval($style_value) == 0)
 			{
 				//Query phpBB style_id corepondent to mxp style_name
@@ -2164,7 +1706,7 @@ class session
 		$phpbb_style_value = $style_value;
 		
 		// END Styles_Demo MOD 
-		if (isset($style_value) && (intval($style_value) == 0))  
+		if (isset($style_value))  
 		{
 			//Query phpBB style_name
 			$sql = "SELECT s.style_id, s.style_name, t.template_storedb, t.template_path, t.template_id, t.bbcode_bitfield, c.theme_path, c.theme_name, c.theme_storedb, c.theme_id, i.imageset_path, i.imageset_id, i.imageset_name
@@ -2172,7 +1714,7 @@ class session
 				WHERE s.style_active = 1 AND s.style_name = '$style_value'
 					AND t.template_id = s.template_id
 					AND c.theme_id = s.theme_id
-					AND i.imageset_id = s.imageset_id";
+					AND i.imageset_id = s.imageset_id";					
 			if(($result = $db->sql_query($sql)) && ($row = $db->sql_fetchrow($result)))
 			{
 				$style = $row['style_id'];
@@ -2182,7 +1724,7 @@ class session
 			{
 				mx_message_die(CRITICAL_ERROR, "Could not query database for phpbb_styles info style_name [$style]", "", __LINE__, __FILE__, $sql);
 			}
-		}
+		}		
 		elseif (intval($style) !== 0)
 		{
 			//Query phpBB style_id get from main style init. Should be correct and valid.
@@ -2341,7 +1883,7 @@ class session
 			
 			if (@file_exists("{$phpbb_root_path}styles/{$this->theme['imageset_path']}/imageset/{$this->img_lang}/imageset.cfg"))
 			{
-				$cfg_data_imageset_data = mx_parse_cfg_file("{$phpbb_root_path}styles/{$this->theme['imageset_path']}/imageset/{$this->img_lang}/imageset.cfg");
+				$cfg_data_imageset_data = phpBB3::parse_cfg_file("{$phpbb_root_path}styles/{$this->theme['imageset_path']}/imageset/{$this->img_lang}/imageset.cfg");
 				foreach ($cfg_data_imageset_data as $image_name => $value)
 				{
 					if (strpos($value, '*') !== false)
@@ -2362,7 +1904,7 @@ class session
 						$image_height = $image_width = 0;
 					}
 					
-					if (strpos($image_name, '') === 0 && $image_filename)
+					if (strpos($image_name, 'img_') === 0 && $image_filename)
 					{
 						$image_name = substr($image_name, 4);
 						$sql_ary[] = array(
@@ -2534,14 +2076,22 @@ class session
 			$this->set_lang($this->lang, $this->help, $lang_set, $use_db, $use_help);
 		}
 	}
-
+	
 	/**
 	* Set language entry (called by add_lang)
 	* @access private
 	*/
 	function set_lang(&$lang, &$help, $lang_file, $use_db = false, $use_help = false)
 	{
-		global $mx_root_path, $phpbb_root_path, $phpEx;
+		global $phpbb_root_path, $phpEx;
+
+		// Make sure the language path is set (if the user setup did not happen it is not set)
+		if (!$this->lang_path)
+		{
+			global $board_config;
+
+			$this->lang_path = $phpbb_root_path . 'language/' . basename($board_config['phpbb_lang']) . '/';
+		}
 
 		// $lang == $this->lang
 		// $help == $this->help
@@ -2557,55 +2107,13 @@ class session
 				$language_filename = $this->lang_path . (($use_help) ? 'help_' : '') . $lang_file . '.' . $phpEx;
 			}
 
-			//fix for mxp phpbb2 backend
+			//fix for mxp
 			if ((@include $language_filename) === false)
 			{
-				global $module_root_path;				
-				
-				//
-				//this will fix the path for shared language files
-				//				
-				$language_phpbb2_filename = substr_count($language_filename, 'phpbb3') ? str_replace("phpbb3", "phpbb2", $language_filename) : str_replace("phpbb3", "phpbb2", $language_filename);
-				$language_phpbb3_filename = substr_count($language_filename, 'phpbb2') ? str_replace("phpbb2", "phpbb3", $language_filename) : str_replace("phpb2", "phpbb3", $language_filename);				
-											
-				//
 				//this will fix the path for anonymouse users
-				//				
-				$shared_phpbb2_path = substr_count($phpbb_root_path, 'phpbb3') ? str_replace("phpbb3", "phpbb2", $phpbb_root_path) : str_replace("phpbb3", "phpbb2", $phpbb_root_path);
-				$shared_phpbb3_path = substr_count($phpbb_root_path, 'phpbb2') ? str_replace("phpbb2", "phpbb3", $phpbb_root_path) : str_replace("phpb2", "phpbb3", $phpbb_root_path);				
-							
-				if ((@include $language_phpbb3_filename) !== false)
+				if ((@include $phpbb_root_path . $language_filename) === false)
 				{
-					//continue;
-				}
-				elseif ((@include $language_phpbb2_filename) !== false)
-				{
-					//continue;
-				}				
-				elseif ((@include $phpbb_root_path . $language_filename) !== false)
-				{
-					//continue;
-				}
-				elseif ((@include $mx_root_path . $language_filename) !== false)
-				{
-					//continue;
-				}	
-				elseif ((@include $module_root_path  . $language_filename) !== false)
-				{
-					//continue;
-				}					
-				elseif ((@include str_replace("phpbb3", "phpbb2", $language_filename)) !== false)
-				{
-					//continue;
-				}
-				elseif ((@include str_replace("phpbb2", "phpbb3", $language_filename)) === false)
-				{
-					$language_filename = $mx_root_path . '/language/' .$this->lang_english_name . (($use_help) ? 'help_' : '') . $lang_file . '.' . $phpEx;
-					
-					if ((@include str_replace("phpbb3", "phpbb2", $language_filename)) !== false)
-					{
-						die('Language file (set_lang) ' . str_replace("phpbb2", "phpbb3", $language_filename) . ' couldn\'t be opened by set_lang().');
-					}
+					die('Language file ' . $language_filename . ' couldn\'t be opened.');
 				}
 			}
 		}
@@ -2619,133 +2127,6 @@ class session
 
 		// We include common language file here to not load it every time a custom language file is included
 		$this->lang = &$lang;
-	}
-	
-	/**
-	* Add Language Items from an extension - use_db and use_help are assigned where needed (only use them to force inclusion)
-	*
-	* @param string $ext_name The extension to load language from, or empty for core files
-	* @param mixed $lang_set specifies the language entries to include
-	* @param bool $use_db internal variable for recursion, do not use
-	* @param bool $use_help internal variable for recursion, do not use
-	*
-	* Note: $use_db and $use_help should be removed. Kept for BC purposes.
-	*
-	* @deprecated: 3.2.0-dev (To be removed: 4.0.0)
-	*/
-	function add_lang_ext($ext_name, $lang_set, $use_db = false, $use_help = false)
-	{
-		if ($ext_name === '/')
-		{
-			$ext_name = '';
-		}
-
-		$this->add_lang($lang_set, $use_db, $use_help, $ext_name);
-	}
-
-	
-	/**
-	* More advanced language substitution
-	* Function to mimic sprintf() with the possibility of using phpBB's language system to substitute nullar/singular/plural forms.
-	* Params are the language key and the parameters to be substituted.
-	* This function/functionality is inspired by SHS` and Ashe.
-	*
-	* Example call: <samp>$user->lang('NUM_POSTS_IN_QUEUE', 1);</samp>
-	*/
-	/**
-	 * Advanced language substitution
-	 *
-	 * Function to mimic sprintf() with the possibility of using phpBB's language system to substitute nullar/singular/plural forms.
-	 * Params are the language key and the parameters to be substituted.
-	 * This function/functionality is inspired by SHS` and Ashe.
-	 *
-	 * Example call: <samp>$mx_user->lang('NUM_POSTS_IN_QUEUE', 1);</samp>
-	 *
-	 * If the first parameter is an array, the elements are used as keys and subkeys to get the language entry:
-	 * Example: <samp>$mx_user->lang(array('datetime', 'AGO'), 1)</samp> uses $user->lang['datetime']['AGO'] as language entry.
-	 *
-	 * @return string	Return localized string or the language key if the translation is not available
-	 */
-	public function lang()
-	{
-		$args = func_get_args();
-		$key = $args[0];
-		//$key = array_shift($args);
-		if (is_array($key))
-		{
-			$lang = &$this->lang[array_shift($key)];
-
-			foreach ($key as $_key)
-			{
-				$lang = &$lang[$_key];
-			}
-		}
-		else
-		{
-			$lang = &$this->lang[$key];
-		}
-		
-		// Return if language string does not exist
-		if (!isset($lang) || (!is_string($lang) && !is_array($lang)))
-		{
-			global $lang;
-		}
-		
-		// Return if language string does not exist
-		if (!isset($lang) || (!is_string($lang) && !is_array($lang)))
-		{
-			return $key;
-		}		
-				
-		// If the language entry is a string, we simply mimic sprintf() behaviour
-		if (is_string($lang))
-		{
-			if (sizeof($args) == 1)
-			{
-				return $lang;
-			}
-
-			// Replace key with language entry and simply pass along...
-			$args[0] = $lang;
-			return call_user_func_array('sprintf', $args);
-		}
-
-		// It is an array... now handle different nullar/singular/plural forms
-		$key_found = false;
-
-		// We now get the first number passed and will select the key based upon this number
-		for ($i = 1, $num_args = sizeof($args); $i < $num_args; $i++)
-		{
-			if (is_int($args[$i]))
-			{
-				$numbers = array_keys($lang);
-
-				foreach ($numbers as $num)
-				{
-					if ($num > $args[$i])
-					{
-						break;
-					}
-
-					$key_found = $num;
-				}
-				break;
-			}
-		}
-
-		// Ok, let's check if the key was found, else use the last entry (because it is mostly the plural form)
-		if ($key_found === false)
-		{
-			$numbers = array_keys($lang);
-			$key_found = end($numbers);
-		}
-		
-
-		
-		// Use the language string we determined and pass it to sprintf()
-		$args[0] = $lang[$key_found];
-		return call_user_func_array('sprintf', $args);
-		//return $this->lang_array($key, $args);
 	}
 	
 	/**
@@ -2780,7 +2161,7 @@ class session
 			// Short representation of month in format? Some languages use different terms for the long and short format of May
 			if ((strpos($format, '\M') === false && strpos($format, 'M') !== false) || (strpos($format, '\r') === false && strpos($format, 'r') !== false))
 			{
-				$date_cache[$format]['lang']['May'] = $this->lang('datetime', 'May_short');
+				$date_cache[$format]['lang']['May'] = $this->lang['datetime']['May_short'];
 			}
 		}
 
@@ -2824,52 +2205,6 @@ class session
 		}
 
 		return strtr(@gmdate($date_cache[$format]['format_long'], $gmepoch + $zone_offset), $date_cache[$format]['lang']);
-	}
-	
-
-	/**
-	* Create a \phpbb\datetime object in the context of the current user
-	*
-	* @since 3.1
-	* @param string $time String in a format accepted by strtotime().
-	* @param DateTimeZone $timezone Time zone of the time.
-	* @return \phpbb\datetime Date time object linked to the current users locale
-	*/
-	public function create_datetime($time = 'now', \DateTimeZone $timezone = null)
-	{
-		$timezone = $timezone ?: $this->timezone;
-		/**
-		$timezones = array('Europe/London', 'Mars/Olympus', 'Mars/Ascraeus', timezone_name_from_abbr('', $timezone, 0));
-				
-		foreach ($timezones as $tz) 
-		{
-		    try 
-			{
-		        $mars = new DateTimeZone($tz);
-		    } 
-			
-			catch(Exception $e) 
-			{
-		        echo $e->getMessage() . '<br />';
-		    }
-		}
-		*/		
-		return new DateTime($time, new DateTimeZone(timezone_name_from_abbr('', $timezone, 0)));
-	}
-
-	/**
-	* Get the UNIX timestamp for a datetime in the users timezone, so we can store it in the database.
-	*
-	* @param	string			$format		Format of the entered date/time
-	* @param	string			$time		Date/time with the timezone applied
-	* @param	DateTimeZone	$timezone	Timezone of the date/time, falls back to timezone of current user
-	* @return	int			Returns the unix timestamp
-	*/
-	public function get_timestamp_from_format($format, $time, \DateTimeZone $timezone = null)
-	{
-		$timezone = $timezone ?: $this->timezone;
-		$date = \DateTime::createFromFormat($format, $time, $timezone);
-		return ($date !== false) ? $date->format('U') : false;
 	}
 	
 	/**
@@ -2932,7 +2267,7 @@ class session
 	{
 		if (!is_numeric($user) || $force_str)
 		{
-			$user = $phpBB2->phpbb_clean_username($user);
+			$user = phpBB2::phpbb_clean_username($user);
 		}
 		else
 		{
@@ -3124,743 +2459,6 @@ class session
 		}
 	}		
 
-/**
-	* Generates default bitfield
-	*
-	* This bitfield decides which bbcodes are defined in a template.
-	*
-	* @return string Bitfield
-	*/
-	public function default_bitfield()
-	{
-		static $value;
-		if (isset($value))
-		{
-			return $value;
-		}
-
-		// Hardcoded template bitfield to add for new templates
-		$default_bitfield = '1111111111111';
-
-		$bitfield = new bitfield();
-		for ($i = 0; $i < strlen($default_bitfield); $i++)
-		{
-			if ($default_bitfield[$i] == '1')
-			{
-				$bitfield->set($i);
-			}
-		}
-
-		return $bitfield->get_base64();
-	}
-	
-	/**
-	* Read style configuration file
-	*
-	* @param string $dir style directory
-	* @return array|bool Style data, false on error
-	*/
-	protected function read_style_cfg($dir)
-	{
-		static $required = array('name', 'phpbb_version', 'copyright');
-		$cfg = parse_cfg_file($this->styles_path . $dir . '/style.cfg');
-
-		// Check if it is a valid file
-		foreach ($required as $key)
-		{
-			if (!isset($cfg[$key]))
-			{
-				return false;
-			}
-		}
-
-		// Check data
-		if (!isset($cfg['parent']) || !is_string($cfg['parent']) || $cfg['parent'] == $cfg['name'])
-		{
-			$cfg['parent'] = '';
-		}
-		if (!isset($cfg['template_bitfield']))
-		{
-			$cfg['template_bitfield'] = $this->default_bitfield();
-		}
-
-		return $cfg;
-	}
-	
-	/**
-	* Specify/Get phpBB3 images array from phpBB2 images  variable
-	*/
-	function image_rows($images)
-	{	
-			/* Here we overwrite phpBB images from the template db or configuration file  */		
-			$rows = array( 
-			array(	'image_id' => 1, 
-					'image_name' => $this->img_name_ext('site_logo.gif', false, false, $type = 'name'), 
-					'image_filename' => $this->img_name_ext('site_logo.gif', false, false, $type = 'filename'), 
-					'image_lang' => '',
-					'image_height' => 52, 
-					'image_width' => 139, 
-					'imageset_id' => 1 
-				), 
-			array(	'image_id' => 2, 
-					'image_name' => 'forum_link', 
-					'image_filename' => 'forum_link.gif', 
-					'image_lang' => '', 
-					'image_height' => 27, 
-					'image_width' => 27, 
-					'imageset_id' => 1 
-				), 
-			array( 'image_id' => 3, 
-					'image_name' => $this->img_name_ext($images['forum'], false, false, $type = 'name'), 
-					'image_filename' => $this->img_name_ext($images['forum'], false, false, $type = 'filename'), 
-					'image_lang' => '', 
-					'image_height' => 27, 
-					'image_width' => 27, 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 4, 
-					'image_name' => $this->img_name_ext($images['forum_locked'], false, false, $type = 'name'), 
-					'image_filename' => $this->img_name_ext($images['forum_locked'], false, false, $type = 'filename'), 
-					'image_lang' => '',
-					'image_height' => 27, 
-					'image_width' => 27, 
-					'imageset_id' => 1 
-					),
-			array( 'image_id' => 5, 
-					'image_name' => $this->img_name_ext($images['forums'], false, false, $type = 'name'), 
-					'image_filename' => $this->img_name_ext($images['forums'], false, false, $type = 'filename'), 
-					'image_lang' => '',
-					'image_height' => 27, 
-					'image_width' => 27, 
-					'imageset_id' => 1 
-					), 
-			array( 
-					'image_id' => 6, 
-					'image_name' => $this->img_name_ext($images['forum_new'], false, false, $type = 'name'), 
-					'image_filename' => $this->img_name_ext($images['forum_new'], false, false, $type = 'filename'), 
-					'image_lang' => '',
-					'image_height' => 27, 
-					'image_width' => 27, 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 7, 
-					'image_name' => 'forum_unread_locked', 
-					'image_filename' => 'forum_unread_locked.gif', 
-					'image_lang' => '', 'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 8, 
-					'image_name' => $this->img_name_ext($images['forums_new'], false, false, $type = 'name'), 
-					'image_filename' => $this->img_name_ext($images['forums_new'], false, false, $type = 'filename'), 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 9, 
-					'image_name' => 'topic_moved', 
-					'image_filename' => 'topic_moved.gif', 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 10, 
-					'image_name' => $this->img_name_ext($images['folder'], false, false, $type = 'name'), 
-					'image_filename' => $this->img_name_ext($images['folder'], false, false, $type = 'filename'), 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 11, 
-					'image_name' => $this->img_name_ext($images['folder_sticky'], false, false, $type = 'name'), 
-					'image_filename' => $this->img_name_ext($images['folder_sticky'], false, false, $type = 'filename'), 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 12, 
-					'image_name' => $this->img_name_ext($images['folder_hot'], false, false, $type = 'name'), 
-					'image_filename' => $this->img_name_ext($images['folder_hot'], false, false, $type = 'filename'), 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 13, 
-					'image_name' => 'topic_read_hot_mine', 
-					'image_filename' => 'topic_read_hot_mine.gif', 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 14, 
-					'image_name' => $this->img_name_ext($images['folder_locked'], false, false, $type = 'name'), 
-					'image_filename' => $this->img_name_ext($images['folder_locked'], false, false, $type = 'filename'), 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 15, 
-					'image_name' => 'topic_read_locked_mine', 
-					'image_filename' => 'topic_read_locked_mine.gif', 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 16, 
-					'image_name' => $this->img_name_ext($images['folder_new'], false, false, $type = 'name'), 
-					'image_filename' => $this->img_name_ext($images['folder_new'], false, false, $type = 'filename'), 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 17, 
-					'image_name' => $this->img_name_ext($images['folder_sticky_new'], false, false, $type = 'name'), 
-					'image_filename' => $this->img_name_ext($images['folder_sticky_new'], false, false, $type = 'filename'), 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 18, 
-					'image_name' => $this->img_name_ext($images['folder_hot_new'], false, false, $type = 'name'), 
-					'image_filename' => $this->img_name_ext($images['folder_hot_new'], false, false, $type = 'filename'), 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 19, 
-					'image_name' => 'topic_unread_hot_mine', 
-					'image_filename' => 'topic_unread_hot_mine.gif', 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					),
-			array( 'image_id' => 20, 
-					'image_name' => $this->img_name_ext($images['folder_locked_new'], false, false, $type = 'name'), 
-					'image_filename' => $this->img_name_ext($images['folder_locked_new'], false, false, $type = 'filename'), 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 21, 
-					'image_name' => 'topic_unread_locked_mine', 
-					'image_filename' => 'topic_unread_locked_mine.gif', 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 22, 
-					'image_name' => 'sticky_read', 
-					'image_filename' => 'sticky_read.gif', 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 23, 
-					'image_name' => 'sticky_read_mine', 
-					'image_filename' => 'sticky_read_mine.gif', 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 24, 
-					'image_name' => 'sticky_read_locked', 
-					'image_filename' => 'sticky_read_locked.gif', 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 25, 
-					'image_name' => 'sticky_read_locked_mine', 
-					'image_filename' => 'sticky_read_locked_mine.gif', 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 26, 
-					'image_name' => 'sticky_unread', 
-					'image_filename' => 'sticky_unread.gif', 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 27, 
-					'image_name' => 'sticky_unread_mine', 
-					'image_filename' => 'sticky_unread_mine.gif', 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 28, 
-					'image_name' => 'sticky_unread_locked', 
-					'image_filename' => 'sticky_unread_locked.gif', 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 29, 
-					'image_name' => 'sticky_unread_locked_mine', 
-					'image_filename' => 'sticky_unread_locked_mine.gif', 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 30, 
-					'image_name' => $this->img_name_ext($images['folder_announce'], false, false, $type = 'name'), 
-					'image_filename' => $this->img_name_ext($images['folder_announce'], false, false, $type = 'filename'), 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 31, 
-					'image_name' => 'announce_read_mine', 
-					'image_filename' => 'announce_read_mine.gif', 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 32, 
-					'image_name' => 'announce_read_locked', 
-					'image_filename' => 'announce_read_locked.gif', 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 33, 
-					'image_name' => 'announce_read_locked_mine', 
-					'image_filename' => 'announce_read_locked_mine.gif', 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 34, 
-					'image_name' => $this->img_name_ext($images['folder_announce_new'], false, false, $type = 'name'), 
-					'image_filename' => $this->img_name_ext($images['folder_announce_new'], false, false, $type = 'filename'), 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 35, 
-					'image_name' => 'announce_unread_mine', 
-					'image_filename' => 'announce_unread_mine.gif', 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 36, 
-					'image_name' => 'announce_unread_locked', 
-					'image_filename' => 'announce_unread_locked.gif', 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 37, 
-					'image_name' => 'announce_unread_locked_mine', 
-					'image_filename' => 'announce_unread_locked_mine.gif', 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 38, 
-					'image_name' => 'global_read', 
-					'image_filename' => $this->img_name_ext($images['folder_announce'], false, false, $type = 'filename'), 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 39, 
-					'image_name' => 'global_read_mine', 
-					'image_filename' => 'announce_read_mine.gif', 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 40, 
-					'image_name' => 'global_read_locked', 
-					'image_filename' => 'announce_read_locked.gif', 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 41, 
-					'image_name' => 'global_read_locked_mine', 
-					'image_filename' => 'announce_read_locked_mine.gif', 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1
-					), 
-			array( 'image_id' => 42, 
-					'image_name' => 'global_unread', 
-					'image_filename' => $this->img_name_ext($images['folder_announce_new'], false, false, $type = 'filename'), 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 43, 
-					'image_name' => 'global_unread_mine', 
-					'image_filename' => 'announce_unread_mine.gif', 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 44, 
-					'image_name' => 'global_unread_locked', 
-					'image_filename' => 'announce_unread_locked.gif', 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 45, 
-					'image_name' => 'global_unread_locked_mine', 
-					'image_filename' => 'announce_unread_locked_mine.gif', 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 46, 
-					'image_name' => 'pm_read', 
-					'image_filename' => $this->img_name_ext($images['folder'], false, false, $type = 'filename'), 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 47, 
-					'image_name' => 'pm_unread', 
-					'image_filename' => $this->img_name_ext($images['folder_new'], false, false, $type = 'filename'), 
-					'image_lang' => '',  
-					'image_height' => 27, 
-					'image_width' => 27 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 48, 
-					'image_name' => 'icon_back_top', 
-					'image_filename' => 'icon_back_top.gif', 
-					'image_lang' => '',  
-					'image_height' => 11, 
-					'image_width' => 11 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 49, 
-					'image_name' => $this->img_name_ext($images['icon_aim'], false, false, $type = 'name'), 
-					'image_filename' => $this->img_name_ext($images['icon_aim'], false, false, $type = 'filename'), 
-					'image_lang' => '{LANG}',  
-					'image_height' => 20, 
-					'image_width' => 20, 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 50, 
-					'image_name' => $this->img_name_ext($images['icon_email'], false, false, $type = 'name'), 
-					'image_filename' => $this->img_name_ext($images['icon_email'], false, false, $type = 'filename'), 
-					'image_lang' => '{LANG}',  
-					'image_height' => 20, 
-					'image_width' => 20, 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 51, 
-					'image_name' => $this->img_name_ext($images['icon_icq'], false, false, $type = 'name'), 
-					'image_filename' => $this->img_name_ext($images['icon_icq'], false, false, $type = 'filename'), 
-					'image_lang' => '',  
-					'image_height' => 20, 
-					'image_width' => 20, 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 52, 
-					'image_name' => 'icon_contact_jabber', 
-					'image_filename' => 'icon_contact_jabber.gif', 
-					'image_lang' => '',  
-					'image_height' => 20, 
-					'image_width' => 20, 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 53, 
-					'image_name' => $this->img_name_ext($images['icon_msnm'], false, false, $type = 'name'),  
-					'image_filename' => $this->img_name_ext($images['icon_msnm'], false, false, $type = 'filename'), 
-					'image_lang' => '',  
-					'image_height' => 20, 
-					'image_width' => 20, 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 54, 
-					'image_name' => $this->img_name_ext($images['icon_www'], false, false, $type = 'name'), 
-					'image_filename' => $this->img_name_ext($images['icon_www'], false, false, $type = 'filename'), 
-					'image_lang' => '',  
-					'image_height' => 20, 
-					'image_width' => 20, 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 55, 
-					'image_name' => $this->img_name_ext($images['icon_yim'], false, false, $type = 'name'), 
-					'image_filename' => $this->img_name_ext($images['icon_yim'], false, false, $type = 'filename'), 
-					'image_lang' => '',  
-					'image_height' => 20, 
-					'image_width' => 20, 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 56, 
-					'image_name' => $this->img_name_ext($images['icon_delpost'], false, false, $type = 'name'), 
-					'image_filename' => $this->img_name_ext($images['icon_delpost'], false, false, $type = 'filename'), 
-					'image_lang' => '',  
-					'image_height' => 20, 
-					'image_width' => 20, 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 57, 
-					'image_name' => 'icon_post_info', 
-					'image_filename' => 'icon_post_info.gif', 
-					'image_lang' => '',  
-					'image_height' => 20, 
-					'image_width' => 20, 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 58, 
-					'image_name' => 'icon_post_report', 
-					'image_filename' => 'icon_post_report.gif', 
-					'image_lang' => '',  
-					'image_height' => 20, 
-					'image_width' => 20, 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 59, 
-					'image_name' => $this->img_name_ext($images['icon_minipost'], false, false, $type = 'name'), 
-					'image_filename' => $this->img_name_ext($images['icon_minipost'], false, false, $type = 'filename'), 
-					'image_lang' => '',  
-					'image_height' => 9, 
-					'image_width' => 11 , 
-					'imageset_id' => 1 
-					), 
-			array( 'image_id' => 60, 
-					 'image_name' => $this->img_name_ext($images['icon_minipost_new'], false, false, $type = 'name'), 
-					 'image_filename' => $this->img_name_ext($images['icon_minipost_new'], false, false, $type = 'filename'), 
-					 'image_lang' => '',  
-					 'image_height' => 9, 
-					 'image_width' => 11 , 
-					 'imageset_id' => 1 
-					 ), 
-			array( 'image_id' => 61, 
-					 'image_name' => 'icon_topic_attach', 
-					 'image_filename' => 'icon_topic_attach.gif', 
-					 'image_lang' => '',  
-					 'image_height' => 10, 
-					 'image_width' => 7 , 
-					 'imageset_id' => 1 
-					 ), 
-			array( 'image_id' => 62, 
-					 'image_name' => 'icon_topic_latest', 
-					 'image_filename' => 'icon_topic_latest.gif', 
-					 'image_lang' => '',  
-					 'image_height' => 9, 
-					 'image_width' => 11 , 
-					 'imageset_id' => 1 
-					 ), 
-			array( 'image_id' => 63, 
-					 'image_name' => 'icon_topic_newest', 
-					 'image_filename' => 'icon_topic_newest.gif', 
-					 'image_lang' => '',  
-					 'image_height' => 9, 
-					 'image_width' => 11 , 
-					 'imageset_id' => 1 
-					 ), 
-			array( 'image_id' => 64, 
-					 'image_name' => 'icon_topic_reported', 
-					 'image_filename' => 'icon_topic_reported.gif', 
-					 'image_lang' => '',  
-					 'image_height' => 14, 
-					 'image_width' => 16 , 
-					 'imageset_id' => 1 
-					 ), 
-			array( 'image_id' => 65, 
-					 'image_name' => 'icon_topic_unapproved', 
-					 'image_filename' => 'icon_topic_unapproved.gif', 
-					 'image_lang' => '',  
-					 'image_height' => 14, 
-					 'image_width' => 16 , 
-					 'imageset_id' => 1
-					 ), 
-			array( 'image_id' => 66, 
-					 'image_name' => 'icon_user_warn', 
-					 'image_filename' => 'icon_user_warn.gif', 
-					 'image_lang' => '',  
-					 'image_height' => 20, 
-					 'image_width' => 20, 
-					 'imageset_id' => 1
-					 ), 
-			array( 'image_id' => 67, 
-					 'image_name' => 'subforum_read', 
-					 'image_filename' => 'subforum_read.gif', 
-					 'image_lang' => '',  
-					 'image_height' => 9, 
-					 'image_width' => 11 , 
-					 'imageset_id' => 1
-					 ), 
-			array( 'image_id' => 68, 
-					 'image_name' => 'subforum_unread', 
-					 'image_filename' => 'subforum_unread.gif', 
-					 'image_lang' => '',  
-					 'image_height' => 9, 
-					 'image_width' => 11 , 
-					 'imageset_id' => 1 
-					 ), 
-			array( 'image_id' => 69, 
-					 'image_name' => $this->img_name_ext($images['icon_pm'], false, false, $type = 'name'), 
-					 'image_filename' => $this->img_name_ext($images['icon_pm'], false, false, $type = 'filename'), 
-					 'image_lang' => '{LANG}',   
-					 'image_height' => 20, 
-					 'image_width' => 28 , 
-					 'imageset_id' => 1 
-					 ), 
-			array( 'image_id' => 70, 
-					 'image_name' => $this->img_name_ext($images['icon_edit'], false, false, $type = 'name'), 
-					 'image_filename' => $this->img_name_ext($images['icon_edit'], false, false, $type = 'filename'),  
-					 'image_lang' => '{LANG}', 
-					 'image_height' => 20, 
-					 'image_width' => 42 , 
-					 'imageset_id' => 1 
-					 ), 
-			array( 'image_id' => 71, 
-					 'image_name' => $this->img_name_ext($images['icon_quote'], false, false, $type = 'name'), 
-					 'image_filename' => $this->img_name_ext($images['icon_quote'], false, false, $type = 'filename'), 
-					 'image_lang' => '{LANG}', 
-					 'image_height' => 20, 
-					 'image_width' => 54 , 
-					 'imageset_id' => 1 
-					 ), 
-			array( 'image_id' => 72, 
-					 'image_name' => 'icon_user_online', 
-					 'image_filename' => 'icon_user_online.gif', 
-					 'image_lang' => '{LANG}', 
-					 'image_height' => 58, 
-					 'image_width' => 58 , 
-					 'imageset_id' => 1 
-					 ),
-			array( 'image_id' => 73, 
-					 'image_name' => 'button_pm_forward', 
-					 'image_filename' => 'button_pm_forward.gif', 
-					 'image_lang' => '{LANG}', 
-					 'image_height' => 25, 
-					 'image_width' => 96 , 
-					 'imageset_id' => 1 
-					 ), 
-			array( 'image_id' => 74, 
-					 'image_name' => 'button_pm_new', 
-					 'image_filename' => 'button_pm_new.gif', 
-					 'image_lang' => '{LANG}', 
-					 'image_height' => 25, 
-					 'image_width' => 84 , 
-					 'imageset_id' => 1 
-					 ), 
-			array( 'image_id' => 75, 
-					 'image_name' => 'button_pm_reply', 
-					 'image_filename' => 'button_pm_reply.gif', 
-					 'image_lang' => '{LANG}', 
-					 'image_height' => 25, 
-					 'image_width' => 96 , 
-					 'imageset_id' => 1 
-					), 
-			array( 'image_id' => 76, 
-					 'image_name' => $this->img_name_ext($images['post_locked'], false, false, $type = 'name'), 
-					 'image_filename' => $this->img_name_ext($images['post_locked'], false, false, $type = 'filename'), 
-					 'image_lang' => '{LANG}', 
-					 'image_height' => 25, 
-					 'image_width' => 88 , 
-					 'imageset_id' => 1 
-					), 
-			array( 'image_id' => 77, 
-					 'image_name' => $this->img_name_ext($images['post_new'], false, false, $type = 'name'), 
-					 'image_filename' => $this->img_name_ext($images['post_new'], false, false, $type = 'filename'), 
-					 'image_lang' => '{LANG}', 
-					 'image_height' => 25, 
-					 'image_width' => 96 , 
-					 'imageset_id' => 1 
-					), 
-			array( 'image_id' => 78, 
-					 'image_name' => $this->img_name_ext($images['reply_new'], false, false, $type = 'name'), 
-					 'image_filename' => $this->img_name_ext($images['reply_new'], false, false, $type = 'filename'), 
-					 'image_lang' => '{LANG}', 
-					 'image_height' => 25, 
-					 'image_width' => 96 , 
-					 'imageset_id' => 1
-				)	
-			);
-		return $rows;
-	}	
-	
-	/**
-	* Specify/Get image name , extension
-	*/
-	function img_name_ext($img, $prefix = '', $new_prefix = '', $type = 'filename')
-	{	
-		if (strpos($img, '.') !== false)
-		{
-			// Nested img
-			$image_filename = $img;
-			$img_ext = substr(strrchr($image_filename, '.'), 1);
-			$img = basename($image_filename, '.' . $img_ext);			
-			
-			unset($img_name, $image_filename);
-		}
-		else
-		{
-			$img_ext = 'gif';			
-		}		
-		
-		switch ($type)
-		{						
-			case 'filename':
-				return $img . '.' . $img_ext;
-			break;
-			
-			case 'class':
-				return $prefix . '_' . $img;
-			break;
-			
-			case 'name':		
-				return $img;
-			break;
-			
-			case 'ext':
-				return $img_ext;
-			break;
-		}		
-	}	
-	
 	/**
 	* Specify/Get images
 	*/
@@ -3881,8 +2479,8 @@ class session
 			}
 
 			$img_data['src'] = PHPBB_URL . 'styles/' . $this->theme['imageset_path'] . '/imageset/' . ($this->img_array[$img]['image_lang'] ? $this->img_array[$img]['image_lang'] .'/' : '') . $this->img_array[$img]['image_filename'];
-			$img_data['width'] = isset($this->img_array[$img]['image_width']) ? $this->img_array[$img]['image_width'] : $width;
-			$img_data['height'] = isset($this->img_array[$img]['image_height']) ? $this->img_array[$img]['image_width'] : $width;
+			$img_data['width'] = $this->img_array[$img]['image_width'];
+			$img_data['height'] = $this->img_array[$img]['image_height'];
 		}
 
 		$alt = (!empty($this->lang[$alt])) ? $this->lang[$alt] : $alt;
@@ -3909,522 +2507,15 @@ class session
 
 		}
 	}
-	
-	/**
-	* Specify/Get image
-	//
-	// phpBB2 Graphics - redefined for mxBB
-	// - Uncomment and redefine phpBB graphics
-	//
-	// If you need to redefine some phpBB graphics, look within the phpBB/templates folder for the template_name.cfg file and
-	// redefine those $image['xxx'] you want. Note: Many phpBB images are reused all over mxBB (eg see below), thus if you redefine
-	// common phpBB images, this will have immedaite effect for all mxBB pages.
-	//
-	*/
-	function img($img, $alt = '', $width = false, $suffix = '', $type = '')
-	{
-		static $imgs;
-		global $phpbb_root_path, $mx_root_path, $theme, $board_config;
-		global $mx_block;
-		
-		//
-		// Look at MX-Publisher-Module folder.........................................................................MX-Publisher-module
-		//
-		if (isset($mx_block->module_root_path))
-		{
-			$this->module_root_path = $this->ext_path = $mx_block->module_root_path;
-		}
-		else
-		{
-			global $module_root_path; 
-			
-			if (isset($module_root_path))
-			{
-				$this->module_root_path = $this->ext_path = $module_root_path;
-			}
-			else
-			{
-				global $mx_root_path;
-				$this->module_root_path = $this->ext_path = $mx_root_path . 'modules/mx_coreblocks/';
-			}
-		}
-		
-		$title = '';
-		$img_ext = 'gif'; 
-		if ($alt)
-		{
-			$alt = $this->lang($alt);
-			$title = ' title="' . $alt . '"';
-		}
-		
-		if (strpos($img, '.') !== false)
-		{
-			// Nested img
-			$image_filename = $img;
-			$img_ext = substr(strrchr($image_filename, '.'), 1);
-			$img = basename($image_filename, '.' . $img_ext);
-			$this->img_array['image_filename'] = array(
-				''.$img => $img . '.' . $img_ext,
-			);			
-			unset($img_name, $image_filename);
-		}
-		
-		if ($width !== false)
-		{
-			$this->img_array['image_width'] = array(
-				''.$img => $width,
-			);
-		}
-		
-		// Load phpBB Template configuration data
-		$current_template_path = $this->current_template_path;
-		$template_name = $this->template_name;
-		
-		//Replace $this->template_path with $this->style_path
-		$current_template_path = $this->style_path . $this->template_name;
-		$default_template_path = $this->style_path . $this->default_template_name;
-		$this->current_style_phpbb_path = $this->style_path . $this->template_name;	//new
-		$this->default_style_phpbb_path = $this->style_path . $this->default_style_name; //new
-		
-		/* Here we overwrite phpBB images from the template configuration file with images from database  */
-		if (!is_array($this->img_array))
-		{
-			$this->img_array['image_filename'] = array(
-				'site_logo' => "logo.gif",
-				'upload_bar' => "upload_bar.gif",
-				'icon_contact_aim' => "icon_aim.gif",
-				'icon_contact_email' => "icon_email.gif",
-				'icon_contact_icq' => "icon_icq_add.gif",
-				'icon_contact_jabber' => "icon_jabber.gif",
-				'icon_contact_msnm' => "icon_msnm.gif",
-				'icon_contact_pm' => "icon_pm.gif",
-				'icon_contact_yahoo' => "icon_yim.gif",
-				'icon_contact_www' => "icon_www.gif",
-				'icon_post_delete' => "icon_delete.gif",
-				'icon_post_edit' => "icon_edit.gif",
-				'icon_post_info' => "icon_info.gif",
-				'icon_post_quote' => "icon_quote.gif",
-				'icon_post_report' => "icon_report.gif",
-				'icon_user_online' => "icon_online.gif",
-				'icon_user_offline' => "icon_offline.gif",
-				'icon_user_profile' => "icon_profile.gif",
-				'icon_user_search' => "icon_search.gif",
-				'icon_user_warn' => "icon_warn.gif",
-				'button_pm_forward' => "reply.gif",
-				'button_pm_new' => "msg_newpost.gif",
-				'button_pm_reply' => "reply.gif",
-				'button_topic_locked' => "msg_newpost.gif",
-				'button_topic_new' => "post.gif",
-				'button_topic_reply' => "reply.gif",
-				'forum_link' => "forum_link.gif",
-				'forum_read' => "forum_read.gif",
-				'forum_read_locked' => "forum_read_locked.gif",
-				'forum_read_subforum' => "forum_read_subforum.gif",
-				'forum_unread' => "forum_unread.gif",
-				'forum_unread_locked' => "forum_unread_locked.gif",
-				'forum_unread_subforum' => "forum_unread_subforum.gif",
-				'topic_moved' => "topic_moved.gif",
-				'topic_read' => "topic_read.gif",
-				'topic_read_mine' => "topic_read_mine.gif",
-				'topic_read_hot' => "topic_read_hot.gif",
-				'topic_read_hot_mine' => "topic_read_hot_mine.gif",
-				'topic_read_locked' => "topic_read_locked.gif",
-				'topic_read_locked_mine' => "topic_read_locked_mine.gif",
-				'topic_unread' => "topic_unread.gif",
-				'topic_unread_mine' => "topic_unread_mine.gif",
-				'topic_unread_hot' => "topic_unread_hot.gif",
-				'topic_unread_hot_mine' => "topic_unread_hot_mine.gif",
-				'topic_unread_locked' => "topic_unread_locked.gif",
-				'topic_unread_locked_mine' => "topic_unread_locked_mine.gif",
-				'sticky_read' => "sticky_read.gif",
-				'sticky_read_mine' => "sticky_read_mine.gif",
-				'sticky_read_locked' => "sticky_read_locked.gif",
-				'sticky_read_locked_mine' => "ticky_read_locked_mine.gif",
-				'sticky_unread' => "sticky_unread.gif",
-				'sticky_unread_mine' => "sticky_unread_mine.gif",
-				'sticky_unread_locked' => "sticky_unread_locked.gif",
-				'sticky_unread_locked_mine' => "sticky_unread_locked_mine.gif",
-				'announce_read' => "announce_read.gif",
-				'announce_read_mine' => "announce_read_mine.gif",
-				'announce_read_locked' => "announce_read_locked.gif",
-				'announce_read_locked_mine' => "announce_read_locked_mine.gif",
-				'announce_unread' => "announce_unread.gif",
-				'announce_unread_mine' => "announce_unread_mine.gif",
-				'announce_unread_locked' => "announce_unread_locked.gif",
-				'announce_unread_locked_mine' => "announce_unread_locked_mine.gif",
-				'global_read' => "announce_read.gif",
-				'global_read_mine' => "announce_read_mine.gif",
-				'global_read_locked' => "announce_read_locked.gif",
-				'global_read_locked_mine' => "announce_read_locked_mine.gif",
-				'global_unread' => "announce_unread.gif",
-				'global_unread_mine' => "announce_unread_mine.gif",
-				'global_unread_locked' => "announce_unread_locked.gif",
-				'global_unread_locked_mine' => "announce_unread_locked_mine.gif",
-				'subforum_read' => "", 
-				'subforum_unread' => "",
-				'pm_read' => "topic_read.gif",
-				'pm_unread' => "topic_unread.gif",
-				'icon_back_top' => "",
-				'icon_post_target' => "icon_post_target.gif",
-				'icon_post_target_unread' => "icon_post_target_unread.gif",
-				'icon_topic_attach' => "icon_topic_attach.gif",
-				'icon_topic_latest' => "icon_topic_latest.gif",
-				'icon_topic_newest' => "icon_topic_newest.gif",
-				'icon_topic_reported' => "icon_topic_reported.gif",
-				'icon_topic_unapproved' => "icon_topic_unapproved.gif"
-			);
-		}
-		
-		$this->img_array['image_lang'] = array(
-			'icon_post_edit' => $this->img_lang,
-			'icon_post_quote' => $this->img_lang,
-			'button_pm_forward' => $this->img_lang,
-			'button_pm_new' => $this->img_lang,
-			'button_pm_reply' => $this->img_lang,
-			'button_topic_new' => $this->img_lang,
-			'button_topic_reply' => $this->img_lang
-		);
-		
-		//Setup current style path for phpBB3 styles
-		$img_data = &$imgs[$img];
-		$current_template_path = $this->current_template_path;
-		$template_name = $this->template_name;
-		
-		//Setup cloned style as prosilver based for phpBB3 styles
-		if ( @file_exists(@mx_realpath($phpbb_root_path . $this->style_path . $this->template_name . '/style.cfg')) )
-		{
-			$cfg = mx_parse_cfg_file($phpbb_root_path . $this->style_path . $this->template_name . '/style.cfg');
-			$this->cloned_template_name = !empty($cfg['parent']) ? $cfg['parent'] : 'prosilver';
-			$this->cloned_template_path = $this->template_path . $this->cloned_template_name;
-			$this->cloned_style_phpbb_path = $cloned_template_path = $this->style_path . $this->cloned_template_name;
-			//$this->default_template_name = !empty($cfg['parent']) ? $cfg['parent'] : 'prosilver';
-		}
-		
-		//
-		// - First try phpBB3 template
-		//
-		if ( file_exists($phpbb_root_path . $this->style_path . $this->template_name  . '/theme/stylesheet.css') )
-		{
-			@define('TEMPLATE_CONFIG', true);
-			$current_template_images = $phpbb_root_path . $this->style_path . $this->template_name . "/theme/images";
-		}
-		
-		
-		//
-		// Load phpBB Template configuration data
-		// - First try current template
-		//
-		if ( is_dir( $phpbb_root_path . $this->current_template_path . "/" ) )
-		{
-			$current_template_path = $this->current_template_path;
-			$template_name = $this->template_name;
-		}
-
-		//
-		// Since we have no current Template Config file, try the cloned template instead
-		//
-		if ( is_dir( $phpbb_root_path . $this->cloned_current_template_path . "/" ) && !defined('TEMPLATE_CONFIG') )
-		{
-			$current_template_path = $this->cloned_current_template_path;
-			$template_name = $this->cloned_template_name;
-		}
-
-		//
-		// Last attempt, use default template intead
-		//
-		if ( is_dir( $phpbb_root_path . $this->default_current_template_path . "/" ) && !defined('TEMPLATE_CONFIG') )
-		{
-			$current_template_path = $this->default_current_template_path;
-			$template_name = $this->default_template_name;
-		}
-
-		$this->img_lang = (file_exists($phpbb_root_path . $current_template_path . $this->lang_name)) ? $this->lang_name : $board_config['default_lang'];		
-		
-		$img_data = &$imgs[$img];
-		
-		
-		//
-		// - First try phpBB3 template lang images then old Olympus image sets
-		// default language
-		if ( file_exists($phpbb_root_path . $current_template_path . '/theme/' . $this->default_language . '/') )
-		{
-			$this->img_lang = $this->default_language;
-		}
-		else if ( file_exists($phpbb_root_path . $this->cloned_template_path  . '/theme/' . $this->default_language . '/') )
-		{
-			$this->img_lang = $this->default_language;
-		}
-		else if ( file_exists($phpbb_root_path . $this->default_template_name  . '/theme/' . $this->default_language . '/') )
-		{
-			$this->img_lang = $this->default_language;
-		}
-		
-		if (empty($this->img_array))
-		{
-			/** 
-				* Now check for the correct existance of all of the images into
-				* each image of a prosilver based style. 
-				foreach ($rows as $row)
-				{
-					$row['image_filename'] = rawurlencode($row['image_filename']);
-					$this->img_array[$row['image_name']] = $row;				
-				}
-			*/
-			trigger_error('NO_STYLE_DATA', E_USER_ERROR);
-		}
-		
-		$img_data = &$this->img_array['image_filename'][$img];
-		
-		if (empty($img_data))
-		{
-			if (!isset($this->img_array['image_filename'][''.$img]) && !isset($this->img_array['image_filename'][$img]))
-			{
-				// Do not fill the image to let designers decide what to do if the image is empty
-				$img_data = '';
-				return $img_data;
-			}
-			
-			//
-			// - First try phpBB3 template theme images then template lang images
-			//
-			if (isset($this->img_array['image_lang'][''.$img]))
-			{
-				if ( file_exists($phpbb_root_path . $this->style_path . $this->template_name . '/theme/' . $this->img_array['image_lang'][''.$img] . '/'. (!empty($this->img_array['image_filename'][''.$img]) ? $this->img_array['image_filename'][''.$img] : $img . '.' . $img_ext)) )
-				{
-					$current_template_images = $this->style_path . $this->template_name . '/theme/' . $this->img_array['image_lang'][''.$img];
-				}
-				else if ( file_exists($phpbb_root_path . $this->style_path . $this->template_name  . '/imageset/' . $this->img_array['image_lang'][''.$img] . '/'. (!empty($this->img_array['image_filename'][''.$img]) ? $this->img_array['image_filename'][''.$img] : $img . '.' . $img_ext)) )
-				{
-					$current_template_images = $this->style_path . $this->template_name . '/imageset/' . $this->img_array['image_lang'][''.$img];
-				}
-			}
-			
-			if ( file_exists($phpbb_root_path . $this->style_path . $this->template_name  . '/imageset/' . (!empty($this->img_array['image_filename'][''.$img]) ? $this->img_array['image_filename'][''.$img] : $img . '.' . $img_ext)) )
-			{
-				$current_template_images = $this->style_path . $this->template_name  . '/imageset/';
-			}
-			elseif ( file_exists($phpbb_root_path . $this->style_path . $this->template_name  . '/imageset/' . $this->encode_lang($this->lang_name) . '/'. (!empty($this->img_array['image_filename'][''.$img]) ? $this->img_array['image_filename'][''.$img] : $img . '.' . $img_ext)) )
-			{
-				$current_template_images = $this->style_path . $this->template_name  . '/imageset/' . $this->encode_lang($this->lang_name);
-			}
-			else if ( file_exists($phpbb_root_path . $this->style_path . $this->template_name  . '/theme/images/' . (!empty($this->img_array['image_filename'][''.$img]) ? $this->img_array['image_filename'][''.$img] : $img . '.' . $img_ext)) )
-			{
-				$current_template_images = $this->style_path . $this->template_name  . '/theme/images/';
-			}
-			else if ( file_exists($phpbb_root_path . $this->style_path . $this->template_name  . '/theme/' . $this->encode_lang($this->lang_name) . '/'. (!empty($this->img_array['image_filename'][''.$img]) ? $this->img_array['image_filename'][''.$img] : $img . '.' . $img_ext)) )
-			{
-				$current_template_images = $this->style_path . $this->template_name  . '/theme/' . $this->encode_lang($this->lang_name);
-			}
-			
-			$img_data['src'] = PHPBB_URL . $current_template_images  . '/' . (!empty($this->img_array['image_filename'][''.$img]) ? $this->img_array['image_filename'][''.$img] : $img . '.' . $img_ext);
-			$img_data['width'] = !empty($width) ? $width : (!empty($this->img_array['image_width']) ? (!empty($this->img_array['image_width'][''.$img]) ? $this->img_array['image_width'][''.$img] : (!empty($this->img_array['image_width'][$img]) ? $this->img_array['image_width'][$img] : 47)) : 47);
-			$img_data['height'] = !empty($width) ? $width : (!empty($this->img_array['image_height']) ? (!empty($this->img_array['image_width'][''.$img]) ? $this->img_array['image_height'][''.$img] : (!empty($this->img_array['image_height'][$img]) ? $this->img_array['image_height'][$img] : 47)) : 47);
-		}
-		
-		$alt = (!empty($this->lang[$alt])) ? $this->lang[$alt] : $alt;
-		
-		$use_width = ($width === false) ? $img_data['width'] : $width;
-		
-		switch ($type)
-		{
-			case 'src':
-				return $img_data['src'];
-			break;
-
-			case 'width':
-				return $use_width;
-			break;
-
-			case 'height':
-				return $img_data['height'];
-			break;
-			
-			case 'filename':
-				return $img . '.' . $img_ext;
-			break;
-			
-			case 'class':
-			case 'name':
-				return $img;
-			break;
-			
-			case 'alt':
-				return $alt;
-			break;
-			
-			case 'ext':
-				return $img_ext;
-			break;
-			
-			case 'full_tag':
-				return '<img src="' . $img_data['src'] . '"' . (($use_width) ? ' width="' . $use_width . '"' : '') . (($img_data['height']) ? ' height="' . $img_data['height'] . '"' : '') . ' alt="' . $alt . '" title="' . $alt . '" />';
-			break;
-			
-			case 'html':	
-			default:
-				return '<span class="imageset ' . $img . '"' . $title . '>' . $alt . '</span>';
-			break;
-		}
-	}
 
 	/**
 	* Specify/Get image
-	//
-	// phpBB2 Graphics - redefined for mxBB
-	// - Uncomment and redefine phpBB graphics
-	//
-	// If you need to redefine some phpBB graphics, look within the phpBB/templates folder for the template_name.cfg file and
-	// redefine those $image['xxx'] you want. Note: Many phpBB images are reused all over mxBB (eg see below), thus if you redefine
-	// common phpBB images, this will have immedaite effect for all mxBB pages.
-	//
 	*/
-	function mx_img($img, $alt = '', $width = false, $suffix = '', $type = 'full_tag')
+	function img($img, $alt = '', $width = false, $suffix = '', $type = 'full_tag')
 	{
 		static $imgs;
-		global $phpbb_root_path, $mx_root_path, $mx_images, $board_config;
-		
-		$template_name = $this->template_name;
-		
-		//Replace $this->template_path with $this->style_path
-		$current_template_path = $this->style_path . $this->template_name;
-		$default_template_path = $this->style_path . $this->default_template_name;
-		$this->current_style_phpbb_path = $this->style_path . $this->template_name;	//new
-		$this->default_style_phpbb_path = $this->style_path . $this->default_style_name; //new
-		
-		//
-		// Load phpBB Template configuration data
-		// - First try current template
-		//
-		if ( is_dir( $phpbb_root_path . $this->current_template_path . "/" ) )
-		{
-			$current_template_path = $this->current_template_path;
-			$template_name = $this->template_name;
+		global $phpbb_root_path, $mx_root_path;
 
-			@include($phpbb_root_path . $this->current_template_path . '/' . $this->template_name . '.cfg');
-		}
-
-		//
-		// Since we have no current Template Config file, try the cloned template instead
-		//
-		if ( is_dir( $phpbb_root_path . $this->cloned_current_template_path . "/" ) && !defined('TEMPLATE_CONFIG') )
-		{
-			$current_template_path = $this->cloned_current_template_path;
-			$template_name = $this->cloned_template_name;
-
-			@include($phpbb_root_path . $this->cloned_current_template_path . '/' . $this->cloned_template_name . '.cfg');
-		}
-
-		//
-		// Last attempt, use default template intead
-		//
-		if ( is_dir( $phpbb_root_path . $this->default_current_template_path . "/" ) && !defined('TEMPLATE_CONFIG') )
-		{
-			$current_template_path = $this->default_current_template_path;
-			$template_name = $this->default_template_name;
-
-			@include($phpbb_root_path . $this->default_current_template_path . '/' . $this->default_template_name . '.cfg');
-		}
-
-		$this->img_lang = (file_exists($phpbb_root_path . $current_template_path . $this->lang_name)) ? $this->lang_name : $board_config['default_lang'];		
-
-		/* Here we overwrite phpBB images from the template configuration file with images from database  */
-		if (!is_array($this->img_array))
-		{
-			$this->img_array['image_filename'] = array(
-				'site_logo' => "logo.gif",
-				'upload_bar' => "upload_bar.gif",
-				'icon_contact_aim' => "icon_aim.gif",
-				'icon_contact_email' => "icon_email.gif",
-				'icon_contact_icq' => "icon_icq_add.gif",
-				'icon_contact_jabber' => "icon_jabber.gif",
-				'icon_contact_msnm' => "icon_msnm.gif",
-				'icon_contact_pm' => "icon_pm.gif",
-				'icon_contact_yahoo' => "icon_yim.gif",
-				'icon_contact_www' => "icon_www.gif",
-				'icon_post_delete' => "icon_delete.gif",
-				'icon_post_edit' => "icon_edit.gif",
-				'icon_post_info' => "icon_info.gif",
-				'icon_post_quote' => "icon_quote.gif",
-				'icon_post_report' => "icon_report.gif",
-				'icon_user_online' => "icon_online.gif",
-				'icon_user_offline' => "icon_offline.gif",
-				'icon_user_profile' => "icon_profile.gif",
-				'icon_user_search' => "icon_search.gif",
-				'icon_user_warn' => "icon_warn.gif",
-				'button_pm_forward' => "reply.gif",
-				'button_pm_new' => "msg_newpost.gif",
-				'button_pm_reply' => "reply.gif",
-				'button_topic_locked' => "msg_newpost.gif",
-				'button_topic_new' => "post.gif",
-				'button_topic_reply' => "reply.gif",
-				'forum_link' => "forum_link.gif",
-				'forum_read' => "forum_read.gif",
-				'forum_read_locked' => "forum_read_locked.gif",
-				'forum_read_subforum' => "forum_read_subforum.gif",
-				'forum_unread' => "forum_unread.gif",
-				'forum_unread_locked' => "forum_unread_locked.gif",
-				'forum_unread_subforum' => "forum_unread_subforum.gif",
-				'topic_moved' => "topic_moved.gif",
-				'topic_read' => "topic_read.gif",
-				'topic_read_mine' => "topic_read_mine.gif",
-				'topic_read_hot' => "topic_read_hot.gif",
-				'topic_read_hot_mine' => "topic_read_hot_mine.gif",
-				'topic_read_locked' => "topic_read_locked.gif",
-				'topic_read_locked_mine' => "topic_read_locked_mine.gif",
-				'topic_unread' => "topic_unread.gif",
-				'topic_unread_mine' => "topic_unread_mine.gif",
-				'topic_unread_hot' => "topic_unread_hot.gif",
-				'topic_unread_hot_mine' => "topic_unread_hot_mine.gif",
-				'topic_unread_locked' => "topic_unread_locked.gif",
-				'topic_unread_locked_mine' => "topic_unread_locked_mine.gif",
-				'sticky_read' => "sticky_read.gif",
-				'sticky_read_mine' => "sticky_read_mine.gif",
-				'sticky_read_locked' => "sticky_read_locked.gif",
-				'sticky_read_locked_mine' => "ticky_read_locked_mine.gif",
-				'sticky_unread' => "sticky_unread.gif",
-				'sticky_unread_mine' => "sticky_unread_mine.gif",
-				'sticky_unread_locked' => "sticky_unread_locked.gif",
-				'sticky_unread_locked_mine' => "sticky_unread_locked_mine.gif",
-				'announce_read' => "announce_read.gif",
-				'announce_read_mine' => "announce_read_mine.gif",
-				'announce_read_locked' => "announce_read_locked.gif",
-				'announce_read_locked_mine' => "announce_read_locked_mine.gif",
-				'announce_unread' => "announce_unread.gif",
-				'announce_unread_mine' => "announce_unread_mine.gif",
-				'announce_unread_locked' => "announce_unread_locked.gif",
-				'announce_unread_locked_mine' => "announce_unread_locked_mine.gif",
-				'global_read' => "announce_read.gif",
-				'global_read_mine' => "announce_read_mine.gif",
-				'global_read_locked' => "announce_read_locked.gif",
-				'global_read_locked_mine' => "announce_read_locked_mine.gif",
-				'global_unread' => "announce_unread.gif",
-				'global_unread_mine' => "announce_unread_mine.gif",
-				'global_unread_locked' => "announce_unread_locked.gif",
-				'global_unread_locked_mine' => "announce_unread_locked_mine.gif",
-				'subforum_read' => "", 
-				'subforum_unread' => "",
-				'pm_read' => "topic_read.gif",
-				'pm_unread' => "topic_unread.gif",
-				'icon_back_top' => "",
-				'icon_post_target' => "icon_post_target.gif",
-				'icon_post_target_unread' => "icon_post_target_unread.gif",
-				'icon_topic_attach' => "icon_topic_attach.gif",
-				'icon_topic_latest' => "icon_topic_latest.gif",
-				'icon_topic_newest' => "icon_topic_newest.gif",
-				'icon_topic_reported' => "icon_topic_reported.gif",
-				'icon_topic_unapproved' => "icon_topic_unapproved.gif"
-			);
-		}
-		$this->img_array['image_lang'] = array(
-			'icon_post_edit' => $this->img_lang,
-			'icon_post_quote' => $this->img_lang,
-			'button_pm_forward' => $this->img_lang,
-			'button_pm_new' => $this->img_lang,
-			'button_pm_reply' => $this->img_lang,
-			'button_topic_new' => $this->img_lang,
-			'button_topic_reply' => $this->img_lang
-		);
-		
 		$img_data = &$imgs[$img];
 
 		if (empty($img_data))
@@ -4435,44 +2526,14 @@ class session
 				$img_data = '';
 				return $img_data;
 			}
-			if (!isset($this->img_array['image_filename'][''.$img]) && !isset($this->img_array['image_filename'][$img]))
-			{
-				// Do not fill the image to let designers decide what to do if the image is empty
-				$img_data = '';
-				return $img_data;
-			}
-			
-			if (isset($this->img_array['image_lang'][''.$img]) && isset($this->img_array['image_lang'][$img]))
-			{
-				//		
-				// - First try phpBB2 then phpBB3 template lang images
-				//		
-				if ( file_exists($phpbb_root_path . $current_template_path . '/images/' . $this->img_array['image_lang'][''.$img] . '/') )
-				{
-					$current_template_images = $current_template_path . '/images/' . $this->img_array['image_lang'][''.$img];
-				}		
-				else if ( file_exists($phpbb_root_path . $current_template_path  . '/theme/images/' . $this->img_array['image_lang'][''.$img] . '/') )
-				{		
-					$current_template_images = $current_template_path . '/theme/images/' . $this->img_array['image_lang'][''.$img];
-				}
-				else if ( file_exists($phpbb_root_path . $current_template_path  . '/theme/images/' . $this->encode_lang($this->lang_name) . '/') )
-				{		
-					$current_template_images = $current_template_path  . '/theme/images/' . $this->encode_lang($this->lang_name);
-				}
-				else if ( file_exists($phpbb_root_path . $current_template_path  . '/theme/imageset/' . $this->encode_lang($this->lang_name) . '/') )
-				{		
-					$current_template_images = $current_template_path  . '/theme/imageset/' . $this->encode_lang($this->lang_name);
-				}				
-			}
-			
-			$img_data['src'] = PHPBB_URL . $current_template_images  . '/' . (!empty($this->img_array['image_filename'][''.$img]) ? $this->img_array['image_filename'][''.$img] : $this->img_array['image_filename'][$img]);
-			//$img_data['src'] = PHPBB_URL . $current_template_path . ($this->img_array[$img]['image_lang'] ? $this->img_array[$img]['image_lang'] .'/' : '') . $this->img_array[$img]['image_filename'];
-			$img_data['width'] = (!empty($width)) ? $width : ''; //$this->img_array[$img]['image_width'];
-			$img_data['height'] = (!empty($height)) ? $height : ''; //$this->img_array[$img]['image_height'];
+
+			$img_data['src'] = PHPBB_URL . 'styles/' . $this->theme['imageset_path'] . '/imageset/' . ($this->img_array[$img]['image_lang'] ? $this->img_array[$img]['image_lang'] .'/' : '') . $this->img_array[$img]['image_filename'];
+			$img_data['width'] = $this->img_array[$img]['image_width'];
+			$img_data['height'] = $this->img_array[$img]['image_height'];
 		}
 
 		$alt = (!empty($this->lang[$alt])) ? $this->lang[$alt] : $alt;
-
+		//die($img_data);
 		switch ($type)
 		{
 			case 'src':
@@ -4538,36 +2599,6 @@ class session
 		{
 			return $var;
 		}
-	}
-
-	/**
-	* Funtion to make the user leave the NEWLY_REGISTERED system group.
-	* @access public
-	*/
-	function leave_newly_registered()
-	{
-		global $db;
-
-		if (empty($this->data['user_new']))
-		{
-			return false;
-		}
-
-		if (!function_exists('remove_newly_registered'))
-		{
-			global $phpbb_root_path, $phpEx;
-
-			include($phpbb_root_path . 'includes/functions_user.' . $phpEx);
-		}
-		if ($group = remove_newly_registered($this->data['user_id'], $this->data))
-		{
-			$this->data['group_id'] = $group;
-
-		}
-		$this->data['user_permissions'] = '';
-		$this->data['user_new'] = 0;
-
-		return true;
 	}
 
 	/**
@@ -5166,14 +3197,14 @@ class session
 	 * decode_lang
 	 *
 	 * $default_lang = $mx_user->decode_lang($board_config['default_lang']);
-	 * @used in URL Language Detection i.e. $this->decode_lang($_GET['lang'])
-	 * @param iso_type $lang
-	 * @return standard_type $lang 
+	 *
+	 * @param unknown_type $lang
+	 * @return unknown
 	 */
 	function decode_lang($lang)
 	{
-		switch($lang)
-		{
+			switch($lang)
+			{
 				case 'aa':
 					$lang_name = 'afar';
 				break;
@@ -5749,11 +3780,116 @@ class session
 				break;
 				default:
 					$lang_name = $lang;
-				break;
-		}
+					break;
+			}
 		return $lang_name;
 	}
+
+	/**
+	* More advanced language substitution
+	* Function to mimic sprintf() with the possibility of using phpBB's language system to substitute nullar/singular/plural forms.
+	* Params are the language key and the parameters to be substituted.
+	* This function/functionality is inspired by SHS` and Ashe.
+	*
+	* Example call: <samp>$user->lang('NUM_POSTS_IN_QUEUE', 1);</samp>
+	*/
+	/**
+	 * Advanced language substitution
+	 *
+	 * Function to mimic sprintf() with the possibility of using phpBB's language system to substitute nullar/singular/plural forms.
+	 * Params are the language key and the parameters to be substituted.
+	 * This function/functionality is inspired by SHS` and Ashe.
+	 *
+	 * Example call: <samp>$mx_user->lang('NUM_POSTS_IN_QUEUE', 1);</samp>
+	 *
+	 * If the first parameter is an array, the elements are used as keys and subkeys to get the language entry:
+	 * Example: <samp>$mx_user->lang(array('datetime', 'AGO'), 1)</samp> uses $user->lang['datetime']['AGO'] as language entry.
+	 *
+	 * @return string	Return localized string or the language key if the translation is not available
+	 */
+	public function lang()
+	{
+		$args = func_get_args();
+		$key = $args[0];
+		//$key = array_shift($args);
+		if (is_array($key))
+		{
+			$lang = &$this->lang[array_shift($key)];
+
+			foreach ($key as $_key)
+			{
+				$lang = &$lang[$_key];
+			}
+		}
+		else
+		{
+			$lang = &$this->lang[$key];
+		}
+		
+		// Return if language string does not exist
+		if (!isset($lang) || (!is_string($lang) && !is_array($lang)))
+		{
+			global $lang;
+		}
+		
+		// Return if language string does not exist
+		if (!isset($lang) || (!is_string($lang) && !is_array($lang)))
+		{
+			return $key;
+		}		
+				
+		// If the language entry is a string, we simply mimic sprintf() behaviour
+		if (is_string($lang))
+		{
+			if (sizeof($args) == 1)
+			{
+				return $lang;
+			}
+
+			// Replace key with language entry and simply pass along...
+			$args[0] = $lang;
+			return call_user_func_array('sprintf', $args);
+		}
+
+		// It is an array... now handle different nullar/singular/plural forms
+		$key_found = false;
+
+		// We now get the first number passed and will select the key based upon this number
+		for ($i = 1, $num_args = sizeof($args); $i < $num_args; $i++)
+		{
+			if (is_int($args[$i]))
+			{
+				$numbers = array_keys($lang);
+
+				foreach ($numbers as $num)
+				{
+					if ($num > $args[$i])
+					{
+						break;
+					}
+
+					$key_found = $num;
+				}
+				break;
+			}
+		}
+
+		// Ok, let's check if the key was found, else use the last entry (because it is mostly the plural form)
+		if ($key_found === false)
+		{
+			$numbers = array_keys($lang);
+			$key_found = end($numbers);
+		}
+		
+
+		
+		// Use the language string we determined and pass it to sprintf()
+		$args[0] = $lang[$key_found];
+		return call_user_func_array('sprintf', $args);
+		//return $this->lang_array($key, $args);
+	}
 	
+
 	/**
 	 * ucstrreplace
 	 *

@@ -1,0 +1,1 @@
+I am not so hapy with mx_shotcast, URL file-access is disabled in the server configuration on moust server so the fuction to check if server is live or not it's not working and I can not use it to avoide using fsockopen() if server is down. Couse with current shotcast_front if server is down I get a nice mxBB error page :(

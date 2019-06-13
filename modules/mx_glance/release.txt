@@ -1,0 +1,10 @@
+[b][Release]: Mx Glance - Last News and Topics Module[/b] 
+[b][Authors]: blulegend, Jack Kan, OryNider, netclectic[/b] 
+[b][Version]: 2.3.4[/b]
+[b]Designed for mxBB Version: 2.8.0[/b]
+[b][Support]:[/b] [URL=http://www.mx-system.com/forum/viewtopic.php?t=9602]Here[/URL] 
+[b]Author's Notes:[/b] 
+This module / block is showing latest news and recent topics on any page.Customizable to show only news, only recent topics, or both. Will check the authorization of users and only show allowed topics. (27/01/2007) :: 31:01:2007
+[b][ScreenShot]:[/b]
+[URL=http://img242.imageshack.us/img242/3866/mxglancemxforumrk3.png][img]http://img242.imageshack.us/img242/3866/mxglancemxforumrk3.png[/img][/URL]
+[b][Download]:[/b][URL=http://www.mx-system.com/modules/mx_pafiledb/dload.php?action=download&file_id=336]mx_glance.zip[/URL]

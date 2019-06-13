@@ -111,7 +111,7 @@ if ($mx_request_vars->get('sid', MX_TYPE_NO_TAGS) != $mx_user->session_id)
 	$url = preg_replace('/\?$/', '', $url);
 	$url .= ((strpos($url, '?')) ? '&' : '?') . 'sid=' . $mx_user->session_id;
 
-	mx_redirect(PORTAL_URL . $url);
+	//mx_redirect(PORTAL_URL . $url);
 }
 
 // Have they authenticated (again) as an admin for this session?

@@ -1,13 +1,17 @@
 <!-- BEGIN page_last_updated -->
-<div align="right"><span class="copyright">{page_last_updated.L_PAGE_UPDATED} {page_last_updated.TIME} {page_last_updated.NAME}&nbsp;</div>
+<div align="right">
+<span class="copyright">{page_last_updated.L_PAGE_UPDATED} {page_last_updated.TIME} {page_last_updated.NAME}&nbsp;</span>
+</div>
 <!-- END page_last_updated -->
 <div align="center">
 	<span class="copyright">
 		<!-- BEGIN editcp_exists -->
 		<span class="genmed">{editcp_exists.ADMIN_OPTIONS}</span>
-		<span class="newsbutton" onclick="mx_toggle_editCP(this, 'editCP_switch', '{editcp_exists.EDITCP_EXPAND_IMG}', '{editcp_exists.EDITCP_CONTRACT_IMG}');"><img src="{editcp_exists.EDITCP_DYNAMIC_IMG}" border="0" alt="" /></span><br />
+		<span class="newsbutton" onclick="mx_toggle_editCP(this, 'editCP_switch', '{editcp_exists.EDITCP_EXPAND_IMG}', '{editcp_exists.EDITCP_CONTRACT_IMG}');"><img src="{editcp_exists.EDITCP_DYNAMIC_IMG}" border="0" alt="" /></span>
+		<br />
 		<!-- END editcp_exists -->
-{ADMIN_LINK}<br />
+{ADMIN_LINK}
+		<br />
 <!--
 	We request you retain the full copyright notice below including the link to www.mx-publisher.com (and www.phpbb.com if you are using MXP with phpbb).
 	This not only gives respect to the large amount of time given freely by the developers

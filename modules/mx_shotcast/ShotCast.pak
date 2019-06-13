@@ -1,0 +1,18 @@
+module=+:71=+:SteamCaster=+:modules/mx_shotcast/=+:SHOUTcast and ICEcast MXP-CMS Module=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:71=+:85=+:Station Front=+:=+:shotcast_front.php=+:
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:SteamCaster Front=+:Demo block=+:85=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:71=+:87=+:SteamCaster Last 10=+:SteamCaster Last 10 Block =+:shotcast_last10.php=+:
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:SteamCaster Last 10=+:Demo block=+:87=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:71=+:88=+:Stream Stats=+:Stream Stats =+:shotcast_stats.php=+:
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:SteamCaster Stats=+:Demo block=+:88=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:71=+:89=+:Radio Player=+:Radio Player=+:radioplayer.php=+:
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Radio Player=+:Web Based Radio Player=+:89=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+function=+:0=+:0=+:0=+:endoflist=+:0=+:0
