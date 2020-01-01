@@ -3,7 +3,7 @@
 *
 * @package Auth
 * @version $Id: core.php,v 1.29 2014/07/07 20:36:53 orynider Exp $
-* @copyright (c) 2002-2008 MX-Publisher Project Team
+* @copyright (c) 2002-2019 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
 *
@@ -3731,4 +3731,3 @@ class mx_backend
 //
 include_once($mx_root_path . 'includes/sessions/rhea/bbcode.' . $phpEx); // BBCode associated functions
 
-?>
