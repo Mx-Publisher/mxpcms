@@ -3,7 +3,7 @@
 *
 * @package Style
 * @version $Id: mx_functions_style.php,v 1.144 2014/07/10 01:04:52 orynider Exp $
-* @copyright (c) 2002-2008 MX-Publisher Project Team
+* @copyright (c) 2002-2019 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
 *
@@ -2094,7 +2094,29 @@ class mx_user extends mx_session
 		}
 		if (!$result = $db->sql_query_limit($sql, 1))
 		{
-			mx_message_die(CRITICAL_ERROR, "Could not query database for theme info '$style'", '', __LINE__, __FILE__, $sql);
+			//Upgrade from olympus ?
+			$sql = "SELECT  t.* , s.* 
+				FROM " . MX_THEMES_TABLE . " AS m, " . STYLES_TABLE . " AS s, " . STYLES_TEMPLATE_TABLE . " AS t, " . STYLES_THEME_TABLE . " AS c, " . STYLES_IMAGESET_TABLE . " i
+					WHERE m.style_name = s.style_name
+						AND m.portal_backend =  '" . 'phpbb3' . "'
+						AND t.template_id = s.template_id
+						AND c.theme_id = s.theme_id
+						AND i.imageset_id = s.imageset_id
+						AND m." . $sql_and . " = '" . $style . "'";
+			if (!$result = $db->sql_query_limit($sql, 1))
+			{
+				mx_message_die(CRITICAL_ERROR, "Could not query database for theme info '$style'", '', __LINE__, __FILE__, $sql);
+			}
+			else
+			{
+				$sql = "UPDATE " . PORTAL_TABLE."
+					SET portal_backend = 'olympus'";
+				$sql .= " WHERE portal_id = 1";
+				if (!$db->sql_query($sql))
+				{
+					print("Configuration file opened but backend check query failed for backend: UPDATE " . PORTAL_TABLE);
+				}
+			}
 		}
 		$row = $db->sql_fetchrow($result);
 		$db->sql_freeresult($result);
@@ -5195,7 +5217,7 @@ class mx_language extends mx_language_file_loader
 				case 'galician':
 					$lang_name = 'gl';
 				break;
-				case 'guaraní':
+				case 'guaranÃ­':
 					$lang_name = 'gn';
 				break;
 				case 'gujarati':
@@ -5784,7 +5806,7 @@ class mx_language extends mx_language_file_loader
 					$lang_name = 'galician';
 				break;
 				case 'gn':
-					$lang_name = 'guaraní';
+					$lang_name = 'guaranÃ­';
 				break;
 				case 'gu':
 					$lang_name = 'gujarati';
@@ -6804,4 +6826,3 @@ class language_file_not_found extends language_exception
 /**
  * class language
  */
-?>
