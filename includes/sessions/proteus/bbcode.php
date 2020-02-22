@@ -2,7 +2,7 @@
 /**
 *
 * @package Functions_phpBB
-* @version $Id: bbcode.php,v 1.1 2014/09/15 21:14:56 orynider Exp $
+* @version $Id: bbcode.php,v 3.1 2020/02/22 23:14:56 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
@@ -177,18 +177,16 @@ class mx_bbcode
 		{
 			$this->template_bitfield = new bitfield($mx_user->theme['bbcode_bitfield']);
 			$this->template_filename = $mx_root_path . 'templates/' . $mx_user->theme['template_path'] . '/template/bbcode.html';
-			
-			// Default phpBB3 style as parent
-			if (empty($mx_user->theme['style_parent_tree']))
-			{	
-				$mx_user->theme['style_parent_tree'] = 'prosilver';
-			}
-			
+
 			if (!@file_exists($this->template_filename))
 			{
-				if (isset($mx_user->theme['style_parent_tree']) && !strpos($mx_user->theme['style_parent_tree'], '/'))
+				if (isset($mx_user->theme['style_parent_tree']) && !empty($mx_user->theme['style_parent_tree']) && !strpos($mx_user->theme['style_parent_tree'], '/'))
 				{
 					$this->template_filename = $phpbb_root_path . 'styles/' . $mx_user->theme['style_parent_tree'] . '/template/bbcode.html';
+				}
+				elseif (is_file($phpbb_root_path . 'styles/' . $mx_user->theme['template_path'] . '/template/bbcode.html'))
+				{
+					$this->template_filename = $phpbb_root_path . 'styles/' . $mx_user->theme['template_path'] . '/template/bbcode.html';
 				}
 				else
 				{
@@ -197,7 +195,7 @@ class mx_bbcode
 				
 				if (!is_file($this->template_filename))
 				{
-					mx_message_die(E_USER_ERROR, 'The file ' . $this->template_filename . ' is missing.', '', __LINE__, __FILE__, '');
+					mx_message_die(E_USER_ERROR, 'The file ' . $this->template_filename . ' is missing for: ' . $mx_user->theme['template_path'], '', __LINE__, __FILE__, '');
 				}
 			}
 		}
