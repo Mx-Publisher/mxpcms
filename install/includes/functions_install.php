@@ -2235,8 +2235,8 @@ function install_file_exists($file_path = '')
 	// Assume failure.
 	$file_exists = 0;
 	$status = "unknown";
-	$filename_ext = '';		 
-		
+	$filename_ext = ''; 
+	
 	//$file_path = 'http://php.net/images/logos/php-logo.svg';
 	//clear cached results
 	//clearstatcache();
@@ -2270,7 +2270,7 @@ function install_file_exists($file_path = '')
 		$status = "is_file";
 		$file_exists = true;
 	}
-		
+	
 	if (function_exists('curl_init') && (!ini_get('safe_mode') || !strtolower(ini_get('safe_mode')) == 'on')) 
 	{
 		// Assume failure.
@@ -2283,15 +2283,9 @@ function install_file_exists($file_path = '')
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win32; x86; rv:63.0) Gecko/20100101 Firefox/63.0.68');  
 		$data = curl_exec($ch);
-			
-		//error check 
-		if (curl_errno($ch))
-		{
-			$file_exists = false;
-			return $file_exists;
-		}
+		
 		curl_close($ch);
-			
+		
 		if ($data) 
 		{
 			$content_length = "unknown";
@@ -2310,7 +2304,7 @@ function install_file_exists($file_path = '')
 		$status = "file_exists";
 		$file_exists = true;
 	}
-			
+	
 	if (function_exists('filesize') && @filesize(str_replace(array(PORTAL_URL, PHPBB_URL), array($mx_root_path, $phpbb_root_path), $file_path))) 
 	{
 		$status = "filesize";
@@ -2327,6 +2321,7 @@ function install_file_exists($file_path = '')
 			$file_exists = true;
 		}
 	}
+	
 	return $file_exists;
 }
 
