@@ -2154,7 +2154,9 @@ class session
 	{
 		global $db, $template, $board_config, $userdata, $phpbb_auth, $phpEx, $phpbb_root_path, $mx_root_path, $mx_cache;
 		global $mx_request_vars, $portal_config, $board_config, $mx_backend, $phpBB2, $phpBB3; //added for mxp
-
+		//
+		// Instantiate the mx_auth class
+		$mx_auth = $phpbb_auth = new phpbb_auth();
 		if (!empty($_GET['style']) && $phpbb_auth->acl_get('a_styles'))
 		{
 			global $SID, $_EXTRA_URL;
@@ -4928,7 +4930,7 @@ class session
 				case 'galician':
 					$lang_name = 'gl';
 				break;
-				case 'guaraní':
+				case 'guaranÃ­':
 					$lang_name = 'gn';
 				break;
 				case 'gujarati':
@@ -5521,7 +5523,7 @@ class session
 					$lang_name = 'galician';
 				break;
 				case 'gn':
-					$lang_name = 'guaraní';
+					$lang_name = 'guaranÃ­';
 				break;
 				case 'gu':
 					$lang_name = 'gujarati';
@@ -6117,7 +6119,7 @@ class session
 					$lang_name = 'galician';
 				break;
 				case 'gn':
-					$lang_name = 'guaraní';
+					$lang_name = 'guaranÃ­';
 				break;
 				case 'gu':
 					$lang_name = 'gujarati';
