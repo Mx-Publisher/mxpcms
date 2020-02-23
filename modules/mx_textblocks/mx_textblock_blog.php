@@ -2,7 +2,7 @@
 /**
 *
 * @package mxBB Portal Module - mx_textblocks
-* @version $Id: mx_textblock_blog.php,v 1.16 2013/07/07 02:41:02 orynider Exp $
+* @version $Id: mx_textblock_blog.php,v 3.16 2020/02/24 01:48:45 orynider Exp $
 * @copyright (c) 2002-2006 [Jon Ohlsson] mxBB Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 *
@@ -41,6 +41,19 @@ $title = $mx_block->block_info['block_title'];
 $message = $mx_block->get_parameters('Blog');
 $blog_id = $mx_block->get_parameters('blog_id');
 
+if (is_object($mx_page))
+{
+	// -------------------------------------------------------------------------
+	// Extend User Style with module lang and images
+	// Usage:  $mx_user->extend(LANG, IMAGES)
+	// Switches:
+	// - LANG: MX_LANG_MAIN (default), MX_LANG_ADMIN, MX_LANG_ALL, MX_LANG_NONE
+	// - IMAGES: MX_IMAGES (default), MX_IMAGES_NONE
+	// -------------------------------------------------------------------------
+	$mx_user->extend(MX_LANG_MAIN, MX_IMAGES_NONE);
+	$mx_page->add_copyright( 'MX-Publisher Text-Blocks Module' );
+}
+
 // **********************************************************************
 // Read language definition
 // **********************************************************************
@@ -51,6 +64,21 @@ if( !file_exists($module_root_path . 'language/lang_' . $board_config['default_l
 else
 {
 	include($module_root_path . 'language/lang_' . $board_config['default_lang'] . '/lang_main.' . $phpEx);
+}
+
+$message = !empty($lang[str_replace(' ', '_', $message)]) ? $lang[str_replace(' ', '_', $message)] : $message;
+
+if (strrpos($message, '_'))
+{
+	$lang_strings = explode(' ', $message);
+	$num_strings = count($lang_strings);
+	
+	$message_row = '';
+	for ($i = 0; $i < $num_strings; $i++)
+	{
+		$message_row .= ($lang[$lang_strings[$i]]) ? $lang[$lang_strings[$i]] : $lang_strings[$i];
+	}
+	$message = $message_row;
 }
 
 //
