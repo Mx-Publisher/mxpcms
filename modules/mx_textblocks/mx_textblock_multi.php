@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Module - mx_textblocks
-* @version $Id: mx_textblock_multi.php,v 1.25 2013/06/28 15:36:45 orynider Exp $
+* @version $Id: mx_textblock_multi.php,v 3.25 2020/02/24 01:46:45 orynider Exp $
 * @copyright (c) 2002-2008 [Jon Ohlsson] MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
@@ -64,7 +64,21 @@ if (is_object($mx_page))
 	// - IMAGES: MX_IMAGES (default), MX_IMAGES_NONE
 	// -------------------------------------------------------------------------
 	$mx_user->extend(MX_LANG_MAIN, MX_IMAGES_NONE);
-	$mx_page->add_copyright( 'MX-Publisher Knowledge Base Module' );
+	$mx_page->add_copyright( 'MX-Publisher Text-Blocks Module' );
+}
+$message = !empty($lang[str_replace(' ', '_', $message)]) ? $lang[str_replace(' ', '_', $message)] : $message;
+
+if (strrpos($message, '_'))
+{
+	$lang_strings = explode(' ', $message);
+	$num_strings = count($lang_strings);
+	
+	$message_row = '';
+	for ($i = 0; $i < $num_strings; $i++)
+	{
+		$message_row .= ($lang[$lang_strings[$i]]) ? $lang[$lang_strings[$i]] : $lang_strings[$i];
+	}
+	$message = $message_row;
 }
 
 //
@@ -86,6 +100,7 @@ $mx_text->init($allow_html, $allow_bbcode, $allow_smilies); // Note: allowed_htm
 //
 // Decode for display
 //
+$title = !empty($lang[$title]) ? $lang[$title] : $title;
 $title = $mx_text->display_simple($title);
 $message = $mx_text->display($message, $mx_block->get_parameters( 'Text', MX_GET_PAR_OPTIONS ));
 
