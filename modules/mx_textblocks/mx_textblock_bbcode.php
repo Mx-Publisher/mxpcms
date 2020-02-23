@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Module - mx_textblocks
-* @version $Id: mx_textblock_bbcode.php,v 1.20 2013/06/28 15:36:45 orynider Exp $
+* @version $Id: mx_textblock_bbcode.php,v 3.20 2020/02/24 01:50:49 orynider Exp $
 * @copyright (c) 2002-2008 [Jon Ohlsson] MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
@@ -16,6 +16,7 @@ if( !defined('IN_PORTAL') || !is_object($mx_block))
 
 //
 // Virtual Blog Mode
+//die($msg_text);
 if ($mx_page->is_virtual)
 {
 	if ($mx_request_vars->is_request('virtual'))
@@ -49,7 +50,19 @@ $mx_text->init($html_on, $bbcode_on, $smilies_on);
 /** Shared Language Tools  **/
 $language_from = $board_config['default_lang']; 
 $language_into = $mx_user->data['user_lang'];
-$mx_user->extend(MX_LANG_MAIN, MX_IMAGES_NONE);
+
+if (is_object($mx_page))
+{
+	// -------------------------------------------------------------------------
+	// Extend User Style with module lang and images
+	// Usage:  $mx_user->extend(LANG, IMAGES)
+	// Switches:
+	// - LANG: MX_LANG_MAIN (default), MX_LANG_ADMIN, MX_LANG_ALL, MX_LANG_NONE
+	// - IMAGES: MX_IMAGES (default), MX_IMAGES_NONE
+	// -------------------------------------------------------------------------
+	$mx_user->extend(MX_LANG_MAIN, MX_IMAGES_NONE);
+	$mx_page->add_copyright( 'MX-Publisher Text-Blocks Module' );
+}
 
 $message = !empty($lang[str_replace(' ', '_', $message)]) ? $lang[str_replace(' ', '_', $message)] : $message;
 
@@ -65,8 +78,6 @@ if (strrpos($message, '_'))
 	}
 	$message = $message_row;
 }
-
-//$message = strrpos($message, '_') ? $lang[strtoupper(substr($message, 0, strrpos($message, '_')))] . ' ' . $lang[substr(strrchr($message, '_'), 1)] : $message;
 
 //
 // Decode for display
