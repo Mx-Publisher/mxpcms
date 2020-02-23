@@ -1,12 +1,12 @@
 <?php
 /***************************************************************************
- *                              admin_styles.php
+ *                              admin_mx_styles.php
  *                            -------------------
  *   begin                : Thursday, Jul 12, 2001
  *   copyright            : (C) 2001 The phpBB Group
  *   email                : support@phpbb.com
  *
- *   $Id: admin_mx_styles.php,v 1.10 2013/06/17 02:53:26 orynider Exp $
+ *   $Id: admin_mx_styles.php,v 1.10 2020/02/23 02:53:26 orynider Exp $
  *
  *
  ***************************************************************************/
