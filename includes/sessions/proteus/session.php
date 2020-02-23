@@ -573,9 +573,9 @@ class session
 					// Check whether the session is still valid if we have one
 					$method = basename(trim($board_config['auth_method']));
 
-					if ((@include_once $mx_root_path . "includes/sessions/proteus/provider/" . $method . ".$phpEx") === false)
+					if ((@include_once $mx_root_path . "includes/sessions/rhea/provider/" . $method . ".$phpEx") === false)
 					{
-						mx_message_die(CRITICAL_ERROR, 'File ' . $mx_root_path . "includes/sessions/proteus/provider/" . $method . ".$phpEx" . ' couldn\'t be opened.');
+						mx_message_die(CRITICAL_ERROR, 'File ' . $mx_root_path . "includes/sessions/rhea/provider/" . $method . ".$phpEx" . ' couldn\'t be opened.');
 					}
 
 					if (class_exists($method))
@@ -585,7 +585,7 @@ class session
 					}
 					else
 					{
-						mx_message_die(CRITICAL_ERROR, 'Class not found: ' . 'in file ' . $mx_root_path . "includes/sessions/proteus/provider/" . $method . ".$phpEx" . ' couldn\'t be opened.');
+						mx_message_die(CRITICAL_ERROR, 'Class not found: ' . 'in file ' . $mx_root_path . "includes/sessions/rhea/provider/" . $method . ".$phpEx" . ' couldn\'t be opened.');
 					}
 
 					//phpBB Olympus login
@@ -604,7 +604,7 @@ class session
 					}
 					/* */
 
-					//phpBB Proteus Login
+					//phpBB Rhea Login
 					$ret = $provider->validate_session($this->data);
 					
 					if ($ret !== null && !$ret)
@@ -870,10 +870,9 @@ class session
 
 			if (!$bot)
 			{
-				$sql = 'SELECT u.*, s.*
-					FROM ' . USERS_TABLE . ' u
-					LEFT JOIN ' . SESSIONS_TABLE . ' s ON (s.session_user_id = u.user_id)
-					WHERE u.user_id = ' . (int) $this->cookie_data['u'];
+				$sql = 'SELECT *
+					FROM ' . USERS_TABLE . '
+					WHERE user_id = ' . (int) $this->cookie_data['u'];
 			}
 			else
 			{
@@ -1870,7 +1869,7 @@ class session
 			$this->timezone = $timezone = new \DateTimeZone('UTC');
 		}
 		
-		$this->dst = $board_config['user_timezone'] * 3600;
+		$this->dst = $timezone * 3600;
 		
 		$sign = ($board_config['user_timezone'] < 0) ? '-' : '+';
 		$time_offset = abs($board_config['user_timezone']);
@@ -1880,7 +1879,7 @@ class session
 		$offset_hours	= ($time_offset - $offset_seconds) / 3600;
 		
 		// Zone offset
-		$zone_offset = $board_config['user_timezone'] + $this->dst;
+		$zone_offset = $this->timezone + $this->dst;
 		
 		$offset_string = sprintf($board_config['default_dateformat'], $sign, $offset_hours, $offset_minutes);
 		
@@ -2154,7 +2153,9 @@ class session
 	{
 		global $db, $template, $board_config, $userdata, $phpbb_auth, $phpEx, $phpbb_root_path, $mx_root_path, $mx_cache;
 		global $mx_request_vars, $portal_config, $board_config, $mx_backend, $phpBB2, $phpBB3; //added for mxp
-
+		//
+		// Instantiate the mx_auth class
+		$mx_auth = $phpbb_auth = new phpbb_auth();
 		if (!empty($_GET['style']) && $phpbb_auth->acl_get('a_styles'))
 		{
 			global $SID, $_EXTRA_URL;
@@ -2176,7 +2177,7 @@ class session
 				$user_style = $this->data['user_style'] ? $this->data['user_style'] : $this->phpbb_style['style_id'];
 				//If user have other style in mxp then the one from phpBB not to have forum page and modules graphics will be messaed up
 				//Anonymouse users should see all block graphic corect
-				//Query phpBB3 Proteus style_id corepondent to mxp themes_id
+				//Query phpBB3 Rhea style_id corepondent to mxp themes_id
 				$sql = "SELECT s.style_id, s.style_name
 					FROM " . MX_THEMES_TABLE . " AS m, " . STYLES_TABLE . " AS s
 					WHERE m.themes_id = " . (int) $user_style . "
@@ -2196,7 +2197,7 @@ class session
 				$default_style = $portal_config['default_style'];
 				//If user have other style in mxp then the one from phpBB not to have forum page and modules graphics will be messaed up
 				//Anonymouse users should see all block graphic corect
-				//Query phpBB3 Proteus style_id corepondent to mxp themes_id
+				//Query phpBB3 Rhea style_id corepondent to mxp themes_id
 				$sql = "SELECT s.style_id, s.style_name
 					FROM " . MX_THEMES_TABLE . " AS m, " . STYLES_TABLE . " AS s
 					WHERE m.themes_id = " . (int) $default_style . "
@@ -2221,7 +2222,7 @@ class session
 			$style_value = $phpBB3->request_var('demostyle', '');
 			if (intval($style_value) == 0)
 			{
-				//Query phpBB3 Proteus style_id corepondent to mxp style_name
+				//Query phpBB3 Rhea style_id corepondent to mxp style_name
 				//Any Demo Style here should work also for portal and forums
 				//Any Demo Style Name should be supported using same guild lines for portal as for forums for e.g. with spaces etc.				
 				$sql = "SELECT s.style_id, s.style_name
@@ -2276,7 +2277,7 @@ class session
 		// END Styles_Demo MOD 
 		if (isset($style_value) && (intval($style_value) == 0))  
 		{
-			//Query phpBB3 Proteus style_name
+			//Query phpBB3 Rhea style_name
 			$sql = "SELECT s.*
 				FROM " . STYLES_TABLE . " AS s
 				WHERE s.style_active = 1 AND s.style_name = '$style_value'";
@@ -2292,7 +2293,7 @@ class session
 		}
 		elseif (intval($style) !== 0)
 		{
-			//Query phpBB3 Proteus style_id get from main style init. Should be correct and valid.
+			//Query phpBB3 Rhea style_id get from main style init. Should be correct and valid.
 			$sql = "SELECT s.*, m.*
 				FROM " . MX_THEMES_TABLE . " AS m, " . STYLES_TABLE . " AS s
 				WHERE s.style_id = " . (int) $style . "
@@ -2326,7 +2327,7 @@ class session
 				mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
 			}
 			
-			//Query phpBB3 Proteus style_id get from main style init. Should be correct and valid.
+			//Query phpBB3 Rhea style_id get from main style init. Should be correct and valid.
 			$sql = "SELECT s.*, t.*
 				FROM " . MX_THEMES_TABLE . " AS t, " . STYLES_TABLE . " AS s
 				WHERE s.style_id = $style
@@ -2428,8 +2429,10 @@ class session
 		
 		$template->set_template();
 		
+		//$this->img_lang = (file_exists($phpbb_root_path . 'styles/' . $this->theme['imageset_path'] . '/imageset/' . $this->lang_name)) ? $this->lang_name : $this->encode_lang($board_config['default_lang']);
+		
 		//
-		// Added here for phpbb3 backend not for proteus backend
+		// Added here for phpbb3 backend not for rhea backend
 		// - First try old Olympus image sets then phpBB2 and phpBB3 Proteus template lang images 
 		//
 		if (is_dir("{$phpbb_root_path}{$this->style_path}{$this->template_name}/imageset/"))
@@ -4928,7 +4931,7 @@ class session
 				case 'galician':
 					$lang_name = 'gl';
 				break;
-				case 'guaraní':
+				case 'guaranÃ­':
 					$lang_name = 'gn';
 				break;
 				case 'gujarati':
@@ -5521,7 +5524,7 @@ class session
 					$lang_name = 'galician';
 				break;
 				case 'gn':
-					$lang_name = 'guaraní';
+					$lang_name = 'guaranÃ­';
 				break;
 				case 'gu':
 					$lang_name = 'gujarati';
@@ -6117,7 +6120,7 @@ class session
 					$lang_name = 'galician';
 				break;
 				case 'gn':
-					$lang_name = 'guaraní';
+					$lang_name = 'guaranÃ­';
 				break;
 				case 'gu':
 					$lang_name = 'gujarati';
