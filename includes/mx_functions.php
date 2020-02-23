@@ -4553,7 +4553,7 @@ function mx_clean_string($text)
 	{
 		// ASCI control characters
 		$text = preg_replace("/[^[:space:]a-zA-Z0-9åäöÅÄÖ.,-:]/", " ", $text);
-		$text = preg_replace("/[^[:space:]a-zA-Z0-9îãâºþÎÃÂªÞ.,-:]/", " ", $text);
+		$text = preg_replace("/[^[:space:]a-zA-Z0-9îăâşţÎĂÂŞŢ.,-:]/", " ", $text);
 		
 		// we need to reduce multiple spaces to a single one   
 		$text = preg_replace('/\s+/', ' ', $text);		
