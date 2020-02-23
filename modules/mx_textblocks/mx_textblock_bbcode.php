@@ -16,7 +16,6 @@ if( !defined('IN_PORTAL') || !is_object($mx_block))
 
 //
 // Virtual Blog Mode
-//die($msg_text);
 if ($mx_page->is_virtual)
 {
 	if ($mx_request_vars->is_request('virtual'))
@@ -47,9 +46,32 @@ include_once($mx_root_path . 'includes/mx_functions_tools.'.$phpEx);
 $mx_text = new mx_text();
 $mx_text->init($html_on, $bbcode_on, $smilies_on);
 
+/** Shared Language Tools  **/
+$language_from = $board_config['default_lang']; 
+$language_into = $mx_user->data['user_lang'];
+$mx_user->extend(MX_LANG_MAIN, MX_IMAGES_NONE);
+
+$message = !empty($lang[str_replace(' ', '_', $message)]) ? $lang[str_replace(' ', '_', $message)] : $message;
+
+if (strrpos($message, '_'))
+{
+	$lang_strings = explode(' ', $message);
+	$num_strings = count($lang_strings);
+	
+	$message_row = '';
+	for ($i = 0; $i < $num_strings; $i++)
+	{
+		$message_row .= ($lang[$lang_strings[$i]]) ? $lang[$lang_strings[$i]] : $lang_strings[$i];
+	}
+	$message = $message_row;
+}
+
+//$message = strrpos($message, '_') ? $lang[strtoupper(substr($message, 0, strrpos($message, '_')))] . ' ' . $lang[substr(strrchr($message, '_'), 1)] : $message;
+
 //
 // Decode for display
 //
+$title = ((mb_strlen($lang[str_replace(' ', '_', $title)]) !== 0) ? $lang[str_replace(' ', '_', $title)] : $language->lang($title));
 $title = $mx_text->display($title);
 $message = $mx_text->display($message, $mx_block->get_parameters( 'Text', MX_GET_PAR_OPTIONS ));
 
@@ -62,7 +84,7 @@ $template->set_filenames(array(
 
 $template->assign_vars(array(
 	'BLOCK_SIZE' => ( !empty($block_size) ? $block_size : '100%' ),
-	'L_TITLE' => ( !empty($lang[$title]) ? $lang[$title] : $title ),
+	'L_TITLE' => $title,
 	'U_TEXT' => $message,
 	'BLOCK_ID' => $block_id,
 	'S_HIDDEN_FORM_FIELDS' => isset($s_hidden_fields) ? $s_hidden_fields : ''
