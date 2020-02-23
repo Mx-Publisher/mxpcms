@@ -97,11 +97,15 @@ switch( $mode )
 			{
 				while( $sub_dir = @readdir($dir) )
 				{
+					// get the sub-template path
 					if( !is_file($phpBB2->phpbb_realpath($mx_root_path . 'templates/' .$sub_dir)) && !is_link($phpBB2->phpbb_realpath($mx_root_path . 'templates/' .$sub_dir)) && $sub_dir != "." && $sub_dir != ".." && $sub_dir != "CVS" )
 					{
 						if( @file_exists($phpBB2->phpbb_realpath($mx_root_path. "templates/" . $sub_dir . "/$sub_dir.cfg")) )
 						{
-							@include($mx_root_path. "templates/" . $sub_dir . "/$sub_dir.cfg");
+							$current_template_path = $mx_root_path . "templates/" . $sub_dir;
+							$cloned_template_path = $default_template_path = $mx_root_path . "templates/" . $mx_user->default_template_name;
+							$mx_template_settings['portal_backend'] = PORTAL_BACKEND;
+							include($mx_root_path. "templates/" . $sub_dir . "/$sub_dir.cfg");
 
 							if  ( ((PORTAL_BACKEND == 'phpbb2') && (PORTAL_BACKEND == $mx_template_settings['portal_backend']) ) || ((PORTAL_BACKEND == 'internal') && ($mx_template_settings['portal_backend'] == 'internal')) || ( ((PORTAL_BACKEND !== 'internal') || (PORTAL_BACKEND !== 'phpbb2')) && (($mx_template_settings['portal_backend'] !== 'internal') && ($mx_template_settings['portal_backend'] !== 'phpbb2')) || $style_name == 'prosilver') )
 							{
