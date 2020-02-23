@@ -1304,12 +1304,6 @@ function mx_file_exists($file_path = '')
 		curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win32; x86; rv:63.0) Gecko/20100101 Firefox/63.0.68');  
 		$data = curl_exec($ch);
 		
-		//error check 
-		if (curl_errno($ch))
-		{
-			$file_exists = false;
-			return $file_exists;
-		}
 		curl_close($ch);
 		
 		 if ($data) 
@@ -1982,7 +1976,7 @@ function mx_clean_username($username)
 	
 	if (strpos($username, '---') !== false)
 	{
-		$username = str_replace('---', '–––', $username);
+		$username = str_replace('---', 'Â–Â–Â–', $username);
 		mx_clean_username($username);
 	}
 	
@@ -4307,7 +4301,7 @@ function mx_guess_lang($encode = false)
 		'en-au'				=> 'au', //Australia
 		'azerbaijani'				=> 'az', //Azerbaijan
 		'finnish'				=> 'ax', //The Aland Islands or Aland (Swedish: Aland, IPA: ['o?land]; Finnish: Ahvenanmaa) is an archipelago province at the entrance to the Gulf of Bothnia in the Baltic Sea belonging to Finland.
-		'bashkir'				=> 'ba', //Baskortostán (Rusia)
+		'bashkir'				=> 'ba', //BaskortostÃ¡n (Rusia)
 		//Bosnia & Herzegovina, Bosnian, Croatian, Serbian
 		'barbados'				=> 'bb',
 		'bangladesh'				=> 'bd',
@@ -4558,8 +4552,8 @@ function mx_clean_string($text)
 	else
 	{
 		// ASCI control characters
-		$text = preg_replace("/[^[:space:]a-zA-Z0-9åäöÅÄÖ.,-:]/", " ", $text);
-		$text = preg_replace("/[^[:space:]a-zA-Z0-9îãâºşÎÃÂªŞ.,-:]/", " ", $text);
+		$text = preg_replace("/[^[:space:]a-zA-Z0-9Ã¥Ã¤Ã¶Ã…Ã„Ã–.,-:]/", " ", $text);
+		$text = preg_replace("/[^[:space:]a-zA-Z0-9Ã®Ã£Ã¢ÂºÃ¾ÃÃƒÃ‚ÂªÃ.,-:]/", " ", $text);
 		
 		// we need to reduce multiple spaces to a single one   
 		$text = preg_replace('/\s+/', ' ', $text);		
