@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Module - mx_navmenu
-* @version $Id: navmenu_functions.php,v 1.17 2014/05/18 06:25:07 orynider Exp $
+* @version $Id: navmenu_functions.php,v 3.17 2020/02/24 04:49:09 orynider Exp $
 * @copyright (c) 2002-2008 [Martin, Markus, Jon Ohlsson] MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net
@@ -278,13 +278,37 @@ function mx_get_site_menu($block_id)
  */
 function generate_site_menu( $page_parent = 0, $depth = 0, $current_parent_page = false )
 {
-	global $mx_page, $template, $phpEx, $images, $block_id, $mx_root_path;
+	global $mx_page, $mx_bbcode, $language, $lang, $template, $phpEx, $images, $block_id, $mx_root_path;
 
 	if ( isset( $mx_page->subpage_rowset[$page_parent] ) )
 	{
 		$first_menu = true;
 		foreach( $mx_page->subpage_rowset[$page_parent] as $subpage_id => $page_data )
 		{
+			// Define the global bbcode bitfield, will be used to load bbcodes
+			$bbcode_uid = $page_data['bbcode_uid'];
+			$bbcode_bitfield = 'cA==';
+			//$bbcode_bitfield = $bbcode_bitfield | base64_decode($catData[0]['bbcode_bitfield']);	
+			// Instantiate BBCode if need be
+			if ($bbcode_bitfield !== '')
+			{
+				switch (PORTAL_BACKEND)
+				{
+					case 'internal':
+					case 'phpbb2':
+					case 'smf2':
+					case 'mybb':
+						$mx_bbcode = new mx_bbcode();
+					break;
+					case 'phpbb3':
+					case 'olympus':
+					case 'ascraeus':
+					default:
+						$mx_bbcode = new mx_bbcode(base64_encode($bbcode_bitfield));
+					break;
+				}
+			}
+			
 			// Auth check
 			$_auth_ary = $mx_page->auth($page_data['auth_view'], $page_data['auth_view_group'], $page_data['auth_moderator_group']);
 			if ($_auth_ary['auth_view'] && $page_data['menu_active'])
@@ -292,8 +316,12 @@ function generate_site_menu( $page_parent = 0, $depth = 0, $current_parent_page 
 				if ( $depth == 0 )
 				{
 					$cat = $page_data['page_name'];
+					$cat = ((mb_strlen($lang[str_replace(' ', '_', $cat)]) !== 0) ? $lang[str_replace(' ', '_', $cat)] : $language->lang($cat));
+					
 					$desc = $page_data['page_desc'];
-
+					$desc = ((mb_strlen($lang[str_replace(' ', '_', $desc)]) !== 0) ? $lang[str_replace(' ', '_', $desc)] : $language->lang($desc));
+					$desc = $mx_bbcode->decode($desc, $bbcode_uid, false);
+					
 					//
 					// Is this category a custom link? If not, link to first menu page.
 					//
