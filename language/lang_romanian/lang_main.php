@@ -126,6 +126,29 @@ $lang = array_merge( $lang, array( // #
 ));
 
 //
+// Multilangual page titles
+// - To have multilangual page titles, add lang keys 'pagetitle_PAGE_TITLE' below
+// - This lang key replaces the page title (PAGE_TITLE) for the page given in the adminCP
+//
+$lang['A__little__text_to_describe_your_site'] = 'Orice text pentru a descrie site-ul dvs.';
+//$lang['pagetitle_NameOfFirstPage'] = 'Whatever one';
+//$lang['pagetitle_NameOfSecondPage'] = 'Whatever two';
+
+//$lang['pagedesc_NameOfFirstPage'] = 'Whatever one';
+//$lang['pagedesc_NameOfSecondPage'] = 'Whatever two';
+
+//
+// Multilangual block titles
+// - To have multilangual block titles, add lang keys 'blocktitle_BLOCK_TITLE' below
+// - This lang key replaces the block title (BLOCK_TITLE) for the block given in the adminCP/blockCP
+//
+//$lang['blocktitle_NameOfFirstPage'] = 'Whatever one';
+//$lang['blocktitle_NameOfSecondPage'] = 'Whatever two';
+
+//$lang['blockdesc_DescOfFirstPage'] = 'Whatever one';
+//$lang['blockdesc_DescOfSecondPage'] = 'Whatever two';
+
+//
 // That's all Folks!
 // -------------------------------------------------
 ?>
