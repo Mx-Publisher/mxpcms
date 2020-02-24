@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Module - mx_textblocks
-* @version $Id: mx_textblock_blog.php,v 1.16 2013/07/07 03:23:02 orynider Exp $
+* @version $Id: mx_textblock_blog.php,v 3.16 2020/02/24 03:25:10 orynider Exp $
 * @copyright (c) 2002-2006 [Jon Ohlsson] mxBB Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 *
