@@ -613,7 +613,7 @@ if ( ($mx_user->data['session_logged_in']) && (PORTAL_BACKEND !== 'internal') &&
 		case 'internal':
 		case 'smf2':
 		case 'mybb':
-				
+		
 		
 		break;
 		
@@ -674,7 +674,7 @@ if ( ($mx_user->data['session_logged_in']) && (PORTAL_BACKEND !== 'internal') &&
 			}
 			$db->sql_freeresult($result);
 		break;
-	}	
+	}
 	
 	if ( !($total_msgs = count($notifications)) )
 	{
@@ -688,16 +688,16 @@ if ( ($mx_user->data['session_logged_in']) && (PORTAL_BACKEND !== 'internal') &&
 			'order_by'				=> 'notification_time',
 			'older_unread'		=> 1,
 			'order_dir'			=> 'DESC',
-			'all_unread'			=> 0,		
-			'unread_count'		=> 0,	
+			'all_unread'			=> 0,
+			'unread_count'		=> 0,
 			'limit'					=> 5,
 			'start'					=> 0,
 			'REASON'			=> 'Could not query private message post information',
 			'count_unread'		=> 0,
 			'count_total'			=> $total_msgs,
 		), $notifications);	
-	}	
-		
+	}
+	
 	// Merge default options
 	$notifications = array_merge(array(
 		'notification_id'		=> $privmsg_id,
@@ -713,7 +713,7 @@ if ( ($mx_user->data['session_logged_in']) && (PORTAL_BACKEND !== 'internal') &&
 		'REASON'			=> $privmsg['privmsgs_text'],
 		'count_unread'		=> $s_privmsg_new,
 		'count_total'			=> $total_msgs,
-	), $notifications);		
+	), $notifications);
 }
 else
 {
@@ -734,27 +734,27 @@ else
 		'notification_time'		=> time(),
 		'user_id'					=> $mx_user->data['user_id'],
 		'order_by'					=> 'notification_time',
-		'order_dir'				=> 'DESC',
+		'order_dir'					=> 'DESC',
 		'limit'						=> 5,
 		'start'						=> 0,
 		'all_unread'				=> $s_privmsg_new,
 		'count_unread'			=> $s_privmsg_new,
 		'count_total'				=> false,
 		'S_ROW_COUNT'		=> 0,
-		'S_NUM_ROWS'			=> 0,
-		'UNREAD'				=> 0,
-		'STYLING'				=> 0,
+		'S_NUM_ROWS'		=> 0,
+		'UNREAD'					=> 0,
+		'STYLING'					=> 0,
 		'URL'						=> 0,
 		'U_MARK_READ'		=> 0,
-		'AVATAR'				=> 0,
+		'AVATAR'					=> 0,
 		'T_THEME_PATH'		=> 0,
 		'FORMATTED_TITLE'	=> 0,
-		'REFERENCE'			=> 0,
+		'REFERENCE'				=> 0,
 		'FORUM'					=> 0,
-		'REASON'				=> 0,
+		'REASON'					=> 0,
 		'TIME'						=> 0,
-		'U_MARK_READ'		=> 0,		
-	), $notifications);	
+		'U_MARK_READ'		=> 0,
+	), $notifications);
 }
 $notification_mark_hash = mx_generate_link_hash('mark_all_notifications_read');
 $mark_hash = mx_generate_link_hash('mark_notification_read');
@@ -786,30 +786,30 @@ else
 		$template->assign_block_vars('notifications', array(
 			'NOTIFICATION_ID'	=> $notifications['notification_id'],
 
-			'USER_ID' 				=>  $notifications['user_id'], 
-			'ORDER_BY' 			=>  $notifications['order_by'], 
+			'USER_ID' 					=>  $notifications['user_id'], 
+			'ORDER_BY' 				=>  $notifications['order_by'], 
 			'ORDER_DIR' 			=>  $notifications['order_dir'], 
-			'ALL_UNREAD'	 	=>  $notifications['all_unread'],
+			'ALL_UNREAD'	 		=>  $notifications['all_unread'],
 			'UNREAD_COUNT' 	=>  $notifications['unread_count'],
-			'LIMIT' 					=>  $notifications['limit'], 
-			'START' 				=>  $notifications['start'], 
+			'LIMIT' 						=>  $notifications['limit'], 
+			'START' 					=>  $notifications['start'], 
 			'COUNT_UNREAD' 	=>  $notifications['count_unread'], 
-			'COUNT_TOTAL' 	=>  $notifications['count_total'], 
+			'COUNT_TOTAL' 		=>  $notifications['count_total'], 
 			
 			'STYLING'					=> 'notification-reported',
 			'AVATAR'					=> mx_get_user_avatar($mx_user->data),
 			'FORMATTED_TITLE'	=> $mx_user->lang('NOTIFICATION', $mx_user->data['username'], false),
 			
-			'REFERENCE'			=> $mx_user->lang('NOTIFICATION_REFERENCE', mx_censor_text($l_privmsgs_text)),
-			'FORUM'				=> mx_append_sid('privmsg.'.$phpEx.'?folder=inbox'), //$this->get_forum(),
-			'REASON'				=> $notifications['REASON'], //$this->get_reason(),
+			'REFERENCE'				=> $mx_user->lang('NOTIFICATION_REFERENCE', mx_censor_text($l_privmsgs_text)),
+			'FORUM'					=> mx_append_sid('privmsg.'.$phpEx.'?folder=inbox'), //$this->get_forum(),
+			'REASON'					=> $notifications['REASON'], //$this->get_reason(),
 			'URL'						=> mx_append_sid('privmsg.'.$phpEx.'?folder=inbox'), //$this->get_url(),
 			
-			'TIME'	   				=> $mx_user->format_date($notifications['notification_time']),
+			'TIME'	   					=> $mx_user->format_date($notifications['notification_time']),
 			
-			'UNREAD'				=> $l_privmsgs_text_unread,
+			'UNREAD'					=> $l_privmsgs_text_unread,
 			'U_MARK_READ'		=> (!$mx_user->data['user_unread_privmsg']) ? $u_mark_read : '',
-		));		
+		));	
 	//}
 }
 
@@ -969,9 +969,9 @@ $admin_link = ($mx_user->data['user_level'] == ADMIN) ? '<a href="admin/index.' 
 
 // Forum rules and subscription info
 $s_watching_forum = array(
-	'link'			=> '',
+	'link'				=> '',
 	'link_toggle'	=> '',
-	'title'			=> '',
+	'title'				=> '',
 	'title_toggle'	=> '',
 	'is_watching'	=> false,
 );
@@ -1018,21 +1018,27 @@ $web_path = (empty($portal_config['portal_url'])) ? PORTAL_URL : $portal_config[
 $https_path = str_replace("http://", "https://", $web_path);
 $web_path = str_replace("https://", "http://", $web_path);
 
+$page_title = ((mb_strlen($lang[str_replace(' ', '_', $mx_page->page_title)]) !== 0) ? $lang[str_replace(' ', '_', $mx_page->page_title)] : $language->lang($mx_page->page_title));
+$page_desc = isset($lang[str_replace(' ', '_', $mx_page->page_desc)]) ? $lang[str_replace(' ', '_', $mx_page->page_desc)] : $language->lang($mx_page->page_desc);
+$sitename = isset($lang[str_replace(' ', '_', $board_config['sitename'])]) ? $lang[str_replace(' ', '_', $board_config['sitename'])] : $language->lang($board_config['sitename']); 
+$site_desc = isset($lang[str_replace(' ', '_', $board_config['site_desc'])]) ? $lang[str_replace(' ', '_', $board_config['site_desc'])] : $language->lang($board_config['site_desc']); 
+
 //
 // The following assigns all _common_ variables that may be used at any point
 // in a template.
 //
 $layouttemplate->assign_vars(array(
-	'SITENAME' 						=> $board_config['sitename'],
-	'SITE_DESCRIPTION' 			=> $board_config['site_desc'],
-	'PAGE_TITLE' 					=> $mx_page->page_title,
+	'SITENAME' 						=> $sitename,
+	'SITE_DESCRIPTION' 		=> $site_desc,
+	'PAGE_TITLE' 					=> $page_title,
+	'PAGE_DESC' 					=> $page_desc,
 	'LANG' 								=> $mx_user->img_lang,
-	'SCRIPT_NAME' 					=> str_replace('.' . $phpEx, '', basename(__FILE__)),	
+	'SCRIPT_NAME' 				=> str_replace('.' . $phpEx, '', basename(__FILE__)),	
 	'LAST_VISIT_DATE' 			=> sprintf($lang['You_last_visit'], $s_last_visit),
-	'LAST_VISIT_YOU' 				=> $s_last_visit,	
+	'LAST_VISIT_YOU' 				=> $s_last_visit,
 	'CURRENT_TIME' 				=> sprintf($lang['Current_time'], mx_create_date($board_config['default_dateformat'], time(), $board_config['board_timezone'])),
-	'TOTAL_USERS_ONLINE' 		=> $l_online_users,
-	'RECORD_USERS' 				=> $l_online_record,	
+	'TOTAL_USERS_ONLINE' 	=> $l_online_users,
+	'RECORD_USERS' 				=> $l_online_record,
 	'LOGGED_IN_USER_LIST' 	=> $online_userlist,
 	'RECORD_USERS' 				=> sprintf($lang['Record_online_users'], $board_config['record_online_users'], mx_create_date($board_config['default_dateformat'], $board_config['record_online_date'], $board_config['board_timezone'])),
 	
@@ -1040,16 +1046,16 @@ $layouttemplate->assign_vars(array(
 	'CURRENT_USERNAME_SIMPLE'		=> mx_get_username_string('no_profile', $mx_user->data['user_id'], $mx_user->data['username'], $mx_user->data['user_colour']),
 	'CURRENT_USERNAME_FULL'			=> mx_get_username_string('full', $mx_user->data['user_id'], $mx_user->data['username'], $mx_user->data['user_colour']),				
 	
-	'S_NOTIFICATIONS_DISPLAY'		=> true,	
+	'S_NOTIFICATIONS_DISPLAY'	=> true,	
 	'S_SHOW_COPPA'						=> false,
-	'S_REGISTRATION'						=> true,	
+	'S_REGISTRATION'					=> true,	
 	
 	'UNREAD_NOTIFICATIONS_COUNT'	=> ($notifications !== false) ? $notifications['unread_count'] : '',
 	'NOTIFICATIONS_COUNT'				=> ($notifications !== false) ? $notifications['unread_count'] : '',
-	'U_VIEW_ALL_NOTIFICATIONS'			=> mx_append_sid("{$phpbb_root_path}profile.$phpEx?i=ucp_notifications"),
-	'U_MARK_ALL_NOTIFICATIONS'			=> mx_append_sid("{$phpbb_root_path}profile.$phpEx?i=ucp_notifications&amp;mode=notification_list&amp;mark=all&amp;token=" . $notification_mark_hash),
-	'U_NOTIFICATION_SETTINGS'				=> mx_append_sid("{$phpbb_root_path}profile.$phpEx?i=ucp_notifications&amp;mode=notification_options"),
-	'S_NOTIFICATIONS_DISPLAY'				=> $mx_user->data['user_active'],	
+	'U_VIEW_ALL_NOTIFICATIONS'		=> mx_append_sid("{$phpbb_root_path}profile.$phpEx?i=ucp_notifications"),
+	'U_MARK_ALL_NOTIFICATIONS'	=> mx_append_sid("{$phpbb_root_path}profile.$phpEx?i=ucp_notifications&amp;mode=notification_list&amp;mark=all&amp;token=" . $notification_mark_hash),
+	'U_NOTIFICATION_SETTINGS'		=> mx_append_sid("{$phpbb_root_path}profile.$phpEx?i=ucp_notifications&amp;mode=notification_options"),
+	'S_NOTIFICATIONS_DISPLAY'		=> $mx_user->data['user_active'],	
 	
 	'loops'											=> '', // To get loops
 	
@@ -1060,7 +1066,7 @@ $layouttemplate->assign_vars(array(
 	'S_IN_SEARCH'							=> false,
 	'S_DISPLAY_QUICK_LINKS'			=> true,
 	
-	'S_USER_NEW_PRIVMSG'					=> $mx_user->data['user_new_privmsg'],
+	'S_USER_NEW_PRIVMSG'				=> $mx_user->data['user_new_privmsg'],
 	'S_USER_UNREAD_PRIVMSG'			=> $mx_user->data['user_unread_privmsg'],
 	'S_USER_NEW'								=> ($mx_user->data['user_active'] == 0) ? true : false,
 
@@ -1080,7 +1086,7 @@ $layouttemplate->assign_vars(array(
 	'L_LOG_ME_IN' => $lang['Log_me_in'],
 	'L_AUTO_LOGIN' => $lang['Log_me_in'],
 	'L_HOME' => $lang['MX_home'],
-	'L_FORUM' => $lang['MX_forum'],	
+	'L_FORUM' => $lang['MX_forum'],
 	'L_INDEX' => $board_config['sitename'],
 	'L_SITE_HOME' => ($board_config['sitename'] !== '') ? $board_config['sitename'] : $mx_user->lang['HOME'],
 	'L_REGISTER' => $lang['Register'],
@@ -1105,33 +1111,33 @@ $layouttemplate->assign_vars(array(
 	'LOGO' => isset($images['mx_logo']) ? $images['mx_logo'] : '',
 	'THEME_GRAPHICS' => isset($images['theme_graphics']) ? $images['theme_graphics'] : '',
 
-	'NAV_IMAGES_HOME' => $images['mx_nav_home'],
-	'NAV_IMAGES_FORUM' => $images['mx_nav_forum'],
-	'NAV_IMAGES_PROFILE' => $images['mx_nav_profile'],
-	'NAV_IMAGES_FAQ' => $images['mx_nav_faq'],
-	'NAV_IMAGES_SEARCH' => $images['mx_nav_search'],
-	'NAV_IMAGES_MEMBERS' => $images['mx_nav_members'],
-	'NAV_IMAGES_GROUPS' => $images['mx_nav_groups'],
-	'NAV_IMAGES_PRIVMSG' => $images['mx_nav_mail'],
-	'NAV_IMAGES_LOGIN_LOGOUT' => $images['mx_nav_login'],
-	'NAV_IMAGES_REGISTER' => $images['mx_nav_register'],
+	'NAV_IMAGES_HOME' 					=> $images['mx_nav_home'],
+	'NAV_IMAGES_FORUM' 				=> $images['mx_nav_forum'],
+	'NAV_IMAGES_PROFILE' 				=> $images['mx_nav_profile'],
+	'NAV_IMAGES_FAQ' 						=> $images['mx_nav_faq'],
+	'NAV_IMAGES_SEARCH' 				=> $images['mx_nav_search'],
+	'NAV_IMAGES_MEMBERS' 			=> $images['mx_nav_members'],
+	'NAV_IMAGES_GROUPS' 				=> $images['mx_nav_groups'],
+	'NAV_IMAGES_PRIVMSG' 				=> $images['mx_nav_mail'],
+	'NAV_IMAGES_LOGIN_LOGOUT' 	=> $images['mx_nav_login'],
+	'NAV_IMAGES_REGISTER' 				=> $images['mx_nav_register'],
 
-	'L_POST_BY_AUTHOR' 		=> $lang['Post_by_author'],
-	'L_POSTED_ON_DATE' 		=> $lang['Posted_on_date'],
-	'L_IN' 								=> $lang['In'],	
+	'L_POST_BY_AUTHOR' 			=> $lang['Post_by_author'],
+	'L_POSTED_ON_DATE' 			=> $lang['Posted_on_date'],
+	'L_IN' 									=> $lang['In'],	
 	
 	//navbar_footer
-	'U_WATCH_FORUM_LINK'	=> $s_watching_forum['link'],
+	'U_WATCH_FORUM_LINK'			=> $s_watching_forum['link'],
 	'U_WATCH_FORUM_TOGGLE'	=> $s_watching_forum['link_toggle'],
-	'S_WATCH_FORUM_TITLE'	=> $s_watching_forum['title'],
+	'S_WATCH_FORUM_TITLE'			=> $s_watching_forum['title'],
 	'S_WATCH_FORUM_TOGGLE'	=> $s_watching_forum['title_toggle'],
-	'S_WATCHING_FORUM'		=> $s_watching_forum['is_watching'],
+	'S_WATCHING_FORUM'			=> $s_watching_forum['is_watching'],
 	
-	'U_SEARCH_SELF'			=> mx_append_sid("{$phpbb_root_path}search.$phpEx?search_id=egosearch"),
-	'U_SEARCH_NEW'			=> mx_append_sid("{$phpbb_root_path}search.$phpEx?search_id=newposts"),
-	'U_SEARCH_UNANSWERED'	=> mx_append_sid("{$phpbb_root_path}search.$phpEx?search_id=unanswered"),
-	'U_SEARCH_UNREAD'		=> mx_append_sid("{$phpbb_root_path}search.$phpEx?search_id=unreadposts"),
-	'U_SEARCH_ACTIVE_TOPICS'=> mx_append_sid("{$phpbb_root_path}search.$phpEx?search_id=active_topics"),
+	'U_SEARCH_SELF'						=> mx_append_sid("{$phpbb_root_path}search.$phpEx?search_id=egosearch"),
+	'U_SEARCH_NEW'						=> mx_append_sid("{$phpbb_root_path}search.$phpEx?search_id=newposts"),
+	'U_SEARCH_UNANSWERED'		=> mx_append_sid("{$phpbb_root_path}search.$phpEx?search_id=unanswered"),
+	'U_SEARCH_UNREAD'				=> mx_append_sid("{$phpbb_root_path}search.$phpEx?search_id=unreadposts"),
+	'U_SEARCH_ACTIVE_TOPICS'		=> mx_append_sid("{$phpbb_root_path}search.$phpEx?search_id=active_topics"),
 	
 	'U_INDEX' 							=> mx_append_sid("{$phpbb_root_path}index.$phpEx"),
 	'U_CANONICAL' 					=> mx_append_sid(PORTAL_URL . "index.$phpEx"),		
@@ -1242,7 +1248,7 @@ $layouttemplate->assign_vars(array(
 	'T_FONT_IONIC_LINK'			=> "{$web_path}assets/css/ionicons.min.css",
 
 	'T_JQUERY_LINK'			=> !empty($board_config['allow_cdn']) && !empty($board_config['load_jquery_url']) ? $board_config['load_jquery_url'] : "{$web_path}assets/javascript/jquery.min.js?assets_version=" . $phpbb_major,
-	'S_ALLOW_CDN'				=> !empty($board_config['allow_cdn']),	
+	'S_ALLOW_CDN'				=> !empty($board_config['allow_cdn']),
 	
 
 	'T_THEME_NAME'			=> rawurlencode($theme['template_name']),
