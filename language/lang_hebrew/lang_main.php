@@ -90,10 +90,34 @@ $lang = array_merge( $lang, array( // #
 	// This is optional, if you would like a _SHORT_ message output
 	// along with our copyright message indicating you are the translator
 	// please add it here.	
-	'TRANSLATION_INFO_MXBB'			=> 'Hwbrew Language by <a href="http://mxpcms.sourceforge.net/" target="_blank">MX-Publisher Development Team</a>',
+	'TRANSLATION_INFO_MXBB'			=> 'Hebrew Language by <a href="http://mxpcms.sourceforge.net/" target="_blank">MX-Publisher Development Team</a>',
 
 	'Please_remove_install_contrib'	=> 'אנא וודא שמחקת את התקיות /install ו- contrib/ ',
+
+
+//
+// Multilangual page titles
+// - To have multilangual page titles, add lang keys 'pagetitle_PAGE_TITLE' below
+// - This lang key replaces the page title (PAGE_TITLE) for the page given in the adminCP
+//
+	'A__little__text_to_describe_your_site' => 'כל טקסט שתאר את האתר שלך',
 	));
+//$lang['pagetitle_NameOfFirstPage'] = 'Whatever one';
+//$lang['pagetitle_NameOfSecondPage'] = 'Whatever two';
+
+//$lang['pagedesc_NameOfFirstPage'] = 'Whatever one';
+//$lang['pagedesc_NameOfSecondPage'] = 'Whatever two';
+
+//
+// Multilangual block titles
+// - To have multilangual block titles, add lang keys 'blocktitle_BLOCK_TITLE' below
+// - This lang key replaces the block title (BLOCK_TITLE) for the block given in the adminCP/blockCP
+//
+//$lang['blocktitle_NameOfFirstPage'] = 'Whatever one';
+//$lang['blocktitle_NameOfSecondPage'] = 'Whatever two';
+
+//$lang['blockdesc_DescOfFirstPage'] = 'Whatever one';
+//$lang['blockdesc_DescOfSecondPage'] = 'Whatever two';
 
 //
 // That's all Folks!
