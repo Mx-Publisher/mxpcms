@@ -2,7 +2,7 @@
 /**
 *
 * @package Functions
-* @version $Id: mx_functions.php,v 1.125 2014/07/07 20:36:52 orynider Exp $
+* @version $Id: mx_functions.php,v 3.125 2020/02/25 03:51:52 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
@@ -4556,8 +4556,8 @@ function mx_clean_string($text)
 		$text = preg_replace("/[^[:space:]a-zA-Z0-9îăâşţÎĂÂŞŢ.,-:]/", " ", $text);
 		
 		// we need to reduce multiple spaces to a single one   
-		$text = preg_replace('/\s+/', ' ', $text);		
-	}	
+		$text = preg_replace('/\s+/', ' ', $text);
+	}
 
 	// Other control characters
 	$text = preg_replace('#(?:[\x00-\x1F\x7F]+|(?:\xC2[\x80-\x9F])+)#', '', $text);
