@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: page_header.php,v 3.78 2020/02/25 03:43:52 orynider Exp $
+* @version $Id: page_header.php,v 3.78 2020/02/25 05:58:02 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
@@ -1014,11 +1014,20 @@ if (empty($portal_config['portal_status']))
 	$portal_config = $mx_cache->obtain_mxbb_config(false);
 }
 
+/**
+* Instantiate the mx_language class
+* $language->_load_lang($mx_root_path, 'lang_main');
+*/
+if (empty($language))
+{
+	$language = new mx_language();
+}
+
 $web_path = (empty($portal_config['portal_url'])) ? PORTAL_URL : $portal_config['portal_url'];
 $https_path = str_replace("http://", "https://", $web_path);
 $web_path = str_replace("https://", "http://", $web_path);
 
-$page_title = ((mb_strlen($lang[str_replace(' ', '_', $mx_page->page_title)]) !== 0) ? $lang[str_replace(' ', '_', $mx_page->page_title)] : $language->lang($mx_page->page_title));
+$page_title = isset($lang[str_replace(' ', '_', $mx_page->page_title)]) ? $lang[str_replace(' ', '_', $mx_page->page_title)] : $language->lang($mx_page->page_title);
 $page_desc = isset($lang[str_replace(' ', '_', $mx_page->page_desc)]) ? $lang[str_replace(' ', '_', $mx_page->page_desc)] : $language->lang($mx_page->page_desc);
 $sitename = isset($lang[str_replace(' ', '_', $board_config['sitename'])]) ? $lang[str_replace(' ', '_', $board_config['sitename'])] : $language->lang($board_config['sitename']); 
 $site_desc = isset($lang[str_replace(' ', '_', $board_config['site_desc'])]) ? $lang[str_replace(' ', '_', $board_config['site_desc'])] : $language->lang($board_config['site_desc']); 
