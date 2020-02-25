@@ -2,7 +2,7 @@
 /**
 *
 * @package Core
-* @version $Id: mx_functions_core.php,v 1.140 2014/05/09 07:51:42 orynider Exp $
+* @version $Id: mx_functions_core.php,v 1.140 2020/02/25 03:45:52 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
@@ -55,7 +55,7 @@ class mx_cache extends cache
 {
 	private $prefix;
 	private $path;
-	private $backend_path;	
+	private $backend_path;
 	private $php_ext;
 	private $mx_cache;
 	private $config;
@@ -70,24 +70,24 @@ class mx_cache extends cache
 	/**
 	* Creates a cache service around a cache driver
 	*
-	 * @return cache	
+	 * @return cache
 	*/
 	public function __construct()
 	{
 		global $mx_root_path, $phpbb_root_path;
 		global $db, $portal_config;
 		global $mx_table_prefix, $table_prefix, $phpEx, $tplEx;
-		global $mx_backend, $phpbb_auth, $mx_bbcode;		
+		global $mx_backend, $phpbb_auth, $mx_bbcode;
 		
 		$this->path = ($mx_root_path) ? $mx_root_path : './';
 		$this->php_ext = $phpEx;
 		$this->cache_dir = $mx_root_path . 'cache/';
-		$this->backend = $mx_backend;		
-		$this->backend_path = $phpbb_root_path;		
+		$this->backend = $mx_backend;
+		$this->backend_path = $phpbb_root_path;
 		$this->db = $db;
-		$this->config = $portal_config; 		
-		$this->tpl_ext = $tplEx;		
-		$this->prefix = $mx_table_prefix;  			
+		$this->config = $portal_config;
+		$this->tpl_ext = $tplEx;
+		$this->prefix = $mx_table_prefix; 
 	}
 	
 	/**
@@ -3456,7 +3456,7 @@ class mx_block_parameter
 				{
 					$parameter_custom = $mx_module_defs->submit_module_parameters($parameter_data, $block_id);
 					return $parameter_custom;
-				}				
+				}
 			}
 		}
 		return false;
@@ -3551,7 +3551,7 @@ class mx_block_parameter
 					
 					// Update block data
 					if ($sub_id == $parameter_data['sub_id'] || true)
-					{	
+					{
 						$sub_id = $mx_request_vars->is_request('virtual') ? $mx_request_vars->request('virtual', MX_TYPE_INT, 0) : $sub_id;
 					
 						//
