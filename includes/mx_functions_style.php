@@ -2,7 +2,7 @@
 /**
 *
 * @package Style
-* @version $Id: mx_functions_style.php,v 1.144 2014/07/10 01:04:52 orynider Exp $
+* @version $Id: mx_functions_style.php,v 3.144 2020/02/25 03:55:52 orynider Exp $
 * @copyright (c) 2002-2019 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
