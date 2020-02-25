@@ -48,7 +48,7 @@ class google_translater
 			$this->errors = 'No cURL support';
 		}
 		$this->lang = $lang;
-		$this->http_referer = $request->variable('HTTP_REFERER', '', false,\phpbb\request\request_interface::SERVER);		
+		$this->http_referer = $request->variable('HTTP_REFERER', '', false,\phpbb\request\request_interface::SERVER);
 		$this->uri = 'http://translate.google.com/translate_a/t';
 		
 	}   
@@ -61,9 +61,10 @@ class google_translater
 		{
 			$this->errors = 'No cURL support';
 		}
+		global $lang;
 		$this->lang = $lang;
-		$this->http_referer = $_SERVER['HTTP_REFERER'];		
-		$this->uri = 'http://translate.google.com/translate_a/t';		
+		$this->http_referer = $_SERVER['HTTP_REFERER'];
+		$this->uri = 'http://translate.google.com/translate_a/t';
 	}     
 	/**
 	* Translate text.
