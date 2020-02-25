@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: page_header.php,v 1.78 2014/05/16 18:02:06 orynider Exp $
+* @version $Id: page_header.php,v 3.78 2020/02/25 03:43:52 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
