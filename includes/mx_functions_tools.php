@@ -2,7 +2,7 @@
 /**
 *
 * @package Tools
-* @version $Id: mx_functions_tools.php,v 1.67 2014/05/09 07:51:42 orynider Exp $
+* @version $Id: mx_functions_tools.php,v 3.67 2020/02/25 11:01:24 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
@@ -1341,7 +1341,16 @@ class mx_text_formatting
 
 			$match = array();
 			$replace = array();
+			
+			/**
+			 * Sick and tired of these variables getting lost...
+			 */
+			$html_entities_match = array('#&(?!(\#[0-9]+;))#', '#<#', '#>#', '#"#');
+			$html_entities_replace = array('&amp;', '&lt;', '&gt;', '&quot;');
 
+			$unhtml_specialchars_match = array('#&gt;#', '#&lt;#', '#&quot;#', '#&amp;#');
+			$unhtml_specialchars_replace = array('>', '<', '"', '&');
+			
 			// relative urls for this board
 			$match[] = '#(^|[\n ])' . $server_protocol . trim( $board_config['server_name'] ) . $server_port . preg_replace( '/^\/?(.*?)(\/)?$/', '$1', trim( $board_config['script_path'] ) ) . '/([^ \t\n\r <"\']+)#i';
 			$replace[] = '<a href="$1" target="_blank">$1</a>';
@@ -1359,7 +1368,7 @@ class mx_text_formatting
 
 			$url = preg_replace($match, $replace, $url);
 			// Also fix already tagged links
-			$url = preg_replace( "/<a href=(.*?)>(.*?)<\/a>/i", "(strlen(\"\\2\") > 25 && !stristr(\"\\2\", \"<\") ) ? '<a href='.stripslashes(\"\\1\").'>'.substr(str_replace(\"http://\",\"\",\"\\2\"), 0, 17) . '...</a>' : '<a href='.stripslashes(\"\\1\").'>'.\"\\2\".'</a>'", $url );
+			//$url = preg_replace( "/<a href=(.*?)>(.*?)<\/a>/i", "(strlen(\"\\2\") > 25 && !stristr(\"\\2\", \"<\") ) ? '<a href='.stripslashes(\"\\1\").'>'.substr(str_replace(\"http://\",\"\",\"\\2\"), 0, 17) . '...</a>' : '<a href='.stripslashes(\"\\1\").'>'.\"\\2\".'</a>'", $url );
 			// $url = preg_replace("/<a href=(.*?)>(.*?)<\/a>/ie", "(strlen(\"\\2\") > 25 && !eregi(\"<\", \"\\2\") ) ? '<a href='.stripslashes(\"\\1\").'>'.substr(str_replace(\"http://\",\"\",\"\\2\"), 0, 12) . ' ... ' . substr(\"\\2\", -3).'</a>' : '<a href='.stripslashes(\"\\1\").'>'.\"\\2\".'</a>'", $url);
 			return $url;
 		}
