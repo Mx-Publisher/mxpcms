@@ -334,15 +334,17 @@ if( $mode != "" )
 			$flag = $flag_rows[$i]['flag_name'];
 			$flag_id = $flag_rows[$i]['flag_id'];
 			
-			$row_color = ( !($i % 2) ) ? $theme['td_color1'] : $theme['td_color2'];
-			$row_class = ( !($i % 2) ) ? $theme['td_class1'] : $theme['td_class2'];
+			$flag_count++;
+			$i = $flag_id ;
+			$row_color = ($i % 2 == 0) ? $theme['td_color1'] : $theme['td_color3'];
+			$row_class = ($i % 2 == 0) ? $theme['td_class1'] : $theme['td_class2'];
 	
 			$template->assign_block_vars("flags", array(
 				"ROW_COLOR" => "#" . $row_color,
 				"ROW_CLASS" => $row_class,
 				
 				"FLAG" => isset($lang[$flag]) ? $lang[$flag] : $flag,
-				//"FLAG" => $flag,
+				
 				"IMAGE_DISPLAY" => ( $flag_rows[$i]['flag_image'] != "" ) ? '<img src="' . $flag_dir . $flag_rows[$i]['flag_image'] . '" />' : "",
 
 				"U_FLAG_EDIT" => mx_append_sid("admin_country_flags.$phpEx?mode=edit&amp;id=$flag_id"),
@@ -2453,8 +2455,10 @@ else
 			$flag = $flag_rows[$i]['flag_name'];
 			$flag_id = $flag_rows[$i]['flag_id'];
 
-			$row_color = ( !($i % 2) ) ? $theme['td_color1'] : $theme['td_color2'];
-			$row_class = ( !($i % 2) ) ? $theme['td_class1'] : $theme['td_class2'];
+			$flag_count++;
+			$i = $flag_id ;
+			$row_color = ($i % 2 == 0) ? $theme['td_color1'] : $theme['td_color3'];
+			$row_class = ($i % 2 == 0) ? $theme['td_class1'] : $theme['td_class2'];
 
 			$template->assign_block_vars("flags", array(
 				"ROW_COLOR" => "#" . $row_color,
@@ -2512,6 +2516,7 @@ else
 				/**/
 
 				$flags[$flag_id] = $flag;
+				$flag_array[$flag] = $flag_id;
 				$countries[$flag] = $country_name;
 			}
 		}
@@ -2522,8 +2527,10 @@ else
 
 		foreach($countries as $flag => $country_name)
 		{
-			$row_color = ( !($i % 2) ) ? $theme['td_color1'] : $theme['td_color2'];
-			$row_class = ( !($i % 2) ) ? $theme['td_class1'] : $theme['td_class2'];
+			$flag_count++;
+			$i = $flag_id = $flag_array[$flag];
+			$row_color = ($i % 2 == 0) ? $theme['td_color1'] : $theme['td_color3'];
+			$row_class = ($i % 2 == 0) ? $theme['td_class1'] : $theme['td_class2'];
 
 			$filename = basename($flag);
 			$displayname = substr($filename, 0, strrpos($filename, '.'));
