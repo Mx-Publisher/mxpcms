@@ -122,14 +122,14 @@ if( $mode != "" )
 			"body" => "admin/flags_edit_body.tpl")
 		);
 
-		if (!is_file($phpbb_root_path . '/images/flags/language/'.$flag_info['flag_image']))
+		if (!is_file($phpbb_root_path . 'images/flags/language/'.$flag_info['flag_image']))
 		{
-			$flag_dir = $phpbb_root_path . '/images/flags/';
+			$flag_dir = $phpbb_root_path . 'images/flags/';
 		}
 		else
 		{
 			// 
-			$flag_dir = $phpbb_root_path . '/images/flags/language/';
+			$flag_dir = $phpbb_root_path . 'images/flags/language/';
 		}
 
 		$template->assign_vars(array(
@@ -268,7 +268,7 @@ if( $mode != "" )
 				mx_message_die(GENERAL_ERROR, "Couldn't delete flag data", "", __LINE__, __FILE__, $sql);
 			}
 			
-			// update the users who where using this flag			
+			// update the users who where using this flag
 			$sql = "UPDATE " . USERS_TABLE . " 
 				SET user_from_flag = 'blank.gif' 
 				WHERE user_from_flag = '$flag_image'";
@@ -319,13 +319,13 @@ if( $mode != "" )
 			"S_FLAGS_ACTION" => mx_append_sid("admin_language_flags.$phpEx"))
 		);
 
-		if (!file_exists('../images/flags/language/'.$flag_rows[$i]['flag_image']))
+		if (!file_exists($phpbb_root_path . 'images/flags/language/'.$flag_rows[$i]['flag_image']))
 		{
-			$flag_dir = '../images/flags/';
+			$flag_dir = $phpbb_root_path . 'images/flags/';
 		}
 		else
 		{
-			$flag_dir = '../images/flags/language/';
+			$flag_dir = $phpbb_root_path . 'images/flags/language/';
 		}
 
 		for( $i = 0; $i < $flag_count; $i++)
@@ -333,9 +333,11 @@ if( $mode != "" )
 			$flag = $flag_rows[$i]['flag_name'];
 			$flag_id = $flag_rows[$i]['flag_id'];
 			
-			$row_color = ( !($i % 2) ) ? $theme['td_color1'] : $theme['td_color2'];
-			$row_class = ( !($i % 2) ) ? $theme['td_class1'] : $theme['td_class2'];
-	
+			$flag_count++;
+			$i = $flag_id ;
+			$row_color = ($i % 2 == 0) ? $theme['td_color1'] : $theme['td_color3'];
+			$row_class = ($i % 2 == 0) ? $theme['td_class1'] : $theme['td_class2'];
+			
 			$template->assign_block_vars("flags", array(
 				"ROW_COLOR" => "#" . $row_color,
 				"ROW_CLASS" => $row_class,
@@ -915,7 +917,7 @@ else
 				case 'deu':
 					$lang_name = 'GERMAN';
 					$country_name = 'GERMANY';
-				break;				
+				break;
 				//Belgium 	11,420,163 	73,000 (0.6%) 	2,472,746 (22%) 	De jure official language in the German speaking community
 				case 'de_be':
 				case 'de-BE':
@@ -1276,30 +1278,30 @@ else
 					$lang_name = 'SPANISH';
 					$country_name = 'SPAIN';
 				break;
-				case 'es-es':	
-				case 'es-ES':	
+				case 'es-es':
+				case 'es-ES':
 				//		Spanish	Spain
 					$lang_name = 'SPANISH';
 					$country_name = 'SPAIN';
 				break;
-				case 'es-ES_tradnl':	
-				case 'es-es_tradnl':	
+				case 'es-ES_tradnl':
+				case 'es-es_tradnl':
 					$lang_name = 'SPANISH_NL';
 					$country_name = 'NL';
-				break;	
-				case 'es-EU':	
-				case 'es-eu':	
+				break;
+				case 'es-EU':
+				case 'es-eu':
 					$lang_name = 'SPANISH_EUROPE';
 					$country_name = 'EUROPE';
-				break;	
+				break;
 				case 'es-gt':
-				case 'es-GT':				
+				case 'es-GT':
 				//	Spanish (Guatemala) (es-GT)
 					$lang_name = 'SPANISH';
 					$country_name = 'SPAIN';
 				break;
-				case 'es-HN':	
-				case 'es-hn':	
+				case 'es-HN':
+				case 'es-hn':
 				//Spanish (Honduras) (es-HN)
 					$lang_name = 'SPANISH';
 					$country_name = 'SPAIN';
@@ -1316,50 +1318,50 @@ else
 					$lang_name = 'SPANISH_NICARAGUAN';
 					$country_name = 'NICARAGUA';
 				break;
-				case 'es-PA':	
-				case 'es-pa':	
+				case 'es-PA':
+				case 'es-pa':
 				//Spanish (Panama) (es-PA)
 					$lang_name = 'SPANISH_PANAMIAN';
 					$country_name = 'PANAMA';
 				break;
-				case 'es-pe':	
+				case 'es-pe':
 				case 'es-PE':
 				//Spanish (Peru) (es-PE)
 					$lang_name = 'SPANISH_PERU';
 					$country_name = 'PERU';
 				break;
-				case 'es-PR':	
-				case 'es-pr':	
+				case 'es-PR':
+				case 'es-pr':
 				//Spanish (Puerto Rico) (es-PR)
 					$lang_name = 'SPANISH_PUERTO_RICO';
 					$country_name = 'PUERTO_RICO';
-				break;	
-				case 'es-PY':	
-				case 'es-py':	
+				break;
+				case 'es-PY':
+				case 'es-py':
 				//Spanish (Paraguay) (es-PY)
 					$lang_name = 'SPANISH_PARAGUAY';
 					$country_name = 'PARAGUAY';
-				break;	
-				case 'es-SV':	
-				case 'es-sv':	
+				break;
+				case 'es-SV':
+				case 'es-sv':
 				//Spanish (El Salvador) (es-SV)
 					$lang_name = 'SPANISH_EL_SALVADOR';
 					$country_name = 'EL_SALVADOR';
-				break;	
-				case 'es-US':	
-				case 'es-us':	
+				break;
+				case 'es-US':
+				case 'es-us':
 				//	Spanish (United States) (es-US)
 					$lang_name = 'SPANISH_UNITED_STATES';
 					$country_name = 'UNITED_STATES';
 				break;
-				case 'es-UY':	
+				case 'es-UY':
 				case 'es-uy':
 				//Spanish (Uruguay) (es-UY)
 					$lang_name = 'SPANISH_URUGUAY';
 					$country_name = 'URUGUAY';
-				break;	
-				case 'es-ve':	
-				case 'es-VE':	
+				break;
+				case 'es-ve':
+				case 'es-VE':
 				//	Spanish (Venezuela) (es-VE)
 					$lang_name = 'SPANISH_VENEZUELA';
 					$country_name = 'BOLIVARIAN_REPUBLIC_OF_VENEZUELA';
@@ -1560,7 +1562,7 @@ else
 				case 'en_ht':
 					$lang_name = 'HAITIAN_CREOLE';
 					$country_name = 'HAITI'; //UNITED_STATES
-				break;				
+				break;
 				//Indian French
 				case 'fr_id':
 					$lang_name = 'INDIAN_FRENCH';
@@ -1634,7 +1636,7 @@ else
 					$country_name = 'SWITZERLAND';
 				break;
 				//French Southern and Antarctic Lands
-				case 'fr_tf':				
+				case 'fr_tf':
 				case 'tf':
 					$lang_name = 'FRENCH_SOUTHERN_TERRITORIES'; //
 					$country_name = 'SOUTHERN_TERRITORIES'; //Terres australes françaises
@@ -1670,7 +1672,7 @@ else
 					$country_name = 'UNITED_STATES';
 				break;
 
-				//gcf – Guadeloupean Creole		
+				//gcf – Guadeloupean Creole
 				case 'gcf':
 					$lang_name = 'GUADELOUPEAN_CREOLE_FRENCH'; 
 					$country_name = 'GUADELOUPE';
@@ -1715,7 +1717,7 @@ else
 				case 'grc':
 					$lang_name = 'ANCIENT_GREEK'; 
 					$country_name = 'GREECE';
-				break;				
+				break;
 				
 				//Galician is spoken by some 2.4 million people, mainly in Galicia, 
 				//an autonomous community located in northwestern Spain.
@@ -1749,7 +1751,7 @@ else
 				case 'gui':
 					$lang_name = 'EASTERN_BOLIVIAN_GUARANI';
 					$country_name = 'BOLIVIA';
-				break;				
+				break;
 				case 'gun':
 					$lang_name = 'MBYA_GUARANI';
 					$country_name = 'PARAGUAY';
@@ -2295,12 +2297,12 @@ else
 				case 'nen':
 					$lang_name = 'NENGONE';
 					$country_name = 'NEW_CALEDONIA';
-				break;	
+				break;
 				
 				case 'new':
 					$lang_name = 'NEW_LANGUAGE'; 
 					$country_name = 'NEW_COUNTRY';
-				break;	
+				break;
 				
 				case 'nc':
 					$lang_name = 'paicî'; //French, Nengone, Paicî, Ajië, Drehu
@@ -2491,7 +2493,7 @@ else
 				case 'ro_RO':
 					$country_name = 'ROMANIA';
 					$lang_name = 'ROMANIAN_ROMANIA';
-				break;				
+				break;
 				
 				case 'rn':
 					$lang_name = 'kirundi';
@@ -2783,7 +2785,7 @@ else
 				case 'fr_vn':
 					$lang_name = 'FRENCH_VIETNAM';
 					$country_name = 'VIETNAM';
-				break;				
+				break;
 				
 				case 'vn':
 					$lang_name = 'Vietnam';
@@ -2916,10 +2918,12 @@ else
 		{
 			$flag = $flag_rows[$i]['flag_name'];
 			$flag_id = $flag_rows[$i]['flag_id'];
-
-			$row_color = ( !($i % 2) ) ? $theme['td_color1'] : $theme['td_color2'];
-			$row_class = ( !($i % 2) ) ? $theme['td_class1'] : $theme['td_class2'];
-
+			
+			$flag_count++;
+			$i = $flag_id;
+			$row_color = ($i % 2 == 0) ? $theme['td_color1'] : $theme['td_color3'];
+			$row_class = ($i % 2 == 0) ? $theme['td_class1'] : $theme['td_class2'];
+			
 			$template->assign_block_vars("flags", array(
 				"ROW_COLOR" => "#" . $row_color,
 				"ROW_CLASS" => $row_class,
@@ -2976,50 +2980,57 @@ else
 				/**/
 
 				$flags[$flag_id] = $flag;
+				$flag_array[$flag] = $flag_id;
 				$countries[$flag] = $country_name;
 			}
 		}
 		@closedir($dir);
 
 		$flag_id = 1;
-		$flag_count = (bool) count($countries);
+		$flag_count = (bool) @count($countries);
 
 		foreach($countries as $flag => $country_name)
 		{
-			$row_color = ( !($i % 2) ) ? $theme['td_color1'] : $theme['td_color2'];
-			$row_class = ( !($i % 2) ) ? $theme['td_class1'] : $theme['td_class2'];
+			$flag_count++;
+			$i = $flag_id = $flag_array[$flag];
+			$row_color = ($i % 2 == 0) ? $theme['td_color1'] : $theme['td_color3'];
+			$row_class = ($i % 2 == 0) ? $theme['td_class1'] : $theme['td_class2'];
 
 			$filename = basename($flag);
 			$displayname = substr($filename, 0, strrpos($filename, '.'));
 
 			$lang_name = decode_country_name($displayname, 'language');
 			//$country_name = decode_country_name($displayname, 'country');
-
-			if (!is_dir('../images/flags/'))
+			
+			if (is_dir($phpbb_root_path . 'ext/'))
 			{
-				// create the directory flags
-				$result = mkdir($phpbb_root_path . '/images/flags/');
-				chmod($phpbb_root_path . 'images/flags/', 777);
-				chdir($phpbb_root_path . 'images/flags/');
-			}
+				if (!is_dir($phpbb_root_path . 'images/flags/'))
+				{
+					// create the directory flags
+					$result = mkdir($phpbb_root_path . 'images/flags/');
+					chmod($phpbb_root_path . 'images/flags/', 0644);
+					chdir($phpbb_root_path . 'images/flags/');
+				}
 
-			if (!is_dir($phpbb_root_path . '/images/flags/language/'))
-			{
-				// create the directory language
-				$result = mkdir($phpbb_root_path . '/images/flags/language/');
-				chmod($phpbb_root_path . '/images/flags/language/', 777);
-				chdir($phpbb_root_path . '/images/flags/language/');
+				if (!is_dir($phpbb_root_path . 'images/flags/language/'))
+				{
+					// create the directory language
+					$result = mkdir($phpbb_root_path . 'images/flags/language/');
+					chmod($phpbb_root_path . 'images/flags/language/', 0777);
+					chdir($phpbb_root_path . 'images/flags/language/');
 
-				$flag_dir = $phpbb_root_path . '/images/flags/';
+					$flag_dir = $phpbb_root_path . 'images/flags/';
+				}
 			}
-			else
+		
+			if (is_dir($phpbb_root_path . 'images/flags/language/'))
 			{
 				// 
-				$flag_dir = $phpbb_root_path . '/images/flags/language/';
+				$flag_dir = $phpbb_root_path . 'images/flags/language/';
 			}
 
 			$ary = array(
-				'flag_id'			=> $flag_id,
+				'flag_id'				=> $flag_id,
 				'flag_name'		=> strtolower(str_replace(array(" ","_"), "_", $lang_name)), //country_name
 				'flag_image'		=> $flag
 			);
