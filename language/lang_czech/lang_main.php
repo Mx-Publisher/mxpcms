@@ -1,9 +1,9 @@
 <?php
 /**
 *
-* @package mxBB Portal Core
+* @package MX-Publisher Core
 * @version $Id: lang_main.php,v 1.35 2007/01/13 00:16:44 mennonitehobbit Exp $
-* @copyright (c) 2002-2006 mxBB Project Team
+* @copyright (c) 2002-2006 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 *
 */
@@ -16,6 +16,13 @@
 // Specify your language character encoding... [optional]
 //
 // setlocale(LC_ALL, 'en');
+
+$lang['USER_LANG'] = 'cz';
+$lang['ENCODING'] = 'UTF-8';
+$lang['DIRECTION'] = 'ltr';
+$lang['LEFT'] = 'left';
+$lang['RIGHT'] = 'right';
+$lang['DATE_FORMAT'] =  'd/M/Y'; // This should be changed to the default date format for your language, php date() format
 
 //
 // General
@@ -32,14 +39,23 @@ $lang['mx_spacer'] = 'Oddělovač';
 $lang['Yes'] = 'Ano';
 $lang['No'] = 'Ne';
 
+
+$lang['Link'] = 'Link';
+
 $lang['Hidden_block'] = 'Skrytý blok';
 $lang['Hidden_block_explain'] = 'Tento blok je \'skrytý\', ale viditelný vámi do řádného nastavení oprávnění.';
+
+//
+// Navigation Block
+//
+$lang['Navigation_Menu'] = 'Menu';
 
 //
 // Overall Navigation Navigation
 //
 $lang['MX_home'] = 'Domovská stránka';
 $lang['MX_forum'] = 'Fórum';
+$lang['MX_navigation'] = 'Pages navigation, eg. forum navigation, like pafiledb navigation.';
 
 //
 // Core Blocks - Language
@@ -48,6 +64,9 @@ $lang['Change_default_lang'] = 'Nastavení výchozího jazyka fóra';
 $lang['Change_user_lang'] = 'Nastavení jazyka';
 $lang['Portal_lang'] = 'Jazyk portálu';
 $lang['Select_lang'] = 'Výběr jazyka:';
+$lang['Who_is_Online'] = 'Who is Online';
+$lang['Who_is_Online?'] = 'Who is Online?';
+$lang['Last_Message_Post'] = 'Last Post';
 
 //
 // Core Blocks - Theme
@@ -63,6 +82,22 @@ $lang['Select_theme'] = 'Výběr tématu/styly:';
 //
 $lang['Mx_Page'] = 'Stránka';
 $lang['Mx_Block'] = 'Sekce';
+//
+// Core Blocks - Virtual
+//
+$lang['Virtual_Create_new'] = 'Create new ';
+$lang['Virtual_Create_new_user'] = 'User Page';
+$lang['Virtual_Create_new_group'] = 'Group Page';
+$lang['Virtual_Create_new_project'] = 'Project Page';
+$lang['Virtual_Create'] = 'Create now';
+$lang['Virtual_Edit'] = 'Update page name';
+$lang['Virtual_Delete'] = 'Delete this page';
+
+$lang['Virtual_Welcome'] = 'Welcome ';
+$lang['Virtual_Info'] = 'Here you can control your private web page.';
+$lang['Virtual_CP'] = 'Page Control Panel';
+$lang['Virtual_Go'] = 'Go';
+$lang['Virtual_Select'] = 'Select:';
 
 //
 // Core Blocks - Site Log (and many last 'item' blocks)
@@ -92,6 +127,11 @@ $lang['Mx_search_kb'] = 'Články';
 $lang['Mx_search_pafiledb'] = 'Stahování';
 $lang['Mx_search_google'] = 'Google';
 $lang['Mx_new_search'] = 'Nové hledání';
+//
+// Overall Header Navigation Modules
+//
+$lang['Share'] = 'Downloads';
+$lang['News_Module'] = 'News';
 
 //
 // Copyrights page
@@ -117,8 +157,12 @@ $lang['Please_remove_install_contrib'] = 'Prosím ujistěte se, zda oba adresá�
 // - To have multilangual page titles, add lang keys 'pagetitle_PAGE_TITLE' below
 // - This lang key replaces the page title (PAGE_TITLE) for the page given in the adminCP
 //
+$lang['A__little__text_to_describe_your_site'] = 'Whatever text to describe your site';
 //$lang['pagetitle_NameOfFirstPage'] = 'Whatever one';
 //$lang['pagetitle_NameOfSecondPage'] = 'Whatever two';
+
+//$lang['pagedesc_NameOfFirstPage'] = 'Whatever one';
+//$lang['pagedesc_NameOfSecondPage'] = 'Whatever two';
 
 //
 // Multilangual block titles
@@ -127,6 +171,9 @@ $lang['Please_remove_install_contrib'] = 'Prosím ujistěte se, zda oba adresá�
 //
 //$lang['blocktitle_NameOfFirstPage'] = 'Whatever one';
 //$lang['blocktitle_NameOfSecondPage'] = 'Whatever two';
+
+//$lang['blockdesc_DescOfFirstPage'] = 'Whatever one';
+//$lang['blockdesc_DescOfSecondPage'] = 'Whatever two';
 
 //
 // That's all Folks!
