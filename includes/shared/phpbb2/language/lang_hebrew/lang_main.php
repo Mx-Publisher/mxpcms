@@ -35,9 +35,9 @@
 //
 
 $lang['ENCODING'] = "utf-8"; //"iso-8859-8-I";
-$lang['DIRECTION'] = "Rtl";
-$lang['LEFT'] = "right";
-$lang['RIGHT'] = "left";
+$lang['DIRECTION'] = "rtl";
+$lang['LEFT'] = "שְׁמֹאל";
+$lang['RIGHT'] = "יְמִין";
 $lang['DATE_FORMAT'] =  "d/m/Y ב- H:i:s"; // This should be changed to the default date format for your language, php date() format
 
 // This is optional, if you would like a _SHORT_ message output
@@ -49,45 +49,69 @@ $lang['TRANSLATION'] = '<a href="http://www.phpbbheb.com" target="_blank">תור
 // Common, these terms are used
 // extensively on several pages
 //
-$lang['Forum'] = "פורום";
-$lang['Category'] = "קטגוריה";
-$lang['Topic'] = "נושא";
-$lang['Topics'] = "נושאים";
-$lang['Replies'] = "תגובות";
-$lang['Views'] = "צפיות";
-$lang['Post'] = "הודעה";
-$lang['Posts'] = "הודעות";
-$lang['Posted'] = "נשלח";
-$lang['Username'] = "שם משתמש";
-$lang['Password'] = "סיסמה";
-$lang['Email'] = "דואר אלקטרוני";
-$lang['Poster'] = "שולח";
-$lang['Author'] = "מחבר";
-$lang['Time'] = "זמן";
-$lang['Hours'] = "שעות";
-$lang['Message'] = "הודעה";
+$lang['Forum'] = "פוֹרוּם";
+$lang['Category'] = "קָטֵגוֹרִיָה";
+$lang['Topic'] = "נוֹשֵׂא";
+$lang['Topics'] = "נוֹשְׂאִים";
+$lang['Replies'] = "תְגוּבָות";
+$lang['Views'] = "צְפִיּוֹת";
+$lang['Post'] = "הוֹדָעָה";
+$lang['Posts'] = "הִוָדְעוּת";
+$lang['Posted'] = "נשֶׁלַח";
+$lang['Username'] = "שֵׁם מִשׁתַמֵשׁ";
+$lang['Password'] = "סִיסמָה";
+$lang['Email'] = "דוֹאַר אֶלֶקטרוֹנִי";
+$lang['Poster'] = "שׁוֹלֵחַ";
+$lang['Author'] = "מְחַבֵּר";
+$lang['Time'] = " זְמַן";
+$lang['Hours'] = "שָׁעָה";
+$lang['Message'] = "הוֹדָעָה";
 
-$lang['1_Day'] = "יום אחד";
-$lang['7_Days'] = "שבעה ימים";
-$lang['2_Weeks'] = "שבועיים";
-$lang['1_Month'] = "חודש אחד";
-$lang['3_Months'] = "שלושה חודשים";
-$lang['6_Months'] = "חצי שנה";
-$lang['1_Year'] = "שנה";
+$lang['1_Day'] = "יוֹם אֶחַד";
+$lang['7_Days'] = "שִׁבעָה יָמִים";
+$lang['2_Weeks'] = "שְׁבוּעַיִים";
+$lang['1_Month'] = "חוֹדֶשׁ אֶחָד";
+$lang['3_Months'] = "שְׁלוֹשָׁה חוֹדֶשׁים";
+$lang['6_Months'] = "חֲצִי שָׁנָה";
+$lang['1_Year'] = "שָׁנָה";
 
-$lang['Go'] = "עבור";
-$lang['Jump_to'] = "עבור";
-$lang['Submit'] = "שליחה";
-$lang['Reset'] = "איפוס";
-$lang['Cancel'] = "ביטול";
-$lang['Preview'] = "תצוגה מקדימה";
-$lang['Confirm'] = "אישור";
-$lang['Spellcheck'] = "בדיקת איות";
-$lang['Yes'] = "כן";
-$lang['No'] = "לא";
-$lang['Enabled'] = "פעיל";
-$lang['Disabled'] = "לא פעיל";
-$lang['Error'] = "שגיאה";
+$lang['Go'] = "לַהֲפוֹך";
+$lang['Jump_to'] = "קְפִיצָה אֶל";
+$lang['Submit'] = "שְׁלִיחָה";
+$lang['Reset'] = "אִיפּוּס";
+$lang['Cancel'] = "בִּיטוּל";
+$lang['Preview'] = "תְצוּגָה מקְדִימָה";
+$lang['Confirm'] = "אִישּׁוּר";
+$lang['Spellcheck'] = "בְּדִיקָה אִיוּת";
+$lang['Yes'] = "כֵּן";
+$lang['No'] = "לֹא";
+$lang['Enabled'] = "פָּעִיל";
+$lang['Disabled'] = "לֹא פָּעִיל";
+$lang['Error'] = "שְׁגִיאָה";
+
+// -------------------------------------------------
+$lang['Goto_page'] = 'מִעֶבֶר לְדָף';
+
+$lang['Post_by_author'] = 'עַל יְדֵי';
+$lang['Posted_on_date'] = 'בתַאֲרִיך';
+$lang['In'] = 'ב';
+
+$lang['Statistics'] = 'סטָטִיסטִיקָות';
+$lang['Legend'] = 'מִקרָא';
+$lang['Posted_articles_zero_total'] = 'לֹא הִוָדְעוּת'; // Number of posts
+$lang['Posted_articles_total'] = 'Total posts <strong>%d</strong>'; // Number of posts
+$lang['Posted_article_total'] = 'Total posts <strong>%d</strong>'; // Number of posts
+$lang['Registered_users_zero_total'] = 'לֹא חֲבֵרִ'; // # registered users
+$lang['Registered_users_total'] = 'Total members <strong>%d</strong>'; // # registered users
+$lang['Registered_user_total'] = 'Total members <strong>%d</strong>'; // # registered users
+$lang['Newest_user'] = 'המשתמש החדש ביותר <strong>%s</strong>'; // a href, username, /a  
+
+$lang['Rules_moderate'] = '%sModerate this forum%s'; // %s replaced by a href links, do not remove!
+
+$lang['Quick_mod'] = 'Quick-mod tools:';
+
+$lang['Search_forums'] = 'Search within';
+// -------------------------------------------------
 
 $lang['Next'] = "הבא";
 $lang['Previous'] = "הקודם";
@@ -154,14 +178,14 @@ $lang['Search_unanswered'] = "הצג הודעות ללא תגובה";
 $lang['Register'] = "הרשמה";
 $lang['Profile'] = "כרטיס אישי";
 $lang['Edit_profile'] = "ערוך את הכרטיס האישי שלך";
-$lang['Search'] = "חיפוש";
-$lang['Memberlist'] = "רשימת חברים";
-$lang['FAQ'] = "שאלות נפוצות";
+$lang['Search'] = "לְחַפֵּשׂ";
+$lang['Memberlist'] = "רְשִׁימַת חֲבֵרִים";
+$lang['FAQ'] = "השְׁאֵלָות נְפוֹצוֹת";
 $lang['BBCode_guide'] = "מדריך BBCode";
-$lang['Usergroups'] = "קבוצות משתמשים";
-$lang['Last_Post'] = "הודעה אחרונה";
-$lang['Moderator'] = "מנהל";
-$lang['Moderators'] = "מנהלים";
+$lang['Usergroups'] = "קְבוּצָות משתַּמְּשִׁים";
+$lang['Last_Post'] = "הוֹדָעָה  אַחֲרוֹנה";
+$lang['Moderator'] = "מַנְחִתֵן";
+$lang['Moderators'] = "מַנְחִתֵים";
 
 //
 // Stats block text
@@ -187,22 +211,22 @@ $lang['Forum_is_locked'] = "הפורום נעול";
 //
 // Login
 //
-$lang['Enter_password'] = "הזן שם משתמש וסיסמה";
-$lang['Login'] = "התחבר";
-$lang['Logout'] = "התנתק";
+$lang['Enter_password'] = "הַזֵּן שָׁם מִשְׁתַּמֵּשׁ וְסִיסְמָה";
+$lang['Login'] = "לְהִתְחַבֵּר";
+$lang['Logout'] = "לְהִתְנַתֵק";
 
-$lang['Forgotten_password'] = "שכחתי את הסיסמה שלי";
+$lang['Forgotten_password'] = "שָׁכַחְתִּי אֶת הַסִּיסְמָה שֶׁלִּי";
 
-$lang['Log_me_in'] = "זכור סיסמה";
+$lang['Log_me_in'] = "זִכּוּר סִיסמָה";
 
-$lang['Error_login'] = "הסיסמה או שם המשתמש אינם נכונים או שאינם פעילים";
+$lang['Error_login'] = "הַסִּיסְמָה אוֹ שָׁם הַמִּשְׁתַּמֵּשׁ אֵינָם נְכוֹנִים אוֹ שֶׁאֵינָם פְּעִילִים";
 
 
 //
 // Index page
 //
-$lang['Index'] = "עמוד ראשי";
-$lang['No_Posts'] = "אין הודעות";
+$lang['Index'] = "עִמוּד רָאשִׁי";
+$lang['No_Posts'] = "אֵין פּוֹסְטִים";
 $lang['No_forums'] = "לקהילה זו אין פורומים";
 
 $lang['Private_Message'] = "מסר אישי";
@@ -252,7 +276,7 @@ $lang['No_topics_post_one'] = "אין הודעות בפורום הנוכחי<br 
 //
 $lang['View_topic'] = "צפייה בנושא";
 
-$lang['Guest'] = 'אורח';
+$lang['Guest'] = 'אוֹרֵחַ';
 $lang['Post_subject'] = "כותרת הודעה";
 $lang['View_next_topic'] = "צפה בנושא הבא";
 $lang['View_previous_topic'] = "צפה בנושא הקודם";
@@ -269,7 +293,7 @@ $lang['All_Posts'] = "כל ההודעות";
 $lang['Newest_First'] = "חדשות קודם";
 $lang['Oldest_First'] = "ישנות קודם";
 
-$lang['Back_to_top'] = "חזור למעלה";
+$lang['Back_to_top'] = "חִזוּר לְמַעלָה";
 
 $lang['Read_profile'] = "צפה בכרטיס האישי של המשתמש"; 
 
@@ -278,7 +302,7 @@ $lang['ICQ_status'] = "מצב איי-סיי-קיו";
 $lang['Edit_delete_post'] = "ערוך/מחק הודעה זו";
 $lang['View_IP'] = "ראה כתובת IP של השולח";
 
-$lang['wrote'] = "כתב"; // proceeds the username and is followed by the quoted text
+$lang['wrote'] = "כְּתָב"; // proceeds the username and is followed by the quoted text
 $lang['Quote'] = "ציטוט"; // comes before bbcode quote output.
 $lang['Code'] = "קוד"; // comes before bbcode code output.
 
