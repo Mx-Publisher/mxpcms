@@ -1,6 +1,5 @@
 <?php
 /**
-/**
 *
 * This file is part of the phpBB Forum Software package.
 *
@@ -906,13 +905,13 @@ $lang = array_merge($lang, array(
 			2		=> 'לפני %d דקות',
 		),
 
-		'Sunday'	=> 'יום ראשון',
-		'Monday'	=> 'יום שני',
-		'Tuesday'	=> 'יום שלישי',
-		'Wednesday'	=> 'יום רביעי',
-		'Thursday'	=> 'יום חמישי',
-		'Friday'	=> 'יום שישי',
-		'Saturday'	=> 'יום שבת',
+		'Sunday'	=> 'יוֹם רִאשׁוֹן',
+		'Monday'	=> 'יוֹם שֵׁנִי',
+		'Tuesday'	=> 'יוֹם שְׁלִישִׁי',
+		'Wednesday'	=> 'יוֹם רְבִיעִי',
+		'Thursday'	=> 'יוֹם חֲמִישִׁי',
+		'Friday'	=> 'יוֹם שִׁישִׁי',
+		'Saturday'	=> 'יוֹם שַׁבָּת',
 
 		'Sun'		=> 'א\'',
 		'Mon'		=> 'ב\'',
@@ -922,31 +921,31 @@ $lang = array_merge($lang, array(
 		'Fri'		=> 'ו\'',
 		'Sat'		=> 'ש\'',
 
-		'January'	=> 'ינואר',
-		'February'	=> 'פברואר',
-		'March'		=> 'מרץ',
-		'April'		=> 'אפריל',
-		'May'		=> 'מאי',
-		'June'		=> 'יוני',
-		'July'		=> 'יולי',
-		'August'	=> 'אוגוסט',
-		'September' => 'ספטמבר',
-		'October'	=> 'אוקטובר',
-		'November'	=> 'נובמבר',
-		'December'	=> 'דצמבר',
+		'January'	=> 'יָנוּאָר',
+		'February'	=> 'פֶבּרוּאָר',
+		'March'		=> 'מַרץ',
+		'April'		=> 'אַפּרִיל',
+		'May'		=> 'מַאִי',
+		'June'		=> 'יְוָנִי',
+		'July'		=> 'יוּלִי',
+		'August'	=> 'אוֹגוּסט',
+		'September' => 'סֶפּטֶמבֶּר',
+		'October'	=> 'אוֹקְטוֹבֶּר',
+		'November'	=> ' נוֹבֶמבֶּר',
+		'December'	=> 'דֵצֶמבֶּר',
 
-		'Jan'		=> 'ינואר',
-		'Feb'		=> 'פברואר',
-		'Mar'		=> 'מרץ',
-		'Apr'		=> 'אפריל',
-		'May_short'	=> 'מאי',	// Short representation of "May". May_short used because in English the short and long date are the same for May.
-		'Jun'		=> 'יוני',
-		'Jul'		=> 'יולי',
-		'Aug'		=> 'אוגוסט',
-		'Sep'		=> 'ספטמבר',
-		'Oct'		=> 'אוקטובר',
-		'Nov'		=> 'נובמבר',
-		'Dec'		=> 'דצמבר',
+		'Jan'		=> 'יָנוּאָר',
+		'Feb'		=> 'פֶבּרוּאָר',
+		'Mar'	=> 'מַרץ',
+		'Apr'		=> 'אַפּרִיל',
+		'May_short'	=> 'מַאִי',	// Short representation of "May". May_short used because in English the short and long date are the same for May.
+		'Jun'		=> 'יְוָנִי',
+		'Jul'		=> 'יוּלִי',
+		'Aug'	=> 'אוֹגוּסט',
+		'Sep' 	=> 'סֶפּטֶמבֶּר',
+		'Oct'		=> 'אוֹקְטוֹבֶּר',
+		'Nov'	=> ' נוֹבֶמבֶּר',
+		'Dec'		=> 'דֵצֶמבֶּר',
 	),
 
 	// Timezones can be translated. We use this for the Etc/GMT timezones here,
