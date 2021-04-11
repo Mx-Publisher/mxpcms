@@ -12,25 +12,24 @@
 /* MG Lang DB - END */
 
 //namespace orynider\mx_translator\acp;
-$modulename = 'mx_translator';
-
-if ( !empty( $setmodules ) )
-{
-	$basename = basename( __FILE__ );
-	$module['Language_tools']['ACP_MX_LANGTOOLS_TITLE'] = 'modules/' . $modulename . '/admin/' . $basename . '';
-	return;
-}
+$basename = basename( __FILE__);
 
 //
 // Security and Page header
 //
 @define('IN_PORTAL', 1);
 $mx_root_path = './../../../';
-$module_root_path = $mx_root_path . 'modules/' . $modulename . '/';
+$module_root_path = $mx_root_path . 'modules/mx_translator/';
 $admin_module_root_path = $module_root_path . 'admin/';
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
 if (!defined('PHP_EXT')) define('PHP_EXT', $phpEx);
 if (!defined('MX_ROOT_PATH')) define('MX_ROOT_PATH', './../');
+
+if(!empty($setmodules))
+{
+	$module['Language_tools']['ACP_MX_LANGTOOLS_TITLE'] = mx_append_sid($admin_module_root_path . $basename . '');	
+	return;
+}
 
 //
 // Load default header
@@ -62,7 +61,7 @@ $mx_user->set_lang($mx_user->lang, $mx_user->help, 'lang_admin');
 /* START Include language file lang_admin_extend_lang or all module language files */
 $language = ($mx_user->user_language_name) ? $mx_user->user_language_name : (($board_config['default_lang']) ? $board_config['default_lang'] : 'english');
 //$mx_user->extend(MX_LANG_ALL, MX_IMAGES_NONE, $module_root_path, true);
-$mx_user->extend('lang_admin_extend_lang', MX_IMAGES_NONE, $module_root_path, true);
+$mx_user->extend('lang_admin_extend_lang', MX_IMAGES_NONE, $module_root_path, true);	
 /* Get an instance of the admin controller */
 if (!include_once($module_root_path . 'controller/mxp_translator.' . $phpEx))
 {
@@ -93,15 +92,15 @@ $packs = $mxp_translator->get_packs();
 $entries = $mxp_translator->get_entries();
 
 // get parameters
-$mode = $mx_request_vars->variable('mode', '');
+$mode = request_var('mode', '');
 $mode = $mx_request_vars->check_var_value($mode, array('pack', 'key'), '');
 
-$level = $mx_request_vars->variable('level', 'normal');
+$level = request_var('level', 'normal');
 $level = $mx_request_vars->check_var_value($level, array('normal', 'admin'));
 
 // pack file
-$pack_file = $mx_request_vars->request('pack_file', '');
-$pack_file = empty($pack_file) ? $mx_request_vars->request('pack', '') : $pack_file;
+$pack_file = request_post_var('pack_file', '');
+$pack_file = empty($pack_file) ? request_get_var('pack', '') : $pack_file;
 $pack_file = urldecode($pack_file);
 
 if (!isset($packs[$pack_file]))
@@ -111,11 +110,11 @@ if (!isset($packs[$pack_file]))
 }
 
 // keys
-$key_main = $mx_request_vars->request('key_main', '');
-$key_main = empty($key_main) ? $mx_request_vars->request('key', '') : $key_main;
+$key_main = request_post_var('key_main', '');
+$key_main = empty($key_main) ? request_get_var('key', '') : $key_main;
 
-$key_sub = $mx_request_vars->request('key_sub', '');
-$key_sub = empty($key_sub) ? $mx_request_vars->request('sub', '') : $key_sub;
+$key_sub = request_post_var('key_sub', '');
+$key_sub = empty($key_sub) ? request_get_var('sub', '') : $key_sub;
 
 if (empty($key_main))
 {
@@ -242,7 +241,7 @@ if ($mode == 'key')
 		// error
 		if ($error)
 		{
-			mx_message_die(GENERAL_MESSAGE, '<br />' . $error_msg . '<br /><br />');
+			message_die(GENERAL_MESSAGE, '<br />' . $error_msg . '<br /><br />');
 			exit;
 		}
 
@@ -338,13 +337,13 @@ if ($mode == 'key')
 			{
 				case 1:
 					$l_status = $lang['Lang_extend_modified'];
-				break;
+					break;
 				case 2:
 					$l_status = $lang['Lang_extend_added'];
-				break;
+					break;
 				default:
 					$l_status = '';
-				break;
+					break;
 			}
 			$template->assign_block_vars('row', array(
 				'L_COUNTRY'		=> $country_name,
@@ -392,7 +391,6 @@ if ($mode == 'pack')
 
 			'L_PACK'					=> $lang['Lang_extend_pack'],
 			'U_PACK'					=> mx_append_sid('admin_lang_user_created.' . $phpEx),
-			
 			/* MG Lang DB - BEGIN */
 			//'PACK'					=> $mxp_translator->get_lang('Lang_extend_' . $packs[$pack_file]),
 			'PACK'						=> $packs[$pack_file],
@@ -425,7 +423,7 @@ if ($mode == 'pack')
 				elseif ($key_main == 'DEMO_VAR') 
 				{
 					$lang[$key_main]= isset($lang['DEMO_VAR']) ? $lang['DEMO_VAR'] : 'Demo Variable';
-				}
+				}									
 				
 				if (($pack == $pack_file) && (($entries['admin'][$key_main][$key_sub] && ($level == 'admin')) || (!$entries['admin'][$key_main][$key_sub] && ($level == 'normal'))))
 				{
@@ -510,7 +508,7 @@ if ($mode == 'search')
 		if (empty($search_words))
 		{
 			$main_url = mx_append_sid('admin_lang_user_created.' . $phpEx);
-			mx_message_die(GENERAL_MESSAGE, sprintf($lang['Lang_extend_search_no_words'], '<a href="' . $main_url . '">', '</a>'));
+			message_die(GENERAL_MESSAGE, sprintf($lang['Lang_extend_search_no_words'], '<a href="' . $main_url . '">', '</a>'));
 			exit;
 		}
 		$w_words = explode(' ', strtolower(str_replace('_', ' ', str_replace("\'", "'", str_replace("''", "'", $search_words)))));

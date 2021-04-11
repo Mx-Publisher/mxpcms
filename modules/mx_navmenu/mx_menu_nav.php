@@ -197,20 +197,14 @@ foreach($navCategory as $cat_id => $catData)
 			$hasCurrentMenu = $catData[$key]['is_current'];
 		}
 	}
-
+	
 	if(!$menuIsCat)
 	{
 		continue;
 	}
-
 	// Define the global bbcode bitfield, will be used to load bbcodes
 	$bbcode_uid = $catData[0]['bbcode_uid'];
-	$bbcode_bitfield = 'cA==';
-	// Setup $mx_bbcode->
-	if (!class_exists('mx_bbcode'))
-	{
-		include($mx_root_path . 'includes/mx_functions_bbcode.' . $phpEx);
-	}
+	$bbcode_bitfield = 'cA==';	
 	//$bbcode_bitfield = $bbcode_bitfield | base64_decode($catData[0]['bbcode_bitfield']);	
 	// Instantiate BBCode if need be
 	if ($bbcode_bitfield !== '')
@@ -223,25 +217,19 @@ foreach($navCategory as $cat_id => $catData)
 			case 'mybb':
 				$mx_bbcode = new mx_bbcode();
 			break;
-			
-			case 'olympus':
-				$mx_bbcode = new mx_bbcode(base64_encode($bbcode_bitfield));
-			break;
-			
 			case 'phpbb3':
+			case 'olympus':
 			case 'ascraeus':
 			default:
 				$mx_bbcode = new mx_bbcode(base64_encode($bbcode_bitfield));
 			break;
-		}
+		}		
 	}
-
 	//$depth = 0;
 	$cat_title = $catData[0]['cat_title'];
 	$cat = ( isset($lang[$cat_title]) ? $lang[$cat_title] : $cat_title );
-	//$cat = $mx_bbcode->decode($cat, $bbcode_uid, false, $bbcode_bitfield);
-	$cat = $mx_bbcode->decode($cat, $bbcode_uid, false);
-
+	$cat = $mx_bbcode->decode($cat, $bbcode_uid, false, $bbcode_bitfield);
+	
 	$cat_desc = '';
 	$cat_desc = $catData[0]['cat_desc'];
 	$cat_desc = ( isset($lang[$cat_desc]) ? $lang[$cat_desc] : $cat_desc );

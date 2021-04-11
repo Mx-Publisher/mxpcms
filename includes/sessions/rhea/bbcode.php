@@ -540,7 +540,7 @@ class mx_bbcode
 			'size'					=> array('{ID}'			=> '$1', '{TEXT}'			=> '$2'),			
 			'email'					=> array('{EMAIL}'		=> '$1', '{DESCRIPTION}'	=> '$2')
 		);
-
+		// /e is dec
 		$tpl = preg_replace('/{L_([A-Z_]+)}/e', "(!empty(\$mx_user->lang['\$1'])) ? \$mx_user->lang['\$1'] : ucwords(strtolower(str_replace('_', ' ', '\$1')))", $tpl);
 
 		if (!empty($replacements[$tpl_name]))

@@ -106,7 +106,7 @@ $lang['Critical_Error']				= 'EROARE CRITICĂ';
 $lang['Error_loading_config']		= 'Ne pare rău, nu s-a putut lansa config.php al MX-Publisher';
 $lang['Error_database_down']		= 'Ne pare rău, nu sa putut conecta la baza de date.';
 $lang['PasswordMissmatch'] 			= 'Ne pare rău, nepotrivire de parole în panoul MXP Admin';
-
+$lang['Cache_generate'] 			= 'Your cache files have been generated.';
 //
 // That's all Folks!
 // -------------------------------------------------

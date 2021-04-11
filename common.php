@@ -46,8 +46,8 @@ define('DEBUG_EXTRA', true); // [Admin Option] Show memory usage. Show link to f
 define('INCLUDES', 'includes/'); //Main Includes folder
 @ini_set('display_errors', '1');
 //@error_reporting(E_ERROR | E_WARNING | E_PARSE); // This will NOT report uninitialized variables
-//@error_reporting(E_ALL | E_NOTICE | E_STRICT);
-@error_reporting(E_ALL & ~E_NOTICE); //Default error reporting in PHP 5.2+
+//@error_reporting(E_ALL & ~E_NOTICE); //Default error reporting in PHP 5.2+
+error_reporting(E_ALL | E_NOTICE | E_STRICT);
 @session_cache_expire (1440);
 @set_time_limit (1500);
 
@@ -61,18 +61,18 @@ define('INCLUDES', 'includes/'); //Main Includes folder
 function deregister_globals()
 {
 	$not_unset = array(
-		'GLOBALS'	=> true,
-		'_GET'		=> true,
-		'_POST'		=> true,
-		'_COOKIE'	=> true,
-		'_REQUEST'	=> true,
-		'_SERVER'	=> true,
-		'_SESSION'	=> true,
-		'_ENV'		=> true,
-		'_FILES'	=> true,
-		'phpEx'		=> true,
+		'GLOBALS'			=> true,
+		'_GET'				=> true,
+		'_POST'				=> true,
+		'_COOKIE'			=> true,
+		'_REQUEST'			=> true,
+		'_SERVER'			=> true,
+		'_SESSION'			=> true,
+		'_ENV'				=> true,
+		'_FILES'			=> true,
+		'phpEx'				=> true,
 		'phpbb_root_path'	=> true,
-		'mx_root_path'	=> true,
+		'mx_root_path'		=> true,
 		'module_root_path'	=> true
 	);
 
@@ -336,7 +336,7 @@ $mx_admin_path = $mx_root_path . $mx_adm_relative_path;
 */
 require($mx_root_path . INCLUDES . 'mx_class_loader.' . $phpEx);
 require($mx_root_path . INCLUDES . 'mx_constants.' . $phpEx); // Also includes phpBB constants
-require($mx_root_path . INCLUDES . 'db/' . $dbms . '.' . $phpEx); // Load dbal and initiate class
+include_once($mx_root_path . INCLUDES . 'db/' . $dbms . '.' . $phpEx); // Load dbal and initiate class
 require($mx_root_path . INCLUDES . 'utf/utf_tools.' . $phpEx); //Load UTF-8 Tools
 
 /**
@@ -458,11 +458,11 @@ $mx_cache->init_mod_rewrite();
 // Instantiate the mx_auth class
 if( class_exists('phpbb_auth'))
 {
-	$mx_auth = $phpbb_auth =new phpbb_auth();
+	$mx_auth = $phpbb_auth = new phpbb_auth();
 }
 elseif( class_exists('mx_auth'))
 {
-	$mx_auth = $phpbb_auth =new mx_auth();
+	$mx_auth = $phpbb_auth = new mx_auth();
 }
 //
 // Instantiate the mx_user class
@@ -492,7 +492,7 @@ $mx_block = new mx_block();
 $client_ip = (!empty($_SERVER['REMOTE_ADDR'])) ? (string) $_SERVER['REMOTE_ADDR'] : ((!empty($_ENV['REMOTE_ADDR'])) ? $_ENV['REMOTE_ADDR'] : getenv('REMOTE_ADDR'));
 //$client_ip = htmlspecialchars_decode($mx_request_vars->server('REMOTE_ADDR'));
 $client_ip = preg_replace('# {2,}#', ' ', str_replace(',', ' ', $client_ip));
-$user_ip = $phpBB2->encode_ip($client_ip);
+$user_ip = $mx_user->encode_ip($client_ip);
 
 //
 // Instantiate the mx_bbcode class

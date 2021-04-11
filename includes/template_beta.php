@@ -9,21 +9,6 @@
 *
 */
 
-/***************************************************************************
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 2 of the License, or
- *   (at your option) any later version.
- *
- ***************************************************************************/
-
-/**
-*
-* @Extra credits for this file
-* Vjacheslav Trushkin (http://www.stsoftware.biz)
-*
-*/
 
 /**
  *
@@ -44,11 +29,6 @@
  *
  */
 
-if (!defined('IN_PORTAL'))
-{
-	die('Hacking attempt');
-}
-
 define('XS_SEPARATOR', '.');
 define('XS_DIR_CACHE', 'cache');
 define('XS_USE_ISSET', '1');
@@ -67,9 +47,6 @@ define('XS_TAG_PHP', 1);
 define('XS_TAG_BEGIN', 2);
 define('XS_TAG_END', 3);
 define('XS_TAG_INCLUDE', 4);
-define('XS_TAG_INCLUDEPHP', 13);
-define('XS_TAG_INCLUDEJS', 14);
-define('XS_TAG_INCLUDECSS', 15);
 define('XS_TAG_IF', 5);
 define('XS_TAG_ELSE', 6);
 define('XS_TAG_ELSEIF', 7);
@@ -77,35 +54,22 @@ define('XS_TAG_ENDIF', 8);
 define('XS_TAG_DEFINE', 9);
 define('XS_TAG_UNDEFINE', 10);
 define('XS_TAG_BEGINELSE', 11);
-define('XS_TAG_ALIAS', 12);
 
-define('ALIAS', 12);
-define('NONE', 0);
-define('PHP', 1);
-define('BEGIN', 2);
-define('END', 3);
-define('INCLUDE', 4);
-define('IF', 5);
-define('ELSE', 6);
-define('ELSEIF', 7);
-define('ENDIF', 8);
-define('DEFINE', 9);
-define('UNDEFINE', 10);
-define('BEGINELSE', 11);
 //MX-Publisher Stuff
-class Template 
-{
+
+
+class Template {
 	var $classname = "Template";
 
 	// variable that holds all the data we'll be substituting into
 	// the compiled templates.
-	var $tpldata = array('.' => array(0 => array()));
+	// ...
 	// This will end up being a multi-dimensional array like this:
 	// $this->_tpldata[block.][iteration#][child.][iteration#][child2.][iteration#][variablename] == value
 	// if it's a root-level variable, it'll be like this:
 	// $this->vars[varname] == value  or  $this->_tpldata['.'][0][varname] == value
 	// array "vars" is added for easier access to data
-	var $_tpldata = array('.' => array(0 => array()), 'DEFINE' => array(9 => array()));	
+	var $_tpldata = array('.' => array(0 => array()));
 	var $vars;
 
 	// Hash of filenames for each template handle.
@@ -116,12 +80,8 @@ class Template
 	// Root template directory.
 	var $root = '';
 
-	// Cache directory (compatible with default cache class)
+	// Cache directory (compatible with default cache mod)
 	var $cachedir = '';
-
-	
-	// Style directory (compatible with default templates class)
-	var $template_path = XS_TPL_START;
 
 	// Search/replace for unknown files
 	var $cache_search = array();
@@ -168,7 +128,7 @@ class Template
 	// eXtreme Styles variables
 	var $xs_started = 0;
 	var $xs_version = 8; // number version. internal. do not change.
-	var $xs_versiontxt = '2.4.1'; // text version
+	var $xs_versiontxt = '2.4.0'; // text version
 
 	// These handles will be parsed if pparse() is executed.
 	// Can be used to automatically include header/footer if there is any content.
@@ -194,40 +154,22 @@ class Template
 		// history mod typo:
 		array('site_today', 'site_week'),
 		);
-	
-	/**
-	* Constructor
-	*
-	* @param $mx_user
-	*/
-	public function __construct()
-	{
-		global $mx_cache, $mx_user; 
-		
-		$this->cache = $mx_cache;
-		$this->user = $mx_user;
-	}
-	
+
 	/**
 	 * Constructor. Installs XS mod on first run or updates it and sets the root dir.
 	 */
 	function Template($root = '.')
 	{
-		global $mx_cache, $mx_user; 
-		
-		$this->cache = $mx_cache;
-		$this->user = $mx_user;		
-		
 		// setting pointer "vars"
 		$this->vars = &$this->_tpldata['.'][0];
 		// load configuration
-		$this->load_config($root, true);
+		$this->load_config($root);
 	}
 
 	/**
 	 * Load mod configuration
 	 */
-	function load_config($root, $edit_db)
+	function load_config($root)
 	{
 		global $mx_cache, $board_config, $portal_config, $phpbb_root_path, $mx_root_path, $phpEx, $mx_backend;
 
@@ -352,13 +294,6 @@ class Template
 		$this->cache_replace = array('_', XS_SEPARATOR, XS_SEPARATOR, '.'.$this->php);
 		$old_root = $this->root;
 		$this->set_rootdir($root);
-		// Mighty Gorgon - Common TPL - BEGIN
-		$cfg_path = $this->tpl;
-		if ((defined('IN_PHPBB') || defined('IN_ADMIN')))
-		{
-			$cfg_path = 'all';
-		}
-		// Mighty Gorgon - Common TPL - END
 		if(!empty($this->tpl))
 		{
 			$this->load_replacements($this->tpldir . $this->tpl . '/xs.cfg');
@@ -402,7 +337,7 @@ class Template
 	* Set custom template location (able to use directory outside of phpBB)
 	* @access public
 	*/
-	function set_custom_template2($template_path, $template_name)
+	function set_custom_template($template_path, $template_name)
 	{
 		global $board_config, $phpbb_root_path, $mx_root_path;
 
@@ -423,37 +358,7 @@ class Template
 		$this->vars = &$this->_tpldata['.'][0];
 		$this->xs_started = 0;
 	}
-	
-	/**
-	* Reset/empty complete block
-	* @access public
-	*/
-	function destroy_block_vars($blockname)
-	{
-		if (strpos($blockname, '.') !== false)
-		{
-			// Nested block.
-			$blocks = explode('.', $blockname);
-			$blockcount = sizeof($blocks) - 1;
 
-			$str = &$this->_tpldata;
-			for ($i = 0; $i < $blockcount; $i++)
-			{
-				$str = &$str[$blocks[$i]];
-				$str = &$str[sizeof($str) - 1];
-			}
-
-			unset($str[$blocks[$blockcount]]);
-		}
-		else
-		{
-			// Top-level block.
-			unset($this->_tpldata[$blockname]);
-		}
-
-		return true;
-	}
-	
 	/**
 	 * Clears list of compiled files.
 	 */
@@ -576,21 +481,21 @@ class Template
 				{
 					case POST_CAT_URL:
 						$cat_id = $id;
-					break;
+						break;
 					case POST_FORUM_URL:
 						$forum_id = $id;
-					break;
+						break;
 					case POST_TOPIC_URL:
 						$topic_id = $id;
-					break;
+						break;
 					case POST_POST_URL:
 						if ( !defined('IN_PRIVMSG') )
 						{
 							$post_id = $id;
-					break;
+							break;
 						}
 					default:
-					break;
+						break;
 				}
 			}
 
@@ -888,136 +793,21 @@ class Template
 	 */
 	function make_filename_cache($file)
 	{
-		if (!ini_get('safe_mode') || !strtolower(ini_get('safe_mode')) == 'on') 
-		{
-			$sufix = ''; 
-		}
-		else
-		{
-			$sufix = ''; 
-		}
 		$str = str_replace($this->cache_search, $this->cache_replace, $file);
 		if(substr($file, 0, $this->tpldir_len) !== $this->tpldir || empty($this->tpl))
 		{
-			return $this->cachedir . XS_TPL_PREFIX2 . $str . $sufix;
+			return $this->cachedir . XS_TPL_PREFIX2 . $str;
 		}
 		// removing not needed part
-		$file = substr($file, $this->tpldir_len, strlen($file . $sufix)) . $sufix;
+		$file = substr($file, $this->tpldir_len, strlen($file));
 		// creating filename
-		return $this->cachedir . XS_TPL_PREFIX . str_replace($this->cache_search, $this->cache_replace, $file) . $sufix;
+		return $this->cachedir . XS_TPL_PREFIX . str_replace($this->cache_search, $this->cache_replace, $file);
 	}
-	
+
 	/**
-	* Set template location
-	* @access public
-	*/
-	function set_template()
-	{
-		global $phpbb_root_path, $mx_root_path, $mx_user;
-
-		if (file_exists($mx_root_path . XS_TPL_START . $mx_user->theme['template_path'] . '/template'))
-		{
-			$this->root = $mx_root_path . XS_TPL_START . $mx_user->theme['template_path'] . '/template';
-			$this->cachepath = $mx_root_path . 'cache/tpl_' . str_replace('_', '-', $mx_user->theme['template_path']) . '_';
-
-			if ($this->orig_tpl_storedb === null)
-			{
-				$this->orig_tpl_storedb = $mx_user->theme['template_storedb'];
-			}
-
-			if ($this->orig_tpl_inherits_id === null)
-			{
-				$this->orig_tpl_inherits_id = $mx_user->theme['template_inherits_id'];
-			}
-
-			$mx_user->theme['template_storedb'] = $this->orig_tpl_storedb;
-			$mx_user->theme['template_inherits_id'] = $this->orig_tpl_inherits_id;
-
-			if ($mx_user->theme['template_inherits_id'])
-			{
-				$this->inherit_root = $mx_root_path . XS_TPL_START . $mx_user->theme['template_inherit_path'] . '/template';
-			}
-		}
-		elseif (file_exists($phpbb_root_path . XS_TPL_START . $mx_user->theme['template_path'] . '/template'))
-		{
-			$this->root = $phpbb_root_path . XS_TPL_START . $mx_user->theme['template_path'] . '/template';
-			$this->cachepath = $phpbb_root_path . 'cache/tpl_' . str_replace('_', '-', $mx_user->theme['template_path']) . '_';
-
-			if ($this->orig_tpl_storedb === null)
-			{
-				$this->orig_tpl_storedb = $mx_user->theme['template_storedb'];
-			}
-
-			if ($this->orig_tpl_inherits_id === null)
-			{
-				$this->orig_tpl_inherits_id = $mx_user->theme['template_inherits_id'];
-			}
-
-			$mx_user->theme['template_storedb'] = $this->orig_tpl_storedb;
-			$mx_user->theme['template_inherits_id'] = $this->orig_tpl_inherits_id;
-
-			if ($mx_user->theme['template_inherits_id'])
-			{
-				$this->inherit_root = $mx_root_path . XS_TPL_START . $mx_user->theme['template_inherit_path'] . '/template';
-			}
-		}		
-		else
-		{
-			trigger_error('Template path could not be found: ' . XS_TPL_START . $mx_user->theme['template_path'] . '/template', E_USER_ERROR);
-		}
-		//$this->vars = &$this->tpldata['.'][0];
-		$this->vars = &$this->_tpldata['.'][0];
-		$this->_rootref = &$this->_tpldata['.'][0];
-		//$this->rootref = &$this->tpldata['.'][0];
-		return true;
-	}
-	
-	/**
-	* Set custom template location (able to use directory outside of phpBB)
-	* @access public
-	*/
-	function set_custom_template($template_path, $template_name, $fallback_template_path = false)
-	{
-		global $mx_root_path, $mx_user;
-
-		// Make sure $template_path has no ending slash
-		if (substr($template_path, -1) == '/')
-		{
-			$template_path = substr($template_path, 0, -1);
-		}
-
-		$this->root = $template_path;
-		$this->cachepath = $mx_root_path . 'cache/ctpl_' . str_replace('_', '-', $template_name) . '_';
-
-		if ($fallback_template_path !== false)
-		{
-			if (substr($fallback_template_path, -1) == '/')
-			{
-				$fallback_template_path = substr($fallback_template_path, 0, -1);
-			}
-
-			$this->inherit_root = $fallback_template_path;
-			$this->orig_tpl_inherits_id = true;
-		}
-		else
-		{
-			$this->orig_tpl_inherits_id = false;
-		}
-
-		// the database does not store the path or name of a custom template
-		// so there is no way we can properly store custom templates there
-		$this->orig_tpl_storedb = false;
-		$this->vars = &$this->_tpldata['.'][0];
-		$this->_rootref = &$this->_tpldata['.'][0];
-
-		return true;
-	}
-	
-	/**
-	* Sets the template filenames for handles. $filename_array
-	* should be a hash of handle => filename pairs.
-	* @access public
-	*/
+	 * Sets the template filenames for handles. $filename_array
+	 * should be a hash of handle => filename pairs.
+	 */
 	function set_filenames($filename_array)
 	{
 		if (!is_array($filename_array))
@@ -1033,18 +823,8 @@ class Template
 
 		return true;
 	}
-	
-	/**
-	* Get a filename from the handle
-	*
-	* @param string $handle
-	* @return string
-	*/
-	protected function get_filename_from_handle($handle)
-	{
-		return (isset($this->filenames[$handle])) ? $this->filenames[$handle] : $handle;
-	}
-	
+
+
 	/**
 	 * Assigns template filename for handle.
 	 */
@@ -1180,54 +960,7 @@ class Template
 		}
 		return true;
 	}
-	
-	/**
-	* Extra CSS and JS
-	*/
-	function add_css_js()
-	{
-		if (!defined('CSS_JS_PARSED'))
-		{
-			define('CSS_JS_PARSED', true);
-		}
 
-		// Include custom CSS from templates/CURRENT_TPL folder
-		if(is_array($this->css_style_include) && !empty($this->css_style_include))
-		{
-			for ($i = 0; $i < sizeof($this->css_style_include); $i++)
-			{
-				$this->assign_block_vars('css_style_include', array(
-					'CSS_FILE' => $this->css_style_include[$i],
-					)
-				);
-			}
-		}
-
-		// Include custom CSS from templates/common folder
-		if(is_array($this->css_include) && !empty($this->css_include))
-		{
-			for ($i = 0; $i < sizeof($this->css_include); $i++)
-			{
-				$this->assign_block_vars('css_include', array(
-					'CSS_FILE' => $this->css_include[$i],
-					)
-				);
-			}
-		}
-
-		// Include custom JS from templates/common folder
-		if(is_array($this->js_include) && !empty($this->js_include))
-		{
-			for ($i = 0; $i < sizeof($this->js_include); $i++)
-			{
-				$this->assign_block_vars('js_include', array(
-					'JS_FILE' => $this->js_include[$i],
-					)
-				);
-			}
-		}
-	}
-	
 	/**
 	 * Load the file for the handle, compile the file,
 	 * and run the compiled code. This will print out
@@ -1260,7 +993,8 @@ class Template
 			die("Template->loadfile(): No files found for handle $handle");
 		}
 		$this->xs_startup();
-		$force_recompile = empty($this->uncompiled_code[$handle]) ? false : true;
+		$force_recompile = empty($this->uncompiled_code[$handle]) ? false : true;		
+		
 		// checking if php file exists.
 		if (!empty($this->files_cache[$handle]) && !$force_recompile)
 		{
@@ -1284,7 +1018,8 @@ class Template
 			{
 				$this->compiled_code[$handle] = $this->compile2($this->uncompiled_code[$handle], '', '');
 			}
-		}
+		}	
+		
 		// Run the compiled code.
 		if (empty($this->files_cache[$handle]) || $force_recompile)
 		{
@@ -1297,7 +1032,6 @@ class Template
 		
 		return true;
 	}
-
 
 	/**
 	* Load a compiled template if possible, if not, recompile it
@@ -1482,24 +1216,7 @@ class Template
 
 		return true;
 	}
-	
-	/**
-	* Assign key variable pairs from an array to a whole specified block loop
-	*
-	* @param string $blockname Name of block to assign $block_vars_array to
-	* @param array $block_vars_array An array of hashes of variable name => value pairs
-	* @return true
-	*/
-	public function assign_block_vars_array($blockname, array $block_vars_array)
-	{
-		foreach ($block_vars_array as $vararray)
-		{
-			$this->assign_block_vars($blockname, $vararray);
-		}
 
-		return true;
-	}
-	
 	/**
 	 * Root-level variable assignment. Adds to current assignments, overriding
 	 * any existing variable assignment with the same name.
@@ -1520,46 +1237,10 @@ class Template
 	function assign_var($varname, $varval)
 	{
 		$this->vars[$varname] = $varval;
-		//$this->_rootref[$varname] = $varval;		
-		
-		return true;
-	}
-	
-	/**
-	* Returns a reference to template data array.
-	*
-	* This function is public so that template renderer may invoke it.
-	* Users should alter template variables via functions in \phpbb\template\template.
-	*
-	* Note: modifying returned array will affect data stored in the context.
-	*
-	* @return array template data
-	*/
-	function &get_data_ref()
-	{
-		// returning a reference directly is not
-		// something php is capable of doing
-		$ref = &$this->tpldata;
 
 		return true;
 	}
 
-	/**
-	* Returns a reference to template root scope.
-	*
-	* This function is public so that template renderer may invoke it.
-	* Users should not need to invoke this function.
-	*
-	* Note: modifying returned array will affect data stored in the context.
-	*
-	* @return array template data
-	*/
-	public function &get_root_ref()
-	{
-		// rootref is already a reference
-		return $this->rootref;
-	}	
-	
 	/**
 	 * If not already done, load the file for the given handle and populate
 	 * the uncompiled_code[] hash with its code. Do not compile.
@@ -1672,181 +1353,9 @@ class Template
 			return '$'. $blocks[$blockcount-1]. '_item[\''. $blocks[$blockcount]. '.\']';
 		}
 	}
-	
-	/**
-	* Remove any PHP tags that do not belong, these regular expressions are derived from
-	* the ones that exist in zend_language_scanner.l
-	* @access private
-	*/
-	function remove_php_tags(&$code)
-	{
-		// This matches the information gathered from the internal PHP lexer
-		$match = array(
-			'#<([\?%])=?.*?\1>#s',
-			'#<script\s+language\s*=\s*(["\']?)php\1\s*>.*?</script\s*>#s',
-			'#<\?php(?:\r\n?|[ \n\t]).*?\?>#s'
-		);
 
-		$code = preg_replace($match, '', $code);
-	}
-	
-	/**
-	* Compile blocks
-	* @access private
-	*/
-	function compile_tag_block($tag_args)
-	{
-		$no_nesting = false;
-
-		// Is the designer wanting to call another loop in a loop?
-		if (strpos($tag_args, '!') === 0)
-		{
-			// Count the number of ! occurrences (not allowed in vars)
-			$no_nesting = substr_count($tag_args, '!');
-			$tag_args = substr($tag_args, $no_nesting);
-		}
-
-		// Allow for control of looping (indexes start from zero):
-		// foo(2)    : Will start the loop on the 3rd entry
-		// foo(-2)   : Will start the loop two entries from the end
-		// foo(3,4)  : Will start the loop on the fourth entry and end it on the fifth
-		// foo(3,-4) : Will start the loop on the fourth entry and end it four from last
-		if (preg_match('#^([^()]*)\(([\-\d]+)(?:,([\-\d]+))?\)$#', $tag_args, $match))
-		{
-			$tag_args = $match[1];
-
-			if ($match[2] < 0)
-			{
-				$loop_start = '($_' . $tag_args . '_count ' . $match[2] . ' < 0 ? 0 : $_' . $tag_args . '_count ' . $match[2] . ')';
-			}
-			else
-			{
-				$loop_start = '($_' . $tag_args . '_count < ' . $match[2] . ' ? $_' . $tag_args . '_count : ' . $match[2] . ')';
-			}
-
-			if (strlen($match[3]) < 1 || $match[3] == -1)
-			{
-				$loop_end = '$_' . $tag_args . '_count';
-			}
-			else if ($match[3] >= 0)
-			{
-				$loop_end = '(' . ($match[3] + 1) . ' > $_' . $tag_args . '_count ? $_' . $tag_args . '_count : ' . ($match[3] + 1) . ')';
-			}
-			else //if ($match[3] < -1)
-			{
-				$loop_end = '$_' . $tag_args . '_count' . ($match[3] + 1);
-			}
-		}
-		else
-		{
-			$loop_start = 0;
-			$loop_end = '$_' . $tag_args . '_count';
-		}
-
-		$this->block_names = is_array($this->block_names) ? $this->block_names : array($this->block_names, $this->block_names);
-		$tag_template_php = '';
-		//array_push($this->block_names, $tag_args);
-
-
-		
-		/**
-		* Minimum Requirement: PHP 5.4.0 for phpBB3
-		*/
-		if (version_compare(PHP_VERSION_MX, '5.4') > 0)
-		{
-			//array_push(is_array($this->block_names) ? $this->block_names : array($this->block_names), $tag_args);
-			array_push($this->block_names, $tag_args);
-		}		
-		elseif (version_compare(PHP_VERSION, '5.6') < 0)
-		{
-			array_push($this->block_names, $tag_args);
-		}			
-		else
-		{				
-			//array_push(is_array($this->block_names) ? $this->block_names : array($this->block_names), $tag_args);
-			array_push($this->block_names, $tag_args);
-		}
-		
-		if ($no_nesting !== false)
-		{
-			// We need to implode $no_nesting times from the end...
-			$block = array_slice($this->block_names, -$no_nesting);
-		}
-		else
-		{
-			$block = $this->block_names;
-		}
-
-		if (sizeof($block) < 2)
-		{
-			// Block is not nested.
-			$tag_template_php = '$_' . $tag_args . "_count = (isset(\$this->_tpldata['$tag_args'])) ? sizeof(\$this->_tpldata['$tag_args']) : 0;";
-			$varref = "\$this->_tpldata['$tag_args']";
-			//$varref = $this->_tpldata[$tag_args];			
-		}
-		else
-		{
-			// This block is nested.
-			// Generate a namespace string for this block.
-			$namespace = implode('.', $block);
-
-			// Get a reference to the data array for this block that depends on the
-			// current indices of all parent blocks.
-			$varref = $this->generate_block_data_ref($namespace, false);
-
-			// Create the for loop code to iterate over this block.
-			$tag_template_php = '$_' . $tag_args . '_count = (isset(' . $varref . ')) ? sizeof(' . $varref . ') : 0;';
-		}
-
-		$tag_template_php .= 'if ($_' . $tag_args . '_count) {';
-
-		/**
-		* The following uses foreach for iteration instead of a for loop, foreach is faster but requires PHP to make a copy of the contents of the array which uses more memory
-		* <code>
-		*	if (!$offset)
-		*	{
-		*		$tag_template_php .= 'foreach (' . $varref . ' as $_' . $tag_args . '_i => $_' . $tag_args . '_val){';
-		*	}
-		* </code>
-		*/
-
-		$tag_template_php .= 'for ($_' . $tag_args . '_i = ' . $loop_start . '; $_' . $tag_args . '_i < ' . $loop_end . '; ++$_' . $tag_args . '_i){';
-		$tag_template_php .= '$_'. $tag_args . '_val = &' . $varref . '[$_'. $tag_args. '_i];';
-
-		return $tag_template_php;
-	}
-
-	/**
-	* Compile INCLUDE tag
-	* @access private
-	*/
-	function compile_tag_include($tag_args)
-	{
-		// Process dynamic includes
-		if ($tag_args[0] == '$')
-		{
-			return "if (isset($tag_args)) { \$this->_tpl_include($tag_args); }";
-		}
-
-		return "\$this->_tpl_include('$tag_args');";
-	}
-
-	/**
-	* Compile INCLUDE_PHP tag
-	* @access private
-	*/
-	function compile_tag_include_php($tag_args)
-	{
-		return "\$this->_php_include('$tag_args');";
-	}
-	
-	/**
-	* Compile variables
-	* @access private
-	*/	
 	function compile_code($filename, $code, $use_isset = false)
 	{
-		global $mx_user, $theme;
 		//	$filename - file to load code from. used if $code is empty
 		//	$code - tpl code
 		//	$use_isset - if false then compiled code looks more beautiful and easier
@@ -1861,78 +1370,7 @@ class Template
 			$code = @implode('', @file($filename));
 		}
 
-		/** Replace some unitialised  page_header() tags **/
-		$code = str_replace('{TEMPLATE_ROOT_PATH}', TEMPLATE_ROOT_PATH, $code);
-		$code = str_replace('{U_PORTAL_ROOT_PATH}', PORTAL_URL, $code);
-		$code = str_replace('{U_PHPBB_ROOT_PATH}', PHPBB_URL, $code);
-		$code = str_replace('{T_MXBB_STYLESHEET}', $mx_user->theme['head_stylesheet'], $code);
-		
-		/** Replace phpBB 2.2 <!-- (END)PHP --> tags **/
-		preg_match_all('#<!-- PHP -->(.*?)<!-- ENDPHP -->#s', $code, $matches);
-		$php_blocks = $matches[1];
-		$code = preg_replace('#<!-- PHP -->.*?<!-- ENDPHP -->#s', '<!-- PHP -->', $code);
-		$code = str_replace('$HAS_SUB', 'S_HAS_SUBFORUM', $code);
-		$code = str_replace('.topicrow', 'S_HAS_SUBFORUM', $code);
-		$code = str_replace('not .notifications', 'not NOTIFICATIONS_COUNT', $code);
-		$code = str_replace('.birthdays', 'S_DISPLAY_BIRTHDAY_LIST', $code);
-		
-		$code = str_replace('.postrow.contact', '$postrow_item[\'contact.\']', $code);
-		$code = str_replace('.pagination or', 'PAGINATION or', $code); 
-		$code = str_replace('.pagination', 'PAGINATION', $code);
-		$code = str_replace('.quickmod', 'QUICKMOD', $code);
-
-		/** Pull out all block/statement level elements and separate plain text **/
-		preg_match_all('#<!-- INCLUDE (\{\$?[A-Z0-9\-_]+\}|[a-zA-Z0-9\_\-\+\./]+) -->#', $code, $matches);
-		$include_blocks = $matches[1];
-		
-		//$code = preg_replace('#<!-- INCLUDE (?:\{\$?[A-Z0-9\-_]+\}|[a-zA-Z0-9\_\-\+\./]+) -->#', '<!-- INCLUDEX -->', $code);
-		
-		/** Remove overall_header and overall_footer included in MX-PORTAL and phpBB2 and mx_phpbb3 Forum Integration 
-		via page_header.php and page_tail.php **/
-		$code = str_replace('<!-- INCLUDE overall', '<!-- INCLUDEX overall', $code);
-		
-		/** Pull out all block/statement level elements and separate plain text **/
-		preg_match_all('#<!-- INCLUDEPHP ([a-zA-Z0-9\_\-\+\./]+) -->#', $code, $matches);
-		$includephp_blocks = $matches[1];
-		$code = preg_replace('#<!-- INCLUDEPHP [a-zA-Z0-9\_\-\+\./]+ -->#', '<!-- INCLUDEPHP -->', $code);
-		
-		preg_match_all('#<!-- INCLUDEJS ([a-zA-Z0-9\_\-\+\./]+) -->#', $code, $matches);
-		$includejs_blocks = $matches[1];
-		$code = preg_replace('#<!-- INCLUDEJS [a-zA-Z0-9\_\-\+\./]+ -->#', '<!-- INCLUDEJS -->', $code);
-		
-		preg_match_all('#<!-- INCLUDECSS ([a-zA-Z0-9\_\-\+\./]+) -->#', $code, $matches);
-		$includecss_blocks = $matches[1];
-		$code = preg_replace('#<!-- INCLUDECSS [a-zA-Z0-9\_\-\+\./]+ -->#', '<!-- INCLUDECSS -->', $code);
-
-		/** Fix our BEGIN statements **/
-		//$code = $this->fix_begin_tokens($code);
-		//$code = $this->fix_tokens_begin($code);
-		/** Fix our BEGIN statements step2 **/
-		$code = str_replace('{% else %}', '<!-- BEGINELSE -->', $code);
-		$code = str_replace('{%', '<!-- ', $code);
-		$code = str_replace('{% set', '<!-- SET', $code);
-		$code = str_replace('%}', '-->', $code);
-		
-		/** Fix our BEGIN statements step3 this will break mx_main_layout.html and mx_menu_classic_ver.html. ** /
-		$code = str_replace('%', '--', $code);		
-		
-		/**Fix our IF tokens **/
-		// $code = $this->fix_if_tokens($code);
-		
-		// Replace ELSE IF with ELSEIF
-		$code = preg_replace('#<!-- ELSE IF (.+?) -->#', '<!-- ELSEIF $1 -->', $code);
-
-		/** Replace all of our language variables, {L_VARNAME}, with Twig style, {{ lang('NAME') }}
-		// Appends any filters after lang() **/
-		//$code = preg_replace('#{L_([a-zA-Z0-9_\.]+)(\|[^}]+?)?}#', '{{ lang(\'$1\')$2 }}', $code);
-		$code = str_replace("{{ ", "{", $code);
-		$code = str_replace(" }}", "}", $code);
-		$code = str_replace("lang", "L_", $code);
-		$code = str_replace("('", "", $code);
-		$code = str_replace("')", "", $code);
-
-
-		/** Replace phpBB 2.2 <!-- (END)PHP --> tags **/
+		// Replace phpBB 2.2 <!-- (END)PHP --> tags
 		$search = array('<!-- PHP -->', '<!-- ENDPHP -->');
 		$replace = array('<'.'?php ', ' ?'.'>');
 		$code = str_replace($search, $replace, $code);
@@ -1961,7 +1399,7 @@ class Template
 		// replace all short php tags
 		$new_code = array();
 		$line_count = count($code_lines);
-		for($i = 0; $i < $line_count; $i++)
+		for($i=0; $i<$line_count; $i++)
 		{
 			$line = $code_lines[$i];
 			$pos = strpos($line, '<?');
@@ -1987,7 +1425,7 @@ class Template
 
 		// main loop
 		$line_count = count($code_lines);
-		for($i = 0; $i < $line_count; $i++)
+		for($i=0; $i<$line_count; $i++)
 		{
 			$line = $code_lines[$i];
 			// reset keyword type
@@ -2001,7 +1439,7 @@ class Template
 				continue;
 			}
 			// find end of html comment
-			$pos2 = strpos($line, ' -->', $pos1);
+			$pos2 = strpos($line, '-->', $pos1);
 			if($pos2 !== false)
 			{
 				// find end of keyword in comment
@@ -2067,7 +1505,7 @@ class Template
 			}
 			// remove keyword
 			$keyword_str = substr($line, $pos1, $pos2 - $pos1 + 4);
-			$params_str = $pos2 == $pos3 ? '' : substr($line, $pos3 + 1, $pos2 - $pos3 - 1);
+			$params_str = ($pos2 == $pos3) ? '' : trim(substr($line, $pos3 + 1, $pos2 - $pos3 - 1));
 			$code_lines[$i] = substr($line, $pos2 + 4);
 			$i--;
 			// Check keywords
@@ -2313,59 +1751,6 @@ class Template
 				continue;
 			}
 			/*
-			* <!-- INCLUDE -->
-			*/
-			if($keyword_type == XS_TAG_INCLUDEPHP)
-			{
-				$params = explode(' ', $params_str);
-				$num_params = count($params);
-				if($num_params != 1)
-				{
-					$compiled[] = $keyword_str;
-					continue;
-				}
-				$tag_args = array_shift($includephp_blocks);
-				$line = "\$this->_php_include('$tag_args');";
-				$compiled[] = $line;
-				continue;
-			}
-			/*
-			* <!-- INCLUDEJS -->
-			*/
-			if($keyword_type == XS_TAG_INCLUDEJS)
-			{
-				$params = explode(' ', $params_str);
-				$num_params = count($params);
-				if($num_params != 1)
-				{
-					$compiled[] = $keyword_str;
-					continue;
-				}
-				$mx_js_path =  'templates/' . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/';
-				$asset_file = array_shift($includejs_blocks);
-				$line = '<script type="text/javascript" src="' . PORTAL_URL . $mx_js_path . $asset_file . '"></script><br />';
-				$compiled[] = $line;
-				continue;
-			}
-			/*
-			* <!-- INCLUDECSS -->
-			*/
-			if($keyword_type == XS_TAG_INCLUDECSS)
-			{
-				$params = explode(' ', $params_str);
-				$num_params = count($params);
-				if($num_params != 1)
-				{
-					$compiled[] = $keyword_str;
-					continue;
-				}
-				$mx_css_path =  'templates/' . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/';
-				$asset_file = array_shift($includecss_blocks);
-				$line = '<link href="' . PORTAL_URL . $mx_css_path . $asset_file . '" rel="stylesheet" type="text/css" media="screen" />';
-				$compiled[] = $line;
-				continue;
-			}
-			/*
 			* <!-- IF -->
 			*/
 			if($keyword_type == XS_TAG_IF || $keyword_type == XS_TAG_ELSEIF)
@@ -2449,69 +1834,7 @@ class Template
 
 		return $code_header . implode('', $compiled) . $code_footer;
 	}
-	
-	/**
-	* Get template vars in a format Twig will use (from the context)
-	*
-	* @return array
-	*/
-	function get_template_vars()
-	{
-		$context_vars = $this->get_data_ref();
 
-		$vars = array_merge(
-			$context_vars, // To get normal vars
-			array(
-				'definition'	=> new definition(),
-				'user'			=> $this->user,
-				'loops'			=> $context_vars, // To get loops
-			)
-		);
-
-		// cleanup
-		unset($vars['loops']['.']);
-
-		return $vars;
-	}	
-	
-	/**
-	* Compile variables
-	* @access private
-	*/
-	function compile_var_tags(&$text_blocks)
-	{
-		// change template varrefs into PHP varrefs
-		$varrefs = array();
-
-		// This one will handle varrefs WITH namespaces
-		preg_match_all('#\{((?:[a-z0-9\-_]+\.)+)(\$)?([A-Z0-9\-_]+)\}#', $text_blocks, $varrefs, PREG_SET_ORDER);
-
-		foreach ($varrefs as $var_val)
-		{
-			$namespace = $var_val[1];
-			$varname = $var_val[3];
-			$new = $this->generate_block_varref($namespace, $varname, true, $var_val[2]);
-
-			$text_blocks = str_replace($var_val[0], $new, $text_blocks);
-		}
-
-		// This will handle the remaining root-level varrefs
-		// transform vars prefixed by L_ into their language variable pendant if nothing is set within the tpldata array
-		if (strpos($text_blocks, '{L_') !== false)
-		{
-			$text_blocks = preg_replace('#\{L_([A-Z0-9\-_]+)\}#', "<?php echo ((isset(\$this->_rootref['L_\\1'])) ? \$this->_rootref['L_\\1'] : ((isset(\$mx_user->lang['\\1'])) ? \$mx_user->lang['\\1'] : '{ \\1 }')); ?>", $text_blocks);
-		}
-
-		// Handle addslashed language variables prefixed with LA_
-		// If a template variable already exist, it will be used in favor of it...
-		if (strpos($text_blocks, '{LA_') !== false)
-		{
-			$text_blocks = preg_replace('#\{LA_([A-Z0-9\-_]+)\}#', "<?php echo ((isset(\$this->_rootref['LA_\\1'])) ? \$this->_rootref['LA_\\1'] : ((isset(\$this->_rootref['L_\\1'])) ? addslashes(\$this->_rootref['L_\\1']) : ((isset(\$mx_user->lang['\\1'])) ? addslashes(\$mx_user->lang['\\1']) : '{ \\1 }'))); ?>", $text_blocks);
-		}
-
-		return;
-	}
-	
 	/*
 	* Compile code between tags
 	*/
@@ -2700,7 +2023,7 @@ class Template
 				{
 					$expr =	"!($is_arg % 2)";
 				}
-			break;
+				break;
 
 			case 'odd':
 				if (@$tokens[$expr_end] == 'by')
@@ -2713,7 +2036,7 @@ class Template
 				{
 					$expr =	"($is_arg %	2)";
 				}
-			break;
+				break;
 
 			case 'div':
 				if (@$tokens[$expr_end] == 'by')
@@ -2722,7 +2045,7 @@ class Template
 					$expr_arg =	$tokens[$expr_end++];
 					$expr =	"!($is_arg % $expr_arg)";
 				}
-			break;
+				break;
 
 			default:
 				break;
@@ -2756,19 +2079,19 @@ class Template
 		else
 		{
 			preg_match('#(true|false|\.)#i', $match[5], $type);
-			//
-			switch (@strtolower($type[1]))
+
+			switch (strtolower($type[1]))
 			{
 				case 'true':
 				case 'false':
 					$match[5] = strtoupper($match[5]);
-				break;
+					break;
 				case '.';
 					$match[5] = doubleval($match[5]);
-				break;
+					break;
 				default:
 					$match[5] = intval($match[5]);
-				break;
+					break;
 			}
 		}
 
@@ -3214,7 +2537,6 @@ class Template
 		}
 		return $str;
 	}
-	
 	function _unserialize($str)
 	{
 		$array = array();
@@ -3229,728 +2551,7 @@ class Template
 		}
 		return $array;
 	}
-	
-	/**
-	* Change already assigned key variable pair (one-dimensional - single loop entry)
-	*
-	* An example of how to use this function:
-	* {@example alter_block_array.php}
-	*
-	* @param	string	$blockname	the blockname, for example 'loop'
-	* @param	array	$vararray	the var array to insert/add or merge
-	* @param	mixed	$key		Key to search for
-	*
-	* array: KEY => VALUE [the key/value pair to search for within the loop to determine the correct position]
-	*
-	* int: Position [the position to change or insert at directly given]
-	*
-	* If key is false the position is set to 0
-	* If key is true the position is set to the last entry
-	*
-	* @param	string	$mode		Mode to execute (valid modes are 'insert' and 'change')
-	*
-	*	If insert, the vararray is inserted at the given position (position counting from zero).
-	*	If change, the current block gets merged with the vararray (resulting in new key/value pairs be added and existing keys be replaced by the new value).
-	*
-	* Since counting begins by zero, inserting at the last position will result in this array: array(vararray, last positioned array)
-	* and inserting at position 1 will result in this array: array(first positioned array, vararray, following vars)
-	*
-	* @return bool false on error, true on success
-	* @access public
-	*/
-	function alter_block_array($blockname, $vararray, $key = false, $mode = 'insert')
-	{
-		if (strpos($blockname, '.') !== false)
-		{
-			// Nested blocks are not supported
-			return false;
-		}
 
-		// Change key to zero (change first position) if false and to last position if true
-		if ($key === false || $key === true)
-		{
-			$key = ($key === false) ? 0 : sizeof($this->_tpldata[$blockname]);
-		}
-
-		// Get correct position if array given
-		if (is_array($key))
-		{
-			// Search array to get correct position
-			list($search_key, $search_value) = @each($key);
-
-			$key = NULL;
-			foreach ($this->_tpldata[$blockname] as $i => $val_ary)
-			{
-				if ($val_ary[$search_key] === $search_value)
-				{
-					$key = $i;
-					break;
-				}
-			}
-
-			// key/value pair not found
-			if ($key === NULL)
-			{
-				return false;
-			}
-		}
-
-		// Insert Block
-		if ($mode == 'insert')
-		{
-			// Make sure we are not exceeding the last iteration
-			if ($key >= sizeof($this->_tpldata[$blockname]))
-			{
-				$key = sizeof($this->_tpldata[$blockname]);
-				unset($this->_tpldata[$blockname][($key - 1)]['S_LAST_ROW']);
-				$vararray['S_LAST_ROW'] = true;
-			}
-			else if ($key === 0)
-			{
-				unset($this->_tpldata[$blockname][0]['S_FIRST_ROW']);
-				$vararray['S_FIRST_ROW'] = true;
-			}
-
-			// Re-position template blocks
-			for ($i = sizeof($this->_tpldata[$blockname]); $i > $key; $i--)
-			{
-				$this->_tpldata[$blockname][$i] = $this->_tpldata[$blockname][$i-1];
-				$this->_tpldata[$blockname][$i]['S_ROW_COUNT'] = $i;
-			}
-
-			// Insert vararray at given position
-			$vararray['S_ROW_COUNT'] = $key;
-			$this->_tpldata[$blockname][$key] = $vararray;
-
-			return true;
-		}
-
-		// Which block to change?
-		if ($mode == 'change')
-		{
-			if ($key == sizeof($this->_tpldata[$blockname]))
-			{
-				$key--;
-			}
-
-			$this->_tpldata[$blockname][$key] = array_merge($this->_tpldata[$blockname][$key], $vararray);
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
-	* Include a separate template
-	* @access private
-	*/
-	function _tpl_include($filename, $include = true)
-	{
-		$handle = $filename;
-		$this->filename[$handle] = $filename;
-		$this->files[$handle] = $this->root . '/' . $filename;
-		/** */
-		$this->set_filename($handle, $filename);
-		/** */		
-		if ($this->inherit_root)
-		{
-			$this->files_inherit[$handle] = $this->inherit_root . '/' . $filename;
-		}
-
-		$filename = $this->_tpl_load($handle);
-
-		if ($include)
-		{
-			global $mx_user;
-
-			if ($filename)
-			{
-				include($filename);
-				return;
-			}
-			eval(' ?>' . $this->compiled_code[$handle] . '<?php ');
-		}
-	}
-
-	/**
-	* Include a php-file
-	* @access private
-	*/
-	function _php_include($filename)
-	{
-		global $mx_root_path, $phpbb_root_path;
-
-		$file = $mx_root_path . $filename;
-		if (file_exists($file))
-		{
-			include($file);
-		}
-		
-		$file = $phpbb_root_path . $filename;
-		if (file_exists($file))
-		{
-			include($file);
-		}
-		
-		if (!file_exists($mx_root_path . $filename) && !file_exists($phpbb_root_path . $filename))
-		{
-			// trigger_error cannot be used here, as the output already started
-			//echo 'template->_php_include(): File ' . htmlspecialchars($filename) . ' does not exist or is empty';
-			return;
-		}	
-	}
-
-	public function set_environment()
-	{
-		$this->env = '';
-	}
-
-	public function tokenize($code, $filename = null)
-	{
-		// Our phpBB tags
-		// Commented out tokens are handled separately from the main replace
-		$phpbb_tags = array(
-			/*'BEGIN',
-			'BEGINELSE',
-			'END',
-			'IF',
-			'ELSE',
-			'ELSEIF',
-			'ENDIF',
-			'DEFINE',
-			'UNDEFINE',*/
-			'ENDDEFINE',
-			'INCLUDE',
-			'INCLUDEPHP',
-			'INCLUDEJS',
-			'INCLUDECSS',
-			'PHP',
-			'ENDPHP',
-			'EVENT',
-		);
-
-		// Twig tag masks
-		/**
-		 * Remove whitespaces between HTML tags.
-		 *
-		 * <pre>
-		 * {% spaceless %}
-		 *      <div>
-		 *          <strong>foo</strong>
-		 *      </div>
-		 * {% endspaceless %}
-		 *
-		 * {# output will be <div><strong>foo</strong></div> #}
-		 * </pre>
-		 *
-		 */		
-		$twig_tags = array(
-			'autoescape',
-			'endautoescape',
-			'if',
-			'elseif',
-			'else',
-			'endif',
-			'block',
-			'endblock',
-			'use',
-			'extends',
-			'embed',
-			'filter',
-			'endfilter',
-			'flush',
-			'for',
-			'endfor',
-			'macro',
-			'endmacro',
-			'import',
-			'from',
-			'sandbox',
-			'endsandbox',
-			'set',
-			'endset',
-			//'spaceless',
-			//'endspaceless',
-			'verbatim',
-			'endverbatim',
-		);
-
-		// Fix tokens that may have inline variables (e.g. <!-- DEFINE $TEST = '{FOO}')
-		$code = $this->strip_surrounding_quotes(array(
-			'INCLUDE',
-			'INCLUDEPHP',
-			'INCLUDEJS',
-			'INCLUDECSS',
-		), $code);
-		$code = $this->fix_inline_variable_tokens(array(
-			'DEFINE \$[a-zA-Z0-9_]+ =',
-			'INCLUDE',
-			'INCLUDEPHP',
-			'INCLUDEJS',
-			'INCLUDECSS',
-		), $code);
-		$code = $this->add_surrounding_quotes(array(
-			'INCLUDE',
-			'INCLUDEPHP',
-			'INCLUDEJS',
-			'INCLUDECSS',
-		), $code);
-
-		// Fix our BEGIN statements
-		$code = $this->fix_begin_tokens($code);
-
-		// Fix our IF tokens
-		$code = $this->fix_if_tokens($code);
-
-		// Fix our DEFINE tokens
-		$code = $this->fix_define_tokens($code);
-
-		// Replace all of our starting tokens, <!-- TOKEN --> with Twig style, {% TOKEN %}
-		// This also strips outer parenthesis, <!-- IF (blah) --> becomes <!-- IF blah -->
-		$code = preg_replace('#<!-- (' . implode('|', $phpbb_tags) . ')(?: (.*?) ?)?-->#', '{% $1 $2 %}', $code);
-
-		// Replace all of our twig masks with Twig code (e.g. <!-- BLOCK .+ --> with {% block $1 %})
-		$code = $this->replace_twig_tag_masks($code, $twig_tags);
-
-		// Replace all of our language variables, {L_VARNAME}, with Twig style, {{ lang('NAME') }}
-		// Appends any filters after lang()
-		$code = preg_replace('#{L_([a-zA-Z0-9_\.]+)(\|[^}]+?)?}#', '{{ lang(\'$1\')$2 }}', $code);
-
-		// Replace all of our escaped language variables, {LA_VARNAME}, with Twig style, {{ lang('NAME')|escape('js') }}
-		// Appends any filters after lang(), but before escape('js')
-		$code = preg_replace('#{LA_([a-zA-Z0-9_\.]+)(\|[^}]+?)?}#', '{{ lang(\'$1\')$2|escape(\'js\') }}', $code);
-
-		// Replace all of our variables, {VARNAME}, with Twig style, {{ VARNAME }}
-		// Appends any filters
-		$code = preg_replace('#{([a-zA-Z0-9_\.]+)(\|[^}]+?)?}#', '{{ $1$2 }}', $code);
-
-		// Tokenize \Twig_Source instance
-		return $code;
-	}
-
-	/**
-	* Strip surrounding quotes
-	*
-	* First step to fix tokens that may have inline variables
-	* E.g. <!-- INCLUDE '{TEST}.html' to <!-- INCLUDE {TEST}.html
-	*
-	* @param array $tokens array of tokens to search for (imploded to a regular expression)
-	* @param string $code
-	* @return string
-	*/
-	protected function strip_surrounding_quotes($tokens, $code)
-	{
-		// Remove matching quotes at the beginning/end if a statement;
-		// E.g. 'asdf'"' -> asdf'"
-		// E.g. "asdf'"" -> asdf'"
-		// E.g. 'asdf'" -> 'asdf'"
-		return preg_replace('#<!-- (' . implode('|', $tokens) . ') (([\'"])?(.*?)\1) -->#', '<!-- $1 $2 -->', $code);
-	}
-
-	/**
-	* Fix tokens that may have inline variables
-	*
-	* Second step to fix tokens that may have inline variables
-	* E.g. <!-- INCLUDE '{TEST}.html' to <!-- INCLUDE ' ~ {TEST} ~ '.html
-	*
-	* @param array $tokens array of tokens to search for (imploded to a regular expression)
-	* @param string $code
-	* @return string
-	*/
-	protected function fix_inline_variable_tokens($tokens, $code)
-	{
-		$callback = function($matches)
-		{
-			// Replace template variables with start/end to parse variables (' ~ TEST ~ '.html)
-			$matches[2] = preg_replace('#{([a-zA-Z0-9_\.$]+)}#', "'~ \$1 ~'", $matches[2]);
-
-			return "<!-- {$matches[1]} {$matches[2]} -->";
-		};
-
-		return preg_replace_callback('#<!-- (' . implode('|', $tokens) . ') (.+?) -->#', $callback, $code);
-	}
-
-	/**
-	* Add surrounding quotes
-	*
-	* Last step to fix tokens that may have inline variables
-	* E.g. <!-- INCLUDE '{TEST}.html' to <!-- INCLUDE '' ~ {TEST} ~ '.html'
-	*
-	* @param array $tokens array of tokens to search for (imploded to a regular expression)
-	* @param string $code
-	* @return string
-	*/
-	protected function add_surrounding_quotes($tokens, $code)
-	{
-		return preg_replace('#<!-- (' . implode('|', $tokens) . ') (.+?) -->#', '<!-- $1 \'$2\' -->', $code);
-	}
-
-	/**
-	* Fix begin tokens (convert our BEGIN to Twig for)
-	*
-	* Not meant to be used outside of this context, public because the anonymous function calls this
-	*
-	* @param string $code
-	* @param array $parent_nodes (used in recursion)
-	* @return string
-	*/
-	public function fix_begin_tokens($code, $parent_nodes = array())
-	{
-		// PHP 5.3 cannot use $this in an anonymous function, so use this as a work-around
-		$parent_class = $this;
-		$callback = function ($matches) use ($parent_class, $parent_nodes)
-		{
-			$hard_parents = explode('.', $matches[1]);
-			array_pop($hard_parents); // ends with .
-			if ($hard_parents)
-			{
-				$parent_nodes = array_merge($hard_parents, $parent_nodes);
-			}
-
-			$name = $matches[2];
-			$subset = trim(substr($matches[3], 1, -1)); // Remove parenthesis
-			$body = $matches[4];
-
-			// Replace <!-- BEGINELSE -->
-			$body = str_replace('<!-- BEGINELSE -->', '{% else %}', $body);
-
-			// Is the designer wanting to call another loop in a loop?
-			// <!-- BEGIN loop -->
-			// <!-- BEGIN !loop2 -->
-			// <!-- END !loop2 -->
-			// <!-- END loop -->
-			// 'loop2' is actually on the same nesting level as 'loop' you assign
-			// variables to it with template->assign_block_vars('loop2', array(...))
-			if (strpos($name, '!') === 0)
-			{
-				// Count the number if ! occurrences
-				$count = substr_count($name, '!');
-				for ($i = 0; $i < $count; $i++)
-				{
-					array_pop($parent_nodes);
-					$name = substr($name, 1);
-				}
-			}
-
-			// Remove all parent nodes, e.g. foo, bar from foo.bar.foobar.VAR
-			foreach ($parent_nodes as $node)
-			{
-				$body = preg_replace('#([^a-zA-Z0-9_])' . $node . '\.([a-zA-Z0-9_]+)\.#', '$1$2.', $body);
-			}
-
-			// Add current node to list of parent nodes for child nodes
-			$parent_nodes[] = $name;
-
-			// Recursive...fix any child nodes
-			$body = $parent_class->fix_begin_tokens($body, $parent_nodes);
-
-			// Need the parent variable name
-			array_pop($parent_nodes);
-			$parent = (!empty($parent_nodes)) ? end($parent_nodes).'.' : '';
-
-			if ($subset !== '')
-			{
-				$subset = '|subset(' . $subset . ')';
-			}
-
-			$parent = ($parent) ? $parent : 'loops.';
-			// Turn into a Twig for loop
-			return "{% for {$name} in {$parent}{$name}{$subset} %}{$body}{% endfor %}";
-		};
-
-		return preg_replace_callback('#<!-- BEGIN ((?:[a-zA-Z0-9_]+\.)*)([!a-zA-Z0-9_]+)(\([0-9,\-]+\))? -->(.+?)<!-- END \1\2 -->#s', $callback, $code);
-	}
-	
-	/**
-	* Fix begin tokens (convert our Twig to  BEGIN for)
-	*
-	* Not meant to be used outside of this context, public because the anonymous function calls this
-	*
-	* @param string $code
-	* @param array $parent_nodes (used in recursion)
-	* @return string
-	*/
-	public function fix_tokens_begin($code, $parent_nodes = array())
-	{
-		// PHP 5.3 cannot use $this in an anonymous function, so use this as a work-around
-		$parent_class = $this;
-		$callback = function ($matches) use ($parent_class, $parent_nodes)
-		{
-			$hard_parents = explode('.', $matches[1]);
-			array_pop($hard_parents); // ends with .
-			if ($hard_parents)
-			{
-				$parent_nodes = array_merge($hard_parents, $parent_nodes);
-			}
-
-			$name = $matches[2];
-			$subset = trim(substr($matches[3], 1, -1)); // Remove parenthesis
-			$body = $matches[4];
-
-			// Replace <!-- BEGINELSE -->
-			$body = str_replace('{% else %}', '<!-- BEGINELSE -->', $body);
-
-			// Is the designer wanting to call another loop in a loop?
-			// <!-- BEGIN loop -->
-			// <!-- BEGIN !loop2 -->
-			// <!-- END !loop2 -->
-			// <!-- END loop -->
-			// 'loop2' is actually on the same nesting level as 'loop' you assign
-			// variables to it with template->assign_block_vars('loop2', array(...))
-			if (strpos($name, '!') === 0)
-			{
-				// Count the number if ! occurrences
-				$count = substr_count($name, '!');
-				for ($i = 0; $i < $count; $i++)
-				{
-					array_pop($parent_nodes);
-					$name = substr($name, 1);
-				}
-			}
-
-			// Remove all parent nodes, e.g. foo, bar from foo.bar.foobar.VAR
-			foreach ($parent_nodes as $node)
-			{
-				$body = preg_replace('#([^a-zA-Z0-9_])' . $node . '\.([a-zA-Z0-9_]+)\.#', ' $1 $2 . ', $body);
-			}
-
-			// Add current node to list of parent nodes for child nodes
-			$parent_nodes[] = $name;
-
-			// Recursive...fix any child nodes
-			$body = $parent_class->fix_tokens_begin($body, $parent_nodes);
-
-			// Need the parent variable name
-			array_pop($parent_nodes);
-			$parent = (!empty($parent_nodes)) ? end($parent_nodes) . '.' : '';
-
-			if ($subset !== '')
-			{
-				$subset = '|subset(' . $subset . ')';
-			}
-
-			$parent = ($parent) ? $parent : 'loops.';
-			// loop
-			return "<!-- FOR {$name} in {$parent}{$name}{$subset} -->{$body}<!-- ENDFOR -->";
-		};
-
-		return preg_replace_callback('#<!-- BEGIN ((?:[a-zA-Z0-9_]+\.)*)([!a-zA-Z0-9_]+)(\([0-9,\-]+\))? -->(.+?)<!-- END \1\2 -->#s', $callback, $code);
-	}
-	
-	/**
-	* Fix IF statements
-	*
-	* @param string $code
-	* @return string
-	*/
-	protected function fix_if_tokens($code)
-	{
-		// Replace ELSE IF with ELSEIF
-		$code = preg_replace('#<!-- ELSE IF (.+?) -->#', '<!-- ELSEIF $1 -->', $code);
-
-		// Replace our "div by" with Twig's divisibleby (Twig does not like test names with spaces)
-		$code = preg_replace('# div by ([0-9]+)#', ' divisibleby($1)', $code);
-
-		$callback = function($matches)
-		{
-			$inner = $matches[2];
-			// Replace $TEST with definition.TEST
-			$inner = preg_replace('#(\s\(*!?)\$([a-zA-Z_0-9]+)#', '$1definition.$2', $inner);
-
-			// Replace .foo with loops.foo|length
-			// $inner = preg_replace('#(\s\(*!?)\.([a-zA-Z_0-9]+)([^a-zA-Z_0-9\.])#', '$1loops.$2|length$3', $inner);
-
-			// Replace .foo.bar with foo.bar|length
-			// $inner = preg_replace('#(\s\(*!?)\.([a-zA-Z_0-9\.]+)([^a-zA-Z_0-9\.])#', '$1$2|length$3', $inner);
-
-			return "<!-- {$matches[1]}IF{$inner}-->";
-		};
-
-		return preg_replace_callback('#<!-- (ELSE)?IF((.*?) (?:\(*!?[\$|\.]([^\s]+)(.*?))?)-->#', $callback, $code);
-	}
-
-	/**
-	* Fix DEFINE statements and {$VARNAME} variables
-	*
-	* @param string $code
-	* @return string
-	*/
-	protected function fix_define_tokens($code)
-	{
-		/**
-		* Changing $VARNAME to definition.varname because set is only local
-		* context (e.g. DEFINE $TEST will only make $TEST available in current
-		* template and any child templates, but not any parent templates).
-		*
-		* DEFINE handles setting it properly to definition in its node, but the
-		* variables reading FROM it need to be altered to definition.VARNAME
-		*
-		* Setting up definition as a class in the array passed to Twig
-		* ($context) makes set definition.TEST available in the global context
-		*/
-
-		// Replace <!-- DEFINE $NAME with {% DEFINE definition.NAME
-		$code = preg_replace('#<!-- DEFINE \$(.*?) -->#', '{% DEFINE $1 %}', $code);
-
-		// Changing UNDEFINE NAME to DEFINE NAME = null to save from creating an extra token parser/node
-		$code = preg_replace('#<!-- UNDEFINE \$(.*?)-->#', '{% DEFINE $1= null %}', $code);
-
-		// Replace all of our variables, {$VARNAME}, with Twig style, {{ definition.VARNAME }}
-		$code = preg_replace('#{\$([a-zA-Z0-9_\.]+)}#', '{{ definition.$1 }}', $code);
-
-		// Replace all of our variables, ~ $VARNAME ~, with Twig style, ~ definition.VARNAME ~
-		$code = preg_replace('#~ \$([a-zA-Z0-9_\.]+) ~#', '~ definition.$1 ~', $code);
-
-		return $code;
-	}
-	
-	/**
-	* Fix DEFINE statements and {$VARNAME} variables
-	*
-	* @param string $code
-	* @return string
-	*/
-	protected function fix_tokens_define($code)
-	{
-		/**
-		* Changing $VARNAME to definition.varname because set is only local
-		* context (e.g. DEFINE $TEST will only make $TEST available in current
-		* template and any child templates, but not any parent templates).
-		*
-		* DEFINE handles setting it properly to definition in its node, but the
-		* variables reading FROM it need to be altered to definition.VARNAME
-		*
-		* Setting up definition as a class in the array passed to Twig
-		* ($context) makes set definition.TEST available in the global context
-		*/
-
-		// Replace <!-- DEFINE $NAME with {% DEFINE definition.NAME
-		$code = preg_replace('#{% DEFINE \$(.*?) %}#', '<!-- DEFINE $1 -->', $code);
-
-		// Changing UNDEFINE NAME to DEFINE NAME = null to save from creating an extra token parser/node
-		$code = preg_replace('#{% UNDEFINE \$(.*?)%}#', '<!-- DEFINE $1= null -->', $code);
-
-		// Replace all of our variables, {$VARNAME}, with Twig style, {{ definition.VARNAME }}
-		//$code = preg_replace('#{\$([a-zA-Z0-9_\.]+)}#', '{{ definition.$1 }}', $code);
-
-		// Replace all of our variables, ~ $VARNAME ~, with Twig style, ~ definition.VARNAME ~
-		//$code = preg_replace('#~ \$([a-zA-Z0-9_\.]+) ~#', '~ definition.$1 ~', $code);
-
-		return $code;
-	}
-	
-	/**
-	* Replace Twig tag masks with Twig tag calls
-	*
-	* E.g. <!-- BLOCK foo --> with {% block foo %}
-	*
-	* @param string $code
-	* @param array $twig_tags All tags we want to create a mask for
-	* @return string
-	*/
-	protected function replace_twig_tag_masks($code, $twig_tags)
-	{
-		$callback = function ($matches)
-		{
-			$matches[1] = strtolower($matches[1]);
-
-			return "{% {$matches[1]}{$matches[2]}%}";
-		};
-
-		foreach ($twig_tags as &$tag)
-		{
-			$tag = strtoupper($tag);
-		}
-
-		// twig_tags is an array of the twig tags, which are all lowercase, but we use all uppercase tags
-		$code = preg_replace_callback('#<!-- (' . implode('|', $twig_tags) . ')(.*?)-->#', $callback, $code);
-
-		return $code;
-	}
-	
-	/**
-	* Replace Twig tag masks with Twig tag calls
-	*
-	* E.g. <!-- BLOCK foo --> with {% block foo %}
-	*
-	* @param string $code
-	* @param array $twig_tags All tags we want to create a mask for
-	* @return string
-	*/
-	protected function replace_tag_twig_masks($code, $twig_tags)
-	{
-		$callback = function ($matches)
-		{
-			$matches[1] = strtolower($matches[1]);
-
-			return "<!-- {$matches[1]}{$matches[2]}-->";
-		};
-
-		foreach ($twig_tags as &$tag)
-		{
-			$tag = strtoupper($tag);
-		}
-
-		// twig_tags is an array of the twig tags, which are all lowercase, but we use all uppercase tags
-		$code = preg_replace_callback('#{% (' . implode('|', $twig_tags) . ')(.*?)%}#', $callback, $code);
-
-		return $code;
-	}	
-}
-
-/**
-* This class holds all DEFINE variables from the current page load
-*/
-class definition
-{
-	/** @var array **/
-	protected $definitions = array();
-
-	/**
-	* Get a DEFINE'd variable
-	*
-	* @param string $name
-	* @param array $arguments
-	*
-	* @return mixed Null if not found
-	*/
-	public function __call($name, $arguments)
-	{
-		return (isset($this->definitions[$name])) ? $this->definitions[$name] : null;
-	}
-
-	/**
-	* DEFINE a variable
-	*
-	* @param string $name
-	* @param mixed $value
-	* @return \phpbb\template\twig\definition
-	*/
-	public function set($name, $value)
-	{
-		$this->definitions[$name] = $value;
-
-		return $this;
-	}
-
-	/**
-	* Append to a variable
-	*
-	* @param string $name
-	* @param string $value
-	* @return \phpbb\template\twig\definition
-	*/
-	public function append($name, $value)
-	{
-		if (!isset($this->definitions[$name]))
-		{
-			$this->definitions[$name] = '';
-		}
-
-		$this->definitions[$name] .= $value;
-
-		return $this;
-	}
 }
 
 function xs_switch($tpl, $name)

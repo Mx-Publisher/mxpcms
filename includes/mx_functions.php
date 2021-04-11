@@ -2,7 +2,7 @@
 /**
 *
 * @package Functions
-* @version $Id: mx_functions.php,v 1.125 2014/07/07 20:36:52 orynider Exp $
+* @version $Id: mx_functions.php,v 3.125 2020/02/25 03:51:52 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
@@ -415,12 +415,84 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 ; E_USER_ERROR      		- user-generated error message
 ; E_USER_WARNING    	- user-generated warning message
 ; E_USER_NOTICE     		- user-generated notice message
-; E_USER_DEPRECATED - user-generated deprecation warnings 
+; E_USER_DEPRECATED - user-generated deprecation warnings
+mx_msg_handler(8, 'Uninitialized string offset: 2', '\www\\includes\mx_functions.php', 1055, 'dotquad_ip ::1ip_check 4ip_sep ' 
 */
 function mx_msg_handler($msg_code, $msg_text = '', $msg_title = '', $err_line = '', $err_file = '', $sql = '')
 {		
-	global $db, $mx_user, $board_config, $phpbb_auth, $mx_root_path;
+	global $db, $mx_user, $board_config, $phpbb_auth, $mx_root_path, $mx_backend, $template;
 	
+	$errno = $msg_code;
+	
+	// Prevent leakage of local path to mx install
+
+	/* Error File type array to string 
+		array ( 
+			[dotquad_ip] => ::1 
+			[ip_sep] => Array ( [0] => ::1 ) 
+		) ;
+		function ip2string($ip)
+		{
+			$long = 4294967295 - ($ip - 1);
+			return long2ip(-$long);
+		}
+		function ip2long($ip)
+		{
+			return sprintf("%u", ip2long($ip));
+		} 	
+	*/
+	if (is_array($err_file))
+	{
+		$values = '';
+			
+		foreach ($err_file as $key => $var)
+		{
+			if (is_null($var))
+			{
+				$values .= $key;
+			}
+			else if (@is_string($var))
+			{
+				$values .= "$key " . $var;
+			}
+			else if (@is_bool($var))
+			{
+				$values .= "$key " . @intval($var);
+			}
+			else if (@is_array($var) && !is_array($key))
+			{
+				if (isset($var[0]))
+				{
+					$values .= "$key " . print_r($var[0], true);
+				}
+				else
+				{
+					$values .= "$key ";
+				}
+			}
+			else if (@is_array($key) && !is_array($var))
+			{
+				foreach ($key as $multi_values)
+				{
+					$values .= !is_object($multi_values) ? "$multi_values " . $var : $var;
+				}
+			}
+			else if (is_object($var))
+			{
+				$values .= "$key ";
+			}			
+			else if (!is_null($var))
+			{
+				$values .= "$key " . $var;
+			}
+			else if (!is_null($key))
+			{
+				$values .= "$key ";
+			}			
+		}	
+		$err_file = $values;		
+	}
+		
 	// Do not display notices if we suppress them via @
 	if (error_reporting() == 0 && $errno != E_USER_ERROR && $errno != E_USER_WARNING && $errno != E_USER_NOTICE && $errno != E_USER_DEPRECATED)
 	{
@@ -496,12 +568,12 @@ function mx_msg_handler($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 				return;
 			}
 
-			if (strpos($errfile, 'cache') === false && strpos($errfile, 'template.') === false)
+			if (strpos($err_file, 'cache') === false && strpos($err_file, 'template.') === false)
 			{
-				$errfile = mx_filter_root_path($errfile);
-				$msg_text = mx_filter_root_path($msg_text);
+				//$err_file = mx_filter_root_path($err_file);
+				//$msg_text = mx_filter_root_path($msg_text);
 				$error_name = ($errno === E_WARNING) ? 'PHP Warning' : 'PHP Notice';
-				echo '<b>[phpBB Debug] ' . $error_name . '</b>: in file <b>' . $errfile . '</b> on line <b>' . $errline . '</b>: <b>' . $msg_text . '</b><br />' . "\n";
+				echo '<b>[phpBB Debug] ' . $error_name . '</b>: in file <b>' . $err_file . '</b> on line <b>' . $err_line . '</b>: <b>' . $msg_text . '</b><br />' . "\n";
 				echo '<br /><br />BACKTRACE<br />' . get_backtrace() . '<br />' . "\n";
 			}
 
@@ -650,11 +722,11 @@ function mx_msg_handler($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 			{
 				if (defined('IN_ADMIN') && isset($mx_user->data['session_admin']) && $mx_user->data['session_admin'])
 				{
-					mx_admin_page_header($msg_title);
+					$mx_backend->admin_page_header($msg_title);
 				}
 				else
 				{
-					mx_page_header($msg_title);
+					$mx_backend->page_header($msg_title);
 				}
 			}
 
@@ -674,14 +746,14 @@ function mx_msg_handler($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 
 			if (defined('IN_ADMIN') && isset($mx_user->data['session_admin']) && $mx_user->data['session_admin'])
 			{
-				mx_admin_page_footer();
+				$mx_backend->adm_page_footer();
 			}
 			else
 			{
-				mx_page_footer();
+				$mx_backend->page_footer();
 			}
 
-			exit_handler();
+			$mx_backend->exit_handler();
 		break;
 
 		// PHP4 compatibility
@@ -979,8 +1051,37 @@ function mx_redirect($url, $redirect_msg = '', $redirect_link = '', $base_url = 
 //
 function mx_encode_ip($dotquad_ip)
 {
-	$ip_sep = explode('.', $dotquad_ip);
-	return sprintf('%02x%02x%02x%02x', $ip_sep[0], $ip_sep[1], $ip_sep[2], $ip_sep[3]);
+	$ip_check = 4; //If is under 4 partial IP will be returned
+	$ip_sep = '';
+	
+	if (strpos($dotquad_ip, '.'))
+	{
+		$ip_sep = explode('.', $dotquad_ip);
+		return sprintf('%02x%02x%02x%02x', $ip_sep[0], $ip_sep[1], $ip_sep[2], $ip_sep[3]);
+	}
+	
+	//Recheck IP_SEP
+	if (strpos($dotquad_ip, '.'))
+	{
+		$ip_sep = implode('.', array_slice(explode('.', $dotquad_ip), 0, $ip_check));
+		return $ip_sep[0] . '.' . $ip_sep[1] . '.' . $ip_sep[2] . '.' . $ip_sep[3];
+	}
+	
+	if (strpos($dotquad_ip, '::'))
+	{
+		$ip_sep = str_replace(array('::f', '::F'), '127.0.0.1', $dotquad_ip);
+	}	
+	
+	if (strpos($dotquad_ip, ':'))
+	{
+		$dotquad_ip = mx_short_ipv6($dotquad_ip, $ip_check);
+		
+       if (preg_match('/^::(\S+\.\S+)$/', $dotquad_ip, $match)) 
+	   {
+			$chunks = explode('.', $match[1]);
+			return $chunks[0] . '.' . $chunks[1] . '.' . $chunks[2] . '.' . $chunks[3];
+		} 	
+	}	
 }
 
 //
@@ -990,6 +1091,43 @@ function mx_decode_ip($int_ip)
 {
 	$hexipbang = explode('.', chunk_split($int_ip, 2, '.'));
 	return hexdec($hexipbang[0]). '.' . hexdec($hexipbang[1]) . '.' . hexdec($hexipbang[2]) . '.' . hexdec($hexipbang[3]);
+}
+
+/**
+* Normalises an internet protocol address,
+* also checks whether the specified address is valid.
+*
+* IPv4 addresses are returned 'as is'.
+*
+* IPv6 addresses are normalised according to
+*	A Recommendation for IPv6 Address Text Representation
+*	http://tools.ietf.org/html/draft-ietf-6man-text-addr-representation-07
+*
+* @param string $address	IP address
+*
+* @return mixed		false if specified address is not valid,
+*					string otherwise
+*/
+function mx_ip_normalise(string $address)
+{
+	$ip_normalised = false;
+
+	if (filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4))
+	{
+		$ip_normalised = $address;
+	}
+	else if (filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6))
+	{
+		$ip_normalised = (function_exists('inet_ntop') && function_exists('inet_pton')) ? @inet_ntop(@inet_pton($address)) : $address;
+
+		// If is ipv4
+		if (stripos($ip_normalised, '::ffff:') === 0)
+		{
+			$ip_normalised = substr($ip_normalised, 7);
+		}
+	}
+
+	return $ip_normalised;
 }
 
 //
@@ -1026,7 +1164,7 @@ function mx_create_date($format, $gmepoch, $tz)
 	}
 	
 	// Zone offset
-	$zone_offset = $mx_user->timezone + $mx_user->dst;
+	$zone_offset = (float) $mx_user->timezone + (int) $mx_user->dst;
 		
 	// Show date <= 1 hour ago as 'xx min ago' but not greater than 60 seconds in the future
 	// A small tolerence is given for times in the future but in the same minute are displayed as '< than a minute ago'
@@ -1389,6 +1527,41 @@ function mx_local_file_exists($file_path = '')
 }
 
 /**
+ * A wrapper for PHP's realpath
+ *
+ * Try to resolve realpath when PHP's realpath is not available, or
+ * known to be buggy.
+ *
+ * @param string	$path	Path to resolve
+ *
+ * @return string	Resolved path
+ */
+function mx_realpath($path)
+{
+	if (!function_exists('realpath'))
+	{
+		return mx_own_realpath($path);
+	}
+
+	$realpath = realpath($path);
+
+	// Strangely there are provider not disabling realpath but returning strange values. :o
+	// We at least try to cope with them.
+	if ((!mx_is_absolute($path) && $realpath === $path) || $realpath === false)
+	{
+		return mx_own_realpath($path);
+	}
+
+	// Check for DIRECTORY_SEPARATOR at the end (and remove it!)
+	if (substr($realpath, -1) === DIRECTORY_SEPARATOR)
+	{
+		$realpath = substr($realpath, 0, -1);
+	}
+
+	return $realpath;
+}
+
+/**
 * Test if a file/directory is writable
 *
 * This function calls the native is_writable() when not running under
@@ -1525,10 +1698,13 @@ unique_id()
 function mx_generate_link_hash($link_name)
 {
 	global $mx_user;
-
+	
+	//Fix for Anonymouse user
+	$user_form_salt = isset($mx_user->data['user_form_salt']) ? $mx_user->data['user_form_salt'] : "its like that because its the way it is.";
+	
 	if (!isset($mx_user->data["hash_$link_name"]))
 	{
-		$mx_user->data["hash_$link_name"] = substr(sha1($mx_user->data['user_form_salt'] . $link_name), 0, 8);
+		$mx_user->data["hash_$link_name"] = substr(sha1($user_form_salt . $link_name), 0, 8);
 	}
 
 	return $mx_user->data["hash_$link_name"];
@@ -3168,6 +3344,38 @@ function generate_page_jumpbox( $name_select, $page_id = 0, $depth = 0, $default
 	}
 }
 
+
+/** Borrowed from phpBB3
+* Returns the first block of the specified IPv6 address and as many additional
+* ones as specified in the length paramater.
+* If length is zero, then an empty string is returned.
+* If length is greater than 3 the complete IP will be returned
+*/
+function mx_short_ipv6($ip, $length)
+{
+	if ($length < 1)
+	{
+		return '';
+	}
+
+	// extend IPv6 addresses
+	$blocks = substr_count($ip, ':') + 1;
+	if ($blocks < 9)
+	{
+		$ip = str_replace('::', ':' . str_repeat('0000:', 9 - $blocks), $ip);
+	}
+	if ($ip[0] == ':')
+	{
+		$ip = '0000' . $ip;
+	}
+	if ($length < 4)
+	{
+		$ip = implode(':', @array_slice(explode(':', $ip), 0, 1 + $length));
+	}
+
+	return $ip;
+}
+
 /**
  * Generate MX-Publisher URL, with arguments.
  *
@@ -4020,18 +4228,63 @@ function mx_is_absolute($path)
 */
 function mx_own_realpath($path)
 {
-	global $request;
+	global $mx_request_vars, $mx_cache;
 
 	// Now to perform funky shizzle
-
-	// Switch to use UNIX slashes
-	$path = str_replace(DIRECTORY_SEPARATOR, '/', $path);
-	$path_prefix = '';
-
+	// Resolve working directory and store it
+	if (is_null($path))
+	{	
+		// Relative Path
+		// Prepend the current working directory
+		if (function_exists('getcwd'))
+		{
+			// This is the best method, hopefully it is enabled
+			$working_directory = str_replace(DIRECTORY_SEPARATOR, '/', getcwd());
+			$path = $working_directory . '/' . $path;
+			$is_absolute_path = true;
+			if (preg_match('#^[a-z]:#i', $path))
+			{
+				$path_prefix = $path[0] . ':';
+				$path = substr($path, 2);
+			}
+			else
+			{
+				$path_prefix = '';
+			}
+		}
+		else if ($request->server('SCRIPT_FILENAME'))
+		{
+			// Warning: If chdir() has been used this will lie!
+			// Warning: This has some problems sometime (CLI can create them easily)
+			$filename = htmlspecialchars_decode($request->server('SCRIPT_FILENAME'));
+			$working_directory = str_replace(DIRECTORY_SEPARATOR, '/', dirname($filename));	
+			$path = $working_directory . '/' . $path;
+			$is_absolute_path = true;
+			$path_prefix = '';
+		}
+		//
+		// From this point on we really just guessing
+		// If chdir were called we screwed
+		//
+		else if (function_exists('debug_backtrace'))
+		{
+			$call_stack = debug_backtrace(0);
+			$working_directory = str_replace(DIRECTORY_SEPARATOR, '/', dirname($call_stack[count($call_stack) - 1]['file']));
+			$path = $working_directory . '/' . $path;
+		}
+	}
+	else
+	{
+		// Switch to use UNIX slashes
+		$working_directory = str_replace(DIRECTORY_SEPARATOR, '/', dirname($filename));
+		$path = str_replace(DIRECTORY_SEPARATOR, '/', $path);
+		$path_prefix = '';
+	}
+	
 	// Determine what sort of path we have
 	if (mx_is_absolute($path))
 	{
-		$absolute = true;
+		$is_absolute_path = true;
 
 		if ($path[0] == '/')
 		{
@@ -4048,40 +4301,34 @@ function mx_own_realpath($path)
 	}
 	else
 	{
-		// Relative Path
-		// Prepend the current working directory
-		if (function_exists('getcwd'))
-		{
-			// This is the best method, hopefully it is enabled!
-			$path = str_replace(DIRECTORY_SEPARATOR, '/', getcwd()) . '/' . $path;
-			$absolute = true;
-			if (preg_match('#^[a-z]:#i', $path))
-			{
-				$path_prefix = $path[0] . ':';
-				$path = substr($path, 2);
-			}
-			else
-			{
-				$path_prefix = '';
-			}
-		}
-		else if ($request->server('SCRIPT_FILENAME'))
-		{
-			// Warning: If chdir() has been used this will lie!
-			// Warning: This has some problems sometime (CLI can create them easily)
-			$filename = htmlspecialchars_decode($request->server('SCRIPT_FILENAME'));
-			$path = str_replace(DIRECTORY_SEPARATOR, '/', dirname($filename)) . '/' . $path;
-			$absolute = true;
-			$path_prefix = '';
-		}
-		else
-		{
-			// We have no way of getting the absolute path, just run on using relative ones.
-			$absolute = false;
-			$path_prefix = '.';
-		}
+		//
+		// Assuming that the working directory is cms root
+		// we could use this as a fallback, when the forums will use controllers
+		// everywhere this will be a safe assumption
+		//
+		//$dir_parts = explode(DIRECTORY_SEPARATOR, __DIR__);
+		//$namespace_parts = explode('\\', trim(__NAMESPACE__, '\\'));
+
+		//$namespace_part_count = count($namespace_parts);
+
+		// Check if we still loading from root
+		//if (array_slice($dir_parts, -$namespace_part_count) === $namespace_parts)
+		//{
+		//	$working_directory = implode('/', array_slice($dir_parts, 0, -$namespace_part_count));
+		//}
+		//else
+		//{
+		//	$working_directory = false;
+		//}
+
+		$working_directory = false;
+
+		// We have no way of getting the absolute path, just run on using relative ones.
+		$is_absolute_path = false;
+		$path_prefix = '.';
 	}
 
+	
 	// Remove any repeated slashes
 	$path = preg_replace('#/{2,}#', '/', $path);
 
@@ -4112,7 +4359,7 @@ function mx_own_realpath($path)
 					$bits = array_values($bits);
 				}
 			}
-			else if ($absolute) // ie. !isset($bits[$i - 1]) && $absolute
+			else if ($is_absolute_path) // ie. !isset($bits[$i - 1]) && $absolute
 			{
 				// We have an absolute path trying to descend above the root of the filesystem
 				// ... Error!
@@ -4154,12 +4401,35 @@ function mx_own_realpath($path)
 
 	// @todo If the file exists fine and open_basedir only has one path we should be able to prepend it
 	// because we must be inside that basedir, the question is where...
-	// @internal The slash in is_dir() gets around an open_basedir restriction
-	if (!@file_exists($resolved) || (!@is_dir($resolved . '/') && !is_file($resolved)))
+	if ($is_absolute_path)
+	{
+		if (defined('PHP_WINDOWS_VERSION_MAJOR'))
+		{
+			$path_prefix = $path[0] . ':';
+			$path = substr($path, 2);
+		}
+		else
+		{
+			$path_prefix = '';
+		}
+	}
+	
+	//Using the protected version of resolve path for site security porposes
+	$resolved_path = $mx_cache->resolve_path($path, $path_prefix, $is_absolute_path);
+	if ($resolved_path === false)
 	{
 		return false;
 	}
-
+	
+	// @internal The slash in is_dir() gets around an open_basedir restriction
+	if (@function_exists('file_exists') && @function_exists('is_dir') && @function_exists('is_file'))
+	{	
+		if (!@file_exists($resolved_path) || (!@is_dir($resolved_path . '/') && !is_file($resolved_path)))
+		{
+			return false;
+		}	
+	}
+	
 	// Put the slashes back to the native operating systems slashes
 	$resolved = str_replace('/', DIRECTORY_SEPARATOR, $resolved);
 
@@ -4172,47 +4442,55 @@ function mx_own_realpath($path)
 	return $resolved; // We got here, in the end!
 }
 
+/**
+* Removes absolute path to mx root directory from error messages
+* and converts backslashes to forward slashes.
+*
+* @param string $errfile	Absolute file path
+*							(e.g. /var/www/portal/includes/mx_functions.php)
+*							Please note that if $errfile is outside of the phpBB root,
+*							the root path will not be found and can not be filtered.
+* @return string			Relative file path
+*							(e.g. /includes/mx_functions.php)
+*/
+function mx_filter_root_path($errfile)
+{
+	global $mx_cache;
+
+	static $root_path;
+
+	if (empty($root_path))
+	{
+		if (function_exists('realpath'))
+		{
+			$root_path = realpath(dirname(__FILE__) . '/../');
+		}
+		elseif (is_object($mx_cache))
+		{
+			$root_path = $mx_cache->realpath(dirname(__FILE__) . '/../');
+		}
+		else
+		{
+			$mx_cache = new mx_cache();
+			$root_path = $mx_cache->realpath(dirname(__FILE__) . '/../');
+		}
+	}
+
+	return str_replace(array($root_path, '\\'), array('[ROOT]', '/'), $errfile);
+}
+
 /*
 * Is this even used ?
 **/
-function mx_phpbb_realpath($path)
-{	
-	return mx_realpath($path);
-}
-
 if (!function_exists('realpath'))
 {
 	/**
 	* A wrapper for realpath
 	* @ignore
 	*/
-	function mx_realpath($path)
+	function realpath($path)
 	{
-		return mx_own_realpath($path);
-	}
-}
-else
-{
-	/**
-	* A wrapper for realpath
-	*/
-	function mx_realpath($path)
-	{
-		$realpath = realpath($path);
-		
-		// Strangely there are provider not disabling realpath but returning strange values. :o
-		// We at least try to cope with them.
-		if ($realpath === $path || $realpath === false)
-		{
-			return mx_own_realpath($path);
-		}
-		
-		// Check for DIRECTORY_SEPARATOR at the end (and remove it!)
-		if (substr($realpath, -1) == DIRECTORY_SEPARATOR)
-		{
-			$realpath = substr($realpath, 0, -1);
-		}
-		return $realpath;
+		return mx_realpath($path);
 	}
 }
 
@@ -4556,8 +4834,8 @@ function mx_clean_string($text)
 		$text = preg_replace("/[^[:space:]a-zA-Z0-9îăâşţÎĂÂŞŢ.,-:]/", " ", $text);
 		
 		// we need to reduce multiple spaces to a single one   
-		$text = preg_replace('/\s+/', ' ', $text);		
-	}	
+		$text = preg_replace('/\s+/', ' ', $text);
+	}
 
 	// Other control characters
 	$text = preg_replace('#(?:[\x00-\x1F\x7F]+|(?:\xC2[\x80-\x9F])+)#', '', $text);

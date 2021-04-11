@@ -100,14 +100,6 @@ a.lastsubject:hover {
 	text-decoration: underline;
 }
 
-.unreadlink {
-	color: #AA0000 !important;
-}
-
-.unreadlink:hover {
-	color: #C30000 !important;
-}
-
 /* Post body links */
 .postlink {
 	text-decoration: none;

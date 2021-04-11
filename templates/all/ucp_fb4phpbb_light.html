@@ -1,0 +1,147 @@
+<!-- INCLUDE ucp_header.html -->
+<h2>{L_FB4PHPBB_LIGHT}</h2>
+<div class="panel">
+    <div class="inner">
+        <span class="corners-top">
+        <span></span>
+        </span>	
+	<!-- IF S_FB4PHPBB_LIGHT_ROW --> 
+		<dl>
+			<dt>{L_UCP_DISABLE_FB4PHPBB_LIGHT_DESCRIPTION}
+			</dt>
+				<dd>
+				<div id="fblogin">
+					<a class="fb_button fb_button_medium"><span class="fb_button_text">{L_UCP_FB4PHPBB_LIGHT_DISABLE_FACEBOOK_TEXT}</span></a>
+				</div>
+				<div class="ui-overlay" style="display:none" id="none_display">
+					<div class="ui-widget-overlay">
+					</div>
+					<div class="ui-widget-shadow ui-corner-all" style="width: 302px; height: 152px; position: absolute; left: 50px; top: 30px;">
+					</div>
+				</div>
+				<div style="position: absolute; width: 280px; height: 130px;left: 50px; top: 30px; padding: 10px;display:none;" class="ui-widget ui-widget-content ui-corner-all" id="none_display_2">
+					<div id="dialog-confirm" class="ui-dialog-content ui-widget-content" style="background: none; border: 0;">
+					</div>
+				</div>
+				<script>
+				jQuery('#fblogin').click(function() 
+				{
+					FB.login(function(data) 
+					{
+						if (data.authResponse) 
+						{
+							FB.api('/me', function(response) 
+							{
+								jQuery.ajax(
+								{
+									url:"{FB4PHPBB_LIGHT_CONNECT}", 
+									type: "POST", 
+									data: 
+									{
+										ajax: "yes", 
+										id: response.id, 
+										email: response.email, 
+										ullink: 'yes' 
+									}, 
+									dataType: 'html', 
+									success: function(data)
+									{ 
+										jQuery('#none_display, #none_display_2').fadeIn(function()
+										{																				
+											jQuery('#dialog-confirm').html(data); 
+										}); 
+										setTimeout(function()
+										{
+											jQuery('#none_display, #none_display_2').fadeOut();
+										}, 4500);
+									},            
+								});        
+							});
+						}
+						else 
+						{
+							console.log('User cancelled login or did not fully authorize.');
+						}
+					}, 
+					{
+						scope: 'email'
+					});
+				});
+				</script>		
+
+				</dd>
+			</dl>	
+	<!-- ELSE -->
+		<dl>
+			<dt>
+                {L_UCP_ENABLE_FB4PHPBB_LIGHT_DESCRIPTION}
+            </dt>
+				<dd>
+				<div id="fblogin">
+					<a class="fb_button fb_button_medium"><span class="fb_button_text">{L_UCP_FB4PHPBB_LIGHT_ENABLE_FACEBOOK_TEXT}</span></a>
+				</div>
+				<div class="ui-overlay" style="display:none" id="none_display">
+					<div class="ui-widget-overlay">
+					</div>
+					<div class="ui-widget-shadow ui-corner-all" style="width: 302px; height: 152px; position: absolute; left: 50px; top: 30px;">
+					</div>
+				</div>
+				<div style="position: absolute; width: 280px; height: 130px;left: 50px; top: 30px; padding: 10px;display:none;" class="ui-widget ui-widget-content ui-corner-all" id="none_display_2">
+					<div id="dialog-confirm" class="ui-dialog-content ui-widget-content" style="background: none; border: 0;">
+					</div>
+				</div>
+				<script>
+				jQuery('#fblogin').click(function() 
+				{
+					FB.login(function(data) 
+					{
+						if (data.authResponse) 
+						{
+							FB.api('/me', function(response) 
+							{
+								jQuery.ajax(
+								{
+									url:"{FB4PHPBB_LIGHT_CONNECT}", 
+									type: "POST", 
+									data: 
+									{
+										ajax: "yes", 
+										id: response.id, 
+										email: response.email, 
+										link: 'yes' 
+									}, 
+									dataType: 'html', 
+									success: function(data)
+									{ 
+										jQuery('#none_display, #none_display_2').fadeIn(function()
+										{																				
+											jQuery('#dialog-confirm').html(data); 
+										}); 
+										setTimeout(function()
+										{
+											jQuery('#none_display, #none_display_2').fadeOut();
+										}, 4500);
+									},            
+								});        
+							});
+						}
+						else 
+						{
+							console.log('User cancelled login or did not fully authorize.');
+						}
+					}, 
+					{
+						scope: 'email'
+					});
+				});
+				</script>		
+				</dd>
+			</dt>
+		
+	<!-- ENDIF -->
+        <span class="corners-bottom">
+        <span></span>
+        </span>
+    </div>
+</div>
+<!-- INCLUDE ucp_footer.html -->

@@ -3,19 +3,14 @@
 --
 -- $Id: postgres_schema_install.sql,v 1.7 2014/05/18 06:24:35 orynider Exp $
 --
-
--- --------------------------------------------------------
-
-
-
 --
 -- Table structure for table `mx_block`
 --
 
 DROP TABLE IF EXISTS mx_table_block CASCADE;
-
+CREATE SEQUENCE mx_table_block_seq;
 CREATE TABLE "mx_table_block" (
-  "block_id" SERIAL,
+  "block_id" INT2 NOT NULL nextval('mx_table_block_seq'),
   "block_title" VARCHAR(150) NULL DEFAULT NULL,
   "block_desc" TEXT NULL DEFAULT NULL,
   "function_id" INTEGER NULL DEFAULT NULL,
@@ -152,15 +147,32 @@ INSERT INTO "mx_table_block_system_parameter" VALUES (29,15,'On this page we [i:
 
 INSERT INTO "mx_table_block_system_parameter" VALUES (30,15,'You may enrich your portal with addon modules - for specific functionality:\r\n\r\n- Download manager\r\n- Picture Album\r\n- Calendar Tools\r\n- Knowledge Base\r\n- Links Gallery\r\n- Games\r\n\r\nand many more. Be sure to visit mxpcms.sourceforge.net for latest available modules!','eacbc1f61a',0);
 
-
+--
+-- Table structure for table 'mx_table_bots'
+--
+DROP TABLE IF EXISTS `mx_table_bots`;
+CREATE SEQUENCE mx_table_bots_seq;
+CREATE TABLE IF NOT EXISTS `mx_table_bots` (
+  "bot_id" INT4 DEFAULT nextval('mx_table_bots_seq'),
+  "bot_active" SMALLINT NOT NULL DEFAULT '-1',
+  "block_title" VARCHAR(150) NOT NULL DEFAULT '1',
+  "bot_color" VARCHAR(255) NOT NULL DEFAULT '9E8DA7',
+  "user_id" INTEGER NOT NULL DEFAULT '0',
+  "bot_agent" VARCHAR(255) NOT NULL DEFAULT 'YahooSeeker/',
+  "bot_ip" VARCHAR(255) NOT NULL DEFAULT '::f',
+  "bot_last_visit" VARCHAR(10) NOT NULL DEFAULT '1617274666',
+  "bot_visit_counter" INTEGER NOT NULL DEFAULT '1'
+  CONSTRAINT mx_table_bots PRIMARY KEY ("bot_id")
+CREATE INDEX "mx_table_bots" ON "mx_table_bots" ("bot_active");
 
 --
 -- Table structure for table 'mx_table_column'
 --
 
 DROP TABLE IF EXISTS mx_table_column CASCADE;
+CREATE SEQUENCE mx_table_column_seq;
 CREATE TABLE "mx_table_column" (
-  "column_id" SERIAL,
+  "column_id" INT2 NOT NULL nextval('mx_table_column_seq'),
   "column_title" VARCHAR(100) NULL DEFAULT NULL,
   "column_order" INTEGER NOT NULL DEFAULT '0',
   "bbcode_uid" VARCHAR(10) NULL DEFAULT NULL,
@@ -256,8 +268,9 @@ INSERT INTO "mx_table_column_templates" VALUES (7,'Right',30,'180',4);
 --
 
 DROP TABLE IF EXISTS mx_table_function CASCADE;
+CREATE SEQUENCE mx_table_functions_seq;
 CREATE TABLE "mx_table_function" (
-  "function_id" SERIAL,
+  "function_id" INT2 NOT NULL nextval('mx_table_functions_seq'),
   "module_id" INTEGER NOT NULL DEFAULT '0',
   "function_name" VARCHAR(150) NULL DEFAULT NULL,
   "function_desc" TEXT NULL DEFAULT NULL,
@@ -297,9 +310,10 @@ INSERT INTO "mx_table_function" VALUES (15, 10,'Site Search','Site Search Block'
 --
 
 DROP TABLE IF EXISTS mx_table_menu_categories CASCADE;
+CREATE SEQUENCE mx_table_menu_categories_seq;
 CREATE TABLE "mx_table_menu_categories" (
   "block_id" INTEGER NOT NULL DEFAULT '1',
-  "cat_id" SERIAL,
+  "cat_id" INT2 NOT NULL nextval('mx_table_mwnu_categories_seq'),
   "cat_title" VARCHAR(100) NULL DEFAULT NULL,
   "cat_order" INTEGER NOT NULL DEFAULT '0',
   "bbcode_uid" VARCHAR(10) NULL DEFAULT NULL,
@@ -328,8 +342,9 @@ SELECT setval('public."mx_menu_categories_cat_id_seq"', max("cat_id") ) FROM "mx
 --
 
 DROP TABLE IF EXISTS mx_table_menu_nav CASCADE;
+CREATE SEQUENCE mx_table_menu_seq;
 CREATE TABLE "mx_table_menu_nav" (
-  "menu_id" SERIAL,
+  "menu_id" INT2 NOT NULL nextval('mx_table_menu_seq'),
   "cat_id" INTEGER NOT NULL DEFAULT '0',
   "menu_name" VARCHAR(150) NULL DEFAULT NULL,
   "menu_desc" TEXT NULL DEFAULT NULL,
@@ -375,8 +390,9 @@ INSERT INTO "mx_table_menu_nav" VALUES (2,3,'Forum','phpBB Forum Index','',0,20,
 --
 
 DROP TABLE IF EXISTS mx_table_module CASCADE;
+CREATE SEQUENCE mx_table_module_seq;
 CREATE TABLE "mx_table_module" (
-  "module_id" SERIAL,
+  "module_id" INT2 NOT NULL nextval('mx_table_module_seq'),
   "module_name" VARCHAR(150) NULL DEFAULT NULL,
   "module_path" VARCHAR(255) NULL DEFAULT NULL,
   "module_desc" TEXT NULL DEFAULT NULL,
@@ -401,13 +417,14 @@ INSERT INTO "mx_table_module" VALUES (50,'Navigation Menu','modules/mx_navmenu/'
 --
 
 DROP TABLE IF EXISTS mx_table_page CASCADE;
+CREATE SEQUENCE mx_table_page_seq;
 CREATE TABLE "mx_table_page" (
-  "page_id" SERIAL,
+  "page_id" INT2 NOT NULL nextval('mx_table_page_seq'),
   "page_name" VARCHAR(255) NULL DEFAULT NULL,
   "page_desc" VARCHAR(255) NULL DEFAULT NULL,
-  `page_parent` INTEGER DEFAULT '0',
-  `parents_data` TEXT NOT NULL DEFAULT NULL,
-  `page_order` SMALLINT NOT NULL DEFAULT '0',
+  "page_parent" INTEGER DEFAULT '0',
+  "parents_data" TEXT NOT NULL DEFAULT NULL,
+  "page_order" SMALLINT NOT NULL DEFAULT '0',
   "page_icon" VARCHAR(255) NULL DEFAULT NULL,
   "page_alt_icon" VARCHAR(255) NULL DEFAULT NULL,
   "menu_icon" VARCHAR(255) NULL DEFAULT NULL,
@@ -465,8 +482,9 @@ INSERT INTO "mx_table_page_templates" VALUES (4,'Three-Columns');
 --
 
 DROP TABLE IF EXISTS mx_table_parameter CASCADE;
+CREATE SEQUENCE mx_table_parameter_seq;
 CREATE TABLE "mx_table_parameter" (
-  "parameter_id" SERIAL,
+  "parameter_id" INT2 NOT NULL nextval('mx_table_parameter_seq'),
   "function_id" INTEGER NOT NULL DEFAULT '0',
   "parameter_name" VARCHAR(150) NULL DEFAULT NULL,
   "parameter_type" VARCHAR(30) NULL DEFAULT NULL,
@@ -555,26 +573,60 @@ INSERT INTO "mx_table_parameter" VALUES (95,31,'msg_filter_date','Function','5',
 --
 
 DROP TABLE IF EXISTS mx_table_portal CASCADE;
+CREATE SEQUENCE mx_table_portal_seq;
 CREATE TABLE "mx_table_portal" (
-  "portal_id" INTEGER NOT NULL ,
-  "portal_name" VARCHAR(150) NULL DEFAULT NULL,
-  "portal_phpbb_url" VARCHAR(255) NULL DEFAULT 'http://www.phpbb.com/phpBB/',
-  "portal_url" VARCHAR(255) NULL DEFAULT NULL,
-  "portal_version" VARCHAR(255) NULL DEFAULT NULL,
-  "default_admin_style" SMALLINT NOT NULL DEFAULT '-1',
-  "default_style" SMALLINT NOT NULL DEFAULT '-1',
-  "override_user_style" SMALLINT NOT NULL DEFAULT '1',
-  "overall_header" VARCHAR(255) NULL DEFAULT 'overall_header.tpl',
-  "overall_footer" VARCHAR(255) NULL DEFAULT 'overall_footer.tpl',
-  "main_layout" VARCHAR(255) NULL DEFAULT 'mx_main_layout.tpl',
-  "navigation_block" INTEGER NOT NULL DEFAULT '0',
-  "top_phpbb_links" INTEGER NOT NULL DEFAULT '0',
-  "mx_use_cache" INTEGER NOT NULL DEFAULT '1',
-  "portal_recached" VARCHAR(255) NOT NULL DEFAULT '',
-  "mod_rewrite" SMALLINT NOT NULL DEFAULT '0',
-  "portal_backend" VARCHAR(255) NULL DEFAULT 'phpBB2',
-  "portal_status" SMALLINT NOT NULL DEFAULT '1',
-  "disabled_message" VARCHAR(255) NULL DEFAULT '',
+  "portal_id" INT2 NOT NULL nextval('mx_table_portal_seq'),
+  "portal_name" varchar(255) NOT NULL DEFAULT 'yourdomain.com',
+  "portal_desc" varchar(255) NOT NULL DEFAULT 'A _little_ text to describe your site',
+  "portal_status" INT2 NOT NULL DEFAULT '1',
+  "disabled_message" varchar(255) NOT NULL DEFAULT 'We are currently upgrading this site with latest MX-Publisher software.',
+  "server_name" varchar(255) NOT NULL DEFAULT 'www.myserver.tld',
+  "script_path" varchar(255) NOT NULL DEFAULT '/',
+  "script_protocol" varchar(255) NOT NULL DEFAULT 'http://',
+  "server_port" varchar(255) NOT NULL DEFAULT '80',
+  "default_dateformat" varchar(255) NOT NULL DEFAULT 'D M d, Y g:i a',
+  "board_timezone" INT2 NOT NULL DEFAULT '0',
+  "gzip_compress" INT2 NOT NULL DEFAULT '0',
+  "mx_use_cache" INT2 NOT NULL DEFAULT '1',
+  "mod_rewrite" INT2 NOT NULL DEFAULT '0',
+  "cookie_domain" varchar(255) NOT NULL DEFAULT '',
+  "cookie_name" varchar(255) NOT NULL DEFAULT 'mxbb30x',
+  "cookie_path" varchar(255) NOT NULL DEFAULT '/',
+  "cookie_secure" INT2 NOT NULL DEFAULT '0',
+  "session_length" varchar(255) NOT NULL DEFAULT '3600',
+  "allow_autologin" INT2 NOT NULL DEFAULT '1',
+  "max_autologin_time" INT2 NOT NULL DEFAULT '0',
+  "max_login_attempts" INT2 NOT NULL DEFAULT '5',
+  "login_reset_time" varchar(255) NOT NULL DEFAULT '30',
+  "default_lang" varchar(255) NOT NULL DEFAULT 'english',
+  "default_style" INT4 NOT NULL DEFAULT '-1',
+  "override_user_style" INT2 NOT NULL DEFAULT '1',
+  "default_admin_style" INT4 NOT NULL DEFAULT '-1',
+  "overall_header" varchar(255) NOT NULL DEFAULT 'overall_header_navigation.tpl',
+  "overall_footer" varchar(255) NOT NULL DEFAULT 'overall_footer.tpl',
+  "main_layout" varchar(255) NOT NULL DEFAULT 'mx_main_layout.tpl',
+  "navigation_block" INT4 NOT NULL DEFAULT '31',
+  "top_phpbb_links" INT2 NOT NULL DEFAULT '0',
+  "allow_html" INT2 NOT NULL DEFAULT '1',
+  "allow_html_tags" varchar(255) NOT NULL DEFAULT 'b,i,u,pre',
+  "allow_bbcode" INT2 NOT NULL DEFAULT '1',
+  "allow_smilies" INT2 NOT NULL DEFAULT '1',
+  "smilies_path" varchar(255) NOT NULL DEFAULT 'images/smiles',
+  "board_email" varchar(255) NOT NULL DEFAULT 'youraddress@yourdomain.com',
+  "board_email_sig" varchar(255) NOT NULL DEFAULT 'Thanks, the MX-Publisher Team',
+  "smtp_delivery" INT2 NOT NULL DEFAULT '0',
+  "smtp_host" varchar(255) NOT NULL DEFAULT '',
+  "smtp_username" varchar(255) NOT NULL DEFAULT '',
+  "smtp_password" varchar(255) NOT NULL DEFAULT '',
+  "smtp_auth_method" varchar(255) NOT NULL DEFAULT '',
+  "portal_version" varchar(255) NOT NULL DEFAULT '',
+  "portal_recached" varchar(255) NOT NULL DEFAULT '',
+  "portal_backend" varchar(255) NOT NULL DEFAULT 'internal',
+  "portal_backend_path" varchar(255) NOT NULL DEFAULT '',
+  "portal_startdate" varchar(255) NOT NULL DEFAULT '0',
+  "rand_seed" varchar(255) NOT NULL DEFAULT '0',
+  "record_online_users" varchar(255) NOT NULL DEFAULT '0',
+  "record_online_date" varchar(255) NOT NULL DEFAULT '0',
   CONSTRAINT mx_table_portal_pkey PRIMARY KEY ("portal_id")
 );
 
@@ -597,35 +649,304 @@ CREATE TABLE "mx_search_results" (
 );
 CREATE INDEX "mx_table_search_results_session_id" ON "mx_table_search_results" ("session_id");
 
-
-
-
 --
 -- Table structure for table 'mx_table_wordlist'
 --
 
 DROP TABLE IF EXISTS mx_table_wordlist CASCADE;
+CREATE SEQUENCE mx_table_wordlist_seq;
 CREATE TABLE "mx_table_wordlist" (
-  "word_text" VARCHAR(50) NOT NULL DEFAULT '',
-  "word_id" SERIAL NOT NULL ,
-  "word_common" BOOLEAN NOT NULL DEFAULT '0',
+  "word_id" INT4 DEFAULT nextval('mx_table_wordlist_seq'),
+  "word_text" varchar(255) DEFAULT '' NOT NULL,
+  "word_common" INT2 DEFAULT '0' NOT NULL CHECK (word_common >= 0),
+  "word_count" INT4 DEFAULT '0' NOT NULL CHECK (word_count >= 0),
+  "word" varchar(255) DEFAULT '' NOT NULL,
+  "replacement" varchar(255) DEFAULT '' NOT NULL,
   CONSTRAINT mx_table_wordlist_pkey PRIMARY KEY ("word_text")
 );
 CREATE INDEX "mx_table_wordlist_word_id" ON "mx_table_wordlist" ("word_id");
-
-
-
 
 --
 -- Table structure for table 'mx_table_wordmatch'
 --
 
 DROP TABLE IF EXISTS mx_table_wordmatch CASCADE;
+CREATE SEQUENCE mx_table_wordmatch_seq;
 CREATE TABLE "mx_table_wordmatch" (
-  "block_id" INTEGER NOT NULL DEFAULT '0',
-  "word_id" INTEGER NOT NULL DEFAULT '0',
-  "title_match" BOOLEAN NOT NULL DEFAULT '0'
+  "block_id" INT4 DEFAULT '0' NOT NULL CHECK (block_id >= 0),
+  "word_id" INT4 DEFAULT '0' NOT NULL CHECK (word_id >= 0),
+  "title_match" INT2 DEFAULT '0' NOT NULL CHECK (title_match >= 0)
 );
+CREATE UNIQUE INDEX "mx_table_wordmatch_unq_mtch" ON "mx_table_wordmatch" ("word_id", "block_id", "title_match");
 CREATE INDEX "mx_table_wordmatch_block_id" ON "mx_table_wordmatch" ("block_id");
-CREATE INDEX "mx_table_wordmatch_word_id" ON "mx_table_wordmatch" ("word_id")
+CREATE INDEX "mx_table_wordmatch_word_id" ON "mx_table_wordmatch" ("word_id");
 
+/*
+	Table: 'mx_table_user_group'
+*/
+DROP TABLE IF EXISTS mx_table_user_group CASCADE;
+CREATE SEQUENCE mx_table_user_group_seq;
+CREATE TABLE "mx_table_user_group" (
+	"group_id" INT4 DEFAULT '0' NOT NULL CHECK (group_id >= 0),
+	"user_id" INT4 DEFAULT '0' NOT NULL CHECK (user_id >= 0),
+	"group_leader" INT2 DEFAULT '0' NOT NULL CHECK (group_leader >= 0),
+	"user_pending" INT2 DEFAULT '1' NOT NULL CHECK (user_pending >= 0)
+);
+CREATE INDEX "mx_table_user_group_group_id" ON "mx_table_user_group" ("group_id");
+CREATE INDEX "mx_table_user_group_user_id" ON "mx_table_user_group" ("user_id");
+CREATE INDEX "mx_table_user_group_group_leader" ON "mx_table_user_group" ("group_leader");
+
+/*
+	Table: 'mx_table_groups'
+*/
+DROP TABLE IF EXISTS mx_table_groups CASCADE;
+CREATE SEQUENCE mx_table_groups_seq;
+CREATE TABLE mx_table_groups (
+	"group_id" INT4 DEFAULT nextval('mx_table_groups_seq'),
+	"group_type" INT2 DEFAULT '1' NOT NULL,
+	"group_name" varchar_ci DEFAULT '' NOT NULL,
+	"group_description" varchar(4000) DEFAULT '' NOT NULL,
+	"group_moderator" INT2 DEFAULT '0' NOT NULL,
+	"group_single_user" INT2 DEFAULT '1' NOT NULL,
+	"group_display" INT2 DEFAULT '0' NOT NULL CHECK (group_display >= 0),
+	"group_avatar" varchar(255) DEFAULT '' NOT NULL,
+	"group_avatar_type" INT2 DEFAULT '0' NOT NULL,
+	"group_avatar_width" INT2 DEFAULT '0' NOT NULL CHECK (group_avatar_width >= 0),
+	"group_avatar_height" INT2 DEFAULT '0' NOT NULL CHECK (group_avatar_height >= 0),
+	"group_colour" varchar(6) DEFAULT '' NOT NULL,
+	"group_legend" INT2 DEFAULT '1' NOT NULL CHECK (group_legend >= 0),
+	PRIMARY KEY ("group_id")
+);
+
+CREATE INDEX "mx_table_groups_group_legend_name" ON "mx_table_groups" ("group_legend", "group_name");
+
+/* --------------------------------------------------------
+#
+# Table structure for table 'mx_table_sessions'
+#
+# Note that if you are running 3.23.x you may want to make
+# this table a type HEAP. This type of table is stored
+# within system memory and therefore for big busy boards
+# is likely to be noticeably faster than continually
+# writing to disk ...
+*/
+DROP TABLE IF EXISTS mx_table_sessions CASCADE;
+CREATE TABLE "mx_table_sessions" (
+	"session_id" char(32) DEFAULT '' NOT NULL,
+	"session_user_id" INT4 DEFAULT '0' NOT NULL CHECK (session_user_id >= 0),
+	"session_start" INT4 DEFAULT '0' NOT NULL CHECK (session_start >= 0),
+	"session_time" INT4 DEFAULT '0' NOT NULL CHECK (session_time >= 0),
+	"session_ip" varchar(40) DEFAULT '' NOT NULL,
+	"session_page" varchar(255) DEFAULT '' NOT NULL,
+	"session_logged_in" INT2 DEFAULT '1' NOT NULL CHECK (session_logged_in >= 0),
+	"session_admin" INT2 DEFAULT '0' NOT NULL CHECK (session_admin >= 0),
+	PRIMARY KEY ("session_id")
+);
+
+CREATE INDEX "mx_table_sessions_session_time" ON "mx_table_sessions" ("session_time");
+CREATE INDEX "mx_table_sessions_session_user_id" ON "mx_table_sessions" ("session_user_id");
+
+/*
+	Table: 'phpbb_sessions_keys'
+*/
+DROP TABLE IF EXISTS mx_table_sessions_keys CASCADE;
+CREATE TABLE "mx_table_sessions_keys" (
+	"key_id" char(32) DEFAULT '' NOT NULL,
+	"user_id" INT4 DEFAULT '0' NOT NULL CHECK (user_id >= 0),
+	"last_ip" varchar(40) DEFAULT '' NOT NULL,
+	"last_login" INT4 DEFAULT '0' NOT NULL CHECK (last_login >= 0),
+	PRIMARY KEY ("key_id", "user_id")
+);
+
+CREATE INDEX "mx_table_sessions_keys_last_login" ON "mx_table_sessions_keys" ("last_login");
+
+
+/*
+	Table: 'mx_table_users'
+*/
+DROP TABLE IF EXISTS mx_table_users CASCADE;
+CREATE SEQUENCE mx_table_users_seq;
+CREATE TABLE "mx_table_users" (
+	user_id INT4 DEFAULT nextval('mx_table_users_seq'),
+	user_type INT2 DEFAULT '0' NOT NULL,
+	group_id INT4 DEFAULT '3' NOT NULL CHECK (group_id >= 0),
+	user_active INT2 DEFAULT '1',
+	user_permissions TEXT DEFAULT '' NOT NULL,
+	user_perm_from INT4 DEFAULT '0' NOT NULL CHECK (user_perm_from >= 0),
+	user_ip varchar(40) DEFAULT '' NOT NULL,
+	user_regdate INT4 DEFAULT '0' NOT NULL CHECK (user_regdate >= 0),
+	username varchar_ci DEFAULT '' NOT NULL,
+	username_clean varchar_ci DEFAULT '' NOT NULL,
+	user_password varchar(40) DEFAULT '' NOT NULL,
+	user_passchg INT4 DEFAULT '0' NOT NULL CHECK (user_passchg >= 0),
+	user_pass_convert INT2 DEFAULT '0' NOT NULL CHECK (user_pass_convert >= 0),
+	user_email varchar(100) DEFAULT '' NOT NULL,
+	user_email_hash INT8 DEFAULT '0' NOT NULL,
+	user_birthday varchar(10) DEFAULT '' NOT NULL,
+	user_lastvisit INT4 DEFAULT '0' NOT NULL CHECK (user_lastvisit >= 0),
+	user_lastmark INT4 DEFAULT '0' NOT NULL CHECK (user_lastmark >= 0),
+	user_lastpost_time INT4 DEFAULT '0' NOT NULL CHECK (user_lastpost_time >= 0),
+	user_lastpage varchar(200) DEFAULT '' NOT NULL,
+	user_last_confirm_key varchar(10) DEFAULT '' NOT NULL,
+	user_last_search INT4 DEFAULT '0' NOT NULL CHECK (user_last_search >= 0),
+	user_warnings INT2 DEFAULT '0' NOT NULL,
+	user_last_warning INT4 DEFAULT '0' NOT NULL CHECK (user_last_warning >= 0),
+	user_login_attempts INT2 DEFAULT '0' NOT NULL,
+	user_inactive_reason INT2 DEFAULT '0' NOT NULL,
+	user_inactive_time INT4 DEFAULT '0' NOT NULL CHECK (user_inactive_time >= 0),
+	user_posts INT4 DEFAULT '0' NOT NULL CHECK (user_posts >= 0),
+	user_lang varchar(30) DEFAULT '' NOT NULL,
+	user_timezone decimal(5,2) DEFAULT '0' NOT NULL,
+	user_dst INT2 DEFAULT '0' NOT NULL CHECK (user_dst >= 0),
+	user_dateformat varchar(30) DEFAULT 'd M Y H:i' NOT NULL,
+	user_style INT4 DEFAULT '0' NOT NULL CHECK (user_style >= 0),
+	user_rank INT4 DEFAULT '0' NOT NULL CHECK (user_rank >= 0),
+	user_colour varchar(6) DEFAULT '' NOT NULL,
+	user_new_privmsg INT4 DEFAULT '0' NOT NULL,
+	user_unread_privmsg INT4 DEFAULT '0' NOT NULL,
+	user_last_privmsg INT4 DEFAULT '0' NOT NULL CHECK (user_last_privmsg >= 0),
+	user_message_rules INT2 DEFAULT '0' NOT NULL CHECK (user_message_rules >= 0),
+	user_full_folder INT4 DEFAULT '-3' NOT NULL,
+	user_emailtime INT4 DEFAULT '0' NOT NULL CHECK (user_emailtime >= 0),
+	user_topic_show_days INT2 DEFAULT '0' NOT NULL CHECK (user_topic_show_days >= 0),
+	user_topic_sortby_type varchar(1) DEFAULT 't' NOT NULL,
+	user_topic_sortby_dir varchar(1) DEFAULT 'd' NOT NULL,
+	user_post_show_days INT2 DEFAULT '0' NOT NULL CHECK (user_post_show_days >= 0),
+	user_post_sortby_type varchar(1) DEFAULT 't' NOT NULL,
+	user_post_sortby_dir varchar(1) DEFAULT 'a' NOT NULL,
+	user_notify INT2 DEFAULT '0' NOT NULL CHECK (user_notify >= 0),
+	user_notify_pm INT2 DEFAULT '1' NOT NULL CHECK (user_notify_pm >= 0),
+	user_notify_type INT2 DEFAULT '0' NOT NULL,
+	user_allow_pm INT2 DEFAULT '1' NOT NULL CHECK (user_allow_pm >= 0),
+	user_allow_viewonline INT2 DEFAULT '1' NOT NULL CHECK (user_allow_viewonline >= 0),
+	user_allow_viewemail INT2 DEFAULT '1' NOT NULL CHECK (user_allow_viewemail >= 0),
+	user_allow_massemail INT2 DEFAULT '1' NOT NULL CHECK (user_allow_massemail >= 0),
+	user_options INT4 DEFAULT '230271' NOT NULL CHECK (user_options >= 0),
+	user_avatar varchar(255) DEFAULT '' NOT NULL,
+	user_avatar_type INT2 DEFAULT '0' NOT NULL,
+	user_avatar_width INT2 DEFAULT '0' NOT NULL CHECK (user_avatar_width >= 0),
+	user_avatar_height INT2 DEFAULT '0' NOT NULL CHECK (user_avatar_height >= 0),
+	user_sig TEXT DEFAULT '' NOT NULL,
+	user_sig_bbcode_uid varchar(8) DEFAULT '' NOT NULL,
+	user_sig_bbcode_bitfield varchar(255) DEFAULT '' NOT NULL,
+	user_actkey varchar(32) DEFAULT '' NOT NULL,
+	user_newpasswd varchar(40) DEFAULT '' NOT NULL,
+	user_form_salt varchar(32) DEFAULT '' NOT NULL,
+	user_new INT2 DEFAULT '1' NOT NULL CHECK (user_new >= 0),
+	user_reminded INT2 DEFAULT '0' NOT NULL,
+	user_reminded_time INT4 DEFAULT '0' NOT NULL CHECK (user_reminded_time >= 0),
+	PRIMARY KEY ("user_id")
+);
+
+CREATE INDEX "mx_table_users_user_birthday" ON "mx_table_users" ("user_birthday");
+CREATE INDEX "mx_table_users_user_email_hash" ON "mx_table_users" ("user_email_hash");
+CREATE INDEX "mx_table_users_user_type" ON "mx_table_users" ("user_type");
+CREATE UNIQUE INDEX "mx_table_users_username_clean" ON "mx_table_users" ("username_clean");
+
+/* -- Users */
+INSERT INTO "mx_table_users" ("user_id", "user_active", "username", "user_password", "user_session_time", "user_session_page", "user_lastvisit", "user_regdate", "user_level", "user_login_tries", "user_last_login_try", "user_email") VALUES('-1', '0', 'Anonymous', '', '0', '0', '0', '1221460256', '0', '0', '0', '');
+
+/* -- username: admin    password: admin (change this or remove it once everything is working!) */
+INSERT INTO "mx_table_users" ("user_id", "user_active", "username", "user_password", "user_session_time", "user_session_page", "user_lastvisit", "user_regdate", "user_level", "user_login_tries", "user_last_login_try", "user_email") VALUES('2', '1', 'Admin', '21232f297a57a5a743894a0e4a801fc3', '1223142439', '0', '1221524623', '1221460256', '1', '0', '0', 'admin@localhost');
+
+/* -- Groups */
+INSERT INTO "mx_table_groups" ("group_id", "group_name", "group_description", "group_single_user") VALUES (1, 'Anonymous', 'Personal User', 1);
+INSERT INTO "mx_table_groups" ("group_id", "group_name", "group_description", "group_single_user") VALUES (2, 'Admin', 'Personal User', 1);
+
+
+/* -- User -> Group */
+INSERT INTO "mx_table_user_group" ("group_id", "user_id", "user_pending") VALUES (1, -1, 0);
+INSERT INTO "mx_table_user_group" ("group_id", "user_id", "user_pending") VALUES (2, 2, 0);
+
+DROP TABLE IF EXISTS mx_table_themes CASCADE;
+CREATE SEQUENCE mx_table_themes_seq;
+CREATE TABLE "mx_table_themes" (
+   "themes_id" INT4 DEFAULT nextval('mx_table_themes_seq'),
+   "template_name" varchar(255) DEFAULT '' NOT NULL,
+   "style_name" varchar(255) DEFAULT '' NOT NULL,
+   "head_stylesheet" varchar(100) default NULL,
+   "portal_backend" varchar(30) DEFAULT '' NOT NULL,
+   PRIMARY KEY  ("themes_id")
+);
+CREATE UNIQUE INDEX "mx_table_themes_template_name" ON "mx_table_themes" ("template_name");
+
+INSERT INTO "mx_table_themes" ("themes_id", "template_name", "style_name", "head_stylesheet", "portal_backend") VALUES (1, 'mxBase1', 'mxBase1', 'mxBase1.css', 'internal');
+INSERT INTO "mx_table_themes" ("themes_id", "template_name", "style_name", "head_stylesheet", "portal_backend") VALUES (2, 'mxBase2', 'mxBase2', 'mxBase2.css', 'internal');
+INSERT INTO "mx_table_themes" ("themes_id", "template_name", "style_name", "head_stylesheet", "portal_backend") VALUES (3, 'mxSilver', 'mxSilver', 'mxSilver.css', 'internal');
+INSERT INTO "mx_table_themes" ("themes_id", "template_name", "style_name", "head_stylesheet", "portal_backend") VALUES (4, 'subSilver', 'subSilver', 'subSilver.css', 'phpbb2');
+INSERT INTO "mx_table_themes" ("themes_id", "template_name", "style_name", "head_stylesheet", "portal_backend") VALUES (5, 'subsilver2', 'subsilver2', 'subsilver2.css', 'phpbb3');
+INSERT INTO "mx_table_themes" ("themes_id", "template_name", "style_name", "head_stylesheet", "portal_backend") VALUES (6, 'prosilver', 'prosilver', 'prosilver.css', 'phpbb3');
+
+/*
+	Table: 'phpbb_smilies'
+*/
+DROP TABLE IF EXISTS mx_table_smilies CASCADE;
+CREATE SEQUENCE mx_table_smilies_seq;
+CREATE TABLE "mx_table_smilies" (
+	"smilies_id" INT4 DEFAULT nextval('mx_table_smilies_seq'),
+	"code" varchar(50) DEFAULT '' NOT NULL,
+	"emoticon" varchar(50) DEFAULT '' NOT NULL,
+	"smile_url" varchar(50) DEFAULT '' NOT NULL,
+	"smile_width" INT2 DEFAULT '0' NOT NULL CHECK (smiley_width >= 0),
+	"smile_height" INT2 DEFAULT '0' NOT NULL CHECK (smiley_height >= 0),
+	"smile_order" INT4 DEFAULT '0' NOT NULL CHECK (smiley_order >= 0),
+	"display_on_posting" INT2 DEFAULT '1' NOT NULL CHECK (display_on_posting >= 0),
+	PRIMARY KEY ("smilies_id")
+);
+
+CREATE INDEX "mx_table_smilies_display_on_post" ON "mx_table_smilies" ("display_on_posting");
+
+/* -- Smilies */
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 1, ':D', 'icon_biggrin.gif', 'Very Happy');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 2, ':-D', 'icon_biggrin.gif', 'Very Happy');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 3, ':grin:', 'icon_biggrin.gif', 'Very Happy');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 4, ':)', 'icon_smile.gif', 'Smile');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 5, ':-)', 'icon_smile.gif', 'Smile');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 6, ':smile:', 'icon_smile.gif', 'Smile');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 7, ':(', 'icon_sad.gif', 'Sad');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 8, ':-(', 'icon_sad.gif', 'Sad');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 9, ':sad:', 'icon_sad.gif', 'Sad');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 10, ':o', 'icon_surprised.gif', 'Surprised');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 11, ':-o', 'icon_surprised.gif', 'Surprised');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 12, ':eek:', 'icon_surprised.gif', 'Surprised');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 13, ':shock:', 'icon_eek.gif', 'Shocked');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 14, ':?', 'icon_confused.gif', 'Confused');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 15, ':-?', 'icon_confused.gif', 'Confused');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 16, ':???:', 'icon_confused.gif', 'Confused');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 17, '8)', 'icon_cool.gif', 'Cool');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 18, '8-)', 'icon_cool.gif', 'Cool');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 19, ':cool:', 'icon_cool.gif', 'Cool');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 20, ':lol:', 'icon_lol.gif', 'Laughing');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 21, ':x', 'icon_mad.gif', 'Mad');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 22, ':-x', 'icon_mad.gif', 'Mad');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 23, ':mad:', 'icon_mad.gif', 'Mad');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 24, ':P', 'icon_razz.gif', 'Razz');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 25, ':-P', 'icon_razz.gif', 'Razz');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 26, ':razz:', 'icon_razz.gif', 'Razz');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 27, ':oops:', 'icon_redface.gif', 'Embarassed');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 28, ':cry:', 'icon_cry.gif', 'Crying or Very sad');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 29, ':evil:', 'icon_evil.gif', 'Evil or Very Mad');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 30, ':twisted:', 'icon_twisted.gif', 'Twisted Evil');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 31, ':roll:', 'icon_rolleyes.gif', 'Rolling Eyes');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 32, ':wink:', 'icon_wink.gif', 'Wink');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 33, ';)', 'icon_wink.gif', 'Wink');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 34, ';-)', 'icon_wink.gif', 'Wink');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 35, ':!:', 'icon_exclaim.gif', 'Exclamation');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 36, ':?:', 'icon_question.gif', 'Question');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 37, ':idea:', 'icon_idea.gif', 'Idea');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 38, ':arrow:', 'icon_arrow.gif', 'Arrow');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 39, ':|', 'icon_neutral.gif', 'Neutral');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 40, ':-|', 'icon_neutral.gif', 'Neutral');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 41, ':neutral:', 'icon_neutral.gif', 'Neutral');
+INSERT INTO "mx_table_smilies" ("smilies_id", "code", "smile_url", "emoticon") VALUES ( 42, ':mrgreen:', 'icon_mrgreen.gif', 'Mr. Green');
+
+/*
+	Table: 'mx_table_words'
+*/
+CREATE SEQUENCE mx_table_words_seq;
+CREATE TABLE mx_table_words (
+	"word_id" INT4 DEFAULT nextval('mx_table_words_seq'),
+	"word" varchar(255) DEFAULT '' NOT NULL,
+	"replacement" varchar(255) DEFAULT '' NOT NULL,
+	PRIMARY KEY ("word_id")
+);

@@ -9,6 +9,12 @@
 *
 */
 
+
+if ( !defined('IN_PORTAL') )
+{
+	die("Hacking attempt");
+}
+
 class Template 
 {
 	var $classname = "Template";
@@ -35,11 +41,23 @@ class Template
 	var $uncompiled_code = array();
 
 	/**
+	* Twig Environment
+	*
+	* @var \Twig\Environment
+	*/ //protected $twig;
+
+	/**
 	 * Constructor. Simply sets the root dir.
-	 *
-	 */
-	function Template($root = ".")
+	*
+	* @param \phpbb\extension\manager $extension_manager extension manager, if null then template events will not be invoked
+	*/
+	public function __construct($root = ".")
 	{
+		global $mx_root_path, $phpEx;
+		
+		$this->mx_root_path = $mx_root_path;
+		$this->php_ext = $phpEx;
+
 		$this->set_rootdir($root);
 	}
 
@@ -208,12 +226,12 @@ class Template
 	 * be an absolute name, or a name relative to the rootdir for this Template
 	 * object.
 	 */
-	function make_filename($filename)
+	function make_filename($filename, $xs_include = false)
 	{
 		// Check if it's an absolute or relative path.
 		if (substr($filename, 0, 1) != '/')
 		{
-       		$filename = ($rp_filename = mx_realpath($this->root . '/' . $filename)) ? $rp_filename : $filename;
+       		$filename = ($rp_filename = install_realpath($this->root . '/' . $filename)) ? $rp_filename : $filename;
 		}
 
 		if (!file_exists($filename))
@@ -255,6 +273,8 @@ class Template
 
 		return true;
 	}
+
+
 
 	/**
 	 * Compiles the given string of code, and returns
@@ -397,6 +417,7 @@ class Template
 
 	}
 
+
 	/**
 	 * Generates a reference to the given variable inside the given (possibly nested)
 	 * block namespace. This is a string of the form:
@@ -404,7 +425,7 @@ class Template
 	 * It's ready to be inserted into an "echo" line in one of the templates.
 	 * NOTE: expects a trailing "." on the namespace.
 	 */
-	function generate_block_varref($namespace, $varname)
+	function generate_block_varref($namespace, $varname, $use_isset = true)
 	{
 		// Strip the trailing period.
 		$namespace = substr($namespace, 0, strlen($namespace) - 1);
@@ -422,6 +443,7 @@ class Template
 
 	}
 
+
 	/**
 	 * Generates a reference to the array of data values for the given
 	 * (possibly nested) block namespace. This is a string of the form:
@@ -430,26 +452,39 @@ class Template
 	 * If $include_last_iterator is true, then [$_childN_i] will be appended to the form shown above.
 	 * NOTE: does not expect a trailing "." on the blockname.
 	 */
-	function generate_block_data_ref($blockname, $include_last_iterator)
+	function generate_block_data_ref($blockname, $include_last_iterator, $defop = true)
 	{
 		// Get an array of the blocks involved.
 		$blocks = explode(".", $blockname);
 		$blockcount = sizeof($blocks) - 1;
-		$varref = '$this->_tpldata';
-		// Build up the string with everything but the last child.
-		for ($i = 0; $i < $blockcount; $i++)
+		
+		if($defop)
 		{
-			$varref .= '[\'' . $blocks[$i] . '.\'][$_' . $blocks[$i] . '_i]';
-		}
-		// Add the block reference for the last child.
-		$varref .= '[\'' . $blocks[$blockcount] . '.\']';
-		// Add the iterator for the last child if requried.
-		if ($include_last_iterator)
-		{
-			$varref .= '[$_' . $blocks[$blockcount] . '_i]';
-		}
+			$varref = '$this->_tpldata';
+			// Build up the string with everything but the last child.
+			for ($i = 0; $i < $blockcount; $i++)
+			{
+				$varref .= '[\'' . $blocks[$i] . '.\'][$_' . $blocks[$i] . '_i]';
+			}
+			// Add the block reference for the last child.
+			$varref .= '[\'' . $blocks[$blockcount] . '.\']';
+			// Add the iterator for the last child if requried.
+			if ($include_last_iterator)
+			{
+				$varref .= '[$_' . $blocks[$blockcount] . '_i]';
+			}
 
-		return $varref;
+			return $varref;
+		}				
+
+		if($include_last_iterator)
+		{
+			return '$'. $blocks[$blockcount]. '_item';
+		}
+		else
+		{
+			return '$'. $blocks[$blockcount-1]. '_item[\''. $blocks[$blockcount]. '.\']';
+		}
 	}
 
 }

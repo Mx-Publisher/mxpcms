@@ -1,136 +1,159 @@
 <?php
 /**
- *
- * @package MX-Publisher CMS Core
- * @version $Id: lang_main.php,v 1.10 2013/06/28 15:34:32 orynider Exp $
- * @copyright (c) 2002-2006 Mx-Publisher Project Team
- * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
- *
- * Encoding: UTF-8
- * 1 tab = 4 spaces
- */
+*
+* @package MX-Publisher Core
+* @version $Id: lang_main.php,v 1.42 2013/06/28 15:34:31 orynider Exp $
+* @copyright (c) 2002-2008 MX-Publisher Project Team
+* @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
+* @link http://mxpcms.sourceforge.net/
+*
+*/
 
-if ( !isset($lang) )
-{
-	$lang = array();
-}
-/*  Editor Settings: Please set Tabsize to 4 ;-) */
- 
-/*  The format of this file is:  ---> $lang['message'] = 'text';
-/*  Specify your language character encoding... [optional] */  
-setlocale(LC_ALL, 'ro');
+//
+// The format of this file is:
+//
+// ---> $lang['message'] = 'text';
+//
+// Specify your language character encoding... [optional]
+//
+// setlocale(LC_ALL, 'en');
 
-$lang = array_merge( $lang, array( // #
+$lang['USER_LANG'] = 'en';
+$lang['ENCODING'] = 'UTF-8';
+$lang['DIRECTION'] = 'ltr';
+$lang['LEFT'] = 'left';
+$lang['RIGHT'] = 'right';
+$lang['DATE_FORMAT'] =  'd/M/Y'; // This should be changed to the default date format for your language, php date() format
+
 //
 // General
 //
-	'Page_Not_Authorised'				=> 'Ne pare rău, dar nu eşti autorizat să accesezi această pagină.',
-	'Execution_Stats'					=> 'Pagina a generat %s querie - Timpul generării: %s secunde',
-	'Redirect_login'					=> 'Click %sAici%s să te logezi.',
-	'Show_admin_options'				=> 'Arată/Ascunde Opţiunile Admin pe Pagină:',
-	'Block_updated_date'				=> 'Updatat',
-	'Block_updated_by'					=> 'de',
-	'Page_updated_date'					=> 'Pagina actualizată',
-	'Page_updated_by'					=> 'de',
-	'Powered_by'						=> 'Powered by',
-	'mx_spacer'							=> 'Spacer',
-	'Yes'								=> 'Da',
-	'No'								=> 'Nu',
-	'Link'								=> 'Legătură',
-	'Hidden_block'						=> 'Block ascuns...',
-	'Hidden_block_explain'				=> 'Acest bloc este \'ascuns\', dar visibil deoarece eşti un admin/moderator.',
+$lang['Page_Not_Authorised'] = 'Sorry, but you are not authorized to access this page.';
+$lang['Execution_Stats'] = 'Page generated %s queries - Generation time: %s seconds';
+$lang['Redirect_login'] = 'Click %shere%s to login.';
+$lang['Show_admin_options'] = 'Show/Hide Page Admin Options: ';
+$lang['Block_updated_date'] = 'Updated ';
+$lang['Block_updated_by'] = 'by ';
+$lang['Page_updated_date'] = 'This page was updated ';
+$lang['Page_updated_by'] = 'by ';
+$lang['Powered_by'] = 'Powered by ';
+
+$lang['mx_spacer'] = 'Spacer';
+$lang['Yes'] = 'Yes';
+$lang['No'] = 'No';
+
+$lang['Link'] = 'Link';
+
+$lang['Hidden_block'] = 'Hidden block';
+$lang['Hidden_block_explain'] = 'This block is \'hidden\', but visible to you since you have the proper permissions set.';
+
+//
+// Navigation Block
+//
+$lang['Navigation_Menu'] = 'Menu';
+
 //
 // Overall Navigation Navigation
-//	
-	'MX_home'							=> 'Acasă',
-	'MX_forum'							=> 'Forum',
-	'MX_navigation'						=> 'Pages navigation, eg. forum navigation, like pafiledb navigation.',	
+//
+$lang['MX_home'] = 'Home';
+$lang['MX_forum'] = 'Forum';
+$lang['MX_navigation'] = 'Pages navigation, eg. forum navigation, like pafiledb navigation.';
+
 //
 // Core Blocks - Language
-//	
-	'Change_default_lang'				=> 'Setează Limba Implicită',
-	'Change_user_lang'					=> 'Setează Limba Ta',
-	'Portal_lang'						=> 'LimbaCP',
-	'Select_lang'						=> 'Selectează Limba:',
+//
+$lang['Change_default_lang'] = 'Set the Board\'s Default Language';
+$lang['Change_user_lang'] = 'Set Your Language';
+$lang['Portal_lang'] = 'LanguageCP';
+$lang['Select_lang'] = 'Select Language:';
+$lang['Who_is_Online'] = 'Who is Online';
+
 //
 // Core Blocks - Theme
-//	
-	'Change'							=> 'Schimbă Acum',
-	'Change_default_style'				=> 'Setează Silul Implicit',
-	'Change_user_style'					=> 'Setează Stilul Tău',
-	'Theme'								=> 'CP Temă/Stil',
-	'Select_theme'						=> 'Selectează Temă/Stil',
+//
+$lang['Change'] = 'Change Now';
+$lang['Change_default_style'] = 'Set the Board\'s Default Style';
+$lang['Change_user_style'] = 'Set Your Style';
+$lang['Theme'] = 'ThemeCP/StyleCP';
+$lang['Select_theme'] = 'Select Theme/Style:';
+
 //
 // Core Blocks - Search
-//	
-	'Mx_Page'							=> 'Pagină',
-	'Mx_Block'							=> 'Secţiune',
+//
+$lang['Mx_Page'] = 'Page';
+$lang['Mx_Block'] = 'Section';
+
 //
 // Core Blocks - Virtual
-//	
-	'Virtual_Create_new'				=> 'Creează Nou',
-	'Virtual_Create_new_user'			=> 'Pagină Utilizator',
-	'Virtual_Create_new_group'			=> 'Pagină Grup',
-	'Virtual_Create_new_project'		=> 'Pagină Proiect',
-	'Virtual_Create'					=> 'Creează Nou',
-	'Virtual_Edit'						=> 'Editează Pagină Nouă',
-	'Virtual_Delete'					=> 'Șterge Pagina Aceasta',
-	'Virtual_Welcome'					=> 'Fii Binevenit',
-	'Virtual_Info'						=> 'Unde Poți controla Pagina ta Virtuală',
-	'Virtual_CP'						=> 'Panou de Control Pagină',
-	'Virtual_Go'						=> 'Mergi',
-	'Virtual_Select'					=> 'Selectare:',
+//
+$lang['Virtual_Create_new'] = 'Create new ';
+$lang['Virtual_Create_new_user'] = 'User Page';
+$lang['Virtual_Create_new_group'] = 'Group Page';
+$lang['Virtual_Create_new_project'] = 'Project Page';
+$lang['Virtual_Create'] = 'Create now';
+$lang['Virtual_Edit'] = 'Update page name';
+$lang['Virtual_Delete'] = 'Delete this page';
+
+$lang['Virtual_Welcome'] = 'Welcome ';
+$lang['Virtual_Info'] = 'Here you can control your private web page.';
+$lang['Virtual_CP'] = 'Page Control Panel';
+$lang['Virtual_Go'] = 'Go';
+$lang['Virtual_Select'] = 'Select:';
+
 //
 // Core Blocks - Site Log (and many last 'item' blocks)
-//	
-	'No_items_found'					=> 'Nimic nou de raportat.',
+//
+$lang['No_items_found'] = 'Nothing new to report. ';
+
 //
 // BlockCP
-//	
-	'Block_Title'						=> 'Titlu',
-	'Block_Info'						=> 'Informaţii',
-	'Block_Config_updated'				=> 'Configuraţia blocului actualizată cu succes',
-	'Edit'								=> 'EDITARE',	
-	'Block_Edit'						=> 'Editează Bloc',
-	'Block_Edit_dyn'					=> 'Editează Blocul părinte dinamic',
-	'Block_Edit_sub'					=> 'Editează Blocul părinte împărţit',
-	'General_updated_return_settings'	=> 'Configuraţia upgradată cu succes...<br /><br />Click %saici%s pentru a continua.',
-	'General_update_error'				=> 'Configuraţia nu se poate upgrada...',
+//
+$lang['Block_Title'] = 'Title';
+$lang['Block_Info'] = 'Information';
+
+$lang['Block_Config_updated'] = 'Block configuration updated successfully.';
+$lang['Edit'] = 'EDIT';
+$lang['Block_Edit'] = 'Edit Block';
+$lang['Block_Edit_dyn'] = 'Edit parent dynamic block';
+$lang['Block_Edit_sub'] = 'Edit parent split block';
+
+$lang['General_updated_return_settings'] = 'Configuration updated successfully.<br /><br />Click %shere%s to continue.'; // %s's for URI params - DO NOT REMOVE
+$lang['General_update_error'] = 'Couldn\'t update configuration.';
+
 //
 // Header
-//	
-	'Mx_search_site'					=> 'Site',
-	'Mx_search_forum'					=> 'Forum',
-	'Mx_search_kb'						=> 'Articole',
-	'Mx_search_pafiledb'				=> 'Download-uri',
-	'Mx_search_google'					=> 'Google',
-	'Mx_new_search'						=> 'Nouă Căutare',
+//
+$lang['Mx_search_site'] = 'Site';
+$lang['Mx_search_forum'] = 'Forum';
+$lang['Mx_search_kb'] = 'Articles';
+$lang['Mx_search_pafiledb'] = 'Downloads';
+$lang['Mx_search_google'] = 'Google';
+$lang['Mx_new_search'] = 'New Search';
+
 //
 // Copyrights page
-//	
-	'mx_about_title'					=> 'Despre Mx-Publisher CMS',
-	'mx_copy_title'						=> 'Mx-Publisher :: Informaţii',
-	'mx_copy_modules_title'				=> 'Module MXP Instalate',
-	'mx_copy_template_title'			=> 'Despre stil',
-	'mx_copy_translation_title'			=> 'Despre traducere',
-	
+//
+$lang['mx_about_title'] = 'About MX-Publisher';
+$lang['mx_copy_title'] = 'MX-Publisher Information';
+$lang['mx_copy_modules_title'] = 'Installed MX-Publisher Modules';
+$lang['mx_copy_template_title'] = 'About the style';
+$lang['mx_copy_translation_title'] = 'About the translation';
+
 // This is optional, if you would like a _SHORT_ message output
 // along with our copyright message indicating you are the translator
 // please add it here.
-	'TRANSLATION_INFO_MXBB' => 'Romanian Language by <a href="http://mxpcms.sourceforge.net/" target="_blank">MX-Publisher Development Team</a>',
+$lang['TRANSLATION_INFO_MXBB'] = 'English Language by <a href="http://mxpcms.sourceforge.net/" target="_blank">MX-Publisher Development Team</a>';
 
 //
 // Installation
-//	
-	'Please_remove_install_contrib'		=> 'Te rog asigură-te că amândouă directoarele install/ şi contrib/ sunt şterse',
-));
+//
+$lang['Please_remove_install_contrib'] = 'Please ensure both the install/ and contrib/ directories are deleted.';
 
 //
 // Multilangual page titles
 // - To have multilangual page titles, add lang keys 'pagetitle_PAGE_TITLE' below
 // - This lang key replaces the page title (PAGE_TITLE) for the page given in the adminCP
 //
-$lang['A__little__text_to_describe_your_site'] = 'Orice text pentru a descrie site-ul dvs.';
 //$lang['pagetitle_NameOfFirstPage'] = 'Whatever one';
 //$lang['pagetitle_NameOfSecondPage'] = 'Whatever two';
 

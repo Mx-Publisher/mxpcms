@@ -28,7 +28,7 @@ $page_id = $mx_request_vars->request('page', MX_TYPE_INT, 1);
  - populate $userdata and $lang
 */
 $mx_user->init($user_ip, $page_id, false);
-
+//die('user_id: ' . print_r($mx_user->data['user_id']));
 /*
 * Load and instatiate CORE (page) and block classes
 */

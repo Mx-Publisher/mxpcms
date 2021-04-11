@@ -57,34 +57,34 @@ if ( $board_config['gzip_compress'] )
 }
 **********/
 
-$template->set_filenames(array( 'header' => 'admin/page_header.tpl') );
+$template->set_filenames(array( 'header' => 'modcp/page_header.tpl') );
 
 //
 // Format Timezone. We are unable to use array_pop here, because of PHP3 compatibility
 //
 $l_timezone = explode('.', $board_config['board_timezone']);
-$l_timezone = (count($l_timezone) > 1 && $l_timezone[count($l_timezone)-1] != 0) ? $lang[sprintf('%.1f', $board_config['board_timezone'])] : $lang[$board_config['board_timezone']];
+$l_timezone = (count($l_timezone) > 1 && $l_timezone[count($l_timezone)-1] != 0) ? $lang[sprintf('%.1f', $board_config['board_timezone'])] : $lang[number_format($board_config['board_timezone'])];
 
 $template->assign_vars(array(
 	'SITENAME' => $board_config['sitename'],
-	'PAGE_TITLE' => $page_title,
+	//	'PAGE_TITLE' => $page_title,
 
 	'L_ADMIN' => $lang['Admin'],
 	'L_INDEX' => sprintf($lang['Forum_Index'], $board_config['sitename']),
 	'L_FAQ' => $lang['FAQ'],
-	'U_INDEX' => mx_append_sid('../index.'.$phpEx),
+	'U_INDEX' => append_sid('../index.'.$phpEx),
 
 	'S_TIMEZONE' => sprintf($lang['All_times'], $l_timezone),
-	'S_LOGIN_ACTION' => mx_append_sid('../login.'.$phpEx),
-	'S_JUMPBOX_ACTION' => mx_append_sid('../viewforum.'.$phpEx),
-	'S_CURRENT_TIME' => sprintf($lang['Current_time'], mx_create_date($board_config['default_dateformat'], time(), $board_config['board_timezone'])),
+	'S_LOGIN_ACTION' => append_sid('../login.'.$phpEx),
+	'S_JUMPBOX_ACTION' => append_sid('../viewforum.'.$phpEx),
+	'S_CURRENT_TIME' => sprintf($lang['Current_time'], create_date($board_config['default_dateformat'], time(), $board_config['board_timezone'])),
 	'S_CONTENT_DIRECTION' => $lang['DIRECTION'],
 	'S_CONTENT_ENCODING' => $lang['ENCODING'],
 	'S_CONTENT_DIR_LEFT' => $lang['LEFT'],
 	'S_CONTENT_DIR_RIGHT' => $lang['RIGHT'],
 
 	//
-	// These theme variables are not used for MXP, since MXP require a theme.css file
+	// These theme variables are not used for mxBB, since mxBB require a theme.css file
 	//
 	'T_HEAD_STYLESHEET' => $theme['head_stylesheet'],
 	'T_BODY_BACKGROUND' => $theme['body_background'],
@@ -141,7 +141,7 @@ $template->assign_vars(array(
 
 // Work around for "current" Apache 2 + PHP module which seems to not
 // cope with private cache control setting
-if (!empty($_SERVER['SERVER_SOFTWARE']) && strstr($_SERVER['SERVER_SOFTWARE'], 'Apache/2'))
+if (!empty($HTTP_SERVER_VARS['SERVER_SOFTWARE']) && strstr($HTTP_SERVER_VARS['SERVER_SOFTWARE'], 'Apache/2'))
 {
 	header ('Cache-Control: no-cache, pre-check=0, post-check=0');
 }

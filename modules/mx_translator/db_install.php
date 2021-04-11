@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Module - mx_translator
-* @version $Id: db_install.php,v 3.0 2018/12/20 06:48:36 orynider Exp $
-* @copyright (c) 2002-2008 [Jon Ohlsson],  (c) 2007-2018 [FlorinCB] MXP Development Team
+* @version $Id: db_install.php,v 1.1 2013/02/04 06:48:36 orynider Exp $
+* @copyright (c) 2002-2008 [Jon Ohlsson] MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://mxpcms.sourceforge.net/
+* @link http://www.mx-publisher.com
 *
 */
 
@@ -37,139 +37,32 @@ $mx_module_copy = 'Original MX-Publisher <i>Translator</i> module by <a href="ht
 // For compatibility with core 2.7.+
 define('MXBB_27x', file_exists($mx_root_path . 'mx_login.php'));
 
-// BEGIN MySQL
-// Structure from phpBBMyAdmin
-// If the DB engine is MySQL query show a specific table:
-$type = $collation = $encoding = $collate = $engine = $charset = $message = '';
-if (preg_match('/mysql/i', $dbms) !== false)
-{
-	$sql = "SHOW TABLE STATUS LIKE '" . $db->sql_escape($mx_table_prefix . "portal") . "'";
-	//$sql = "SHOW COLUMNS FROM " . $mx_table_prefix . "portal";
-	$result = $db->sql_query($sql);
-
-	$message .= "<b>Show MySQL Columns!<br/><br/>We get: COLLATE, and ENGINE, and  DEFAULT CHARSET ...</b><br/><br/>";
-
-	if (!$result)
-	{
-		// Eeeeeh... no columns perhaps?
-		$message .= "<b>" . $lang['SQL_Admin_Columns_Error'] . "</b><br/><br/>";
-	}
-	else
-	{
-		$message .= "<b>" . $lang['import_module_pack'] . "...</b><br/><br/>";
-	}
-	// Found data (obviously), let's build an output...
-	$counter = 0;
-	while ($row = $db->sql_fetchrow($result))
-	{
-		$counter++;
-		$tables[$counter] = $row['Name'];
-		
-		if (!isset($row['Engine']) && ($counter == 1))
-		{
-			$message .= "<b>No Engine?</b><br/><br/>";
-		}
-		//Vars:
-		//$row['Field'];
-		//$row['Null'];
-		//$row['Key'];
-		//$row['Default'];
-		//$row['Extra'];
-		//$row['Key'];
-		//$row['Default'];
-		//$row['Extra'];
-		$engine = $row['Engine'];
-
-		if (is_array($row['Type'])) 
-		{
-			$column_spec = extractColumnSpec($row['Type']);
-			$attribute = trim($column_spec[ 'attribute']);
-			$type = $column_spec['type'];
-			$length = $column_spec['spec_in_brackets'];
-		}
-		else
-		{
-			$type = $row['Type'];
-		}
-
-		if (isset($def['Attribute'])) 
-		{
-			 $attribute = $def['Attribute'];
-		}
-
-		$collation = isset($row['Collation']) ? $row['Collation'] : 'utf8_bin'; 
-	}
-	$db->sql_freeresult($result);
-	// END structure
-
-	$db->sql_query("SET NAMES 'utf8'");
-
-	if (empty($engine))
-	{
-		$engine = $type;
-	}
-
-	if (is_array($engine))
-	{
-		$engine = $engine[0];
-	}
-
-	if (is_array($collation))
-	{
-		$collation = $collation[0];
-	}
-
-	if (empty($engine))
-	{
-		$sql_results = array();
-		// MG forced this because in MySQL 5.5.5 
-		//			the new default DB Engine is InnoDB, 
-		//				not MyISAM any more
-		$message .= "<b>Can not determine engine type, so we try MyISAM!</b><br/><br/>";
-		$engine = "MYISAM";
-	}
-
-	$sql_engine = "SET storage_engine=".$engine."";
-	$sql_foreign = "SET FOREIGN_KEY_CHECKS=1";
-	$db->sql_return_on_error(true);
-	$db->sql_query($sql_engine);
-	$db->sql_query($sql_foreign);
-	$db->sql_return_on_error(false);
-
-	$collate = " COLLATE $collation"; 
-	$engine = " ENGINE=$engine";
-	$charset = preg_match('/utf8/i', $collation) ? " DEFAULT CHARSET=utf8" : "";
-}
-// END MySQL
-
 // If fresh install
 if (!$result = $db->sql_query( "SELECT config_name from " . $mx_table_prefix . "translator_config") )
 {
-	$message .= "<b>This is a fresh install!</b><br/><br/>";
+	$message = "<b>This is a fresh install!</b><br/><br/>";
 
 	$sql = array(
 		"DROP TABLE IF EXISTS " . $mx_table_prefix . "translator_config ",
 
 		// --------------------------------------------------------
-		/* Table structure for table `translator_config`*/
-		"CREATE TABLE `" . $mx_table_prefix . "translator_config` (
-		  `config_name` varchar(100)" . $collate . " NOT NULL DEFAULT '',
-		  `config_value` varchar(190)" . $collate . " NOT NULL DEFAULT '',
-		  `is_dynamic` tinyint(1) UNSIGNED NOT NULL DEFAULT '0'
-		) " . $engine . $charset . $collate . "",
-
-		"ALTER TABLE `" . $mx_table_prefix . "translator_config`
-		  ADD PRIMARY KEY (`config_name`),
-		  ADD KEY `is_dynamic` (`is_dynamic`)",
+		/* Table structure for table `phpbb_pa_config`*/
+		"CREATE TABLE " . $mx_table_prefix . "translator_config (
+			  config_name varchar(255) NOT NULL default '',
+			  config_value varchar(255) NOT NULL default '',
+			  PRIMARY KEY  (config_name)
+		)",
 		
 		/* */
 		/* Config values
 		/* */
-		"INSERT INTO " . $mx_table_prefix . "translator_config (`config_name`, `config_value`) VALUES ('enable_module', '1')", // settings_disable
-		"INSERT INTO " . $mx_table_prefix . "translator_config (`config_name`, `config_value`) VALUES ('module_name', 'Download Database')", // settings_dbname
-		"INSERT INTO " . $mx_table_prefix . "translator_config (`config_name`, `config_value`) VALUES ('translator_default_lang', 'en')", // settings_disable
-		"INSERT INTO " . $mx_table_prefix . "translator_config (`config_name`, `config_value`) VALUES ('translator_choice_lang', 'fr,es,ro,it')", // settings_dbname
-	);
+
+		/* General */
+		"INSERT INTO " . $mx_table_prefix . "translator_config VALUES ('enable_module', '1')", // settings_disable
+		"INSERT INTO " . $mx_table_prefix . "translator_config VALUES ('module_name', 'Download Database')", // settings_dbname
+		"INSERT INTO " . $mx_table_prefix . "translator_config VALUES ('translator_default_lang', 'en')", // settings_disable
+		"INSERT INTO " . $mx_table_prefix . "translator_config VALUES ('translator_choice_lang', 'fr,es,ro,it')", // settings_dbname
+		);
 
 	if (!MXBB_27x)
 	{

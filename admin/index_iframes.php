@@ -95,7 +95,7 @@ function read_admin($dir_module)
 //
 if ($mx_request_vars->get('pane', MX_TYPE_NO_TAGS) == 'left')
 {
-	require($mx_root_path.'admin/page_header_admin.'.$phpEx);
+	//require($mx_root_path.'admin/page_header_admin.'.$phpEx);
 
 	$template->set_filenames(array(
 		'body' => 'admin/index_navigate.'.$tplEx)

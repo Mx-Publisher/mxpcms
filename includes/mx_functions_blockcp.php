@@ -209,17 +209,17 @@ class mx_blockcp extends mx_block
 			'L_EDIT' 			=> $lang['Edit'],
 
 			'L_AUTH_TITLE' 					=> $lang['Auth_Block'],
-			'L_AUTH_TITLE_EXPLAIN'	=> $lang['Auth_Block_explain'],
-			'L_FUNCTION'					=> $lang['Function'],
+			'L_AUTH_TITLE_EXPLAIN'		=> $lang['Auth_Block_explain'],
+			'L_FUNCTION'						=> $lang['Function'],
 
-			'L_BLOCK_TITLE' 				=> $lang['Block_title'],
-			'L_BLOCK_DESC' 				=> $lang['Block_desc'],
+			'L_BLOCK_TITLE' 					=> $lang['Block_title'],
+			'L_BLOCK_DESC' 					=> $lang['Block_desc'],
 			'L_BLOCK_SIZE' 					=> !empty($mx_user->lang['Block_size']) ? $mx_user->lang['Block_size'] : 'Block_size',
-			'L_SHOW_BLOCK' 				=> $lang['Show_block'],
-			'L_SHOW_BLOCK_EXPLAIN' => $lang['Show_block_explain'],
-			'L_SHOW_TITLE' 				=> $lang['Show_title'],
+			'L_SHOW_BLOCK' 					=> $lang['Show_block'],
+			'L_SHOW_BLOCK_EXPLAIN' 	=> $lang['Show_block_explain'],
+			'L_SHOW_TITLE' 					=> $lang['Show_title'],
 			'L_SHOW_TITLE_EXPLAIN' 	=> $lang['Show_title_explain'],
-			'L_SHOW_STATS' 				=> $lang['Show_stats'],
+			'L_SHOW_STATS' 					=> $lang['Show_stats'],
 			'L_SHOW_STATS_EXPLAIN'	=> $lang['Show_stats_explain'],
 
 			'BLOCK_ID' 		=> $block_id,
@@ -231,10 +231,10 @@ class mx_blockcp extends mx_block
 			'U_BLOCK_DELETE' => mx_append_sid(PORTAL_URL . "admin/admin_mx_block.$phpEx?mode=delete_block&amp;block_id=$block_id"),
 			'U_BLOCK_PERMISSIONS' => mx_append_sid(PORTAL_URL . "admin/admin_mx_block_auth.$phpEx?cat_id=$block_id"),
 
-			'E_BLOCK_TITLE' 		=> $block_title,
-			'E_BLOCK_DESC' 		=> $block_desc,
+			'E_BLOCK_TITLE' 			=> $block_title,
+			'E_BLOCK_DESC' 			=> $block_desc,
 			'E_BLOCK_SIZE' 			=> $block_sizes,
-			'S_FUNCTION_LIST' 	=> $functionlist,
+			'S_FUNCTION_LIST' 		=> $functionlist,
 
 			// Update
 			'S_SHOW_BLOCK_YES' => $show_block_yes,

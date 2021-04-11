@@ -409,7 +409,7 @@ input.button1:focus, input.button2:focus, input.button3:focus {
 	display: block;
 	float: right;
 	margin-right: 5px;
-	margin-top: 23px;
+	margin-top: 30px;
 }
 
 .search-header .inputbox { border: 0; }

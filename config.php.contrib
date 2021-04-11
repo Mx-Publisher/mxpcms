@@ -1,6 +1,16 @@
 <?php
 /** ------------------------------------------------------------------------
  * 
+ An error has occurred during the installation:
+
+CRITICAL ERROR:
+
+Sorry, could not connect to the database.
+dbms: mysqli
+dbhost: hercules.bluepink.ro
+dbuser: hismajestyservan
+using dbpasswd: Yes
+dbname: hismajestyservan
  *    $Id: config.php.contrib,v 1.5 2011/03/30 10:05:23 orynider Exp $
  * This file must be put into the MX-Publisher Modular System directory, not into the phpBB directory.
  **/
@@ -8,13 +18,13 @@
 //
 // MySql Information ( CHANGE HERE )
 //
-$dbms = 'mysql4';
+$dbms = 'mysqli';
 
 
 $dbhost = 'localhost';
-$dbname = 'test';
-$dbuser = 'root';
-$dbpasswd = '';
+$dbname = 'hismajestyservan';
+$dbuser = 'hismajestyservan';
+$dbpasswd = '12345678';
 
 //@ini_set('session.save_path', "/storage1/home/tmp");
 @ini_set('post_max_size', 24);
@@ -37,11 +47,11 @@ $acm_type = 'file';
 //
 // Portal is Installed
 //
-define('MX_INSTALLED', true);
+
 
 //
 // phpBB Is Intalled
 //
-define('PHPBB_INSTALLED', true);
+
 
 ?>

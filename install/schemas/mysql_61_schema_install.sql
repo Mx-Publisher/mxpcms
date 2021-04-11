@@ -9,9 +9,10 @@
 #
 DROP TABLE IF EXISTS `mx_table_block`;
 CREATE TABLE `mx_table_block` (
-  `block_id` smallint(5) unsigned NOT NULL auto_increment,
+  `block_id` mediumint(8) unsigned NOT NULL auto_increment,
   `block_title` varchar(150),
   `block_desc` text,
+  `block_size` varchar(30) NOT NULL DEFAULT '100%',
   `function_id` smallint(5) unsigned,
   `auth_view` tinyint(2) NOT NULL DEFAULT '0',
   `auth_edit` tinyint(2) NOT NULL DEFAULT '0',
@@ -106,6 +107,24 @@ INSERT INTO `mx_table_block_system_parameter` VALUES("28", "15", "[b:787bdbfe25]
 INSERT INTO `mx_table_block_system_parameter` VALUES("29", "15", "On this page we [i:6d09b58ee2]demonstrate[/i:6d09b58ee2] how subpages are easily created, using the CORE dynamic block and the user navigation block. Create new textblocks in the adminCP, and add them in the navigation menu. Have fun!\r\n\r\nLorem ipsum dolor sit amet, consectetuer adipiscing elit. Maecenas malesuada semper ante. Aliquam orci ipsum, aliquam sodales, dictum id, tincidunt non, elit. Proin tincidunt felis id urna. Praesent in erat. Nunc at arcu et nisi tempor interdum. Quisque enim. Nunc et lorem. Ut tortor. Suspendisse potenti. Nam egestas orci at mi. Sed pulvinar est sit amet ante. Mauris pharetra mollis risus. Donec accumsan fermentum leo.", "6d09b58ee2", "0");
 INSERT INTO `mx_table_block_system_parameter` VALUES("30", "15", "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Maecenas malesuada semper ante. Aliquam orci ipsum, aliquam sodales, dictum id, tincidunt non, elit. Proin tincidunt felis id urna. Praesent in erat. Nunc at arcu et nisi tempor interdum. Quisque enim. Nunc et lorem. Ut tortor. Suspendisse potenti. Nam egestas orci at mi. Sed pulvinar est sit amet ante. Mauris pharetra mollis risus. Donec accumsan fermentum leo.\r\n\r\nSuspendisse potenti. Quisque tincidunt, mi viverra semper iaculis, nisl metus vehicula libero, eget tincidunt est massa ac purus. Aenean a justo. Sed ultrices, mi vitae hendrerit suscipit, mauris velit rutrum lectus, eget pharetra metus ipsum in purus. Sed placerat ornare nulla. Nullam vel leo non nulla fermentum varius. Integer nec pede a velit tempor aliquam. Sed eu neque in eros scelerisque eleifend. Vivamus id urna. Pellentesque nec nulla. Fusce et sapien. Nulla venenatis imperdiet ligula. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin vel nunc eu leo malesuada congue. Praesent faucibus. Vivamus quis sapien in dolor gravida vehicula.", "61fc3afdd8", "0");
 
+
+#
+# Table structure for table 'mx_table_bots'
+#
+DROP TABLE IF EXISTS `mx_table_bots`;
+CREATE TABLE IF NOT EXISTS `mx_table_bots` (
+  `bot_id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+  `bot_active` tinyint(1) unsigned NOT NULL DEFAULT '1',
+  `bot_name` varchar(255) NOT NULL DEFAULT 'YahooSeeker',
+  `bot_color` varchar(255) NOT NULL DEFAULT '9E8DA7',
+  `user_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `bot_agent` varchar(255) NOT NULL DEFAULT 'YahooSeeker/',
+  `bot_ip` varchar(255) NOT NULL DEFAULT '::f',
+  `bot_last_visit` varchar(11) NOT NULL DEFAULT '1617274666',
+  `bot_visit_counter` int(8) unsigned NOT NULL DEFAULT '1',
+  PRIMARY KEY (`bot_id`),
+  KEY bot_active (`bot_active`)
+) CHARACTER SET `utf8` COLLATE `utf8mb3_bin`;
 
 
 #
@@ -291,7 +310,7 @@ CREATE TABLE `mx_table_menu_nav` (
 #
 INSERT INTO `mx_table_menu_nav` VALUES("5", "1", "phpBB Home", "", "http://www.phpbb.com", "0", "20", "a9ff189bf5", "icon_info.gif", "", "", "0", "0", "0", "0", "1");
 INSERT INTO `mx_table_menu_nav` VALUES("16", "7", "Page 1", "", "", "0", "10", "", "icon_home.gif", "", "", "0", "0", "3", "0", "0");
-INSERT INTO `mx_table_menu_nav` VALUES("4", "1", "MX-Publisher Home", "", "http://mxpcms.sourceforge.net", "0", "10", "1f171544ea", "icon_info.gif", "", "", "0", "0", "0", "0", "1");
+INSERT INTO `mx_table_menu_nav` VALUES("4", "1", "MX-Publisher Home", "", "http://www.mx-publisher.com", "0", "10", "1f171544ea", "icon_info.gif", "", "", "0", "0", "0", "0", "1");
 INSERT INTO `mx_table_menu_nav` VALUES("6", "1", "Demo Page", "On this page we demonstrate a basic subpage setup with textblocks.", "", "0", "30", "", "icon_message.gif", "", "", "0", "0", "3", "0", "0");
 INSERT INTO `mx_table_menu_nav` VALUES("1", "3", "Welcome to MXP", "Back to home", "", "0", "10", "", "", "", "", "0", "0", "1", "0", "0");
 INSERT INTO `mx_table_menu_nav` VALUES("17", "7", "Page 2", "", "", "0", "20", "", "icon_dot.gif", "", "", "0", "30", "3", "0", "0");
@@ -407,6 +426,8 @@ CREATE TABLE `mx_table_parameter` (
   `parameter_order` smallint(5) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`parameter_id`)
 ) CHARACTER SET `utf8` COLLATE `utf8mb3_bin`;
+
+
 
 #
 # Dumping data for table 'mx_table_parameter'
@@ -579,7 +600,7 @@ CREATE TABLE `mx_table_groups` (
 #
 # Table structure for table 'mx_table_sessions'
 #
-# Note that if you\'re running 3.23.x you may want to make
+# Note that if you are running 3.23.x you may want to make
 # this table a type HEAP. This type of table is stored
 # within system memory and therefore for big busy boards
 # is likely to be noticeably faster than continually
@@ -624,18 +645,51 @@ CREATE TABLE `mx_table_sessions_keys` (
 #
 DROP TABLE IF EXISTS `mx_table_users`;
 CREATE TABLE `mx_table_users` (
-   user_id mediumint(8) NOT NULL,
-   user_active tinyint(1) DEFAULT '1',
-   username varchar(25) NOT NULL,
-   user_password varchar(32) NOT NULL,
-   user_session_time int(11) DEFAULT '0' NOT NULL,
-   user_session_page smallint(5) DEFAULT '0' NOT NULL,
-   user_lastvisit int(11) DEFAULT '0' NOT NULL,
-   user_regdate int(11) DEFAULT '0' NOT NULL,
-   user_level tinyint(4) DEFAULT '0',
-   user_login_tries smallint(5) UNSIGNED DEFAULT '0' NOT NULL,
-   user_last_login_try int(11) DEFAULT '0' NOT NULL,
-   user_email varchar(255),
+  user_id mediumint(8) NOT NULL,
+  user_type tinyint(2) DEFAULT '0' NOT NULL,
+  group_id mediumint(8) UNSIGNED DEFAULT '3' NOT NULL,
+  user_active tinyint(1) DEFAULT '1',
+  user_newpasswd varchar(33) NOT NULL DEFAULT '00000000000000000000000000000000',
+  user_new tinyint(1) NOT NULL DEFAULT '1',
+  user_ip varchar(40) NOT NULL DEFAULT '7f000001',
+  username varchar(25) NOT NULL DEFAULT '',
+  username_clean varchar(255) NOT NULL DEFAULT '',
+  user_password varchar(40) DEFAULT '',
+  user_passchg int(11) NOT NULL DEFAULT '0',
+  user_colour varchar(50) NOT NULL DEFAULT 'FEFDAF',
+  user_session_time int(11) NOT NULL DEFAULT '0',
+  user_session_page smallint(5) NOT NULL DEFAULT '0',
+  user_lastvisit int(11) NOT NULL DEFAULT '0',
+  user_lastmark int(11) NOT NULL DEFAULT '0',
+  user_lastpage varchar(200) NOT NULL DEFAULT '',
+  user_lastblock varchar(200) NOT NULL DEFAULT '',
+  user_regdate int(11) NOT NULL DEFAULT '0',
+  user_level tinyint(4) DEFAULT '0',
+  user_options int(11) NOT NULL DEFAULT '230271',
+  user_login_tries smallint(5) UNSIGNED NOT NULL DEFAULT '0',
+  user_last_login_try int(11) NOT NULL DEFAULT '0',
+  user_lang varchar(30) DEFAULT '' NOT NULL,
+  user_timezone decimal(5,2) DEFAULT '0' NOT NULL,
+  user_dst tinyint(1) UNSIGNED DEFAULT '0' NOT NULL,
+  user_dateformat varchar(30) DEFAULT 'd M Y H:i' NOT NULL,
+  user_style mediumint(8) UNSIGNED DEFAULT '1' NOT NULL,
+  user_rank mediumint(8) UNSIGNED DEFAULT '0' NOT NULL,
+  user_sig varchar(255) NOT NULL DEFAULT '',
+  user_sig_bbcode_uid varchar(8) NOT NULL DEFAULT '1',
+  user_sig_bbcode_bitfield varchar(255) NOT NULL DEFAULT '1111111111111',
+  user_agent varchar(255) NOT NULL DEFAULT 'Mozilla/5.0 (Windows NT 10.0; rv:100.0) Gecko/20210101 Firefox/100.0.00',
+  device_name varchar(99) NOT NULL DEFAULT 'Desktop-PC',
+  user_avatar_height tinyint(6) NOT NULL DEFAULT '98',
+  user_avatar_width tinyint(6) NOT NULL DEFAULT '98',
+  user_inactive_reason int(11) NOT NULL DEFAULT '0',
+  user_inactive_time int(11) NOT NULL DEFAULT '0',
+  user_email varchar(255) NOT NULL DEFAULT 'user@name.domain',
+  user_email_hash bigint(20) DEFAULT '0' NOT NULL,
+  user_allow_viewonline tinyint(1) NOT NULL DEFAULT '1',
+  user_allow_massemail tinyint(1) NOT NULL DEFAULT '1',
+  user_form_salt varchar(32) NOT NULL DEFAULT '+',
+  is_bot int(2) NOT NULL DEFAULT '0',
+  is_mobile int(2) NOT NULL DEFAULT '0',
    PRIMARY KEY (user_id),
    KEY user_session_time (user_session_time)
 ) CHARACTER SET `utf8` COLLATE `utf8mb3_bin`;
@@ -643,7 +697,7 @@ CREATE TABLE `mx_table_users` (
 
 
 # -- Users
-INSERT INTO `mx_table_users` (user_id, username, user_level, user_regdate, user_password, user_email, user_active) VALUES ( -1, 'Anonymous', 0, 0, '', '', 0);
+INSERT INTO `mx_table_users` (user_id, username, user_level, user_regdate, user_password, user_email, user_active) VALUES ( 1, 'Anonymous', 0, 0, '', '', 0);
 
 # -- username: admin    password: admin (change this or remove it once everything is working!)
 INSERT INTO `mx_table_users` (user_id, username, user_level, user_regdate, user_password, user_email, user_active) VALUES ( 2, 'Admin', 1, 0, '21232f297a57a5a743894a0e4a801fc3', 'admin@yourdomain.com', 1);

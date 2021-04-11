@@ -21,16 +21,58 @@ function page_header_install($title, $instruction_text = '')
 	// Get the current Server URL.
 	$server_url = ($_SERVER['SERVER_PORT'] == 443 ? 'https' : 'http' ) . '://' . $_SERVER['HTTP_HOST'];
 	// Get the MX-Publisher Path in the URL (this might not be the same as the base path when using aliases).
-	$mx_self_path = substr($_SERVER['PHP_SELF'], 0, -strlen('install/'.basename(__FILE__)));
+	$mx_self_path = substr($_SERVER['PHP_SELF'], 0, - strlen('install/'.basename(__FILE__)));
+	
+	// We have to generate a full HTTP/1.1 header here since we can't guarantee to have any of the information
+	// available as used by the redirect function
+	$server_name = (!empty($_SERVER['HTTP_HOST'])) ? strtolower($_SERVER['HTTP_HOST']) : ((!empty($_SERVER['SERVER_NAME'])) ? $_SERVER['SERVER_NAME'] : getenv('SERVER_NAME'));
+	$server_port = (!empty($_SERVER['SERVER_PORT'])) ? (int) $_SERVER['SERVER_PORT'] : (int) getenv('SERVER_PORT');
+	$secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 1 : 0;
+
+	if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+	{
+		$secure = 1;
+		$server_port = 443;
+	}
+
+	$script_name = (!empty($_SERVER['PHP_SELF'])) ? $_SERVER['PHP_SELF'] : getenv('PHP_SELF');
+	if (!$script_name)
+	{
+		$script_name = (!empty($_SERVER['REQUEST_URI'])) ? $_SERVER['REQUEST_URI'] : getenv('REQUEST_URI');
+	}
+
+	// $phpbb_root_path accounts for redirects from e.g. /adm
+	$script_path = trim(dirname($script_name)) . '/'; //core/install/ 
+
+	// Replace any number of consecutive backslashes and/or slashes with a single slash
+	// (could happen on some proxy setups and/or Windows servers)
+	$script_path = preg_replace('#[\\\\/]{2,}#', '/', $script_path); //core/install/ 
+
+	$portal_url = (($secure) ? 'https://' : 'http://') . $server_name;
+
+	if ($server_port && (($secure && $server_port <> 443) || (!$secure && $server_port <> 80)))
+	{
+		// HTTP HOST can carry a port number...
+		if (strpos($server_name, ':') === false)
+		{
+			$portal_url .= ':' . $server_port;
+		}
+	}
 
 	// Get the MX-Publisher URL.
-	$portal_url = $server_url . $mx_self_path . '/';
+	$install_url = $portal_url . $script_path;
+	$portal_url = str_replace('install/', '', $install_url);
 	$default_lang = guess_lang();
 	
+	//Base Style for Installation
+	$subtplEx = ($tplEx !== $phpEx) ? 'tpl' : $tplEx;
+	$protplEx = ($tplEx !== $phpEx) ? 'html' : $tplEx;
+
 	//Base Style for Installation
 	if ($mx_request_vars->is_get('style') )
 	{
 		$style = $mx_request_vars->request('style', MX_TYPE_NO_TAGS);
+		$tplEx = ($style !== 'prosilver') ? $subtplEx : $protplEx;
 		$theme = array('template_name' => ($style !== 'prosilver') ? 'subSilver' : 'prosilver');
 	}
 	else
@@ -42,37 +84,36 @@ function page_header_install($title, $instruction_text = '')
 	$board_config['smilies_path'] = 'includes/shared/phpbb2/images/smiles/';
 	$board_config['avatar_gallery_path'] = 'includes/shared/phpbb2/images/';
 
-
 	$template->set_filenames(array('header' => 'mx_install_header.'.$tplEx));
 
 	$template->assign_vars(array(
 		'L_PORTAL_NAME'			=> $mx_portal_name,
 		'L_PORTAL_VERSION'		=> $mx_portal_version,
-		'U_INSTALL_URL'			=> $mx_root_path . 'install/',
+		'U_INSTALL_URL'			=> $install_url,
 		'L_INSTALLATION'		=> $title,
-		'U_INDEX'				=> $mx_root_path . 'install/mx_install.'.$phpEx,
-		'U_LOGO'				=> $mx_root_path . 'install/templates/logo.gif',
+		'U_INDEX'				=> $install_url . "mx_install.$phpEx",
+		'U_LOGO'				=> "{$portal_url}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/images/logo.gif',
 		'L_INSTRUCTION_TEXT'	=> $instruction_text,
 		
-		'T_ASSETS_VERSION'		=> INSTALLER_VERSION,
-		'T_ASSETS_PATH'			=> "{$portal_url}assets",
-		'T_THEME_PATH'			=> "{$portal_url}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme',
-		'T_TEMPLATE_PATH'		=> "{$portal_url}templates/" . rawurlencode($theme['template_name']) . '',
-		'T_SUPER_TEMPLATE_PATH'	=> "{$portal_url}templates/" . rawurlencode($theme['template_name']) . '/template',
+		'T_ASSETS_VERSION'				=> INSTALLER_VERSION,
+		'T_ASSETS_PATH'					=> "{$portal_url}assets",
+		'T_THEME_PATH'					=> "{$portal_url}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme',
+		'T_TEMPLATE_PATH'				=> "{$portal_url}templates/" . rawurlencode($theme['template_name']) . '',
+		'T_SUPER_TEMPLATE_PATH'			=> "{$portal_url}templates/" . rawurlencode($theme['template_name']) . '/template',
 			
-		'T_IMAGES_PATH'			=> "{$portal_url}images/",
-		'T_SMILIES_PATH'		=> "{$portal_url}{$board_config['smilies_path']}/",
-		'T_AVATAR_GALLERY_PATH'	=> "{$portal_url}{$board_config['avatar_gallery_path']}/",
+		'T_IMAGES_PATH'					=> "{$portal_url}images/",
+		'T_SMILIES_PATH'				=> "{$portal_url}{$board_config['smilies_path']}/",
+		'T_AVATAR_GALLERY_PATH'			=> "{$portal_url}{$board_config['avatar_gallery_path']}/",
 		
-		'T_STYLESHEET_LINK'		=> "{$portal_url}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme/stylesheet.css',
-		'T_STYLESHEET_LANG_LINK'=> "{$portal_url}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme/images/lang_' . $default_lang . '/stylesheet.css',
-		'T_FONT_AWESOME_LINK'	=> "{$portal_url}assets/css/font-awesome.min.css",
-		'T_FONT_IONIC_LINK'			=> "{$portal_url}assets/css/ionicons.min.css",
+		'T_STYLESHEET_LINK'				=> "{$portal_url}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme/stylesheet.css',
+		'T_STYLESHEET_LANG_LINK'		=> "{$portal_url}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme/images/lang_' . $default_lang . '/stylesheet.css',
+		'T_FONT_AWESOME_LINK'			=> "{$portal_url}assets/css/font-awesome.min.css",
+		'T_FONT_IONIC_LINK'				=> "{$portal_url}assets/css/ionicons.min.css",
 
-		'T_JQUERY_LINK'			=> "{$portal_url}assets/javascript/jquery.min.js?assets_version=" . INSTALLER_VERSION,
-		'S_ALLOW_CDN'				=> false,
+		'T_JQUERY_LINK'					=> "{$portal_url}assets/javascript/jquery.min.js?assets_version=" . INSTALLER_VERSION,
+		'S_ALLOW_CDN'						=> false,
 		
-		'S_CONTENT_ENCODING'	=> 'UTF-8',
+		'S_CONTENT_ENCODING'		=> 'UTF-8',
 	));
 	$template->pparse('header');
 }
@@ -88,18 +129,28 @@ function page_footer_install($show_phpinfo = true)
 		'<a href="' . U_ONLINE_SUPPORT . '" target="_blank">', '</a>',
 		'<a href="' . U_TERMS_OF_USE . '" target="_blank">', '</a>'
 	);
-
+	
 	//Base Style for Installation
-	$subSilver = ($tplEx !== $phpEx) ? '<a href="?style=subSilver">Classic Style</a>' : '';
-	$prosilver = ($tplEx !== $phpEx) ? '<a href="?style=prosilver">Normal Style</a>' : '';
+	$subtplEx = ($tplEx !== $phpEx) ? 'tpl' : $tplEx;
+	$protplEx = ($tplEx !== $phpEx) ? 'html' : $tplEx;
 	
 	if ($mx_request_vars->is_get('style') )
 	{
 		$style = $mx_request_vars->request('style', MX_TYPE_NO_TAGS);
+		$tplEx = ($style !== 'prosilver') ? $subtplEx : $protplEx;
+		
+		//Base Style for Installation
+		$subSilver = ($tplEx !== $phpEx) ? '<a href="?style=subSilver">Classic Style</a>' : '';
+		$prosilver = ($tplEx !== $phpEx) ? '<a href="?style=prosilver">Normal Style</a>' : '';
+		
 		$install_theme = ($style == 'prosilver') ? $subSilver : $prosilver;
 	}
 	else
 	{
+		//Base Style for Installation
+		$subSilver = ($tplEx !== $phpEx) ? '<a href="?style=subSilver">Classic Style</a>' : '';
+		$prosilver = ($tplEx !== $phpEx) ? '<a href="?style=prosilver">Normal Style</a>' : '';
+		
 		$install_theme = ($tplEx == 'tpl') ? $subSilver : $prosilver;
 	}
 
@@ -112,6 +163,7 @@ function page_footer_install($show_phpinfo = true)
 		'U_INSTALL_THEME'		=> $install_theme,
 		'U_INSTALL_PHPINFO'	=> ( $show_phpinfo ? '<a href="?phpinfo" target="_blank">phpInfo</a>' : '' ),
 	));
+
 	$template->pparse('footer');
 
 	if( $db )
@@ -433,6 +485,12 @@ function connect_check_db($error_connect, &$error, $dbms, $table_prefix, $dbhost
 			print("This version of php is not supported, returned: " . PHP_VERSION . "<br />Please upgrade at least to $mx_php_version.<br />");
 		
 		}
+		if (version_compare(PHP_VERSION, '5.0.0', '>')) 
+		{			
+			//this version of php does not have Uncaught Error: when php_mysql extension not loaded		
+			$dbms = @function_exists('mysql_connect') ? $dbms : str_replace(array('mysqli', 'mysql4'), 'mysqli', $dbms);
+		}		
+		
 		require_once($mx_root_path . 'includes/db/' . $dbms . '.' . $phpEx); // Load dbal and initiate class		
 	}
 
@@ -706,7 +764,7 @@ function adjust_language_keys_callback($matches)
 
 function install_die($message, $debuginfo = false)
 {
-	global $mx_root_path, $phpEx, $template, $lang;
+	global $mx_root_path, $mx_install_dirname, $phpEx, $template, $lang;
 
 	$message = '<table cellpadding="20" cellspacing="0" border="1" style="margin:30px 80px 30px 80px;">'.
 		'<tr><td class="row1"><span class="gen"><b>' . $lang['Installation_error'] . ':</b><br /><br />' . $message . '</span>';
@@ -730,8 +788,8 @@ function install_die($message, $debuginfo = false)
 	}
 	else
 	{
-		include_once($mx_root_path . "install/includes/template.$phpEx");
-		$template = new Template($mx_root_path . 'install/templates');
+		include_once($mx_root_path . $mx_install_dirname . "/includes/template.$phpEx");
+		$template = new Template($mx_root_path . $mx_install_dirname . '/templates');
 		page_header_install($lang['Installation_error'], $message);
 	}
 	page_footer_install();
@@ -784,46 +842,46 @@ function guess_lang()
 	// me first - psoTFX
 	$match_lang = array(
 		'arabic'					=> 'ar([_-][a-z]+)?',
-		'bulgarian'			=> 'bg',
-		'catalan'				=> 'ca',
-		'czech'					=> 'cs',
-		'danish'				=> 'da',
-		'german'				=> 'de([_-][a-z]+)?',
-		'english'				=> 'en([_-][a-z]+)?',
-		'estonian'				=> 'et',
-		'finnish'				=> 'fi',
+		'bulgarian'					=> 'bg',
+		'catalan'					=> 'ca',
+		'czech'						=> 'cs',
+		'danish'					=> 'da',
+		'german'					=> 'de([_-][a-z]+)?',
+		'english'					=> 'en([_-][a-z]+)?',
+		'estonian'					=> 'et',
+		'finnish'					=> 'fi',
 		'french'					=> 'fr([_-][a-z]+)?',
-		'greek'					=> 'el',
-		'spanish_argentina'	=> 'es[_-]ar',
-		'spanish'				=> 'es([_-][a-z]+)?',
+		'greek'						=> 'el',
+		'spanish_argentina'			=> 'es[_-]ar',
+		'spanish'					=> 'es([_-][a-z]+)?',
 		'gaelic'					=> 'gd',
-		'galego'				=> 'gl',
-		'gujarati'				=> 'gu',
-		'hebrew'				=> 'he',
-		'hindi'					=> 'hi',
-		'croatian'				=> 'hr',
-		'hungarian'			=> 'hu',
-		'icelandic'				=> 'is',
-		'indonesian'			=> 'id([_-][a-z]+)?',
+		'galego'					=> 'gl',
+		'gujarati'					=> 'gu',
+		'hebrew'					=> 'he',
+		'hindi'						=> 'hi',
+		'croatian'					=> 'hr',
+		'hungarian'					=> 'hu',
+		'icelandic'					=> 'is',
+		'indonesian'				=> 'id([_-][a-z]+)?',
 		'italian'					=> 'it([_-][a-z]+)?',
-		'japanese'				=> 'ja([_-][a-z]+)?',
-		'korean'				=> 'ko([_-][a-z]+)?',
-		'latvian'				=> 'lv',
-		'lithuanian'			=> 'lt',
-		'macedonian'		=> 'mk',
-		'dutch'					=> 'nl([_-][a-z]+)?',
-		'norwegian'			=> 'no',
-		'punjabi'				=> 'pa',
+		'japanese'					=> 'ja([_-][a-z]+)?',
+		'korean'					=> 'ko([_-][a-z]+)?',
+		'latvian'					=> 'lv',
+		'lithuanian'				=> 'lt',
+		'macedonian'				=> 'mk',
+		'dutch'						=> 'nl([_-][a-z]+)?',
+		'norwegian'					=> 'no',
+		'punjabi'					=> 'pa',
 		'polish'					=> 'pl',
-		'portuguese_brazil'	=> 'pt[_-]br',
+		'portuguese_brazil'			=> 'pt[_-]br',
 		'portuguese'				=> 'pt([_-][a-z]+)?',
-		'romanian'				=> 'ro([_-][a-z]+)?',
+		'romanian'					=> 'ro([_-][a-z]+)?',
 		'russian'					=> 'ru([_-][a-z]+)?',
-		'slovenian'				=> 'sl([_-][a-z]+)?',
+		'slovenian'					=> 'sl([_-][a-z]+)?',
 		'albanian'					=> 'sq',
 		'serbian'					=> 'sr([_-][a-z]+)?',
 		'slovak'					=> 'sv([_-][a-z]+)?',
-		'swedish'				=> 'sv([_-][a-z]+)?',
+		'swedish'					=> 'sv([_-][a-z]+)?',
 		'thai'						=> 'th([_-][a-z]+)?',
 		'turkish'					=> 'tr([_-][a-z]+)?',
 		'ukranian'					=> 'uk([_-][a-z]+)?',
@@ -843,7 +901,7 @@ function guess_lang()
 			{
 				if (preg_match('#' . $match . '#i', trim($accept_lang_ary[$i])))
 				{
-					if (@install_file_exists($mx_root_path . 'language/lang_' . $lang))
+					if (@file_exists($mx_root_path . 'language/lang_' . $lang))
 					{
 						return $lang;
 					}
@@ -1099,7 +1157,16 @@ function get_backend_info($config)
 	if (version_compare(PHP_VERSION, '5.0.0', '<')) 
 	{		
 		$dbms = str_replace('mysqli', 'mysql4', $dbms); //this version of php does not have mysqli extension and my crash the installer if finds a forum using this		
+	}
+	
+	if (!function_exists('mysql_connect') && ($dbms == 'mysql4')) { print('<br />The Extension php_mysql is not loaded in php.ini for ' . $dbname . '.<br />'); }
+	if (version_compare(PHP_VERSION, '5.0.0-dev', '>')) 
+	{
+		//this version of php does not have mysqli extension and my crash the installer if finds a forum using this
+		$dbms = @function_exists('mysql_connect') ? str_replace(array('mysql3', 'mysqli'), 'mysql4', $dbms) : $dbms;
+		$dbms = !function_exists('mysql_connect') ? str_replace(array('mysql3', 'mysql4'), 'mysqli', $dbms) : $dbms;		
 	}	
+	
 	return array(
 		'dbms'			=> $dbms,
 		'dbhost'		=> $dbhost,
@@ -1168,11 +1235,19 @@ function get_phpbb_info($root_path, $backend = 'phpbb3', $phpbbversion = '3.2.25
 			$acm_type = get_keys_sufix($acm_type);
 		break;
 	}
+
 	// If we are on PHP < 5.0.0 we need to force include or we get a blank page
 	if (version_compare(PHP_VERSION, '5.0.0', '<')) 
 	{		
 		$dbms = str_replace('mysqli', 'mysql4', $dbms); //this version of php does not have mysqli extension and my crash the installer if finds a forum using this		
 	}	
+	if (!function_exists('mysql_connect') && ($dbms == 'mysql4')) { print('<br />The Extension php_mysql is not loaded in php.ini for ' . $dbname . '.<br />'); }
+	if (version_compare(PHP_VERSION, '5.0.0-dev', '>')) 
+	{
+		//this version of php does not have mysqli extension and my crash the installer if finds a forum using this
+		$dbms = @function_exists('mysql_connect') ? str_replace(array('mysql3', 'mysqli'), 'mysql4', $dbms) : $dbms;
+		$dbms = !function_exists('mysql_connect') ? str_replace(array('mysql3', 'mysql4'), 'mysqli', $dbms) : $dbms;		
+	}
 	return array(
 		'dbms'			=> $dbms,
 		'dbhost'		=> $dbhost,
@@ -1197,6 +1272,12 @@ function get_smf_info($settings)
 	if (version_compare(PHP_VERSION, '5.0.0', '<')) 
 	{		
 		$db_type = str_replace('mysqli', 'mysql4', $db_type); //this version of php does not have mysqli extension and my crash the installer if finds a forum using this		
+	}
+	if (version_compare(PHP_VERSION, '5.0.0', '>')) 
+	{
+		//this version of php does not have mysqli extension and my crash the installer if finds a forum using this
+		$db_type = @function_exists('mysql_connect') ? str_replace(array('mysql3', 'mysqli'), 'mysql4', $db_type) : $db_type;
+		$db_type = !function_exists('mysql_connect') ? str_replace(array('mysql3', 'mysql4'), 'mysqli', $db_type) : $db_type;		
 	}
 	// If the UTF-8 setting was enabled, add it to the table definitions.
 	if ($db_character_set == 'utf8') 
@@ -1267,6 +1348,24 @@ function get_mxbb_info($config)
 	{
 		install_die(GENERAL_ERROR, 'Configuration file ' . $config . ' couldn\'t be opened.');
 	}
+	else
+	{
+		if (@function_exists('mysqli_connect'))
+		{
+			//define('SQL_LAYER', 'mysqli');
+			$dbms = 'mysqli'; // Repopulated for multiple db connections	
+		}
+		elseif (@function_exists('mysql_connect'))
+		{
+			//define('SQL_LAYER', 'mysql');
+			$dbms = 'mysql4'; // Repopulated for multiple db connections	
+		}
+		$dbhost = 'localhost';
+		$dbname = '';
+		$dbuser = '';
+		$dbpasswd = '';
+		$mx_table_prefix = 'mx_';
+	}
 	return array(
 		'dbms'				=> $dbms,
 		'dbhost'			=> $dbhost,
@@ -1293,7 +1392,7 @@ function get_phpbb_url($table_prefix, $portal_backend = 'internal')
 		. $were_sql;
 	if (!($result = $db->sql_query($sql)))
 	{
-		if (!function_exists('mx_message_die'))
+		if (!function_exists('mx3_message_die'))
 		{
 			global $db;
 			
@@ -1306,7 +1405,7 @@ function get_phpbb_url($table_prefix, $portal_backend = 'internal')
 		}
 		else
 		{
-			mx_message_die( GENERAL_ERROR, 'Couldnt query config information', '', __LINE__, __FILE__, $sql );
+			install_die( GENERAL_ERROR, 'Couldnt query config information', '', __LINE__, __FILE__, $sql );
 		}
 	}
 	while ($row = $db->sql_fetchrow($result))
@@ -1411,12 +1510,16 @@ function open_phpbb_db(&$db, &$phpbb_info)
 
 	// If we are on PHP < 5.6.04 we get the error:
 	//The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead
-	if (!function_exists('mysql_connect')) 
+	//this version of php does not have mysqli extension and my crash the installer if finds a forum using this
+	if (!function_exists('mysql_connect') && ($dbms == 'mysql4')) { print('<br />The Extension php_mysql is not loaded in php.ini for ' . $dbname . '.<br />'); }
+	if (version_compare(PHP_VERSION, '5.0.0', '>')) 
 	{
-		$dbms = str_replace(array('mysql', 'mysql4'), 'mysqli', $dbms); 
 		//this version of php does not have mysqli extension and my crash the installer if finds a forum using this
-	}
+		$dbms = @function_exists('mysql_connect') ? str_replace(array('mysql3', 'mysqli'), 'mysql4', $dbms) : $dbms;
+		$dbms = !function_exists('mysql_connect') ? str_replace(array('mysql3', 'mysql4'), 'mysqli', $dbms) : $dbms;		
+	}	
 
+	
 	// Load dbal and initiate class
 	//Apache 2.0.x and php < 5.2.5 combination will crash here this is fixed by upgrading to php 5.2.6 or Apache 2.2.x
 	include_once($mx_root_path . 'includes/db/' . $dbms . '.' . $phpEx);
@@ -1469,6 +1572,10 @@ function open_smf_db(&$db, &$backend_info)
 		$dbms = str_replace('mysqli', 'mysql4', $dbms); //this version of php does not have mysqli extension and my crash the installer if finds a forum using this		
 	}
 	
+	if (!function_exists('mysql_connect') && ($dbms == 'mysql4')) { print('<br />The Extension php_mysql is not loaded in php.ini for '.$config.'<br />'); }
+	$dbms = @function_exists('mysql_connect') ? $dbms : str_replace(array('mysql3', 'mysqli'), 'mysql4', $dbms);
+	$dbms = !function_exists('mysql_connect') ? $dbms : str_replace(array('mysql3', 'mysql4'), 'mysqli', $dbms);	
+	
 	// Load dbal and initiate class
 	//Apache 2.0.x and php < 5.2.5 combination will crash here this is fixed by upgrading to php 5.2.6 or Apache 2.2.x
 	require_once($mx_root_path . 'includes/db/' . $dbms . '.' . $phpEx);
@@ -1520,6 +1627,10 @@ function open_mybb_db(&$db, &$backend_info)
 	{		
 		$dbms = str_replace('mysqli', 'mysql4', $dbms); //this version of php does not have mysqli extension and my crash the installer if finds a forum using this		
 	}
+	
+	if (!function_exists('mysql_connect') && ($dbms == 'mysql4')) { print('<br />The Extension php_mysql is not loaded in php.ini for '.$config.'<br />'); }
+	$dbms = @function_exists('mysql_connect') ? $dbms : str_replace(array('mysql3', 'mysqli'), 'mysql4', $dbms);
+	$dbms = !function_exists('mysql_connect') ? $dbms : str_replace(array('mysql3', 'mysql4'), 'mysqli', $dbms);	
 	
 	// Load dbal and initiate class
 	//Apache 2.0.x and php < 5.2.5 combination will crash here this is fixed by upgrading to php 5.2.6 or Apache 2.2.x
@@ -1711,7 +1822,7 @@ function get_install_schemas()
 		if ($database['LABEL'])
 		{
 			$db_type = $database['name'];
-			if (!install_file_exists($mx_root_path . 'install/schemas/' . $database['SCHEMA'] . '_schema_install.sql'))
+			if (!file_exists($mx_root_path . 'install/schemas/' . $database['SCHEMA'] . '_schema_install.sql'))
 			{			
 				$available_dbms[$dbms]['AVAILABLE'] = false;				
 			}
@@ -1967,7 +2078,7 @@ function mx_install_cmd_sql( $sql = '', $main_install = false )
 */
 function exec_post_process($mode, $upgrade_mode)
 {
-	global $mx_portal_name, $mx_portal_version, $tplEx, $db, $table_prefix;
+	global $mx_request_vars, $mx_portal_name, $mx_portal_version, $tplEx, $db, $table_prefix;
 	global $language, $board_email, $script_path, $server_port, $server_name;
 	global $mx_root_path, $phpbb_root_path;
 	global $admin_name, $admin_pass1;
@@ -1988,8 +2099,11 @@ function exec_post_process($mode, $upgrade_mode)
 			'portal_backend'		=> "'".$portal_backend."'",
 			'portal_backend_path'	=> "'".$backend_path."'",
 		);
-
-		if ($_POST['mxbb']) // Internal install
+		
+		$domain_name = !empty($server_name) ? $server_name : $_SERVER['HTTP_HOST'];
+		$user_email = !empty($board_email) ? $board_email : 'admin@'.$domain_name;
+		
+		if ($mx_request_vars->is_post('mxbb')) // Internal install
 		{
 			$portal_table['default_style'] = "'1'";
 			$portal_table['default_admin_style'] = "'3'";
@@ -2021,7 +2135,7 @@ function exec_post_process($mode, $upgrade_mode)
 		$admin_pass_md5 = md5($admin_pass1);
 
 		$sql = "UPDATE " . USERS_TABLE . "
-			SET username = '" . str_replace("\'", "''", $admin_name) . "', user_password='" . str_replace("\'", "''", $admin_pass_md5) . "'
+			SET username = '" . str_replace("\'", "''", $admin_name) . "', username_clean = '" . str_replace("\'", "''", $admin_name) . "', user_password='" . str_replace("\'", "''", $admin_pass_md5) . "'
 			WHERE username = 'admin'";
 
 		parse_cmd_sql($sql);
@@ -2031,24 +2145,57 @@ function exec_post_process($mode, $upgrade_mode)
 
 		parse_cmd_sql($sql);
 
-		if (!$_POST['mxbb'] && $portal_backend == 'phpbb2') // phpBB2 install
+		if (!$_POST['mxbb'] && $portal_backend !== 'internal')
 		{
 			$sql_phpbb = "SELECT * FROM ".$table_prefix."users WHERE user_level = 1";
-
-			if( !($result = $db->sql_query($sql_phpbb)) )
+			if ((!$result = $db->sql_query($sql_phpbb)))
 			{
-				return false;
+				$sql_mxp = "SELECT * FROM ".USERS_TABLE." WHERE user_level = 1";
+
+				if((!$result = $db->sql_query($sql_mxp)) )
+				{
+					$user_id = '2'; // Add ontop admin user...
+					$username = 'admin';
+					$user_password = '21232f297a57a5a743894a0e4a801fc3';
+					//$user_email = 'admin@localhost';
+					$user_level = '1';
+				
+					$sql = "INSERT INTO " . USERS_TABLE . "
+							(user_id, username, username_clean, user_password, user_email, user_level, user_regdate, user_active)
+							VALUES ('" . $user_id . "', '" . $username . "', '" . $username . "', '" . $user_password . "', '" . $user_email . "', '" . $user_level . "', '" . time() . "', '1')";
+					parse_cmd_sql($sql);
+				}
 			}
-			$user_id = 2; // Add ontop admin user...
+
+			$user_id = '2'; // Add ontop admin user...
 			while( $row = $db->sql_fetchrow($result) )
 			{
 				$user_id++;
 				$sql = "INSERT INTO " . USERS_TABLE . "
-					(user_id, username, user_password, user_email, user_level, user_regdate, user_active)
-					VALUES ('" . $user_id . "', '" . $row['username'] . "', '" . $row['user_password'] . "', '" . $row['user_email'] . "', '" . $row['user_level'] . "', '" . time() . "', '1')";
-
+					(user_id, username, username_clean, user_password, user_email, user_level, user_regdate, user_active)
+					VALUES ('" . $user_id . "', '" . $row['username'] . "', '" . $row['username'] . "', '" . $row['user_password'] . "', '" . $row['user_email'] . "', '" . $row['user_level'] . "', '" . time() . "', '1')";
 				parse_cmd_sql($sql);
 			}
+		}
+		elseif (!$_POST['mxbb'] && $portal_backend == 'internal')
+		{
+			
+			$sql_mxp = "SELECT * FROM ".USERS_TABLE." WHERE user_level = 1";
+
+			if((!$result = $db->sql_query($sql_mxp)) )
+			{
+				$user_id = '2'; // Add ontop admin user...
+				$username = 'admin';
+				$user_password = '21232f297a57a5a743894a0e4a801fc3';
+				//$user_email = 'admin@localhost';
+				$user_level = '1';
+			
+				$sql = "INSERT INTO " . USERS_TABLE . "
+						(user_id, username, username_clean, user_password, user_email, user_level, user_regdate, user_active)
+						VALUES ('" . $user_id . "', '" . $username . "', '" . $username . "', '" . $user_password . "', '" . $user_email . "', '" . $user_level . "', '" . time() . "', '1')";
+				parse_cmd_sql($sql);
+			}
+			
 		}		
 	}
 	else
@@ -2128,13 +2275,13 @@ function exec_post_process($mode, $upgrade_mode)
 			{
 				return false;
 			}
-			$user_id = 2; // Add ontop admin user...
+			$user_id = '2'; // Add ontop admin user...
 			while( $row = $db->sql_fetchrow($result) )
 			{
 				$user_id++;
 				$sql = "INSERT INTO " . USERS_TABLE . "
-					(user_id, username, user_password, user_email, user_level, user_regdate, user_active)
-					VALUES ('" . $user_id . "', '" . $row['username'] . "', '" . $row['user_password'] . "', '" . $row['user_email'] . "', '" . $row['user_level'] . "', '" . time() . "', '1')";
+					(user_id, username, username_clean, user_password, user_email, user_level, user_regdate, user_active)
+					VALUES ('" . $user_id . "', '" . $row['username'] . "', '" . $row['username'] . "', '" . $row['user_password'] . "', '" . $row['user_email'] . "', '" . $row['user_level'] . "', '" . time() . "', '1')";
 
 					parse_cmd_sql($sql);
 			}
@@ -2149,36 +2296,6 @@ function format_error($message)
 	$message = '<b><span style="color:orange;">Warning:</span> ' . $message . '</b>';
 	return $message;
 }
-
-/**
- * Get html select list - from array().
- *
- * This function generates and returns a html select list (name = $nameselect).
- *
- * @access public
- * @param string $name_select select name
- * @param array $row source data
- * @param string $id needle
- * @param boolean $full_list expanded or dropdown list
- * @return unknown
- */
-function install_list_static($name_select, $row, $id, $full_list = true)
-{
-	$rows_count = ( count($row) < '25' ) ? count($row) : '25';
-	$full_list_true = $full_list ? ' size="' . $rows_count . '"' : '';
-
-	$column_list = '<select name="' . $name_select .'" ' . $full_list_true . '>';
-	foreach( $row as $idfield => $namefield )
-	{
-		$selected = ( $idfield == $id ) ? ' selected="selected"' : '';
-		$column_list .= '<option value="' . $idfield . '"' . $selected . '>' . $namefield . "</option>\n";
-	}
-	$column_list .= '</select>';
-
-	unset($row);
-	return $column_list;
-}
-
 //
 // FYI: This is our easy workaround to the PHP realpath function, which might be disabled
 // on some servers (Lycos and maybe others) ...they say it's for "security" reasons, heh.
@@ -2196,7 +2313,7 @@ function install_list_static($name_select, $row, $id, $full_list = true)
 // function (in includes/functions.php). I never understood why they did it. Only if they
 // had documented the correct reason in their source code. ;-)
 //
-function mx_realpath($path, $errstr = false)
+function install_realpath($path, $errstr = false)
 {
 	global $mx_root_path;
 	//set error handler if save mode
@@ -2224,105 +2341,6 @@ function mx_realpath($path, $errstr = false)
 	}
 	*/
 	return ( @function_exists('realpath') && @realpath(__FILE__) ? realpath($path) : $path );
-}
-
-/** /
-*
-* Credit: https://stackoverflow.com/users/2456038/rafasashi
-/**/
-function install_file_exists($file_path = '')
-{
-	// Assume failure.
-	$file_exists = 0;
-	$status = "unknown";
-	$filename_ext = ''; 
-	
-	//$file_path = 'http://php.net/images/logos/php-logo.svg';
-	//clear cached results
-	//clearstatcache();
-		
-	//trim path
-	$file_dir = trim(dirname($file_path));
-		
-	//trim file name
-	$file_name = trim(basename($file_path));
-		
-	if (strpos($file_path, '.') !== false)
-	{
-		// Nested file
-		$filename_ext = substr(strrchr($file_path, '.'), 1);
-	}
-		
-	//rebuild path
-	$file_path = $file_dir . "/{$file_name}";
-		
-	global $mx_root_path, $phpbb_root_path, $phpEx ;
-		
-	//If you simply want to check that some file (not directory) exists, 
-	//and concerned about performance, try is_file() instead.
-	//It seems like is_file() is almost 2x faster when a file exists 
-	//and about the same when it doesn't.
-			
-	$file = $file_dir . '/' . $file_name;
-		
-	if (function_exists('is_file') && @is_file($file)) 
-	{
-		$status = "is_file";
-		$file_exists = true;
-	}
-	
-	if (function_exists('curl_init') && (!ini_get('safe_mode') || !strtolower(ini_get('safe_mode')) == 'on')) 
-	{
-		// Assume failure.
-		$data = -1;
-		$ch = curl_init($file);
-		// Issue a HEAD request and follow any redirects.
-		curl_setopt($ch, CURLOPT_NOBODY, true);
-		curl_setopt($ch, CURLOPT_HEADER, true);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win32; x86; rv:63.0) Gecko/20100101 Firefox/63.0.68');  
-		$data = curl_exec($ch);
-		
-		curl_close($ch);
-		
-		if ($data) 
-		{
-			$content_length = "unknown";
-			$status = "curl_init";
-			
-			if (preg_match("/^HTTP\/1\.[01] (\d\d\d)/", $data, $matches))
-			{
-				$status = (int)$matches[1];
-				$file_exists = ($status == '200') ? true : (($status == '404') ? false : false);	
-			}
-		}
-	}
-		
-	if (function_exists('file_exists') && @file_exists(str_replace(array(PORTAL_URL, PHPBB_URL), array($mx_root_path, $phpbb_root_path), $file_path))) 
-	{
-		$status = "file_exists";
-		$file_exists = true;
-	}
-	
-	if (function_exists('filesize') && @filesize(str_replace(array(PORTAL_URL, PHPBB_URL), array($mx_root_path, $phpbb_root_path), $file_path))) 
-	{
-		$status = "filesize";
-		$file_exists = true;
-	}
-	
-	if ((ini_get('safe_mode') || strtolower(ini_get('safe_mode')) == 'on') && ($status == 'unknown') && !empty($filename_ext))
-	{
-		$status = "safe_mode";		
-		
-		if (($filename_ext == $phpEx ) && ((@include $file) !== false))
-		{
-			$status = "safe_mode_include";
-			$file_exists = true;
-		}
-	}
-	
-	return $file_exists;
 }
 
 ?>

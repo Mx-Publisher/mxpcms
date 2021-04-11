@@ -133,7 +133,7 @@ $percentage = 0;
 $bar_percent = 0;
 
 $firstcount = $user_data[0]['user_posts'];
-$get_db_stats = mx_get_db_stat( 'postcount' );
+$get_db_stats = phpBB2::get_db_stat( 'postcount' );
 
 for( $i = 0; $i < $user_count; $i++ )
 {
@@ -157,14 +157,14 @@ for( $i = 0; $i < $user_count; $i++ )
 //
 // Most active topics SQL
 //
-$sql = "SELECT COUNT(p.post_id) AS topic_replies, t.topic_id, t.topic_title
-	FROM " . TOPICS_TABLE . " t, " . POSTS_TABLE . " p
-	WHERE t.forum_id IN ( $auth_data_sql_stats )
-		AND p.topic_id = t.topic_id
-		AND t.topic_status <> 2
-	ORDER BY t.topic_id DESC
+$sql = "SELECT topic_id, topic_title, topic_replies
+	FROM " . TOPICS_TABLE . "
+	WHERE forum_id IN ( $auth_data_sql_stats )
+		AND topic_status <> 2
+		AND topic_replies > 0
+	ORDER BY topic_replies DESC
 	LIMIT " . $return_limit;
-	
+
 if( !($result = $db->sql_query($sql)) )
 {
 	mx_message_die(GENERAL_ERROR, "Couldn't retrieve topic data", "", __LINE__, __FILE__, $sql);
@@ -221,10 +221,10 @@ for( $i = 0; $i < count($topic_data); $i++ )
 	// Get forum statistics
 	//
 	$total_posts = $get_db_stats; //Already queried above
-	$total_users = mx_get_db_stat('usercount');
-	$total_topics = mx_get_db_stat('topiccount');
+	$total_users = phpBB2::get_db_stat('usercount');
+	$total_topics = phpBB2::get_db_stat('topiccount');
 
-	$start_date = mx_create_date($board_config['default_dateformat'], $board_config['board_startdate'], $board_config['board_timezone']);
+	$start_date = phpBB2::create_date($board_config['default_dateformat'], $board_config['board_startdate'], $board_config['board_timezone']);
 
 	$boarddays = ( time() - $board_config['board_startdate'] ) / 86400;
 

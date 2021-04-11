@@ -1,0 +1,83 @@
+<!-- IF S_SHOW_COPPA or S_REGISTRATION -->
+	<form method="post" action="{S_UCP_ACTION}" id="agreement">
+<!-- IF S_LANG_OPTIONS -->
+<script type="text/javascript">
+// <![CDATA[
+	/**
+	* Change language
+	*/
+	function change_language(lang_iso)
+	{
+        jQuery('#agreed').remove();
+        jQuery('fieldset.submit-buttons').append('<input type="hidden" name="agreed" value="0">');
+        jQuery( "#fbinner" ).hide('fold');    
+        jQuery( "#fbinner" ).show('fold').html('<span style="text-align:center;"><img src="images/loading.gif"></span>');
+        var newform = jQuery('#agreement'),     
+        url = newform.attr('action');
+        var values = newform.serialize();
+        jQuery.post(url, 
+        values,
+        function(data) 
+        {
+            jQuery('#dialog-confirm').fadeOut('fast');
+            jQuery('#dialog-confirm').fadeIn(function()
+            { 
+                jQuery('#dialog-confirm').html(data); 
+                jQuery('#agreed').remove();
+                jQuery('#not_agreed').remove();
+                jQuery('fieldset.submit-buttons').append('<input type="hidden" name="ajax" value="yes">');
+                jQuery('fieldset.submit-buttons').append('<input type="hidden" name="agreed" value="I agree to these terms">');
+                jQuery('fieldset.submit-buttons').append('<input type="hidden" name="dialog" value="yes">');                            
+            });
+        });
+	}
+
+// ]]>
+</script>
+
+		<p class="rightside">
+			<label for="lang">{L_LANGUAGE}:</label><select name="lang" id="lang" onchange="change_language(this.value); return false;" title="{L_LANGUAGE}">{S_LANG_OPTIONS}</select>
+		</p>
+
+	<div class="clear"></div>
+
+<!-- ENDIF -->
+
+	<div class="panel">
+		<div class="inner"><span class="corners-top"><span></span></span>
+		<div class="content">        <div id="fbinner">
+			<h2>{SITENAME} - {L_REGISTRATION}</h2>
+			<p><!-- IF S_SHOW_COPPA -->{L_COPPA_BIRTHDAY}<!-- ELSE -->{L_TERMS_OF_USE}<!-- ENDIF --></p>
+		</div></div>
+		<span class="corners-bottom"><span></span></span></div>
+	</div>
+
+	<div class="panel">
+		<div class="inner"><span class="corners-top"><span></span></span>
+		<fieldset class="submit-buttons">
+			<!-- IF S_SHOW_COPPA -->
+			<strong><a href="{U_COPPA_NO}" class="button1">{L_COPPA_NO}</a></strong>&nbsp; <a href="{U_COPPA_YES}" class="button2">{L_COPPA_YES}</a>
+			<!-- ELSE -->
+			<!-- ENDIF -->
+			<input type="hidden" name="agreed" id="agreed" value="I agree to these terms"/>
+			{S_HIDDEN_FIELDS}
+			{S_FORM_TOKEN}
+		</fieldset>
+		<span class="corners-bottom"><span></span></span></div>
+	</div>
+	</form>
+
+<!-- ELSEIF S_AGREEMENT -->
+
+	<div class="panel">
+		<div class="inner"><span class="corners-top"><span></span></span>
+		<div class="content">
+			<h2>{SITENAME} - {AGREEMENT_TITLE}</h2>
+			<p>{AGREEMENT_TEXT}</p>
+			<hr class="dashed" />
+		</div>
+		<span class="corners-bottom"><span></span></span></div>
+	</div>
+
+<!-- ENDIF -->
+

@@ -1178,7 +1178,7 @@ class mx_backend
 	var $user_ip = 'ffffff';
 	
 	/***/
-	function mx_backend()
+	function __construct()
 	{	
 		// Obtain and encode users IP
 		// from MXP 2.7.x common
@@ -1405,8 +1405,8 @@ class mx_backend
 
 		//
 		// Dummy include, to make all original phpBB functions available
-		//
-		include_once($phpbb_root_path . 'includes/functions.' . $phpEx); // In case we need old functions...
+		//include_once($phpbb_root_path . 'includes/functions.' . $phpEx); // In case we need old functions...
+		include_once($mx_root_path . 'includes/shared/phpbb2/includes/functions.' . $phpEx);
 		include_once($mx_root_path . 'includes/shared/phpbb3/includes/functions.' . $phpEx);
 		//
 		// Is phpBB File Attachment MOD present?

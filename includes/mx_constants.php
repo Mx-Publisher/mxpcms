@@ -243,6 +243,9 @@ define('PAGE_TEMPLATES' , $mx_table_prefix . 'page_templates');
 
 define('MX_THEMES_TABLE', $mx_table_prefix.'themes');
 
+!defined('LANG_FLAGS_TABLE') ? define('LANG_FLAGS_TABLE', $mx_table_prefix . 'lang_flags') : false;
+!defined('FLAG_TABLEE') ? define('FLAG_TABLE', $mx_table_prefix . 'flags') : false; //Country Flags Table
+
 define('MX_MATCH_TABLE' , $mx_table_prefix . 'wordmatch');
 define('MX_WORD_TABLE' , $mx_table_prefix . 'wordlist');
 define('MX_SEARCH_TABLE' , $mx_table_prefix . 'search_results');

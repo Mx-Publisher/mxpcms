@@ -2,7 +2,7 @@
 /**
 *
 * @package Core
-* @version $Id: mx_functions_core.php,v 1.140 2014/05/09 07:51:42 orynider Exp $
+* @version $Id: mx_functions_core.php,v 1.140 2020/02/25 03:45:52 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
@@ -55,7 +55,7 @@ class mx_cache extends cache
 {
 	private $prefix;
 	private $path;
-	private $backend_path;	
+	private $backend_path;
 	private $php_ext;
 	private $mx_cache;
 	private $config;
@@ -70,24 +70,24 @@ class mx_cache extends cache
 	/**
 	* Creates a cache service around a cache driver
 	*
-	 * @return cache	
+	 * @return cache
 	*/
 	public function __construct()
 	{
 		global $mx_root_path, $phpbb_root_path;
 		global $db, $portal_config;
 		global $mx_table_prefix, $table_prefix, $phpEx, $tplEx;
-		global $mx_backend, $phpbb_auth, $mx_bbcode;		
+		global $mx_backend, $phpbb_auth, $mx_bbcode;
 		
 		$this->path = ($mx_root_path) ? $mx_root_path : './';
 		$this->php_ext = $phpEx;
 		$this->cache_dir = $mx_root_path . 'cache/';
-		$this->backend = $mx_backend;		
-		$this->backend_path = $phpbb_root_path;		
+		$this->backend = $mx_backend;
+		$this->backend_path = $phpbb_root_path;
 		$this->db = $db;
-		$this->config = $portal_config; 		
-		$this->tpl_ext = $tplEx;		
-		$this->prefix = $mx_table_prefix;  			
+		$this->config = $portal_config;
+		$this->tpl_ext = $tplEx;
+		$this->prefix = $mx_table_prefix; 
 	}
 	
 	/**
@@ -174,6 +174,8 @@ class mx_cache extends cache
 		
 		// Instantiate the mx_backend class
 		$mx_backend = new mx_backend();
+		
+	
 		// Validate backend
 		if (!$mx_backend->validate_backend($portal_config))
 		{
@@ -185,7 +187,8 @@ class mx_cache extends cache
 		}
 		else
 		{
-			define('PORTAL_BACKEND', $portal_config['portal_backend']);
+			$backend_info = $mx_backend->get_phpbb_info($phpbb_root_path . "config.$phpEx", $portal_config['portal_backend'], '3.0.0');
+			define('PORTAL_BACKEND', $backend_info['backend']);		
 		}
 		
 		// Now, load backend specific constants
@@ -272,7 +275,21 @@ class mx_cache extends cache
 			{
 				if (!function_exists('mx_message_die'))
 				{
-					die("mx_cache::obtain_mxbb_config(); Couldnt query portal configuration, Allso this hosting or server is using a cache optimizer not compatible with MX-Publisher or just lost connection to database wile query.");
+					$message = '';
+					
+					// Remove install and contrib folders
+					if( file_exists('install') || file_exists('contrib') )
+					{
+						$message .= 'Not removed install and contrib and the database is empty?';
+					}
+					
+					$row = $db->sql_fetchrow($db->sql_query("SELECT * FROM " . PORTAL_TABLE));
+					global $dbname;
+					$message .= "mx_cache::obtain_mxbb_config(); 
+					Couldnt query portal configuration, 
+					Allso this hosting or server is using a cache optimizer not compatible with MX-Publisher 
+					or just lost connection to database wile query.
+					The table in query for PORTAL_TABLE is '" . PORTAL_TABLE . "' and the database name is '". $dbname ."' and has: " . count($row) . " rows.";
 				}
 				else
 				{
@@ -1351,13 +1368,13 @@ class mx_cache extends cache
 	*/
 	public function remove_file($filename, $check = false)
 	{
-		if (!function_exists('phpbb_is_writable'))
+		if (!function_exists('mx_is_writable'))
 		{
 			global $phpbb_root_path, $phpEx;
 			include($phpbb_root_path . 'includes/functions.' . $phpEx);
 		}
 
-		if ($check && !phpbb_is_writable($this->cache_dir))
+		if ($check && !mx_is_writable($this->cache_dir))
 		{
 			// E_USER_ERROR - not using language entry - intended.
 			trigger_error('Unable to remove files within ' . $this->cache_dir . '. Please check directory permissions.', E_USER_ERROR);
@@ -1365,7 +1382,204 @@ class mx_cache extends cache
 
 		return @unlink($filename);
 	}
-}	
+	
+	/**
+	 * Try to resolve symlinks in path
+	 * borrowed from phpBB3, http://phpbb.com/
+	 * @param string	$path			The path to resolve
+	 * @param string	$prefix			The path prefix (on windows the drive letter)
+	 * @param bool 	$absolute		Whether or not the path is absolute
+	 * @param bool	$return_array	Whether or not to return path parts
+	 *
+	 * @return string|array|bool	returns the resolved path or an array of parts of the path if $return_array is true
+	 * 								or false if path cannot be resolved
+	 */
+	protected function resolve_path($path, $prefix = '', $absolute = false, $return_array = false)
+	{
+		if ($return_array)
+		{
+			$path = str_replace(DIRECTORY_SEPARATOR, '/', $path);
+		}
+
+		trim ($path, '/');
+		$path_parts = explode('/', $path);
+		$resolved = array();
+		$resolved_path = $prefix;
+		$file_found = false;
+
+		foreach ($path_parts as $path_part)
+		{
+			if ($file_found)
+			{
+				return false;
+			}
+
+			if (empty($path_part) || ($path_part === '.' && ($absolute || !empty($resolved))))
+			{
+				continue;
+			}
+			else if ($absolute && $path_part === '..')
+			{
+				if (empty($resolved))
+				{
+					// No directories above root
+					return false;
+				}
+
+				array_pop($resolved);
+				$resolved_path = false;
+			}
+			else if ($path_part === '..' && !empty($resolved) && !in_array($resolved[count($resolved) - 1], array('.', '..')))
+			{
+				array_pop($resolved);
+				$resolved_path = false;
+			}
+			else
+			{
+				if ($resolved_path === false)
+				{
+					if (empty($resolved))
+					{
+						$resolved_path = ($absolute) ? $prefix . '/' . $path_part : $path_part;
+					}
+					else
+					{
+						$tmp_array = $resolved;
+						if ($absolute)
+						{
+							array_unshift($tmp_array, $prefix);
+						}
+
+						$resolved_path = implode('/', $tmp_array);
+					}
+				}
+
+				$current_path = $resolved_path . '/' . $path_part;
+
+				// Resolve symlinks
+				if (@is_link($current_path))
+				{
+					if (!function_exists('readlink'))
+					{
+						return false;
+					}
+
+					$link = readlink($current_path);
+
+					// Is link has an absolute path in it?
+					if ($this->is_absolute_path($link))
+					{
+						if (defined('PHP_WINDOWS_VERSION_MAJOR'))
+						{
+							$prefix = $link[0] . ':';
+							$link = substr($link, 2);
+						}
+						else
+						{
+							$prefix = '';
+						}
+
+						$resolved = $this->resolve_path($link, $prefix, true, true);
+						$absolute = true;
+					}
+					else
+					{
+						$resolved = $this->resolve_path($resolved_path . '/' . $link, $prefix, $absolute, true);
+					}
+
+					if (!$resolved)
+					{
+						return false;
+					}
+
+					$resolved_path = false;
+				}
+				elseif (@function_exists('is_dir') && @function_exists('is_file'))
+				{					
+					if (@is_dir($current_path . '/'))
+					{
+						$resolved[] = $path_part;
+						$resolved_path = $current_path;
+					}					
+					elseif (@is_file($current_path))
+					{
+						$resolved[] = $path_part;
+						$resolved_path = $current_path;
+						$file_found = true;
+					}
+					else
+					{
+						return false;
+					}					
+				}
+				else
+				{
+					return false;
+				}
+			}
+		}
+
+		// If at the end of the path there were a .. or .
+		// we need to build the path again.
+		// Only doing this when a string is expected in return
+		if ($resolved_path === false && $return_array === false)
+		{
+			if (empty($resolved))
+			{
+				$resolved_path = ($absolute) ? $prefix . '/' : './';
+			}
+			else
+			{
+				$tmp_array = $resolved;
+				if ($absolute)
+				{
+					array_unshift($tmp_array, $prefix);
+				}
+
+				$resolved_path = implode('/', $tmp_array);
+			}
+		}
+
+		return ($return_array) ? $resolved : $resolved_path;
+	}
+	
+	/**
+	 * A wrapper for PHP's realpath
+	 *
+	 * Try to resolve realpath when PHP's realpath is not available, or
+	 * known to be buggy.
+	 *
+	 * @param string	$path	Path to resolve
+	 *
+	 * @return string	Resolved path
+	 */
+	function realpath($path)
+	{
+		if (!function_exists('realpath'))
+		{
+			return mx_own_realpath($path);
+		}
+		
+		//Native PHP build-in realpath()
+		$realpath = realpath($path);
+
+		// Strangely there are provider not disabling realpath but returning strange values. :o
+		// We at least try to cope with them.
+		if ((!mx_is_absolute($path) && $realpath === $path) || $realpath === false)
+		{
+			return mx_own_realpath($path);
+		}
+
+		// Check for DIRECTORY_SEPARATOR at the end (and remove it!)
+		if (substr($realpath, -1) === DIRECTORY_SEPARATOR)
+		{
+			$realpath = substr($realpath, 0, -1);
+		}
+
+		return $realpath;
+	}	
+	
+}		
 
 /**
  * Class: cache.
@@ -2949,6 +3163,11 @@ class mx_block extends mx_block_parameter
 	{
 		global $layouttemplate, $language, $mx_user;
 
+		/**
+		* Instantiate the mx_language class
+		* $language->_load_lang($mx_root_path, 'lang_main');
+		*/
+		$language = is_object($language) ? $language : new mx_language();
 		$this_block_title = !$this->show_title  && $this->auth_mod ? '<i>(' . $this->block_title . ')</i>' : $this->block_title;
 		$this_block_title = ((mb_strlen($mx_user->lang(str_replace(' ', '_', $this_block_title))) !== 0) ? $mx_user->lang(str_replace(' ', '_', $this_block_title)) : $language->lang($this_block_title));
 		$layouttemplate->assign_block_vars('layout_column.blocks.show_title', array(
@@ -3456,7 +3675,7 @@ class mx_block_parameter
 				{
 					$parameter_custom = $mx_module_defs->submit_module_parameters($parameter_data, $block_id);
 					return $parameter_custom;
-				}				
+				}
 			}
 		}
 		return false;
@@ -3551,7 +3770,7 @@ class mx_block_parameter
 					
 					// Update block data
 					if ($sub_id == $parameter_data['sub_id'] || true)
-					{	
+					{
 						$sub_id = $mx_request_vars->is_request('virtual') ? $mx_request_vars->request('virtual', MX_TYPE_INT, 0) : $sub_id;
 					
 						//
@@ -5102,7 +5321,7 @@ define('MX_NOT_EMPTY'		, true);	//
  * This class IS instatiated in common.php ;-)
  *
  * @access public
- * @author Markus
+ * @author Markus Petrux, John Olson, FlorinCB
  * @package Core
  */
 class mx_request_vars
@@ -5185,6 +5404,7 @@ class mx_request_vars
 	* Getter for $super_globals_disabled
 	*
 	* @return	bool	Whether super globals are disabled or not.
+	* borrowed from github.com/phpbbb
 	*/
 	public function super_globals_disabled()
 	{
@@ -5194,6 +5414,7 @@ class mx_request_vars
 	/**
 	* Disables access of super globals specified in $super_globals.
 	* This is achieved by overwriting the super globals with instances of {@link \phpbb\request\deactivated_super_global \phpbb\request\deactivated_super_global}
+	* borrowed from github.com/phpbbb
 	*/
 	public function disable_super_globals()
 	{
@@ -5212,6 +5433,7 @@ class mx_request_vars
 	/**
 	* Enables access of super globals specified in $super_globals if they were disabled by {@link disable_super_globals disable_super_globals}.
 	* This is achieved by making the super globals point to the data stored within this class in {@link $input input}.
+	* borrowed from github.com/phpbbb
 	*/
 	public function enable_super_globals()
 	{
@@ -5548,17 +5770,17 @@ class mx_request_vars
 		{
 			return $this->_read($var, ($type | MX_TYPE_POST_VARS), $dflt, $not_null);
 		}
-		else	
+		else
 		{
 			$super_global = self::POST;
 			$multibyte = false; //UTF-8 ?
 			$default = $dflt;
 			return $this->_variable($var_name, $default, $multibyte, $super_global, true);
-		}			
-		
+		}
+	
 	}
 	
-	/** ** /	
+	/** ** /
 	public function post($var_name, $default, $multibyte = false, $super_global = self::POST)
 	{
 		return $this->_variable($var_name, $default, $multibyte, $super_global, true);
@@ -5616,7 +5838,7 @@ class mx_request_vars
 		{
 			return $this->_read($var, ($type | MX_TYPE_POST_VARS | MX_TYPE_GET_VARS), $dflt, $not_null);	
 		}
-		else	
+		else
 		{
 			$super_global = self::REQUEST;
 			$multibyte = false; //UTF-8 ?
@@ -5636,8 +5858,8 @@ class mx_request_vars
 	 */
 	public function is_post($var)
 	{
-		// Note: _x and _y are used by (at least IE) to return the mouse position at onclick of INPUT TYPE="img" elements.	
-		return ($this->is_set_post($var) || $this->is_set_post($var.'_x') && $this->is_set_post($var.'_y')) ? 1 : 0;		
+		// Note: _x and _y are used by (at least IE) to return the mouse position at onclick of INPUT TYPE="img" elements.
+		return ($this->is_set_post($var) || $this->is_set_post($var.'_x') && $this->is_set_post($var.'_y')) ? 1 : 0;
 	}
 
 	/**
@@ -5652,7 +5874,7 @@ class mx_request_vars
 	public function is_get($var)
 	{
 		//return isset($_GET[$var]) ? 1 : 0 ;
-		return $this->is_set($var, self::GET);		
+		return $this->is_set($var, self::GET);
 	}
 
 	/**
@@ -5699,7 +5921,7 @@ class mx_request_vars
 	public function is_empty_get($var)
 	{
 		//return empty($_GET[$var]) ? 1 : 0;
-		return $this->is_empty($var, self::GET);		
+		return $this->is_empty($var, self::GET);
 	}
 
 	/**

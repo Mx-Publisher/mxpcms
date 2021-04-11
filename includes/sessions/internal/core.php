@@ -2,7 +2,7 @@
 /**
 *
 * @package Auth
-* @version $Id: core.php,v 1.29 2014/05/16 18:02:23 orynider Exp $
+* @version $Id: core.php,v 0.3.3 2021/04/05 18:02:23 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
@@ -19,8 +19,13 @@ if ( !defined( 'IN_PORTAL' ) )
 // Note: These functions will later be accessible wrapped as phpBBX::orig_functionname()
 //
 include_once($mx_root_path . 'includes/shared/phpbb2/includes/functions.' . $phpEx);
+include_once($mx_root_path . 'includes/shared/phpbb3/includes/functions.' . $phpEx);
 
-
+/*
+* Instantiate Dummy phpBB Classes
+$phpBB2 = new phpBB2();
+$phpBB3 = new phpBB3();
+*/
 
 //
 // Finally, load some backend specific functions
@@ -32,10 +37,1207 @@ include_once($mx_root_path . 'includes/sessions/internal/functions.' . $phpEx);
 //
 include_once($mx_root_path . 'includes/sessions/internal/auth.' . $phpEx);
 
+/**
+* Permission/Auth class
+*
+* @package MX-Publisher
+*
+*/
+class phpbb_auth extends mx_auth_base
+{
+	var $acl = array();
+	var $mx_cache = array();
+	var $acl_options = array();
+	var $acl_forum_ids = false;
+	
+	/**
+	* Init permissions
+	*/
+	function acl(&$mx_userdata)
+	{
+		global $db, $mx_cache;
+
+		$this->acl = $this->cache = $this->acl_options = array();
+		$this->acl_forum_ids = false;
+
+		if (($this->acl_options = $mx_cache->get('_acl_options')) === false)
+		{
+			$this->acl_options = array ( 
+				'local' => array ( 
+					'f_' => 0, 
+					'f_announce' => 1, 
+					'f_announce_global' => 2, 
+					'f_attach' => 3, 
+					'f_bbcode' => 4, 
+					'f_bump' => 5, 
+					'f_delete' => 6, 
+					'f_download' => 7, 
+					'f_edit' => 8, 
+					'f_email' => 9, 
+					'f_flash' => 10, 
+					'f_icons' => 11, 
+					'f_ignoreflood' => 12, 
+					'f_img' => 13, 
+					'f_list' => 14, 
+					'f_list_topics' => 15, 
+					'f_noapprove' => 16, 
+					'f_poll' => 17, 
+					'f_post' => 18, 
+					'f_postcount' => 19, 
+					'f_print' => 20, 
+					'f_read' => 21, 
+					'f_reply' => 22, 
+					'f_report' => 23, 
+					'f_search' => 24, 
+					'f_sigs' => 25, 
+					'f_smilies' => 26, 
+					'f_sticky' => 27, 
+					'f_subscribe' => 28, 
+					'f_user_lock' => 29, 
+					'f_vote' => 30, 
+					'f_votechg' => 31, 
+					'f_softdelete' => 32, 
+					'm_' => 33, 
+					'm_approve' => 34, 
+					'm_chgposter' => 35, 
+					'm_delete' => 36, 
+					'm_edit' => 37, 
+					'm_info' => 38, 
+					'm_lock' => 39, 
+					'm_merge' => 40, 
+					'm_move' => 41, 
+					'm_report' => 42, 
+					'm_split' => 43, 
+					'm_softdelete' => 44 
+				), 
+				'id' => array ( 
+					'f_' => 1, 
+					'f_announce' => 2, 
+					'f_announce_global' => 3, 
+					'f_attach' => 4, 
+					'f_bbcode' => 5, 
+					'f_bump' => 6, 
+					'f_delete' => 7, 
+					'f_download' => 8, 
+					'f_edit' => 9, 
+					'f_email' => 10, 
+					'f_flash' => 11, 
+					'f_icons' => 12, 
+					'f_ignoreflood' => 13, 
+					'f_img' => 14, 
+					'f_list' => 15, 
+					'f_list_topics' => 16, 
+					'f_noapprove' => 17, 
+					'f_poll' => 18, 
+					'f_post' => 19, 
+					'f_postcount' => 20, 
+					'f_print' => 21, 
+					'f_read' => 22, 
+					'f_reply' => 23, 
+					'f_report' => 24, 
+					'f_search' => 25, 
+					'f_sigs' => 26, 
+					'f_smilies' => 27, 
+					'f_sticky' => 28, 
+					'f_subscribe' => 29, 
+					'f_user_lock' => 30, 
+					'f_vote' => 31, 
+					'f_votechg' => 32, 
+					'f_softdelete' => 33, 
+					'm_' => 34, 
+					'm_approve' => 35, 
+					'm_chgposter' => 36, 
+					'm_delete' => 37, 
+					'm_edit' => 38, 
+					'm_info' => 39, 
+					'm_lock' => 40, 
+					'm_merge' => 41, 
+					'm_move' => 42, 
+					'm_report' => 43, 
+					'm_split' => 44, 
+					'm_softdelete' => 45, 
+					'm_ban' => 46, 
+					'm_pm_report' => 47, 
+					'm_warn' => 48, 
+					'a_' => 49, 
+					'a_aauth' => 50, 
+					'a_attach' => 51, 
+					'a_authgroups' => 52, 
+					'a_authusers' => 53, 
+					'a_backup' => 54, 
+					'a_ban' => 55, 
+					'a_bbcode' => 56, 
+					'a_board' => 57, 
+					'a_bots' => 58, 
+					'a_clearlogs' => 59, 
+					'a_email' => 60, 
+					'a_extensions' => 61, 
+					'a_fauth' => 62, 
+					'a_forum' => 63, 
+					'a_forumadd' => 64, 
+					'a_forumdel' => 65, 
+					'a_group' => 66, 
+					'a_groupadd' => 67, 
+					'a_groupdel' => 68, 
+					'a_icons' => 69, 
+					'a_jabber' => 70, 
+					'a_language' => 71, 
+					'a_mauth' => 72, 
+					'a_modules' => 73, 
+					'a_names' => 74, 
+					'a_phpinfo' => 75, 
+					'a_profile' => 76, 
+					'a_prune' => 77, 
+					'a_ranks' => 78, 
+					'a_reasons' => 79, 
+					'a_roles' => 80, 
+					'a_search' => 81, 
+					'a_server' => 82, 
+					'a_storage' => 83, 
+					'a_styles' => 84, 
+					'a_switchperm' => 85, 
+					'a_uauth' => 86, 
+					'a_user' => 87, 
+					'a_userdel' => 88, 
+					'a_viewauth' => 89, 
+					'a_viewlogs' => 90, 
+					'a_words' => 91,
+					'u_' => 92,
+					'u_attach' => 93,
+					'u_chgavatar' => 94,
+					'u_chgcensors' => 95,
+					'u_chgemail' => 96,
+					'u_chggrp' => 97,
+					'u_chgname' => 98,
+					'u_chgpasswd' => 99,
+					'u_chgprofileinfo' => 100,
+					'u_download' => 101,
+					'u_hideonline' => 102,
+					'u_ignoreflood' => 103,
+					'u_masspm' => 104,
+					'u_masspm_group' => 105,
+					'u_pm_attach' => 106,
+					'u_pm_bbcode' => 107,
+					'u_pm_delete' => 108,
+					'u_pm_download' => 109,
+					'u_pm_edit' => 110,
+					'u_pm_emailpm' => 111,
+					'u_pm_flash' => 112,
+					'u_pm_forward' => 113,
+					'u_pm_img' => 114,
+					'u_pm_printpm' => 115,
+					'u_pm_smilies' => 116,
+					'u_readpm' => 117,
+					'u_savedrafts' => 118,
+					'u_search' => 119,
+					'u_sendemail' => 120,
+					'u_sendim' => 121,
+					'u_sendpm' => 122,
+					'u_sig' => 123,
+					'u_viewonline' => 124,
+					'u_viewprofile' => 125,
+					'u_dae_user' => 142, 
+					'a_dae_admin' => 143 
+				), 
+				'option' => array ( 
+					'1' => 'f_', 
+					'2' => 'f_announce', 
+					'3' => 'f_announce_global', 
+					'4' => 'f_attach', 
+					'5' => 'f_bbcode', 
+					'6' => 'f_bump', 
+					'7' => 'f_delete', 
+					'8' => 'f_download', 
+					'9' => 'f_edit', 
+					'10' => 'f_email', 
+					'11' => 'f_flash', 
+					'12' => 'f_icons', 
+					'13' => 'f_ignoreflood', 
+					'14' => 'f_img', 
+					'15' => 'f_list',
+					'16' => 'f_list_topics', 
+					'17' => 'f_noapprove', 
+					'18' => 'f_poll', 
+					'19' => 'f_post', 
+					'20' => 'f_postcount', 
+					'21' => 'f_print', 
+					'22' => 'f_read', 
+					'23' => 'f_reply', 
+					'24' => 'f_report', 
+					'25' => 'f_search', 
+					'26' => 'f_sigs', 
+					'27' => 'f_smilies', 
+					'28' => 'f_sticky', 
+					'29' => 'f_subscribe', 
+					'30' => 'f_user_lock', 
+					'31' => 'f_vote', 
+					'32' => 'f_votechg', 
+					'33' => 'f_softdelete', 
+					'34' => 'm_', 
+					'35' => 'm_approve', 
+					'36' => 'm_chgposter', 
+					'37' => 'm_delete', 
+					'38' => 'm_edit', 
+					'39' => 'm_info', 
+					'40' => 'm_lock', 
+					'41' => 'm_merge', 
+					'42' => 'm_move', 
+					'43' => 'm_report', 
+					'44' => 'm_split', 
+					'45' => 'm_softdelete', 
+					'46' => 'm_ban', 
+					'47' => 'm_pm_report', 
+					'48' => 'm_warn', 
+					'49' => 'a_', 
+					'50' => 'a_aauth', 
+					'51' => 'a_attach', 
+					'52' => 'a_authgroups', 
+					'53' => 'a_authusers', 
+					'54' => 'a_backup', 
+					'55' => 'a_ban', 
+					'56' => 'a_bbcode', 
+					'57' => 'a_board', 
+					'58' => 'a_bots', 
+					'59' => 'a_clearlogs', 
+					'60' => 'a_email', 
+					'61' => 'a_extensions', 
+					'62' => 'a_fauth', 
+					'63' => 'a_forum', 
+					'64' => 'a_forumadd', 
+					'65' => 'a_forumdel', 
+					'66' => 'a_group', 
+					'67' => 'a_groupadd', 
+					'68' => 'a_groupdel', 
+					'69' => 'a_icons', 
+					'70' => 'a_jabber', 
+					'71' => 'a_language', 
+					'72' => 'a_mauth', 
+					'73' => 'a_modules', 
+					'74' => 'a_names', 
+					'75' => 'a_phpinfo', 
+					'76' => 'a_profile', 
+					'77' => 'a_prune', 
+					'78' => 'a_ranks', 
+					'79' => 'a_reasons', 
+					'80' => 'a_roles', 
+					'81' => 'a_search', 
+					'82' => 'a_server', 
+					'83' => 'a_storage', 
+					'84' => 'a_styles', 
+					'85' => 'a_switchperm', 
+					'86' => 'a_uauth', 
+					'87' => 'a_user', 
+					'88' => 'a_userdel', 
+					'89' => 'a_viewauth', 
+					'90' => 'a_viewlogs', 
+					'91' => 'a_words', 
+					'92' => 'u_', 
+					'93' => 'u_attach', 
+					'94' => 'u_chgavatar', 
+					'95' => 'u_chgcensors', 
+					'96' => 'u_chgemail', 
+					'97' => 'u_chggrp', 
+					'98' => 'u_chgname', 
+					'99' => 'u_chgpasswd', 
+					'100' => 'u_chgprofileinfo', 
+					'101' => 'u_download', 
+					'102' => 'u_hideonline', 
+					'103' => 'u_ignoreflood', 
+					'104' => 'u_masspm', 
+					'105' => 'u_masspm_group', 
+					'106' => 'u_pm_attach', 
+					'107' => 'u_pm_bbcode', 
+					'108' => 'u_pm_delete', 
+					'109' => 'u_pm_download', 
+					'110' => 'u_pm_edit', 
+					'111' => 'u_pm_emailpm',
+					'112' => 'u_pm_flash', 
+					'113' => 'u_pm_forward', 
+					'114' => 'u_pm_img', 
+					'115' => 'u_pm_printpm', 
+					'116' => 'u_pm_smilies', 
+					'117' => 'u_readpm',
+					'118' => 'u_savedrafts', 
+					'119' => 'u_search', 
+					'120' => 'u_sendemail', 
+					'121' => 'u_sendim', 
+					'122' => 'u_sendpm', 
+					'123' => 'u_sig', 
+					'124' => 'u_viewonline', 
+					'125' => 'u_viewprofile', 
+					'142' => 'u_dae_user', 
+					'143' => 'a_dae_admin' 
+				), 
+				'global' => array ( 
+					'm_' => 0, 
+					'm_approve' => 1,  
+					'm_chgposter' => 2,  
+					'm_delete' => 3,  
+					'm_edit' => 4,  
+					'm_info' => 5,  
+					'm_lock' => 6,  
+					'm_merge' => 7,  
+					'm_move' => 8,  
+					'm_report' => 9,  
+					'm_split' => 10,  
+					'm_softdelete' => 11,  
+					'm_ban' => 12,  
+					'm_pm_report' => 13,  
+					'm_warn' => 14,  
+					'a_' => 15,  
+					'a_aauth' => 16,  
+					'a_attach' => 17,  
+					'a_authgroups' => 18,  
+					'a_authusers' => 19,  
+					'a_backup' => 20,  
+					'a_ban' => 21,  
+					'a_bbcode' => 22,  
+					'a_board' => 23,  
+					'a_bots' => 24, 
+					'a_clearlogs' => 25, 
+					'a_email' => 26, 
+					'a_extensions' => 27, 
+					'a_fauth' => 28, 
+					'a_forum' => 29, 
+					'a_forumadd' => 30, 
+					'a_forumdel' => 31, 
+					'a_group' => 32, 
+					'a_groupadd' => 33, 
+					'a_groupdel' => 34, 
+					'a_icons' => 35, 
+					'a_jabber' => 36, 
+					'a_language' => 37, 
+					'a_mauth' => 38, 
+					'a_modules' => 39, 
+					'a_names' => 40, 
+					'a_phpinfo' => 41, 
+					'a_profile' => 42, 
+					'a_prune' => 43, 
+					'a_ranks' => 44, 
+					'a_reasons' => 45, 
+					'a_roles' => 46, 
+					'a_search' => 47, 
+					'a_server' => 48, 
+					'a_storage' => 49, 
+					'a_styles' => 50, 
+					'a_switchperm' => 51, 
+					'a_uauth' => 52, 
+					'a_user' => 53, 
+					'a_userdel' => 54, 
+					'a_viewauth' => 55, 
+					'a_viewlogs' => 56, 
+					'a_words' => 57, 
+					'u_' => 58, 
+					'u_attach' => 59, 
+					'u_chgavatar' => 60, 
+					'u_chgcensors' => 61, 
+					'u_chgemail' => 62, 
+					'u_chggrp' => 63, 
+					'u_chgname' => 64, 
+					'u_chgpasswd' => 65, 
+					'u_chgprofileinfo' => 66, 
+					'u_download' => 67, 
+					'u_hideonline' => 68, 
+					'u_ignoreflood' => 69, 
+					'u_masspm' => 70, 
+					'u_masspm_group' => 71, 
+					'u_pm_attach' => 72, 
+					'u_pm_bbcode' => 73, 
+					'u_pm_delete' => 74, 
+					'u_pm_download' => 75, 
+					'u_pm_edit' => 76, 
+					'u_pm_emailpm' => 77, 
+					'u_pm_flash' => 78, 
+					'u_pm_forward' => 79, 
+					'u_pm_img' => 80, 
+					'u_pm_printpm' => 81, 
+					'u_pm_smilies' => 82, 
+					'u_readpm' => 83, 
+					'u_savedrafts' => 84, 
+					'u_search' => 85, 
+					'u_sendemail' => 86, 
+					'u_sendim' => 87, 
+					'u_sendpm' => 88, 
+					'u_sig' => 89, 
+					'u_viewonline' => 90, 
+					'u_viewprofile' => 91, 
+					'u_dae_user' => 92, 
+					'a_dae_admin' => 93 
+				) 
+			);
+			
+			$mx_cache->put('_acl_options', $this->acl_options);
+		}
+		
+		if (!isset($mx_userdata['user_permissions']) || !trim($mx_userdata['user_permissions']))
+		{
+			$this->acl_cache($mx_userdata);
+		}
+
+		// Fill ACL array
+		$this->_fill_acl($mx_userdata['user_permissions']);
+		
+		// Verify bitstring length with options provided...
+		$renew = false;
+		$global_length = count($this->acl_options['global']);
+		$local_length = count($this->acl_options['local']);
+
+		// Specify comparing length (bitstring is padded to 31 bits)
+		$global_length = ($global_length % 31) ? ($global_length - ($global_length % 31) + 31) : $global_length;
+		$local_length = ($local_length % 31) ? ($local_length - ($local_length % 31) + 31) : $local_length;
+
+		// You thought we are finished now? Noooo... now compare them.
+		foreach ($this->acl as $forum_id => $bitstring)
+		{
+			if (($forum_id && strlen($bitstring) != $local_length) || (!$forum_id && strlen($bitstring) != $global_length))
+			{
+				$renew = true;
+				break;
+			}
+		}
+
+		// If a bitstring within the list does not match the options, we have a user with incorrect permissions set and need to renew them
+		if ($renew)
+		{
+			$this->acl_cache($mx_userdata);
+			$this->_fill_acl($mx_userdata['user_permissions']);
+		}
+
+		return;
+	}
+	
+	/**
+	* Build bitstring from permission set
+	*/
+	function build_bitstring(&$hold_ary)
+	{
+		$hold_str = '';
+
+		if (count($hold_ary))
+		{
+			ksort($hold_ary);
+
+			$last_f = 0;
+
+			foreach ($hold_ary as $f => $auth_ary)
+			{
+				$ary_key = (!$f) ? 'global' : 'local';
+
+				$bitstring = array();
+				foreach ($this->acl_options[$ary_key] as $opt => $id)
+				{
+					if (isset($auth_ary[$this->acl_options['id'][$opt]]))
+					{
+						$bitstring[$id] = $auth_ary[$this->acl_options['id'][$opt]];
+
+						$option_key = substr($opt, 0, strpos($opt, '_') + 1);
+
+						// If one option is allowed, the global permission for this option has to be allowed too
+						// example: if the user has the a_ permission this means he has one or more a_* permissions
+						if ($auth_ary[$this->acl_options['id'][$opt]] == ACL_YES && (!isset($bitstring[$this->acl_options[$ary_key][$option_key]]) || $bitstring[$this->acl_options[$ary_key][$option_key]] == ACL_NEVER))
+						{
+							$bitstring[$this->acl_options[$ary_key][$option_key]] = ACL_YES;
+						}
+					}
+					else
+					{
+						$bitstring[$id] = ACL_NEVER;
+					}
+				}
+
+				// Now this bitstring defines the permission setting for the current forum $f (or global setting)
+				$bitstring = implode('', $bitstring);
+
+				// The line number indicates the id, therefore we have to add empty lines for those ids not present
+				$hold_str .= str_repeat("\n", $f - $last_f);
+
+				// Convert bitstring for storage - we do not use binary/bytes because PHP's string functions are not fully binary safe
+				for ($i = 0, $bit_length = strlen($bitstring); $i < $bit_length; $i += 31)
+				{
+					$hold_str .= str_pad(base_convert(str_pad(substr($bitstring, $i, 31), 31, 0, STR_PAD_RIGHT), 2, 36), 6, 0, STR_PAD_LEFT);
+				}
+
+				$last_f = $f;
+			}
+			unset($bitstring);
+
+			$hold_str = rtrim($hold_str);
+		}
+
+		return $hold_str;
+	}
+	
+	/**
+	* Cache data to user_permissions row
+	*/
+	function acl_cache(&$mx_userdata)
+	{
+		global $db;
+		
+		// Empty user_permissions
+		$mx_userdata['user_permissions'] = '';
+
+		$hold_ary = $this->acl_raw_data_single_user($mx_userdata['user_id']);
+
+		// Key 0 in $hold_ary are global options, all others are forum_ids
+
+		// If this user is founder we're going to force fill the admin options ...
+		if ($mx_userdata['user_level'] == ADMIN)
+		{
+			foreach ($this->acl_options['global'] as $opt => $id)
+			{
+				if (strpos($opt, 'a_') === 0)
+				{
+					$hold_ary[0][$this->acl_options['id'][$opt]] = ACL_YES;
+				}
+			}
+		}
+		
+		$hold_str = $this->build_bitstring($hold_ary);
+
+		if ($hold_str)
+		{
+			$mx_userdata['user_permissions'] = $hold_str;
+			
+			$sql = 'UPDATE ' . USERS_TABLE . "
+				SET user_permissions = '" . $db->sql_escape($mx_userdata['user_permissions']) . "',
+					user_perm_from = 0
+				WHERE user_id = " . $mx_userdata['user_id'];
+			if (!($db->sql_query($sql)))
+			{
+				// If the column exists we change it, else we add it ;)
+				$table = USERS_TABLE;
+				
+				$column_data = $mx_userdata;
+				
+				if (!class_exists('phpbb_db_tools') && !class_exists('tools'))
+				{
+					global $phpbb_root_path, $phpEx;
+					require($phpbb_root_path . 'includes/db/tools.' . $phpEx);
+				}
+				
+				if (class_exists('phpbb_db_tools'))
+				{
+					$db_tools = new phpbb_db_tools($db);					
+				}				
+				elseif (class_exists('tools'))
+				{
+					$db_tools = new tools($db);					
+				}
+				
+				if (is_object($db_tools))
+				{
+					if ($db_tools->sql_column_exists($table, 'user_perm_from'))
+					{
+						$result = true;
+					}
+					else
+					{
+						$column_name = 'user_perm_from';
+						
+						$column_data['column_type_sql'] = 'TEXT';
+						$column_data['user_perm_from'] = '0';
+						
+						$result = $db_tools->sql_column_add($table, $column_name, $column_data, true);				
+					
+						if (!$result)
+						{
+							$after = (!empty($column_data['after'])) ? ' AFTER ' . $column_data['after'] : '';
+							$sql = 'ALTER TABLE `' . $table . '` ADD `' . $column_name . '` ' . (($column_data['column_type_sql'] = 'NULL') ? 'TEXT' :  $column_data['column_type_sql']) . ' ' . (!empty($column_data[$column_name]) ? $column_data[$column_name] : 'NULL') . ' DEFAULT NULL'  . $after;					
+						
+							// We could add error handling here...
+							$result = $db->sql_query($sql);
+							if (!($result))
+							{
+								mx_message_die(CRITICAL_ERROR, "Could not info", '', __LINE__, __FILE__, $sql);
+							}
+						}
+					}
+					
+					if ($db_tools->sql_column_exists($table, 'user_permissions'))
+					{
+						$result = true;
+					}
+					else
+					{
+						$column_name = 'user_permissions';
+						
+						$column_data['column_type_sql'] = 'TEXT';
+						$column_data['user_permissions'] = 'NULL';
+						
+						$result = $db_tools->sql_column_add($table, $column_name, $column_data, true);				
+					
+						if (!$result)
+						{
+							$after = (!empty($column_data['after'])) ? ' AFTER ' . $column_data['after'] : '';
+							$sql = 'ALTER TABLE `' . $table . '` ADD `' . $column_name . '` ' . (($column_data['column_type_sql'] = 'NULL') ? 'TEXT' :  $column_data['column_type_sql']) . ' ' . (!empty($column_data[$column_name]) ? $column_data[$column_name] : 'NULL') . ' DEFAULT NULL'  . $after;
+							
+							// We could add error handling here...
+							$result = $db->sql_query($sql);
+							if (!($result))
+							{
+								mx_message_die(CRITICAL_ERROR, "Could not info", '', __LINE__, __FILE__, $sql);
+							}
+						}
+					}
+					
+					if ($db_tools->sql_column_exists($table, 'user_birthday'))
+					{
+						$result = true;
+					}
+					else					
+					{
+						$column_name = 'user_birthday';
+						
+						$column_data['column_type_sql'] = 'TEXT';
+						$column_data['user_birthday'] = 'NULL';
+						
+						$result = $db_tools->sql_column_add($table, $column_name, $column_data, true);
+						
+						if (!$result)
+						{
+							$after = (!empty($column_data['after'])) ? ' AFTER ' . $column_data['after'] : '';
+							$statements[] = 'ALTER TABLE `' . $table . '` ADD `' . $column_name . '` ' . (($column_data['column_type_sql'] = 'NULL') ? 'TEXT' :  $column_data['column_type_sql']) . ' ' . (!empty($column_data[$column_name]) ? $column_data[$column_name] : 'NULL') . ' DEFAULT NULL'  . $after;					
+							
+							// We could add error handling here...
+							$result = $db->sql_query($sql);
+							if (!($result))
+							{
+								mx_message_die(CRITICAL_ERROR, "Could not info", '', __LINE__, __FILE__, $sql);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return;
+	}
+	
+	/**
+ 	* get_auth_forum
+ 	*
+ 	* @param unknown_type $mode
+ 	* @return unknown
+ 	*/
+	function get_auth_forum($mode = 'phpbb')
+	{
+		global $mx_userdata, $mx_root_path, $phpEx;
+		static $auth_data_sql;
+		//
+		// Try to reuse auth_view query result.
+		//
+		$mx_userdata_key = 'mx_get_auth_' . $mode . $mx_userdata['user_id'];
+		if( !empty($mx_userdata[$mx_userdata_key]) )
+		{
+			$auth_data_sql = $mx_userdata[$mx_userdata_key];
+			return $auth_data_sql;
+		}
+		//
+		// Now, this tries to optimize DB access involved in auth(),
+		// passing AUTH_LIST_ALL will load info for all forums at once.
+		// Start auth check
+		if (!$is_auth_ary = $this->acl_getf('f_read', false))
+		{
+			if ($mx_user->data['user_id'] != ANONYMOUS)
+			{
+				//trigger_error('SORRY_AUTH_READ');
+				$auth_data_sql = false;
+			}
+			//login_box('', $mx_user->lang['LOGIN_VIEWFORUM']);
+			$auth_data_sql = $this->acl_getf_global('m_');			
+		}
+		//
+		// Loop through the list of forums to retrieve the ids for
+		// those with AUTH_VIEW allowed.
+		//
+		foreach( $is_auth_ary as $fid => $is_auth_row )
+		{
+			if( ($is_auth_row['f_read']) )
+			{
+				$auth_data_sql .= ( $auth_data_sql != '' ) ? ', ' . $fid : $fid;
+			}
+		}
+		if( empty($auth_data_sql) )
+		{
+			$auth_data_sql = 0;			
+		}
+		$mx_userdata[$mx_userdata_key] = $auth_data_sql;
+		return $auth_data_sql;
+	}
+
+	/**
+	* function acl_getfignore()
+	* $auth_level_read can be a value or array;
+	* $ignore_forum_ids can have this sintax: forum_id(1), forum_id(2), ..., forum_is(n);
+	* 1st test 25.06.2008 by FlorinCB
+	 */
+	function acl_getfignore($auth_level_read, $ignore_forum_ids)
+	{
+		global $phpbb_root_path, $mx_user;
+
+		$ignore_forum_ids = ($ignore_forum_ids) ? $ignore_forum_ids : '';
+
+		$auth_user = array();
+
+		if (is_array($auth_level_read))
+		{
+			foreach ($auth_level_read as $auth_level)
+			{
+				$auth_user = $this->acl_getf('!' . $auth_level, true);
+
+				if ($num_forums = count($auth_user))
+				{
+					while ( list($forum_id, $auth_mod) = each($auth_user) )
+					{
+						$unauthed = false;
+
+						if (!$auth_mod[$auth_level] && ( strstr($ignore_forum_ids,$auth_mod['forum_id']) === FALSE))
+						{
+							$unauthed = true;
+						}
+
+						if ($unauthed)
+						{
+							$ignore_forum_ids .= ($ignore_forum_ids) ? ',' . $forum_id : $forum_id;
+						}
+					}
+				}
+				unset($auth_level_read);
+			}
+		}
+		elseif ($auth_level_read)
+		{
+			$auth_user = $this->acl_getf('!' . $auth_level_read, true);
+
+			if ($num_forums = count($auth_user))
+			{
+				while ( list($forum_id, $auth_mod) = each($auth_user) )
+				{
+					$unauthed = false;
+
+					if (!$auth_mod[$auth_level] && ( strstr($ignore_forum_ids,$auth_mod['forum_id']) === FALSE))
+					{
+						$unauthed = true;
+					}
+
+					if ($unauthed)
+					{
+						$ignore_forum_ids .= ($ignore_forum_ids) ? ',' . $forum_id : $forum_id;
+					}
+				}
+			}
+
+		}
+		$ignore_forum_ids = ($ignore_forum_ids) ? $ignore_forum_ids : 0;
+		return $ignore_forum_ids;
+	}
+	
+	/**
+	* Retrieves data wanted by acl function from the database for the
+	* specified user.
+	*
+	* @param int $mx_user_id User ID
+	* @return array User attributes
+	*/
+	public function obtain_user_data($mx_user_id)
+	{
+		global $db;
+
+		$sql = 'SELECT u.user_id, u.username, u.user_permissions, u.user_type, u.user_id as user_colour, u.user_level as user_type, u.user_avatar as avatar, u.user_avatar_type as avatar_type
+			FROM ' . USERS_TABLE . ' u
+			WHERE user_id = ' . $mx_user_id;
+		if (!($result = $db->sql_query($sql)))
+		{
+			mx_message_die(CRITICAL_ERROR, 'Could not query user info');
+		}		
+		$mx_user_data = $db->sql_fetchrow($result);
+		$db->sql_freeresult($result);
+		return $mx_user_data;
+	}
+
+	/**
+	* Fill ACL array with relevant bitstrings from user_permissions column
+	* @access private
+	*/
+	function _fill_acl($mx_user_permissions)
+	{
+		$seq_cache = array();
+		$this->acl = array();
+		$mx_user_permissions = explode("\n", $mx_user_permissions);
+
+		foreach ($mx_user_permissions as $f => $seq)
+		{
+			if ($seq)
+			{
+				$i = 0;
+
+				if (!isset($this->acl[$f]))
+				{
+					$this->acl[$f] = '';
+				}
+
+				while ($subseq = substr($seq, $i, 6))
+				{
+					if (isset($seq_cache[$subseq]))
+					{
+						$converted = $seq_cache[$subseq];
+					}
+					else
+					{
+						$converted = $seq_cache[$subseq] = str_pad(base_convert($subseq, 36, 2), 31, 0, STR_PAD_LEFT);
+					}
+
+					// We put the original bitstring into the acl array
+					$this->acl[$f] .= $converted;
+					$i += 6;
+				}
+			}
+		}
+	}
+ 
+	/**
+	* Look up an option
+	* if the option is prefixed with !, then the result becomes negated
+	*
+	* If a forum id is specified the local option will be combined with a global option if one exist.
+	* If a forum id is not specified, only the global option will be checked.
+	*/
+	function acl_get($opt, $f = 0)
+	{
+		global $mx_user;
+		
+		$negate = false;
+
+		if (strpos($opt, '!') === 0)
+		{
+			$negate = true;
+			$opt = substr($opt, 1);
+		}
+
+		if (!isset($this->cache[$f][$opt]))
+		{
+			// We combine the global/local option with an OR because some options are global and local.
+			// If the user has the global permission the local one is true too and vice versa
+			$this->cache[$f][$opt] = false;
+
+			// Is this option a global permission setting?
+			if (isset($this->acl_options['global'][$opt]))
+			{
+				if (isset($this->acl[0]))
+				{
+					$this->cache[$f][$opt] = $this->acl[0][$this->acl_options['global'][$opt]];
+				}
+			}
+
+			// Is this option a local permission setting?
+			// But if we check for a global option only, we won't combine the options...
+			if (($f != 0) && isset($this->acl_options['local'][$opt]))
+			{
+				if (isset($this->acl[$f]) && isset($this->acl[$f][$this->acl_options['local'][$opt]]))
+				{
+					$this->cache[$f][$opt] |= $this->acl[$f][$this->acl_options['local'][$opt]];
+				}
+			}
+		}
+		
+		//'124' => 'u_viewonline', 
+		//'125' => 'u_viewprofile', 		
+		if (strpos($opt, 'u_view') === 0)
+		{
+			$this->cache[$f][$opt] = ($mx_user->data['user_id'] != ANONYMOUS) ? true : false;
+		}
+		
+		//'89' => 'a_viewauth', 
+		//'90' => 'a_viewlogs', 
+		if (strpos($opt, 'a_view') === 0)
+		{
+			$this->cache[$f][$opt] = ($mx_user->data['user_level'] == ADMIN) ? true : false;
+		}
+		
+		// Founder always has all global options set to true...
+		return ($negate) ? !$this->cache[$f][$opt] : $this->cache[$f][$opt];
+	}
+
+	/**
+	* Get forums with the specified permission setting
+	* if the option is prefixed with !, then the result becomes nagated
+	*
+	* @param bool $clean set to true if only values needs to be returned which are set/unset
+	*/
+	function acl_getf($opt, $clean = false)
+	{
+		$acl_f = array();
+		$negate = false;
+
+		if (strpos($opt, '!') === 0)
+		{
+			$negate = true;
+			$opt = substr($opt, 1);
+		}
+
+		// If we retrieve a list of forums not having permissions in, we need to get every forum_id
+		if ($negate)
+		{
+			if ($this->acl_forum_ids === false)
+			{
+				global $db;
+
+				$sql = 'SELECT forum_id
+					FROM ' . FORUMS_TABLE;
+
+				if (sizeof($this->acl))
+				{
+					$sql .= ' WHERE ' . $db->sql_in_set('forum_id', array_keys($this->acl), true);
+				}
+				$result = $db->sql_query($sql);
+
+				$this->acl_forum_ids = array();
+				while ($row = $db->sql_fetchrow($result))
+				{
+					$this->acl_forum_ids[] = $row['forum_id'];
+				}
+				$db->sql_freeresult($result);
+			}
+		}
+
+		if (isset($this->acl_options['local'][$opt]))
+		{
+			foreach ($this->acl as $f => $bitstring)
+			{
+				// Skip global settings
+				if (!$f)
+				{
+					continue;
+				}
+
+				$allowed = (!isset($this->cache[$f][$opt])) ? $this->acl_get($opt, $f) : $this->cache[$f][$opt];
+
+				if (!$clean)
+				{
+					$acl_f[$f][$opt] = ($negate) ? !$allowed : $allowed;
+				}
+				else
+				{
+					if (($negate && !$allowed) || (!$negate && $allowed))
+					{
+						$acl_f[$f][$opt] = 1;
+					}
+				}
+			}
+		}
+
+		// If we get forum_ids not having this permission, we need to fill the remaining parts
+		if ($negate && sizeof($this->acl_forum_ids))
+		{
+			foreach ($this->acl_forum_ids as $f)
+			{
+				$acl_f[$f][$opt] = 1;
+			}
+		}
+
+		return $acl_f;
+	}
+
+	/**
+	* Get local permission state for any forum.
+	*
+	* Returns true if user has the permission in one or more forums, false if in no forum.
+	* If global option is checked it returns the global state (same as acl_get($opt))
+	* Local option has precedence...
+	*/
+	function acl_getf_global($opt)
+	{
+		if (is_array($opt))
+		{
+			// evaluates to true as soon as acl_getf_global is true for one option
+			foreach ($opt as $check_option)
+			{
+				if ($this->acl_getf_global($check_option))
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		if (isset($this->acl_options['local'][$opt]))
+		{
+			foreach ($this->acl as $f => $bitstring)
+			{
+				// Skip global settings
+				if (!$f)
+				{
+					continue;
+				}
+
+				// as soon as the user has any permission we're done so return true
+				if ((!isset($this->cache[$f][$opt])) ? $this->acl_get($opt, $f) : $this->cache[$f][$opt])
+				{
+					return true;
+				}
+			}
+		}
+		else if (isset($this->acl_options['global'][$opt]))
+		{
+			return $this->acl_get($opt);
+		}
+
+		return false;
+	}
+
+	/**
+	* Get permission settings (more than one)
+	*/
+	function acl_gets()
+	{
+		$args = func_get_args();
+		$f = array_pop($args);
+
+		if (!is_numeric($f))
+		{
+			$args[] = $f;
+			$f = 0;
+		}
+
+		// alternate syntax: acl_gets(array('m_', 'a_'), $forum_id)
+		if (is_array($args[0]))
+		{
+			$args = $args[0];
+		}
+
+		$acl = 0;
+		foreach ($args as $opt)
+		{
+			$acl |= $this->acl_get($opt, $f);
+		}
+
+		return $acl;
+	}
+
+	/**
+	* Get permission listing based on user_id/options/forum_ids
+	*/
+	function acl_get_list($mx_user_id = false, $opts = false, $forum_id = false)
+	{
+		if ($mx_user_id !== false && !is_array($mx_user_id) && $opts === false && $forum_id === false)
+		{
+			$hold_ary = array($mx_user_id => $this->acl_raw_data_single_user($mx_user_id));
+		}
+		else
+		{
+			$hold_ary = $this->acl_raw_data($mx_user_id, $opts, $forum_id);
+		}
+
+		$auth_ary = array();
+		foreach ($hold_ary as $mx_user_id => $forum_ary)
+		{
+			foreach ($forum_ary as $forum_id => $auth_option_ary)
+			{
+				foreach ($auth_option_ary as $auth_option => $auth_setting)
+				{
+					if ($auth_setting)
+					{
+						$auth_ary[$forum_id][$auth_option][] = $mx_user_id;
+					}
+				}
+			}
+		}
+
+		return $auth_ary;
+	}
+	
+	/**
+	* Get raw acl data based on user for caching user_permissions
+	* This function returns the same data as acl_raw_data(), but without the user id as the first key within the array.
+	*/
+	function acl_raw_data_single_user($mx_user_id)
+	{
+		global $db, $mx_cache;
+
+		// Check if the role-cache is there
+		if (($this->role_cache = $mx_cache->get('_role_cache')) === false)
+		{
+			$this->role_cache = array();
+
+			// We pre-fetch roles
+			$sql = 'SELECT *
+				FROM ' . ACL_ROLES_DATA_TABLE . '
+				ORDER BY role_id ASC';
+			$result = $db->sql_query($sql);
+
+			while ($row = $db->sql_fetchrow($result))
+			{
+				$this->role_cache[$row['role_id']][$row['auth_option_id']] = (int) $row['auth_setting'];
+			}
+			$db->sql_freeresult($result);
+
+			foreach ($this->role_cache as $role_id => $role_options)
+			{
+				$this->role_cache[$role_id] = serialize($role_options);
+			}
+
+			$mx_cache->put('_role_cache', $this->role_cache);
+		}
+
+		$hold_ary = array();
+
+		// Grab user-specific permission settings
+		$sql = 'SELECT forum_id, auth_option_id, auth_role_id, auth_setting
+			FROM ' . ACL_USERS_TABLE . '
+			WHERE user_id = ' . $mx_user_id;
+		$result = $db->sql_query($sql);
+
+		while ($row = $db->sql_fetchrow($result))
+		{
+			// If a role is assigned, assign all options included within this role. Else, only set this one option.
+			if ($row['auth_role_id'])
+			{
+				$hold_ary[$row['forum_id']] = (empty($hold_ary[$row['forum_id']])) ? unserialize($this->role_cache[$row['auth_role_id']]) : $hold_ary[$row['forum_id']] + unserialize($this->role_cache[$row['auth_role_id']]);
+			}
+			else
+			{
+				$hold_ary[$row['forum_id']][$row['auth_option_id']] = $row['auth_setting'];
+			}
+		}
+		$db->sql_freeresult($result);
+
+		// Now grab group-specific permission settings
+		$sql = 'SELECT a.forum_id, a.auth_option_id, a.auth_role_id, a.auth_setting
+			FROM ' . ACL_GROUPS_TABLE . ' a, ' . USER_GROUP_TABLE . ' ug, ' . GROUPS_TABLE . ' g
+			WHERE a.group_id = ug.group_id
+				AND g.group_id = ug.group_id
+				AND ug.user_pending = 0
+				AND NOT (ug.group_leader = 1 AND g.group_skip_auth = 1)
+				AND ug.user_id = ' . $mx_user_id;
+		$result = $db->sql_query($sql);
+
+		while ($row = $db->sql_fetchrow($result))
+		{
+			if (!$row['auth_role_id'])
+			{
+				$this->_set_group_hold_ary($hold_ary[$row['forum_id']], $row['auth_option_id'], $row['auth_setting']);
+			}
+			else if (!empty($this->role_cache[$row['auth_role_id']]))
+			{
+				foreach (unserialize($this->role_cache[$row['auth_role_id']]) as $option_id => $setting)
+				{
+					$this->_set_group_hold_ary($hold_ary[$row['forum_id']], $option_id, $setting);
+				}
+			}
+		}
+		$db->sql_freeresult($result);
+
+		return $hold_ary;
+	}
+
+}
+
 //
 // Init the auth class if this is required
 //
-$phpbb_auth = new mx_auth_base();
+$mx_auth = $phpbb_auth = new mx_auth_base();
 
 //
 // Instantiate Dummy Forum Specific Shared Classes
@@ -52,23 +1254,60 @@ class mx_backend
 	//
 	// XS Template - use backend db settings
 	//
-	var $edit_db = false;
+	var $edit_db = true;
 	var $page_id = 1;
-	var $user_ip = 'ffffff';
+	var $mx_user_ip = '::1';
+	var $user_ip = '127.0.0.1';
+	var $client_ip = '127.0.0.1';
 	
 	/***/
-	function mx_backend()
+	function __construct()
 	{	
 		// Obtain and encode users IP
 		// from MXP 2.7.x common
+		global $mx_request_vars;
 		// I'm removing HTTP_X_FORWARDED_FOR ... this may well cause other problems such as
 		// private range IP's appearing instead of the guilty routable IP, tough, don't
 		// even bother complaining ... go scream and shout at the idiots out there who feel
 		// "clever" is doing harm rather than good ... karma is a great thing ... :)
-		//
-		$this->client_ip = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : ( ( !empty($_ENV['REMOTE_ADDR']) ) ? $_ENV['REMOTE_ADDR'] : getenv('REMOTE_ADDR') );
-		$ip_sep = explode('.', $this->client_ip);
-		$this->user_ip = sprintf('%02x%02x%02x%02x', $ip_sep[0], $ip_sep[1], $ip_sep[2], $ip_sep[3]);	
+		// Why no forwarded_for et al? Well, too easily spoofed. With the results of my recent requests
+		// it's pretty clear that in the majority of cases you'll at least be left with a proxy/cache ip.
+		$client_ip = htmlspecialchars_decode($mx_request_vars->server('REMOTE_ADDR'));
+		$client_ip = preg_replace('# {2,}#', ' ', str_replace(',', ' ', $client_ip));
+		
+		// split the list of IPs
+		$ips = explode(' ', trim($client_ip));
+		
+		// Default IP if REMOTE_ADDR is invalid
+		$this->ip = '127.0.0.1';
+		$user_ip = $this->encode_ip($client_ip);
+		
+		if (substr_count($client_ip, '::1') === 1)
+		{
+			$user_ip = '127.0.0.1';
+			$ip_sep = explode('.', $this->ip);
+			$this->user_ip = sprintf('%02x%02x%02x%02x', $ip_sep[0], $ip_sep[1], $ip_sep[2], $ip_sep[3]);
+		}
+		
+		foreach ($ips as $ip)
+		{
+			// Normalise IP address
+			$ip = $this->ip_normalise($ip);
+
+			if ($ip === false)
+			{
+				// IP address is invalid.
+				break;
+			}
+			
+			// IP address is valid.
+			$this->ip = $ip;
+		} 
+		
+		$this->user_ip = $this->ip_normalise($client_ip);
+		$this->page_id = $mx_request_vars->request('page', MX_TYPE_INT, 1);
+		$this->domain = gethostbyaddr($user_ip);		
+			
 	}	
 	/***/
 	 
@@ -79,11 +1318,15 @@ class mx_backend
 	 * Set i.e. $phpbb_root_path, $tplEx, $table_prefix
 	 *
 	 */
-	function validate_backend()
+	function validate_backend($cache_config = array())
 	{
-		global $db, $portal_config, $phpbb_root_path, $mx_root_path;
-		global $table_prefix, $phpEx, $tplEx;
-
+		global $db, $phpbb_root_path, $mx_root_path;
+		global $phpEx, $tplEx, $portal_config;
+		global $mx_dbms, $mx_dbhost, $mx_dbname, $mx_dbuser, $mx_dbpasswd, $mx_table_prefix;
+		global $dbms, $dbhost, $dbname, $dbuser, $dbpasswd, $table_prefix;
+		
+		$backend_table_prefix = '';
+		
 		//
 		// Define backend template extension
 		//
@@ -112,7 +1355,7 @@ class mx_backend
 			
 		$script_name = preg_replace('/^\/?(.*?)\/?$/', "\\1", trim($portal_config['script_path']));
 		$server_name = trim($portal_config['server_name']);
-		$server_protocol = ( $portal_config['cookie_secure'] ) ? 'http://' : 'http://';
+		$server_protocol = ( $portal_config['cookie_secure'] ) ? 'https://' : 'http://';
 		$server_port = (($portal_config['server_port']) && ($portal_config['server_port'] <> 80)) ? ':' . trim($portal_config['server_port']) . '/' : '/';
 		$portal_config['portal_phpbb_url'] = str_replace("//", "/", $server_name . $server_port . $script_name . '/');
 		$server_url = $server_protocol . str_replace("//", "/", $server_name . $server_port . $script_name . '/'); //On some server the slash is not added and this trick will fix it
@@ -129,19 +1372,6 @@ class mx_backend
 		if (empty($portal_config['portal_version']))
 		{
 			$portal_config = $mx_cache->obtain_mxbb_config(false);
-		}
-		/**		
-		$this->data = !empty($this->data['user_id']) ? $this->data : $mx_user->session_pagestart($user_ip, $page_id);
-		
-		$this->cache = is_object($mx_cache) ? $mx_cache : new base();
-		*/		
-		if (preg_match('/bot|crawl|curl|dataprovider|search|get|spider|find|java|majesticsEO|google|yahoo|teoma|contaxe|yandex|libwww-perl|facebookexternalhit/i', $_SERVER['HTTP_USER_AGENT'])) 
-		{
-		    $this->data['is_bot'] = true;
-		}
-		else
-		{
-		    $this->data['is_bot'] = false;
 		}	
 		
 		//
@@ -374,17 +1604,17 @@ class mx_backend
 		if (strpos($root_path, '.') !== false)
 		{
 			// Nested file
-			$filename_ext = substr(strrchr($root_path, '.'), 1);
-			$filename = basename($root_path, '.' . $filename_ext);
-			$current_dir = dirname(realpath($root_path));
-			$root_path = dirname($root_path);			
+			$filename_ext 	= substr(strrchr($root_path, '.'), 1);
+			$filename 		= basename($root_path, '.' . $filename_ext);
+			$current_dir 	= dirname(realpath($root_path));
+			$root_path 		= dirname($root_path);			
 		}
 		else		
 		{
-			$filename_ext = substr(strrchr(__FILE__, '.'), 1);
-			$filename = "config";
-			$current_dir = $root_path;
-			$root_path = dirname($root_path);			
+			$filename_ext 	= substr(strrchr(__FILE__, '.'), 1);
+			$filename 		= "config";
+			$current_dir 	= $root_path;
+			$root_path 		= dirname($root_path);			
 		}		
 		
 		$config = $root_path . "/config.$phpEx";
@@ -426,18 +1656,18 @@ class mx_backend
 		}	
 		
 		return array(
-			'dbms'			=> $dbms,
-			'dbhost'		=> $dbhost,
-			'dbname'		=> $dbname,
-			'dbuser'		=> $dbuser,
-			'dbpasswd'		=> $dbpasswd,
+			'dbms'				=> $dbms,
+			'dbhost'			=> $dbhost,
+			'dbname'			=> $dbname,
+			'dbuser'			=> $dbuser,
+			'dbpasswd'			=> $dbpasswd,
 			'mx_table_prefix'	=> $mx_table_prefix,			
-			'table_prefix'	=> $table_prefix,
-			'backend'		=> $backend,		
-			'version'		=> $phpbbversion,
-			'acm_type'		=> isset($acm_type) ? $acm_type : '',
+			'table_prefix'		=> $table_prefix,
+			'backend'			=> $backend,		
+			'version'			=> $phpbbversion,
+			'acm_type'			=> isset($acm_type) ? $acm_type : '',
 			'phpbb_root_path'	=> $phpbb_root_path,			
-			'status'		=> defined('MX_INSTALLED') ? true : false,			
+			'status'			=> defined('MX_INSTALLED') ? true : false,			
 		);
 	}	
 	
@@ -454,17 +1684,17 @@ class mx_backend
 		if (strpos($root_path, '.') !== false)
 		{
 			// Nested file
-			$filename_ext = substr(strrchr($root_path, '.'), 1);
-			$filename = basename($root_path, '.' . $filename_ext);
-			$current_dir = dirname(realpath($root_path));
-			$root_path = dirname($root_path);			
+			$filename_ext	= substr(strrchr($root_path, '.'), 1);
+			$filename		= basename($root_path, '.' . $filename_ext);
+			$current_dir	= dirname(realpath($root_path));
+			$root_path		= dirname($root_path);			
 		}
 		else		
 		{
-			$filename_ext = substr(strrchr(__FILE__, '.'), 1);
-			$filename = "config";
-			$current_dir = $root_path;
-			$root_path = dirname($root_path);			
+			$filename_ext	= substr(strrchr(__FILE__, '.'), 1);
+			$filename		= "config";
+			$current_dir	= $root_path;
+			$root_path		= dirname($root_path);			
 		}		
 		
 		$config = $root_path . "/config.$phpEx";
@@ -472,7 +1702,7 @@ class mx_backend
 		//
 		if ((@include $config) === false)
 		{
-			die('Configuration file ' . $config . ' couldn\'t be opened.');
+			die('Configuration file (get_phpbb_info) ' . $config . ' couldn\'t be opened.');
 		}
 		//
 		
@@ -537,7 +1767,7 @@ class mx_backend
 			'dbname'		=> $dbname,
 			'dbuser'		=> $dbuser,
 			'dbpasswd'		=> $dbpasswd,
-			'table_prefix'	=> $table_prefix,
+			'table_prefix'	=> isset($table_prefix) ? $table_prefix : 'phpbb_',
 			'backend'		=> $backend,		
 			'version'		=> $phpbbversion,
 			'acm_type'		=> isset($acm_type) ? $acm_type : '',
@@ -568,7 +1798,7 @@ class mx_backend
 			$db_type = str_replace('mysql', 'mysql4', $db_type);		
 		}	
 		return array(
-			'dbms'				=> $db_type, // 'mysql'
+			'dbms'			=> $db_type, // 'mysql'
 			'dbhost'			=> $db_server, // 'localhost';
 			'dbname'			=> $db_name, // 'smf';
 			'dbuser'			=> $db_user, // 'root';
@@ -604,7 +1834,7 @@ class mx_backend
 			install_die(GENERAL_ERROR, 'Configuration file ' . $mybb_config . ' couldn\'t be opened.');
 		}	
 		return array(
-			'dbms'				=> $config['database']['type'], // 'mysqli';
+			'dbms'			=> $config['database']['type'], // 'mysqli';
 			'dbname'			=> $config['database']['database'], // 'mybb';
 			'table_prefix'		=> $config['database']['table_prefix'], // 'mybb_';
 
@@ -779,11 +2009,15 @@ class mx_backend
 		{
 			case 'generate_login_logout_stats':
 
+				//Users Class Initialised ?
+				$username = isset($mx_user->data['username']) ? $mx_user->data['username'] : 'Anonymouse';
+				$user_id = isset($mx_user->data['user_id']) ? $mx_user->data['user_id'] : '1';
+				
 				if ( $userdata['session_logged_in'] )
 				{
 					$is_logged = true;
 					$u_login_logout = 'login.'.$phpEx.'?logout=true&amp;sid=' . $userdata['session_id'];
-					$l_login_logout = $lang['Logout'] . ' [ ' . $userdata['username'] . ' ]';
+					$l_login_logout = $lang['Logout'] . ' [ ' . $username . ' ]';
 				}
 				else
 				{
@@ -792,7 +2026,9 @@ class mx_backend
 					$l_login_logout = $lang['Login'];
 				}
 
-				$s_last_visit = ( $userdata['session_logged_in'] ) ? $phpBB2->create_date($board_config['default_dateformat'], $userdata['user_lastvisit'], $board_config['board_timezone']) : '';
+				//Internal Backend Check
+				$user_lastvisit = isset($userdata['user_lastvisit']) ? $userdata['user_lastvisit'] : time();
+				$s_last_visit = ( $userdata['session_logged_in'] ) ? $phpBB2->create_date($board_config['default_dateformat'], $user_lastvisit, $board_config['board_timezone']) : '';
 
 				//
 				// Obtain number of new private messages
@@ -800,7 +2036,9 @@ class mx_backend
 				//
 				if ( ($userdata['session_logged_in']) && (empty($gen_simple_header)) )
 				{
-					if ( $userdata['user_new_privmsg'] )
+					//Internal Backend does not have private messages in core
+					$user_new_privmsg = isset($userdata['user_new_privmsg']) ? $userdata['user_new_privmsg'] : '0';
+					if ( $user_new_privmsg )
 					{
 						$l_message_new = ( $userdata['user_new_privmsg'] == 1 ) ? $lang['New_pm'] : $lang['New_pms'];
 						$l_privmsgs_text = sprintf($l_message_new, $userdata['user_new_privmsg']);
@@ -834,7 +2072,9 @@ class mx_backend
 						$mx_priv_msg = $lang['Private_Messages'];
 					}
 
-					if ( $userdata['user_unread_privmsg'] )
+					//Internal Backend does not have private messages in core
+					$user_unread_privmsg = isset($userdata['user_unread_privmsg']) ? $userdata['user_unread_privmsg'] : '0';
+					if ( $user_unread_privmsg )
 					{
 						$l_message_unread = ( $userdata['user_unread_privmsg'] == 1 ) ? $lang['Unread_pm'] : $lang['Unread_pms'];
 						$l_privmsgs_text_unread = sprintf($l_message_unread, $userdata['user_unread_privmsg']);
@@ -1266,7 +2506,7 @@ class mx_backend
 	}
 
 	/**
-	 * Enter description here...
+	 * decode the IP.
 	 *
 	 * @param unknown_type $str_ip
 	 * @return unknown
@@ -1277,7 +2517,115 @@ class mx_backend
 		
 		return $phpBB2->decode_ip($str_ip);
 	}
+	
+	//
+	// Encode the IP from decimals into hexademicals
+	//
+	function encode_ip($dotquad_ip)
+	{
+		$ip_check = 4; //If is under 4 partial IP will be returned
+		$ip_sep = '';
+			
+		if (strpos($dotquad_ip, '::f') || strpos($dotquad_ip, '::F') || strpos($dotquad_ip, '::1'))
+		{
+			$dotquad_ip = '127.0.0.1';
+		}
+		
+		if (strpos($dotquad_ip, '.'))
+		{
+			$ip_sep = explode('.', $dotquad_ip);
+			return sprintf('%02x%02x%02x%02x', $ip_sep[0], $ip_sep[1], $ip_sep[2], $ip_sep[3]);
+		}
+		
+		//Recheck IP_SEP
+		if (strpos($dotquad_ip, '.'))
+		{
+			$ip_sep = implode('.', array_slice(explode('.', $dotquad_ip), 0, $ip_check));
+			return $ip_sep[0] . '.' . $ip_sep[1] . '.' . $ip_sep[2] . '.' . $ip_sep[3];
+		}	
+		
+		if (strpos($dotquad_ip, ':'))
+		{
+			$short_ipv6 = $this->short_ipv6($dotquad_ip, $ip_check);
+			
+		   if (preg_match('/^::(\S+\.\S+)$/', $short_ipv6, $match)) 
+		   {
+				$chunks = explode('.', $match[1]);
+				return $chunks[0] . '.' . $chunks[1] . '.' . $chunks[2] . '.' . $chunks[3];
+			} 	
+		}
+				
+		return $dotquad_ip;		
+	}	
+	
+	/**
+	* Normalises an internet protocol address,
+	* also checks whether the specified address is valid.
+	*
+	* IPv4 addresses are returned 'as is'.
+	*
+	* IPv6 addresses are normalised according to
+	*	A Recommendation for IPv6 Address Text Representation
+	*	http://tools.ietf.org/html/draft-ietf-6man-text-addr-representation-07
+	*
+	* @param string $address	IP address
+	*
+	* @return mixed		false if specified address is not valid,
+	*					string otherwise
+	*/
+	function ip_normalise(string $address)
+	{
+		$ip_normalised = false;
 
+		if (filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4))
+		{
+			$ip_normalised = $address;
+		}
+		else if (filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6))
+		{
+			$ip_normalised = (function_exists('inet_ntop') && function_exists('inet_pton')) ? @inet_ntop(@inet_pton($address)) : $address;
+
+			// If is ipv4
+			if (stripos($ip_normalised, '::ffff:') === 0)
+			{
+				$ip_normalised = substr($ip_normalised, 7);
+			}
+		}
+
+		return $ip_normalised;
+	}
+	
+	/** Borrowed from phpBB3
+	* Returns the first block of the specified IPv6 address and as many additional
+	* ones as specified in the length paramater.
+	* If length is zero, then an empty string is returned.
+	* If length is greater than 3 the complete IP will be returned
+	*/
+	function short_ipv6($ip, $length)
+	{
+		if ($length < 1)
+		{
+			return '';
+		}
+
+		// extend IPv6 addresses
+		$blocks = substr_count($ip, ':') + 1;
+		if ($blocks < 9)
+		{
+			$ip = str_replace('::', ':' . str_repeat('0000:', 9 - $blocks), $ip);
+		}
+		if ($ip[0] == ':')
+		{
+			$ip = '0000' . $ip;
+		}
+		if ($length < 4)
+		{
+			$ip = implode(':', @array_slice(explode(':', $ip), 0, 1 + $length));
+		}
+
+		return $ip;
+	}
+	
 	/**
 	 * Enter description here...
 	 *
@@ -1299,7 +2647,7 @@ class mx_backend
 	{
 		global $portal_config;
 
-		return PORTAL_BACKEND == $portal_config['portal_backend'];
+		return (PORTAL_BACKEND == $portal_config['portal_backend']) ? true : false;
 	}
 
 	/**

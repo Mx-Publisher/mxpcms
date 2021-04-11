@@ -16,31 +16,9 @@ if ( !defined('IN_PORTAL') )
 
 /**
  * Modifications:
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
-*/
- 
-/**
- * Disable bots
  *
+ * Class wrapper
+ * mx_dss_rand
  */
 class mx_nothing
 {
@@ -120,7 +98,7 @@ class session
 	 * @access public
 	 *
 	 */	
-	function session()
+	function __construct()
 	{
 		global $mx_cache, $board_config, $db, $phpbb_root_path, $mx_root_path, $phpEx;
 		global $mx_request_vars, $template, $language;
@@ -508,7 +486,7 @@ class session
 				OR ban_userid = $user_id";
 		if ( $user_id != ANONYMOUS )
 		{
-			$sql .= " OR ban_email LIKE  ". $userdata['user_email'];
+			//$sql .= " OR ban_email LIKE '" . str_replace("\'", "''", $userdata['user_email']) . "' OR ban_email LIKE '" . substr(str_replace("\'", "''", $userdata['user_email']), strpos(str_replace("\'", "''", $userdata['user_email']), "@")) . "'";
 		}
 		if ( !($result = $db->sql_query($sql)) )
 		{
@@ -1153,7 +1131,7 @@ class session
 	*/
 	function setup($lang_set = false, $style = false)
 	{
-		global $mx_cache, $template, $phpbb_auth, $phpEx, $phpbb_root_path, $mx_root_path;
+		global $phpBB2, $mx_cache, $template, $phpbb_auth, $phpEx, $phpbb_root_path, $mx_root_path;
 		global $mx_request_vars, $portal_config, $shared_lang_path; //added for mxp
 
 
@@ -1193,7 +1171,8 @@ class session
 		if (empty($board_config['script_path']))
 		{
 			$board_config = $mx_cache->obtain_config(false);
-		}		
+		}
+		
 		$board_config['avatar_gallery_path'] = isset($board_config['avatar_gallery_path']) ? $board_config['avatar_gallery_path'] : 'images/avatars'; 
 		$board_config['user_timezone'] = !empty($board_config['user_timezone']) ? $board_config['user_timezone'] : $board_config['board_timezone'];
 		$this->data['user_dst'] = !empty($this->data['user_dst']) ? $this->data['user_dst'] : $this->data['user_timezone'];
@@ -1255,7 +1234,7 @@ class session
 		}
 		else
 		{
-			$default_lang = phpbb_ltrim(basename(phpbb_rtrim($board_config['default_lang'])), "'");
+			$default_lang = $phpBB2->phpbb_ltrim(basename($phpBB2->phpbb_rtrim($board_config['default_lang'])), "'");
 		}
 		
 		// Shared phpBB2 lang files dir
@@ -1517,7 +1496,7 @@ class session
 		//Setup cloned template	as prosilver based for phpBB3 styles		
 		if( @file_exists(@phpbb_realpath($phpbb_root_path . $this->template_path . $this->template_name . '/style.cfg')) )
 		{
-			$cfg = parse_cfg_file($phpbb_root_path . $this->template_path . $this->template_name . '/style.cfg');
+			$cfg = mx_parse_cfg_file($phpbb_root_path . $this->template_path . $this->template_name . '/style.cfg');
 			$this->cloned_template_name = !empty($cfg['parent']) ? $cfg['parent'] : 'prosilver';
 			$this->cloned_template_path = $this->template_path . $this->cloned_template_name;			
 			$this->default_template_name = !empty($cfg['parent']) ? $cfg['parent'] : 'prosilver';
@@ -1544,7 +1523,7 @@ class session
 			if (!isset($parsed_array['filetime']) || (@filemtime($cfg_file) > $parsed_array['filetime']))
 			{
 				// Re-parse cfg file
-				$parsed_array = parse_cfg_file($cfg_file);		
+				$parsed_array = mx_parse_cfg_file($cfg_file);		
 				$parsed_array['filetime'] = @filemtime($cfg_file);				
 				$this->cache->put('_cfg_' . $this->template_path, $parsed_array);
 			}							
@@ -1559,7 +1538,7 @@ class session
 			{
 				if (!isset($parsed_array['filetime']) || (@filemtime($cfg_file) > $parsed_array['filetime']))
 				{				
-					$parsed_array = parse_cfg_file($cfg_file);		
+					$parsed_array = mx_parse_cfg_file($cfg_file);		
 					$parsed_array['filetime'] = @filemtime($cfg_file);
 					$this->cache->put('_cfg_' . $this->template_path, $parsed_array);				
 				}
@@ -1677,7 +1656,7 @@ class session
 		//		
 		if (@file_exists("{$phpbb_root_path}{$this->template_path}{$this->template_name}{$this->imageset_path}/imageset.cfg"))
 		{		
-			$cfg_data_imageset = parse_cfg_file("{$phpbb_root_path}{$this->template_path}{$this->template_name}{$this->imageset_path}/imageset.cfg");
+			$cfg_data_imageset = mx_parse_cfg_file("{$phpbb_root_path}{$this->template_path}{$this->template_name}{$this->imageset_path}/imageset.cfg");
 			
 			foreach ($cfg_data_imageset as $image_name => $value)
 			{
@@ -1727,7 +1706,7 @@ class session
 		//		
 		if (@file_exists("{$phpbb_root_path}{$this->template_path}{$this->template_name}{$this->imageset_path}{$this->img_lang}/imageset.cfg"))
 		{
-			$cfg_data_imageset_data = parse_cfg_file("{$phpbb_root_path}{$this->template_path}{$this->template_name}{$this->imageset_path}{$this->img_lang}/imageset.cfg");
+			$cfg_data_imageset_data = mx_parse_cfg_file("{$phpbb_root_path}{$this->template_path}{$this->template_name}{$this->imageset_path}{$this->img_lang}/imageset.cfg");
 			foreach ($cfg_data_imageset_data as $image_name => $value)
 			{
 				if (strpos($value, '*') !== false)
@@ -2444,26 +2423,26 @@ class session
 		// and be able to change the variables within code.
 		//
 		$nav_links['top'] = array (
-			'url' => append_sid($phpbb_root_path . 'index.' . $phpEx),
+			'url' => mx_append_sid($phpbb_root_path . 'index.' . $phpEx),
 			'title' => sprintf($lang['Forum_Index'], $board_config['sitename'])
 		);
 		$nav_links['search'] = array (
-			'url' => append_sid($phpbb_root_path . 'search.' . $phpEx),
+			'url' => mx_append_sid($phpbb_root_path . 'search.' . $phpEx),
 			'title' => $lang['Search']
 		);
 		$nav_links['help'] = array (
-			'url' => append_sid($phpbb_root_path . 'faq.' . $phpEx),
+			'url' => mx_append_sid($phpbb_root_path . 'faq.' . $phpEx),
 			'title' => $lang['FAQ']
 		);
 		$nav_links['author'] = array (
-			'url' => append_sid($phpbb_root_path . 'memberlist.' . $phpEx),
+			'url' => mx_append_sid($phpbb_root_path . 'memberlist.' . $phpEx),
 			'title' => $lang['Memberlist']
 		);
 
 		//
 		// Dummy include, to make all original phpBB functions available
-		//
-		include_once($phpbb_root_path . 'includes/functions.' . $phpEx); // In case we need old functions...
+		//include_once($phpbb_root_path . 'includes/functions.' . $phpEx); // In case we need old functions...
+		include_once($mx_root_path . 'includes/sessions/phpbb2/functions.' . $phpEx);
 
 		//
 		// Is phpBB File Attachment MOD present?
@@ -2530,7 +2509,7 @@ class session
 				// Do not alter this line!
 				//
 				@define(TEMPLATE_CONFIG, TRUE);
-				$cfg = parse_cfg_file($phpbb_root_path. $this->template_path . basename($this->template_name) . '/style.cfg');
+				$cfg = mx_parse_cfg_file($phpbb_root_path. $this->template_path . basename($this->template_name) . '/style.cfg');
 				
 				//		
 				// - First try phpBB2 then phpBB3 template lang images then old Olympus image sets
@@ -3112,7 +3091,7 @@ class session
 	protected function read_style_cfg($dir)
 	{
 		static $required = array('name', 'phpbb_version', 'copyright');
-		$cfg = parse_cfg_file($this->styles_path . $dir . '/style.cfg');
+		$cfg = mx_parse_cfg_file($this->styles_path . $dir . '/style.cfg');
 
 		// Check if it is a valid file
 		foreach ($required as $key)
@@ -4158,7 +4137,7 @@ class session
 			}			
 		}		
 		
-		$board_url = generate_board_url() . '/';
+		$board_url = mx_generate_board_url() . '/';
 		
 		if (isset($this->images[$img]))
 		{

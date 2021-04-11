@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: page_header.php,v 1.78 2014/05/16 18:02:06 orynider Exp $
+* @version $Id: page_header.php,v 3.78 2020/02/25 05:58:02 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
@@ -84,12 +84,20 @@ if(!isset($mx_cache) || !is_object($mx_cache))
 {
 	$cache = new mx_cache();
 }
-
-if(!isset($phpbb_auth) || !is_object($phpbb_auth))
+//
+if(!isset($phpbb_auth) || !is_object($phpbb_auth) || !isset($mx_auth) || !is_object($mx_auth))
 {
-	$phpbb_auth = new phpbb_auth();
+	// Instantiate the mx_auth class
+	if( class_exists('phpbb_auth'))
+	{
+		$mx_auth = $phpbb_auth = new phpbb_auth();
+		$phpbb_auth->acl($mx_user->data);
+	}
+	elseif( class_exists('mx_auth'))
+	{
+		$mx_auth = $phpbb_auth = new mx_auth();
+	}
 }
-$phpbb_auth->acl($mx_user->data);
 
 //
 // Load common language file from phpBB3
@@ -126,6 +134,8 @@ switch (PORTAL_BACKEND)
 {
 	case 'internal':
 	case 'mybb':
+		$phpbb_adm_relative_path = 'admin/';
+		$phpbb_admin_path = $mx_root_path . $phpbb_adm_relative_path;
 		//To do:
 	case 'smf2':
 		//To do:
@@ -151,7 +161,19 @@ switch (PORTAL_BACKEND)
 	case 'mybb':
 		//To do: Profile oe UCP Links for each backend.
 	case 'smf2':
+		//To do: Check this in sessions/phpbb2 comparing to sessions/internal
+		$u_login = mx_append_sid("login.".$phpEx);
 		
+		if (  ($mx_user->data['session_logged_in'] == true) )
+		{		
+			$u_login_logout = mx_append_sid('login.'.$phpEx.'?logout=true&sid=' . $mx_user->data['session_id']);
+			$l_login_logout = $lang['Logout'] . ' [ ' . $mx_user->data['username'] . ' ]';
+		}
+		else
+		{
+			$u_login_logout = mx_append_sid("login.".$phpEx);
+			$l_login_logout = $lang['Login'];
+		}		
 		$u_register = mx_append_sid('login.'.$phpEx.'?mode=register');
 		$u_profile = mx_append_sid('profile.'.$phpEx.'?mode=editprofile');
 		
@@ -164,9 +186,9 @@ switch (PORTAL_BACKEND)
 	break;
 
 	case 'phpbb2':
-	//To do: Check this in sessions/phpbb2 comparing to sessions/internal
+		//To do: Check this in sessions/phpbb2 comparing to sessions/internal
 		$u_login = mx_append_sid("login.".$phpEx);
-		if (  $mx_user->data['user_id'] != ANONYMOUS )
+		if ($mx_user->data['user_id'] != ANONYMOUS )
 		{
 			$u_login_logout = mx_append_sid('login.'.$phpEx.'?logout=true&sid=' . $mx_user->data['session_id']);
 			$l_login_logout = $lang['Logout'] . ' [ ' . $mx_user->data['username'] . ' ]';
@@ -188,7 +210,7 @@ switch (PORTAL_BACKEND)
 	break;
 	
 	case 'olympus':
-	//To do: Check this in sessions/phpbb2 comparing to sessions/internal
+		//To do: Check this in sessions/phpbb2 comparing to sessions/internal
 		$u_login = mx_append_sid("login.".$phpEx);
 		if ($mx_user->data['user_id'] != ANONYMOUS)
 		{
@@ -1014,11 +1036,20 @@ if (empty($portal_config['portal_status']))
 	$portal_config = $mx_cache->obtain_mxbb_config(false);
 }
 
+/**
+* Instantiate the mx_language class
+* $language->_load_lang($mx_root_path, 'lang_main');
+*/
+if (empty($language))
+{
+	$language = new mx_language();
+}
+
 $web_path = (empty($portal_config['portal_url'])) ? PORTAL_URL : $portal_config['portal_url'];
 $https_path = str_replace("http://", "https://", $web_path);
 $web_path = str_replace("https://", "http://", $web_path);
 
-$page_title = ((mb_strlen($lang[str_replace(' ', '_', $mx_page->page_title)]) !== 0) ? $lang[str_replace(' ', '_', $mx_page->page_title)] : $language->lang($mx_page->page_title));
+$page_title = isset($lang[str_replace(' ', '_', $mx_page->page_title)]) ? $lang[str_replace(' ', '_', $mx_page->page_title)] : $language->lang($mx_page->page_title);
 $page_desc = isset($lang[str_replace(' ', '_', $mx_page->page_desc)]) ? $lang[str_replace(' ', '_', $mx_page->page_desc)] : $language->lang($mx_page->page_desc);
 $sitename = isset($lang[str_replace(' ', '_', $board_config['sitename'])]) ? $lang[str_replace(' ', '_', $board_config['sitename'])] : $language->lang($board_config['sitename']); 
 $site_desc = isset($lang[str_replace(' ', '_', $board_config['site_desc'])]) ? $lang[str_replace(' ', '_', $board_config['site_desc'])] : $language->lang($board_config['site_desc']); 
@@ -1443,6 +1474,7 @@ if ($mx_page->auth_view || $mx_page->auth_mod)
 
 // Work around for "current" Apache 2 + PHP module which seems to not
 // cope with private cache control setting
+/*
 if (!empty($_SERVER['SERVER_SOFTWARE']) && strstr($_SERVER['SERVER_SOFTWARE'], 'Apache/2'))
 {
 	header ('Cache-Control: no-cache, pre-check=0, post-check=0');
@@ -1453,7 +1485,7 @@ else
 }
 header ('Expires: 0');
 header ('Pragma: no-cache');
-
+*/
 $icongif = 'favicon.gif';
 
 include_once($mx_root_path . 'mx_meta.inc');

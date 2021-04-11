@@ -1,0 +1,803 @@
+<!-- saved from url=(0022)http://internet.e-mail -->
+<html>
+<head>
+<title>Mx Portal installation - readme</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<!-- link rel="stylesheet" href="templates/subSilver/subSilver.css" type="text/css" -->
+<style type="text/css">
+<!--
+/*
+  The original subSilver Theme for phpBB version 2+
+  Created by subBlue design
+  http://www.subBlue.com
+
+  NOTE: These CSS definitions are stored within the main page body so that you can use the phpBB2
+  theme administration centre. When you have finalised your style you could cut the final CSS code
+  and place it in an external file, deleting this section to save bandwidth.
+*/
+
+/* General page style. The scroll bar colours only visible in IE5.5+ */
+body {
+	background-color: #E5E5E5;
+	scrollbar-face-color: #DEE3E7;
+	scrollbar-highlight-color: #FFFFFF;
+	scrollbar-shadow-color: #DEE3E7;
+	scrollbar-3dlight-color: #D1D7DC;
+	scrollbar-arrow-color:  #006699;
+	scrollbar-track-color: #EFEFEF;
+	scrollbar-darkshadow-color: #98AAB1;
+}
+
+/* General font families for common tags */
+font,th,td,p { font-family: Verdana, Arial, Helvetica, sans-serif }
+a:link,a:active,a:visited { color : #006699; }
+a:hover		{ text-decoration: underline; color : #DD6900; }
+hr	{ height: 0px; border: solid #D1D7DC 0px; border-top-width: 1px;}
+
+/* This is the border line & background colour round the entire page */
+.bodyline	{ background-color: #FFFFFF; border: 1px #98AAB1 solid; }
+
+/* This is the outline round the main forum tables */
+.forumline	{ background-color: #FFFFFF; border: 2px #006699 solid; }
+
+/* Main table cell colours and backgrounds */
+td.row1	{ background-color: #EFEFEF; }
+td.row2	{ background-color: #DEE3E7; }
+td.row3	{ background-color: #D1D7DC; }
+
+/*
+  This is for the table cell above the Topics, Post & Last posts on the index.php page
+  By default this is the fading out gradiated silver background.
+  However, you could replace this with a bitmap specific for each forum
+*/
+td.rowpic {
+		background-color: #FFFFFF;
+		background-image: url(templates/subSilver/images/cellpic2.jpg);
+		background-repeat: repeat-y;
+}
+
+/* Header cells - the blue and silver gradient backgrounds */
+th	{
+	color: #FFA34F; font-size: 11px; font-weight : bold;
+	background-color: #006699; height: 25px;
+	background-image: url(templates/subSilver/images/cellpic3.gif);
+}
+
+td.cat,td.catHead,td.catSides,td.catLeft,td.catRight,td.catBottom {
+			background-image: url(templates/subSilver/images/cellpic1.gif);
+			background-color:#D1D7DC; border: #FFFFFF; border-style: solid; height: 28px;
+}
+
+/*
+  Setting additional nice inner borders for the main table cells.
+  The names indicate which sides the border will be on.
+  Don't worry if you don't understand this, just ignore it :-)
+*/
+td.cat,td.catHead,td.catBottom {
+	height: 29px;
+	border-width: 0px 0px 0px 0px;
+}
+th.thHead,th.thSides,th.thTop,th.thLeft,th.thRight,th.thBottom,th.thCornerL,th.thCornerR {
+	font-weight: bold; border: #FFFFFF; border-style: solid; height: 28px;
+}
+td.row3Right,td.spaceRow {
+	background-color: #D1D7DC; border: #FFFFFF; border-style: solid;
+}
+
+th.thHead,td.catHead { font-size: 12px; border-width: 1px 1px 0px 1px; }
+th.thSides,td.catSides,td.spaceRow	 { border-width: 0px 1px 0px 1px; }
+th.thRight,td.catRight,td.row3Right	 { border-width: 0px 1px 0px 0px; }
+th.thLeft,td.catLeft	  { border-width: 0px 0px 0px 1px; }
+th.thBottom,td.catBottom  { border-width: 0px 1px 1px 1px; }
+th.thTop	 { border-width: 1px 0px 0px 0px; }
+th.thCornerL { border-width: 1px 0px 0px 1px; }
+th.thCornerR { border-width: 1px 1px 0px 0px; }
+
+/* The largest text used in the index page title and toptic title etc. */
+.maintitle	{
+	font-weight: bold; font-size: 22px; font-family: "Trebuchet MS",Verdana, Arial, Helvetica, sans-serif;
+	text-decoration: none; line-height : 120%; color : #000000;
+}
+
+/* General text */
+.gen { font-size : 12px; }
+.genmed { font-size : 11px; }
+.gensmall { font-size : 10px; }
+.gen,.genmed,.gensmall { color : #000000; }
+a.gen,a.genmed,a.gensmall { color: #006699; text-decoration: none; }
+a.gen:hover,a.genmed:hover,a.gensmall:hover	{ color: #DD6900; text-decoration: underline; }
+
+/* The register, login, search etc links at the top of the page */
+.mainmenu		{ font-size : 11px; color : #000000 }
+a.mainmenu		{ text-decoration: none; color : #006699;  }
+a.mainmenu:hover{ text-decoration: underline; color : #DD6900; }
+
+/* Forum category titles */
+.cattitle		{ font-weight: bold; font-size: 12px ; letter-spacing: 1px; color : #006699}
+a.cattitle		{ text-decoration: none; color : #006699; }
+a.cattitle:hover{ text-decoration: underline; }
+
+/* Forum title: Text and link to the forums used in: index.php */
+.forumlink		{ font-weight: bold; font-size: 12px; color : #006699; }
+a.forumlink 	{ text-decoration: none; color : #006699; }
+a.forumlink:hover{ text-decoration: underline; color : #DD6900; }
+
+/* Used for the navigation text, (Page 1,2,3 etc) and the navigation bar when in a forum */
+.nav			{ font-weight: bold; font-size: 11px; color : #000000;}
+a.nav			{ text-decoration: none; color : #006699; }
+a.nav:hover		{ text-decoration: underline; }
+
+/* titles for the topics: could specify viewed link colour too */
+.topictitle,h1,h2	{ font-weight: bold; font-size: 11px; color : #000000; }
+a.topictitle:link   { text-decoration: none; color : #006699; }
+a.topictitle:visited { text-decoration: none; color : #5493B4; }
+a.topictitle:hover	{ text-decoration: underline; color : #DD6900; }
+
+/* Name of poster in viewmsg.php and viewtopic.php and other places */
+.name			{ font-size : 11px; color : #000000;}
+
+/* Location, number of posts, post date etc */
+.postdetails		{ font-size : 10px; color : #000000; }
+
+/* The content of the posts (body of text) */
+.postbody { font-size : 12px; line-height: 18px}
+a.postlink:link	{ text-decoration: none; color : #006699 }
+a.postlink:visited { text-decoration: none; color : #5493B4; }
+a.postlink:hover { text-decoration: underline; color : #DD6900}
+
+/* Quote & Code blocks */
+.code {
+	font-family: Courier, 'Courier New', sans-serif; font-size: 11px; color: #006600;
+	background-color: #FAFAFA; border: #D1D7DC; border-style: solid;
+	border-left-width: 1px; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px
+}
+
+.quote {
+	font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px; color: #444444; line-height: 125%;
+	background-color: #FAFAFA; border: #D1D7DC; border-style: solid;
+	border-left-width: 1px; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px
+}
+
+/* Copyright and bottom info */
+.copyright		{ font-size: 10px; font-family: Verdana, Arial, Helvetica, sans-serif; color: #444444; letter-spacing: -1px;}
+a.copyright		{ color: #444444; text-decoration: none;}
+a.copyright:hover { color: #000000; text-decoration: underline;}
+
+/* Form elements */
+input,textarea, select {
+	color : #000000;
+	font: normal 11px Verdana, Arial, Helvetica, sans-serif;
+	border-color : #000000;
+}
+
+/* The text input fields background colour */
+input.post, textarea.post, select {
+	background-color : #FFFFFF;
+}
+
+input { text-indent : 2px; }
+
+/* The buttons used for bbCode styling in message post */
+input.button {
+	background-color : #EFEFEF;
+	color : #000000;
+	font-size: 11px; font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+
+/* The main submit button option */
+input.mainoption {
+	background-color : #FAFAFA;
+	font-weight : bold;
+}
+
+/* None-bold submit button */
+input.liteoption {
+	background-color : #FAFAFA;
+	font-weight : normal;
+}
+
+/* This is the line in the posting page which shows the rollover
+  help line. This is actually a text box, but if set to be the same
+  colour as the background no one will know ;)
+*/
+.helpline { background-color: #DEE3E7; border-style: none; }
+
+/* Import the fancy styles for IE only (NS4.x doesn't use the @import function) */
+@import url("templates/subSilver/formIE.css");
+-->
+</style>
+<script language="Javascript" type="text/javascript">
+<!--
+	if ( 0 )
+	{
+		window.open('privmsg.php?mode=newpm', '_phpbbprivmsg', 'HEIGHT=225,resizable=yes,WIDTH=400');;
+	}
+//-->
+</script>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<table>
+			<tr>
+				<td colspan="2"><span class="postbody"><a name="top"><span style="font-weight: bold"><span style="font-size: 18px; line-height: normal">[RELEASE]
+				      MX-Portal v 2.7.3</span></span><br />
+<span style="font-style: italic">New Year 2004 Milestone release - 3rd edition</span>
+<br />
+
+<br />
+This is the MX-Portal release and installation notes. Further portal information (i.e. roadmap, development, version history etc) is located <a href="http://www.mx-system.com/forum/viewtopic.php?t=2829" target="_blank" class="postlink"> here </a>.
+<br />
+
+<br />
+<span style="font-weight: bold"><span style="font-size: 14px; line-height: normal">Overview</span></span>
+<br />
+Mx system is a fully modular portal, for phpbb, while it uses integrated features it works without touching phpbb. Mx-system requires phpbb to run, and currently supports the mySQL and postresSQL databases. The system is still in development and as such may be unsuitable for novices.
+<br />
+
+<br />
+<a href="http://www.mx-system.com" target="_blank" class="postlink"> DEMO </a>
+<br />
+
+<br />
+Download <a href="http://www.mx-system.com/index.php?page=112&amp;action=category&amp;cat_id=3" target="_blank" class="postlink"> MX-Portal </a> / <a href="http://www.mx-system.com/index.php?page=112&amp;action=category&amp;cat_id=4" target="_blank" class="postlink"> Addon Modules </a>
+<br />
+
+<br />
+<span style="font-weight: bold"><span style="font-size: 14px; line-height: normal">Contents</span></span>
+<br />
+0. <a href="#features">MX Portal Features</a>
+<br />
+Ia. <a href="#install">Installation instructions</a>
+<br />
+Ib. <a href="#upgrade">Upgrade instructions</a>
+<br />
+II. <a href="#modules">Installing Addon modules</a>
+<br />
+III. <a href="#headers">How to syncronize the mx and phpBB overall_headers</a>
+<br />
+IV. <a href="#themes">Additional themes/styles</a>
+<br />
+V. <a href="#languages">Additional languages</a>
+<br />
+
+<br />
+<a name="features"><span style="font-size: 18px; line-height: normal"><span style="font-weight: bold">0. MX Portal features</span></span></a>
+<br />
+
+<br />
+- Easy to use and install web portal
+<br />
+- Intergrates smoothly with the popular <a href="http://www.phpbb.com" target="_blank" class="postlink"> phpbb forum</a>, without modifying any phpbb files
+<br />
+- Intuitive, yet advanced Portal Admin Panel
+<br />
+- Modular based approach with easy to use and install (and create) addon packages
+<br />
+- Portal defined "pages", referred to by pageid; featuring view/edit permissions based on user/group belongings and customizable overall_header file
+<br />
+- Page blocks compatible with phpbb themes, languages and permissions
+<br />
+- Categorized menu navigation defined by user rank
+<br />
+- Cache, for fast functionality 
+<br />
+- Support forum (<a href="http://www.mx-system.com" target="_blank" class="postlink">www.mx-system.com</a>)
+<br />
+
+<br />
+<span style="font-weight: bold">Included Modules in the Mx Portal - Core distribution</span>
+<br />
+- CORE Module (standard blocks)
+<br />
+- Last Message Module 
+<br />
+- Statistics Module
+<br />
+- Textblocks Module 
+<br />
+
+<br />
+<span style="font-weight: bold">Official Modules - addon packages</span>
+<br />
+Official Modules/Styles/Languages are released and supported <a href="http://www.mx-system.com/forum/viewforum.php?f=11" target="_blank" class="postlink">here</a>. 
+<br />
+
+<br />
+<span style="font-weight: bold">User contributed Modules</span>
+<br />
+User contributed Modules/Styles/Languages are released and supported  <a href="http://www.mx-system.com/forum/viewforum.php?f=10" target="_blank" class="postlink">here</a>.
+<br />
+
+<br />
+<span style="font-weight: bold">Requirements</span>
+<br />
+- PHP4+
+<br />
+- PHPBB 2.0x (latest version)
+<br />
+- MySQL or postresSQL Db's 
+<br />
+
+<br />
+Be sure to use the lastest phpbb, core and module releases, otherwise conflicts may occur!
+<br />
+<a href="#top">Back to Top</a>
+<br />
+
+<br />
+<a name="install">
+<br />
+<span style="font-size: 18px; line-height: normal"><span style="font-weight: bold">Ia. Installation Instructions</span></span>
+<br />
+</a>
+<br />
+
+<br />
+<span style="font-weight: bold">1)</span> The Mx Portal requires a working installation of PHPBB and will not run standalone. If  PHPBB is not installed on your system, please visit <a href="http://www.phpbb.com" target="_blank">www.phpbb.com</a> for further instructions. 
+<br />
+
+<br />
+Also, select the SubSilver theme and English language for your phpbb forum (admin and default) before installing the portal - otherwise the install script may behave incorrectly. 
+<br />
+
+<br />
+<span style="font-weight: bold">2)</span> The Mx Portal and phpBB forum is installed in <span style="font-style: italic">different </span>directories. Do not mix the files up!!
+<br />
+
+<br />
+<span style="font-style: italic">Default directory structure is:</span>
+<br />
+
+<br />
+MyDomain/[MY_FORUMNAME] (this is the place where your working PHPBB installation should be located)
+<br />
+MyDomain/[MY_PORTALNAME] (this is the place were all mx files should be located)
+<br />
+
+<br />
+Using this setup, the install path variables should be:
+<br />
+
+<br />
+PHPBB PATH: ../MY_FORUMNAME/
+<br />
+PORTAL URL:http://MyDomain/MY_PORTALNAME/
+<br />
+PHPBB URL:http://MyDomain/MY_FORUMNAME/
+<br />
+
+<br />
+<span style="font-style: italic">Note1</span>: If you move the phpbb installation to another folder, the phpbb configuration (phpbb2/config.php file) must also be modified to match the new phpbb location. This is done either in the Admin control panel and/or in the config.php file directly.
+<br />
+
+<br />
+<span style="font-style: italic">Note2</span>: phpBB and MX uses individual config.php files. Do not confuse them together!
+<br />
+
+<br />
+<span style="font-style: italic">Example 1:</span>
+<br />
+
+<br />
+MyDomain-root/(MX files...)
+<br />
+     /admin
+<br />
+     /DB
+<br />
+     /phpbb2 (this is the place where your working PHPBB installation should be located)
+<br />
+     /language
+<br />
+     /modules
+<br />
+     /templates
+<br />
+
+<br />
+<img src="http://www.mx-system.com/images/docs/explorer_subdir.gif">
+<br />
+
+<br />
+Using this setup, the install path variables should be:
+<br />
+
+<br />
+PHPBB PATH: phpbb2/
+<br />
+PORTAL URL:http://MyDomain/
+<br />
+PHPBB URL:http://MyDomain/phpbb2/
+<br />
+
+<br />
+<img src="http://www.mx-system.com/images/docs/installing_subdir.gif">
+<br />
+
+<br />
+<span style="font-style: italic">Note</span>: These are standard install paths, since they acknowledge the standard phpbb install directory (/phpbb2). No further changes are needed for the phpbb configuration.
+<br />
+
+<br />
+<span style="font-style: italic">Example 2:</span>
+<br />
+
+<br />
+ROOT/
+<br />
+
+<br />
+     /phpbb2 (this is the place where your working PHPBB installation should be located)
+<br />
+     /mx (this is the place where your mx installation should be located)
+<br />
+
+<br />
+
+<br />
+<img src="http://www.mx-system.com/images/docs/explorer_sidebyside.gif">
+<br />
+
+<br />
+Using this setup, the install path variables should be:
+<br />
+
+<br />
+PHPBB PATH: ../phpbb2/
+<br />
+PORTAL URL:http://MyDomain/mx/
+<br />
+PHPBB URL:http://MyDomain/phpbb2/
+<br />
+
+<br />
+<img src="http://www.mx-system.com/images/docs/installing_sidebyside.gif">
+<br />
+
+<br />
+<span style="font-style: italic">Note</span>: These are standard install paths, since they acknowledge the standard phpbb install directory (/phpbb2). No further changes are needed for the phpbb configuration.
+<br />
+
+<br />
+<span style="font-weight: bold">3)</span> Unzip the distributed MX-Portal files and upload
+<br />
+
+<br />
+<span style="font-style: italic">Special note</span>
+<br />
+MX needs write access to certain files/folders: mx_meta.inc and cache/
+<br />
+
+<br />
+## Create and CHMOD (0777) THE FOLLOWING DIRECTORIES: 
+<br />
+## - mxroot/cache/ 
+<br />
+## - mxroot/mx_meta.inc 
+<br />
+
+<br />
+<span style="font-weight: bold">4)</span> In your browser, call [PORTAL URL]/install/ and follow instructions.
+<br />
+
+<br />
+<span style="font-style: italic">Note</span>: The install script features a 'validate setup' option. Be sure all entries/settings all cleared (green) before installing! Do <span style="font-weight: bold">not</span> force an installation, unless you search for problems later on...
+<br />
+
+<br />
+<span style="font-style: italic">Note</span>: The install script creates/generates the MX config.php file. If for some reason the install fails, you may need to remove the created config.php manually before retrying install.
+<br />
+
+<br />
+<span style="font-style: italic">Note</span>: If you feel like doing a fresh reinstallation, you have to remove old mx config.php file, otherwise the script will try to update.
+<br />
+
+<br />
+Also, some webservers deny the script to create the config.php. In this case you need to first upload an empty config.php file to be udated by the install script. If this also fails the install script will send you the config.php file and you have to upload it manually.
+<br />
+
+<br />
+<span style="font-weight: bold">5)</span> Verify the main menu (navigation) configuration. If you have chosen a non-standard directory structure you must reconfigure certain menu options. This is done in the Admin Control Panel.
+<br />
+
+<br />
+<span style="font-weight: bold">6)</span> Don't forget to remove the install folder after successful installation! Otherwise this could mean a potential security hole...
+<br />
+
+<br />
+<span style="font-weight: bold">7)</span> Installation complete.
+<br />
+Now enter the portal adminCP and configure the portal. The user interface is intuitive. For further information, visit some of our docs/kbs at mx-system.com.
+<br />
+
+<br />
+<img src="http://www.mx-system.com/images/docs/adminCP_overview.gif">
+<br />
+
+<br />
+Note 1: In version 2.7 there's a new syntax for the Mx Portal config.php file. This may be of interest for those who want to edit this file directly...
+<br />
+
+<br />
+</span><table width="90%" cellspacing="1" cellpadding="3" border="0" align="center"><tr> 	  <td><span class="genmed"><b>Code:</b></span></td>	</tr>	<tr>	  <td class="code">&lt;?php
+<br />
+
+<br />
+&nbsp; //
+<br />
+&nbsp; // MX-Portal 2.x auto-generated config file
+<br />
+&nbsp; // 
+<br />
+&nbsp; //
+<br />
+
+<br />
+&nbsp; $mx_table_prefix = &quot;mx_&quot;;
+<br />
+
+<br />
+&nbsp; define&#40;'MX_INSTALLED', true&#41;;
+<br />
+&nbsp; 
+<br />
+&nbsp; $dbms = 'mysql';
+<br />
+
+<br />
+&nbsp; $dbhost = 'host';
+<br />
+&nbsp; $dbname = 'DBNAME';
+<br />
+&nbsp; $dbuser = 'DBUSER';
+<br />
+&nbsp; $dbpasswd = 'DBPASSWD';
+<br />
+
+<br />
+&nbsp; $table_prefix = 'phpbb_';
+<br />
+
+<br />
+&nbsp; define&#40;'PHPBB_INSTALLED', true&#41;;
+<br />
+
+<br />
+&nbsp; $phpbb_root_path = $mx_root_path . &quot;/forum/&quot;
+<br />
+
+<br />
+?&gt;</td>	</tr></table><span class="postbody">
+<br />
+
+<br />
+<a href="#top">Back to Top</a>
+<br />
+
+<br />
+<a name="upgrade">
+<br />
+<span style="font-size: 18px; line-height: normal"><span style="font-weight: bold">Ib. Upgrade Instructions</span></span>
+<br />
+</a>
+<br />
+Upgrading between v. 2.7xx versions are simple. Simply override your old files and run the install script. Remember, also upgrade all modules used.
+<br />
+
+<br />
+<span style="font-style: italic">Note:</span> If upgrading from mx 2.704, we have renamed most of the core images and moved them to the template's folder. This will affect nav images in the menu, and Page admin...you have to update image names manually!! There is a Photoshop template file in the MX Download area with all MX graphics if you want to develope your own styles.
+<br />
+<a href="#top">Back to Top</a>
+<br />
+
+<br />
+<a name="modules">
+<br />
+<span style="font-size: 18px; line-height: normal"><span style="font-weight: bold">II. Installing Addon Modules</span></span>
+<br />
+</a>
+<br />
+Official Modules are released <a href="http://www.mx-system.com/forum/viewforum.php?f=11" target="_blank" class="postlink">here</a>. Simply download a module pack, unzip it into the modules folder (see image below), and 'Import Module' from the Portal Module Administration Panel. For further instructions, see the install documentation for the module.
+<br />
+<a href="#top">Back to Top</a>
+<br />
+
+<br />
+<img src="http://www.mx-system.com/images/docs/setup_modules.gif">
+<br />
+
+<br />
+<a name="headers">
+<br />
+<span style="font-size: 18px; line-height: normal"><span style="font-weight: bold">III. How to syncronize the mx and phpBB overall_headers</span></span>
+<br />
+</a>
+<br />
+For flexibility, MX and phpBB use its own overall_header.tpl (and overall_footer.tpl), contained within each template theme's folder. If you want the same layout/feel when browsing between mx and phpbb, you need to edit the phpbb overall_header.
+<br />
+
+<br />
+<span style="font-style: italic">Note:</span> MX use the same overall_header syntax as phpbb, please be sure you understand the phpbb approach before trying to adapt MX using it.
+<br />
+
+<br />
+<span style="font-size: 14px; line-height: normal"><span style="font-weight: bold">Individual Headers</span></span>
+<br />
+The Portal and the Forum use individual (their own) headers and this is the default mode after installation. This means when browsing to a forum page the portal look and feel is replaced by the forum layout. Nothing further need to be done...
+<br />
+
+<br />
+<span style="font-size: 14px; line-height: normal"><span style="font-weight: bold">Editing the phpBB overall_header</span></span>
+<br />
+To get the mx header also for non-portal pages (i.e forum pages), you need to
+overwrite the <span style="font-style: italic">phpbb</span> overall_header.tpl with a modified mx overall_header.tpl. Such an example file is included in the contrib folder.
+<br />
+
+<br />
+Then you have to add some mx definitions in the phpBB page_header.php (required) and lang_main.php (optional) 
+<br />
+
+<br />
+OPEN phpbb/includes/page_header.php
+<br />
+
+<br />
+FIND
+<br />
+
+<br />
+</span><table width="90%" cellspacing="1" cellpadding="3" border="0" align="center"><tr> 	  <td><span class="genmed"><b>Code:</b></span></td>	</tr>	<tr>	  <td class="code">&nbsp; &nbsp;'U_GROUP_CP' =&gt; append_sid&#40;'groupcp.'.$phpEx&#41;,</td>	</tr></table><span class="postbody">
+<br />
+
+<br />
+AFTER ADD
+<br />
+
+<br />
+</span><table width="90%" cellspacing="1" cellpadding="3" border="0" align="center"><tr> 	  <td><span class="genmed"><b>Code:</b></span></td>	</tr>	<tr>	  <td class="code">//
+<br />
+// MX Definitions for syncronized overall_header
+<br />
+//
+<br />
+&nbsp; &nbsp;// Define the relative path to mx, eg ../mx/ or ../ or whatever
+<br />
+&nbsp; &nbsp;'MX_ROOT_PATH' =&gt; '../core/',
+<br />
+&nbsp; &nbsp;'TEMPLATE_ROOT_PATH' =&gt; 'templates/'.$theme&#91;'template_name'&#93;,
+<br />
+&nbsp; &nbsp;'L_FORUM' =&gt; $lang&#91;'Forum'&#93;, 
+<br />
+&nbsp; &nbsp;//
+<br />
+&nbsp; &nbsp;// Use either 'sitename' or manual definfition in lang_main for the home link text!
+<br />
+&nbsp; &nbsp;// Note&#58; if using $lang&#91;'Portal_home'&#93;, you have to add the entry in lang_main youself
+<br />
+&nbsp; &nbsp;// for example&#58;
+<br />
+&nbsp; &nbsp;// $lang&#91;'Portal_home'&#93; = 'Portal Home';
+<br />
+&nbsp; &nbsp;// before // That's all, Folks!
+<br />
+&nbsp; &nbsp;//
+<br />
+//&nbsp; &nbsp;'L_HOME'&nbsp; =&gt; $board_config&#91;'sitename'&#93;, 
+<br />
+&nbsp; &nbsp;'L_HOME'&nbsp; =&gt; $lang&#91;'Portal_home'&#93;, 
+<br />
+&nbsp; &nbsp;'U_INDEX_FORUM'&nbsp; &nbsp; =&gt; append_sid&#40; 'index.'.$phpEx . '?page=2'&#41;,
+<br />
+&nbsp; &nbsp;'U_INDEX' =&gt; append_sid&#40; 'index.'.$phpEx&#41;,
+<br />
+&nbsp; &nbsp;// Additional header links are defined accordinly
+<br />
+//
+<br />
+// END MX
+<br />
+//</td>	</tr></table><span class="postbody">
+<br />
+
+<br />
+If using the user defined L_HOME entry, add the lang def to lang_main (optional)
+<br />
+
+<br />
+OPEN phpbb/language/.../lang_main.php
+<br />
+
+<br />
+
+FIND
+<br />
+
+<br />
+</span><table width="90%" cellspacing="1" cellpadding="3" border="0" align="center"><tr> 	  <td><span class="genmed"><b>Code:</b></span></td>	</tr>	<tr>	  <td class="code">//
+<br />
+// That's all, Folks!</td>	</tr></table><span class="postbody">
+<br />
+
+<br />
+BEFORE ADD
+<br />
+
+<br />
+</span><table width="90%" cellspacing="1" cellpadding="3" border="0" align="center"><tr> 	  <td><span class="genmed"><b>Code:</b></span></td>	</tr>	<tr>	  <td class="code">// MX addon for syncronized overall_header
+<br />
+$lang&#91;'Portal_home'&#93; = 'Portal Home';</td>	</tr></table><span class="postbody">
+<br />
+
+<br />
+For further info on how to modify headers...consult our support forum. 
+<br />
+<a href="#top">Back to Top</a>
+<br />
+
+<br />
+<a name="themes">
+<br />
+<span style="font-size: 18px; line-height: normal"><span style="font-weight: bold">IV. Additional themes/styles</span></span>
+<br />
+</a>
+<br />
+Installed phpBB themes/templates may be used for MX too, but they also need to be installed for MX. Lets say you want to use a theme called 'Mytheme'.
+<br />
+
+<br />
+<span style="font-style: italic">Note:</span> MX use the same theme/style syntax as phpbb, please be sure you understand the phpbb approach before trying to adapt MX using it!
+<br />
+
+<br />
+- The theme/style 'Mytheme' (for example 'BlueSilver') must first be installed for phpbb (the forum). Visit <a href="http://www.phpbb.com" target="_blank">www.phpbb.com</a> for further instructions.
+<br />
+- Duplicate (copy and paste) the MxPortal/template/SubSilver directory and rename the directory 'Mytheme'.
+<br />
+- If you like to keep the Mx header, the header images are located in the template/Mytheme/images/ folder. These images may be replaced by your own to match your style.
+<br />
+- If you like to keep the PHPBB header, copy the PHPBB/overall_header.tpl and PHPBB/admin/page_header.tpl files to your own template folder, i.e. MxPortal/template/Mytheme.
+<br />
+Then edit the MyTheme/overall_header.tpl and Mytheme/admin/page_header.tpl files.
+<br />
+Search for "templates/subSilver/" and "../templates/subSilver/". Replace these paths with "{U_PHPBB_ROOT_PATH}{TEMPLATE_ROOT_PATH}"
+<br />
+- Make sure to change the css link in the overall_header.tpl file to 
+<br />
+</span><table width="90%" cellspacing="1" cellpadding="3" border="0" align="center"><tr> 	  <td><span class="genmed"><b>Code:</b></span></td>	</tr>	<tr>	  <td class="code">&lt;link rel=&quot;stylesheet&quot; href=&quot;&#123;U_PHPBB_ROOT_PATH&#125;&#123;TEMPLATE_ROOT_PATH&#125;&#123;T_HEAD_STYLESHEET&#125;&quot; type=&quot;text/css&quot;&gt;</td>	</tr></table><span class="postbody"> 
+<br />
+- Rename the *.css file to Mytheme.css (optional)
+<br />
+- Test the new template (theme/style).
+<br />
+<a href="#top">Back to Top</a>
+<br />
+
+<br />
+<a name="languages">
+<br />
+<span style="font-size: 18px; line-height: normal"><span style="font-weight: bold">V. Additional languages</span></span>
+<br />
+</a>
+<br />
+First check to see if your language is already translated. Translated languages are downloaded in the MX download area.
+<br />
+
+<br />
+If your language is not already translated, duplicate (copy and paste) the /language/english  directory, rename it to 'yourownlanguage', translate insluded files, save and upload. Be sure to report translated languages to us.
+<br />
+<a href="#top">Back to Top</a>
+<br />
+
+<br />
+Haplo and Drift 
+<br />
+<span style="font-style: italic">Project Leads 
+<br />
+and the rest of the Development team</span><br />
+<span class="gensmall"></span></p>
+    </td>
+			</tr>
+
+</table>
+</body>
+</html>

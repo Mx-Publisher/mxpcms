@@ -1,8 +1,8 @@
-ï»¿<?php
+<?php
 /***************************************************************************
  *                            lang_main.php [Chinese_Big5]
  *                              -------------------
- *			å°æ²™ç²’ç¹é«”åŒ– http://flash.to/greenboard
+ *			¤p¨F²ÉÁcÅé¤Æ http://flash.to/greenboard
  ****************************************************************************/
 
 //
@@ -21,46 +21,46 @@
 
 // Menu_nav.php
 
-$lang['Home Page']              = "é¦–é ";
-$lang['MX_home'] 				= "é¦–é ";
-$lang['MX_forum'] 				= "è«–å£‡";
+$lang['Home Page']              = "­º­¶";
+$lang['MX_home'] 				= "­º­¶";
+$lang['MX_forum'] 				= "½×¾Â";
 $lang['MX_navigation'] 			= 'Pages navigation, eg. forum navigation, like pafiledb navigation.';	
-$lang['Web Links']              = "è¯çµ";
-$lang['Edit your Profile']      = "å€‹äººè³‡æ–™";   
-$lang['Announcements']          = "å…¬å‘Š";   
-$lang['Send a new Ad']          = "ç™¼è¡¨å…¬å‘Š";
-$lang['Forum']                  = "è«–å£‡";
-$lang['Main Menu']              = "é¸å–®";
-$lang['Module Statistics']      = "è¨Žè«–å€çµ±è¨ˆè³‡æ–™"; 
-$lang['Send a Private message'] = "ç™¼é€æ–°çš„ç§äººè¨Šæ¯";
+$lang['Web Links']              = "Ápµ²";
+$lang['Edit your Profile']      = "­Ó¤H¸ê®Æ";   
+$lang['Announcements']          = "¤½§i";   
+$lang['Send a new Ad']          = "µoªí¤½§i";
+$lang['Forum']                  = "½×¾Â";
+$lang['Main Menu']              = "¿ï³æ";
+$lang['Module Statistics']      = "°Q½×°Ï²Î­p¸ê®Æ"; 
+$lang['Send a Private message'] = "µo°e·sªº¨p¤H°T®§";
 $lang['Submit a Url']           = "Submit a Url";      
 
-$lang['Portal_lang']          = "èªžç³»";
-$lang['SELECTGUILANG']        = "è«‹é¸æ“‡æ‚¨çš„èªžç³»:";
+$lang['Portal_lang']          = "»y¨t";
+$lang['SELECTGUILANG']        = "½Ð¿ï¾Ü±zªº»y¨t:";
 
 $lang['Change']="Change now"; 
 
-$lang['Welcome_Title']          = "æ­¡è¿Žä¾†åˆ°";
-$lang['Welcome_Msg']            = "æ­¡è¿Žå…§å®¹";
+$lang['Welcome_Title']          = "Åwªï¨Ó¨ì";
+$lang['Welcome_Msg']            = "Åwªï¤º®e";
 
-$lang['Theme']                  = "ä¸»é¡Œ";
-$lang['SelectTheme']            = "è«‹é¸æ“‡ä¸€å€‹æ‚¨å–œæ­¡çš„ä¸»é¡Œ:";
+$lang['Theme']                  = "¥DÃD";
+$lang['SelectTheme']            = "½Ð¿ï¾Ü¤@­Ó±z³ßÅwªº¥DÃD:";
 
-$lang['Surveys/Polls']          = "èª¿æŸ¥ / æŠ•é¸";
-$lang['Already_voted']          = "æ‚¨å·²ç¶“æŠ•éŽç¥¨äº†";
-$lang['Click_view_voted']       = "è«‹æŒ‰ %sé€™è£¡%s æŸ¥çœ‹æŠ•ç¥¨çµæžœ";
-$lang['Portal_admin']           = "å…¥å£ç¶²ç«™æŽ§åˆ¶å°";
-$lang['Portal_admin_explain']   = "åœ¨é€™è£¡ï¹æ‚¨å¯å¢žåŠ , æ’¤é™¤, ç·¨è¼¯, é‡æ•´å’Œèª¿è©¦æ‚¨çš„å…¥å£ç¶²ç«™";
+$lang['Surveys/Polls']          = "½Õ¬d / §ë¿ï";
+$lang['Already_voted']          = "±z¤w¸g§ë¹L²¼¤F";
+$lang['Click_view_voted']       = "½Ð«ö %s³o¸Ì%s ¬d¬Ý§ë²¼µ²ªG";
+$lang['Portal_admin']           = "¤J¤fºô¯¸±±¨î¥x";
+$lang['Portal_admin_explain']   = "¦b³o¸Ì¡M±z¥i¼W¥[, ºM°£, ½s¿è, ­«¾ã©M½Õ¸Õ±zªº¤J¤fºô¯¸";
 
-$lang['Annonce_sent']           = "æ‚¨çš„å…¬å‘Šç¶“å·²ç™¼è¡¨äº†";
-$lang['Annonce_Deleted']        = "æ‚¨çš„å…¬å‘Šç¶“å·²æ’¤é™¤äº†";
+$lang['Annonce_sent']           = "±zªº¤½§i¸g¤wµoªí¤F";
+$lang['Annonce_Deleted']        = "±zªº¤½§i¸g¤wºM°£¤F";
 
-$lang['Welcome_msg_send']       = "æ‚¨çš„æ­¡è¿Žè©žç¶“å·²ç™¼è¡¨äº†";
-$lang['Edit_Welcome_msg']       = "ç·¨è¼¯æ‚¨çš„æ­¡è¿Žè©ž";
+$lang['Welcome_msg_send']       = "±zªºÅwªïµü¸g¤wµoªí¤F";
+$lang['Edit_Welcome_msg']       = "½s¿è±zªºÅwªïµü";
 
-$lang['Url_sent']               = "æ‚¨çš„ç¶²å€ç¶“å·²ç™¼è¡¨äº†";
-$lang['Url_Deleted']            = "æ‚¨çš„ç¶²å€ç¶“å·²æ’¤é™¤äº†";
-$lang['Submit Url']             = "åŠ å…¥è¯çµ";   
+$lang['Url_sent']               = "±zªººô§}¸g¤wµoªí¤F";
+$lang['Url_Deleted']            = "±zªººô§}¸g¤wºM°£¤F";
+$lang['Submit Url']             = "¥[¤JÁpµ²";   
 
 //
 // That's all Folks!

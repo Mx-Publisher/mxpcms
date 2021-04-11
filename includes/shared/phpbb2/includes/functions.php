@@ -38,7 +38,7 @@ class phpBB2
 	protected $module_root_path;		
 	protected $phpbb_root_path;		
 	
-	public function phpBB2()
+	public function __construct()
 	{
 		global $template, $mx_user, $db, $mx_cache, $mx_request_vars, $board_config, $phpEx, $phpbb_root_path, $mx_root_path, $module_root_path;		
 			
@@ -2705,7 +2705,7 @@ class phpBB2
 		}
 
 		// Zone offset
-		$zone_offset = $mx_user->timezone + $mx_user->dst;
+		$zone_offset = (float) $mx_user->timezone + (int) $mx_user->dst;
 		
 		// Show date <= 1 hour ago as 'xx min ago' but not greater than 60 seconds in the future
 		// A small tolerence is given for times in the future but in the same minute are displayed as '< than a minute ago'
@@ -2917,7 +2917,7 @@ class phpBB2
 
 				for($i = $total_pages - 2; $i < $total_pages + 1; $i++)
 				{
-					$page_string .= ( $i == $on_page ) ? '<strong>' . $i . '</strong>'  : '<a href="' . mx_append_sid($base_url . "&amp;start=" . ( ( $i - 1 ) * $per_page ) ) . '">' . $i . '</a>';
+					$page_string .= ( $i == $on_page ) ? '<strong>' . $i . '</strong>'  : '<a href="' . $this->append_sid($base_url . "&amp;start=" . ( ( $i - 1 ) * $per_page ) ) . '">' . $i . '</a>';
 					if( $i <  $total_pages )
 					{
 						$page_string .= ", ";
@@ -2929,7 +2929,7 @@ class phpBB2
 		{
 			for($i = 1; $i < $total_pages + 1; $i++)
 			{
-				$page_string .= ( $i == $on_page ) ? '<strong>' . $i . '</strong>' : '<a href="' . mx_append_sid($base_url . "&amp;start=" . ( ( $i - 1 ) * $per_page ) ) . '">' . $i . '</a>';
+				$page_string .= ( $i == $on_page ) ? '<strong>' . $i . '</strong>' : '<a href="' . $this->append_sid($base_url . "&amp;start=" . ( ( $i - 1 ) * $per_page ) ) . '">' . $i . '</a>';
 				if ( $i <  $total_pages )
 				{
 					$page_string .= ', ';
@@ -2946,7 +2946,7 @@ class phpBB2
 
 			if ($on_page < $total_pages)
 			{
-				$page_string .= '&nbsp;&nbsp;<a href="' . mx_append_sid($base_url . "&amp;start=" . ($on_page * $per_page)) . '">' . $lang['Next'] . '</a>';
+				$page_string .= '&nbsp;&nbsp;<a href="' . $this->append_sid($base_url . "&amp;start=" . ($on_page * $per_page)) . '">' . $lang['Next'] . '</a>';
 			}
 
 		}

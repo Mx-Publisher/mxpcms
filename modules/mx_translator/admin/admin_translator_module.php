@@ -37,7 +37,7 @@ if ( !empty( $setmodules))
  */
 @define('IN_ADMIN', 1); 
 $phpEx = substr( __FILE__, strrpos( __FILE__, '.') + 1);
-if (!defined('PHP_EXT')) define('PHP_EXT', $phpEx);
+if (!defined('$php_ext')) define('$php_ext', $phpEx);
 $lang = array();
 $no_page_header = '';
 require_once($mx_root_path . 'admin/pagestart.' . $phpEx);

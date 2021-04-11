@@ -93,7 +93,6 @@ $cookie_states = !empty($_COOKIE[$cookie_tmp]) ? explode(",", $_COOKIE[$cookie_t
 // --------------------------------------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------------------------------------
-
 //
 // Start page proper
 //
@@ -103,57 +102,9 @@ $template->set_filenames(array( 'body' => 'admin/mx_module_admin_body.tpl') );
 // Define some graphics
 //
 $module_nav_icon_url = PORTAL_URL . $images['mx_graphics']['admin_icons'] . '/';
-
 $admin_icon['contract'] = $module_nav_icon_url . 'contract.gif';
 $admin_icon['expand'] = $module_nav_icon_url . 'expand.gif';
 $admin_icon['module'] = $module_nav_icon_url . 'icon_module.gif';
-$admin_icon['function'] = $module_nav_icon_url . 'icon_function.gif';
-$admin_icon['parameter'] = $module_nav_icon_url . 'icon_parameter.gif';
-$admin_icon['block'] = $module_nav_icon_url . 'icon_block.gif';
-
-$admin_icon['edit_block'] = $module_nav_icon_url . 'icon_edit.gif';
-
-if (mx_file_exists($mx_root_path . $images['mx_graphics']['admin_icons'] . '/'.'icon_edit.gif'))
-{
-	$button_edit_block_img = '<img src="'.$admin_icon["edit_block"].'" align="absmiddle" />';
-}
-else
-{
-	$button_edit_block_img = '';
-}
-
-$admin_icon['upgrade_block'] = $module_nav_icon_url . 'icon_upgrade.gif';
-
-if (mx_file_exists($mx_root_path . $images['mx_graphics']['admin_icons'] . '/'.'icon_upgrade.gif'))
-{
-	$button_upgrade_block_img = '<img src="'.$admin_icon["upgrade_block"].'" align="absmiddle" />';
-}
-else
-{
-	$button_upgrade_block_img = '';
-}
-
-$admin_icon['export_block'] = $module_nav_icon_url . 'icon_export.gif';
-
-if (mx_file_exists($mx_root_path . $images['mx_graphics']['admin_icons'] . '/'.'icon_export.gif'))
-{
-	$button_export_block_img = '<img src="'.$admin_icon["export_block"].'" align="absmiddle" />';
-}
-else
-{
-	$button_export_block_img = '';
-}
-
-$admin_icon['delete_block'] = $module_nav_icon_url . 'icon_delete.gif';
-
-if (mx_file_exists($mx_root_path . $images['mx_graphics']['admin_icons'] . '/'.'icon_delete.gif'))
-{
-	$button_delete_block_img = '<img src="'.$admin_icon['delete_block'].'" align="absmiddle" />';
-}
-else
-{
-	$button_delete_block_img = '';
-}
 
 //
 // Install module
@@ -211,20 +162,7 @@ $template->assign_vars(array(
 
 	'IMG_URL_CONTRACT' => $admin_icon['contract'],
 	'IMG_URL_EXPAND' => $admin_icon['expand'],
-
-	'IMG_ICON_EDIT_BLOCK' => $admin_icon['edit_block'],
-	'IMG_EDIT_BLOCK' => $button_edit_block_img,
-	'IMG_ICON_UPDRADE' => $admin_icon['upgrade_block'],
-	'IMG_UPDRADE_BLOCK' => $button_upgrade_block_img,
-	'IMG_ICON_EXPORT' => $admin_icon['export_block'],
-	'IMG_EXPORT_BLOCK' => $button_export_block_img,
-	'IMG_ICON_DELETE' => $admin_icon['delete_block'],
-	'IMG_DELETE_BLOCK' => $button_delete_block_img,
-
 	'IMG_ICON_MODULE' => $admin_icon['module'],
-	'IMG_ICON_FUNCTION' => $admin_icon['function'],
-	'IMG_ICON_PARAMETER' => $admin_icon['parameter'],
-	'IMG_ICON_BLOCK' => $admin_icon['block'],
 
 	'S_HIDDEN_FIELDS_MODULE' => $s_hidden_fields_module,
 	'S_SUBMIT' => $lang['Update'],

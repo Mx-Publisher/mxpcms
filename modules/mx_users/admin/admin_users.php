@@ -325,45 +325,14 @@ if ( $mode == 'edit' || $mode == 'add' || $mode == 'save' && $mx_request_vars->i
 			//
 			if($password != $password_confirm)
 			{
-				$error = true;
+				$error = TRUE;
 				$error_msg .= ( ( isset($error_msg) ) ? '<br />' : '' ) . $lang['Password_mismatch'];
 			}
 			else
 			{
-				/**/
-				switch ($portal_config['portal_backend'])
-				{
-					case 'internal':
-					case 'smf2': 
-					case 'mybb': 
-						// These are the additional vars able to be specified
-						$password = md5($password);
-						$passwd_sql = "user_password = '$password', ";
-						$passwd_sql_add = $password;
-					break;
-
-					case 'phpbb2':
-						// These are the additional vars able to be specified
-						$password = htmlspecialchars(stripslashes($password));
-						$password = md5($password);
-						$passwd_sql = "user_password = '$password', ";
-						$passwd_sql_add = md5($password_old_format);
-					break;
-
-					case 'phpbb3': 
-					case 'olympus': 
-					case 'ascraeus':
-					case 'rhea':
-					case 'proteus':
-					case 'phpbb4':
-						// These are the additional vars able to be specified
-						$password = md5($password);
-						$passwd_sql = "user_password = '$password', ";
-						$passwd_sql_add = $password;
-					break;
-
-				}
-				/**/
+				$password = md5($password);
+				$passwd_sql = "user_password = '$password', ";
+				$passwd_sql_add = "'$password'";
 			}
 		}
 		else if( $password && !$password_confirm )
@@ -375,11 +344,6 @@ if ( $mode == 'edit' || $mode == 'add' || $mode == 'save' && $mx_request_vars->i
 		{
 			$error = TRUE;
 			$error_msg .= ( ( isset($error_msg) ) ? '<br />' : '' ) . $lang['Password_mismatch'];
-		}
-		else if ( strlen($password) > 32 )
-		{
-			$error = TRUE;
-			$error_msg .= ( ( isset($error_msg) ) ? '<br />' : '' ) . $lang['Password_long'];
 		}
 		else if( $action == 'do_add' ) // New user must have password
 		{
@@ -393,7 +357,7 @@ if ( $mode == 'edit' || $mode == 'add' || $mode == 'save' && $mx_request_vars->i
 		if( !$error )
 		{
 			$email_sql = "'" . str_replace("\'", "''", $email) . "'";
-
+			
 			if ($action == 'do_add')
 			{
 				$sql = "SELECT MAX(user_id) AS total
@@ -402,328 +366,15 @@ if ( $mode == 'edit' || $mode == 'add' || $mode == 'save' && $mx_request_vars->i
 				{
 					mx_message_die(GENERAL_ERROR, 'Could not obtain next user_id information', '', __LINE__, __FILE__, $sql);
 				}
-
+				
 				if ( !($row = $db->sql_fetchrow($result)) )
 				{
 					mx_message_die(GENERAL_ERROR, 'Could not obtain next user_id information', '', __LINE__, __FILE__, $sql);
 				}
-
 				$user_id = $row['total'] + 1;
-
-				/*
+				
 				$sql = "INSERT INTO " . USERS_TABLE . " (user_id, username, user_password, user_email, user_active, user_regdate, user_level)
 					VALUES ($user_id, $username_sql_add, $passwd_sql_add, $email_sql, $user_status, '".time()."', $user_admin)";
-				*/
-				$username_sql_add = stripslashes($username);
-				$email_sql = stripslashes($email);
-				$sql_ary = array(
-					'user_id'				=> $user_id,
-					'username'			=> $username_sql_add,
-					'user_active'			=> $user_status,
-					'user_newpasswd'	=> '',
-					'user_password'	=> (isset($passwd_sql_add)) ? $passwd_sql_add : '',
-					'user_email'			=> strtolower($email_sql),
-					'user_regdate'		=> time(),
-				);
-
-				if (isset($mx_user->data['username_clean']))
-				{
-					//print('<p><span style="color: red;"></span></p><i><p>Refreshing the users table!</p></i>');
-					//$db_tools->sql_column_add(USERS_TABLE, 'username_clean', array('column_type_sql' => 'varchar(255)', 'null' => 'NOT NULL', 'default' => '', 'after' => 'username'), false);
-					$sql_ary['username_clean']	= utf8_clean_string($username_sql_add);
-				}
-
-				if (isset($mx_user->data['user_level']))
-				{
-					//print('<p><span style="color: red;"></span></p><i><p>Refreshing the users table!</p></i>');
-					//$db_tools->sql_column_add(USERS_TABLE, 'user_level', array('column_type_sql' => 'tinyint(2)', 'null' => 'NOT NULL', 'default' => '0', 'after' => 'user_level'), false);
-					$sql_ary['user_level']	= $user_admin;
-				}
-
-				if (isset($mx_user->data['group_id']))
-				{
-					//print('<p><span style="color: red;"></span></p><i><p>Refreshing the users table!</p></i>');
-					//$db_tools->sql_column_add(USERS_TABLE, 'group_id', array('column_type_sql' => 'tinyint(2)', 'null' => 'NOT NULL', 'default' => '0', 'after' => 'group_id'), false);
-					if (($user_admin = 1) && ($user_status= 1))
-					{
-						$sql_ary['group_id'] = $mx_backend->get_group_id('ADMINISTRATORS');
-					}
-					
-					if (($user_admin= 0) && ($user_status = 1))
-					{
-						$sql_ary['group_id'] = $mx_backend->get_group_id('REGISTERED');
-					}
-					
-					if (($user_admin = 0) && ($user_status = 0))
-					{
-						$sql_ary['group_id'] = $mx_backend->get_group_id('REGISTERED_COPPA');
-					}
-				}
-
-				if (isset($mx_user->data['user_type']))
-				{
-					//print('<p><span style="color: red;"></span></p><i><p>Refreshing the users table!</p></i>');
-					//$db_tools->sql_column_add(USERS_TABLE, 'user_type', array('column_type_sql' => 'tinyint(2)', 'null' => 'NOT NULL', 'default' => '0', 'after' => 'user_id'), false);
-					if (($user_admin = 1) && ($user_status= 1))
-					{
-						$sql_ary['user_type'] = 3;
-					}
-					
-					if (($user_admin= 0) && ($user_status = 1))
-					{
-						$sql_ary['user_type'] = 0;
-					}
-					
-					if (($user_admin = 0) && ($user_status = 0))
-					{
-						$sql_ary['user_type'] = 1; //or 2
-					}
-				}
-				
-				if (isset($mx_user->data['user_type']))
-				{
-					//print('<p><span style="color: red;"></span></p><i><p>Refreshing the users table!</p></i>'
-					$sql_ary['user_email_hash']	= mx_email_hash($email_sql);
-				}
-				
-				if (isset($mx_user->data['user_permissions']))
-				{
-					$sql_ary['user_permissions']	= '';
-				}
-				
-				//Gost permisions
-				if (isset($mx_user->data['user_perm_from']))
-				{
-					$sql_ary['user_perm_from'] = $mx_user->data['user_id'];
-				}
-				
-				if (isset($mx_user->data['user_passchg']))
-				{
-					$sql_ary['user_passchg'] = time();
-				}
-				
-				if (isset($mx_user->data['user_lastmark']))
-				{
-					$sql_ary['user_lastmark']	= time();
-				}
-				
-				if (isset($mx_user->data['is_bot']))
-				{
-					$sql_ary['is_bot']	= 0;
-				}
-				
-				if (isset($mx_user->data['is_mobile']))
-				{
-					$sql_ary['is_mobile']	= $mx_user->data['is_mobile'];
-				}
-				
-				if (isset($mx_user->data['device_name']))
-				{
-					$sql_ary['device_name']	= $mx_user->data['device_name'];
-				}
-				
-				if (isset($mx_user->data['user_inactive_reason']))
-				{
-					$sql_ary['user_inactive_reason']	= $mx_user->data['user_inactive_reason'];
-				}
-				
-				if (isset($mx_user->data['user_inactive_time']))
-				{
-					$sql_ary['user_inactive_time']	= 0;
-				}
-				
-				/* */
-				switch ($portal_config['portal_backend'])
-				{
-					case 'internal':
-					case 'smf2': 
-					case 'mybb': 
-						// These are the additional vars able to be specified
-						$additional_vars = array(
-							//phpbb2/'user_permissions'	=> '',
-							//phpbb2/'user_timezone'		=> $board_config['board_timezone'],
-							//phpbb2/'user_dateformat'	=> $board_config['default_dateformat'],
-							//phpbb2/'user_lang'			=> $board_config['default_lang'],
-							//phpbb2/'user_style'		=> (int) $board_config['default_style'],
-							//phpbb2/'user_actkey'		=> '',
-							//'user_ip'			=> $user_row['user_ip'],
-							//'user_regdate'		=> time(),
-							//'user_passchg'		=> time(),
-							//'user_options'		=> 230271,
-							// We do not set the new flag here - registration scripts need to specify it
-							//'user_new'			=> 0,
-
-							//'user_inactive_reason'	=> 0,
-							//'user_inactive_time'	=> 0,
-							//'user_lastmark'			=> time(),
-							//'user_lastvisit'		=> 0,
-							//phpbb3/'user_lastpost_time'	=> 0,
-							//'user_lastpage'			=> '',
-							//phpbb2/'user_posts'			=> 0,
-							//'user_colour'			=> '',
-							//phpbb2/'user_avatar'			=> '',
-							//phpbb2/'user_avatar_type'		=> AVATAR_UPLOAD,
-							//'user_avatar_width'		=> 0,
-							//'user_avatar_height'	=> 0,
-							//phpbb2/'user_new_privmsg'		=> 0,
-							//phpbb2/'user_unread_privmsg'	=> 0,
-							//phpbb2/'user_last_privmsg'		=> 0,
-							//phpbb3/'user_message_rules'	=> 0,
-							//phpbb3/'user_full_folder'		=> PRIVMSGS_NO_BOX,
-							//phpbb2/'user_emailtime'		=> 0,
-
-							//phpbb2/'user_notify'			=> 0,
-							//phpbb2/'user_notify_pm'		=> 1,
-							//phpbb3/'user_notify_type'		=> NOTIFY_EMAIL,
-							//phpbb2/'user_allow_pm'			=> 1,
-							//'user_allow_viewonline'	=> 1,
-							//phpbb2/'user_allow_viewemail'	=> 1,
-							//'user_allow_massemail'	=> 1,
-
-							//'user_sig'					=> '',
-							//'user_sig_bbcode_uid'		=> '',
-							//'user_sig_bbcode_bitfield'	=> '1111111111111',
-
-							//'user_form_salt'			=> mx_unique_id(),
-						);
-					break;
-
-					case 'phpbb2':
-						// These are the additional vars able to be specified
-						$additional_vars = array(
-							//phpbb2/'user_permissions'	=> '',
-							//phpbb2/'user_timezone'		=> $board_config['board_timezone'],
-							//phpbb2/'user_dateformat'	=> $board_config['default_dateformat'],
-							//phpbb2/'user_lang'			=> $board_config['default_lang'],
-							//phpbb2/'user_style'		=> (int) $board_config['default_style'],
-							//phpbb2/'user_actkey'		=> '',
-							//'user_ip'			=> $user_row['user_ip'],
-							//'user_regdate'		=> time(),
-							//'user_passchg'		=> time(),
-							//'user_options'		=> 230271,
-							// We do not set the new flag here - registration scripts need to specify it
-							//'user_new'			=> 0,
-
-							//'user_inactive_reason'	=> 0,
-							//'user_inactive_time'	=> 0,
-							//'user_lastmark'			=> time(),
-							//'user_lastvisit'		=> 0,
-							//phpbb3/'user_lastpost_time'	=> 0,
-							//'user_lastpage'			=> '',
-							//phpbb2/'user_posts'			=> 0,
-							//'user_colour'			=> '',
-							//phpbb2/'user_avatar'			=> '',
-							//phpbb2/'user_avatar_type'		=> AVATAR_UPLOAD,
-							//'user_avatar_width'		=> 0,
-							//'user_avatar_height'	=> 0,
-							//phpbb2/'user_new_privmsg'		=> 0,
-							//phpbb2/'user_unread_privmsg'	=> 0,
-							//phpbb2/'user_last_privmsg'		=> 0,
-							//phpbb3/'user_message_rules'	=> 0,
-							//phpbb3/'user_full_folder'		=> PRIVMSGS_NO_BOX,
-							//phpbb2/'user_emailtime'		=> 0,
-
-							//phpbb2/'user_notify'			=> 0,
-							//phpbb2/'user_notify_pm'		=> 1,
-							//phpbb3/'user_notify_type'		=> NOTIFY_EMAIL,
-							//phpbb2/'user_allow_pm'			=> 1,
-							//'user_allow_viewonline'	=> 1,
-							//phpbb2/'user_allow_viewemail'	=> 1,
-							//'user_allow_massemail'	=> 1,
-
-							//'user_sig'					=> '',
-							//'user_sig_bbcode_uid'		=> '',
-							//'user_sig_bbcode_bitfield'	=> '1111111111111',
-
-							//'user_form_salt'			=> mx_unique_id(),
-						);
-					break;
-
-					case 'phpbb3': 
-					case 'olympus': 
-					case 'ascraeus':
-					case 'rhea':
-					case 'proteus':
-					case 'phpbb4':
-						// These are the additional vars able to be specified
-						$additional_vars = array(
-							//phpbb2/'user_permissions'	=> '',
-							//phpbb2/'user_timezone'		=> $board_config['board_timezone'],
-							//phpbb2/'user_dateformat'	=> $board_config['default_dateformat'],
-							//phpbb2/'user_lang'			=> $board_config['default_lang'],
-							//phpbb2/'user_style'		=> (int) $board_config['default_style'],
-							//phpbb2/'user_actkey'		=> '',
-							'user_ip'			=> $user_row['user_ip'],
-							'user_regdate'		=> time(),
-							'user_passchg'		=> time(),
-							'user_options'		=> 230271,
-							// We do not set the new flag here - registration scripts need to specify it
-							'user_new'			=> 0,
-
-							'user_inactive_reason'	=> 0,
-							'user_inactive_time'	=> 0,
-							'user_lastmark'			=> time(),
-							'user_lastvisit'		=> 0,
-							//phpbb3/'user_lastpost_time'	=> 0,
-							'user_lastpage'			=> '',
-							//phpbb2/'user_posts'			=> 0,
-							'user_colour'			=> '',
-							//phpbb2/'user_avatar'			=> '',
-							//phpbb2/'user_avatar_type'		=> AVATAR_UPLOAD,
-							'user_avatar_width'		=> 0,
-							'user_avatar_height'	=> 0,
-							//phpbb2/'user_new_privmsg'		=> 0,
-							//phpbb2/'user_unread_privmsg'	=> 0,
-							//phpbb2/'user_last_privmsg'		=> 0,
-							//phpbb3/'user_message_rules'	=> 0,
-							//phpbb3/'user_full_folder'		=> PRIVMSGS_NO_BOX,
-							//phpbb2/'user_emailtime'		=> 0,
-
-							//phpbb2/'user_notify'			=> 0,
-							//phpbb2/'user_notify_pm'		=> 1,
-							//phpbb3/'user_notify_type'		=> NOTIFY_EMAIL,
-							//phpbb2/'user_allow_pm'			=> 1,
-							'user_allow_viewonline'	=> 1,
-							//phpbb2/'user_allow_viewemail'	=> 1,
-							'user_allow_massemail'	=> 1,
-
-							'user_sig'					=> '',
-							'user_sig_bbcode_uid'		=> '',
-							'user_sig_bbcode_bitfield'	=> '1111111111111',
-
-							'user_form_salt'			=> mx_unique_id(),
-						);
-					break;
-
-				}
-				/**/
-
-				// Now fill the sql array with not required variables
-				foreach ($additional_vars as $key => $default_value)
-				{
-					$sql_ary[$key] = (isset($user_row[$key])) ? $user_row[$key] : $default_value;
-				}
-
-				// Any additional variables in $user_row not covered above?
-				$remaining_vars = array_diff(array_keys($user_row), array_keys($sql_ary));
-
-				// Now fill our sql array with the remaining vars
-				if (count($remaining_vars))
-				{
-					foreach ($remaining_vars as $key)
-					{
-						$sql_ary[$key] = $user_row[$key];
-					}
-				}
-
-				$sql = 'INSERT INTO ' . USERS_TABLE . ' ' . $db->sql_build_array('INSERT', $sql_ary);
-				if ( !($result = $db->sql_query($sql)) )
-				{
-					$sql_error = $db->sql_error('');
-					mx_message_die(CRITICAL_ERROR, 'Could not update user info', '<br /><br />SQL Error : ' . $sql_error['code'] . ' ' . $sql_error['message'] . ' <br />' . $sql, __LINE__, __FILE__, $sql);
-				}
-
-//user_type
 			}
 			else
 			{
@@ -801,7 +452,7 @@ if ( $mode == 'edit' || $mode == 'add' || $mode == 'save' && $mx_request_vars->i
 					WHERE user_id = ' . $user_id;
 				$db->sql_query($sql);
 				/* * /
-				$phpbb_log->add('user', $mx_user->data['user_id'], $user->ip, 'LOG_USER_NEW_PASSWORD', false, array(
+				$phpbb_log->add('user', $user->data['user_id'], $user->ip, 'LOG_USER_NEW_PASSWORD', false, array(
 					'reportee_id' => $user_row['user_id'],
 					$user_row['username']
 				));

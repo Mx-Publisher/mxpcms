@@ -39,6 +39,7 @@ class session
 	var $theme = array();
 	var $date_format;
 	var $timezone;
+	var $int_timezone;
 	var $dst;
 
 	var $lang_name;

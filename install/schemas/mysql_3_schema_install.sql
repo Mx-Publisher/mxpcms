@@ -12,6 +12,7 @@ CREATE TABLE `mx_table_block` (
   `block_id` smallint(5) unsigned NOT NULL auto_increment,
   `block_title` varchar(150),
   `block_desc` text,
+  `block_size` varchar(30) NOT NULL DEFAULT '100%',
   `function_id` smallint(5) unsigned,
   `auth_view` tinyint(2) NOT NULL DEFAULT '0',
   `auth_edit` tinyint(2) NOT NULL DEFAULT '0',
@@ -33,25 +34,25 @@ CREATE TABLE `mx_table_block` (
 #
 # Dumping data for table 'mx_table_block'
 #
-INSERT INTO `mx_table_block` VALUES("1", "Demo Page 3", "Demo", "24", "0", "5", "0", "0", "0", "0", "0", "1", "1", "0", "1202765204", "2");
-INSERT INTO `mx_table_block` VALUES("2", "Split Block", "This is a Demo Block", "11", "0", "5", "0", "0", "0", "0", "0", "1", "1", "0", "1202598000", "2");
-INSERT INTO `mx_table_block` VALUES("3", "Site Log", "This is a Demo Block", "10", "0", "5", "0", "0", "0", "0", "0", "1", "1", "0", "1202598000", "2");
-INSERT INTO `mx_table_block` VALUES("4", "Demo page", "SubBlocks", "3", "0", "5", "0", "0", "0", "0", "0", "1", "1", "0", "1202761342", "2");
-INSERT INTO `mx_table_block` VALUES("7", "Language Select", "This is a Demo Block", "6", "0", "5", "0", "0", "0", "0", "0", "1", "1", "0", "1202598000", "2");
-INSERT INTO `mx_table_block` VALUES("8", "Navigation Menu", "This is a vertical Navigation Menu Demo Block", "51", "0", "5", "0", "0", "0", "0", "0", "1", "1", "0", "1202598000", "2");
-INSERT INTO `mx_table_block` VALUES("9", "Demo Page 5 - Custom", "Demo", "22", "0", "5", "0", "0", "0", "0", "0", "1", "1", "0", "1202761540", "2");
-INSERT INTO `mx_table_block` VALUES("10", "Demo Page 4 - wysiwyg", "Demo", "23", "0", "5", "0", "0", "0", "0", "0", "1", "1", "1", "1202761496", "2");
-INSERT INTO `mx_table_block` VALUES("13", "Login", "This is a Demo Block", "7", "9", "5", "0", "0", "0", "0", "0", "1", "1", "0", "1202598000", "2");
-INSERT INTO `mx_table_block` VALUES("14", "Theme Select", "This is a Demo Block", "12", "0", "5", "0", "0", "0", "0", "0", "1", "1", "0", "1202598000", "2");
-INSERT INTO `mx_table_block` VALUES("15", "Site Search", "Site Search", "15", "0", "5", "0", "0", "0", "0", "0", "1", "1", "0", "1202598000", "2");
-INSERT INTO `mx_table_block` VALUES("19", "Who is Online?", "This is a Demo Block", "13", "5", "5", "0", "0", "0", "0", "0", "1", "1", "0", "1202763740", "2");
-INSERT INTO `mx_table_block` VALUES("21", "Google", "This is a Demo Block", "4", "0", "5", "0", "0", "0", "0", "0", "1", "1", "0", "1202598000", "2");
-INSERT INTO `mx_table_block` VALUES("32", "Demo page", "", "51", "0", "5", "0", "0", "0", "0", "0", "1", "1", "0", "1202761705", "2");
-INSERT INTO `mx_table_block` VALUES("27", "IncludeX", "This is a Demo Block", "5", "0", "5", "0", "0", "0", "0", "0", "1", "1", "0", "1202598000", "2");
-INSERT INTO `mx_table_block` VALUES("28", "Welcome", "This is the welcome block", "24", "0", "5", "0", "0", "0", "0", "0", "1", "1", "0", "1202766730", "2");
-INSERT INTO `mx_table_block` VALUES("29", "Demo Page 1", "Demo", "24", "0", "5", "0", "0", "0", "0", "0", "1", "1", "0", "1202765153", "2");
-INSERT INTO `mx_table_block` VALUES("30", "Demo Page 2", "Demo", "24", "0", "5", "0", "0", "0", "0", "0", "1", "1", "0", "1202765190", "2");
-INSERT INTO `mx_table_block` VALUES("31", "Page Navigation", "This is a page navigation menu", "52", "0", "5", "0", "0", "0", "0", "0", "1", "1", "0", "1202598000", "2");
+INSERT INTO `mx_table_block` VALUES("1", "Demo Page 3", "Demo", "100%", "24", "0", "5", "0", "0", "0", "0", "0", "1", "1", "0", "1202765204", "2");
+INSERT INTO `mx_table_block` VALUES("2", "Split Block", "This is a Demo Block", "100%", "11", "0", "5", "0", "0", "0", "0", "0", "1", "1", "0", "1202598000", "2");
+INSERT INTO `mx_table_block` VALUES("3", "Site Log", "This is a Demo Block", "100%", "10", "0", "5", "0", "0", "0", "0", "0", "1", "1", "0", "1202598000", "2");
+INSERT INTO `mx_table_block` VALUES("4", "Demo page", "SubBlocks", "100%", "3", "0", "5", "0", "0", "0", "0", "0", "1", "1", "0", "1202761342", "2");
+INSERT INTO `mx_table_block` VALUES("7", "Language Select", "This is a Demo Block", "100%", "6", "0", "5", "0", "0", "0", "0", "0", "1", "1", "0", "1202598000", "2");
+INSERT INTO `mx_table_block` VALUES("8", "Navigation Menu", "This is a vertical Navigation Menu Demo Block", "100%", "51", "0", "5", "0", "0", "0", "0", "0", "1", "1", "0", "1202598000", "2");
+INSERT INTO `mx_table_block` VALUES("9", "Demo Page 5 - Custom", "Demo", "100%", "22", "0", "5", "0", "0", "0", "0", "0", "1", "1", "0", "1202761540", "2");
+INSERT INTO `mx_table_block` VALUES("10", "Demo Page 4 - wysiwyg", "Demo", "100%", "23", "0", "5", "0", "0", "0", "0", "0", "1", "1", "1", "1202761496", "2");
+INSERT INTO `mx_table_block` VALUES("13", "Login", "This is a Demo Block", "100%", "7", "9", "5", "0", "0", "0", "0", "0", "1", "1", "0", "1202598000", "2");
+INSERT INTO `mx_table_block` VALUES("14", "Theme Select", "This is a Demo Block", "100%", "12", "0", "5", "0", "0", "0", "0", "0", "1", "1", "0", "1202598000", "2");
+INSERT INTO `mx_table_block` VALUES("15", "Site Search", "Site Search", "100%", "15", "0", "5", "0", "0", "0", "0", "0", "1", "1", "0", "1202598000", "2");
+INSERT INTO `mx_table_block` VALUES("19", "Who is Online?", "This is a Demo Block", "100%", "13", "5", "5", "0", "0", "0", "0", "0", "1", "1", "0", "1202763740", "2");
+INSERT INTO `mx_table_block` VALUES("21", "Google", "This is a Demo Block", "100%", "4", "0", "5", "0", "0", "0", "0", "0", "1", "1", "0", "1202598000", "2");
+INSERT INTO `mx_table_block` VALUES("32", "Demo page", "", "100%", "51", "0", "5", "0", "0", "0", "0", "0", "1", "1", "0", "1202761705", "2");
+INSERT INTO `mx_table_block` VALUES("27", "IncludeX", "This is a Demo Block", "100%", "5", "0", "5", "0", "0", "0", "0", "0", "1", "1", "0", "1202598000", "2");
+INSERT INTO `mx_table_block` VALUES("28", "Welcome", "This is the welcome block", "100%", "24", "0", "5", "0", "0", "0", "0", "0", "1", "1", "0", "1202766730", "2");
+INSERT INTO `mx_table_block` VALUES("29", "Demo Page 1", "Demo", "100%", "24", "0", "5", "0", "0", "0", "0", "0", "1", "1", "0", "1202765153", "2");
+INSERT INTO `mx_table_block` VALUES("30", "Demo Page 2", "Demo", "100%", "24", "0", "5", "0", "0", "0", "0", "0", "1", "1", "0", "1202765190", "2");
+INSERT INTO `mx_table_block` VALUES("31", "Page Navigation", "This is a page navigation menu", "100%", "52", "0", "5", "0", "0", "0", "0", "0", "1", "1", "0", "1202598000", "2");
 
 
 
@@ -106,7 +107,23 @@ INSERT INTO `mx_table_block_system_parameter` VALUES("28", "15", "[b:787bdbfe25]
 INSERT INTO `mx_table_block_system_parameter` VALUES("29", "15", "On this page we [i:6d09b58ee2]demonstrate[/i:6d09b58ee2] how subpages are easily created, using the CORE dynamic block and the user navigation block. Create new textblocks in the adminCP, and add them in the navigation menu. Have fun!\r\n\r\nLorem ipsum dolor sit amet, consectetuer adipiscing elit. Maecenas malesuada semper ante. Aliquam orci ipsum, aliquam sodales, dictum id, tincidunt non, elit. Proin tincidunt felis id urna. Praesent in erat. Nunc at arcu et nisi tempor interdum. Quisque enim. Nunc et lorem. Ut tortor. Suspendisse potenti. Nam egestas orci at mi. Sed pulvinar est sit amet ante. Mauris pharetra mollis risus. Donec accumsan fermentum leo.", "6d09b58ee2", "0");
 INSERT INTO `mx_table_block_system_parameter` VALUES("30", "15", "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Maecenas malesuada semper ante. Aliquam orci ipsum, aliquam sodales, dictum id, tincidunt non, elit. Proin tincidunt felis id urna. Praesent in erat. Nunc at arcu et nisi tempor interdum. Quisque enim. Nunc et lorem. Ut tortor. Suspendisse potenti. Nam egestas orci at mi. Sed pulvinar est sit amet ante. Mauris pharetra mollis risus. Donec accumsan fermentum leo.\r\n\r\nSuspendisse potenti. Quisque tincidunt, mi viverra semper iaculis, nisl metus vehicula libero, eget tincidunt est massa ac purus. Aenean a justo. Sed ultrices, mi vitae hendrerit suscipit, mauris velit rutrum lectus, eget pharetra metus ipsum in purus. Sed placerat ornare nulla. Nullam vel leo non nulla fermentum varius. Integer nec pede a velit tempor aliquam. Sed eu neque in eros scelerisque eleifend. Vivamus id urna. Pellentesque nec nulla. Fusce et sapien. Nulla venenatis imperdiet ligula. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin vel nunc eu leo malesuada congue. Praesent faucibus. Vivamus quis sapien in dolor gravida vehicula.", "61fc3afdd8", "0");
 
-
+#
+# Table structure for table 'mx_table_bots'
+#
+DROP TABLE IF EXISTS `mx_table_bots`;
+CREATE TABLE IF NOT EXISTS `mx_table_bots` (
+  `bot_id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+  `bot_active` tinyint(1) unsigned NOT NULL DEFAULT '1',
+  `bot_name` varchar(255) NOT NULL DEFAULT 'YahooSeeker',
+  `bot_color` varchar(255) NOT NULL DEFAULT '9E8DA7',
+  `user_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `bot_agent` varchar(255) NOT NULL DEFAULT 'YahooSeeker/',
+  `bot_ip` varchar(255) NOT NULL DEFAULT '::f',
+  `bot_last_visit` varchar(11) NOT NULL DEFAULT '1617274666',
+  `bot_visit_counter` int(8) unsigned NOT NULL DEFAULT '1',
+  PRIMARY KEY (`bot_id`),
+  KEY bot_active (`bot_active`)
+);
 
 #
 # Table structure for table 'mx_table_column'
@@ -321,10 +338,10 @@ CREATE TABLE `mx_table_module` (
 #
 # Dumping data for table 'mx_table_module'
 #
-INSERT INTO `mx_table_module` VALUES("10", "Core Blocks", "modules/mx_coreblocks/", "MX-Publisher Core Blocks", "", "MX-Publisher Core Module", "Original mxBB <i>Core Blocks</i> module by <a href=\"http://www.mx-publisher.com\" target=\"_blank\">The MX-Publisher Development Team</a>");
-INSERT INTO `mx_table_module` VALUES("20", "Textblocks", "modules/mx_textblocks/", "MX-Publisher Textblocks", "", "MX-Publisher Core Module", "Original mxBB <i>Textblocks</i> module by <a href=\"http://www.mx-publisher.com\" target=\"_blank\">Jon</a>");
-INSERT INTO `mx_table_module` VALUES("40", "Users and Groups", "modules/mx_users/", "MX-Publisher Users and Groups", "1", "MX-Publisher Core Module", "Based on original phpBB <i>Admin Tool MODs</i> by Adam Alkins, Omar Ramadan & wGEric :: Adapted for MX-Publisher by <a href=\"http://www.mx-publisher.com\" target=\"_blank\">Jon</a>");
-INSERT INTO `mx_table_module` VALUES("50", "Navigation Menu", "modules/mx_navmenu/", "MX-Publisher Site Navigation", "", "MX-Publisher Core Module", "Original mxBB <i>Navigation Menu</i> module by <a href=\"http://www.mx-publisher.com\" target=\"_blank\">Jon</a>");
+INSERT INTO `mx_table_module` VALUES("10", "Core Blocks", "modules/mx_coreblocks/", "MX-Publisher Core Blocks", "", "MX-Publisher Core Module", "Original mxBB <i>Core Blocks</i> module by <a href=\"http://mxpcms.sourceforge.net\" target=\"_blank\">The MX-Publisher Development Team</a>");
+INSERT INTO `mx_table_module` VALUES("20", "Textblocks", "modules/mx_textblocks/", "MX-Publisher Textblocks", "", "MX-Publisher Core Module", "Original mxBB <i>Textblocks</i> module by <a href=\"http://mxpcms.sourceforge.net\" target=\"_blank\">Jon</a>");
+INSERT INTO `mx_table_module` VALUES("40", "Users and Groups", "modules/mx_users/", "MX-Publisher Users and Groups", "1", "MX-Publisher Core Module", "Based on original phpBB <i>Admin Tool MODs</i> by Adam Alkins, Omar Ramadan & wGEric :: Adapted for MX-Publisher by <a href=\"http://mxpcms.sourceforge.net\" target=\"_blank\">Jon</a>");
+INSERT INTO `mx_table_module` VALUES("50", "Navigation Menu", "modules/mx_navmenu/", "MX-Publisher Site Navigation", "", "MX-Publisher Core Module", "Original mxBB <i>Navigation Menu</i> module by <a href=\"http://mxpcms.sourceforge.net\" target=\"_blank\">Jon</a>");
 
 
 
@@ -581,7 +598,7 @@ CREATE TABLE `mx_table_groups` (
 #
 # Table structure for table 'mx_table_sessions'
 #
-# Note that if you\'re running 3.23.x you may want to make
+# Note that if you are running 3.23.x you may want to make
 # this table a type HEAP. This type of table is stored
 # within system memory and therefore for big busy boards
 # is likely to be noticeably faster than continually
@@ -626,18 +643,51 @@ CREATE TABLE `mx_table_sessions_keys` (
 #
 DROP TABLE IF EXISTS `mx_table_users`;
 CREATE TABLE `mx_table_users` (
-   user_id mediumint(8) NOT NULL,
-   user_active tinyint(1) DEFAULT '1',
-   username varchar(25) NOT NULL,
-   user_password varchar(32) NOT NULL,
-   user_session_time int(11) DEFAULT '0' NOT NULL,
-   user_session_page smallint(5) DEFAULT '0' NOT NULL,
-   user_lastvisit int(11) DEFAULT '0' NOT NULL,
-   user_regdate int(11) DEFAULT '0' NOT NULL,
-   user_level tinyint(4) DEFAULT '0',
-   user_login_tries smallint(5) UNSIGNED DEFAULT '0' NOT NULL,
-   user_last_login_try int(11) DEFAULT '0' NOT NULL,
-   user_email varchar(255),
+  user_id mediumint(8) unsigned NOT NULL auto_increment,
+  user_type tinyint(2) DEFAULT '0' NOT NULL,
+  group_id mediumint(8) unsigned DEFAULT '3' NOT NULL,
+  user_active tinyint(1) DEFAULT '1',
+  user_newpasswd varchar(33) NOT NULL DEFAULT '00000000000000000000000000000000',
+  user_new tinyint(1) NOT NULL DEFAULT '1',
+  user_ip varbinary(40) DEFAULT '7f000001' NOT NULL,
+  username blob NOT NULL,
+  username_clean blob NOT NULL,
+  user_password varbinary(120) DEFAULT '' NOT NULL,
+  user_passchg int(11) unsigned DEFAULT '0' NOT NULL,
+  user_colour varbinary(6) DEFAULT 'FEFDAF' NOT NULL,
+  user_session_time int(11) NOT NULL DEFAULT '0',
+  user_session_page smallint(5) NOT NULL DEFAULT '0',
+  user_lastvisit int(11) NOT NULL DEFAULT '0',
+  user_lastmark int(11) NOT NULL,
+  user_lastpage varchar(200) NOT NULL DEFAULT '',
+  user_lastblock varchar(200) NOT NULL DEFAULT '',
+  user_regdate int(11) NOT NULL DEFAULT '0',
+  user_level tinyint(4) DEFAULT '0',
+  user_options int(11) NOT NULL DEFAULT '230271',
+  user_login_tries smallint(5) unsigned NOT NULL DEFAULT '0',
+  user_last_login_try int(11) NOT NULL DEFAULT '0',
+  user_lang varchar(30) DEFAULT '' NOT NULL,
+  user_timezone decimal(5,2) DEFAULT '0' NOT NULL,
+  user_dst tinyint(1) unsigned DEFAULT '0' NOT NULL,
+  user_dateformat varchar(30) DEFAULT 'd M Y H:i' NOT NULL,
+  user_style mediumint(8) unsigned DEFAULT '1' NOT NULL,
+  user_rank mediumint(8) unsigned DEFAULT '0' NOT NULL,
+  user_sig mediumtext NOT NULL,
+  user_sig_bbcode_uid varchar(8) NOT NULL,
+  user_sig_bbcode_bitfield varchar(255) NOT NULL DEFAULT '1111111111111',
+  user_agent varchar(255) NOT NULL DEFAULT 'Mozilla/5.0 (Windows NT 10.0; rv:100.0) Gecko/20210101 Firefox/100.0.00',
+  device_name varchar(99) NOT NULL DEFAULT 'Desktop-PC',
+  user_avatar_height tinyint(6) NOT NULL DEFAULT '98',
+  user_avatar_width tinyint(6) NOT NULL DEFAULT '98',
+  user_inactive_reason tinyint(4) NOT NULL,
+  user_inactive_time int(2) NOT NULL,
+  user_email blob NOT NULL,
+  user_email_hash bigint(20) DEFAULT '0' NOT NULL,
+  user_allow_viewonline tinyint(1) NOT NULL DEFAULT '1',
+  user_allow_massemail tinyint(1) NOT NULL DEFAULT '1',
+  user_form_salt varchar(32) NOT NULL DEFAULT '+',
+  is_bot int(2) NOT NULL DEFAULT '0',
+  is_mobile int(2) NOT NULL DEFAULT '0',
    PRIMARY KEY (user_id),
    KEY user_session_time (user_session_time)
 );
@@ -683,6 +733,7 @@ INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_styles
 INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (4, 'subSilver', 'subSilver', 'subSilver.css', 'phpbb2');
 INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (5, 'subsilver2', 'subsilver2', 'subsilver2.css', 'phpbb3');
 INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (6, 'prosilver', 'prosilver', 'prosilver.css', 'phpbb3');
+INSERT INTO `mx_table_themes` (themes_id, template_name, style_name, head_stylesheet, portal_backend) VALUES (8, 'mx_prosilver', 'mx_prosilver', 'mx_prosilver.css', 'internal');
 
 
 

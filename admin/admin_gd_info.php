@@ -57,15 +57,15 @@ else
 		if (is_array($gd_value))
 		{
 			/*Convert the array to a string */
-			$gd_value = print_r($gd_value, true);
+			$gd_value = print_r($gd_value, true);				
 		}
 		
 		if (ctype_digit(strval($gd_value)) || empty($gd_value))
 		{
-			$gd_value = !empty($gd_value) ? $true : $false;
+			$gd_value = !empty($gd_value) ? $true : $false;				
 		}
 		
-		$gd_info_ary[$gd_key] = $gd_value;
+		$gd_info_ary[$gd_key] = $gd_value;		
 	}	
 	$template->assign_vars(array( //#
 			'VERSION' => $gd_info_ary['GD Version'],

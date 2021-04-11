@@ -36,18 +36,16 @@ $vote_left = $images['mx_vote_lcap'] ;
 $vote_right = $images['mx_vote_rcap'] ;
 $vote_bar = $images['mx_vote_bar'];
 
-/* START Include language file */
-$default_lang = $language = ($mx_user->user_language_name) ? $mx_user->user_language_name : (($board_config['default_lang']) ? $board_config['default_lang'] : 'english');
-
-if ((@include $mx_root_path . "includes/shared/phpbb2/language/lang_" . $language . "/lang_admin.$phpEx") === false)
+if( file_exists($module_root_path . 'language/lang_' . $board_config['default_lang'] . '/lang_main.' . $phpEx) )
 {
-	if ((@include $mx_root_path . "includes/shared/phpbb2/language/lang_english/lang_admin.$phpEx") === false)
-	{
-			mx_message_die(CRITICAL_ERROR, 'Language file ' . $mx_root_path . "includes/shared/phpbb2/language/lang_" . $language . "/lang_admin.$phpEx" . ' couldn\'t be opened.');
-	}
-	$default_lang = $language = 'english'; 
+	include($phpbb_root_path . 'language/lang_' . $board_config['default_lang'] . '/lang_admin.' . $phpEx);
+	include($module_root_path . 'language/lang_' . $board_config['default_lang'] . '/lang_main.' . $phpEx);
 }
-/*  */
+else
+{
+	include($phpbb_root_path . 'language/lang_english/lang_admin.' . $phpEx);
+	include($module_root_path . 'language/lang_english/lang_main.' . $phpEx);
+}
 
 //
 // Do the math :) (i think this is the same method as in philip mayer's statistic's file)

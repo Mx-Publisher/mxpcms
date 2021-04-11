@@ -11,11 +11,15 @@
 *
 */
 
-if (!defined('IN_PORTAL')) { die("Hacking attempt"); }
+if (!defined('IN_PORTAL')) 
+{ 
+	die("Hacking attempt"); 
+}
 
 /**
 * @package DBal
 * Database Abstraction Layer
+* utf-8 test characters: ăîşţ-â
 */
 class dbal
 {
@@ -80,7 +84,7 @@ class dbal
 	/**
 	* Constructor
 	*/
-	function dbal() //__construct()
+	function __construct() //__construct()
 	{
 		/* $this->num_queries = array(
 			'cached'		=> 0,
@@ -567,19 +571,31 @@ class dbal
 		else if ($query == 'UPDATE' || $query == 'SELECT')
 		{
 			$values = array();
+			
 			foreach ($assoc_ary as $key => $var)
 			{
 				if (is_null($var))
 				{
 					$values[] = "$key = NULL";
 				}
-				else if (is_string($var))
+				else if (@is_string($var))
 				{
 					$values[] = "$key = '" . $this->sql_escape($var) . "'";
 				}
+				else if (@is_bool($var))
+				{
+					$values[] = "$key = '" . @intval($var) . "'";
+				}
+				else if (@is_array($var))
+				{
+					foreach ($var as $multi_values)
+					{
+						$values[] = "$key = " . $multi_values;
+					}
+				}				
 				else
 				{
-					$values[] = (is_bool($var)) ? "$key = " . intval($var) : "$key = $var";
+					$values[] = "$key = " . $this->_sql_validate_value($var);
 				}
 			}
 			$query = implode(($query == 'UPDATE') ? ', ' : ' AND ', $values);
@@ -1273,5 +1289,3 @@ if (!defined('IN_PORTAL'))
 * This variable holds the class name to use later
 */
 $sql_db = 'dbal_' . $dbms;
-
-?>

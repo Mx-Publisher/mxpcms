@@ -68,7 +68,6 @@ $lang['Portal_lang'] = 'LanguageCP';
 $lang['Select_lang'] = 'Select Language:';
 $lang['Who_is_Online'] = 'Who is Online';
 $lang['Who_is_Online?'] = 'Who is Online?';
-$lang['Last_Message_Post'] = 'Last Post';
 
 //
 // Core Blocks - Theme
@@ -156,7 +155,6 @@ $lang['Please_remove_install_contrib'] = 'Please ensure both the install/ and co
 // - To have multilangual page titles, add lang keys 'pagetitle_PAGE_TITLE' below
 // - This lang key replaces the page title (PAGE_TITLE) for the page given in the adminCP
 //
-$lang['A__little__text_to_describe_your_site'] = 'Whatever text to describe your site';
 //$lang['pagetitle_NameOfFirstPage'] = 'Whatever one';
 //$lang['pagetitle_NameOfSecondPage'] = 'Whatever two';
 

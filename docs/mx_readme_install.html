@@ -1,0 +1,1790 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+
+  
+
+
+  
+  
+  
+  <title>mxBB Portal :: Installation - readme</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<!-- link rel="stylesheet" href="templates/subSilver/subSilver.css" type="text/css" -->
+
+
+
+  
+  
+  <style type="text/css">
+<!--
+/*
+The original subSilver Theme for phpBB version 2+
+Created by subBlue design
+http://www.subBlue.com
+NOTE: These CSS definitions are stored within the main page body so that you can use the phpBB2
+theme administration centre. When you have finalised your style you could cut the final CSS code
+and place it in an external file, deleting this section to save bandwidth.
+*/
+/* General page style. The scroll bar colours only visible in IE5.5+ */
+body {
+background-color: #E5E5E5;
+scrollbar-face-color: #DEE3E7;
+scrollbar-highlight-color: #FFFFFF;
+scrollbar-shadow-color: #DEE3E7;
+scrollbar-3dlight-color: #D1D7DC;
+scrollbar-arrow-color: #006699;
+scrollbar-track-color: #EFEFEF;
+scrollbar-darkshadow-color: #98AAB1;
+}
+/* General font families for common tags */
+font,th,td,p { font-family: Verdana, Arial, Helvetica, sans-serif }
+a:link,a:active,a:visited { color : #006699; }
+a:hover { text-decoration: underline; color : #DD6900; }
+hr { height: 0px; border: solid #D1D7DC 0px; border-top-width: 1px;}
+/* This is the border line & background colour round the entire page */
+.bodyline { background-color: #FFFFFF; border: 1px #98AAB1 solid; }
+/* This is the outline round the main forum tables */
+.forumline { background-color: #FFFFFF; border: 2px #006699 solid; }
+/* Main table cell colours and backgrounds */
+td.row1 { background-color: #EFEFEF; }
+td.row2 { background-color: #DEE3E7; }
+td.row3 { background-color: #D1D7DC; }
+/*
+This is for the table cell above the Topics, Post & Last posts on the index.php page
+By default this is the fading out gradiated silver background.
+However, you could replace this with a bitmap specific for each forum
+*/
+td.rowpic {
+background-color: #FFFFFF;
+background-image: url(templates/subSilver/images/cellpic2.jpg);
+background-repeat: repeat-y;
+}
+/* Header cells - the blue and silver gradient backgrounds */
+th {
+color: #FFA34F; font-size: 11px; font-weight : bold;
+background-color: #006699; height: 25px;
+background-image: url(templates/subSilver/images/cellpic3.gif);
+}
+td.cat,td.catHead,td.catSides,td.catLeft,td.catRight,td.catBottom {
+background-image: url(templates/subSilver/images/cellpic1.gif);
+background-color:#D1D7DC; border: #FFFFFF; border-style: solid; height: 28px;
+}
+/*
+Setting additional nice inner borders for the main table cells.
+The names indicate which sides the border will be on.
+Don't worry if you don't understand this, just ignore it :-)
+*/
+td.cat,td.catHead,td.catBottom {
+height: 29px;
+border-width: 0px 0px 0px 0px;
+}
+th.thHead,th.thSides,th.thTop,th.thLeft,th.thRight,th.thBottom,th.thCornerL,th.thCornerR {
+font-weight: bold; border: #FFFFFF; border-style: solid; height: 28px;
+}
+td.row3Right,td.spaceRow {
+background-color: #D1D7DC; border: #FFFFFF; border-style: solid;
+}
+th.thHead,td.catHead { font-size: 12px; border-width: 1px 1px 0px 1px; }
+th.thSides,td.catSides,td.spaceRow { border-width: 0px 1px 0px 1px; }
+th.thRight,td.catRight,td.row3Right { border-width: 0px 1px 0px 0px; }
+th.thLeft,td.catLeft { border-width: 0px 0px 0px 1px; }
+th.thBottom,td.catBottom { border-width: 0px 1px 1px 1px; }
+th.thTop { border-width: 1px 0px 0px 0px; }
+th.thCornerL { border-width: 1px 0px 0px 1px; }
+th.thCornerR { border-width: 1px 1px 0px 0px; }
+/* The largest text used in the index page title and toptic title etc. */
+.maintitle {
+font-weight: bold; font-size: 22px; font-family: "Trebuchet MS",Verdana, Arial, Helvetica, sans-serif;
+text-decoration: none; line-height : 120%; color : #000000;
+}
+/* General text */
+.gen { font-size : 12px; }
+.genmed { font-size : 11px; }
+.gensmall { font-size : 10px; }
+.gen,.genmed,.gensmall { color : #000000; }
+a.gen,a.genmed,a.gensmall { color: #006699; text-decoration: none; }
+a.gen:hover,a.genmed:hover,a.gensmall:hover { color: #DD6900; text-decoration: underline; }
+/* The register, login, search etc links at the top of the page */
+.mainmenu { font-size : 11px; color : #000000 }
+a.mainmenu { text-decoration: none; color : #006699; }
+a.mainmenu:hover{ text-decoration: underline; color : #DD6900; }
+/* Forum category titles */
+.cattitle { font-weight: bold; font-size: 12px ; letter-spacing: 1px; color : #006699}
+a.cattitle { text-decoration: none; color : #006699; }
+a.cattitle:hover{ text-decoration: underline; }
+/* Forum title: Text and link to the forums used in: index.php */
+.forumlink { font-weight: bold; font-size: 12px; color : #006699; }
+a.forumlink { text-decoration: none; color : #006699; }
+a.forumlink:hover{ text-decoration: underline; color : #DD6900; }
+/* Used for the navigation text, (Page 1,2,3 etc) and the navigation bar when in a forum */
+.nav { font-weight: bold; font-size: 11px; color : #000000;}
+a.nav { text-decoration: none; color : #006699; }
+a.nav:hover { text-decoration: underline; }
+/* titles for the topics: could specify viewed link colour too */
+.topictitle,h1,h2 { font-weight: bold; font-size: 11px; color : #000000; }
+a.topictitle:link { text-decoration: none; color : #006699; }
+a.topictitle:visited { text-decoration: none; color : #5493B4; }
+a.topictitle:hover { text-decoration: underline; color : #DD6900; }
+/* Name of poster in viewmsg.php and viewtopic.php and other places */
+.name { font-size : 11px; color : #000000;}
+/* Location, number of posts, post date etc */
+.postdetails { font-size : 10px; color : #000000; }
+/* The content of the posts (body of text) */
+.postbody { font-size : 12px; line-height: 18px}
+a.postlink:link { text-decoration: none; color : #006699 }
+a.postlink:visited { text-decoration: none; color : #5493B4; }
+a.postlink:hover { text-decoration: underline; color : #DD6900}
+/* Quote & Code blocks */
+.code {
+font-family: Courier, 'Courier New', sans-serif; font-size: 11px; color: #006600;
+background-color: #FAFAFA; border: #D1D7DC; border-style: solid;
+border-left-width: 1px; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px
+}
+.quote {
+font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px; color: #444444; line-height: 125%;
+background-color: #FAFAFA; border: #D1D7DC; border-style: solid;
+border-left-width: 1px; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px
+}
+/* Copyright and bottom info */
+.copyright { font-size: 10px; font-family: Verdana, Arial, Helvetica, sans-serif; color: #444444; letter-spacing: -1px;}
+a.copyright { color: #444444; text-decoration: none;}
+a.copyright:hover { color: #000000; text-decoration: underline;}
+/* Form elements */
+input,textarea, select {
+color : #000000;
+font: normal 11px Verdana, Arial, Helvetica, sans-serif;
+border-color : #000000;
+}
+/* The text input fields background colour */
+input.post, textarea.post, select {
+background-color : #FFFFFF;
+}
+input { text-indent : 2px; }
+/* The buttons used for bbCode styling in message post */
+input.button {
+background-color : #EFEFEF;
+color : #000000;
+font-size: 11px; font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+/* The main submit button option */
+input.mainoption {
+background-color : #FAFAFA;
+font-weight : bold;
+}
+/* None-bold submit button */
+input.liteoption {
+background-color : #FAFAFA;
+font-weight : normal;
+}
+/* This is the line in the posting page which shows the rollover
+help line. This is actually a text box, but if set to be the same
+colour as the background no one will know ;)
+*/
+.helpline { background-color: #DEE3E7; border-style: none; }
+/* Import the fancy styles for IE only (NS4.x doesn't use the @import function) */
+@import url("templates/subSilver/formIE.css");
+-->
+  </style>
+</head>
+
+
+<body style="color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);">
+
+
+
+<table class="bodyline" align="center" cellpadding="8" cellspacing="0" width="90%">
+
+
+
+  <tbody>
+
+
+
+    <tr>
+
+
+
+      <td colspan="2"><span class="postbody"><a name="top"><span style="font-weight: bold;"><span style="font-size: 18px; line-height: normal;">[RELEASE]
+mxBB Portal v 2.7.7 </span></span></a> <br>
+
+
+
+      <span style="font-style: italic;">The
+"I should be outside" edition</span> <img style="border: 0px solid ; width: 15px; height: 15px;" src="images/icon_cool.gif" alt="Cool"> <br>
+
+
+
+      <br>
+
+
+
+      <br>
+
+
+
+This is the mxBB Portal release and installation notes. Further portal
+information (i.e. roadmap, <a href="http://www.mx-system.com/forum/viewforum.php?f=22">development
+news</a>, <a href="http://www.mx-system.com/forum/viewtopic.php?t=2829#MXhistory" target="_blank" class="postlink">version history,</a>
+etc,) is located <a href="http://www.mx-system.com/forum/viewtopic.php?t=2829" target="_blank" class="postlink">here</a>. <br>
+
+
+
+      <br>
+
+
+
+      <span style="font-weight: bold;"><span style="font-size: 14px; line-height: normal;">Overview</span></span>
+      <br>
+
+
+
+      </span><span class="postbody">mxBB Portal is
+the only fully modular portal and CMS for phpBB. It
+features dynamic pages, blocks, and themes, by means of a powerful yet
+flexible AdminCP. It works without touching phpBB by using integrated
+features and functions. This makes it a lot easier to upgrade to phpBB
+3.0 "Olympus" when the time comes, among other things. mxBB Portal
+requires phpBB to run, and currently supports the mySQL and postgreSQL
+databases, with planned support for other database management systems
+(DBMSs) such as MS-SQL. mxBB Portal is the classic phpBB portal addon,
+improved and enhanced for every phpBB version released since 2001. </span><br>
+
+
+
+      <span class="postbody"> <br>
+
+
+
+      <a href="http://www.mx-system.com" target="_blank" class="postlink">See the demo here running at our site here!
+      </a><br>
+
+
+
+      <small><span style="font-style: italic;" class="postlink">Note that we are running a development
+version of the next-generation</span><span style="font-style: italic;"> 2.8.0 Core. If you wish to
+participate in our 2.8.0B1 Quality Assurance forum, take a look at <a href="http://www.mx-system.com/forum/viewtopic.php?t=7997">our
+announcement</a> regarding it.</span></small><br>
+
+
+
+      <br>
+
+
+
+      <br>
+
+
+
+Download the: </span>
+      
+      
+      <ul>
+
+
+
+        <li><span class="postbody"><span class="postlink"><a href="http://www.mx-system.com/index.php?page=112&amp;action=file&amp;file_id=2">mxBB Portal
+Core</a> </span> (required for <span style="font-weight: bold;">all</span> setups)</span></li>
+
+
+
+        <li><span class="postbody"><a href="http://www.mx-system.com/index.php?page=112&amp;action=category&amp;cat_id=4" target="_blank" class="postlink">Add-on Modules</a>
+(optional; download whichever ones you need) </span></li>
+
+
+
+      
+      
+      </ul>
+
+
+
+      <span class="postbody"><br>
+
+
+
+Keep yourself up to date on the latest releases and mxBB news!
+Subscribe to the <a href="http://lists.sourceforge.net/lists/listinfo/mxbb-news" target="_blank" class="postlink">mxBB-News Mailing
+List</a>! <img style="border: 0px solid ; width: 15px; height: 15px;" src="images/icon_wink.gif" alt="Wink"> <br>
+
+
+
+      <br>
+
+
+
+      
+      
+      <hr> <br>
+
+
+
+      <span style="font-weight: bold;"><span style="font-size: 14px; line-height: normal;">Contents</span></span>
+      <br>
+
+
+
+0. <a href="#features">mxBB Portal Features</a> <br>
+
+
+
+Ia. <a href="#install">Installation Instructions</a>
+      <br>
+
+
+
+Ib. <a href="#upgrade">Upgrade Instructions</a> <br>
+
+
+
+II. <a href="#modules">Installing Add-on Modules</a>
+      <br>
+
+
+
+III. <a href="#themes">Installing Themes/Styles</a>
+      <br>
+
+
+
+IV. <a href="#languages">Additional Languages</a> <br>
+
+
+
+      <br>
+
+
+
+      
+      
+      <hr> <br>
+
+
+
+      <br>
+
+
+
+      <a name="features"><span style="font-size: 18px; line-height: normal;"><span style="font-weight: bold;">0. mxBB Portal features</span></span></a>
+      <br>
+
+
+
+      <br>
+
+
+
+- mxBB is an easy to use
+and install portal and content management system (CMS)<br>
+
+
+
+- Integrates smoothly with the popular <span class="postlink"><a href="http://www.phpbb.com"> phpBB</a> Bulletin Board
+System (BBS)</span> without modifying (aka MODding) any phpBB
+files, hence "modular" <br>
+
+
+
+- Intuitive, yet advanced Portal Admin Control Panel (AdminCP, or ACP),
+managing every aspect of the portal, along with the phpBB admin pages<br>
+
+
+
+- Modular based approach with easy to use and install/upgrade (and
+create) add-on packages; this means no MODding to the mxBB Portal core
+to add features <img src="images/icon_wink.gif" alt="Wink" border="0"> <br>
+
+
+
+- Install only the modules with features that <span style="font-weight: bold;">you</span> want<br>
+
+
+
+- Unlimited number of dynamic portal pages, making unique page designs
+truly creative<br>
+
+
+
+- Flexible Core page blocks featuring standard phpBB themes, BBCode,
+HTML, languages, and view/edit permissions (user/group) <br>
+
+
+
+- Additional Module page blocks, enriched with tailored features unique
+to each module<br>
+
+
+
+- Advanced interface for categorized menu navigation <br>
+
+
+
+- Cache system for fast functionality and decreased DB queries needed <br>
+
+
+
+- Support forum (<a href="http://www.mx-system.com" target="_blank" class="postlink">www.mx-system.com</a>)<br>
+
+
+
+      <br>
+
+
+
+      <span style="font-weight: bold;">Included Modules in
+the mxBB Portal&nbsp;Core distribution</span><br>
+
+
+
+- Last Message Module <br>
+
+
+
+- Statistics Module<br>
+
+
+
+- TextBlocks Module<br>
+
+
+
+      <br>
+
+
+
+      <span style="font-weight: bold;">Official Modules -
+Add-On packages</span> <br>
+
+
+
+All official modules are located <a href="http://www.mx-system.com/index.php?page=4&amp;action=category&amp;cat_id=4">her</a><a href="http://www.mx-system.com/index.php?page=4&amp;action=category&amp;cat_id=4">e</a>.<br>
+
+
+
+      <br>
+
+
+
+      <span style="font-weight: bold;">3rd Party Modules</span><br>
+
+
+
+3rd Party Modules are modules that are written, maintained, and
+supported, by 3rd party authors. You can find 3rd Party module releases
+      <a href="http://www.mx-system.com/forum/viewforum.php?f=31">here</a>.<br>
+
+
+
+      <br>
+
+
+
+      <span style="font-weight: bold;">Requirements</span>
+      <br>
+
+
+
+- PHP4 (Recommended: latest version)<br>
+
+
+
+- phpBB 2.0.x (latest version) <br>
+
+
+
+- mySQL or postgreSQL database<br>
+
+
+
+- An FTP client capable of uploading files to your server (this is not
+needed if you're hosting your own server) <br>
+
+
+
+      <br>
+
+
+
+      <span style="font-weight: bold;">Note that the
+mxBB Portal Core 2.7.x and up do NOT support PHP5. Sorry. We are
+planning to implement PHP5 support with our mxBB 3.0 release, which
+will be released parallel to phpBB 3.0 "Olympus".</span> <br>
+
+
+
+      <br>
+
+
+
+Be sure to use the latest phpBB, mxBB Core, and module releases;
+otherwise, conflicts may occur! <br>
+
+
+
+      <a href="#top">Back to Top</a> <br>
+
+
+
+      <br>
+
+
+
+      <a name="install"> <br>
+
+
+
+      <span style="font-size: 18px; line-height: normal;"><span style="font-weight: bold;">Ia. Installation Instructions</span></span>
+      </a> <br>
+
+
+
+      <br>
+
+
+
+      <span style="font-weight: bold;">1)</span> mxBB Portal requires a working installation of phpBB and will <span style="font-weight: bold;">not</span> run standalone.
+If phpBB is not installed on your system, please visit <a href="http://www.phpbb.com" target="_blank">www.phpbb.com</a>
+for further instructions.</span> <span class="postbody">For
+the new
+installer introduced in 2.7.5, you need not set the board's
+default theme to subSilver; you also need not set the default language
+to English. The installer automatically picks all of this
+information for you.</span><br>
+
+
+
+      <span class="postbody"><br>
+
+
+
+      <span style="font-weight: bold;">2)</span> The
+mxBB Portal and phpBB forum <span style="font-weight: bold;"><span style="text-decoration: underline;">must</span></span>
+be installed in <span style="font-style: italic;">different</span>
+directories. Do not mix the files up!! <br>
+
+
+
+      <br>
+
+
+
+      <span style="font-size: 16px; line-height: normal;"><span style="font-weight: bold;">Note that for ALL of the
+directory structure examples below, you MUST include the trailing slash
+at the end of the folder names! If you don't, you'll run into errors
+later!</span></span> <br>
+
+
+
+      <br>
+
+
+
+      <br>
+
+
+
+      <span style="font-style: italic;">Default directory
+structure is:</span> <br>
+
+
+
+      <br>
+
+
+
+/your/path/to/public/html/YOUR_FORUM_NAME/ (this is the place where
+your working phpBB installation should be located) <br>
+
+
+
+      <br>
+
+
+
+/your/path/to/public/html/YOUR_PORTAL_NAME/ (this is the place were all
+mxBB files should be located) <br>
+
+
+
+      <br>
+
+
+
+Note that you can alternatively install mxBB in your root directory
+(which can be accessed via <a href="http://www.yourdomain.com/%29" target="_blank">www.yourdomain.com/)</a> while your
+forum can be installed in a folder <span style="font-style: italic;">within</span>
+mxBB's (ie it'd be located in <a href="http://www.yourdomain.com/phpBB2/%29." target="_blank">www.yourdomain.com/phpBB2/).</a>
+      <br>
+
+
+
+      <br>
+
+
+
+Using the <span style="font-weight: bold;">default setup
+above</span>, the install path variables should be: <br>
+
+
+
+      <br>
+
+
+
+phpBB Relative Path: <span style="font-weight: bold;">../YOUR_FORUM_NAME/</span>
+      <br>
+
+
+
+Portal URL: <span style="font-weight: bold;">http://www.yourdomain.com/YOUR_PORTAL_NAME/</span>
+      <br>
+
+
+
+phpBB URL: <span style="font-weight: bold;">http://www.yourdomain.com/YOUR_FORUM_
+NAME/</span> <br>
+
+
+
+      <br>
+
+
+
+      <span style="font-style: italic;">Note #1</span>:
+If you move the phpBB folder into another one before installing mxBB,
+the phpBB configuration (the /phpbbroot/config.php file) must also be
+modified to match the new phpB location. This is done in the Admin CP <span style="font-weight: bold;">and</span> the config.php
+file directly. <br>
+
+
+
+      <br>
+
+
+
+      <span style="font-style: italic;">Note #2</span>:
+phpBB and mxBB use separate config.php files. Do not confuse them and
+mix them together! They are two different files. <br>
+
+
+
+      <br>
+
+
+
+      <span style="font-style: italic;">Example: mxBB is
+installed in your root directory</span> <br>
+
+
+
+      <br>
+
+
+
+/your/site/root/ <br>
+
+
+
+      <br>
+
+
+
+/admin <br>
+
+
+
+/db <br>
+
+
+
+/language <br>
+
+
+
+/modules <br>
+
+
+
+/phpBB2 (this is the place where your working phpBB installation should
+be located) <br>
+
+
+
+/templates<br>
+
+
+
+/*.*<br>
+
+
+
+      <br>
+
+
+
+      <img style="width: 700px; height: 390px;" alt="mxBB Portal Installation Wizard" src="http://www.mx-system.com/images/mxbb_install_276.jpg"> </span><span class="postbody"><span style="font-style: italic;"><span style="font-weight: bold;"><br>
+
+
+
+      <br>
+
+
+
+Note:</span> This
+screenshot is from the 2.7.6 release; however, this 2.7.7
+release only introduced security and bug fixes; as such,
+nothing changed on the
+user's end.</span> </span><span class="postbody">As
+stated above,
+using the default setup, the install path variables should be: <br>
+
+
+
+      <br>
+
+
+
+phpBB Relative Path: phpBB2/ <br>
+
+
+
+Portal URL: <a href="http://www.yourdomain.com/" target="_blank">http://www.yourdomain.com/</a> <br>
+
+
+
+phpBB URL: <a href="http://www.yourdomain.com/phpBB2/" target="_blank">http://www.yourdomain.com/phpBB2/</a> <br>
+
+
+
+      <br>
+
+
+
+I'm repeating this just to clarify this for any of you who are
+confused. <img src="images/icon_wink.gif" alt="Wink" border="0"> <br>
+
+
+
+      <br>
+
+
+
+      <span style="font-style: italic;">Note</span>:
+These are standard install paths, since they acknowledge the standard
+phpBB install directory (phpBB2/). No further changes are needed for
+the phpBB configuration. <br>
+
+
+
+      <br>
+
+
+
+      <span style="font-weight: bold;">3)</span>
+Unzip the distributed mxBB Portal files and upload <br>
+
+
+
+      <br>
+
+
+
+      <span style="font-style: italic;">Special note</span>
+      <br>
+
+
+
+mxBB needs write access/permissions to the cache folder and the
+mx_meta.inc file. <br>
+
+
+
+      <br>
+
+
+
+## CHMOD (0777) THE FOLLOWING FILES/DIRECTORIES: <br>
+
+
+
+## - mxroot/cache/ <br>
+
+
+
+## - mxroot/mx_meta.inc <br>
+
+
+
+      <br>
+
+
+
+For those with Windows servers, CHMOD 0777 gives read, write, and
+access permissions to all 3 auth types (commonly Owner, Group, and
+Other/Anonymous). You'll have to give the files/folders above these
+permissions; this depends from host to host, though usually you can do
+it via your hosting control panel (ex. cPanel, DirectAdmin, etc.). <br>
+
+
+
+      <br>
+
+
+
+      <span style="font-weight: bold;">4)</span> In
+your browser, call <a href="http://www.yourdomain.com/mxbbroot/install/mx_install.php" target="_blank">http://www.yourdomain.com/mxbbroot/install/mx_install.php.</a>
+Replace "mxbbroot" with whatever name you had for your mxBB folder,
+which contains all of the mxBB files and folders. <br>
+
+
+
+      <br>
+
+
+
+With the new installer recently introduced for 2.7.5, all of the values
+should already be filled in, and you should be set up to go and click
+"Install." However, you should go over the information filled in. If
+you definitely need something changed, then go ahead and see <a href="http://www.mx-system.com/forum/viewtopic.php?t=6714#invpath">this
+document</a> for details on how to set the installer to allow you
+to enter your own settings. Note that you should <span style="font-weight: bold;">only do this if you know what you
+are doing</span>.<br>
+
+
+
+      <br>
+
+
+
+The aforementioned document describes this: </span><span class="postbody">"To choose your
+own configuration, as opposed to the installer's
+suggestions, open up the mx_install.php file in your
+favorite PHP or
+text editor:<br>
+
+
+
+      <br>
+
+
+
+      <big><span style="font-weight: bold;">Find:</span></big><br>
+
+
+
+      <br>
+
+
+
+      <small style="font-weight: bold;"><small>Code:</small></small><br>
+
+
+
+      <span class="code">define('INSTALL_READONLY',
+true);</span> <br>
+
+
+
+      <small><small><span style="font-weight: bold;"><br>
+
+
+
+      <big><big><big>Replace With:<br>
+
+
+
+      <br>
+
+
+
+      </big></big></big>Code:</span></small></small><br>
+
+
+
+      <span class="code">//
+define('INSTALL_READONLY', true)</span> <br>
+
+
+
+      <br>
+
+
+
+      </span><span class="postbody">Basically,
+you're commenting out that line, which will in turn allow you to set up
+your own configuration. </span><span class="postbody">"</span><span class="postbody"> <span style="font-style: italic;"><br>
+
+
+
+      <br>
+
+
+
+      <span style="font-weight: bold;">Note</span></span><span style="font-weight: bold;">:</span>
+The install script creates/generates the mxBB config.php file. If for
+some reason the install fails, you may need to remove the generated
+config.php manually before retrying the install.
+Also, if you feel like doing a fresh reinstallation, you have to remove
+old
+mxBB config.php file; otherwise, the script will try to update. <br>
+
+
+
+      <br>
+
+
+
+Also, some webservers deny the installer the rights to edit the
+config.php file. In this case you'll need to CHMOD the config.php file
+to 0777. (CHMOD is overviewed above). If you have any other errors
+regarding config.php (you shouldn't), go <a href="http://www.mx-system.com/forum/viewtopic.php?t=5593#configerror" target="_blank" class="postlink">here</a>.<br>
+
+
+
+      <br>
+
+
+
+      <span style="font-weight: bold;">5)</span>
+Don't forget to remove the install/ and contrib/ folders after a
+successful installation! Otherwise, this could mean a potential
+security hole.<br>
+
+
+
+      <br>
+
+
+
+      <span style="font-weight: bold;">6)</span>
+Installation Complete! <img src="images/icon_smile.gif" alt="Smile" border="0"> <br>
+
+
+
+Now enter the Portal AdminCP and configure the portal. The user
+interface is intuitive. For further information, visit some of our
+documents and Knowledge Base articles at <a href="http://www.mx-system.com">mx-system.com</a>. <br>
+
+
+
+      <br>
+
+
+
+      <img style="width: 143px; height: 398px;" alt="AdminCP Overview" src="http://www.mx-system.com/images/docs/adminCP_overview.gif">
+      <br>
+
+
+
+      <br>
+
+
+
+Note 1: In version 2.7.x the mxBB config.php
+file has a new format. This may be of interest for those who want to edit this file
+directly: </span>
+      
+      
+      <table align="center" border="0" cellpadding="3" cellspacing="1" width="90%">
+
+
+
+        <tbody>
+
+
+
+          <tr>
+
+
+
+            <td><span class="genmed"><b>Code:</b></span></td>
+
+
+
+          </tr>
+
+
+
+          <tr>
+
+
+
+            <td class="code">&lt;?php <br>
+
+
+
+            <br>
+
+
+
+&nbsp; // <br>
+
+
+
+&nbsp; // MX-Portal 2.x auto-generated config file <br>
+
+
+
+&nbsp; // <br>
+
+
+
+&nbsp; // <br>
+
+
+
+            <br>
+
+
+
+&nbsp; $mx_table_prefix = "mx_"; <br>
+
+
+
+            <br>
+
+
+
+&nbsp; define('MX_INSTALLED', true); <br>
+
+
+
+&nbsp; <br>
+
+
+
+&nbsp; $dbms = 'mysql'; <br>
+
+
+
+            <br>
+
+
+
+&nbsp; $dbhost = 'host'; <br>
+
+
+
+&nbsp; $dbname = 'DBNAME'; <br>
+
+
+
+&nbsp; $dbuser = 'DBUSER'; <br>
+
+
+
+&nbsp; $dbpasswd = 'DBPASSWD'; <br>
+
+
+
+            <br>
+
+
+
+&nbsp; $table_prefix = 'phpbb_'; <br>
+
+
+
+            <br>
+
+
+
+&nbsp; define('PHPBB_INSTALLED', true); <br>
+
+
+
+            <br>
+
+
+
+&nbsp; $phpbb_root_path = $mx_root_path . "/forum/" <br>
+
+
+
+            <br>
+
+
+
+?&gt;</td>
+
+
+
+          </tr>
+
+
+
+        
+        
+        </tbody>
+      
+      
+      </table>
+
+
+
+      <span class="postbody"><br>
+
+
+
+      <br>
+
+
+
+      <a href="#top">Back to Top</a> <br>
+
+
+
+      <br>
+
+
+
+      <a name="upgrade"> <br>
+
+
+
+      <span style="font-size: 18px; line-height: normal;"><span style="font-weight: bold;">Ib. Upgrade Instructions</span></span>
+      </a> <br>
+
+
+
+      <br>
+
+
+
+      <img style="width: 700px; height: 177px;" alt="mxBB Portal Upgrade Screenshot" src="http://www.mx-system.com/images/mxbb_upgrade_276.jpg"> <br>
+
+
+
+      <br>
+
+
+
+      </span><span class="postbody"><span style="font-style: italic;"><span style="font-weight: bold;">Note:</span> This
+screenshot is from the 2.7.6 release; however, this 2.7.7
+release only introduced security fixes; as such,
+nothing changed on the
+user's end.</span></span><span class="postbody">
+When upgrading from older versions, you should first apply the changes
+described to upgrade from your current version to the next, and so on! <br>
+
+
+
+      <br>
+
+
+
+      </span><span class="postbody">When upgrading
+from older versions, you should first apply the changes
+described to upgrade from your current version to the next, and so on!
+      <br>
+
+
+
+      <br>
+
+
+
+If your current portal version is far from more than one release,
+we advise you to remove all your portal files from your webspace, then
+proceed as if it was a new installation, except: keep your current
+portal config.php file (otherwise, the installation wizard will assume
+you're doing a fresh installation! ) and also all non-core modules in
+place.
+      <br>
+
+
+
+      <br>
+
+
+
+Remember: The rule that makes the Installation Wizard switch from
+installation to upgrade modes is the presence of a valid config.php in
+your portal root folder, with all correct settings in place. The
+upgrade mode makes changes to your database to upgrade to latest
+version, whereas the install mode DELETES all your previous portal
+tables (if exist) and then creates fresh tables with default settings!
+      <br>
+
+
+
+      <br>
+
+
+
+      <span style="color: red;">Please, make sure you have
+verified backups of ALL your files and database BEFORE proceeding!</span>
+      <br>
+
+
+
+      <br>
+
+
+
+Now, once you have done all of the above, use <span style="text-decoration: underline;">one</span> of the
+bolded green steps below.
+      </span><span class="postbody"><br>
+
+
+
+      <br>
+
+
+
+      </span><span class="postbody"><big><span style="font-weight: bold;"><span style="color: green;">Upgrading
+using the Full Package</span></span></big><br>
+
+
+
+      <br>
+
+
+
+      </span><span class="postbody">There are two
+ways to upgrade using the Full Package. They are as follows:<br>
+
+
+
+      <br>
+
+
+
+      </span><span class="postbody"><span style="font-size: 14px; line-height: normal;"><span style="font-weight: bold;">Method #1.</span></span>
+      <br>
+
+
+
+      
+      
+      <ol>
+
+
+
+        <li>Remove all of your mxBB files from your webspace, <span style="font-weight: bold;">except</span> for
+config.php and any other files you want to keep, but are not affected
+by the upgrade.
+          <br>
+
+
+
+        </li>
+
+
+
+        <li>Download the Core Full Package. UnZIP it.
+          <br>
+
+
+
+        </li>
+
+
+
+        <li>Upload all of the files in the Full Package into your
+webspace, <span style="font-weight: bold;">except</span>
+for config.php.
+          <br>
+
+
+
+        </li>
+
+
+
+        <li>Run <a href="http://www.yourdomain.com/mxbbroot/install/mx_install.php" target="_blank">http://www.yourdomain.com/mxbbroot/install/mx_install.php</a>
+to upgrade.
+          <br>
+
+
+
+        </li>
+
+
+
+        <li>Once the above step has been done, remove the
+install/ and contrib/ directories.
+          <br>
+
+
+
+        </li>
+
+
+
+        <li>You're done!<br>
+
+
+
+        </li>
+
+
+
+      
+      
+      </ol>
+
+
+
+      <span class="postbody"><br>
+
+
+
+      <span style="font-size: 14px; line-height: normal;"><span style="font-weight: bold;">Method #2.</span></span>
+      <br>
+
+
+
+      
+      
+      <ol type="1">
+
+
+
+        <li>Download the Core Full Package. UnZIP it.
+          <br>
+
+
+
+        </li>
+
+
+
+        <li>Find the appropriate HTML upgrade document in the
+install/
+folder. The naming convention is as
+follows:"mx_upgrade_changes_between_2.7.x_and_2.7.x.htm". Please follow
+          <span style="text-decoration: underline;">all</span>
+of the instructions located in those upgrade documents.
+The list of these available documents is as follows:<br>
+
+
+          <br>
+
+
+
+          
+          
+          <ul>
+
+
+
+            <li style="font-weight: bold;"><a href="mx_upgrade_changes_between_2.7.3_and_2.7.5.htm">Upgrade from 2.7.3 to 2.7.5</a></li>
+
+
+            <li><a style="font-weight: bold;" href="mx_upgrade_changes_between_2.7.5_and_2.7.5-pl4.htm">Upgrade from 2.7.5 to 2.7.5-pl4</a></li>
+
+
+            <li><a style="font-weight: bold;" href="mx_upgrade_changes_between_2.7.5-pl4_and_2.7.6.htm">Upgrade from 2.7.5-pl4 to 2.7.6</a></li>
+
+
+            <li><a style="font-weight: bold;" href="mx_upgrade_changes_between_2.7.6_and_2.7.6-pl1.html">Upgrade from 2.7.6 to 2.7.6-pl1</a></li>
+
+
+            <li><a style="font-weight: bold;" href="mx_upgrade_changes_between_2.7.6-pl1_and_2.7.6-pl2.html">Upgrade from 2.7.6-pl1 to 2.7.6-pl2</a></li>
+
+
+			<li><a style="font-weight: bold;" href="mx_upgrade_changes_between_2.7.6-pl2_and_2.7.7.html">Upgrade from 2.7.6-pl2 to 2.7.7</a></li>
+
+          
+          
+          </ul>
+
+
+
+          <br>
+
+
+
+        </li>
+
+
+
+        <li>The previous step covers all of Method #2.
+          Make sure you've done everything those documents instruct you to do.<br>
+
+
+
+        </li>
+
+
+
+        <li>You're done!</li>
+
+
+
+      
+      
+      </ol>
+
+
+
+      <br>
+
+
+
+      <span class="postbody"><span style="font-weight: bold;"><span style="color: green;"><big>Upgrading
+using the Changed Files Package</big><br>
+
+
+
+      </span></span></span><span class="postbody">
+      
+      
+      <ol type="1">
+
+
+
+        <li>Download the Core Changed Files Package. UnZIP
+it.
+          <br>
+
+
+
+        </li>
+
+
+
+        <li>Find the appropriate folder that matches the
+upgrade
+path
+you're attempting. For example, if you wish to upgrade from mxBB 2.7.5
+to 2.7.7, you should find the folder named "2.7.5 to 2.7.7".
+          <br>
+
+
+
+        </li>
+
+
+
+        <li>Upload the contents of the appropriate folder
+into
+your root
+mxBB folder, which is on your webspace. Make sure your FTP client
+"knows" to overwrite the old files with the new ones.
+          <br>
+
+
+
+        </li>
+
+
+
+        <li>Finish the upgrade by running <a href="http://www.yourdomain.com/mxbbroot/install/mx_install.php" target="_blank">http://www.yourdomain.com/mxbbroot/install/mx_install.php</a>
+.
+          <br>
+
+
+
+        </li>
+
+
+
+        <li>Remove the install/ directory from your webspace.
+          <br>
+
+
+
+        </li>
+
+
+
+        <li>You're done!</li>
+
+
+
+      
+      
+      </ol>
+
+
+
+      </span><span class="postbody"><span style="font-weight: bold;"><span style="color: green;"></span></span><big>&nbsp;</big></span><span class="postbody"><big><span style="font-weight: bold;"><span style="color: green;">Upgrading using the Code Changes
+Package</span></span>
+      </big><br>
+
+
+
+      
+      
+      <ol type="1">
+
+
+
+        <li>Download the Code Changes Package.
+          <br>
+
+
+
+        </li>
+
+
+
+        <li>Find the appropriate text file that has the
+upgrade
+path
+you're using. The naming convention is as follows: "cc_27x-27x.txt";
+the first "27x" represents the version you're currently running, while
+the second "27x" is the "target version" (ie the one you're going to
+upgrade to).
+          <br>
+
+
+
+        </li>
+
+
+
+        <li>Read through the install script's header <span style="font-weight: bold;">before</span> proceeding.
+Pay special attention to the "MOD Description" and "Author's Notes"
+fields.
+          <br>
+
+
+
+        </li>
+
+
+
+        <li>Do everything the install script says.
+          <br>
+
+
+
+        </li>
+
+
+
+        <li>Upload the install/ folder that was distributed
+in
+the Code Changes package into your root mxBB folder.
+          <br>
+
+
+
+        </li>
+
+
+
+        <li>Finish the upgrade by running <a href="http://www.yourdomain.com/mxbbroot/install/mx_install.php" target="_blank">http://www.yourdomain.com/mxbbroot/install/mx_install.php</a>
+.
+          <br>
+
+
+
+        </li>
+
+
+
+        <li>Delete the install/ folder.
+          <br>
+
+
+
+        </li>
+
+
+
+        <li>You're done!</li>
+
+
+
+      
+      
+      </ol>
+
+
+
+      </span><span class="postbody"><span class="postbody">
+      </span>
+
+      </span><span class="postbody"> <br>
+
+
+
+      <span style="font-weight: bold;"></span><span style="font-style: italic;">Note:</span>
+If you are upgrading from mxBB 2.704, note that we have renamed most of the core
+images
+and moved them to the template's folder. This will affect nav images in
+the menu, and Page Admin. You'll have to update the image names
+manually!! There is a PhotoShop template file ( *.PSD ) in the mxBB
+Download area with all mxBB graphics if you want to develop your own
+styles; it is located <a href="http://www.mx-system.com/index.php?page=4&amp;action=file&amp;file_id=10">here</a>.<br>
+
+
+
+      <br>
+
+
+
+      <a href="#top">Back to Top</a> <br>
+
+
+
+      <br>
+
+
+
+      <a name="modules"> <br>
+
+
+
+      <span style="font-size: 18px; line-height: normal;"><span style="font-weight: bold;">II. Installing Add-On Modules</span></span>
+      </a> <br>
+
+
+
+      <br>
+
+
+
+Official Modules are released <a href="http://www.mx-system.com/forum/viewforum.php?f=11" target="_blank" class="postlink">here</a>.
+Simply download a module pack, un-ZIP it onto your computer, and upload
+it into the mxroot/modules/ folder (see image below). Go into your mxBB
+Admin CP, and click on the "Install Module" button in the <span style="font-weight: bold;">Module Administration</span>
+page. For further instructions, see the install documentation for the
+module. <br>
+
+
+
+      <br>
+
+
+
+      <a href="#top">Back to Top</a> <br>
+
+
+
+      <br>
+
+
+
+      <img style="width: 286px; height: 248px;" alt="Modules Setup" src="http://www.mx-system.com/images/docs/setup_modules.gif">
+      <br>
+
+
+
+      <br>
+
+
+
+      <a name="themes"> <br>
+
+
+
+      <span style="font-size: 18px; line-height: normal;"><span style="font-weight: bold;">III. Additional Themes/Styles</span></span>
+      </a> <br>
+
+
+
+      <br>
+
+
+
+Installed phpBB themes/templates may be used for mxBB too, but they
+also need to be installed for mxBB. Read the whole documentation
+article regarding theme installs <a href="http://www.mx-system.com/forum/viewtopic.php?t=4741" target="_blank" class="postlink">here</a>.
+Common style customization questions that have been answered can be
+found <a href="http://www.mx-system.com/forum/viewtopic.php?t=7762">here</a>.<br>
+
+
+
+      <br>
+
+
+
+      <span style="font-style: italic;">Note:</span>
+mxBB uses the same theme/style syntax as phpBB, so please be sure you
+understand the phpBB approach before trying to adapt a theme to mxBB! <br>
+
+
+
+      <br>
+
+
+
+      <a href="#top">Back to Top</a> <br>
+
+
+
+      <br>
+
+
+
+      <a name="languages"> <br>
+
+
+
+      <span style="font-size: 18px; line-height: normal;"><span style="font-weight: bold;">IV. Additional Languages</span></span>
+      <br>
+
+
+
+      <br>
+
+
+
+      </a></span><span class="postbody">First,
+check to see if your
+language is already translated. Translated languages are
+downloaded in the mxBB download area. The translations/language packs
+are released and maintained <a href="http://www.mx-system.com/forum/viewforum.php?f=42">here</a>.
+      <br>
+
+
+
+      <br>
+
+
+
+If your language has not already been translated, you can create a
+translation yourself! Simply duplicate (copy and
+paste) the /language/lang_english/ directory, rename
+it to something
+like "lang_yourlanguage." Translate all of the included files,
+save
+it, ZIP it, and upload it to the mxBB Languages Download Area. Be sure
+to <a href="http://www.mx-system.com/forum/viewforum.php?f=42">report</a>
+translated languages to us. We appreciate your contribution.</span><span class="postbody">&nbsp;<img src="images/icon_smile.gif" alt="Smile" border="0">
+      <br>
+
+
+
+      <br>
+
+
+
+      <a href="#top">Back to Top</a> <br>
+
+
+
+      <br>
+
+
+
+Jon and MHobbit<br>
+
+
+
+      <span style="font-style: italic;">On behalf of
+the <a href="http://www.mx-system.com/index.php?page=143">mxBB Project
+Team</a></span></span>
+      </span></span></td>
+
+
+
+    </tr>
+
+
+
+  
+  
+  </tbody>
+</table>
+
+
+
+</body>
+</html>

@@ -2,7 +2,7 @@
 /**
 *
 * @package Tools
-* @version $Id: mx_functions_tools.php,v 1.67 2014/05/09 07:51:42 orynider Exp $
+* @version $Id: mx_functions_tools.php,v 3.67 2020/02/25 11:01:24 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
@@ -66,7 +66,7 @@ class mx_text
 	 */
 	function init($html_on = false, $bbcode_on = true, $smilies_on = false, $links_on = true, $images_on = true)
 	{
-		global $theme, $mx_cache;
+		global $phpBB2, $theme, $mx_cache;
 
 		//
 		// Toggles
@@ -128,7 +128,7 @@ class mx_text
 			unset($words);
 
 			$this->highlight = urlencode($_GET['highlight']);
-			$this->highlight_match = phpBB2::phpbb_rtrim($this->highlight_match, "\\");
+			$this->highlight_match = $phpBB2->phpbb_rtrim($this->highlight_match, "\\");
 		}
 
 		//
@@ -1341,7 +1341,16 @@ class mx_text_formatting
 
 			$match = array();
 			$replace = array();
+			
+			/**
+			 * Sick and tired of these variables getting lost...
+			 */
+			$html_entities_match = array('#&(?!(\#[0-9]+;))#', '#<#', '#>#', '#"#');
+			$html_entities_replace = array('&amp;', '&lt;', '&gt;', '&quot;');
 
+			$unhtml_specialchars_match = array('#&gt;#', '#&lt;#', '#&quot;#', '#&amp;#');
+			$unhtml_specialchars_replace = array('>', '<', '"', '&');
+			
 			// relative urls for this board
 			$match[] = '#(^|[\n ])' . $server_protocol . trim( $board_config['server_name'] ) . $server_port . preg_replace( '/^\/?(.*?)(\/)?$/', '$1', trim( $board_config['script_path'] ) ) . '/([^ \t\n\r <"\']+)#i';
 			$replace[] = '<a href="$1" target="_blank">$1</a>';
@@ -1359,7 +1368,7 @@ class mx_text_formatting
 
 			$url = preg_replace($match, $replace, $url);
 			// Also fix already tagged links
-			$url = preg_replace( "/<a href=(.*?)>(.*?)<\/a>/i", "(strlen(\"\\2\") > 25 && !stristr(\"\\2\", \"<\") ) ? '<a href='.stripslashes(\"\\1\").'>'.substr(str_replace(\"http://\",\"\",\"\\2\"), 0, 17) . '...</a>' : '<a href='.stripslashes(\"\\1\").'>'.\"\\2\".'</a>'", $url );
+			//$url = preg_replace( "/<a href=(.*?)>(.*?)<\/a>/i", "(strlen(\"\\2\") > 25 && !stristr(\"\\2\", \"<\") ) ? '<a href='.stripslashes(\"\\1\").'>'.substr(str_replace(\"http://\",\"\",\"\\2\"), 0, 17) . '...</a>' : '<a href='.stripslashes(\"\\1\").'>'.\"\\2\".'</a>'", $url );
 			// $url = preg_replace("/<a href=(.*?)>(.*?)<\/a>/ie", "(strlen(\"\\2\") > 25 && !eregi(\"<\", \"\\2\") ) ? '<a href='.stripslashes(\"\\1\").'>'.substr(str_replace(\"http://\",\"\",\"\\2\"), 0, 12) . ' ... ' . substr(\"\\2\", -3).'</a>' : '<a href='.stripslashes(\"\\1\").'>'.\"\\2\".'</a>'", $url);
 			return $url;
 		}
@@ -3811,7 +3820,7 @@ class phpbb_posts
 	    $bbcode_on = 1,
 	    $smilies_on = 1)
 	{
-		global $db, $phpbb_root_path, $phpEx, $board_config, $user_ip, $portal_config, $lang, $userdata, $mx_user, $phpbb_auth, $mx_bbcode, $mx_backend;
+		global $phpBB2, $db, $phpbb_root_path, $phpEx, $board_config, $user_ip, $portal_config, $lang, $userdata, $mx_user, $phpbb_auth, $mx_bbcode, $mx_backend;
 
 		//
 		// initialise some variables
@@ -3831,7 +3840,7 @@ class phpbb_posts
 		$subject = mx_censor_text($subject);
 
 	    $username = addslashes(unprepare_message(trim($user_name)));
-	    $username = phpBB2::phpbb_clean_username($username);
+	    $username = $phpBB2->phpbb_clean_username($username);
 		
 
 		// Unique ID for this message..
@@ -4265,7 +4274,7 @@ class phpbb_posts
 			break;
 
 			case 'phpbb2':
-				phpBB2::add_search_words('single', $post_id, stripslashes($message), stripslashes($subject));
+				$phpBB2->add_search_words('single', $post_id, stripslashes($message), stripslashes($subject));
 
 			break;
 			
@@ -4331,7 +4340,7 @@ class phpbb_posts
 				break;
 
 				case 'phpbb2':
-					phpBB2::add_search_words('single', $first_post_id, stripslashes($message_update_first), stripslashes($subject_update_first));
+					$phpBB2->add_search_words('single', $first_post_id, stripslashes($message_update_first), stripslashes($subject_update_first));
 
 				break;
 				case 'phpbb3':
@@ -5678,7 +5687,7 @@ class mx_comments extends phpbb_posts
 	 */
 	function display_internal_comments()
 	{
-		global $template, $lang, $board_config, $phpEx, $db, $userdata, $images, $mx_user;
+		global $phpBB2, $template, $lang, $board_config, $phpEx, $db, $userdata, $images, $mx_user;
 		global $mx_root_path, $module_root_path, $phpbb_root_path, $is_block, $phpEx, $mx_request_vars, $portal_config;
 
 		//
@@ -5730,7 +5739,7 @@ class mx_comments extends phpbb_posts
 
 		while ( $this->comments_row = $db->sql_fetchrow( $result ) )
 		{
-			$time = phpBB2::create_date( $board_config['default_dateformat'], $this->comments_row['comments_time'], $board_config['board_timezone'] );
+			$time = $phpBB2->create_date( $board_config['default_dateformat'], $this->comments_row['comments_time'], $board_config['board_timezone'] );
 
 			//
 			// Decode comment for display
@@ -5871,7 +5880,7 @@ class mx_comments extends phpbb_posts
 		}
 
 		$num_of_replies = intval( $this->total_comments );
-		//$pagination = phpBB2::generate_pagination( $this->u_pagination($page_num), $num_of_replies, $this->pagination_num, $this->start ) . '&nbsp;';
+		//$pagination = $phpBB2->generate_pagination( $this->u_pagination($page_num), $num_of_replies, $this->pagination_num, $this->start ) . '&nbsp;';
 		$pagination = mx_generate_pagination( $this->u_pagination($page_num), $num_of_replies, $this->pagination_num, $this->start, true, true, true, false ) . '&nbsp;';
 		if ($num_of_replies > 0)
 		{
@@ -5891,7 +5900,7 @@ class mx_comments extends phpbb_posts
 	 */
 	function display_phpbb_comments( )
 	{
-		global $template, $lang, $board_config, $phpEx, $db, $userdata, $images, $mx_user;
+		global $phpBB2, $template, $lang, $board_config, $phpEx, $db, $userdata, $images, $mx_user;
 		global $mx_root_path, $module_root_path, $phpbb_root_path, $is_block, $phpEx, $mx_request_vars, $portal_config;
 
 		if ( !isset($this->topic_id) || $this->topic_id < 0 )
@@ -5955,10 +5964,10 @@ class mx_comments extends phpbb_posts
 		{
 			$poster_id = $this->comments_row['user_id'];
 			$poster = ( $poster_id == ANONYMOUS ) ? $lang['Guest'] : $this->comments_row['username'];
-			$time = phpBB2::create_date( $board_config['default_dateformat'], $this->comments_row['post_time'], $board_config['board_timezone'] );
+			$time = $phpBB2->create_date( $board_config['default_dateformat'], $this->comments_row['post_time'], $board_config['board_timezone'] );
 			$poster_posts = ( $this->comments_row['user_id'] != ANONYMOUS ) ? $lang['Posts'] . ': ' . $this->comments_row['user_posts'] : '';
 			$poster_from = ( $this->comments_row['user_from'] && $this->comments_row['user_id'] != ANONYMOUS ) ? $lang['Location'] . ': ' . $this->comments_row['user_from'] : '';
-			$poster_joined = ( $this->comments_row['user_id'] != ANONYMOUS ) ? $lang['Joined'] . ': ' . phpBB2::create_date( $lang['DATE_FORMAT'], $this->comments_row['user_regdate'], $board_config['board_timezone'] ) : '';
+			$poster_joined = ( $this->comments_row['user_id'] != ANONYMOUS ) ? $lang['Joined'] . ': ' . $phpBB2->create_date( $lang['DATE_FORMAT'], $this->comments_row['user_regdate'], $board_config['board_timezone'] ) : '';
 
 			//
 			// Handle anon users posting with usernames
@@ -6009,7 +6018,7 @@ class mx_comments extends phpbb_posts
 			{
 				$l_edit_time_total = ( $this->comments_row['post_edit_count'] == 1 ) ? $lang['Edited_time_total'] : $lang['Edited_times_total'];
 
-				$l_edited_by = '<br /><br />' . sprintf( $l_edit_time_total, $poster, phpBB2::create_date( $board_config['default_dateformat'], $this->comments_row['post_edit_time'], $board_config['board_timezone'] ), $this->comments_row['post_edit_count'] );
+				$l_edited_by = '<br /><br />' . sprintf( $l_edit_time_total, $poster, $phpBB2->create_date( $board_config['default_dateformat'], $this->comments_row['post_edit_time'], $board_config['board_timezone'] ), $this->comments_row['post_edit_count'] );
 			}
 			else
 			{
@@ -6114,7 +6123,7 @@ class mx_comments extends phpbb_posts
 		}
 
 		$num_of_replies = intval( $this->total_comments );
-		$pagination = phpBB2::generate_pagination( $this->u_pagination($page_num), $num_of_replies, $this->pagination_num, $this->start ) . '&nbsp;';
+		$pagination = $phpBB2->generate_pagination( $this->u_pagination($page_num), $num_of_replies, $this->pagination_num, $this->start ) . '&nbsp;';
 
 		if ($num_of_replies > 0)
 		{

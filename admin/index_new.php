@@ -1,24 +1,21 @@
 <?php
 /**
  *
- * @package Mx-Publisher Core
+ * @package mx-Publisher Core
  * @version $Id: index_new.php,v 1.19 2013/06/17 02:53:26 orynider Exp $
  * @copyright (c) 2002-2006 mxBB Project Team
  * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
  * @link http://www.mxbb.net
  * @origin This file is borrowed from phpBB, with some modifications
  */
- 
 // Security and Page header
 @define('IN_PORTAL', 1);
-
 $mx_root_path = './../';
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
 $no_page_header = TRUE;
 
 require($mx_root_path.'admin/pagestart.' . $phpEx);
 error_reporting( E_ALL ^ E_NOTICE );
-
 // ------------------------------
 // DEBUG ONLY ;-)
 // error_reporting(E_ALL);
@@ -43,11 +40,11 @@ function inarray( $needle, $haystack )
 	}
 	return false;
 }
-
 function inarray_dec_( $needle, $haystack )
 {
 	return inarray( $needle, $haystack );
 }
+
 
 function cache_filename( $part = 'NONE', $file = '')
 {
@@ -76,14 +73,11 @@ function cache_filename( $part = 'NONE', $file = '')
 function cache_file( $code, $part = 'NONE', $file = '')
 {
 	$filename = cache_filename( $part, $file);
-	
 	$fopen = fopen( $filename, 'w');
 	fwrite( $fopen, "<?php\r\n$code\r\n?>");
 	fclose( $fopen);
-	
 	return $filename;
 }
-
 /**
  * Enter description here...
  *
@@ -111,7 +105,6 @@ function read_admin( $dir_module )
 	return $module;
 }
 // End functions
-
 // -------------
 /**
  */
@@ -119,25 +112,8 @@ if ( !defined( 'PORTAL_BACKEND' ) )
 {
 	define( 'PORTAL_BACKEND', 'phpbb2' );
 }
-
 define( 'PHPBB2X_BACKEND', 'phpbb2' );
-
-switch ( PORTAL_BACKEND )
-{
-	case 'internal':
-	case 'phpbb2':
-		define( 'OLYMPUS_BACKEND', 'phpbb2' );
-	break;
-
-	case 'phpbb3':
-	case 'olympus':
-	case 'rhea':
-	case 'ascraeus':
-	case 'proteus':
-	default:
-		define( 'OLYMPUS_BACKEND', 'phpbb3' );
-	break;
-}
+define( 'OLYMPUS_BACKEND', 'phpbb3' );
 
 define( 'MAIN_CATEGORY', 'portal' );
 define( 'MODULE_CATEGORY', 'modules' );
@@ -150,7 +126,6 @@ if ( ( empty( $_SID ) || $_SID == 'sid=' ) )
 {
 	$_SID = 'sid='.$mx_request_vars->get('sid', MX_TYPE_NO_TAGS);
 }
-
 if ( ( empty( $SID ) || $SID == 'sid=' ) )
 {
 	$SID = 'sid='.$mx_request_vars->get('sid', MX_TYPE_NO_TAGS);
@@ -162,7 +137,6 @@ if ( PORTAL_BACKEND == PHPBB2X_BACKEND )
 	mx_cache::load_file( 'functions_selects' );
 	mx_cache::load_file( 'functions_validate' );
 }
-
 if ( PORTAL_BACKEND == OLYMPUS_BACKEND )
 {
 	//include_once( $mx_root_path . 'includes/sessions/phpbb3/auth.' . $phpEx );
@@ -176,7 +150,6 @@ if ( PORTAL_BACKEND == OLYMPUS_BACKEND )
 
 	$phpbb_admin_path = ( defined( 'PHPBB_ADMIN_PATH' ) ) ? PHPBB_ADMIN_PATH : 'adm/';
 }
-
 class mx_acp
 {
 	var $template;
@@ -196,7 +169,6 @@ class mx_acp
 	var $action_script = '';
 	var $phpbb3_hook = null;
 	var $phpbb3_i = null;
-
 	/**
 	 * Constructor
 	 *
@@ -227,8 +199,7 @@ class mx_acp
 	 */
 	function decode_url( $params )
 	{
-		global $lang, $mx_user;
-		
+		global $lang, $mx_user ;
 		if ( isset( $params['cat'] ) )
 		{
 			$this->category = $params['cat'];
@@ -236,23 +207,19 @@ class mx_acp
 			{
 				case MAIN_CATEGORY:
 					$this->category_title = $lang['MX_Portal'];
-				break;
-				
+					break;
 				case MODULE_CATEGORY:
 					$this->category_title = $lang['MX_Modules'];
-				break;
-				
+					break;
 				case PHPBB2X_CATEGORY:
 					$this->category_title = $lang['Phpbb'];
-				break;
-				
+					break;
 				case OLYMPUS_CATEGORY:
 					$this->category_title = '';
-					$this->phpbb3_i = $params['i'];
-				break;
+					$this->phpbb3_i = @$params['i'];
+					break;
 			} // switch
 		}
-		
 		if ( isset( $params['panel'] ) )
 		{
 			$this->panel = $params['panel'];
@@ -273,7 +240,6 @@ class mx_acp
 			'PARAMS' => '',
 			'L_TAB' => $lang['MX_Portal'],
 			);
-		
 		// MX PORTAL MODULE CATEGORY
 		$this->tabs[] = array( // #
 			'ACTIVE_TAB' => ( $this->category == MODULE_CATEGORY )?'activetab':'',
@@ -291,8 +257,7 @@ class mx_acp
 					'PARAMS' => '',
 					'L_TAB' => $lang['Phpbb'],
 					);
-			break;
-			
+				break;
 			case OLYMPUS_BACKEND: // phpBB3 Backend TABS
 				$phpbb3_tabs = $this->phpbb3_hook->get_tabs( $this->phpbb3_i );
 				if ( $this->category == OLYMPUS_CATEGORY )
@@ -300,7 +265,7 @@ class mx_acp
 					$this->category_title = $lang['Phpbb'] . ' &bull; ' . $phpbb3_tabs['CATEGORY_TITLE'];
 				}
 				$this->tabs = array_merge( $this->tabs, $phpbb3_tabs['TABS'] );
-			break;
+				break;
 		}
 
 		foreach( $this->tabs as $key => $tab )
@@ -329,8 +294,7 @@ class mx_acp
 						$this->menu_actions[$action] = 'panel=' . $menu;
 					}
 				}
-			break;
-		
+				break;
 			case OLYMPUS_CATEGORY:
 
 				$cat_main = array_keys( $menu_array );
@@ -346,7 +310,7 @@ class mx_acp
 						}
 					}
 				}
-			break;
+				break;
 		}
 	}
 
@@ -379,7 +343,6 @@ class mx_acp
 		}
 		$db->sql_freeresult( $result );
 		$menu_array = array();
-		
 		for( $module_cnt = 0; $module_cnt < $total_modules; $module_cnt++ )
 		{
 			$module_path_admin = $mx_root_path . $module_rows[$module_cnt]['module_path'] . "admin/";
@@ -423,12 +386,12 @@ class mx_acp
 				}
 				$this->menu_complete[PHPBB2X_CATEGORY] = $menu_array;
 				$this->_read_menu_actions( $menu_array, PHPBB2X_CATEGORY );
-			break;
-			
+
+				break;
 			case OLYMPUS_BACKEND:
 				$this->menu_complete[OLYMPUS_CATEGORY] = $this->phpbb3_hook->get_menu_complete();
 				$this->_read_menu_actions( $this->menu_complete[OLYMPUS_CATEGORY], OLYMPUS_CATEGORY );
-			break;
+				break;
 		}
 
 		$menu_array = $this->menu_complete[$this->category];
@@ -446,8 +409,7 @@ class mx_acp
 					$panel_keys = array_keys( $mnu_ary[$menu_array_keys[0]] );
 					$this->panel = $panel_keys[0];
 				}
-			break;
-			
+				break;
 			case OLYMPUS_CATEGORY:
 				$allow_menu_sort = false;
 				$menu_array = $this->phpbb3_hook->get_menu( $this->phpbb3_i );
@@ -457,7 +419,7 @@ class mx_acp
 					$p_keys = array_keys( $menu_array[$menu_keys[0]] );
 					$this->panel = $p_keys[0];
 				}
-			break;
+				break;
 		}
 
 		if ( sizeOf( $menu_array ) == 0 )
@@ -507,13 +469,12 @@ class mx_acp
 				{
 					case OLYMPUS_CATEGORY:
 						$menu_link_params = preg_replace( '#panel=[^&]*#', '&amp;cat=' . $this->category . '&amp;panel=' . $panel, $file_part[1] );
-					break;
-					
+						break;
 					case PHPBB2X_CATEGORY:
 					case MODULE_CATEGORY:
 					case MAIN_CATEGORY:
 						$menu_link_params = str_replace( '?', '', '&amp;cat=' . $this->category . '&amp;panel=' . $panel . '&amp;' . $file_part[1] );
-					break;
+						break;
 				}
 
 				$menu_link_params = explode( '&amp;', $menu_link_params );
@@ -563,9 +524,7 @@ class mx_acp
 			case PHPBB2X_CATEGORY:
 				$script = trim( file_get_contents( $mx_root_path . $this->action_script ) );
 				$folders = explode( '/' , dirname( $this->action_script ) );
-				
 				$module_root_path = '';
-				
 				for( $i = 0; $i < sizeOf( $folders ); $i++ )
 				{
 					if ( $folders[$i] == 'admin' )
@@ -573,9 +532,8 @@ class mx_acp
 						unset( $folders[$i] );
 					}
 				}
-				
 				$module_root_path = implode( '/', $folders ) . '/';
-				
+
 				$preg_array = array( '#^<\?(php)?#' => '',
 					'#\?>$#' => '',
 					"#define\('IN_PORTAL', 1\);#si" => '',
@@ -594,21 +552,17 @@ class mx_acp
 					'#\sexit;#si' => 'return;// exit;',
 
 					);
-				
 				$preg_array = array_merge( $preg_array, array( // #
 						"#([\n\t ](@?(include|require)\\(\\\$phpbb_root_path[^;]*;))#si" => '// \2 // <<== PHPBB2 INCLUDE',
 						"#([\n\t ](@?(include|require)[^(lang)]*;))#si" => "\n" . '// \2 //<= has been allready defined INCLUDE',
 						) );
-				
 				// PHPBB2 FUNCTIONS REPLACE
 				$functions_ary = array( // #
 					'get_userdata', 'phpbb_clean_username', phpbb_realpath
 					);
-				
 				$preg_array = array_merge( $preg_array, array( // #
 						'#(' . implode( '|', $functions_ary ) . ')\(#si' => '$phpBB2->\1(',
 						) );
-				
 				// REPLACE FUNCTIONS that ARE ALLREADY DECLARED
 				$func_cnt = preg_match_all( "#\nfunction ([^(]*)\\(#si", $script, $func_match );
 
@@ -624,11 +578,10 @@ class mx_acp
 
 				$script = preg_replace( array_keys( $preg_array ), $preg_array, $script );
 				$script = str_replace( '$phpBB2->$phpBB2->', '$phpBB2->', $script );
-			break;
-			
+				break;
 			case OLYMPUS_BACKEND:
 				$script = $this->phpbb3_hook->prepare_action_script( $this->panel );
-			break;
+				break;
 		} // switch
 		return $script;
 	}
@@ -644,20 +597,18 @@ class mx_acp
 	function _template_set_filenames()
 	{
 		$this->template->set_filenames( array( 'adm_header' => 'admin/mainpage_header.html',
-			'adm_body' => 'admin/mainpage_body.html',
-			'adm_footer' => 'admin/mainpage_footer.html',
-			) );
+				'adm_body' => 'admin/mainpage_body.html',
+				'adm_footer' => 'admin/mainpage_footer.html',
+				) );
 	}
 
 	function _convert_links( &$text, $match_links = array() )
 	{
 		global $phpEx, $mx_root_path;
-		
 		$match_count = count( $match_links['LINK'] );
 		$values = array_keys( $this->menu_actions );
 		$values_cnt = count( $values );
 		$admin_path = substr( str_replace( dirname( realpath( $mx_root_path . 'index.' . $phpEx ) ) , '', dirname( __FILE__ ) ), 1 ) . '/';
-		
 		switch ( $this->category )
 		{
 			case MAIN_CATEGORY:
@@ -684,9 +635,7 @@ class mx_acp
 						} // if END
 					} // for END
 				} // for END
-			
-			break;
-			
+				break;
 			case OLYMPUS_CATEGORY:
 				$text = $this->phpbb3_hook->_convert_links( $text );
 				/*print '<pre>';
@@ -694,8 +643,7 @@ class mx_acp
 				print '<hr/>';
 				print_r( $match_links);
 				//die( 'here');*/
-			break;
-		
+				break;
 		}
 	}
 
@@ -724,7 +672,6 @@ class mx_acp
 		global $mx_root_path, $phpbb_root_path, $phpEx;
 
 		$preg_pattern = $preg_replace = array();
-
 		switch ( $this->category )
 		{
 			case MAIN_CATEGORY:
@@ -738,14 +685,12 @@ class mx_acp
 				$matched_links['PARAMS'] = $match_links[9];
 
 				$this->_convert_links( $acp_html, $matched_links );
-			break;
-
+				break;
 			case OLYMPUS_CATEGORY:
 				$acp_html = $this->phpbb3_hook->assign_content_acp( $acp_html );
 				// $acp_html = '<h1>' . $this->panel_title . '</h1><p>Panel: ' . $this->panel . '</p>' . $acp_html;
-			break;
+				break;
 		} // switch
-		
 		$forms_cnt = preg_match_all( "#<form([^>]*)>#si", $acp_html, $forms );
 
 		for( $f_i = 0; $f_i < $forms_cnt; $f_i++ )
@@ -753,7 +698,6 @@ class mx_acp
 			$form_cnt = preg_match_all( "#([^=]*)=[\"']([^\"']*)[\"']#si", $forms[1][$f_i], $form );
 			$form_action = '';
 			$form_method = '';
-			
 			for( $i = 0; $i < $form_cnt; $i++ )
 			{
 				if ( strtolower( trim( $form[1][$i] ) ) == 'method' )
@@ -786,10 +730,10 @@ class mx_acp
 	function _template_assign_vars()
 	{
 		global $board_config, $userdata, $lang, $mx_user, $admincp_nav_icon_url;
-		global $theme, $images, $mx_starttime, $db, $phpBB2, $phpEx;
+		global $theme, $images, $mx_starttime, $db, $phpEx;
 
 		$l_timezone = explode( '.', $board_config['board_timezone'] );
-		$l_timezone = ( count( $l_timezone ) > 1 && $l_timezone[count( $l_timezone )-1] != 0 ) ? $lang[sprintf( '%.1f', $board_config['board_timezone'] )] : $lang[number_format($mx_user->timezone)];
+		$l_timezone = ( count( $l_timezone ) > 1 && $l_timezone[count( $l_timezone )-1] != 0 ) ? $lang[sprintf( '%.1f', $board_config['board_timezone'] )] : $lang[number_format( $board_config['board_timezone'] )];
 		// Generate stats
 		$endtime = explode( ' ', microtime() );
 		$stime = ( $endtime[1] + $endtime[0] ) - $mx_starttime;
@@ -800,21 +744,14 @@ class mx_acp
 			case 'internal':
 			case 'phpbb2':
 				$current_phpbb_version = '2' . $board_config['version'];
-			break;
+				break;
 
 			case 'phpbb3':
-			case 'olympus':
-			case 'rhea':
-			case 'ascraeus':
-			case 'proteus':
-			default:
 				$current_phpbb_version = $board_config['version'];
-			break;
+				break;
 		}
-		
 		// isset( $mx_user->lang[$action_file_id] )?$mx_user->lang[$action_file_id]:( isset( $lang[$action_file_id] )?$lang[$action_file_id]:str_replace( '_' , ' ', $action_file_id ) )
 		$global_vars = array(
-		
 			// +MOD: DHTML Menu for ACP
 			'COOKIE_NAME' => $board_config['cookie_name'],
 			'COOKIE_PATH' => $board_config['cookie_path'],
@@ -823,7 +760,6 @@ class mx_acp
 			'IMG_URL_CONTRACT' => $admincp_nav_icon_url . '/contract.gif',
 			'IMG_URL_EXPAND' => $admincp_nav_icon_url . '/expand.gif',
 			// -MOD: DHTML Menu for ACP
-			
 			'U_PORTAL_ROOT_PATH' => PORTAL_URL,
 			'U_PHPBB_ROOT_PATH' => PHPBB_URL,
 			'TEMPLATE_ROOT_PATH' => TEMPLATE_ROOT_PATH,
@@ -833,13 +769,13 @@ class mx_acp
 			'T_GECKO_STYLESHEET' => 'gecko.css',
 
 			'MX_ICON_CSS' => $images['mx_graphics']['icon_style'],
-			'LOGO' => !empty( $images['mx_logo_acp'] ) ? $images['mx_logo_acp']: $images['mx_logo'],
+			'LOGO' => !empty( $images['mx_logo_acp'] ) ? @$images['mx_logo_acp']: @$images['mx_logo'],
 
 			"U_PORTAL_INDEX" => mx_append_sid( PORTAL_URL . basename( __FILE__ ) ),
 			"U_FORUM_INDEX" => mx_append_sid( PHPBB_URL . "index.$phpEx" ),
 			"U_PORTAL_ADMIN_INDEX" => mx_append_sid( basename( __FILE__ ) ),
 			"U_ADMIN_INDEX" => mx_append_sid( basename( __FILE__ ) ),
-			'U_LOGOUT' => mx_append_sid(PORTAL_URL . 'login.' . $phpEx . '?logout=1'),
+			'U_LOGOUT' => mx_append_sid( PORTAL_URL . 'login.' . $phpEx . '?logout=1' ),
 
 			'ADMIN_TITLE' => $lang['Mx-Publisher_adminCP'],
 
@@ -850,7 +786,7 @@ class mx_acp
 			"L_PORTAL_INDEX" => $lang['Portal_index'],
 			"L_PREVIEW_PORTAL" => $lang['Preview_portal'],
 
-			'L_LOGOUT' => $lang['Log_out'],
+			'L_LOGOUT' => @$lang['Log_out'],
 			"L_FORUM_INDEX" => $lang['Main_index'],
 			"L_ADMIN_INDEX" => $lang['Admin_Index'],
 			"L_PREVIEW_FORUM" => $lang['Preview_forum'],
@@ -864,12 +800,12 @@ class mx_acp
 			'L_ADMIN' => $lang['Admin'],
 			'L_INDEX' => sprintf( $lang['Forum_Index'], $board_config['sitename'] ),
 			'L_FAQ' => $lang['FAQ'],
-			'U_INDEX' => mx_append_sid('../index.' . $phpEx),
+			'U_INDEX' => mx_append_sid( '../index.' . $phpEx ),
 
-			'S_TIMEZONE' => sprintf($lang['All_times'], $l_timezone),
+			'S_TIMEZONE' => sprintf( $lang['All_times'], $l_timezone ),
 			'S_LOGIN_ACTION' => mx_append_sid( '../login.' . $phpEx ),
 			'S_JUMPBOX_ACTION' => mx_append_sid( '../viewforum.' . $phpEx ),
-			'S_CURRENT_TIME' => sprintf($lang['Current_time'], $phpBB2->create_date($board_config['default_dateformat'], time(), $board_config['board_timezone'])),
+			'S_CURRENT_TIME' => sprintf($lang['Current_time'], phpBB2::create_date($board_config['default_dateformat'], time(), $board_config['board_timezone'])),
 			'S_CONTENT_DIRECTION' => $lang['DIRECTION'],
 			'S_CONTENT_ENCODING' => $lang['ENCODING'],
 			'S_CONTENT_DIR_LEFT' => $lang['LEFT'],
@@ -887,6 +823,7 @@ class mx_acp
 	}
 }
 
+
 $mx_acp = new mx_acp();
 $mx_acp->decode_url( $_GET );
 
@@ -895,31 +832,27 @@ $mx_acp->assign_menu();
 
 //$cache_acp_file = "{$mx_root_path}cache"
 $script = $mx_acp->prepare_action_script();
-
 error_reporting( E_ALL ^ E_NOTICE );
 ini_set( 'display_errors', '1' );
-
 $i = 1;
-// VERSION MXP v2.9
+// VERSION mx v2.8
 //$script = str_replace( '$phpBB2->', 'phpBB2::', $script);
-
+// VERSION mxP v2.9
 $script = str_replace( 'mx_$phpBB2->', '$phpBB2->', $script );
 $script = str_replace( 'phpBB2::', '', $script ); 
 $cache_file_name = cache_file( $script, 'PANEL');
 
-switch (0)
+switch ( 0 )
 {
 	case 0:
 		ob_start();
 		include_once( $cache_file_name);
 		$panel_html = ob_get_contents();
 		ob_end_clean();
-	break;
-	
+		break;
 	case 1:
 		$panel_html = preg_replace( array( "#\n#esi", "#\t#si" ), array( "sprintf('%4d', \$i++) . '\n'", '&nbsp;&nbsp;&nbsp;' ), str_replace( "\n", "<br/>\n", htmlentities( $script ) ) );
-	break;
-	
+		break;
 	case 2:
 		ob_start();
 		eval( $script );
@@ -927,20 +860,17 @@ switch (0)
 		ob_end_clean();
 		print_r( $_POST );
 		$panel_html .= preg_replace( array( "#\n#esi", "#\t#si" ), array( "sprintf('%4d', \$i++) . '\n'", '&nbsp;&nbsp;&nbsp;' ), str_replace( "\n", "<br/>\n", htmlentities( $script ) ) );
-	break;
-	
+		break;
 	case 3:
 		ob_start();
 		eval( $script );
 		$panel_html = ob_get_contents();
 		ob_end_clean();
 		$panel_html = preg_replace( array( "#\n#esi", "#\t#si" ), array( "sprintf('%4d', \$i++) . '\n'", '&nbsp;&nbsp;&nbsp;' ), str_replace( "\n", "<br/>\n", htmlentities( $panel_html ) ) );;
-	break;
-	
+		break;
 	case 4:
 		eval( $script );
 }
-
 $mx_acp->assign_content_acp( $panel_html );
 $mx_acp->display();
 

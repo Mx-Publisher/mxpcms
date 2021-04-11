@@ -1,0 +1,1 @@
+mx_install.php Notice: Undefined variable: backend_root_path in C:\\Wamp\\www\\hismajestyservants\\install\\mx_install.php on line 951\n\nNotice: Constant DBCHARACTER_SET already defined in C:\\Wamp\\www\\hismajestyservants\\config.php on line 17\n\nNotice: Undefined variable: hash in C:\\Wamp\\www\\hismajestyservants\\cache\\sql_5e04349da32c3f2ae6365787f13742ea.php on line 7Â

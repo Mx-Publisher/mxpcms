@@ -39,7 +39,7 @@ if (!defined('IN_PHPBB'))
 */
 function login_db($username, $password, $ip = '', $browser = '', $forwarded_for = '')
 {
-	global $db, $config;
+	global $db, $board_config;
 
 	// do not allow empty password
 	if (!$password)
@@ -69,12 +69,12 @@ function login_db($username, $password, $ip = '', $browser = '', $forwarded_for 
 	$row = $db->sql_fetchrow($result);
 	$db->sql_freeresult($result);
 
-	if (($ip && !$config['ip_login_limit_use_forwarded']) ||
-		($forwarded_for && $config['ip_login_limit_use_forwarded']))
+	if (($ip && !$board_config['ip_login_limit_use_forwarded']) ||
+		($forwarded_for && $board_config['ip_login_limit_use_forwarded']))
 	{
 		$sql = 'SELECT COUNT(*) AS attempts
 			FROM ' . LOGIN_ATTEMPT_TABLE . '
-			WHERE attempt_time > ' . (time() - (int) $config['ip_login_limit_time']);
+			WHERE attempt_time > ' . (time() - (int) $board_config['ip_login_limit_time']);
 		if ($config['ip_login_limit_use_forwarded'])
 		{
 			$sql .= " AND attempt_forwarded_for = '" . $db->sql_escape($forwarded_for) . "'";
@@ -107,7 +107,7 @@ function login_db($username, $password, $ip = '', $browser = '', $forwarded_for 
 
 	if (!$row)
 	{
-		if ($config['ip_login_limit_max'] && $attempts >= $config['ip_login_limit_max'])
+		if ($board_config['ip_login_limit_max'] && $attempts >= $board_config['ip_login_limit_max'])
 		{
 			return array(
 				'status'		=> LOGIN_ERROR_ATTEMPTS,
@@ -123,8 +123,8 @@ function login_db($username, $password, $ip = '', $browser = '', $forwarded_for 
 		);
 	}
 
-	$show_captcha = ($config['max_login_attempts'] && $row['user_login_attempts'] >= $config['max_login_attempts']) ||
-		($config['ip_login_limit_max'] && $attempts >= $config['ip_login_limit_max']);
+	$show_captcha = ($board_config['max_login_attempts'] && $row['user_login_attempts'] >= $board_config['max_login_attempts']) ||
+		($board_config['ip_login_limit_max'] && $attempts >= $board_config['ip_login_limit_max']);
 
 	// If there are too much login attempts, we need to check for an confirm image
 	// Every auth module is able to define what to do by itself...
@@ -134,10 +134,13 @@ function login_db($username, $password, $ip = '', $browser = '', $forwarded_for 
 		if (!class_exists('phpbb_captcha_factory'))
 		{
 			global $phpbb_root_path, $phpEx;
-			include ($phpbb_root_path . 'includes/captcha/captcha_factory.' . $phpEx);
+			if ((@include_once $phpbb_root_path . "includes/captcha/captcha_factory.$phpEx") === false)
+			{
+				mx_message_die(CRITICAL_ERROR, "File " . $phpbb_root_path . "includes/captcha/captcha_factory.$phpEx" . " couldn\'t be opened.");
+			}
 		}
 
-		$captcha =& phpbb_captcha_factory::get_instance($config['captcha_plugin']);
+		$captcha =& phpbb_captcha_factory::get_instance($board_config['captcha_plugin']);
 		$captcha->init(CONFIRM_LOGIN);
 		$vc_response = $captcha->validate($row);
 		if ($vc_response)
@@ -169,8 +172,8 @@ function login_db($username, $password, $ip = '', $browser = '', $forwarded_for 
 		{
 			if (!function_exists('utf8_to_cp1252'))
 			{
-				global $phpbb_root_path, $phpEx;
-				include($phpbb_root_path . 'includes/utf/data/recode_basic.' . $phpEx);
+				global $mx_root_path, $phpEx;
+				include($mx_root_path . 'includes/utf/data/recode_basic.' . $phpEx);
 			}
 
 			// cp1252 is phpBB2's default encoding, characters outside ASCII range might work when converted into that encoding

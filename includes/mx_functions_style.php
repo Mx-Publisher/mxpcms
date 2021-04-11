@@ -2,7 +2,7 @@
 /**
 *
 * @package Style
-* @version $Id: mx_functions_style.php,v 1.144 2014/07/10 01:04:52 orynider Exp $
+* @version $Id: mx_functions_style.php,v 3.144 2020/02/25 03:55:52 orynider Exp $
 * @copyright (c) 2002-2019 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
@@ -91,7 +91,7 @@ class mx_Template extends Template
 	 *
 	 * @access private
 	 */
-	function mx_Template($root = '.')
+	function __construct($root = '.')
 	{
 		parent::init($root);
 
@@ -1413,6 +1413,23 @@ class mx_user extends mx_session
 			}
 		}
 		
+		/* * *
+		* Instantiate the mx_language class
+		* 
+		* START Include language file for devices * */
+		if ((@include $mx_root_path . "language/lang_" . $this->lang['default_lang'] . "/lang_devices.$phpEx") === false)
+		{
+			if ((@include $mx_root_path . "language/lang_english/lang_devices.$phpEx") === false)
+			{
+				mx_message_die(CRITICAL_ERROR, 'Language file ' . $this->mx_root_path . "language/lang_" . $this->lang['default_lang'] . "/lang_devices.$phpEx" . ' couldn\'t be opened.');
+			}
+			//Fallback to English
+			$default_lang = $language = 'english'; 
+		}
+		// Merge Language Keys
+		//$this->lang = array_merge($this->lang, $lang);
+		
+		/* */		
 		//this line is issued on backend		
 		//  We include common language file here to not load it every time a custom language file is included			
 		//$this->lang = &$lang;			
@@ -1511,8 +1528,22 @@ class mx_user extends mx_session
 			}
 		}
 		
-		/**/
-		/** /
+		/* * *
+		* Instantiate the mx_language class
+		* 
+		* START Include language file for devices * */
+		if ((@include $mx_root_path . "language/lang_" . $this->lang_path . "/lang_devices.$phpEx") === false)
+		{
+			if ((@include $mx_root_path . "language/lang_english/lang_devices.$phpEx") === false)
+			{
+				mx_message_die(CRITICAL_ERROR, 'Language file ' . $this->mx_root_path . "language/lang_" . $this->lang_path . "/lang_devices.$phpEx" . ' couldn\'t be opened.');
+			}
+			//Fallback to English
+			$default_lang = $language = 'english'; 
+		}
+		
+		// Merge Language Keys $this->lang = array_merge($this->lang, $lang);		
+
 		//
 		// Set up style to output
 		//
@@ -1520,14 +1551,10 @@ class mx_user extends mx_session
 		{
 			$this->data['user_style'] = $board_config['default_style'];
 		}
-		/**/
-
-		
 		
 		// Core Main Translation after shared phpBB keys so we can overwrite some settings
 		/** Sort of pointless here, since we have already included all main lang files **/
 		//this will fix the path for anonymouse users
-
 		
 		//
 		// Load backend specific lang defs.
@@ -1580,6 +1607,7 @@ class mx_user extends mx_session
 		global $template, $lang, $phpEx, $phpbb_root_path, $mx_root_path, $db;
 		global $mx_page, $mx_request_vars, $_GET, $_COOKIE, $phpBB3;
 		
+		//Debuging: die('user_id: ' . print_r($mx_user->data['user_id']));
 		if ( !empty($portal_config['default_style']) && !is_array($portal_config['default_style']) )
 		{
 			$portal_config = $mx_cache->obtain_mxbb_config();
@@ -1890,8 +1918,8 @@ class mx_user extends mx_session
 								WHERE bbt.style_name = mxt.style_name";
 						break;
 					}
-					
-					if (($result = $db->sql_query_limit($sql)) && ($row = $db->sql_fetchrowset($result)))
+					//Fatal error: Uncaught ArgumentCountError: Too few arguments to function dbal_mysqli::sql_query_limit(), 1 passed in C:\Wamp\www\mxpSeo\includes\mx_functions_style.php on line 1894 and at least 2 expected in C:\Wamp\www\mxpSeo\includes\db\mysqli.php:297 Stack trace: #0 C:\Wamp\www\mxpSeo\includes\mx_functions_style.php(1894): dbal_mysqli->sql_query_limit('SELECT mxt.*, ...') #1 C:\Wamp\www\mxpSeo\includes\mx_functions_style.php(4267): mx_user->_init_style() #2 C:\Wamp\www\mxpSeo\index.php(41): mx_user->init_style() #3 {main} thrown in C:\Wamp\www\mxpSeo\includes\db\mysqli.php on line 297
+					if (($result = $db->sql_query($sql)) && ($row = $db->sql_fetchrowset($result)))
 					{
 						$count = count($row);
 						
@@ -1968,12 +1996,16 @@ class mx_user extends mx_session
 	{
 		global $db, $board_config, $portal_config, $template, $phpbb_root_path, $mx_root_path;
 		
-		global $mx_request_vars, $theme;
+		global $mx_user, $mx_request_vars, $theme;
+		
+		//Debuging; die('user_id: ' . print_r($mx_user->data['user_id']));
 		
 		//
 		// Set up style to output
 		//
-		if ($this->data['user_id'] == ANONYMOUS && empty($this->data['user_style']))
+		// Check if the User Class is initialised
+		//
+		if (isset($this->data['user_id']) && $this->data['user_id'] == ANONYMOUS && empty($this->data['user_style']))
 		{
 			$this->data['user_style'] = $board_config['default_style'];
 		}
@@ -3187,7 +3219,7 @@ class mx_user extends mx_session
 				}
 				if ($this->data['session_logged_in'])
 				{
-					$this->lang_name = (file_exists($phpbb_root_path . 'language/' . $this->encode_lang($this->data['user_lang']) . "/common.$phpEx")) ? $this->encode_lang($this->data['user_lang']) : ((file_exists($phpbb_root_path . 'language/' . $this->encode_lang($this->lang['default_lang']) . "/common.$phpEx")) ? $this->encode_lang($this->lang['default_lang']) : 'en');
+					$this->lang_name = (file_exists($phpbb_root_path . 'language/' . $this->user_language . "/common.$phpEx")) ? $this->user_language : ((file_exists($phpbb_root_path . 'language/' . $this->default_language . "/common.$phpEx")) ? $this->default_language : 'en');
 					$this->lang_path = $phpbb_root_path . 'language/' . $this->lang_name . '/';
 
 					$this->date_format = $this->data['user_dateformat'];
@@ -3196,13 +3228,13 @@ class mx_user extends mx_session
 				}
 				else
 				{
-					$this->lang_name = (file_exists($phpbb_root_path . 'language/' . $this->encode_lang($this->lang['default_lang']) . "/common.$phpEx")) ? $this->encode_lang($this->lang['default_lang']) : 'en';
+					$this->lang_name = (file_exists($phpbb_root_path . 'language/' . $this->default_language . "/common.$phpEx")) ? $this->default_language : 'en';
 					$this->lang_path = $phpbb_root_path . 'language/' . $this->lang_name . '/';
 					$this->date_format = $board_config['default_dateformat'];
 					$this->timezone = $board_config['board_timezone'] * 3600;
 					$this->dst = $board_config['board_dst'] * 3600;
 				}				
-				$this->img_lang = (@file_exists($phpbb_root_path . 'styles/' . $this->theme['imageset_path'] . '/imageset/' . $this->lang_name)) ? $this->lang_name : $this->encode_lang($board_config['default_lang']);				
+				$this->img_lang = (@file_exists($phpbb_root_path . 'styles/' . $this->theme['imageset_path'] . '/imageset/' . $this->lang_name)) ? $this->lang_name : $this->default_language;				
 				//$this->template_name = $this->theme['imageset_path'];
 				//trigger_error("Could not get style data: $this->template_name", E_USER_ERROR);
 				
@@ -3374,14 +3406,32 @@ class mx_user extends mx_session
 			case 'rhea':
 			case 'proteus':
 			case 'phpbb3':
+			default:
 				/*
 				* Load phpBB Template configuration data
 				* - First prepare the variables
 				*/
 				$this->setup_style();
+				
 				if (!$this->template_name)
 				{
 					trigger_error("Could not get style data: $this->template_name", E_USER_ERROR);
+				}
+				
+				try
+				{
+					$DateTimeZone = new \DateTimeZone($board_config['user_timezone']);
+				}
+				catch (\Exception $e)
+				{
+					// If the timezone the user has selected is invalid, we fall back to UTC or server.
+					$DateTimeZone = new \DateTimeZone(date_default_timezone_get());
+				}
+				
+				foreach ($DateTimeZone as $timezone_type => $dst)
+				{
+					$dst = $DateTimeZone->timezone_type;
+					$timezone = $DateTimeZone->timezone;
 				}
 				
 				if ($this->data['session_logged_in'])
@@ -3390,16 +3440,22 @@ class mx_user extends mx_session
 					$this->lang_path = $phpbb_root_path . 'language/' . $this->lang_name . '/';
 
 					$this->date_format = $this->data['user_dateformat'];
-					$this->timezone = $this->data['user_timezone'] * 3600;
-					$this->dst = $this->data['user_dst'] * 3600;
+					$this->timezone = $timezone = $this->data['user_timezone'];
+					$this->dst = $this->data['user_dst'];
+					$offset = (float) $timezone + (int) $dst;
 				}
 				else
 				{
 					$this->lang_name = (file_exists($phpbb_root_path . 'language/' . $this->encode_lang($this->lang['default_lang']) . "/common.$phpEx")) ? $this->encode_lang($this->lang['default_lang']) : 'en';
 					$this->lang_path = $phpbb_root_path . 'language/' . $this->lang_name . '/';
 					$this->date_format = $board_config['default_dateformat'];
-					$this->timezone = $board_config['board_timezone'] * 3600;
-					$this->dst = isset($this->data['user_dst']) ? $this->data['user_dst'] * 3600 : $board_config['user_timezone'] * 3600;
+	
+					$timezone = $this->config['board_timezone'];			
+					$this->date_format = $this->config['default_dateformat'];
+					$this->timezone = $this->config['board_timezone'];
+					$this->dst = $dst;				
+					$offset = (float) $timezone + (int) $dst;
+				
 				}
 				
 				$this->img_lang = (@file_exists($phpbb_root_path . 'styles/' . $this->theme['imageset_path'] . '/theme/' . $this->lang_name)) ? $this->lang_name : $this->encode_lang($board_config['default_lang']);				
@@ -3505,7 +3561,7 @@ class mx_user extends mx_session
 			//mx_message_die(CRITICAL_ERROR, "Could not open phpBB $this->template_name template config file", '', __LINE__, __FILE__);
 		}
 		
-		$img_lang = ( file_exists($phpbb_root_path . $this->current_template_path . '/images/lang_' . $this->encode_lang($this->lang['default_lang'])) ) ? $this->encode_lang($this->lang['default_lang']) : 'english';
+		$img_lang = ( file_exists($phpbb_root_path . $this->current_template_path . '/images/lang_' . $this->lang_name) ) ? $this->lang_name : 'english';
 		
 		/*
 		* Import phpBB Graphics, prefix with PHPBB_URL, and apply LANG info
@@ -6281,6 +6337,10 @@ class mx_language extends mx_language_file_loader
 			{
 				include_once($phpbb_default_path);
 			}
+		}
+		else if (file_exists($path))
+		{
+			include_once($path);
 		}		
 		$this->lang = array_merge($this->lang, $lang);
 	}	

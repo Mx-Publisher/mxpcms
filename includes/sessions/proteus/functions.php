@@ -2,7 +2,7 @@
 /**
 *
 * @package Auth
-* @version $Id: functions.php,v 1.1 2014/07/07 20:38:12 orynider Exp $
+* @version $Id: functions.php,v 3.3 2021/04/02 20:38:12 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/

@@ -107,7 +107,7 @@ $lang['Critical_Error'] = 'CRITICAL ERROR';
 $lang['Error_loading_config'] = 'Sorry, could not load MX-Publisher config.php';
 $lang['Error_database_down'] = 'Sorry, could not connect to the database.';
 $lang['PasswordMissmatch'] = 'Sorry, your MXP Admin passwords mismatch.';
-
+$lang['Cache_generate'] = 'Your cache files have been generated.';
 //
 // That's all Folks!
 // -------------------------------------------------

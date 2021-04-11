@@ -49,16 +49,14 @@ class dbal_mysqli extends dbal
 			$this->connect_error = 'mysqli_connect function does not exist, is mysqli extension installed?';
 			return $this->sql_error('');
 		}
-
 		$this->persistency = $persistency;
 		$this->user = $sqluser;
-
+		
 		// If persistent connection, set dbhost to localhost when empty and prepend it with 'p:' prefix
 		$this->server = ($this->persistency) ? 'p:' . (($sqlserver) ? $sqlserver : 'localhost') : $sqlserver;
-
 		$this->dbname = $database;
 		$port = (!$port) ? null : $port;
-
+		
 		// If port is set and it is not numeric, most likely mysqli socket is set.
 		// Try to map it to the $socket parameter.
 		$socket = null;

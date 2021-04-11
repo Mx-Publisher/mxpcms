@@ -7,15 +7,14 @@
 * @license GNU General Public License, version 2 (GPL-2.0)
  *
  */
-namespace orynider\mx_translator\controller;
+//namespace orynider\mx_translator\controller;
 if (!defined('IN_PHPBB'))
 {
 	exit;
 }
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use orynider\mx_translator\google_translater;
+//use Symfony\Component\DependencyInjection\ContainerInterface;
+//use orynider\mx_translator\google_translater;
 define('MXP_LANG_TOOLS_COOKIE_NAME', 'lT_');
-mb_internal_encoding('UTF-8');
 /**
  * mxp_translator
  * 
@@ -56,9 +55,6 @@ class mxp_translator
 	protected $user;
 	/** @var string phpBB root path */
 	protected $root_path;
-	
-	protected $common_language_files_loaded;
-	
 	protected $phpbb_admin_path;
 	/** @var string forum root path */
 	protected $forum_root_path;
@@ -113,7 +109,7 @@ class mxp_translator
 	 * @param string                                $root_path
 	 * @param string                                $php_ext
 	 */
-	public function __construct(\phpbb\cache\driver\driver_interface $cache, \phpbb\config\config $config, ContainerInterface $container, \phpbb\controller\helper $helper, \phpbb\db\driver\driver_interface $db, \phpbb\language\language $language, \phpbb\log\log $log, \phpbb\request\request $request, \phpbb\template\template $template, \phpbb\user $user, $root_path, $table_prefix, $php_ext, $server = array())
+	public function __construct_(\phpbb\cache\driver\driver_interface $cache, \phpbb\config\config $config, ContainerInterface $container, \phpbb\controller\helper $helper, \phpbb\db\driver\driver_interface $db, \phpbb\language\language $lang, \phpbb\log\log $log, \phpbb\request\request $request, \phpbb\template\template $template, \phpbb\user $user, $root_path, $table_prefix, $php_ext, $server = array())
 	{
 		$this->cache = $cache;
 		$this->config = $config;
@@ -214,10 +210,8 @@ class mxp_translator
 		
 		$this->trans = $this->container->get('orynider.mx_translator.googletranslater');
 		
-		$language = $this->request->is_set_post('language') ? $this->request->variable('language', array('into' => 'en')) : array('into' => 'en');
-		$translate = $this->request->is_set_post('translate') ? $this->request->variable('translate', array('dir' => '', 'module' => 'modules/mx_translator/', 'file' => 'common.php')) : array('dir' => '', 'module' => 'modules/mx_translator/', 'file' => 'common.php');
-		$translate['dir'] = isset($translate['dir']) ? $translate['dir'] : $this->request->variable('dir', 'language/');
-		$translate['file'] = isset($translate['file']) ? $translate['file'] : $this->request->variable('file', 'common.php');
+		$language = $this->request->variable('language', array('into' => 'en'));
+		$translate = $this->request->variable('translate', array('module' => 'modules/mx_translator/', 'file' => 'common.php'));
 		$this->language_into = $this->phpbb_cookie(MXP_LANG_TOOLS_COOKIE_NAME . 'language_into', $language['into']);
 		$this->dir_select_from = $this->phpbb_cookie(MXP_LANG_TOOLS_COOKIE_NAME . 'dir_select_from', $translate['dir']);
 		$this->dir_select_into = $this->phpbb_cookie(MXP_LANG_TOOLS_COOKIE_NAME . 'dir_select_into', $translate['dir']);
@@ -246,19 +240,13 @@ class mxp_translator
 		if (isset($lang_enc['ENCODING']) && $lang_enc != '')
 		{
 			$this->file_encoding = $lang_enc['ENCODING'];
-		}
-		
-		$original_file_path1 = (($this->s == 'MODS') ? $this->module_select : ($this->s == 'phpbb_ext' ? $this->module_select : '')) . (!empty($this->gen_select_list('in_array', 'dirs')) ? $this->dir_select_from : 'language/' . $this->language_from) . '/' . $this->module_file;
-		$translate_file_path1 = (($this->s == 'MODS') ? $this->module_select : ($this->s == 'phpbb_ext' ? $this->module_select : '')) . (!empty($this->gen_select_list('in_array', 'dirs')) ? $this->dir_select_into : 'language/' . $this->language_into) . '/' . $this->module_file;		
-		$original_file_path = (($this->s == 'MODS') ? $this->module_select : ($this->s == 'phpbb_ext' ? $this->module_select : '')) . 'language/' . $this->language_from . '/' . $this->module_file;
-		$translate_file_path = (($this->s == 'MODS') ? $this->module_select : ($this->s == 'phpbb_ext' ? $this->module_select : '')) . 'language/' . $this->language_into . '/' . $this->module_file;		
-		
-		$this->file_save_path = $this->root_path . $translate_file_path;
+		}			
+		$this->file_save_path = $mx_root_path . ($this->request->variable('s', '') == 'MODS' ? $this->module_select : '') . 'language/' . $this->language_into . '/' . $this->module_file;
 	}
 	
 	public function mxp_translator()
 	{
-		global $mx_cache, $board_config, $db, $table_prefix, $mx_table_prefix; 
+		global $mx_cache, $board_config, $db, $table_prefix; 
 		global $phpbb_root_path, $smf_root_path, $mx_root_path, $module_root_path; 
 		global $php_ext, $phpEx, $lang, $mx_request_vars, $template, $mx_user;
 		$this->cache = $mx_cache;
@@ -347,10 +335,9 @@ class mxp_translator
 		
 		$this->portal_block = !empty($board_config['portal_backend']) ? $board_config['portal_backend'] : false;
 		
-		if (isset($board_config['version']) && ($board_config['version'] < '3.1.0'))
+		if ($board_config['version'] < '3.1.0')
 		{			
 			define('EXT_TABLE',	$table_prefix . 'ext');
-			define('STYLES_TABLE',	'THEMES_TABLE');			
 		}
 		
 		/* Get an instance of the admin controller */
@@ -407,7 +394,7 @@ class mxp_translator
 			$return = $value;
 			// Currently not working under linux machines [Ubuntu GG]
 			//setcookie( $cookie_board_name, $value, (time()+21600), $board_config['cookie_path'], $board_config['cookie_domain'], $board_config['cookie_secure']);
-			@setcookie( $cookie_board_name, $value, (time() + 21600), $board_config['cookie_path']);
+			setcookie( $cookie_board_name, $value, (time() + 21600), $board_config['cookie_path']);
 			
 			$this->cookie[$cookie_board_name] = $value;
 			
@@ -440,7 +427,7 @@ class mxp_translator
 			$return = $value;
 			// Currently not working under linux machines [Ubuntu GG]
 			//setcookie( $cookie_board_name, $value, (time()+21600), $board_config['cookie_path'], $board_config['cookie_domain'], $board_config['cookie_secure']);
-			@setcookie($cookie_board_name, $value, (time() + 21600), $board_config['cookie_path']);
+			setcookie($cookie_board_name, $value, (time() + 21600), $board_config['cookie_path']);
 			
 			$this->cookie[$cookie_board_name] = $value;
 			
@@ -667,9 +654,8 @@ class mxp_translator
 		{
 			case 'MXP':
 			case 'MODS':			
-				$lang_dir = (isset($this->mx_root_path) ?  $this->mx_root_path : $this->root_path) . 'language/';
-				$lang_dir_ext = $this->module_root_path . 'language/';
-			
+				$lang_dir = $this->mx_root_path . 'language/';
+				$lang_dir_ext = $this->module_root_path . 'language/';					
 			break;			
 			case 'PHPBB':
 			case 'phpbb_ext':			
@@ -678,15 +664,6 @@ class mxp_translator
 				$lang_dir = $this->root_path . 'language/';									
 			break;
 		}
-		
-		if (!isset($lang_dir))
-		{
-			global $mx_root_path, $module_root_path, $phpbb_root_path;
-					
-			$lang_dir = (isset($mx_root_path) ?  $mx_root_path : $phpbb_root_path) . 'language/';
-			$lang_dir_ext = $module_root_path . 'language/';				
-		}			
-		
 		$dir = opendir($lang_dir);		
 		while($f = readdir($dir))
 		{
@@ -962,8 +939,8 @@ class mxp_translator
 		if (($this->dir_select_from == $this->dir_select_into) && ($this->language_from !== $this->language_into))
 		{
 			$this->dir_select_from = str_replace($this->language_into, $this->language_from, $this->dir_select_from);
-			$this->dir_select_from = ($this->trisstr('\.' . $this->php_ext . '$', $this->dir_select_from) == false) ? $this->dir_select_from : dirname($this->dir_select_from);
-			$this->dir_select_into = ($this->trisstr('\.' . $this->php_ext . '$', $this->dir_select_into) == false) ? $this->dir_select_into : dirname($this->dir_select_into);
+			$this->dir_select_from = ($this->trisstr('\.' . $php_ext . '$', $this->dir_select_from) == false) ? $this->dir_select_from : dirname($this->dir_select_from);
+			$this->dir_select_into = ($this->trisstr('\.' . $php_ext . '$', $this->dir_select_into) == false) ? $this->dir_select_into : dirname($this->dir_select_into);
 		}
 		/* root path at witch we add ie. extension path */  
 		switch ($this->s)
@@ -1064,11 +1041,9 @@ class mxp_translator
 				$lang_files = array_merge($lang_files, $sub_files);
 			}
 		}
-		@closedir($subdir);
+		@closedir($subdir);		
 		return $lang_files;
 	}
-	
-	
 	
 	function get_module_list()
 	{ 
@@ -1079,10 +1054,7 @@ class mxp_translator
 		switch ($this->s)
 		{
 			case 'MXP':
-			case 'MODS':
-			
-			if( !empty($mx_block) || is_object($mx_block))
-			{
+			case 'MODS':				
 				$sql = "SELECT module_path, module_name FROM " . MXP_MODULE_TABLE . " ORDER BY module_name";
 				if (($rs = $this->db->sql_query($sql)))
 				{
@@ -1090,7 +1062,6 @@ class mxp_translator
 					{
 						$dir_list = $this->__load_lang_dirs($row['module_path'], $this->language_from, '', $this->language_into);
 						$file_list = $this->__load_lang_files($row['module_path'], $this->language_from);
-						
 						//print_r($dir_list);
 						if (count( $file_list) == 0)
 						{
@@ -1105,8 +1076,7 @@ class mxp_translator
 						{
 							$this->module_select = $this->mxp_cookie( MXP_LANG_TOOLS_COOKIE_NAME . 'module_select', $row['module_path']);
 							
-						}
-						
+						}						
 						$this->ext_root_path = $this->mx_root_path . $row['module_path'];						
 						$this->module_list[$row['module_path']] = $row['module_name'];
 						$this->module_name = print_r($row['module_name'], true);
@@ -1117,9 +1087,7 @@ class mxp_translator
 				else
 				{				
 					$this->ext_root_path = $this->mx_root_path;
-				}
-			}
-				
+				}				
 			break;			
 			case 'PHPBB':
 			case 'phpbb_ext':
@@ -1127,57 +1095,42 @@ class mxp_translator
 				$lang_dir = $this->forum_root_path . 'language/';
 
 				// Now only pull the data of the requested topics
-				$sql = 'SELECT *
-					FROM ' . EXT_TABLE;
-
-				$result = $this->db->sql_query($sql);
-				$extensions = $this->db->sql_fetchrowset($result);
-				$this->db->sql_freeresult($result);
-				
-				$row = array();
+				$sql_array = array(
+					'SELECT'    => 'e.*',
+					'FROM'      => array(EXT_TABLE => 'e'),
+				); 			
+				$sql = $this->db->sql_build_query('SELECT', $sql_array);
+				$rs = $this->db->sql_query_limit($sql, 10);
 				$file_list = array();
-				$ext_count = count($extensions);
-				if ($ext_count == 0)
-				{				
-					$this->msg_handler(E_USER_ERROR, $this->user->lang['COULDNT_GET'] . ' ' . $this->user->lang['CONFIG'], __FILE__, __LINE__, $sql);
-				}
-				
-				foreach ($extensions as $row)
-				{			
-					$row['ext_name'] = isset($row['ext_name']) ? $row['ext_name'] : 'none';
-					$row['module_path'] = 'ext/' . $row['ext_name'] . '/';
-					$ext_root_path = $this->forum_root_path . $row['module_path'];			
-					$row['ext_path'] = $ext_root_path;							
-				
-					$dir_list = $this->__load_lang_dirs($row['module_path'], $this->language_from, '', $this->language_into);
-					$file_list = $this->__load_lang_files($row['module_path'], $this->language_from);				
-					
-					if ($this->dir_select == '')
-					{
-						$this->dir_select = $this->phpbb_cookie(MXP_LANG_TOOLS_COOKIE_NAME . 'dir_select', $row['module_path']);
-					}				
-					if ($this->module_select == '')
-					{
-						$this->module_select = $this->phpbb_cookie(MXP_LANG_TOOLS_COOKIE_NAME . 'module_select', $row['module_path']);
-							
-					}					
-					
-					$module_name = explode('/', $row['ext_name']);
-					$row['module_name'] = isset($module_name[1]) ? $module_name[1] : $module_name;
-					$module_name = explode('/', $row['ext_name']);
-					$vendor = $module_name[0];
-					$counthost = count($module_name) - 1;
-					$docid2 = $module_name[$counthost];
-					$this->module_list[$row['module_path']] = $row['module_name'];
-					$this->module_name = print_r($row['module_name'], true);
-					$this->language_dir_list[$row['module_path']] = $dir_list;
-					$this->language_file_list[$row['module_path']] = $file_list;
-				}
-				
+				$row = $this->db->sql_fetchrow($rs);
+				$row['module_path'] = 'ext/' . $row['ext_name'] . '/';
+				$this->ext_root_path = $this->forum_root_path . $row['module_path'];
+				$dir_list = $this->__load_lang_dirs($row['module_path'], $this->language_from, '', $this->language_into);
+				$file_list = $this->__load_lang_files($row['module_path'], $this->language_from);
 				if (count($file_list) == 0)
 				{
 					continue;
 				}
+				if ($this->dir_select == '')
+				{
+					$this->dir_select = $this->phpbb_cookie(MXP_LANG_TOOLS_COOKIE_NAME . 'dir_select', $row['module_path']);
+				}				
+				if ($this->module_select == '')
+				{
+					$this->module_select = $this->phpbb_cookie(MXP_LANG_TOOLS_COOKIE_NAME . 'module_select', $row['module_path']);
+						
+				}
+				$module_name = explode('/', $row['ext_name']);
+				$row['module_name'] = $module_name[1];
+				$module_name = explode('/', $row['ext_name']);
+				$vendor = $module_name[0];
+				$counthost = count($module_name) - 1;
+				$docid2 = $module_name[$counthost];
+				$this->module_list[$row['module_path']] = $row['module_name'];
+				$this->module_name = print_r($row['module_name'], true);
+				$this->language_dir_list[$row['module_path']] = $dir_list;
+				$this->language_file_list[$row['module_path']] = $file_list;
+				$this->db->sql_freeresult($rs);
 			break;			
 		}
 				
@@ -1225,7 +1178,7 @@ class mxp_translator
 						$list_ary = $this->language_file_list[$this->module_select];
 					break;
 					case 'phpbb_ext':
-						$list_ary = @isset($this->language_file_list[$this->module_select]) ? $this->language_file_list[$this->module_select] : $this->module_select;
+						$list_ary = $this->language_file_list[$this->module_select];
 					break;					
 				}
 			break;
@@ -1239,13 +1192,13 @@ class mxp_translator
 						$list_ary = $this->language_dir_list['PHPBB'];
 					break;					
 					case 'MODS':
-						$list_ary = @isset($this->dir_select) ? @print_r($this->language_dir_list[$this->dir_select], true) : '';
+						$list_ary = $this->language_dir_list[$this->dir_select];
 					break;
 					case 'phpbb_ext':
-						$list_ary = isset($this->language_dir_list[$this->dir_select]) ? $this->language_dir_list[$this->dir_select] : $this->dir_select;
+						$list_ary = $this->language_dir_list[$this->dir_select];
 					break;
 					default:
-						$list_ary = $this->language_dir_list[$this->dir_select] ? $this->language_dir_list[$this->dir_select] : $this->dir_select;
+						$list_ary = $this->language_dir_list[$this->dir_select];
 					break;						
 				}			
 			break;			
@@ -1257,17 +1210,8 @@ class mxp_translator
 		{
 			return '';
 		}
-		if (is_array($list_ary))
-		{
-			asort($list_ary);
-			reset($list_ary);
-		}
-		else
-		{
-			
-			$list_ary = is_array($list_ary) ? array(print_r($list_ary, true), '') : array(array());
-		}
-	
+		asort($list_ary);
+		reset($list_ary);
 		$option_list = '';
 		$num_args = func_num_args();
 		
@@ -1281,7 +1225,6 @@ class mxp_translator
 						continue;
 					}
 					$option_list .= '<option value="' . $key . '"';
-					$value = is_array($value) ? print_r($value, true) : $value;
 					if ( $selected == $key )
 					{
 						$option_list .= ' selected';
@@ -1554,7 +1497,6 @@ class mxp_translator
 		
 		return $data;
 	} 	
-	
 	function _get_file_perms($file) 
 	{
 		$length = strlen(decoct(@fileperms($file)))-3;
@@ -1589,7 +1531,7 @@ class mxp_translator
 	
 	function file_preparesave()
 	{
-		$mx_user = $this->user;		
+		$mx_user = $this->user;	
 		if (@file_exists($this->file_save_path) && !isset($_POST['resetheader']))
 		{
 			$file_content = file_get_contents($this->file_save_path);
@@ -1598,57 +1540,16 @@ class mxp_translator
 		}
 		else
 		{
-			switch ($this->s)
-			{
-				case 'MXP':
-					$file_content = "/**
-									 * Language file [" . $this->module_file . "]
-									 * 
-									 * @package language
-									 * @author " . $mx_user->data['username'] . "
-									 * @" ."version $I" . "d: " . $this->module_file . ",v 1.-1 " . date( 'Y/m/d H:i:s') ." " . $userdata['username'] . " Exp $
-									 * @copyright (c) 2002-2008 [Jon Ohlsson] MX-Publisher Project Team
-									 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-									 * @link http://mxpcms.sourceforge.net/
-									 ";
-				break;			
-				case 'MODS':				
-					$file_content = "/**
-									 * Language file [" . $this->module_file . "]
-									 * 
-									 * @package language
-									 * @author " . $mx_user->data['username'] . "
-									 * @" ."version $I" . "d: " . $this->module_file . ",v 1.-1 " . date( 'Y/m/d H:i:s') ." " . $userdata['username'] . " Exp $
-									 * @copyright (c) 2002-2008 [Jon Ohlsson] MX-Publisher Project Team
-									 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-									 * @link http://mxpcms.sourceforge.net/
-									 ";
-				break;			
-				case 'PHPBB':
-					$file_content = "/**
-									 * Language file [" . $this->module_file . "]
-									 * 
-									 * @package language
-									 * @author " . $mx_user->data['username'] . "
-									 * @" ."version $I" . "d: " . $this->module_file . ",v 1.-1 " . date( 'Y/m/d H:i:s') ." " . $mx_user->data['username'] . " Exp $
-									 * @copyright (c) phpBB Limited <https://www.phpbb.com>
-									 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-									 * @link http://www.phpbb.com
-									 ";
-				break;			
-				case 'phpbb_ext':
-					$file_content = "/**
-									 * Language file [" . $this->module_file . "]
-									 * 
-									 * @package language
-									 * @author " . $mx_user->data['username'] . "
-									 * @" ."version $I" . "d: " . $this->module_file . ",v 1.-1 " . date( 'Y/m/d H:i:s') ." " . $mx_user->data['username'] . " Exp $
-									 * @copyright (c) phpBB Limited <https://www.phpbb.com>
-									 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-									 * @link http://www.phpbb.com
-									 ";
-				break;			
-			} 		
+			$file_content = "/**
+							 * Language file [" . $this->module_file . "]
+							 * 
+							 * @package language
+							 * @author " . $mx_user->data['username'] . "
+							 * @" ."version $I" . "d: " . $this->module_file . ",v 1.-1 " . date( 'Y/m/d H:i:s') ." " . $mx_user->data['username'] . " Exp $
+							 * @copyright (c) phpBB Limited <https://www.phpbb.com>
+							 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
+							 * @link http://www.phpbb.com
+							 ";
 		}
 		$file_content = preg_replace('#\* (Encoding|1 tab).*'. "\n" . '#', '', $file_content);
 		$file_content .= '* Encoding: ' . $this->file_encoding . "\n* 1 tab = 4 spaces\n */";
@@ -1675,53 +1576,25 @@ class mxp_translator
 		}
 		if ( $file_content_values != '' )
 		{
-			$file_content .= utf8_encode("\n\nif ( !isset(\$lang) )\n{\n\t\$lang = array();\n}\n\n\$lang = array_merge( \$lang, array( // #\n");
-			$file_content .= utf8_encode(str_replace( ' =>', '=>', preg_replace( '# [ ]{1,3}#', "\t", $file_content_values)));
-			$file_content .= utf8_encode('));');
+			$file_content .= "\n\nif ( !isset(\$lang) )\n{\n\t\$lang = array();\n}\n\n\$lang = array_merge( \$lang, array( // #\n";
+			$file_content .= str_replace( ' =>', '=>', preg_replace( '# [ ]{1,3}#', "\t", $file_content_values));
+			$file_content .= '));';
 		}
 		else
 		{
-			$file_content .= utf8_encode("\n\n// Nothing translated\n\n");
+			$file_content .= "\n\n// Nothing translated\n\n";
 		}
 		$this->file_save_content = "<" . "?php\n" . $file_content . "\n\n//\n// That's all Folks!\n// -------------------------------------------------\n?" . ">";
 	}
-	
-	// The function by  Oscar Broman in 2003
-	function utf8_encode_deep(&$input) 
-	{
-	    if (is_string($input)) 
-		{
-	        $input = utf8_encode($input);
-	    } 
-		else if (is_array($input)) 
-		{
-	        foreach ($input as &$value) 
-			{
-	            utf8_encode_deep($value);
-	        }
-
-	        unset($value);
-	    } 
-		else if (is_object($input)) 
-		{
-	        $vars = array_keys(get_object_vars($input));
-
-	        foreach ($vars as $var) 
-			{
-	            utf8_encode_deep($input->$var);
-	        }
-	    }
-	}	
-	
 	
 	function file_save()
 	{
 		// Control path id exists
 		function __control_folder($folder)
 		{
-			if (!is_dir($folder))
+			if (!file_exists($folder))
 			{
-				__control_folder(dirname($folder));
+				__control_folder( dirname( $folder));
 				mkdir($folder);
 				@chmod($folder, 0755);
 				$fp = fopen( $folder . '/index.htm', 'w');
@@ -1731,11 +1604,10 @@ class mxp_translator
 			}
 		}
 		__control_folder(dirname($this->file_save_path));
-		print_r('mkdir ' . dirname($this->file_save_path) . '<br />');
+		
 		$fp = fopen( $this->file_save_path, 'w');
 		fwrite($fp, $this->file_save_content);
 		fclose($fp);
-		print_r('fwrite ' . $this->file_save_path . '<br />');
 		@chmod($this->file_save_path, 0644);	
 	}
 	
@@ -2162,9 +2034,7 @@ class mxp_translator
 				case 'ossetian':
 					$lang_name = 'os';
 				break;
-				case 'punjabi':
 				case 'panjabi':
-				case 'gurmiki':				
 					$lang_name = 'pa';
 				break;
 				case 'pali':
@@ -3384,7 +3254,7 @@ class mxp_translator
 			$user->action_install();
 		}
 		
-		$this->user_template_name = isset($this->user->style_name) ? $this->user->style_name : $this->user->style['style_name'];
+		$this->user_template_name = $user->style['style_path'];
 		
 		$ext_path_img_user = $module_root_path . 'styles/' .  rawurlencode($user->style['style_path']) . '/images/menu_icons/' . $image_file;
 				
@@ -3465,7 +3335,7 @@ class mxp_translator
 	{
 		if (!defined('IN_AJAX'))
 		{
-			define('IN_AJAX', (isset($_GET['ajax']) && ($this->ajax == 1) && ($this->server['HTTP_SEREFER'] = $this->server['PHP_SELF'])) ? 1 : 0);
+			define('IN_AJAX', (isset($_GET['ajax']) && ($this->ajax == 1) && ($server['HTTP_SEREFER'] = $server['PHP_SELF'])) ? 1 : 0);
 		}
 		$phpEx = $this->php_ext;
 		// Requests
@@ -3539,7 +3409,7 @@ class mxp_translator
 			$this->template->assign_block_vars('file_to_translate_select', array());
 			
 			$basename = basename( __FILE__);
-			$mx_root_path = (defined('PHPBB_USE_BOARD_URL_PATH') && PHPBB_USE_BOARD_URL_PATH) ? generate_board_url() . '/' : $this->root_path;
+			$mx_root_path = (defined('PHPBB_USE_BOARD_URL_PATH') && PHPBB_USE_BOARD_URL_PATH) ? generate_board_url() . '/' : $phpbb_root_path;
 			$module_root_path = $this->root_path . 'ext/orynider/mx_translator/';
 			$admin_module_root_path = $this->root_path . 'adm/';		
 
@@ -3586,7 +3456,7 @@ class mxp_translator
 			print_r($this->gen_select_list( 'html', 'dirs', $this->dir_select)); 
 			/* */					
 			$this->template->assign_vars(array( // #
-				'TH_COLOR2' => isset($theme['th_color2']) ? isset($theme['th_color2']) : '#fff',
+				'TH_COLOR2' => $theme['th_color2'],
 				
 				'S_LANGUAGE_INTO' => $this->gen_select_list( 'html', 'language', $this->language_into, $this->language_from),
 				'S_MODULE_LIST' => $this->gen_select_list( 'html', 'modules', $this->module_select),
@@ -3595,7 +3465,7 @@ class mxp_translator
 				'S_ACTION' => $this->u_action . '?' . str_replace('&amp;', '&', $params),
 				'S_ACTION_AJAX' => $this->u_action . '?' . str_replace('&amp;', '&', $params) . '&ajax=1',
 				
-				'L_RESET' => isset($this->user->lang['RESET']) ? $this->user->lang['RESET'] : 'Reset',
+				'L_RESET' => $lang['Reset'],
 				'IMG_INFO' => $img_info,
 				'IMG_GOOGLE' => $img_google,				
 				'I_LANGUAGE' => $this->language_into,
@@ -3606,7 +3476,7 @@ class mxp_translator
 			/* */
 			$this->assign_template_vars($this->template);
 			$this->template->assign_vars( array( // #
-				'L_MX_MODULES' =>  isset($this->user->lang['MX_MODULES']) ? $this->user->lang['MX_MODULES'] : 'MX_Modules',
+				'L_MX_MODULES' => $lang['MX_Modules'],
 			));
 			if (($this->s == 'MODS') || ($this->s == 'phpbb_ext'))
 			{
@@ -3664,639 +3534,6 @@ class mxp_translator
 			));
 			//$this->template->pparse('body');
 		}
-	}
-	
-	/**
-	* Get lang key or value
-	* To do: update this->user->lang[] into this->language->lang()
-	* Not used, to be removed in 1.0.0-RC4
-	* @return unknown
-	 */	
-	function get_lang($key)
-	{
-		return ((!empty($key) && isset($this->user->lang[$key])) ? $this->user->lang[$key] : $key);
-	}
-	
-	/**
-	*
-	* List all countries for witch languages files are installed 
-	* and multilangual files uploaded
-	* $this->countries = $this->get_countries()
-	*/
-	function get_countries()
-	{
-		// get all countries installed
-		$countries = array();
-		$dir = @opendir($this->root_path . 'language');
-		while ($file = @readdir($dir))
-		{
-			if (preg_match('#^lang_#i', $file) && !is_file($this->root_path . 'language/' . $file) && !is_link($this->root_path . 'language/' . $file))
-			{
-				$filename = trim(str_replace('lang_', '', $file));
-				$displayname = preg_replace("/^(.*?)_(.*)$/", "\\1 [ \\2 ]", $filename);
-				$displayname = preg_replace("/\[(.*?)_(.*)\]/", "[ \\1 - \\2 ]", $displayname);
-				$countries[$file] = ucfirst($displayname);
-			}
-		}
-		@closedir($dir);
-		@asort($countries);
-
-		return $countries;
-	}
-
-	function get_packs()
-	{
-		global $countries;
-
-		/* MG Lang DB - BEGIN */
-		$skip_files = array(('lang_bbcode.' . $this->php_ext), ('lang_faq.' . $this->php_ext), ('lang_rules.' . $this->php_ext));
-		/* MG Lang DB - END */
-
-		// get all the extensions installed
-		$packs = array();
-		
-		@reset($countries);
-		
-		while (list($country_dir, $country_name) = @each($countries))
-		{
-			$dir = @opendir($this->root_path . 'language/' . $country_dir);
-			
-			while ($file = @readdir($dir))
-			{
-				if ( ( $file == '.' || $file == '..') || (substr(strrchr($file, '.'), 1) !== $this->php_ext) || (strpos($file, 'lang_') === false))
-				{
-					continue;
-				}				
-				
-				$pattern = 'lang_u';
-				if (preg_match('/' . $pattern . '/i', $file))
-				//if(preg_match("/^lang_user_created.*?\." . $this->php_ext . "$/", $file))
-				//if((preg_match("/^lang_user_created.*?\." . $this->php_ext . "$/", $file)) || (preg_match("/^lang_main.*?\." . $this->php_ext . "$/", $file)))
-				//if((preg_match("/^lang_user_created.*?\." . $this->php_ext . "$/", $file)) || (preg_match("/^lang_admin.*?\." . $this->php_ext . "$/", $file)))
-				//if(preg_match("/^lang_user_created.*?\." . $this->php_ext . "$/", $file))
-				{
-					/* MG Lang DB - BEGIN */
-					if (!in_array($file, $skip_files))
-					/* MG Lang DB - END */
-					{
-						$displayname = $file;
-						$packs[$file] = $displayname;
-					}
-				}
-				/* MG Lang DB - BEGIN */
-				if(preg_match("/^lang_extend_.*?\." . $this->php_ext . "$/", $file))
-				{
-					$displayname = trim(str_replace(('.' . $this->php_ext), '', str_replace('lang_extend_', '', $file)));
-					$packs[$file] = $displayname;
-				}
-				/* MG Lang DB - END */
-			}
-			@closedir($dir);
-		}
-		/* MG Lang DB - BEGIN */
-		/*
-		$packs['lang'] = '_phpBB';
-		$packs['custom'] = '_custom';
-		*/
-		/* MG Lang DB - END */
-		@asort($packs);
-
-		return $packs;
-	}
-
-	function read_one_pack($country_dir, $pack_file, &$entries)
-	{
-		global $countries, $packs;
-
-		// get filename
-		$file = $this->root_path . 'language/' . $country_dir . '/' . $pack_file;
-		if (($pack_file != 'lang') && ($pack_file != 'custom') && !file_exists($file))
-		{
-			//die('This file doesn\'t exist: ' . $file);
-			echo('This file doesn\'t exist: ' . $file . '<br />');
-		}
-
-		// process first admin then standard keys
-		for ($i = 0; $i < 2; $i++)
-		{
-			$lang_extend_admin = ($i == 0);
-
-			/* MG Lang DB - BEGIN */
-			// fix the filename for standard keys
-			if ($pack_file == 'lang')
-			{
-				$file = $this->root_path . 'language/' . $country_dir . '/' . ($lang_extend_admin ? 'lang_admin.' : 'lang_main.') . $this->php_ext;
-			}
-			// fix the filename for custom keys
-			if ($pack_file == 'custom')
-			{
-				$file = $this->root_path . 'language/' . $country_dir . '/' . 'lang_extend.' . $this->php_ext;
-			}
-			/* MG Lang DB - END */
-
-			// process
-			$lang = array();
-			@include($file);
-			@reset($lang);
-			while (list($key_main, $data) = @each($lang))
-			{
-				$custom = ($pack_file == 'custom');
-				$first = !is_array($data);
-				while ((is_array($data) && (list($key_sub, $value) = @each($data))) || $first)
-				{
-					$first = false;
-					if (!is_array($data))
-					{
-						$key_sub = '';
-						$value = $data;
-					}
-					$pack = $pack_file;
-					$original = '';
-					if ($custom && isset($entries['pack'][$key_main][$key_sub]))
-					{
-						$pack = $entries['pack'][$key_main][$key_sub];
-						$original = $entries['pack'][$key_main][$key_sub][$country_dir];
-					}
-					$entries['pack'][$key_main][$key_sub] = $pack;
-					$entries['value'][$key_main][$key_sub][$country_dir] = $value;
-					$entries['original'][$key_main][$key_sub][$country_dir] = $original;
-					$entries['admin'][$key_main][$key_sub] = $lang_extend_admin;
-					// status : 0 = original, 1 = modified, 2 = added
-					$entries['status'][$key_main][$key_sub][$country_dir] = (!$custom ? 0 : (($pack != $pack_file) ? 1 : 2));
-				}
-			}
-		}
-	}
-	
-	/**
-	* Get entries (all lang keys) from all multilangual files of a package
-	* $old_entries = $this->get_entries(false);
-	*/		
-	function get_entries($modified = true)
-	{
-		global $config;
-		global $countries, $packs;
-
-		// init
-		$entries = array();
-
-		// process by countries first
-		/* MG Lang DB - BEGIN */
-		/*
-		@reset($countries);
-		while (list($country_dir, $country_name) = @each($countries))
-		{
-			// phpBB lang keys
-			$pack_file = 'lang';
-			$this->read_one_pack($country_dir, $pack_file, $entries);
-		}
-
-		// process other packs except custom one
-		@reset($countries);
-		while (list($country_dir, $country_name) = @each($countries))
-		{
-			@reset($packs);
-			while (list($pack_file, $pack_name) = @each($packs))
-			{
-				if (($pack_file != 'lang') && ($pack_file != 'custom'))
-				{
-					$this->read_one_pack($country_dir, $pack_file, $entries);
-				}
-			}
-		}
-		*/
-		/* MG Lang DB - END */
-
-		/* MG Lang DB - BEGIN */
-		@reset($countries);
-		while (list($country_dir, $country_name) = @each($countries))
-		{
-			@reset($packs);
-			while (list($pack_file, $pack_name) = @each($packs))
-			{
-				$this->read_one_pack($country_dir, $pack_file, $entries);
-			}
-		}
-		/* MG Lang DB - END */
-
-		// process the added/modified keys
-		if ($modified)
-		{
-			/* MG Lang DB - BEGIN */
-			@reset($countries);
-			while (list($country_dir, $country_name) = @each($countries))
-			{
-				$pack_file = 'custom';
-				$this->read_one_pack($country_dir, $pack_file, $entries);
-			}
-			/* MG Lang DB - END */
-
-			// add the missing keys in a language
-			$default_lang = 'lang_' . $config['default_lang'];
-			$english_lang = 'lang_english';
-			@reset($entries['pack']);
-			while (list($key_main, $data) = @each($entries['pack']))
-			{
-				@reset($data);
-				while (list($key_sub, $pack_file) = @each($data))
-				{
-					// add the key to the default lang if missing by using the english one
-					if (!isset($entries['value'][$key_main][$key_sub][$default_lang]))
-					{
-						// add the key to english lang if missing
-						if (!isset($entries['value'][$key_main][$key_sub][$english_lang]))
-						{
-							// find the first not empty value
-							$found = false;
-							$new_value = '';
-							@reset($entries['value'][$key_main][$key_sub]);
-							while (list($country_dir, $value) = @each($entries['value'][$key_main][$key_sub]))
-							{
-								$found = !empty($value);
-								if ($found)
-								{
-									$new_value = $value;
-								}
-							}
-							// add it (even if empty)
-							$entries['value'][$key_main][$key_sub][$english_lang] = $new_value;
-							$entries['status'][$key_main][$key_sub][$english_lang] = 2; // 2=added
-						}
-
-						// fill the default lang
-						if ($default_lang!= $english_lang)
-						{
-							$entries['value'][$key_main][$key_sub][$default_lang] = $entries['value'][$key_main][$key_sub][$english_lang];
-							$entries['status'][$key_main][$key_sub][$default_lang] = 2; // 2=added
-						}
-					}
-
-					// process all langs for this key
-					@reset($countries);
-					while (list($country_dir, $country_name) = @each($countries))
-					{
-						if (!isset($entries['value'][$key_main][$key_sub][$country_dir]))
-						{
-							$entries['value'][$key_main][$key_sub][$country_dir] = $entries['value'][$key_main][$key_sub][$default_lang];
-							$entries['status'][$key_main][$key_sub][$country_dir] = 2; // 2=added
-						}
-					}
-				}
-			}
-		}
-
-		// all is done : return the result
-		return $entries;
-	}
-
-	function write($entries)
-	{
-		global $template, $user, $lang;
-		global $countries, $packs;
-
-		// read old values
-		$old_entries = $this->get_entries(false);
-
-		// regenerate each file (per country then per pack)
-		@reset($countries);
-		while (list($country_dir, $country_name) = each($countries))
-		{
-			// init
-			$local = array();
-			// read packs
-			@reset($packs);
-			while (list($pack_file, $pack_name) = @each($packs))
-			{
-				// read keys
-				@reset($entries['admin']);
-				while (list($key_main, $data) = @each($entries['admin']))
-				{
-					@reset($data);
-					while (list($key_sub, $admin) = @each($data))
-					{
-						$std = !$entries['admin'][$key_main][$key_sub];
-						$local[$std][$pack_name][$key_main][$key_sub] = $entries['value'][$key_main][$key_sub][$country_dir];
-					}
-				}
-			}
-			@ksort($local);
-
-			$file_content = $this->empty_file_header();
-
-			// read admin/standard type of key
-			@reset($local);
-			while (list($std, $pack_data) = @each($local))
-			{
-				$prefix = ($std ? 'normal' : 'admin');
-				if ($prefix == 'admin')
-				{
-					$file_content .= 'if($lang_extend_admin)' . "\n";
-					$file_content .= '{' . "\n";
-				}
-				// read pack
-				@reset($pack_data);
-				while (list($pack_file, $key_data) = @each($pack_data))
-				{
-					$pack_filename = $pack_file;
-					/*
-					$file_content .= '// Pack: ' . $pack_file . "\n";
-					$file_content .= "\n";
-					*/
-					// read key main
-					@reset($key_data);
-					while (list($key_main, $sub_data) = @each($key_data))
-					{
-						// read key sub
-						@reset($sub_data);
-						while (list($key_sub, $value) = @each($sub_data))
-						{
-							$key_main = $this->clean_string($key_main);
-							$key_sub = $this->clean_string($key_sub);
-							$value = $this->clean_string($value);
-							$n_sub = intval($key_sub);
-							$file_content .= (($prefix == 'admin') ? "\t" : '');
-							if (!empty($key_sub) || ($key_sub == "$n_sub"))
-							{
-								$file_content .= '$lang[\'' . $key_main . '\'][\'' . $key_sub . '\'] = \'' . $value . '\';' . "\n";
-							}
-							else
-							{
-								$file_content .= '$lang[\'' . $key_main . '\'] = \'' . $value . '\';' . "\n";
-							}
-						}
-					}
-				}
-				if ($prefix == 'admin')
-				{
-					$file_content .= '}' . "\n";
-					$file_content .= "\n";
-				}
-			}
-			$file_content .= "\n";
-			$file_content .= '?' . '>';
-
-			$edittime = gmdate('Y-m-d H:i:s');
-
-			$array_find = array(
-				'$' . 'Id' . '$',
-				'{COUNTRY_NAME}',
-				'{EDITTIME}',
-				'{USERNAME}',
-			);
-
-			$array_replace = array(
-				'$' . 'Id: ' . $pack_filename . ' ' . $edittime . ' ' . $this->user->data['username'] . ' $',
-				$country_name,
-				$edittime,
-				$this->user->data['username'],
-			);
-
-			$file_content = str_replace($array_find, $array_replace, $file_content);
-
-			$filename = $this->root_path . 'language/' . $country_dir . '/' . $pack_filename;
-			$this->write_file($filename, $file_content);
-		}
-	}
-
-	function clean_string($string)
-	{
-		$array_find = array(
-			"''",
-			"'",
-			"\r\n",
-		);
-
-		$array_replace = array(
-			"'",
-			"\'",
-			"\n",
-		);
-
-		$string = str_replace($array_find, $array_replace, stripslashes(print_r($string, true)));
-		return $string;
-	}
-	
-	function mx_clean_string($string)
-	{
-		$array_find = array(
-			"''",
-			"'",
-			"\r\n",
-		);
-
-		$array_replace = array(
-			"'",
-			"\'",
-			"\n",
-		);
-
-		$string = str_replace($array_find, $array_replace, $this->array_to_string($string, true));
-		return $string;
-	}
-	
-	/* replacement for print_r(array(), true); */
-	function array_to_string($val, $all = true) 
-	{  	
-			if(is_array($val))
-			{
-				foreach($val as $k => $v)
-				{
-					$val[$k] = $this->removeslashes($v);
-				}
-				return $k . ', ' . $v;
-			}
-			else
-			{
-				$val = $this->removeslashes($val);
-				return $val;
-			}
-	}
-	
-	/* replacement for stripslashes(); */
-	function removeslashes($string, $all = true) 
-	{  	
-		//remove also slashes inside the string
-		//or remove only leading and trailing slashes		
-		return ($all !== false)  ? str_replace('/', '', $string)  : trim($string, '/');
-	}	
-	
-	function write_file($filename, $content)
-	{
-		@chmod($filename, 0666);
-		@unlink($filename);
-		$f = @fopen($filename, 'w');
-		@fwrite($f, $content);
-		@ftruncate($f);
-		@fclose($f);
-		@chmod($filename, 0666);
-	}
-
-	function empty_file_header()
-	{
-		$file_content = '';
-		$file_content .= '<' . '?' . 'php' . "\n";
-		$file_content .= '/**' . "\n";
-		$file_content .= '*' . "\n";
-		$file_content .= '* @package Language' . "\n";
-		$file_content .= '* @version $' . 'Id' . '$' . "\n";
-		$file_content .= '* @copyright (c) 2018' . "\n";
-		$file_content .= '* @license http://opensource.org/licenses/gpl-license.php GNU Public License' . "\n";
-		$file_content .= '*' . "\n";
-		$file_content .= '*/' . "\n";
-		$file_content .= '' . "\n";
-		$file_content .= '/**' . "\n";
-		$file_content .= '*' . "\n";
-		$file_content .= '* @Extra credits for this file' . "\n";
-		$file_content .= '* Ptirhiik (admin@rpgnet-fr.com)' . "\n";
-		$file_content .= '*' . "\n";
-		$file_content .= '*/' . "\n";
-		$file_content .= '' . "\n";
-		$file_content .= '/**' . "\n";
-		$file_content .= '*' . "\n";
-		$file_content .= '* [{COUNTRY_NAME}]' . "\n";
-		$file_content .= '* LAST UPDATE {EDITTIME} by {USERNAME}' . "\n";
-		$file_content .= '*' . "\n";
-		$file_content .= '*/' . "\n";
-		$file_content .= '' . "\n";
-		$file_content .= 'if (!defined(\'IN_PHPBB\'))' . "\n";
-		$file_content .= '{' . "\n";
-		$file_content .= '' . "\t" . 'die(\'Hacking attempt\');' . "\n";
-		$file_content .= '}' . "\n";
-		$file_content .= '' . "\n";
-		return $file_content;
-	}
-	
-	/**
-		; User error handling and logging in PHP;
-		; E_USER_ERROR      		- user-generated error message
-		; E_USER_WARNING    	- user-generated warning message
-		; E_USER_NOTICE     		- user-generated notice message
-		; E_USER_DEPRECATED - user-generated deprecation warnings 
-	*/
-	function msg_handler($msg_code, $msg_text = '', $msg_title = '', $err_line = '', $err_file = '', $sql = '')
-	{		
-			
-		// Do not display notices if we suppress them via @
-		if (error_reporting() == 0 && $errno != E_USER_ERROR && $errno != E_USER_WARNING && $errno != E_USER_NOTICE && $errno != E_USER_DEPRECATED)
-		{
-			return;
-		}	
-			
-		//
-		// Get SQL error if we are debugging. Do this as soon as possible to prevent
-		// subsequent queries from overwriting the status of sql_error()
-		//
-		if (DEBUG && ($msg_code == E_USER_NOTICE || $msg_code == E_USER_ERROR))
-		{	
-			if ( isset($sql) )
-			{
-				$sql_error = $this->db->sql_error($sql);
-				$sql_error['message'] = $sql_error['message'] ? $sql_error['message'] : '<br /><br />SQL : ' . $sql; 
-				$sql_error['code'] = $sql_error['code'] ? $sql_error['code'] : 0;
-			}
-			else
-			{
-				$sql_error = $this->db->sql_error_returned;
-				$sql_error['message'] = $this->db->sql_error_returned['message']; 
-				$sql_error['code'] = $this->db->sql_error_returned['code'];
-			}
-				
-			$debug_text = '';
-				
-			//Some code with harcoded language from function db::sql_error() and other from msg_handler() with some fixes here
-			// If error occurs in initiating the session we need to use a pre-defined language string
-			// This could happen if the connection could not be established for example (then we are not able to grab the default language)
-			if ( isset($sql_error['message']) )
-			{	
-				$message = 'SQL  ' . $this->user->lang('ERROR') . ' [ ' . $this->db->sql_layer . ' ]<br /><br />' . $sql_error['message'] . ' [' . $sql_error['code'] . ']';
-					
-				if (!empty($this->user->lang('SQL_ERROR_OCCURRED')))
-				{
-					$message .= '<br /><br />An sql error occurred while fetching this page. Please contact an administrator if this problem persists.';
-				}
-				else
-				{
-					if (!empty($this->config['board_contact']))
-					{
-						$message .= '<br /><br />' . sprintf($this->user->lang('SQL_ERROR_OCCURRED'), '<a href="mailto:' . $this->config['board_contact'] . '">', '</a>');
-					}
-					else
-					{
-						$message .= '<br /><br />' . sprintf($this->user->lang('SQL_ERROR_OCCURRED'), '', '');
-					}
-				}
-				$debug_text .= '<br /><br />SQL '  . $this->user->lang('ERROR') . ' ' . $this->user->lang('COLON') . ' ' . $sql_error['code'] . ' ' . $sql_error['message'];
-			}
-				
-			if ( isset($sql_store) )
-			{
-				$debug_text .= "<br /><br />$sql_store";
-			}
-
-			if ( isset($err_line) && isset($err_file) )
-			{
-				$debug_text .= '</br /><br />Line : ' . $err_line . '<br />File : ' . $err_file;
-			}
-		}
-			
-		switch($msg_code)
-		{
-			case E_USER_ERROR:
-				if ( $msg_title == '' )
-				{
-					$msg_title = $this->user->lang('GENERAL_ERROR'); 
-				}
-			break;
-
-			case E_USER_WARNING:
-				if ( $msg_text == '' )
-				{
-					$msg_text = $this->user->lang('GENERAL_ERROR');
-				}
-
-				if ( $msg_title == '' )
-				{
-					$msg_title = $this->user->lang('ERROR');
-				}
-			break;
-				
-			case E_USER_NOTICE:
-				if ( $msg_title == '' )
-				{
-					$msg_title = $this->user->lang('INFORMATION');
-				}
-			break;
-				
-			case E_USER_DEPRECATED:
-				if ($msg_text == '')
-				{
-					$msg_text = $this->user->lang('GENERAL_ERROR');
-				}
-
-				if ($msg_title == '')
-				{
-					$msg_title = 'phpBB' . $this->user->lang('COLON') . '<b>' . $this->user->lang('ERROR') . '</b>';
-				}
-			break;
-		}
-			
-		//
-			// Add on DEBUG info if we've enabled debug mode and this is an error. This
-			// prevents debug info being output for general messages should DEBUG be
-			// set TRUE by accident (preventing confusion for the end user!)
-		//
-		if ( DEBUG && ( $msg_code == E_USER_NOTICE || $msg_code == E_USER_ERROR ) )
-		{
-			if ( $debug_text != '' )
-			{
-				$msg_text = $msg_text . '<br /><br /><b><u>DEBUG MODE</u></b> ' . $debug_text;
-			}
-		}
-			
-		$msg_text = (!empty($this->user->lang[$msg_text])) ? $this->user->lang[$msg_text] : $msg_text;
-		$msg_title = (!empty($this->user->lang[$msg_title])) ? $this->user->lang[$msg_title] : $msg_title;
-			
-		mx_message_die($msg_code, $msg_text, $msg_title, $err_line, $err_file, $sql);
 	}	
 }	// class mx_user
 // THE END

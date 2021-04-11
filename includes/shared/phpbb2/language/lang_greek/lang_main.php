@@ -1038,13 +1038,6 @@ $lang['General_Error'] = 'Γενικό Λάθος';
 $lang['Critical_Error'] = 'Κρίσιμο Λάθος';
 $lang['An_error_occured'] = 'Παρουσιάσθηκε Λάθος';
 $lang['A_critical_error'] = 'Παρουσιάσθηκε Κρίσιμο Λάθος';
-// Login
-$lang['Enter_password'] = 'Please enter your username and password to log in.';
-$lang['Login'] = 'Log in';
-$lang['Logout'] = 'Log out';
-$lang['Forgotten_password'] = 'I forgot my password';
-$lang['AUTOLOGIN'] = 'Log me on automatically each visit';
-$lang['Error_login'] = 'You have specified an incorrect or inactive username, or an invalid password.'; 
 
 $lang['Admin_reauthenticate'] = 'Για να διαχειριστείτε τον πίνακα πρέπει να ξαναεισάγετε τον κωδικό σας.';
 $lang['Login_attempts_exceeded'] = 'Ο μέγιστος αριθμός %s προσπαθειών εισαγωγής σας έφτασε. Δεν επιτρέπεται η εισαγωγή σας για τα επόμενα %s λεπτά.';

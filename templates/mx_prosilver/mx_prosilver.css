@@ -17,6 +17,7 @@
 @import url("./theme/forms.css");
 @import url("./theme/tweaks.css");
 @import url("./theme/colours.css");
+@import url("./theme/mxPublisher.css");
 
 .block {
 	background-position: 0px -20px;

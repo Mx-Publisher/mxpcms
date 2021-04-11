@@ -2,8 +2,8 @@
 /**
 *
 * @package Style
-* @version $Id: session.php,v 1.1 2014/07/07 20:38:17 orynider Exp $
-* @copyright (c) 2002-2008 MX-Publisher Project Team & (C) 2005 The phpBB Group
+* @version $Id: session.php,v 3.2.9 2021/03/25 04:13:02 orynider Exp $
+* @copyright (c) 2002-2021 MX-Publisher Project Team & (C) 2005 The phpBB Group
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
 *
@@ -41,6 +41,8 @@ if ( !defined('IN_PORTAL') )
 /**
  * Disable bots
  *
+ * Class wrapper
+ * mx_dss_rand
  */
 class mx_nothing
 {
@@ -50,19 +52,123 @@ class mx_nothing
 	}
 }
 
+/*
+ * This class is part of Crawler Detect - the web crawler detection library.
+ *
+ * (c) Mark Beech <m@rkbee.ch>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file fixtures\LICENSE.
+ */
+//namespace Jaybizzle\CrawlerDetect;
+abstract class AbstractProvider
+{
+    /**
+     * The data set.
+     * 
+     * @var array
+     */
+    protected $data;
+    /**
+     * Return the data set.
+     * 
+     * @return array
+     */
+    public function getAll()
+    {
+        return $this->data;
+    }
+}
+
+include_once($mx_root_path . 'includes/fixtures/headers.'.$phpEx);
+include_once($mx_root_path . 'includes/fixtures/crawlers.'.$phpEx);
+include_once($mx_root_path . 'includes/fixtures/exclusions.'.$phpEx);
+
 /**
 * Session class
 * @package MX-Publisher
 */
 class session
 {
+	/**#@+
+	 * user class specific vars
+	 *
+	 */
+	var $loaded_langs = array();
+	var $loaded_styles = array();
+	var $loaded_default_styles = array();
+	
+	var $lang_path = 'language/';
+	var $lang = array();
+	var $help = array();
+	var $lang_name;
+	var $lang_id = false;
+
+	var $img_lang;
+	
+	/**
+	 * @var string	ISO code of the default board language
+	 */
+	var $default_language;
+	var $default_language_name;
+	
+	/**
+	 * @var string	ISO code of the User's language
+	 */
+	var $user_language;
+	var $user_language_name;
+
+		
+	var $lang_iso = 'en';		
+	var $lang_dir = 'lang_english';
+	//
+	var $img_lang_dir = 'en';
+
+	var $template_path = 'templates/';
+	var $styles_path = 'templates/';
+
+	var $template_name = '';
+	var $template_names = array();
+	var $current_template_path = '';
+
+	var $cloned_template_name = 'subSilver';
+	var $default_template_name = 'subsilver2';
+	
+	var $cloned_current_template_name = 'prosilver';
+	var $default_current_template_name = '';	
+	
+	var $cloned_current_template_path = 'templates/subSilver';
+	var $default_current_template_path = 'templates/subsilver2';
+	
+	var $imageset_backend = 'phpbb2';
+	var $ext_imageset_backend = 'phpbb2';
+
+	var $img_array = array();
+	var $default_module_style = '';
+	var $style = array();
+	var $theme = array();
+
+	var $date_format;
+	var $timezone;
+	var $int_timezone;
+	var $dst;
+	
+	// Able to add new options (up to id 31)
+	var $keyoptions = array('viewimg' => 0, 'viewflash' => 1, 'viewsmilies' => 2, 'viewsigs' => 3, 'viewavatars' => 4, 'viewcensors' => 5, 'attachsig' => 6, 'bbcode' => 8, 'smilies' => 9, 'sig_bbcode' => 15, 'sig_smilies' => 16, 'sig_links' => 17);
+	
+	var $is_admin = false;
+	
+	var $page_id = '';
+	var $user_ip = '';
+
 	/** @var \phpbb\cache\driver\driver_interface */
 	protected $cache;
-	protected $mx_cache;
 	protected $language;
 	protected $request;
+	
 	/** @var \phpbb\config\config */
 	protected $config;
+	
 	/** @var \phpbb\db\driver\driver_interface */
 	protected $db; 
 	
@@ -74,78 +180,102 @@ class session
 	var $host = '';
 	var $session_id = '';
 	var $ip = '';
-	var $page_id = '';
-	var $user_ip = '';	
+	var $datetime = '';
+
 	var $load = 0;
 	var $time_now = 0;
 	var $update_session_page = true;
+	
+	var $module_lang_path = array();
+	protected $phpbb_root_path;
 
-	var $lang = array();
-	var $help = array();
-	var $theme = array();
-	var $style = 1;
-	var $date_format;
-	var $timezone;
-	var $int_timezone;
-	var $dst;
+	
+    /**
+     * The user agent.
+     *
+     * @var null
+     */
+    protected $userAgent = null;
 
-	/**
-	 * @var string	ISO code of the default board language
-	 */
-	var $default_language;
-	var $default_language_name;
-	
-	var	$default_template_name = 'subsilver2';
-	var	$cloned_template_name = 'subSilver';
-	
-	var	$cloned_template_path;	
-	var	$default_template_path;
-	
-	/**
-	 * @var string	ISO code of the User's language
-	 */
-	var $user_language;
-	var $user_language_name;
-	
-	var $lang_iso = 'en';	
-	var $lang_dir = 'lang_english';
-	
-	protected $common_language_files_loaded;
-	
-	var $img_lang_dir = 'en';
-	var $lang_english_name = 'English';	
-	var $lang_local_name = 'English United Kingdom';
-	var $language_list = array();
-	var $debug_paths;
+    /**
+     * Headers that contain a user agent.
+     *
+     * @var array
+     */
+    protected $httpHeaders = array();
 
-	var $lang_name;
-	var $lang_id = false;
-	var $lang_path;
-	var $img_lang;
-	var $img_array = array();
+    /**
+     * Store regex matches.
+     *
+     * @var array
+     */
+    protected $matches = array();
+
+    /**
+     * Crawlers object.
+     *
+     * @var \Jaybizzle\CrawlerDetect\Fixtures\Crawlers
+     */
+    protected $crawlers;
+
+    /**
+     * Exclusions object.
+     *
+     * @var \Jaybizzle\CrawlerDetect\Fixtures\Exclusions
+     */
+    protected $exclusions;
+
+    /**
+     * Headers object.
+     *
+     * @var \Jaybizzle\CrawlerDetect\Fixtures\Headers
+     */
+    protected $uaHttpHeaders;
+
+    /**
+     * The compiled regex string.
+     *
+     * @var string
+     */
+    protected $compiledRegex;
+
+    /**
+     * The compiled exclusions regex string.
+     *
+     * @var string
+     */
+    protected $compiledExclusions;
+	
+	/** @var bool */
+	protected $is_setup_flag;
+	
+	//var  $phpbb_root_path;	
+	/**#@-*/
 	
 	/**
 	 * Load sessions
 	 * @access public
 	 *
-	 */	
-	function session()
+	 */
+	function __construct()
 	{
-		global $mx_cache, $board_config, $db, $phpbb_root_path, $mx_root_path, $phpEx;
+		global $mx_cache, $mx_backend, $board_config, $db, $phpbb_root_path, $mx_root_path, $phpEx;
 		global $mx_request_vars, $template, $language;
 		
-		$this->cache				= $mx_cache;
-		$this->config				= $board_config;
-		$this->db                 	= $db;
-		$this->user               	= $this;
+		$this->cache			= $mx_cache;
+		$this->config			= $board_config;
+		$this->db               = $db;
+		$this->user             = $this;
 		$this->service_providers = array('user_id' => 1, 'session_id' => 0, 'provider'	=> '', 'oauth_token' => '');
-		$this->phpbb_root_path = $phpbb_root_path;
-		$this->mx_root_path	= $mx_root_path;
+		$this->phpbb_root_path 	= $phpbb_root_path;
+		$this->mx_root_path		= $mx_root_path;
 		$this->php_ext			= $phpEx;
-		$this->lang_path			= $mx_root_path . 'language/';
-		$this->request				= $mx_request_vars;
+		$this->lang_path		= $mx_root_path . 'language/';
+		$this->request			= $mx_request_vars;
 		$this->template			= $template;
 		$this->language			= $language;
+
+		$this->is_setup_flag = false;
 
 		// Setup $this->db_tools
 		if (!class_exists('mx_db_tools') && !class_exists('tools'))
@@ -166,23 +296,37 @@ class session
 		$this->php_ext = $phpEx;
 	
 		$this->lang_path = $mx_root_path . 'language/';
-		/*
-        $this->crawlers = new Crawlers();
-        $this->exclusions = new Exclusions();
-        $this->uaHttpHeaders = new Headers();
+		
+		/**/
+		$this->crawlers = new Crawlers();
+		$this->exclusions = new Exclusions();
+		$this->uaHttpHeaders = new Headers();
 
-        $this->compiledRegex = $this->compileRegex($this->crawlers->getAll());
-        $this->compiledExclusions = $this->compileRegex($this->exclusions->getAll());
+		$this->compiledRegex = $this->compileRegex($this->crawlers->getAll());
+		$this->compiledExclusions = $this->compileRegex($this->exclusions->getAll());
 
-        $this->setHttpHeaders($headers);
-        $this->userAgent = $this->setUserAgent($userAgent);
-		*/
+		$this->setHttpHeaders($headers);
+		$this->userAgent = $this->setUserAgent($userAgent);
+		/**/
+		
 		$this->lang_path = $phpbb_root_path . 'language/';
 		$this->load();
 		$this->setup();
 		$this->setup_style();
-
 	}
+	// ------------------------------
+	// Private Methods
+	//
+	
+	/**
+	 * Returns whether user::setup was called
+	 *
+	 * @return bool
+	 */
+	public function is_setup()
+	{
+		return $this->is_setup_flag;
+	}	
 	
 	/**
 	 * Load sessions
@@ -191,10 +335,744 @@ class session
 	 */
 	function load()
 	{
-		global $board_config, $cache;
+		global $mx_cache, $board_config, $db, $phpbb_root_path, $mx_root_path, $phpEx;
+		global $mx_request_vars, $template, $language;
 
 		$board_config['auth_method'] = 'db';
 		$cache = new mx_nothing();
+		
+		$this->cache			= $mx_cache;
+		$this->config			= $board_config;
+		$this->db               = $db;
+		$this->user             = $this;
+		$this->service_providers = array('user_id' => 1, 'session_id' => 0, 'provider'	=> '', 'oauth_token' => '');
+		$this->phpbb_root_path = $phpbb_root_path;
+		$this->mx_root_path	= $mx_root_path;
+		$this->php_ext			= $phpEx;
+		$this->lang_path		= $mx_root_path . 'language/';
+		$this->request			= $mx_request_vars;
+		$this->template			= $template;
+		$this->language			= $language;
+		
+		// Give us some basic information
+		$this->time_now				= time();
+		$this->cookie_data			= array('u' => 0, 'k' => '');
+		$this->update_session_page	= true;
+		$this->browser				= (!empty($_SERVER['HTTP_USER_AGENT'])) ? htmlspecialchars((string) $_SERVER['HTTP_USER_AGENT']) : '';
+		$this->referer				= (!empty($_SERVER['HTTP_REFERER'])) ? htmlspecialchars((string) $_SERVER['HTTP_REFERER']) : '';		
+		$this->forwarded_for		= (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) ? (string) $_SERVER['HTTP_X_FORWARDED_FOR'] : '';
+		$this->host					= (!empty($_SERVER['HTTP_HOST'])) ? (string) $_SERVER['HTTP_HOST'] : 'localhost';
+		$this->page					= $this->extract_current_page($mx_root_path);
+		
+		if (!isset($this->user_ip)) 
+		{
+			global $user_ip;
+		
+			$this->user_ip = $user_ip;
+		}		
+		
+		//$this->page_id = $page_id ? $page_id : $this->request->request('page', MX_TYPE_INT, PAGE_INDEX);
+		
+		if (!isset($this->page_id)) 
+		{
+			global $mx_request_vars;
+
+			$this->page_id = $mx_request_vars->request('page', MX_TYPE_INT, 1);
+		}
+		
+		if (!isset($this->config)) 
+		{
+			global $board_config;
+
+			$this->config = $board_config;
+		}		
+		
+		if (!isset($this->mx_root_path)) 
+		{
+			global $mx_root_path;
+		
+			$this->mx_root_path = $mx_root_path;
+		}
+		
+		if (!isset($this->phpbb_root_path)) 
+		{
+			global $phpbb_root_path;
+		
+			$this->phpbb_root_path = $phpbb_root_path;
+		}		
+		
+		if (!isset($this->cache)) 
+		{
+			global $mx_cache;
+
+			$this->cache = $mx_cache;
+			
+			if (!isset($this->cache)) 
+			{
+				$this->cache= new mx_cache();
+			}
+		}
+		
+		// Setup $this->db_tools
+		if (!class_exists('mx_db_tools') && !class_exists('tools'))
+		{
+			include_once($this->mx_root_path . 'includes/db/db_tools.' . $phpEx);
+		}
+		if (class_exists('mx_db_tools'))
+		{
+			$this->db_tools = new mx_db_tools($this->db);
+		}
+		elseif (class_exists('tools'))
+		{
+			$this->db_tools = new tools($this->db);
+		}
+		
+		//
+		// Populate user data
+		//
+		$this->data = array();
+		
+		$this->data = $this->session_pagestart($this->user_ip, - ( MX_PORTAL_PAGES_OFFSET + $this->page_id ));
+		
+		//
+		// Populate session_id
+		$this->session_id = $this->data['session_id'];
+			
+		if (preg_match('/bot|crawl|curl|dataprovider|search|get|spider|find|java|majesticsEO|google|yahoo|teoma|contaxe|yandex|libwww-perl|facebookexternalhit/i', $_SERVER['HTTP_USER_AGENT'])) 
+		{
+		    substr($this->data['is_bot'], false, true);
+		}
+		else
+		{
+		    substr($this->data['is_bot'], true, false);
+		}
+		
+		$status = $this->mobile_device_detect();
+		
+		if (!$this->db->sql_field_exists('user_type', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_type</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_type', array('column_type_sql' => 'tinyint(2)', 'null' => 'NOT NULL', 'default' => '0', 'after' => 'user_id'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('username_clean', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">username_clean</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'username_clean', array('column_type_sql' => 'varchar(255)', 'null' => 'NOT NULL', 'default' => '', 'after' => 'username'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_email_hash', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_email_hash</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_email_hash', array('column_type_sql' => 'BIGINT(20)', 'null' => 'NOT NULL', 'default' => '0', 'after' => 'user_email'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('group_id', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">group_id</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'group_id', array('column_type_sql' => 'mediumint(8)', 'null' => 'NOT NULL', 'default' => '3', 'after' => 'user_type'), false);
+		}
+
+		if (!$this->db->sql_field_exists('user_ip', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_ip</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_ip', array('column_type_sql' => 'varchar(40)', 'null' => 'NOT NULL', 'default' => '"'.@mx_encode_ip('127.0.0.1').'"', 'after' => 'user_active'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_passchg', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_passchg</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_passchg', array('column_type_sql' => 'int(11)', 'null' => 'NOT NULL', 'default' => '0', 'after' => 'user_password'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_options', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_options</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_options', array('column_type_sql' => 'int(11)', 'null' => 'NOT NULL', 'default' => '230271', 'after' => 'user_level '), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_newpasswd', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_newpasswd</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_newpasswd', array('column_type_sql' => 'varchar(33)', 'null' => 'NOT NULL', 'default' => '', 'after' => 'user_active'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_new', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_new</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_new', array('column_type_sql' => 'tinyint(1)', 'null' => 'NOT NULL', 'default' => '1', 'after' => 'user_newpasswd'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_inactive_reason', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_inactive_reason</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_inactive_reason', array('column_type_sql' => 'tinyint(4)', 'null' => 'NOT NULL', 'default' => '0', 'after' => 'user_last_login_try'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_inactive_time', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_inactive_time</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_inactive_time', array('column_type_sql' => 'int(2)', 'null' => 'NOT NULL', 'default' => '0', 'after' => 'user_inactive_reason'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_lastmark', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_lastmark</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_lastmark', array('column_type_sql' => 'int(11)', 'null' => 'NOT NULL', 'default' => '0', 'after' => 'user_lastvisit'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_lastvisit', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_lastvisit</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_lastvisit', array('column_type_sql' => 'int(11)', 'null' => 'NOT NULL', 'default' => '0', 'after' => 'user_birthday'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_lastpage', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_lastpage</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_lastpage', array('column_type_sql' => 'varchar(200)', 'null' => 'NOT NULL', 'default' => '""', 'after' => 'user_lastmark'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_lastblock', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_lastblock</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_lastblock', array('column_type_sql' => 'varchar(200)', 'null' => 'NOT NULL', 'default' => '""', 'after' => 'user_lastpage'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_colour', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_colour</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_colour', array('column_type_sql' => 'varchar(50)', 'null' => 'NOT NULL', 'default' => '"9E8DA7"', 'after' => 'user_passchg'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_avatar_width', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_avatar_width</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_avatar_width', array('column_type_sql' => 'tinyint(6)', 'null' => 'NOT NULL', 'default' => 98, 'after' => 'user_last_login_try'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_avatar_height', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_avatar_height</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_avatar_height', array('column_type_sql' => 'tinyint(6)', 'null' => 'NOT NULL', 'default' => 98, 'after' => 'user_last_login_try'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_allow_viewonline', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_allow_viewonline</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_allow_viewonline', array('column_type_sql' => 'tinyint(1)', 'null' => 'NOT NULL', 'default' => '1', 'after' => 'user_email_hash'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_allow_massemail', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_allow_massemail</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_allow_massemail', array('column_type_sql' => 'tinyint(1)', 'null' => 'NOT NULL', 'default' => '1', 'after' => 'user_allow_viewonline'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_sig', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_sig</span></p><i><p>Cheching for user_sig column in USERS_TABLE schema!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_sig', array('column_type_sql_default'	=> 'mediumtext ', 'column_type_sql' => 'mediumtext', 'null' => 'NOT NULL', 'after' => 'user_last_login_try'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_sig_bbcode_uid', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_sig_bbcode_uid</span></p><i><p>Cheching for user_sig_bbcode_uid column in USERS_TABLE schema!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_sig_bbcode_uid', array('column_type_sql_default'	=> 'varchar(8)', 'column_type_sql' => 'varchar(8)', 'null' => 'NOT NULL', 'after' => 'user_sig'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_sig_bbcode_bitfield', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_sig_bbcode_bitfield</span></p><i><p>Cheching for user_sig_bbcode_bitfield column in USERS_TABLE schema!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_sig_bbcode_bitfield', array('column_type_sql_default'	=> 'varchar(255)', 'column_type_sql' => 'varchar(255)', 'null' => 'NOT NULL', 'default' => '"1111111111111"', 'after' => 'user_sig_bbcode_uid'), false);
+		}
+		
+		//
+		// Check USERS_TABLE schema for user_agent
+		//
+		if (!$this->db->sql_field_exists('user_agent', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_agent</span></p><i><p>Cheching for user_agent column in USERS_TABLE schema!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_agent', array('column_type_sql_default'	=> 'varchar(255)', 'column_type_sql' => 'varchar(99)', 'null' => 'NOT NULL', 'default' => '"Mozilla/5.0 (Windows NT 10.0; rv:100.0) Gecko/20210101 Firefox/100.0.00"', 'after' => 'user_sig'), false);
+		}
+		
+		if (!$this->db->sql_field_exists('user_form_salt', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">user_form_salt</span></p><i><p>Refreshing the users table!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'user_form_salt', array('column_type_sql' => 'varchar(32)', 'null' => 'NOT NULL', 'default' => '"+"'), false);
+		}
+		
+		//
+		// Check USERS_TABLE schema for is_bot
+		//
+		if (!$this->db->sql_field_exists('is_bot', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">is_bot</span></p><i><p>Cheching for is_bot column in USERS_TABLE schema!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'is_bot', array('column_type_sql'	=> 'int(2)', 'null' => 'NOT NULL', 'default' => '"0"'), false);
+		}
+		
+		//
+		// Check USERS_TABLE schema for is_mobile
+		//
+		if (!$this->db->sql_field_exists('is_mobile', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">is_mobile</span></p><i><p>Cheching for is_mobile column in USERS_TABLE schema!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'is_mobile', array('column_type_sql'	=> 'int(2)', 'null' => 'NOT NULL', 'default' => '"0"', 'after' => 'is_bot'), false);
+		}
+		
+		//
+		// Check USERS_TABLE schema for device_name
+		//
+		if (!$this->db->sql_field_exists('device_name', USERS_TABLE))
+		{
+			print('<p><span style="color: red;">device_name</span></p><i><p>Cheching for device_name column in USERS_TABLE schema!</p></i>');
+			$this->db_tools->sql_column_add(USERS_TABLE, 'device_name', array('column_type_sql' => 'varchar(99)', 'null' => 'NOT NULL', 'default' => '"PC"', 'after' => 'user_agent'), false);
+		}
+		
+		/*
+		if (!isset($this->data['device_name']))
+		{	
+			$after = '';
+			$sql_arry = array(
+				"ADD COLUMN  int(2) UNSIGNED NOT NULL DEFAULT 1" . $after,
+				"ADD COLUMN is_mobile int(2) UNSIGNED NOT NULL DEFAULT 1",
+				"ADD COLUMN user_agent varchar(255) NOT NULL",
+				"ADD COLUMN device_name varchar(99) NOT NULL",
+			);
+			
+			foreach ($sql_arry as $alter)
+			{
+				$sql = "ALTER TABLE " . USERS_TABLE . " " . $alter;
+				$this->db->sql_return_on_error(true);
+				$result = $this->db->sql_query($sql);
+				$this->db->sql_return_on_error(false);
+				
+				// We could add error handling here...
+				if (!($result))
+				{		
+					print_r("Could not upgrade users table at ". ' '. __LINE__ . ': '. __FILE__ . ':<br /> ' . $sql . '<br />');
+				}
+			}
+		}
+		*/
+		
+		substr($this->data['is_mobile'], false, $status);
+		substr($this->data['device_name'], false, $status[1]);
+		//$this->data['device_name'] = $this->cookie_data['mobile_name'] = $status[1];
+		$cookie_mobile_name = $this->request->variable($this->config['cookie_name'] . '_mobile_name', '', true, mx_request_vars::COOKIE);
+		if (!$cookie_mobile_name)
+		{
+			$this->user->set_cookie('mobile_name', $status[1], time() + 5 * 24 * 60 * 60, '/', false, false);
+		}
+		
+		if (!$this->db->sql_field_exists('group_colour', GROUPS_TABLE))
+		{
+			print('<p><span style="color: red;"></span></p><i><p>Refreshing the groups table!</p></i>');
+			$this->db_tools->sql_column_add(GROUPS_TABLE, 'group_colour', array('column_type_sql' => 'varchar(50)', 'null' => 'NOT NULL', 'after' => ''), false);
+			
+			/*
+			-- Refreshing Groups
+			*/
+			$default_groups = array(
+				//'Anonymous'					=> array('', 0, 0, 1, 'Personal User'),
+				'GUESTS'					=> array('', 0, 0, 0, 'Default Group'),
+				'REGISTERED'				=> array('', 0, 0, 0, 'Default Group'),
+				'REGISTERED_COPPA'			=> array('', 0, 0, 0, 'Default Group'),
+				'GLOBAL_MODERATORS'			=> array('00AA00', 2, 0, 0, 'Default Group'),
+				'ADMINISTRATORS'			=> array('AA0000', 1, 1, 0, 'Default Group'),
+				'BOTS'						=> array('9E8DA7', 0, 0, 0, 'Default Group'),
+				'NEWLY_REGISTERED'			=> array('', 0, 0, 0, 'Default Group'),
+			);
+			
+			/*
+			-- Refreshing Groups
+			*/
+			$sql = 'SELECT *, group_id as g.group_type
+				FROM ' . GROUPS_TABLE . '
+				WHERE ' . $this->db->sql_in_set('group_name', array_keys($default_groups));
+			$result = $this->db->sql_query($sql);
+			while ($row = $this->db->sql_fetchrow($result))
+			{
+				unset($default_groups[strtoupper($row['group_name'])]);
+			}
+			$this->db->sql_freeresult($result);
+			
+			$sql_ary = array();
+			foreach ($default_groups as $name => $data)
+			{
+				$sql_ary[] = array(
+					'group_type'				=> GROUP_CLOSED,
+					'group_name'				=> (string) $name,
+					'group_description'			=> (string) $data[4],
+					//'group_desc_uid'				=> '',
+					//'group_desc_bitfield'				=> '',
+					'group_colour'				=> (string) $data[0],
+					//'group_legend'					=> (int) $data[1],
+					'group_moderator'			=> (int) $data[2],
+					'group_single_user'			=> (int) $data[3],
+				);
+			}
+			if (count($sql_ary))
+			{
+				$this->db->sql_multi_insert(GROUPS_TABLE, $sql_ary);
+			}
+			
+			/** /
+			$sql_ary[] = array(
+				'group_id'						=> (int) $db->sql_nextid(),
+				'user_id'							=> '',
+				'user_pending'					=>  '0',
+			);
+			if (count($sql_ary))
+			{
+				$this->db->sql_multi_insert(USER_GROUP_TABLE, $sql_ary);
+			}
+			/**/
+			
+		}
+		
+		//
+		// Check BOTS_TABLE Schema
+		//
+		if (!$this->db->sql_field_exists('bot_id', BOTS_TABLE))
+		{
+			print('<p><span style="color: red;"></span></p><i><p>Creating the BOTS_TABLE!</p></i>');
+			
+			/* Updating from IP 1.2.10.37
+			* Make sure we have bot_name field
+			*
+			* old phpbb2 colums field names: 
+			* 	bot_id, bot_name, last_visit, bot_visits, bot_pages list($page_id, )
+			* new phpbb colums field names: 
+			* 	bot_id, bot_name, bot_last_visit, bot_visit_counter
+			*/
+			$schema = array(
+				'COLUMNS'	=> array(
+					'bot_id'			=> array('UINT', NULL, 'auto_increment'),
+					'bot_active'		=> array('BOOL', 1),
+					'bot_name'			=> array('STEXT_UNI', ''),
+					'bot_color'			=> array('VCHAR', ''),
+					'user_id'			=> array('UINT', 0),
+					'bot_agent'			=> array('VCHAR', ''),
+					'bot_ip'			=> array('VCHAR', ''),
+					'bot_last_visit'	=> array('VCHAR:11', ''),
+					'bot_visit_counter'	=> array('UINT:8', 0),
+				),
+				'PRIMARY_KEY'	=> 'bot_id',
+				'KEYS'	=> array(
+					'bot_active'	=> array('INDEX', 'bot_active'),
+				),
+			);
+			if (!$this->db->sql_table_exists(BOTS_TABLE))
+			{
+				$this->db_tools->sql_create_table(BOTS_TABLE, $schema);
+			}
+		}
+		
+		if ($this->isCrawler($this->request->server('HTTP_USER_AGENT')) && ($this->data['is_bot'] !== 1)) 
+		{
+		    substr($this->data['is_bot'], false, true);
+			
+			// Register new bot...
+			
+			$sql = 'SELECT group_id
+				FROM ' . GROUPS_TABLE . "
+				WHERE group_name = 'BOTS'
+					AND group_type = " . GROUP_CLOSED;
+			if ( !($result = $this->db->sql_query($sql)) )
+			{
+				mx_message_die(CRITICAL_ERROR, 'Could not update user info');
+			}
+			$add_group_id = (int) $this->db->sql_fetchfield('group_id');
+			$this->db->sql_freeresult($result);
+			
+			$bots = array(
+				'AdsBot [Google]'					=> array('AdsBot-Google', 'adsbot-support@google.com'),
+				'Alexa [Bot]'						=> array('ia_archiver', 'crawler@alexa.com'),
+				'Alta Vista [Bot]'					=> array('Scooter/', 'search-support@altavista.de'),
+				'Ask Jeeves [Bot]'					=> array('Ask Jeeves', 'askjeevesbot@askjeeves.com'),
+				'Baidu [Spider]'					=> array('Baiduspider+(', 'ir@baidu.com'),
+				'Bing [Bot]'						=> array('bingbot/', 'bingbot@microsoft.com'), //bingbot-feedback@microsoft.com
+				'Exabot [Bot]'						=> array('Exabot/', 'crawler@exabot.com'),
+				'FAST Enterprise [Crawler]'			=> array('FAST Enterprise Crawler', 'scirus-crawler@fast.no'),
+				'FAST WebCrawler [Crawler]'			=> array('FAST-WebCrawler/', 'atw-crawler@fast.no'),
+				'Francis [Bot]'						=> array('http://www.neomo.de/', 'francis@neomo.de'),
+				'Gigabot [Bot]'						=> array('Gigabot/', 'gigabot-support@google.com'),
+				'Google Adsense [Bot]'				=> array('Mediapartners-Google', 'adsense-support@google.com'),
+				'Google Desktop'					=> array('Google Desktop', 'desktop-support@google.com'),
+				'Google Feedfetcher'				=> array('Feedfetcher-Google', 'feedfetcher-support@google.com'),
+				'Google [Bot]'						=> array('Googlebot', 'googlebot@googlebot.com'),
+				'Heise IT-Markt [Crawler]'			=> array('heise-IT-Markt-Crawler', 'info-hg@heise.de'),
+				'Heritrix [Crawler]'				=> array('heritrix/1.', 'info@archive.org'),
+				'IBM Research [Bot]'				=> array('ibm.com/cs/crawler', 'crawler@almaden.ibm.com'),
+				'ICCrawler - ICjobs'				=> array('ICCrawler - ICjobs', 'bot@icjobs.de'),
+				'ichiro [Crawler]'					=> array('ichiro/2', 'ichiro@mail.goo.ne.jp'), //ichiro@abc.ne.jp
+				'Majestic-12 [Bot]'					=> array('MJ12bot/', 'help@majestic.com'),
+				'Metager [Bot]'						=> array('MetagerBot/', ' office@suma-ev.de'),
+				'MSN NewsBlogs'						=> array('msnbot-NewsBlogs/', 'msnbot-newsblogs@microsoft.com'),
+				'MSN [Bot]'							=> array('msnbot/', 'msnbot@microsoft.com'),
+				'MSNbot Media'						=> array('msnbot-media/', 'msnbot-media@microsoft.com'),
+				'NG-Search [Bot]'					=> array('NG-Search/', 'info@newvisionsystems.com'),
+				'Nutch [Bot]'						=> array('http://lucene.apache.org/nutch/', 'nutch-agent@lucene.apache.org'),
+				'Nutch/CVS [Bot]'					=> array('NutchCVS/', 'nutch-agent@lists.sourceforge.net'),
+				'OmniExplorer [Bot]'				=> array('OmniExplorer_Bot/', 'info@etherdesk.com'),
+				'Online link [Validator]'			=> array('online link validator', ''),
+				'psbot [Picsearch]'					=> array('psbot/0', 'custom@passionsports.ca'),
+				'Seekport [Bot]'					=> array('Seekbot/', 'info@seekbot.net'),
+				'Sensis [Crawler]'					=> array('Sensis Web Crawler', 'digitalenquiries@sensis.com.au'),
+				'SEO Crawler'						=> array('SEO search Crawler/', ''),
+				'Seoma [Crawler]'					=> array('Seoma [SEO Crawler]', 'comp-seo@seomaconsulting.com'),
+				'SEOSearch [Crawler]'				=> array('SEOsearch/', 'e-search@seosearch.biz'),
+				'Snappy [Bot]'						=> array('Snappy/1.1 ( http://www.urltrends.com/ )', ''),
+				'Steeler [Crawler]'					=> array('http://www.tkl.iis.u-tokyo.ac.jp/~crawler/', ''),
+				'Synoo [Bot]'						=> array('SynooBot/', 'synoobot'),
+				'Telekom [Bot]'						=> array('crawleradmin.t-info@telekom.de', 'crawleradmin.t-info@telekom.de'),
+				'TurnitinBot [Bot]'					=> array('TurnitinBot/', 'tiisupport@turnitin.com'),
+				'Voyager [Bot]'						=> array('voyager/1.0', ''),
+				'W3 [Sitesearch]'					=> array('W3 SiteSearch Crawler', 'sitesearch@w3.org'), //MIT/LCS (Massachusetts Institute of Technology, Laboratory for Computer Science)
+				'W3C [Linkcheck]'					=> array('W3C-checklink/', 'site-comments@w3.org'),
+				'W3C [Validator]'					=> array('W3C_*Validator', 'www-validator@w3.org'),
+				'WiseNut [Bot]'						=> array('http://www.WISEnutbot.com', 'ZyBorg@WISEnutbot.com'),
+				'YaCy [Bot]'						=> array('yacybot', '(mc@yacy.net'),
+				'Yahoo MMCrawler [Bot]'				=> array('Yahoo-MMCrawler/', 'vertical-crawl-support@yahoo-inc.com'),
+				'Yahoo Slurp [Bot]'					=> array('Yahoo! DE Slurp', 'slurp@inktomi.com'),
+				'Yahoo [Bot]'						=> array('Yahoo! Slurp', 'crawl-support@yahoo-inc.com'),
+				'YahooSeeker [Bot]'					=> array('YahooSeeker/', 'seeker-support@yahoo-inc.com'),
+			);
+			
+			$botmatches = $this->getMatches();
+			
+
+			//$bots[$bot_name] = $bot_ary[$user_agent][$bot_email];
+			foreach ($bots as $bot_name => $bot_ary)
+			{
+				$user_row = array(
+					'user_type'			=> USER_IGNORE,
+					'group_id'			=> $add_group_id,
+					'username'			=> $bot_name,
+					'user_regdate'		=> time(),
+					'user_password'		=> '',
+					'user_colour'		=> '9E8DA7',
+					'user_email'		=> $bot_ary[1],
+					//phpbb2/'user_timezone'	=> $this->config['board_timezone'],
+					//phpbb2/'user_dateformat'	=> $this->config['default_dateformat'],
+					//phpbb2/'user_lang'		=> $this->config['default_lang'],
+					//phpbb2/'user_style'		=> (int) $this->config['default_style'],
+					'is_bot'			=> (int) 1,
+					'is_mobile'			=> (int) $this->data['is_mobile'] ,
+					'user_agent'  		=> (string) $bot_ary[0],
+					'user_ip'			=> (string) $this->user_ip,
+					'device_name' 		=> (string) $this->data['device_name'],
+					'user_allow_massemail'	=> 0,
+				);
+			}
+			  
+			$sql = "SELECT user_id, username as bot_name
+					FROM " . USERS_TABLE . "
+					WHERE username = '$bot_name'";
+			if ( !($result = $this->db->sql_query($sql)) )
+			{
+				mx_message_die(GENERAL_ERROR, 'Couldn\'t query data from bots table.', '', __LINE__, __FILE__, $sql);
+			}
+				
+			$sql_bot_name_check = $this->db->sql_numrows($result);
+			$row = $this->db->sql_fetchrow($result);
+			$current_name = $row['bot_name'];
+			$this->db->sql_freeresult($result);
+		
+			if(($sql_bot_name_check > 0) && ($current_name != $bot_name))
+			{
+				$bot_errors = $lang['Error_Bot_Name_Taken'];
+			}
+			
+			if ($current_name !== $bot_name)
+			{
+				// Register user...
+				print('<p><span style="color: red;"></span></p><i><p>Registering Your IP to the dabadase...!</p></i>');
+				if (!function_exists('user_add'))
+				{
+					include($this->mx_root_path . 'includes/shared/phpbb2/includes/functions_user.' . $this->php_ext);
+				}
+				
+				$user_id = (int) user_add($user_row);
+				
+				/*
+				* Make sure we have bot_name field
+				*
+				*/
+				$ary = array(
+					'bot_active'		=> 1,
+					'bot_name'			=> $bot_name,
+					'user_id'			=> $user_id,
+					'bot_agent'			=> $bot_ary[0],
+					'bot_ip'			=> $this->user_ip,
+					//'bot_style'		=> (int) $board_config['default_style'],
+					'bot_color'			=> '9E8DA7',
+					'bot_last_visit'	=> time(),
+					'bot_visit_counter'	=> 1,
+				);
+				
+				/*
+				* Update bots table
+				*/
+				if ( !($result = $this->db->sql_query('INSERT INTO ' . BOTS_TABLE . ' ' . $this->db->sql_build_array('INSERT', $ary))) )
+				{
+					$sql_error = $this->db->sql_error('');
+					mx_message_die(GENERAL_ERROR, 'Couldn\'t insert data into bots table.', '', __LINE__, __FILE__,  '<br /><br />SQL Error : ' . $sql_error['code'] . ' ' . $sql_error['message']);
+				}
+				/*
+				*/
+			}
+			else
+			{
+				$user_id = (int) $row['user_id'];
+				//$bot_name = (string) $row['bot_name'];
+				
+				$sql = "SELECT *
+					FROM " . BOTS_TABLE . "
+					WHERE bot_name = '$bot_name'";
+				if ( !($result = $this->db->sql_query($sql)) )
+				{
+					mx_message_die(GENERAL_ERROR, 'Couldn\'t delete data from bots table.', '', __LINE__, __FILE__, $sql);
+				}
+				
+				$sql_bot_name_check = $this->db->sql_numrows($result);
+				$row = $this->db->sql_fetchrow($result);
+				$current_name = $row['bot_name'];
+				$this->db->sql_freeresult($result);
+		
+				if(($sql_bot_name_check > 0) && ($current_name != $bot_name))
+				{
+					$bot_errors = $lang['Error_Bot_Name_Taken'];
+				}
+				elseif(($sql_bot_name_check > 0) && ($current_name == $bot_name))
+				{
+					//$user_id = (int) $this->data['user_id'];
+					// Update existing bot last visit time
+					$sql = "UPDATE " . BOTS_TABLE . "
+									SET bot_visit_counter = (bot_visit_counter + 1),
+										bot_last_visit = '" . time() . "'
+									WHERE bot_id = '" . $row['bot_id'] . "'";
+					if ( !($result = $this->db->sql_query($sql)) )
+					{
+						//mx_message_die(CRITICAL_ERROR, 'Could not update bot info', '', __LINE__, __FILE__, $sql);
+					}
+					$this->db->sql_freeresult($result);
+				}
+				else
+				{
+					// Register user...
+					print('<p><span style="color: red;"></span></p><i><p>Registering You as bot to the dabadase...!</p></i>');
+					
+					/*
+					* Make sure we have bot_name field
+					*/
+					$ary = array(
+						'bot_active'		=> 1,
+						'bot_name'			=> $bot_name,
+						'user_id'			=> $user_id,
+						'bot_agent'			=> $bot_ary[0],
+						'bot_ip'			=> $user_ip,
+						//'bot_style'			=> (int) $board_config['default_style'],
+						'bot_color'			=> '9E8DA7',
+						'bot_last_visit'	=> time(),
+						'bot_visit_counter'	=> 1,
+					);
+					
+					/*
+					* Update bots table
+					*/
+					//$this->db->sql_return_on_error(true);
+					if ( !($result = $this->db->sql_query('INSERT INTO ' . BOTS_TABLE . ' ' . $this->db->sql_build_array('INSERT', $ary))) )
+					{
+						$sql_error = $this->db->sql_error('');
+						mx_message_die(GENERAL_ERROR, 'Couldn\'t insert data into bots table.', '', __LINE__, __FILE__,  '<br /><br />SQL Error : ' . $sql_error['code'] . ' ' . $sql_error['message']);
+					}
+					//$this->db->sql_return_on_error(false);
+					/*
+					*/
+				}
+			}
+		}
+		else
+		{
+			$user_row[] = array(
+				'is_bot'					=> (int) false,
+				'is_mobile'					=> (int) $status,
+				'device_name'				=> (string) $status[1],			
+			);
+			substr($this->data['is_bot'], false, false);
+
+		}
+			
+		if (preg_match('/bot|crawl|curl|dataprovider|search|get|spider|find|java|majesticsEO|google|yahoo|teoma|contaxe|yandex|libwww-perl|facebookexternalhit/i', $_SERVER['HTTP_USER_AGENT'])) 
+		{
+			$user_row[] = array(
+				'is_bot'					=> (int) true,
+				'is_mobile'					=> (int) $status,
+				'device_name'				=> (string) $status[1],
+				
+				'user_perm_from'			=> (string) '',
+			
+				'user_topic_sortby_type'	=> (string) 't',
+				'user_topic_sortby_dir'		=> (string) 'd',
+				'user_topic_show_days'		=> (int) 0,
+			
+				'user_last_privmsg'			=> (int) 0,
+			
+				'user_post_sortby_type'		=> (string) 't',
+				'user_post_sortby_dir'		=> (string) 'a',
+				'user_post_show_days'		=> (int) 0,
+			
+				'user_new_privmsg'			=> (int) 0,
+				'user_unread_privmsg'		=> (int) 0,
+				'user_form_salt'			=> bin2hex(random_bytes(8)),
+				'user_avatar'				=> (string) 'includes/shared/phpbb2/images/user_avatar.png',
+				'user_avatar_type'			=> (int) 2,
+			
+			
+				'user_form_salt'			=> (string) bin2hex(random_bytes(8)),
+			
+			);
+			substr($this->data['is_bot'], false, true);
+		}
+		else
+		{
+			$user_row[] = array(
+				'is_bot'					=> (int) false,
+				'is_mobile'					=> (int) $status,
+				'device_name'				=> (string) $status[1],
+				
+				'user_perm_from'			=> (string) '',
+			
+				'user_topic_sortby_type'	=> (string) 't',
+				'user_topic_sortby_dir'		=> (string) 'd',
+				'user_topic_show_days'		=> (int) 0,
+			
+				'user_last_privmsg'			=> (int) 0,
+			
+				'user_post_sortby_type'		=> (string) 't',
+				'user_post_sortby_dir'		=> (string) 'a',
+				'user_post_show_days'		=> (int) 0,
+			
+				'user_new_privmsg'			=> (int) 0,
+				'user_unread_privmsg'		=> (int) 0,
+				'user_form_salt'			=> bin2hex(random_bytes(8)),
+				'user_avatar'				=> (string) 'includes/shared/phpbb2/images/user_avatar.png',
+				'user_avatar_type'			=> (int) 2,
+			
+			
+				'user_form_salt'			=> (string) bin2hex(random_bytes(8)),
+			
+			);
+			substr($this->data['is_bot'], false, true);
+		}
+
+		$board_config['auth_method'] = 'db';
+		$sql = 'UPDATE ' . USERS_TABLE . ' SET ' . $db->sql_build_array('UPDATE', $user_row) . " WHERE user_id = {$this->data['user_id']}";
+		$db->sql_query($sql);
+		$db->sql_return_on_error(false);		
+			
 		//define('NEED_SID', 1);
 		$this->session_begin();
 
@@ -314,11 +1192,11 @@ class session
 
 		$page_array += array(
 			'page_name'			=> $page_name,
-			'page_dir'				=> $page_dir,
+			'page_dir'			=> $page_dir,
 
-			'query_string'			=> $query_string,
-			'script_path'				=> str_replace(' ', '%20', htmlspecialchars($script_path)),
-			'root_script_path'		=> str_replace(' ', '%20', htmlspecialchars($root_script_path)),
+			'query_string'		=> $query_string,
+			'script_path'		=> str_replace(' ', '%20', htmlspecialchars($script_path)),
+			'root_script_path'	=> str_replace(' ', '%20', htmlspecialchars($root_script_path)),
 
 			'page'				=> $page,
 			'forum'				=> $forum_id,
@@ -380,6 +1258,139 @@ class session
 		// It may be still no valid host, but for sure only a hostname (we may further expand on the cookie domain... if set)
 		return $host;
 	}
+	
+	/*
+	 * This class is part of Crawler Detect - the web crawler detection library.
+	 *
+	 * (c) Mark Beech <m@rkbee.ch>
+	 *
+	 * This source file is subject to the MIT license that is bundled
+	 * with this source code in the file fixtures\LICENSE.
+	 */
+	 
+	// ------------------------------
+	// Public Methods
+	// 
+	 
+    /**
+	* Compile the regex patterns into one regex string.
+	*
+	* @param array
+	* 
+	* @return string
+	*/
+    public function compileRegex($patterns)
+    {
+        return '('.implode('|', $patterns).')';
+    }
+
+    /**
+	* Set HTTP headers.
+	*
+	* @param array|null $httpHeaders
+	*/
+	public function setHttpHeaders($httpHeaders)
+	{
+		// Use global _SERVER if $httpHeaders aren't defined.
+		if (! is_array($httpHeaders) || ! count($httpHeaders))
+		{
+			// enable super globals to get literal value
+			$super_globals_disabled = $this->request->super_globals_disabled();
+			
+			if ($super_globals_disabled)
+			{
+				$this->request->enable_super_globals();
+			}
+			
+			$httpHeaders = $_SERVER;
+			
+			if ($super_globals_disabled)
+			{
+				$this->request->disable_super_globals();
+			}
+		}
+		
+		// Clear existing headers.
+		$this->httpHeaders = array();
+		// Only save HTTP headers. In PHP land, that means
+		// only _SERVER vars that start with HTTP_.
+		foreach ($httpHeaders as $key => $value)
+		{
+            if (strpos($key, 'HTTP_') === 0) 
+			{
+                $this->httpHeaders[$key] = $value;
+            }
+        }
+		unset($httpHeaders);
+    }
+
+    /**
+	* Return user agent headers.
+	*
+	* @return array
+	*/
+    public function getUaHttpHeaders()
+    {
+        return $this->uaHttpHeaders->getAll();
+    }
+
+    /**
+	* Set the user agent.
+	*
+	* @param string $userAgent
+	*/
+    public function setUserAgent($userAgent)
+    {
+        if (is_null($userAgent)) 
+		{
+            foreach ($this->getUaHttpHeaders() as $altHeader) 
+			{
+                if (isset($this->httpHeaders[$altHeader])) 
+				{
+                    $userAgent .= $this->httpHeaders[$altHeader].' ';
+                }
+            }
+        }
+        return $userAgent;
+	}
+
+    /**
+	* Check user agent string against the regex.
+	*
+	* @param string|null $userAgent
+	*
+	* @return bool
+	*/
+    public function isCrawler($userAgent = null)
+    {
+        $agent = $userAgent ?: $this->userAgent;
+
+        $agent = preg_replace('/'.$this->compiledExclusions.'/i', '', $agent);
+
+        if (strlen(trim($agent)) == 0) 
+		{
+            return false;
+        }
+
+        $result = preg_match('/'.$this->compiledRegex.'/i', trim($agent), $matches);
+		//print_r($result);
+        if ($matches)
+		{
+            $this->matches = $matches;
+        }
+
+        return (bool) $result;
+	}
+	
+	/**
+	* Return the matches.
+	*
+	* @return string|null
+	*/
+    public function getMatches()
+    {
+        return isset($this->matches[0]) ? $this->matches[0] : null;
+    }
 
 	/**
 	* Start session management
@@ -401,11 +1412,11 @@ class session
 		// Give us some basic information
 		$this->time_now					= time();
 		$this->cookie_data				= array('u' => 0, 'k' => '');
-		$this->update_session_page	= $update_session_page;
+		$this->update_session_page		= $update_session_page;
 		$this->browser					= (!empty($_SERVER['HTTP_USER_AGENT'])) ? htmlspecialchars((string) $_SERVER['HTTP_USER_AGENT']) : '';
-		$this->referer						= (!empty($_SERVER['HTTP_REFERER'])) ? htmlspecialchars((string) $_SERVER['HTTP_REFERER']) : '';		
-		$this->forwarded_for				= (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) ? (string) $_SERVER['HTTP_X_FORWARDED_FOR'] : '';
-		$this->host							= (!empty($_SERVER['HTTP_HOST'])) ? (string) $_SERVER['HTTP_HOST'] : 'localhost';
+		$this->referer					= (!empty($_SERVER['HTTP_REFERER'])) ? htmlspecialchars((string) $_SERVER['HTTP_REFERER']) : '';		
+		$this->forwarded_for			= (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) ? (string) $_SERVER['HTTP_X_FORWARDED_FOR'] : '';
+		$this->host						= (!empty($_SERVER['HTTP_HOST'])) ? (string) $_SERVER['HTTP_HOST'] : 'localhost';
 		$this->page						= $this->extract_current_page($phpbb_root_path);
 
 		// if the forwarded for header shall be checked we have to validate its contents
@@ -540,8 +1551,8 @@ class session
 
 				if (strpos($this->ip, ':') !== false && strpos($this->data['session_ip'], ':') !== false)
 				{
-					$s_ip = short_ipv6($this->data['session_ip'], $board_config['ip_check']);
-					$u_ip = short_ipv6($this->ip, $board_config['ip_check']);
+					$s_ip = $this->short_ipv6($this->data['session_ip'], $board_config['ip_check']);
+					$u_ip = $this->short_ipv6($this->ip, $board_config['ip_check']);
 				}
 				else
 				{
@@ -938,8 +1949,8 @@ class session
 			// Only assign the current session if the ip, browser and forwarded_for match...
 			if (strpos($this->ip, ':') !== false && strpos($this->data['session_ip'], ':') !== false)
 			{
-				$s_ip = short_ipv6($this->data['session_ip'], $board_config['ip_check']);
-				$u_ip = short_ipv6($this->ip, $board_config['ip_check']);
+				$s_ip = $this->short_ipv6($this->data['session_ip'], $board_config['ip_check']);
+				$u_ip = $this->short_ipv6($this->ip, $board_config['ip_check']);
 			}
 			else
 			{
@@ -1099,6 +2110,301 @@ class session
 
 			$SID = '?sid=';
 			$_SID = '';
+		}
+
+		return true;
+	}
+	//
+	// Checks for a given user session, tidies session table and updates user
+	// sessions at each page refresh
+	//
+	function session_pagestart($user_ip, $thispage_id)
+	{
+		global $db, $lang, $board_config;
+		global $mx_request_vars, $SID;
+
+		$cookiename = $board_config['cookie_name'];
+		$cookiepath = $board_config['cookie_path'];
+		$cookiedomain = $board_config['cookie_domain'];
+		$cookiesecure = $board_config['cookie_secure'];
+
+		$current_time = time();
+		unset($userdata);
+
+		if ( isset($_COOKIE[$cookiename . '_sid']) || isset($_COOKIE[$cookiename . '_data']) )
+		{
+			$sessiondata = isset( $_COOKIE[$cookiename . '_data'] ) ? unserialize(stripslashes($_COOKIE[$cookiename . '_data'])) : array();
+			$session_id = isset( $_COOKIE[$cookiename . '_sid'] ) ? $_COOKIE[$cookiename . '_sid'] : '';
+			$sessionmethod = SESSION_METHOD_COOKIE;
+		}
+		else
+		{
+			$sessiondata = array();
+			$session_id = $mx_request_vars->is_get('sid', MX_TYPE_NO_TAGS);
+			$sessionmethod = SESSION_METHOD_GET;
+		}
+
+		//
+		if (!preg_match('/^[A-Za-z0-9]*$/', $session_id))
+		{
+			$session_id = '';
+		}
+
+		$thispage_id = (int) $thispage_id;
+
+		//
+		// Does a session exist?
+		//
+		if ( !empty($session_id) )
+		{
+			//
+			// session_id exists so go ahead and attempt to grab all
+			// data in preparation
+			//
+			$sql = "SELECT u.*, u.user_id as user_colour, u.user_level as user_type, p.default_lang as user_lang, p.board_timezone as user_timezone, s.*
+				FROM " . SESSIONS_TABLE . " s, " . USERS_TABLE . " u, " . PORTAL_TABLE . " p
+				WHERE s.session_id = '$session_id'
+					AND u.user_id = s.session_user_id
+					AND p.portal_id = 1";					
+			if ( !($result = $db->sql_query($sql)) )
+			{
+				//mx_message_die(CRITICAL_ERROR, 'Error doing DB query userdata row fetch', '', __LINE__, __FILE__, $sql);
+			}
+
+			$userdata = $db->sql_fetchrow($result);
+
+			//
+			// Did the session exist in the DB?
+			//
+			if ( isset($userdata['user_id']) )
+			{
+				//
+				// Do not check IP assuming equivalence, if IPv4 we'll check only first 24
+				// bits ... I've been told (by vHiker) this should alleviate problems with
+				// load balanced et al proxies while retaining some reliance on IP security.
+				//
+				$ip_check_s = substr($userdata['session_ip'], 0, 6);
+				$ip_check_u = substr($user_ip, 0, 6);
+
+				if ($ip_check_s == $ip_check_u)
+				{
+					$SID = ($sessionmethod == SESSION_METHOD_GET || defined('IN_ADMIN')) ? 'sid=' . $session_id : '';
+
+					//
+					// Only update session DB a minute or so after last update
+					//
+					if ( $current_time - $userdata['session_time'] > 60 )
+					{
+						// A little trick to reset session_admin on session re-usage
+						$update_admin = (!defined('IN_ADMIN') && $current_time - $userdata['session_time'] > ($board_config['session_length']+60)) ? ', session_admin = 0' : '';
+
+						$sql = "UPDATE " . SESSIONS_TABLE . "
+							SET session_time = $current_time, session_page = $thispage_id$update_admin
+							WHERE session_id = '" . $userdata['session_id'] . "'";
+						if ( !$db->sql_query($sql) )
+						{
+							mx_message_die(CRITICAL_ERROR, 'Error updating sessions table', '', __LINE__, __FILE__, $sql);
+						}
+
+						if ( $userdata['user_id'] != ANONYMOUS )
+						{
+							$sql = "UPDATE " . USERS_TABLE . "
+								SET user_session_time = $current_time, user_session_page = $thispage_id
+								WHERE user_id = " . $userdata['user_id'];
+							if ( !$db->sql_query($sql) )
+							{
+								mx_message_die(CRITICAL_ERROR, 'Error updating sessions table', '', __LINE__, __FILE__, $sql);
+							}
+						}
+
+						$this->session_clean($userdata['session_id']);
+
+						setcookie($cookiename . '_data', serialize($sessiondata), $current_time + 31536000, $cookiepath, $cookiedomain, $cookiesecure);
+						setcookie($cookiename . '_sid', $session_id, 0, $cookiepath, $cookiedomain, $cookiesecure);
+					}
+
+					// Add the session_key to the userdata array if it is set
+					if ( isset($sessiondata['autologinid']) && $sessiondata['autologinid'] != '' )
+					{
+						$userdata['session_key'] = $sessiondata['autologinid'];
+					}
+
+					return $userdata;
+				}
+			}
+		}
+
+		//
+		// If we reach here then no (valid) session exists. So we'll create a new one,
+		// using the cookie user_id if available to pull basic user prefs.
+		//
+		$user_id = ( isset($sessiondata['userid']) ) ? intval($sessiondata['userid']) : ANONYMOUS;
+
+		if ( !($userdata = $this->session_begin($user_id, $user_ip, $thispage_id, TRUE)) )
+		{
+			mx_message_die(CRITICAL_ERROR, 'Error creating user session', '', __LINE__, __FILE__, $sql);
+		}
+
+		return $userdata;
+
+	}
+	
+	/**
+	* Update the session data
+	*
+	* @param array $session_data associative array of session keys to be updated
+	* @param string $session_id optional session_id, defaults to current user's session_id
+	*/
+	function update_session($session_data, $session_id = null)
+	{
+		global $db;
+
+		$session_id = ($session_id) ? $session_id : $this->session_id;
+
+		$sql = 'UPDATE ' . SESSIONS_TABLE . ' SET ' . $db->sql_build_array('UPDATE', $session_data) . "
+			WHERE session_id = '" . $db->sql_escape($session_id) . "'";
+		$db->sql_query($sql);
+	}
+
+	function update_session_infos()
+	{
+		global $board_config, $db;
+
+		// No need to update if it's a new session. Informations are already inserted by session_create()
+		if (isset($this->data['session_created']) && $this->data['session_created'])
+		{
+			return;
+		}
+
+		// Do not update the session page for ajax requests, so the view online still works as intended
+		$page_changed = $this->update_session_page && $this->data['session_page'] != $this->page['page'] && !$this->request->is_ajax();
+
+		// Only update session DB a minute or so after last update or if page changes
+		if ($this->time_now - (isset($this->data['session_time']) ? $this->data['session_time'] : 0) > 60 || $page_changed)
+		{
+			$sql_ary = array('session_time' => $this->time_now);
+
+			if ($page_changed)
+			{
+				$sql_ary['session_page'] = substr($this->page['page'], 0, 199);
+				$sql_ary['session_forum_id'] = $this->page['forum'];
+			}
+
+			$db->sql_return_on_error(true);
+
+			$this->update_session($sql_ary);
+
+			$db->sql_return_on_error(false);
+
+			$this->data = array_merge($this->data, $sql_ary);
+
+			if ($this->data['user_id'] != ANONYMOUS && isset($board_config['new_member_post_limit']) && $this->data['user_new'] && $board_config['new_member_post_limit'] <= $this->data['user_posts'])
+			{
+				$this->leave_newly_registered();
+			}
+		}
+	}
+	
+	/**
+	* Terminates the specified session
+	* It will delete the entry in the sessions table for this session,
+	* remove the corresponding auto-login key and reset the cookies
+	*/
+	function session_end($session_id, $user_id)
+	{
+		global $db, $lang, $board_config, $userdata;
+		global $SID;
+
+		$cookiename = $board_config['cookie_name'];
+		$cookiepath = $board_config['cookie_path'];
+		$cookiedomain = $board_config['cookie_domain'];
+		$cookiesecure = $board_config['cookie_secure'];
+
+		$current_time = time();
+
+		if (!preg_match('/^[A-Za-z0-9]*$/', $session_id))
+		{
+			return;
+		}
+
+		//
+		// Delete existing session
+		//
+		$sql = 'DELETE FROM ' . SESSIONS_TABLE . "
+			WHERE session_id = '$session_id'
+				AND session_user_id = $user_id";
+		if ( !$db->sql_query($sql) )
+		{
+			mx_message_die(CRITICAL_ERROR, 'Error removing user session', '', __LINE__, __FILE__, $sql);
+		}
+
+		//
+		// Remove this auto-login entry (if applicable)
+		//
+		if ( isset($userdata['session_key']) && $userdata['session_key'] != '' )
+		{
+			$autologin_key = md5($userdata['session_key']);
+			$sql = 'DELETE FROM ' . SESSIONS_KEYS_TABLE . '
+				WHERE user_id = ' . (int) $user_id . "
+					AND key_id = '$autologin_key'";
+			if ( !$db->sql_query($sql) )
+			{
+				mx_message_die(CRITICAL_ERROR, 'Error removing auto-login key', '', __LINE__, __FILE__, $sql);
+			}
+		}
+
+		//
+		// We expect that message_die will be called after this function,
+		// but just in case it isn't, reset $userdata to the details for a guest
+		//
+		$sql = 'SELECT u.*, u.user_id as user_colour, u.user_level as user_type, p.default_lang as user_lang, p.board_timezone as user_timezone
+			FROM ' . USERS_TABLE . ' u, ' . PORTAL_TABLE . ' p
+			WHERE user_id = ' . ANONYMOUS;
+		if ( !($result = $db->sql_query($sql)) )
+		{
+			mx_message_die(CRITICAL_ERROR, 'Error obtaining user details', '', __LINE__, __FILE__, $sql);
+		}
+		if ( !($userdata = $db->sql_fetchrow($result)) )
+		{
+			mx_message_die(CRITICAL_ERROR, 'Error obtaining user details', '', __LINE__, __FILE__, $sql);
+		}
+		$db->sql_freeresult($result);
+
+
+		setcookie($cookiename . '_data', '', $current_time - 31536000, $cookiepath, $cookiedomain, $cookiesecure);
+		setcookie($cookiename . '_sid', '', $current_time - 31536000, $cookiepath, $cookiedomain, $cookiesecure);
+
+		return true;
+	}
+
+	/**
+	* Removes expired sessions and auto-login keys from the database
+	*/
+	function session_clean($session_id)
+	{
+		global $board_config, $db;
+
+		//
+		// Delete expired sessions
+		//
+		$sql = 'DELETE FROM ' . SESSIONS_TABLE . '
+			WHERE session_time < ' . (time() - (int) $board_config['session_length']) . "
+				AND session_id <> '$session_id'";
+		if ( !$db->sql_query($sql) )
+		{
+			mx_message_die(CRITICAL_ERROR, 'Error clearing sessions table', '', __LINE__, __FILE__, $sql);
+		}
+
+		//
+		// Delete expired auto-login keys
+		// If max_autologin_time is not set then keys will never be deleted
+		// (same behaviour as old 2.0.x session code)
+		//
+		if (!empty($board_config['max_autologin_time']) && $board_config['max_autologin_time'] > 0)
+		{
+			$sql = 'DELETE FROM ' . SESSIONS_KEYS_TABLE . '
+				WHERE last_login < ' . (time() - (86400 * (int) $board_config['max_autologin_time']));
+			$db->sql_query($sql);
 		}
 
 		return true;
@@ -1292,6 +2598,19 @@ class session
 		$domain = (!$board_config['cookie_domain'] || $board_config['cookie_domain'] == 'localhost' || $board_config['cookie_domain'] == '127.0.0.1') ? '' : '; domain=' . $board_config['cookie_domain'];
 
 		header('Set-Cookie: ' . $name_data . '; expires=' . $expire . '; path=' . $board_config['cookie_path'] . $domain . ((!$board_config['cookie_secure']) ? '' : '; secure') . '; HttpOnly', false);
+		
+		// Work around for "current" Apache 2 + PHP module which seems to not
+		// cope with private cache control setting
+		/**/
+		if (!empty($this->request->server('SERVER_SOFTWARE')) && strstr($this->request->server('SERVER_SOFTWARE'), 'Apache/2') && strstr($this->request->server('SERVER_SOFTWARE'), 'Apache/4'))
+		{
+			@header ('Cache-Control: no-cache, pre-check=0, post-check=0');
+		}
+		else
+		{
+			@header ('Cache-Control: private, pre-check=0, post-check=0, max-age=0');
+		}
+		/**/
 	}
 
 	/**
@@ -1862,25 +3181,36 @@ class session
 		
 		try
 		{
-			$this->timezone = $timezone = new \DateTimeZone($board_config['user_timezone']);
+			$DateTimeZone = new \DateTimeZone($board_config['user_timezone']);
 		}
 		catch (\Exception $e)
 		{
-			// If the timezone the user has selected is invalid, we fall back to UTC.
-			$this->timezone = $timezone = new \DateTimeZone('UTC');
+			// If the timezone the user has selected is invalid, we fall back to UTC or server.
+			$DateTimeZone = new \DateTimeZone(date_default_timezone_get());
 		}
 		
-		$this->dst = $board_config['user_timezone'] * 3600;
+		foreach ($DateTimeZone as $timezone_type => $dst)
+		{
+			$dst = $DateTimeZone->timezone_type;
+			$timezone = $DateTimeZone->timezone;
+		}
 		
-		$sign = ($board_config['user_timezone'] < 0) ? '-' : '+';
-		$time_offset = abs($board_config['user_timezone']);
+		$timezone = $this->config['board_timezone'];
+		$offset = (float) $timezone + (int) $dst;
+			
+		$this->date_format = $this->config['default_dateformat'];
+		$this->timezone = $this->config['board_timezone'];
+		$this->dst = $dst;
+		
+		$sign = ($this->config['user_timezone'] < 0) ? '-' : '+';
+		$time_offset = abs($this->config['user_timezone']);
 
 		$offset_seconds	= $time_offset % 3600;
 		$offset_minutes	= $offset_seconds / 60;
 		$offset_hours	= ($time_offset - $offset_seconds) / 3600;
 		
 		// Zone offset
-		$zone_offset = $board_config['user_timezone'] + $this->dst;
+		$zone_offset = (float) $this->timezone + (int) $this->dst;
 		
 		$offset_string = sprintf($board_config['default_dateformat'], $sign, $offset_hours, $offset_minutes);
 		
@@ -1896,6 +3226,7 @@ class session
 		$script_name_phpbb = preg_replace('/^\/?(.*?)\/?$/', "\\1", trim($board_config['script_path'])) . '/';
 		$server_url = $server_protocol . str_replace("//", "/", $server_name . $server_port . '/'); //On some server the slash is not added and this trick will fix it	
 		$corrected_url = $server_protocol . $server_name . $server_port . $script_name_phpbb;
+		
 		$board_url = PORTAL_URL;
 		$web_path = (defined('PORTAL_URL')) ? $board_url : $corrected_url;
 	
@@ -1912,8 +3243,10 @@ class session
 			$this->lang_path = $phpbb_root_path . 'language/' . $this->lang_name . '/';
 
 			$this->date_format = $this->data['user_dateformat'];
-			$this->timezone = $this->data['user_timezone'] * 3600;
-			$this->dst = isset($this->data['user_dst']) ? $this->data['user_dst'] * 3600 : $board_config['user_timezone'] * 3600;
+			$this->timezone = $timezone = $this->data['user_timezone'];
+			$this->dst = $this->data['user_dst'];
+			$offset = (float) $timezone + (int) $dst;
+		
 			if (!empty($this->data['user_lang']))
 			{
 				$default_lang = mx_ltrim(basename(mx_rtrim($this->data['user_lang'])), "'");
@@ -1931,15 +3264,40 @@ class session
 		}
 		else
 		{
+			// In case this is somehow run twice on a row.
+			// Otherwise it would just end up as UTC on the second run
+			if (is_numeric($this->data['user_timezone']))
+			{
+				print ('PLS update blocks of users who have dst as timezone! See develop folder.');
+				/*Commented code * /
+				$update_blocks = array();
+				$update_blocks[$this->data['user_timezone'] . ':' . $this->data['user_dst']][] = (int) $this->data['user_id'];
+				// Update blocks of users who share the same timezone/dst
+				foreach ($update_blocks as $timezone => $user_ids)
+				{
+					$timezone = explode(':', $timezone);
+					$converted_timezone = $this->convert_phpbb30_timezone($timezone[0], $timezone[1]);
+
+					$sql = 'UPDATE ' . $this->table_prefix . "users
+						SET user_timezone = '" . $this->db->sql_escape($converted_timezone) . "'
+						WHERE " . $this->db->sql_in_set('user_id', $user_ids);
+					$this->sql_query($sql);
+				}
+				/**/
+			}
+			
+			$timezone = $this->data['user_timezone'];
+			$dst = $this->data['user_dst'];
+			$offset = (float) $timezone + (int) $dst;
+			
 			$this->lang_name = (file_exists($phpbb_root_path . 'language/' . $this->encode_lang($this->lang['default_lang']) . "/common.$phpEx")) ? $this->encode_lang($this->lang['default_lang']) : 'en';
 			$this->lang_path = $phpbb_root_path . 'language/' . $this->lang_name . '/';
 			$this->date_format = $board_config['default_dateformat'];
-			$this->timezone = $board_config['board_timezone'] * 3600;
-			$this->dst = isset($this->data['user_dst']) ? $this->data['user_dst'] * 3600 : $board_config['user_timezone'] * 3600;
+			$this->timezone = !empty($timezone) ? $timezone : $this->config['board_timezone'];
+			$this->dst = is_numeric($dst) ? $dst : 0;
 			
 			$default_lang = mx_ltrim(basename(mx_rtrim($board_config['default_lang'])), "'");
 	
-			
 			/**
 			* If a guest user is surfing, we try to guess his/her language first by obtaining the browser language
 			* If re-enabled we need to make sure only those languages installed are checked
@@ -2143,6 +3501,8 @@ class session
 		//
 		$this->add_lang($lang_set);
 
+		$this->is_setup_flag = true;
+		
 		unset($lang_set);
 	}
 
@@ -2657,6 +4017,8 @@ class session
 			}
 		}
 		
+		$this->is_setup_flag = true;
+		
 		return;
 	}
 	
@@ -2917,13 +4279,349 @@ class session
 			$numbers = array_keys($lang);
 			$key_found = end($numbers);
 		}
-		
-
-		
+				
 		// Use the language string we determined and pass it to sprintf()
-		$args[0] = $lang[$key_found];
-		return call_user_func_array('sprintf', $args);
-		//return $this->lang_array($key, $args);
+		//not allowed in PHP7+ 	$args[0] = $lang[$key_found];
+
+		$args = is_array($key) ? $this->lang_array($key, $args) : array_merge($args, $lang);
+
+		// lang key is transformed into lang(\'$1\')|, so we should not
+		// need to check for it
+		return call_user_func_array('sprintf', $args);		
+		
+	}
+
+	/**
+	* @package Sessions - Mobile Device
+	* @author FlorinCB aka orynider
+	* @copyright (c) 2015 Sniper_E - http://www.sniper-e.com
+	* @copyright (c) 2015 dmzx - http://www.dmzx-web.net
+	* @copyright (c) 2015 martin - http://www.martins-phpbb.com
+	* @license http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
+	*/
+	public function mobile_device_detect($iphone = true, $ipod = true, $ipad = true, $android = true, $opera = true, $blackberry = true, $palm = true, $windows = true, $lg = true)
+	{
+		$mobile_browser = false;
+		$user_agent = $this->request->server('HTTP_USER_AGENT');
+		
+		switch (true)
+		{		
+			case (preg_match('/x86_64|WOW64|Win64|Iceweasel/i', $user_agent) && $this->config['mobile_test_enable']);
+				$status = $this->user->lang('DESKTOP');
+				$mobile_browser = true;
+			break;
+			case (preg_match('/Bot|CFNetwork|libwww|Java|Jigsaw|SpreadTrum|httpget/i', $user_agent)) || $this->user->data['is_bot'];
+				$mobile_browser = false;
+			break;
+			case (preg_match('/ipad/i',$user_agent));
+				$status = $this->user->lang('IPAD');
+				$mobile_browser = $ipad;
+			break;
+			case (preg_match('/ipod/i',$user_agent));
+				$status = $this->user->lang('IPOD');
+				$mobile_browser = $ipod;
+			break;
+			case (preg_match('/iphone/i', $user_agent));
+				$status = $this->user->lang('IPHONE');
+				$mobile_browser = $iphone;
+			break;
+			case (preg_match('/android/i', $user_agent));
+				if (preg_match('/SM-G870A/i', $user_agent))
+				{
+					$status = $this->user->lang('SGS5A');
+				}
+				else if (preg_match('/SM-G900A|SM-G900F|SM-G900H|SM-G900M|SM-G900P|SM-G900R4|SM-G900T|SM-G900V|SM-G900W8|SM-G800F/i', $user_agent))
+				{
+					$status = $this->user->lang('SGS5');
+				}
+				else if (preg_match('/SM-G920F/i', $user_agent))
+				{
+					$status = $this->user->lang('SGS6');
+				}
+				else if (preg_match('/SGH-I497/i', $user_agent))
+				{
+					$status = $this->user->lang('SG2T');
+				}
+				else if (preg_match('/GT-P5210|SM-T110|SM-T310/i', $user_agent))
+				{
+					$status = $this->user->lang('SGT3');
+				}
+				else if (preg_match('/SM-T210/i', $user_agent))
+				{
+					$status = $this->user->lang('SGT3W');
+				}
+				else if (preg_match('/SM-T335|SM-T530/i', $user_agent))
+				{
+					$status = $this->user->lang('SGT4');
+				}
+				else if (preg_match('/SM-T520/i', $user_agent))
+				{
+					$status = $this->user->lang('SGTP');
+				}
+				else if (preg_match('/SGH-I537/i', $user_agent))
+				{
+					$status = $this->user->lang('SGS4A');
+				}
+				else if (preg_match('/GT-I9505|GT-I9500|SPH-L720T/i', $user_agent))
+				{
+					$status = $this->user->lang('SGS4');
+				}
+				else if (preg_match('/GT-I9100P/i', $user_agent))
+				{
+					$status = $this->user->lang('SGS2');
+				}
+				else if (preg_match('/SM-N9005|SM-P600/i', $user_agent))
+				{
+					$status = $this->user->lang('SGN3');
+				}
+				else if (preg_match('/SM-N7505/i', $user_agent))
+				{
+					$status = $this->user->lang('SGN3N');
+				}
+				else if (preg_match('/SM-N910C|SM-N910F/i', $user_agent))
+				{
+					$status = $this->user->lang('SGN4');
+				}
+				else if (preg_match('/SM-N920P/i', $user_agent))
+				{
+					$status = $this->user->lang('SGN5');
+				}
+				else if (preg_match('/SM-G357FZ/i', $user_agent))
+				{
+					$status = $this->user->lang('SGA4');
+				}
+				else if (preg_match('/SM-G925P/i', $user_agent))
+				{
+					$status = $this->user->lang('SGS6E');
+				}
+				else if (preg_match('/SM-G935F/i', $user_agent))
+				{
+					$status = $this->user->lang('SGS7E');
+				}
+				else if (preg_match('/SM-G950F|SM-G955F/i', $user_agent))
+				{
+					$status = $this->user->lang('SGS8');
+				}
+				else if (preg_match('/GT-S7582/i', $user_agent))
+				{
+					$status = $this->user->lang('SGSD2');
+				}
+				else if (preg_match('/GT-I9100P/i', $user_agent))
+				{
+					$status = $this->user->lang('SGS2');
+				}
+				else if (preg_match('/HONORPLK-L01/i',$user_agent))
+				{
+					$status = $this->user->lang('HPL01');
+				}
+				else if (preg_match('/EVA-L09/i', $user_agent))
+				{
+					$status = $this->user->lang('HPL09');
+				}
+				else if (preg_match('/VNS-L23/i', $user_agent))
+				{
+					$status = $this->user->lang('HPL23');
+				}
+				else if (preg_match('/IMM76B/i', $user_agent))
+				{
+					$status = $this->user->lang('SGN');
+				}
+				else if (preg_match('/TF101/i', $user_agent))
+				{
+					$status = $this->user->lang('ATT');
+				}
+				else if (preg_match('/Archos 40b/i', $user_agent))
+				{
+					$status = $this->user->lang('A4TS');
+				}
+				else if (preg_match('/A0001/i', $user_agent))
+				{
+					$status = $this->user->lang('OPO');
+				}
+				else if (preg_match('/Orange Nura/i', $user_agent))
+				{
+					$status = $this->user->lang('ORN');
+				}
+				else if (preg_match('/XT1030/i', $user_agent))
+				{
+					$status = $this->user->lang('MDM');
+				}
+				else if (preg_match('/TIANYU-KTOUCH/i', $user_agent))
+				{
+					$status = $this->user->lang('TKT');
+				}
+				else if (preg_match('/D2005|D2105/i',$user_agent))
+				{
+					$status = $this->user->lang('SXED');
+				}
+				else if (preg_match('/C2005|D2303/i', $user_agent))
+				{
+					$status = $this->user->lang('SXM2');
+				}
+				else if (preg_match('/C6906/i', $user_agent))
+				{
+					$status = $this->user->lang('SXZ1');
+				}
+				else if (preg_match('/D5803/i', $user_agent))
+				{
+					$status = $this->user->lang('SXZ3');
+				}
+				else if (preg_match('/P710/i', $user_agent))
+				{
+					$status = $this->user->lang('LGOL7IT');
+				}
+				else if (preg_match('/LG-H850/i', $user_agent))
+				{
+					$status = $this->user->lang('LGH850');
+				}
+				else if (preg_match('/LG-V500/i', $user_agent))
+				{
+					$status = $this->user->lang('LGV500');
+				}
+				else if (preg_match('/lg/i', $user_agent))
+				{
+					$status = $this->user->lang('LG');
+				}
+				else if (preg_match('/ASUS_T00J/i', $user_agent))
+				{
+					$status = $this->user->lang('ATOOJ');
+				}
+				else if (preg_match('/Aquaris E5/i', $user_agent))
+				{
+					$status = $this->user->lang('AE5HD');
+				}
+				else if (preg_match('/HTC Desire|626s/i', $user_agent))
+				{
+					$status = $this->user->lang('HTCD');
+				}
+				else if (preg_match('/Nexus One/i', $user_agent))
+				{
+					$status = $this->user->lang('N1');
+				}
+				else if (preg_match('/Nexus 4|LRX22C|LVY48F|LMY47V/i', $user_agent))
+				{
+					$status = $this->user->lang('N4');
+				}
+				else if (preg_match('/Nexus 5|LMY48S/i', $user_agent))
+				{
+					$status = $this->user->lang('N5');
+				}
+				else if (preg_match('/Nexus 7|KTU84P/i', $user_agent))
+				{
+					$status = $this->user->lang('N7');
+				}
+				else if (preg_match('/Nexus 9|LMY47X/i',$user_agent))
+				{
+					$status = $this->user->lang('N9');
+				}
+				else if (preg_match('/Lenovo_K50_T5/i', $user_agent))
+				{
+					$status = $this->user->lang('LK50T5');
+				}
+				else
+				{
+					$status = $this->user->lang('ANDROID');
+				}
+				$mobile_browser = $android;
+			break;
+			case (preg_match('/opera mini/i', $user_agent));
+				$status = $this->user->lang('MOBILE_DEVICE');
+				$mobile_browser = $opera;
+			break;
+			case (preg_match('/blackberry/i', $user_agent));
+				if (preg_match('/BlackBerry9900|BlackBerry9930|BlackBerry9790|BlackBerry9780|BlackBerry9700|BlackBerry9650|BlackBerry9000|/i',$user_agent))
+				{
+					$status = 'BlackBerry Bold';
+				}
+				else if (preg_match('/BlackBerry9380|BlackBerry9370|BlackBerry9360|BlackBerry9350|BlackBerry9330|BlackBerry9320|BlackBerry9300|BlackBerry9220|BlackBerry8980|BlackBerry8900|BlackBerry8530|BlackBerry8520|BlackBerry8330|BlackBerry8320|BlackBerry8310|BlackBerry8300/i',$user_agent))
+				{
+					$status = $this->user->lang('BBCURVE');
+				}
+				else if (preg_match('/BlackBerry9860|BlackBerry9850|BlackBerry9810|BlackBerry9800/i', $user_agent))
+				{
+					$status = $this->user->lang('BBTORCH');
+				}
+				else if (preg_match('/BlackBerry9900/i', $user_agent))
+				{
+					$status = $this->user->lang('BBTOUCH');
+				}
+				else if (preg_match('/BlackBerry9105/i', $user_agent))
+				{
+					$status = $this->user->lang('BBPEARL');
+				}
+				else if (preg_match('/BlackBerry8220/i', $user_agent))
+				{
+					$status = $this->user->lang('BBPEARLF');
+				}
+				else if (preg_match('/BlackBerry Storm|BlackBerry Storm2/i', $user_agent))
+				{
+					$status = $this->user->lang('BBSTORM');
+				}
+				else if (preg_match('/BlackBerry Passport/i', $user_agent))
+				{
+					$status = $this->user->lang('BBPP');
+				}
+				else if (preg_match('/BlackBerry Porsche/i',$user_agent))
+				{
+					$status = $this->user->lang('BBP');
+				}
+				else if (preg_match('/BlackBerry PlayBook/i', $user_agent))
+				{
+					$status = $this->user->lang('BBPB');
+				}
+				else
+				{
+					$status = $this->user->lang('BLACKBERRY');
+				}
+				$mobile_browser = $blackberry;
+			break;
+			case (preg_match('/(pre\/|palm os|palm|hiptop|avantgo|plucker|xiino|blazer|elaine)/i', $user_agent));
+				$status = $this->user->lang('PALM');
+				$mobile_browser = $palm;
+			break;
+			case (preg_match('/(iris|3g_t|windows ce|windows Phone|opera mobi|windows ce; smartphone;|windows ce; iemobile)/i', $user_agent));
+				if (preg_match('/Lumia 640 XL/i', $user_agent))
+				{
+					$status = $this->user->lang('L640XL');
+				}
+				else
+				{
+					$status = $this->user->lang('WSP');
+				}
+				$mobile_browser = $windows;
+			break;
+			case (preg_match('/lge vx10000/i', $user_agent));
+				$status = $this->user->lang('VOYAGER');
+				$mobile_browser = $windows;
+			break;
+			case (preg_match('/(mini 9.5|vx1000|lge |m800|e860|u940|ux840|compal|wireless| mobi|ahong|lg380|lgku|lgu900|lg210|lg47|lg920|lg840|lg370|sam-r|mg50|s55|g83|t66|vx400|mk99|d615|d763|el370|sl900|mp500|samu3|samu4|vx10|xda_|samu5|samu6|samu7|samu9|a615|b832|m881|s920|n210|s700|c-810|_h797|mob-x|sk16d|848b|mowser|s580|r800|471x|v120|rim8|c500foma:|160x|x160|480x|x640|t503|w839|i250|sprint|w398samr810|m5252|c7100|mt126|x225|s5330|s820|htil-g1|fly v71|s302|-x113|novarra|k610i|-three|8325rc|8352rc|sanyo|vx54|c888|nx250|n120|mtk |c5588|s710|t880|c5005|i;458x|p404i|s210|c5100|teleca|s940|c500|s590|foma|samsu|vx8|vx9|a1000|_mms|myx|a700|gu1100|bc831|e300|ems100|me701|me702m-three|sd588|s800|8325rc|ac831|mw200|brew |d88|htc\/|htc_touch|355x|m50|km100|d736|p-9521|telco|sl74|ktouch|m4u\/|me702|8325rc|kddi|phone|lg |sonyericsson|samsung|240x|x320|vx10|nokia|sony cmd|motorola|up.browser|up.link|mmp|symbian|smartphone|midp|wap|vodafone|o2|pocket|kindle|mobile|psp|treo)/i', $user_agent));
+				$status = $this->user->lang('MOBILE_DEVICE');
+				$mobile_browser = true;
+			break;
+			case (isset($post['HTTP_X_WAP_PROFILE'])||isset($post['HTTP_PROFILE']));
+				$status = $this->user->lang('MOBILE_DEVICE');
+				$mobile_browser = true;
+			break;
+			case (in_array(strtolower(substr($user_agent, 0, 4)), array('1207'=>'1207','3gso'=>'3gso','4thp'=>'4thp','501i'=>'501i','502i'=>'502i','503i'=>'503i','504i'=>'504i','505i'=>'505i','506i'=>'506i','6310'=>'6310','6590'=>'6590','770s'=>'770s','802s'=>'802s','a wa'=>'a wa','acer'=>'acer','acs-'=>'acs-','airn'=>'airn','alav'=>'alav','asus'=>'asus','attw'=>'attw','au-m'=>'au-m','aur '=>'aur ','aus '=>'aus ','abac'=>'abac','acoo'=>'acoo','aiko'=>'aiko','alco'=>'alco','alca'=>'alca','amoi'=>'amoi','anex'=>'anex','anny'=>'anny','anyw'=>'anyw','aptu'=>'aptu','arch'=>'arch','argo'=>'argo','bell'=>'bell','bird'=>'bird','bw-n'=>'bw-n','bw-u'=>'bw-u','beck'=>'beck','benq'=>'benq','bilb'=>'bilb','blac'=>'blac','c55/'=>'c55/','cdm-'=>'cdm-','chtm'=>'chtm','capi'=>'capi','cond'=>'cond','craw'=>'craw','dall'=>'dall','dbte'=>'dbte','dc-s'=>'dc-s','dica'=>'dica','ds-d'=>'ds-d','ds12'=>'ds12','dait'=>'dait','devi'=>'devi','dmob'=>'dmob','doco'=>'doco','dopo'=>'dopo','el49'=>'el49','erk0'=>'erk0','esl8'=>'esl8','ez40'=>'ez40','ez60'=>'ez60','ez70'=>'ez70','ezos'=>'ezos','ezze'=>'ezze','elai'=>'elai','emul'=>'emul','eric'=>'eric','ezwa'=>'ezwa','fake'=>'fake','fly-'=>'fly-','fly_'=>'fly_','g-mo'=>'g-mo','g1 u'=>'g1 u','g560'=>'g560','gf-5'=>'gf-5','grun'=>'grun','gene'=>'gene','go.w'=>'go.w','good'=>'good','grad'=>'grad','hcit'=>'hcit','hd-m'=>'hd-m','hd-p'=>'hd-p','hd-t'=>'hd-t','hei-'=>'hei-','hp i'=>'hp i','hpip'=>'hpip','hs-c'=>'hs-c','htc '=>'htc ','htc-'=>'htc-','htca'=>'htca','htcg'=>'htcg','htcp'=>'htcp','htcs'=>'htcs','htct'=>'htct','htc_'=>'htc_','haie'=>'haie','hita'=>'hita','huaw'=>'huaw','hutc'=>'hutc','i-20'=>'i-20','i-go'=>'i-go','i-ma'=>'i-ma','i230'=>'i230','iac'=>'iac','iac-'=>'iac-','iac/'=>'iac/','ig01'=>'ig01','im1k'=>'im1k','inno'=>'inno','iris'=>'iris','jata'=>'jata','java'=>'java','kddi'=>'kddi','kgt'=>'kgt','kgt/'=>'kgt/','kpt '=>'kpt ','kwc-'=>'kwc-','klon'=>'klon','lexi'=>'lexi','lg g'=>'lg g','lg-a'=>'lg-a','lg-b'=>'lg-b','lg-c'=>'lg-c','lg-d'=>'lg-d','lg-f'=>'lg-f','lg-g'=>'lg-g','lg-k'=>'lg-k','lg-l'=>'lg-l','lg-m'=>'lg-m','lg-o'=>'lg-o','lg-p'=>'lg-p','lg-s'=>'lg-s','lg-t'=>'lg-t','lg-u'=>'lg-u','lg-w'=>'lg-w','lg/k'=>'lg/k','lg/l'=>'lg/l','lg/u'=>'lg/u','lg50'=>'lg50','lg54'=>'lg54','lge-'=>'lge-','lge/'=>'lge/','lynx'=>'lynx','leno'=>'leno','m1-w'=>'m1-w','m3ga'=>'m3ga','m50/'=>'m50/','maui'=>'maui','mc01'=>'mc01','mc21'=>'mc21','mcca'=>'mcca','medi'=>'medi','meri'=>'meri','mio8'=>'mio8','mioa'=>'mioa','mo01'=>'mo01','mo02'=>'mo02','mode'=>'mode','modo'=>'modo','mot '=>'mot ','mot-'=>'mot-','mt50'=>'mt50','mtp1'=>'mtp1','mtv '=>'mtv ','mate'=>'mate','maxo'=>'maxo','merc'=>'merc','mits'=>'mits','mobi'=>'mobi','motv'=>'motv','mozz'=>'mozz','n100'=>'n100','n101'=>'n101','n102'=>'n102','n202'=>'n202','n203'=>'n203','n300'=>'n300','n302'=>'n302','n500'=>'n500','n502'=>'n502','n505'=>'n505','n700'=>'n700','n701'=>'n701','n710'=>'n710','nec-'=>'nec-','nem-'=>'nem-','newg'=>'newg','neon'=>'neon','netf'=>'netf','noki'=>'noki','nzph'=>'nzph','o2 x'=>'o2 x','o2-x'=>'o2-x','opwv'=>'opwv','owg1'=>'owg1','opti'=>'opti','oran'=>'oran','p800'=>'p800','pand'=>'pand','pg-1'=>'pg-1','pg-2'=>'pg-2','pg-3'=>'pg-3','pg-6'=>'pg-6','pg-8'=>'pg-8','pg-c'=>'pg-c','pg13'=>'pg13','phil'=>'phil','pn-2'=>'pn-2','pt-g'=>'pt-g','palm'=>'palm','pana'=>'pana','pire'=>'pire','pock'=>'pock','pose'=>'pose','psio'=>'psio','qa-a'=>'qa-a','qc-2'=>'qc-2','qc-3'=>'qc-3','qc-5'=>'qc-5','qc-7'=>'qc-7','qc07'=>'qc07','qc12'=>'qc12','qc21'=>'qc21','qc32'=>'qc32','qc60'=>'qc60','qci-'=>'qci-','qwap'=>'qwap','qtek'=>'qtek','r380'=>'r380','r600'=>'r600','raks'=>'raks','rim9'=>'rim9','rove'=>'rove','s55/'=>'s55/','sage'=>'sage','sams'=>'sams','sc01'=>'sc01','sch-'=>'sch-','scp-'=>'scp-','sdk/'=>'sdk/','se47'=>'se47','sec-'=>'sec-','sec0'=>'sec0','sec1'=>'sec1','semc'=>'semc','sgh-'=>'sgh-','shar'=>'shar','sie-'=>'sie-','sk-0'=>'sk-0','sl45'=>'sl45','slid'=>'slid','smb3'=>'smb3','smt5'=>'smt5','sp01'=>'sp01','sph-'=>'sph-','spv '=>'spv ','spv-'=>'spv-','sy01'=>'sy01','samm'=>'samm','sany'=>'sany','sava'=>'sava','scoo'=>'scoo','send'=>'send','siem'=>'siem','smar'=>'smar','smit'=>'smit','soft'=>'soft','sony'=>'sony','t-mo'=>'t-mo','t218'=>'t218','t250'=>'t250','t600'=>'t600','t610'=>'t610','t618'=>'t618','tcl-'=>'tcl-','tdg-'=>'tdg-','telm'=>'telm','tim-'=>'tim-','ts70'=>'ts70','tsm-'=>'tsm-','tsm3'=>'tsm3','tsm5'=>'tsm5','tx-9'=>'tx-9','tagt'=>'tagt','talk'=>'talk','teli'=>'teli','topl'=>'topl','hiba'=>'hiba','up.b'=>'up.b','upg1'=>'upg1','utst'=>'utst','v400'=>'v400','v750'=>'v750','veri'=>'veri','vk-v'=>'vk-v','vk40'=>'vk40','vk50'=>'vk50','vk52'=>'vk52','vk53'=>'vk53','vm40'=>'vm40','vx98'=>'vx98','virg'=>'virg','vite'=>'vite','voda'=>'voda','vulc'=>'vulc','w3c '=>'w3c ','w3c-'=>'w3c-','wapj'=>'wapj','wapp'=>'wapp','wapu'=>'wapu','wapm'=>'wapm','wig '=>'wig ','wapi'=>'wapi','wapr'=>'wapr','wapv'=>'wapv','wapy'=>'wapy','wapa'=>'wapa','waps'=>'waps','wapt'=>'wapt','winc'=>'winc','winw'=>'winw','wonu'=>'wonu','x700'=>'x700','xda2'=>'xda2','xdag'=>'xdag','yas-'=>'yas-','your'=>'your','zte-'=>'zte-','zeto'=>'zeto','acs-'=>'acs-','alav'=>'alav','alca'=>'alca','amoi'=>'amoi','aste'=>'aste','audi'=>'audi','avan'=>'avan','benq'=>'benq','bird'=>'bird','blac'=>'blac','blaz'=>'blaz','brew'=>'brew','brvw'=>'brvw','bumb'=>'bumb','ccwa'=>'ccwa','cell'=>'cell','cldc'=>'cldc','cmd-'=>'cmd-','dang'=>'dang','doco'=>'doco','eml2'=>'eml2','eric'=>'eric','fetc'=>'fetc','hipt'=>'hipt','http'=>'http','ibro'=>'ibro','idea'=>'idea','ikom'=>'ikom','inno'=>'inno','ipaq'=>'ipaq','jbro'=>'jbro','jemu'=>'jemu','java'=>'java','jigs'=>'jigs','kddi'=>'kddi','keji'=>'keji','kyoc'=>'kyoc','kyok'=>'kyok','leno'=>'leno','lg-c'=>'lg-c','lg-d'=>'lg-d','lg-g'=>'lg-g','lge-'=>'lge-','libw'=>'libw','m-cr'=>'m-cr','maui'=>'maui','maxo'=>'maxo','midp'=>'midp','mits'=>'mits','mmef'=>'mmef','mobi'=>'mobi','mot-'=>'mot-','moto'=>'moto','mwbp'=>'mwbp','mywa'=>'mywa','nec-'=>'nec-','newt'=>'newt','nok6'=>'nok6','noki'=>'noki','o2im'=>'o2im','opwv'=>'opwv','palm'=>'palm','pana'=>'pana','pant'=>'pant','pdxg'=>'pdxg','phil'=>'phil','play'=>'play','pluc'=>'pluc','port'=>'port','prox'=>'prox','qtek'=>'qtek','qwap'=>'qwap','rozo'=>'rozo','sage'=>'sage','sama'=>'sama','sams'=>'sams','sany'=>'sany','sch-'=>'sch-','sec-'=>'sec-','send'=>'send','seri'=>'seri','sgh-'=>'sgh-','shar'=>'shar','sie-'=>'sie-','siem'=>'siem','smal'=>'smal','smar'=>'smar','sony'=>'sony','sph-'=>'sph-','symb'=>'symb','t-mo'=>'t-mo','teli'=>'teli','tim-'=>'tim-','tosh'=>'tosh','treo'=>'treo','tsm-'=>'tsm-','upg1'=>'upg1','upsi'=>'upsi','vk-v'=>'vk-v','voda'=>'voda','vx52'=>'vx52','vx53'=>'vx53','vx60'=>'vx60','vx61'=>'vx61','vx70'=>'vx70','vx80'=>'vx80','vx81'=>'vx81','vx83'=>'vx83','vx85'=>'vx85','wap-'=>'wap-','wapa'=>'wapa','wapi'=>'wapi','wapp'=>'wapp','wapr'=>'wapr','webc'=>'webc','whit'=>'whit','winw'=>'winw','wmlb'=>'wmlb','xda-'=>'xda-',)));
+				$status = $this->user->lang('MOBILE_DEVICE');
+				$mobile_browser = true;
+			break;
+			default;
+				$status = $this->user->lang('DESKTOP');
+				$mobile_browser = false;
+			break;
+		}
+		header('Cache-Control: no-transform');
+		header('Vary: User-Agent');
+		
+		if ($mobile_browser == '')
+		{
+			return $mobile_browser;
+		}
+		else
+		{
+			return array($mobile_browser, $status);
+		}
 	}
 	
 	/**
@@ -2963,7 +4661,7 @@ class session
 		}
 
 		// Zone offset
-		$zone_offset = $this->timezone + $this->dst;
+		$zone_offset = (float) $this->timezone + (int) $this->dst;
 
 		// Show date <= 1 hour ago as 'xx min ago' but not greater than 60 seconds in the future
 		// A small tolerence is given for times in the future but in the same minute are displayed as '< than a minute ago'
@@ -4726,6 +6424,7 @@ class session
 		}
 	}
 
+
 	/**
 	* Funtion to make the user leave the NEWLY_REGISTERED system group.
 	* @access public
@@ -4755,7 +6454,155 @@ class session
 
 		return true;
 	}
+	
+	//
+	// Encode the IP from decimals into hexademicals
+	//
+	function encode_ip($dotquad_ip)
+	{
+		$ip_check = 4; //If is under 4 partial IP will be returned
+		$ip_sep = '';
+			
+		if (strpos($dotquad_ip, '::f') || strpos($dotquad_ip, '::F') || strpos($dotquad_ip, '::1'))
+		{
+			$dotquad_ip = '127.0.0.1';
+		}
+		
+		if (strpos($dotquad_ip, '.'))
+		{
+			$ip_sep = explode('.', $dotquad_ip);
+			return sprintf('%02x%02x%02x%02x', $ip_sep[0], $ip_sep[1], $ip_sep[2], $ip_sep[3]);
+		}
+		
+		//Recheck IP_SEP
+		if (strpos($dotquad_ip, '.'))
+		{
+			$ip_sep = implode('.', array_slice(explode('.', $dotquad_ip), 0, $ip_check));
+			return $ip_sep[0] . '.' . $ip_sep[1] . '.' . $ip_sep[2] . '.' . $ip_sep[3];
+		}	
+		
+		if (strpos($dotquad_ip, ':'))
+		{
+			$short_ipv6 = $this->short_ipv6($dotquad_ip, $ip_check);
+			
+		   if (preg_match('/^::(\S+\.\S+)$/', $short_ipv6, $match)) 
+		   {
+				$chunks = explode('.', $match[1]);
+				return $chunks[0] . '.' . $chunks[1] . '.' . $chunks[2] . '.' . $chunks[3];
+			} 	
+		}
+				
+		return $dotquad_ip;		
+	}	
+	
+	/**
+	* Normalises an internet protocol address,
+	* also checks whether the specified address is valid.
+	*
+	* IPv4 addresses are returned 'as is'.
+	*
+	* IPv6 addresses are normalised according to
+	*	A Recommendation for IPv6 Address Text Representation
+	*	http://tools.ietf.org/html/draft-ietf-6man-text-addr-representation-07
+	*
+	* @param string $address	IP address
+	*
+	* @return mixed		false if specified address is not valid,
+	*					string otherwise
+	*/
+	function ip_normalise(string $address)
+	{
+		$ip_normalised = false;
 
+		if (filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4))
+		{
+			$ip_normalised = $address;
+		}
+		else if (filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6))
+		{
+			$ip_normalised = (function_exists('inet_ntop') && function_exists('inet_pton')) ? @inet_ntop(@inet_pton($address)) : $address;
+
+			// If is ipv4
+			if (stripos($ip_normalised, '::ffff:') === 0)
+			{
+				$ip_normalised = substr($ip_normalised, 7);
+			}
+		}
+
+		return $ip_normalised;
+	}
+	
+	/** Borrowed from phpBB3
+	* Returns the first block of the specified IPv6 address and as many additional
+	* ones as specified in the length paramater.
+	* If length is zero, then an empty string is returned.
+	* If length is greater than 3 the complete IP will be returned
+	*/
+	function short_ipv6($ip, $length)
+	{
+		if ($length < 1)
+		{
+			return '';
+		}
+
+		// extend IPv6 addresses
+		$blocks = substr_count($ip, ':') + 1;
+		if ($blocks < 9)
+		{
+			$ip = str_replace('::', ':' . str_repeat('0000:', 9 - $blocks), $ip);
+		}
+		if ($ip[0] == ':')
+		{
+			$ip = '0000' . $ip;
+		}
+		if ($length < 4)
+		{
+			$ip = implode(':', @array_slice(explode(':', $ip), 0, 1 + $length));
+		}
+
+		return $ip;
+	}
+	
+	/**
+	 * Load available languages list
+	 * author: Jan Kalah aka culprit_cz
+	 * @return array available languages list: KEY = folder name
+	 */
+	function get_lang_list($ext_root_path = '')
+	{
+		if (count($this->language_list))
+		{
+			return $this->language_list;
+		}
+		/* c:\Wamp\www\Rhea\language\ */
+		$dir = opendir($this->phpbb_root_path . 'language/');			
+		while($f = readdir($dir))
+		{
+			if (($f == '.' || $f == '..') || !is_dir($this->phpbb_root_path . 'language/' . $f))
+			{
+				continue;
+			}
+			$this->language_list[$f] =  $this->ucstrreplace('lang_', '', $f);	
+		}
+		closedir($dir);
+		if (!empty($ext_root_path))
+		{	
+			$dir = opendir($this->phpbb_root_path . 'ext/' . $ext_root_path . '/language/');			
+			while($f = readdir($dir))
+			{
+				if (($f == '.' || $f == '..') || !is_dir($this->phpbb_root_path . 'ext/' . $ext_root_path . '/language/' . $f))
+				{
+					continue;
+				}
+				$this->ext_language_list[$f] =  $this->ucstrreplace('lang_', '', $f);	
+			}
+			closedir($dir);
+			return $this->language_list = array_merge($this->ext_language_list, $this->language_list);
+		}			
+		return $this->language_list;
+	}	
+		
+	
 	/**
 	 * encode_lang
 	 *
@@ -4930,7 +6777,7 @@ class session
 				case 'galician':
 					$lang_name = 'gl';
 				break;
-				case 'guaraní':
+				case 'guaranĂ­':
 					$lang_name = 'gn';
 				break;
 				case 'gujarati':
@@ -5523,7 +7370,7 @@ class session
 					$lang_name = 'galician';
 				break;
 				case 'gn':
-					$lang_name = 'guaraní';
+					$lang_name = 'guaranĂ­';
 				break;
 				case 'gu':
 					$lang_name = 'gujarati';
@@ -6119,7 +7966,7 @@ class session
 					$lang_name = 'galician';
 				break;
 				case 'gn':
-					$lang_name = 'guaraní';
+					$lang_name = 'guaranĂ­';
 				break;
 				case 'gu':
 					$lang_name = 'gujarati';

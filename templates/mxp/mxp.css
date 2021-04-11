@@ -22,67 +22,6 @@ body{
 	scrollbar-darkshadow-color: #98AAB1;
 }
 
-
-
-#pageheader { }
-#pagecontent { }
-#pagefooter { }
-
-#poll { }
-#postrow { }
-#postdata { }
-
-/* General Markup Styles
----------------------------------------- */
-html {
-	font-size: 100%;
-	/* Always show a scrollbar for short pages - stops the jump when the scrollbar appears. non-IE browsers */
-	height: 101%;
-}
-
-
-
-
-h1 {
-	/* Forum name */
-	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-	margin-right: 200px;
-	margin-top: 15px;
-	font-weight: bold;
-	font-size: 2em;
-}
-
-h2 {
-	/* Forum header titles */
-	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-	font-weight: normal;
-	font-size: 2em;
-	margin: 0.8em 0 0.2em 0;
-}
-
-h2.solo {
-	margin-bottom: 1em;
-}
-
-h3 {
-	/* Sub-headers (also used as post headers, but defined later) */
-	font-family: Arial, Helvetica, sans-serif;
-	font-weight: bold;
-	text-transform: uppercase;
-	border-bottom: 1px solid transparent;
-	margin-bottom: 3px;
-	padding-bottom: 2px;
-	font-size: 1.05em;
-	margin-top: 20px;
-}
-
-h4 {
-	/* Forum and topic list titles */
-	font-family: "Trebuchet MS", Verdana, Helvetica, Arial, Sans-serif;
-	font-size: 1.3em;
-}
-
-
 /* TinyMCE specific rules */
 body.mceContentBody {
 	text-align: left;

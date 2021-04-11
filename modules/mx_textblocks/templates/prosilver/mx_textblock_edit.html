@@ -26,7 +26,6 @@ var is_mac    = (clientPC.indexOf("mac")!=-1);
 b_help = "{L_BBCODE_B_HELP}";
 i_help = "{L_BBCODE_I_HELP}";
 u_help = "{L_BBCODE_U_HELP}";
-h_help = "{L_BBCODE_H_HELP}";
 q_help = "{L_BBCODE_Q_HELP}";
 c_help = "{L_BBCODE_C_HELP}";
 l_help = "{L_BBCODE_L_HELP}";
@@ -39,7 +38,7 @@ f_help = "{L_BBCODE_F_HELP}";
 
 // Define the bbCode tags
 bbcode = new Array();
-bbtags = new Array('[b]','[/b]','[i]','[/i]','[u]','[/u]','[fa]','[/fa]','[quote]','[/quote]','[code]','[/code]','[html]','[/html]','[list]','[/list]','[list=]','[/list]','[img]','[/img]','[url]','[/url]');
+bbtags = new Array('[b]','[/b]','[i]','[/i]','[u]','[/u]','[quote]','[/quote]','[code]','[/code]','[list]','[/list]','[list=]','[/list]','[img]','[/img]','[url]','[/url]');
 imageTag = false;
 
 // Shows the help texts in the helpline window
@@ -302,18 +301,12 @@ function storeCaret(textEl) {
 				  <input type="button" class="button" accesskey="u" name="addbbcode4" value=" u " style="text-decoration: underline; width: 30px" onClick="bbstyle(4)" onMouseOver="helpline('u')" />
 				  </span></dt>
 				<dt><span class="text">
-				  <input type="button" class="button" accesskey="f" name="addbbcode5" value=" f " style="text-decoration: underline; width: 30px" onClick="bbstyle(5)" onMouseOver="helpline('f')" />
-				  </span></dt>				  
-				<dt><span class="text">
 				  <input type="button" class="button" accesskey="q" name="addbbcode6" value="Quote" style="width: 50px" onClick="bbstyle(6)" onMouseOver="helpline('q')" />
 				  </span></dt>
 				<dt><span class="text">
 				  <input type="button" class="button" accesskey="c" name="addbbcode8" value="Code" style="width: 40px" onClick="bbstyle(8)" onMouseOver="helpline('c')" />
 				  </span></dt>
 				<dt><span class="text">
-				  <input type="button" class="button" accesskey="h" name="addbbcode9" value="Html" style="width: 40px" onClick="bbstyle(9)" onMouseOver="helpline('h')" />
-				  </span></dt>
-				<dt><span class="text">			
 				  <input type="button" class="button" accesskey="l" name="addbbcode10" value="List" style="width: 40px" onClick="bbstyle(10)" onMouseOver="helpline('l')" />
 				  </span></dt>
 				<dt><span class="text">
