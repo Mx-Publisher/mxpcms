@@ -1862,15 +1862,21 @@ class session
 		
 		try
 		{
-			$this->timezone = $timezone = new \DateTimeZone($board_config['user_timezone']);
+			$DateTimeZone = new \DateTimeZone($board_config['user_timezone']);
 		}
 		catch (\Exception $e)
 		{
-			// If the timezone the user has selected is invalid, we fall back to UTC.
-			$this->timezone = $timezone = new \DateTimeZone('UTC');
+			// If the timezone the user has selected is invalid, we fall back to UTC or server.
+			$DateTimeZone = new \DateTimeZone(date_default_timezone_get());
 		}
 		
-		$this->dst = $board_config['user_timezone'] * 3600;
+		foreach ($DateTimeZone as $timezone_type => $dst)
+		{
+			$dst = $DateTimeZone->timezone_type;
+			$timezone = $DateTimeZone->timezone;
+		}
+		
+		$this->dst = $timezone * 3600;
 		
 		$sign = ($board_config['user_timezone'] < 0) ? '-' : '+';
 		$time_offset = abs($board_config['user_timezone']);
@@ -1880,7 +1886,7 @@ class session
 		$offset_hours	= ($time_offset - $offset_seconds) / 3600;
 		
 		// Zone offset
-		$zone_offset = $board_config['user_timezone'] + $this->dst;
+		$zone_offset = $this->timezone + $this->dst;
 		
 		$offset_string = sprintf($board_config['default_dateformat'], $sign, $offset_hours, $offset_minutes);
 		

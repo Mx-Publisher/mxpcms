@@ -3606,7 +3606,7 @@ class mx_backend
 	 */
 	function phpbb_version_check($force_update = false, $warn_fail = false, $ttl = 86400)
 	{
-		global $mx_cache, $mx_request_vars, $board_config, $lang, $phpbb_version_info;
+		global $mx_cache, $mx_user, $mx_request_vars, $board_config, $lang, $phpbb_version_info;
 		
 		$errno = 0;
 		$errstr = $phpbb_version_info = '';
@@ -3632,9 +3632,9 @@ class mx_backend
 			{
 				$upgrades_available = array_pop($upgrades_available);
 			}
-			$version_up_to_date		= empty($updates_available);
-			$version_upgradeable		= !empty($upgrades_available);
-			$upgrade_instructions		= !empty($upgrades_available) ? $mx_user->lang('UPGRADE_INSTRUCTIONS', $upgrades_available['current'], $upgrades_available['announcement']) : false;
+			$version_up_to_date = empty($updates_available);
+			$version_upgradeable = !empty($upgrades_available);
+			$upgrade_instructions = !empty($upgrades_available) ? $mx_user->lang('UPGRADE_INSTRUCTIONS', $upgrades_available['current'], $upgrades_available['announcement']) : false;
 		}
 		catch (\RuntimeException $e)
 		{

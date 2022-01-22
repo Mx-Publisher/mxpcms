@@ -35,8 +35,20 @@ if ((@include $mx_root_path . "language/lang_" . $language . "/lang_meta.$phpEx"
 	}
 	$language = 'english'; 
 } 
-/* ENDS Include language file */
-
+//vars
+	$title			=  '';
+	$author			=  '';
+	$copyright		=  '';
+	$imagetoolbar	=  '';
+	$distribution	=  '';
+	$keywords		=  '';
+	$description	=  '';
+	$langcode		=  '';
+	$rating			=  '';
+	$index			=  '';
+	$follow			=  '';
+	$pragma			=  '';
+	$icon			=  '';
 //
 // Main procedure
 //
