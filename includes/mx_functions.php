@@ -1908,7 +1908,7 @@ function mx_ltrim($str, $charlist = false)
 		return ltrim($str);
 	}
 	
-	$php_version = explode('.', PHP_VERSION);
+	$php_version = explode_on_delims('.', PHP_VERSION);
 
 	/**
 	* If we are on PHP >= 4.1 we do not need some code
@@ -1940,7 +1940,7 @@ function mx_rtrim($str, $charlist = false)
 		return rtrim($str);
 	}
 
-	$php_version = explode('.', PHP_VERSION);
+	$php_version = explode_on_delims('.', PHP_VERSION);
 
 	/**
 	* If we are on PHP >= 4.1 we do not need some code
@@ -2489,7 +2489,7 @@ function mx_is_group_member($group_ids = '', $group_mod_mode = false)
 		$db->sql_freeresult($result);
 	}
 
-	$group_ids_array = explode(',', $group_ids);
+	$group_ids_array = explode_on_delims(',', $group_ids);
 
 	for( $i = 0; $i < count($userdata[$userdata_key]); $i++ )
 	{
@@ -2857,7 +2857,7 @@ function get_list_multiple($name_select, $table, $idfield, $namefield, $id_list,
 		mx_message_die(GENERAL_ERROR, "Couldn't get list of Column/blocks", '', __LINE__, __FILE__, $sql);
 	}
 
-	$id_list = explode(',', $id_list);
+	$id_list = explode_on_delims(',', $id_list);
 	$rows_count = $db->sql_numrows($result);
 	$rows_count = ( $rows_count < '25' ) ? $rows_count : '25';
 
@@ -3187,7 +3187,7 @@ function mx_url()
 	$url_array = array();
 	if( ! empty($url['query']) )
 	{
-		$url_array = explode('&', $url['query']);
+		$url_array = explode_on_delims('&', $url['query']);
 	}
 
 	$arg_list = func_get_args();
@@ -3202,7 +3202,7 @@ function mx_url()
 		$opt_fund = false;
 		for( $j = 0; $j < count($url_array); $j++ )
 		{
-			$tmp = explode('=', $url_array[$j]);
+			$tmp = explode_on_delims('=', $url_array[$j]);
 			if( $option == $tmp[0] )
 			{
 				$url_array[$j] = $option . '=' . $value ;
@@ -3483,7 +3483,7 @@ function get_page_id($search_item, $use_function_file = false, $get_page_data_ar
 			
 			while( $temp_row = $db->sql_fetchrow($p_result) )
 			{
-				$block_ids_array = explode(',' , $temp_row['parameter_value']);
+				$block_ids_array = explode_on_delims(',' , $temp_row['parameter_value']);
 				
 				foreach($block_ids_array as $key => $block_id)
 				{
@@ -3528,7 +3528,7 @@ function get_page_id($search_item, $use_function_file = false, $get_page_data_ar
 			
 			while( $temp_row = $db->sql_fetchrow($p_result) )
 			{
-				$block_ids_array = explode(',' , $temp_row['parameter_value']);
+				$block_ids_array = explode_on_delims(',' , $temp_row['parameter_value']);
 				
 				foreach($block_ids_array as $key => $block_id)
 				{
@@ -3877,7 +3877,7 @@ if( !function_exists('memory_get_usage') )
 			//This should work on most UNIX systems
 			$pid = getmypid();
 			exec("ps -eo%mem,rss,pid | grep $pid", $output);
-			$output = explode("  ", $output[0]);
+			$output = explode_on_delims("  ", $output[0]);
 			//rss is given in 1024 byte units
 			return $output[1] * 1024;
 		}
@@ -4089,7 +4089,7 @@ function mx_own_realpath($path)
 	$path = trim($path, '/');
 
 	// Break the string into little bits for us to nibble on
-	$bits = explode('/', $path);
+	$bits = explode_on_delims('/', $path);
 
 	// Remove any . in the path, renumber array for the loop below
 	$bits = array_values(array_diff($bits, array('.')));
@@ -4362,7 +4362,7 @@ function mx_guess_lang($encode = false)
 
 	if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']))
 	{
-		$accept_lang_ary = explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
+		$accept_lang_ary = explode_on_delims(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
 		for ($i = 0; $i < sizeof($accept_lang_ary); $i++)
 		{
 			@reset($match_lang);
@@ -4681,5 +4681,31 @@ if(!function_exists('ereg'))
 		return preg_match('#'.$pattern.'#', $string, $array);      
 	} 
 }
-*/ 
+*/
+
+/*
+* function explode 
+*/        
+function explode_on_delims($delims = null, $input = "") 
+{
+		$query = "";
+		if($delims === null || !is_array($delims)) 
+		{
+			$delims = array("#", $delims);
+		}		
+		foreach($delims as $delimiter) 
+		{
+			$query .= preg_quote($delimiter) . "#";
+		}
+		$query = rtrim($query, "#");
+		if($query != "") 
+		{
+			$query = "(".$query.")";
+			//print $query . "\n";
+			return preg_split("/(".$query.")/", $input);
+			// $output = preg_split("/(@|vs)/", $input);
+			// return $output;
+		}
+		return $input;
+}
 ?>
