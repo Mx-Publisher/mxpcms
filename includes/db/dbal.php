@@ -2,16 +2,16 @@
 /**
 *
 * @package DBal
-* @version $Id: dbal.php,v 1.17 2013/06/28 15:33:26 orynider Exp $
+* @version $Id: dbal.php,v 1.17 2023/10/17 15:33:26 orynider Exp $
 * @copyright (c) 2005 phpBB Group
-* @copyright (c) 2002-2008 MX-Publisher Project Team
+* @copyright (c) 2002-2023 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU Public License
 * @link http://mxpcms.sourceforge.net/
 *
 *
 */
 
-if (!defined('IN_PORTAL')) { die("Hacking attempt"); }
+if (!defined('IN_PORTAL')) { die("Hacking attempt in package DBal."); }
 
 /**
 * @package DBal
@@ -78,14 +78,14 @@ class dbal
 	const SUBQUERY_BUILD = 5;
 
 	/**
-	* Constructor
+	* Constructor dbal() //
 	*/
-	function dbal() //__construct()
+	function __construct()
 	{
 		/* $this->num_queries = array(
 			'cached'		=> 0,
 			'normal'		=> 0,
-			'total'			=> 0,
+			'total'		=> 0,
 		); */
 
 		// Fill default sql layer based on the class being called.
