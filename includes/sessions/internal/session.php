@@ -2,7 +2,7 @@
 /**
 *
 * @package Style
-* @version $Id: session.php,v 1.18 2014/05/09 07:52:03 orynider Exp $
+* @version $Id: session.php,v 1.18 2023/10/17 17:50:03 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team & (C) 2001 The phpBB Group
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
@@ -249,7 +249,7 @@ class session
 	 * @access public
 	 *
 	 */
-	function session()
+	function __construct()
 	{
 		global $mx_cache, $board_config, $db, $phpbb_root_path, $mx_root_path, $phpEx;
 		global $mx_request_vars, $template, $language;
@@ -5905,7 +5905,7 @@ class session
 				case 'galician':
 					$lang_name = 'gl';
 				break;
-				case 'guaraní':
+				case 'guaranÃ­':
 					$lang_name = 'gn';
 				break;
 				case 'gujarati':
@@ -6498,7 +6498,7 @@ class session
 					$lang_name = 'galician';
 				break;
 				case 'gn':
-					$lang_name = 'guaraní';
+					$lang_name = 'guaranÃ­';
 				break;
 				case 'gu':
 					$lang_name = 'gujarati';
@@ -7094,7 +7094,7 @@ class session
 					$lang_name = 'galician';
 				break;
 				case 'gn':
-					$lang_name = 'guaraní';
+					$lang_name = 'guaranÃ­';
 				break;
 				case 'gu':
 					$lang_name = 'gujarati';
