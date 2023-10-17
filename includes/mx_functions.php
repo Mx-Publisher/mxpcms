@@ -2,8 +2,8 @@
 /**
 *
 * @package Functions
-* @version $Id: mx_functions.php,v 3.125 2020/02/25 03:51:52 orynider Exp $
-* @copyright (c) 2002-2008 MX-Publisher Project Team
+* @version $Id: mx_functions.php,v 3.125 2023/10/17 03:51:52 orynider Exp $
+* @copyright (c) 2002-2023 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
 *
@@ -169,12 +169,12 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 	// Start user session
 	// - populate $userdata and $lang
 	//
-	if( empty($userdata) && ( $msg_code == GENERAL_MESSAGE || $msg_code == GENERAL_ERROR ) )
+	if (empty($userdata) && ($msg_code == GENERAL_MESSAGE || $msg_code == GENERAL_ERROR))
 	{
 		$mx_user->init($user_ip, $page_id, false);
 	}
 
-	if(empty($theme))
+	if (empty($theme))
 	{
 		global $user_ip;
 		$mx_user->page_id = 1;
@@ -185,7 +185,7 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 	//
 	// Load and instatiate CORE (page) and block classes
 	//
-	$mx_page->init( $page_id );
+	$mx_page->init($page_id);
 
 	$default_lang = (isset($mx_user->lang['default_lang'])) ? $mx_user->encode_lang($mx_user->lang['default_lang']) : $board_config['default_lang'];
 
@@ -1615,9 +1615,9 @@ function mx_check_link_hash($token, $link_name)
 /**
 * Hashes an email address to a big integer
 *
-* @param string $email		Email address
+* @param string $email	Email address
 *
-* @return string			Unsigned Big Integer
+* @return string		Unsigned Big Integer
 */
 function mx_email_hash($email)
 {
@@ -1908,14 +1908,14 @@ function mx_ltrim($str, $charlist = false)
 		return ltrim($str);
 	}
 	
-	$php_version = explode_on_delims('.', PHP_VERSION);
+	$php_version = explode('.', PHP_VERSION);
 
 	/**
 	* If we are on PHP >= 4.1 we do not need some code
 	*/
 	if ((int) $php_version[0] < 4 || ((int) $php_version[0] == 4 && (int) $php_version[1] < 1))
 	{
-		while ($str{0} == $charlist)
+		while ($str[0] == $charlist)
 		{
 			$str = substr($str, 1);
 		}
@@ -1940,7 +1940,7 @@ function mx_rtrim($str, $charlist = false)
 		return rtrim($str);
 	}
 
-	$php_version = explode_on_delims('.', PHP_VERSION);
+	$php_version = explode('.', PHP_VERSION);
 
 	/**
 	* If we are on PHP >= 4.1 we do not need some code
@@ -2489,7 +2489,7 @@ function mx_is_group_member($group_ids = '', $group_mod_mode = false)
 		$db->sql_freeresult($result);
 	}
 
-	$group_ids_array = explode_on_delims(',', $group_ids);
+	$group_ids_array = explode(',', $group_ids);
 
 	for( $i = 0; $i < count($userdata[$userdata_key]); $i++ )
 	{
@@ -2857,7 +2857,7 @@ function get_list_multiple($name_select, $table, $idfield, $namefield, $id_list,
 		mx_message_die(GENERAL_ERROR, "Couldn't get list of Column/blocks", '', __LINE__, __FILE__, $sql);
 	}
 
-	$id_list = explode_on_delims(',', $id_list);
+	$id_list = explode(',', $id_list);
 	$rows_count = $db->sql_numrows($result);
 	$rows_count = ( $rows_count < '25' ) ? $rows_count : '25';
 
@@ -3187,7 +3187,7 @@ function mx_url()
 	$url_array = array();
 	if( ! empty($url['query']) )
 	{
-		$url_array = explode_on_delims('&', $url['query']);
+		$url_array = explode('&', $url['query']);
 	}
 
 	$arg_list = func_get_args();
@@ -3202,7 +3202,7 @@ function mx_url()
 		$opt_fund = false;
 		for( $j = 0; $j < count($url_array); $j++ )
 		{
-			$tmp = explode_on_delims('=', $url_array[$j]);
+			$tmp = explode('=', $url_array[$j]);
 			if( $option == $tmp[0] )
 			{
 				$url_array[$j] = $option . '=' . $value ;
@@ -3483,7 +3483,7 @@ function get_page_id($search_item, $use_function_file = false, $get_page_data_ar
 			
 			while( $temp_row = $db->sql_fetchrow($p_result) )
 			{
-				$block_ids_array = explode_on_delims(',' , $temp_row['parameter_value']);
+				$block_ids_array = explode(',' , $temp_row['parameter_value']);
 				
 				foreach($block_ids_array as $key => $block_id)
 				{
@@ -3528,7 +3528,7 @@ function get_page_id($search_item, $use_function_file = false, $get_page_data_ar
 			
 			while( $temp_row = $db->sql_fetchrow($p_result) )
 			{
-				$block_ids_array = explode_on_delims(',' , $temp_row['parameter_value']);
+				$block_ids_array = explode(',' , $temp_row['parameter_value']);
 				
 				foreach($block_ids_array as $key => $block_id)
 				{
@@ -3877,7 +3877,7 @@ if( !function_exists('memory_get_usage') )
 			//This should work on most UNIX systems
 			$pid = getmypid();
 			exec("ps -eo%mem,rss,pid | grep $pid", $output);
-			$output = explode_on_delims("  ", $output[0]);
+			$output = explode("  ", $output[0]);
 			//rss is given in 1024 byte units
 			return $output[1] * 1024;
 		}
@@ -4089,7 +4089,7 @@ function mx_own_realpath($path)
 	$path = trim($path, '/');
 
 	// Break the string into little bits for us to nibble on
-	$bits = explode_on_delims('/', $path);
+	$bits = explode('/', $path);
 
 	// Remove any . in the path, renumber array for the loop below
 	$bits = array_values(array_diff($bits, array('.')));
@@ -4362,7 +4362,7 @@ function mx_guess_lang($encode = false)
 
 	if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']))
 	{
-		$accept_lang_ary = explode_on_delims(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
+		$accept_lang_ary = explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
 		for ($i = 0; $i < sizeof($accept_lang_ary); $i++)
 		{
 			@reset($match_lang);
@@ -4471,8 +4471,8 @@ function update_portal_backend($new_backend = PORTAL_BACKEND)
 		'dbname'		=> $dbname,
 		'dbuser'		=> $dbuser,
 		'dbpasswd'		=> $dbpasswd,
-		'mx_table_prefix'		=> $mx_table_prefix,
-		'portal_backend'		=> (!empty($portal_backend) ? $portal_backend : 'internal'),
+		'mx_table_prefix' => $mx_table_prefix,
+		'portal_backend'	=> (!empty($portal_backend) ? $portal_backend : 'internal'),
 	);
 	*/
 
@@ -4684,7 +4684,9 @@ if(!function_exists('ereg'))
 */
 
 /*
-* function explode 
+* This is a function as explode on arrays of delimitors.
+* explode() will now throw ValueError when separator parameter is given an empty string (""). Previously, explode() returned false instead. 
+* A ValueError is thrown when the type of an argument is correct but the value of it is incorrect. 
 */        
 function explode_on_delims($delims = null, $input = "") 
 {
