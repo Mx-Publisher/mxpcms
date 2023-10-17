@@ -2,7 +2,7 @@
 /**
 *
 * @package Style
-* @version $Id: mx_functions_style.php,v 3.144 2020/02/25 03:55:52 orynider Exp $
+* @version $Id: mx_functions_style.php,v 3.144 2023/10/17 15:25:52 orynider Exp $
 * @copyright (c) 2002-2019 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
@@ -91,7 +91,7 @@ class mx_Template extends Template
 	 *
 	 * @access private
 	 */
-	function mx_Template($root = '.')
+	function __construct($root = '.')
 	{
 		parent::init($root);
 
@@ -5217,7 +5217,7 @@ class mx_language extends mx_language_file_loader
 				case 'galician':
 					$lang_name = 'gl';
 				break;
-				case 'guaraní':
+				case 'guaraní­':
 					$lang_name = 'gn';
 				break;
 				case 'gujarati':
@@ -6826,3 +6826,4 @@ class language_file_not_found extends language_exception
 /**
  * class language
  */
+?>
