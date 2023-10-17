@@ -6,7 +6,7 @@
  *   copyright            : (C) 2001 The phpBB Group
  *   email                : support@phpbb.com
  *
- *   $Id: functions.php,v 1.7 2013/06/16 01:10:14 orynider Exp $
+ *   $Id: functions.php,v 1.7 2023/10/17 15:40:14 orynider Exp $
  *
  *
  ***************************************************************************/
@@ -38,7 +38,7 @@ class phpBB2
 	protected $module_root_path;		
 	protected $phpbb_root_path;		
 	
-	public function phpBB2()
+	public function __construct()
 	{
 		global $template, $mx_user, $db, $mx_cache, $mx_request_vars, $board_config, $phpEx, $phpbb_root_path, $mx_root_path, $module_root_path;		
 			
@@ -490,7 +490,7 @@ class phpBB2
 		// php version < 4.1.0
 		if ((int) $php_version[0] < 4 || ((int) $php_version[0] == 4 && (int) $php_version[1] < 1))
 		{
-			while ($str{0} == $charlist)
+			while ($str[0] == $charlist)
 			{
 				$str = substr($str, 1);
 			}
@@ -3337,7 +3337,6 @@ class phpBB2
 			break;
 		}
 
-
 		//
 		// Add on DEBUG info if we've enabled debug mode and this is an error. This
 		// prevents debug info being output for general messages should DEBUG be
@@ -3660,11 +3659,8 @@ class phpBB2
 				$host = (function_exists('php_uname')) ? php_uname('n') : 'localhost';
 			}
 		}
-
 		// It may be still no valid host, but for sure only a hostname (we may further expand on the cookie domain... if set)
 		return $host;
 	}
-
-
 }
 ?>
