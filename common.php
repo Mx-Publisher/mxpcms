@@ -2,8 +2,8 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: common.php,v 1.121 2014/05/09 07:51:42 orynider Exp $
-* @copyright (c) 2002-2008 MX-Publisher Project Team
+* @version $Id: common.php,v 1.121 2023/10/17 11:51:42 orynider Exp $
+* @copyright (c) 2002-2023 MX-Publisher Development Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
 *
@@ -126,6 +126,26 @@ function deregister_globals()
 
 	unset($input);
 }
+
+/**
+* @function mx_each($array) { }
+* based on: https://stackoverflow.com/questions/46492621/how-can-i-update-code-that-uses-the-deprecated-each-function
+* if does not work replace code:
+* while (list($key, $value) = mx_each($array)) {
+* with code:
+* foreach($array as $key => $value) {
+*/
+function mx_each(&$arr) 
+{
+    $key = key($arr);
+    $result = ($key === null) ? false : array($key, current($arr), 
+										'key' => $key, 
+										'value' => current($arr));
+    next($arr);
+    return $result;
+}
+
+
 /**
 * Minimum Requirement: PHP 7.3.0
 * const PHP_VERSION (PHP 4 >= 4.1.0, PHP 5, PHP 7)
@@ -183,7 +203,7 @@ if (isset($_POST['GLOBALS']) || isset($HTTP_POST_FILES['GLOBALS']) || isset($_GE
 // Protect against HTTP_SESSION_VARS tricks
 if (isset($HTTP_SESSION_VARS) && !is_array($HTTP_SESSION_VARS))
 {
-	die("Hacking attempt");
+	die("Hacking attempt using HTTP_SESSION_VARS tricks!");
 }
 
 if (@ini_get('register_globals') == '1' || strtolower(@ini_get('register_globals')) == 'on')
@@ -210,11 +230,11 @@ if (@ini_get('register_globals') == '1' || strtolower(@ini_get('register_globals
 	unset($input['input']);
 	unset($input['not_unset']);
 
-	while (list($var,) = @each($input))
+	foreach($input as $key => $var)
 	{
 		if (in_array($var, $not_unset))
 		{
-			die('Hacking attempt!');
+			die('Register globals "On" in commmon.php!');
 		}
 		unset($$var);
 	}
