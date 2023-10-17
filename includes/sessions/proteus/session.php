@@ -2,8 +2,8 @@
 /**
 *
 * @package Style
-* @version $Id: session.php,v 1.1 2014/07/07 20:38:17 orynider Exp $
-* @copyright (c) 2002-2008 MX-Publisher Project Team & (C) 2005 The phpBB Group
+* @version $Id: session.php,v 1.1 2023/10/17 16:14:17 orynider Exp $
+* @copyright (c) 2002-2023 MX-Publisher Development Team & (C) 2005 The phpBB Group
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
 *
@@ -129,23 +129,23 @@ class session
 	 * @access public
 	 *
 	 */	
-	function session()
+	function __construct()
 	{
 		global $mx_cache, $board_config, $db, $phpbb_root_path, $mx_root_path, $phpEx;
 		global $mx_request_vars, $template, $language;
 		
-		$this->cache				= $mx_cache;
-		$this->config				= $board_config;
-		$this->db                 	= $db;
-		$this->user               	= $this;
+		$this->cache		= $mx_cache;
+		$this->config		= $board_config;
+		$this->db			= $db;
+		$this->user         = $this;
 		$this->service_providers = array('user_id' => 1, 'session_id' => 0, 'provider'	=> '', 'oauth_token' => '');
 		$this->phpbb_root_path = $phpbb_root_path;
 		$this->mx_root_path	= $mx_root_path;
-		$this->php_ext			= $phpEx;
-		$this->lang_path			= $mx_root_path . 'language/';
-		$this->request				= $mx_request_vars;
-		$this->template			= $template;
-		$this->language			= $language;
+		$this->php_ext		= $phpEx;
+		$this->lang_path	= $mx_root_path . 'language/';
+		$this->request		= $mx_request_vars;
+		$this->template		= $template;
+		$this->language		= $language;
 
 		// Setup $this->db_tools
 		if (!class_exists('mx_db_tools') && !class_exists('tools'))
@@ -6120,7 +6120,7 @@ class session
 					$lang_name = 'galician';
 				break;
 				case 'gn':
-					$lang_name = 'guaraní';
+					$lang_name = 'guaraní­';
 				break;
 				case 'gu':
 					$lang_name = 'gujarati';
