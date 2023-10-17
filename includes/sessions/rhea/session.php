@@ -2,7 +2,7 @@
 /**
 *
 * @package Style
-* @version $Id: session.php,v 3.1 2020/02/25 04:13:02 orynider Exp $
+* @version $Id: session.php,v 3.1 2023/10/17 15:52:02 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team & (C) 2005 The phpBB Group
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
@@ -129,7 +129,7 @@ class session
 	 * @access public
 	 *
 	 */	
-	function session()
+	function __construct()
 	{
 		global $mx_cache, $board_config, $db, $phpbb_root_path, $mx_root_path, $phpEx;
 		global $mx_request_vars, $template, $language;
