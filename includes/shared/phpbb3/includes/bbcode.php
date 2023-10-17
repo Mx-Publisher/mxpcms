@@ -2,7 +2,7 @@
 /**
 *
 * @package phpBB3
-* @version $Id: bbcode.php,v 1.3 2008/06/15 21:01:41 jonohlsson Exp $
+* @version $Id: bbcode.php,v 1.3 2023/10/17 15:47:41 orynider Exp $
 * @copyright (c) 2005 phpBB Group
 * @license http://opensource.org/licenses/gpl-license.php GNU Public License
 *
@@ -41,7 +41,7 @@ class bbcode
 	* Constructor
 	* Init bbcode cache entries if bitfield is specified
 	*/
-	function bbcode($bitfield = '')
+	function __construct($bitfield = '')
 	{
 		if ($bitfield)
 		{
