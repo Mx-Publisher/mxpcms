@@ -168,3 +168,4 @@ class mx_class_loader
 		}
 	}
 }
+?>
