@@ -2,16 +2,16 @@
 /**
 *
 * @package Core
-* @version $Id: mx_functions_core.php,v 1.140 2020/02/25 03:45:52 orynider Exp $
-* @copyright (c) 2002-2008 MX-Publisher Project Team
+* @version $Id: mx_functions_core.php,v 1.140 2023/10/17 15:15:52 orynider Exp $
+* @copyright (c) 2002-2023 MX-Publisher Development Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
 *
 */
 
-if ( !defined( 'IN_PORTAL' ) )
+if (!defined('IN_PORTAL'))
 {
-	die( "Hacking attempt" );
+	die("Hacking attempt");
 }
 
 /**#@+
@@ -212,7 +212,7 @@ class mx_cache extends cache
 			$sql = "SELECT *
 				FROM " . CONFIG_TABLE;
 
-			if ( !( $result = $db->sql_query( $sql ) ) )
+			if (!( $result = $db->sql_query($sql)))
 			{
 				if (!function_exists('mx_message_die'))
 				{
@@ -244,7 +244,7 @@ class mx_cache extends cache
 				$this->put('phpbb_config', $config);
 			}
 
-			return ( $config );
+			return ($config);
 		}
 	}
 	
@@ -1743,7 +1743,7 @@ class cache
 	 */
 	public function _exists($var_name)
 	{
-		if ($var_name{0} == '_')
+		if ($var_name[0] == '_')
 		{
 			$phpEx = substr(strrchr(__FILE__, '.'), 1);
 			return file_exists($this->cache_dir . 'data' . $var_name . "." . $phpEx);
@@ -1841,7 +1841,7 @@ class cache
 	 */
 	public function get($var_name)
 	{
-		if ($var_name{0} == '_')
+		if ($var_name[0] == '_')
 		{
 			global $phpEx;
 
@@ -1870,7 +1870,7 @@ class cache
 	 */
 	public function put($var_name, $var, $ttl = 31536000)
 	{
-		if ($var_name{0} == '_')
+		if ($var_name[0] == '_')
 		{
 			$phpEx = substr(strrchr(__FILE__, '.'), 1);
 			if ($fp = @fopen($this->cache_dir . 'data' . $var_name . ".$phpEx", 'wb'))
@@ -1975,7 +1975,7 @@ class cache
 			return;
 		}
 
-		if ($var_name{0} == '_')
+		if ($var_name[0] == '_')
 		{
 			@unlink($this->cache_dir . 'data' . $var_name . "." . $phpEx);
 		}
