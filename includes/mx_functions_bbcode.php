@@ -2,7 +2,7 @@
 /**
 *
 * @package Functions_phpBB
-* @version $Id: mx_functions_bbcode.php,v 1.22 2014/05/09 07:51:42 orynider Exp $
+* @version $Id: mx_functions_bbcode.php,v 1.23 2023/10/17 15:11:42 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
