@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: common.php,v 1.121 2023/10/17 11:51:42 orynider Exp $
+* @version $Id: common.php,v 1.122 2023/10/20 03:11:42 orynider Exp $
 * @copyright (c) 2002-2023 MX-Publisher Development Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
@@ -249,13 +249,13 @@ if (@ini_get('register_globals') == '1' || strtolower(@ini_get('register_globals
 // If we are on PHP >= 6.0.0 we do not need some code
 if ( (@phpversion() < '5.3.0') or ( @function_exists('get_magic_quotes_gpc') && !@get_magic_quotes_gpc() ) )
 {
-	if( is_array($_GET) )
+	if(is_array($_GET))
 	{
-		while( list($k, $v) = each($_GET) )
+		foreach($_GET as $k => $v)
 		{
-			if( is_array($_GET[$k]) )
+			if(is_array($_GET[$k]))
 			{
-				while( list($k2, $v2) = each($_GET[$k]) )
+				foreach($_GET as $k2 => $v2)
 				{
 					$_GET[$k][$k2] = addslashes($v2);
 				}
@@ -269,13 +269,13 @@ if ( (@phpversion() < '5.3.0') or ( @function_exists('get_magic_quotes_gpc') && 
 		@reset($_GET);
 	}
 
-	if( is_array($_POST) )
+	if(is_array($_POST))
 	{
-		while( list($k, $v) = each($_POST) )
+		foreach($_POST as $k => $v)
 		{
 			if( is_array($_POST[$k]) )
 			{
-				while( list($k2, $v2) = each($_POST[$k]) )
+				foreach($_POST as $k2 => $v2)
 				{
 					$_POST[$k][$k2] = addslashes($v2);
 				}
@@ -289,13 +289,13 @@ if ( (@phpversion() < '5.3.0') or ( @function_exists('get_magic_quotes_gpc') && 
 		@reset($_POST);
 	}
 
-	if( is_array($_COOKIE) )
+	if(is_array($_COOKIE))
 	{
-		while( list($k, $v) = each($_COOKIE) )
+		foreach($_COOKIE as $k => $v)
 		{
 			if( is_array($_COOKIE[$k]) )
 			{
-				while( list($k2, $v2) = each($_COOKIE[$k]) )
+				foreach($_COOKIE as $k2 => $v2)
 				{
 					$_COOKIE[$k][$k2] = addslashes($v2);
 				}
