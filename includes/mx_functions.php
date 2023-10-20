@@ -2,7 +2,7 @@
 /**
 *
 * @package Functions
-* @version $Id: mx_functions.php,v 3.125 2023/10/17 03:51:52 orynider Exp $
+* @version $Id: mx_functions.php,v 3.126 2023/10/20 03:15:52 orynider Exp $
 * @copyright (c) 2002-2023 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
@@ -1947,7 +1947,7 @@ function mx_rtrim($str, $charlist = false)
 	*/
 	if ((int) $php_version[0] < 4 || ((int) $php_version[0] == 4 && (int) $php_version[1] < 1))
 	{
-		while ($str{strlen($str)-1} == $charlist)
+		while ($str[strlen($str)-1] == $charlist)
 		{
 			$str = substr($str, 0, strlen($str)-1);
 		}
@@ -2646,11 +2646,11 @@ function mx_generate_text_for_display($text, $uid, $bitfield, $flags)
 
 		if (empty($mx_bbcode))
 		{
-			$mx_bbcode = new mx_bbcode($bitfield);
+			$mx_bbcode = new __construct($bitfield);
 		}
 		else
 		{
-			$mx_bbcode->mx_bbcode($bitfield);
+			$mx_bbcode->__construct($bitfield);
 		}
 
 		$mx_bbcode->bbcode_second_pass($text, $uid);
