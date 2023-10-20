@@ -43,7 +43,7 @@ class mx_bbcode extends bbcode_base
 	var $template_bitfield;
 	var $template_filename = '';
 
-	function mx_bbcode($bitfield = '')
+	function __construct($bitfield = '')
 	{
 		global $board_config, $phpbb_root_path;
 
