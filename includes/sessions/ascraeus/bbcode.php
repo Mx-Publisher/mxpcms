@@ -70,7 +70,7 @@ class mx_bbcode
 	* Constructor
 	* Init bbcode cache entries if bitfield is specified
 	*/
-	function mx_bbcode($bitfield = '')
+	function __construct($bitfield = '')
 	{
 		global $board_config, $phpbb_root_path;
 		
