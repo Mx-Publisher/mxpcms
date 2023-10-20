@@ -44,7 +44,7 @@ class mx_bbcode extends bbcode_base
 	var $template_bitfield;
 	var $template_filename = '';
 
-	function mx_bbcode($bitfield = '')
+	function __construct($bitfield = '')
 	{
 		global $board_config, $phpbb_root_path;
 
@@ -729,7 +729,7 @@ class mx_bbcode extends bbcode_base
 	    [*]Yellow
 	    [/list]
 
-	The question is how to specify a custom list’s bullet such as [b]?[/b] for a Features BBcode List ?
+	The question is how to specify a custom listÂ’s bullet such as [b]?[/b] for a Features BBcode List ?
 
 	    [b]?[/b][color=#FF0000]Red[/color]
 	    [b]?[/b][color=#0040FF]Blue[/color]
