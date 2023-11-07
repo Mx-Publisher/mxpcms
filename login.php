@@ -2,8 +2,8 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: login.php,v 1.35 2014/05/16 18:02:06 orynider Exp $
-* @copyright (c) 2002-2008 MX-Publisher Project Team
+* @version $Id: login.php,v 1.35 2023/11/07 18:02:06 orynider Exp $
+* @copyright (c) 2002-2023 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
 *
@@ -13,6 +13,7 @@
 // Allow people to reach login page if
 // board is shut down
 //
+define("IN_PORTAL", true);
 define("IN_LOGIN", true);
 define('IN_PHPBB', true);
 define('IN_SOCIAL_CONNECT', true);
