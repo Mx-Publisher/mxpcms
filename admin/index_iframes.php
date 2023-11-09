@@ -2,10 +2,10 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: index_iframes.php,v 1.2 2010/04/27 21:58:16 orynider Exp $
-* @copyright (c) 2002-2008 MX-Publisher Project Team
+* @version $Id: index_iframes.php, v 1.70 2023/11/09 21:58:36 orynider Exp $
+* @copyright (c) 2002-2023 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
-* @link http://www.mx-publisher.com
+* @link http://mxpcms.sourceforge.net/
 *
 */
 
@@ -317,7 +317,9 @@ elseif ($mx_request_vars->get('pane', MX_TYPE_NO_TAGS) == 'right')
 	);
 	
 
-	$whois_url = "http://network-tools.com/default.asp?host=";
+	$whois_url_sufix = '/#_whois';
+	$whois_url = "https://bgp.he.net/ip/";
+	//$whois_url = "http://network-tools.com/default.asp?host=";
 	//$whois_url = mx_append_sid(PHPBB_URL . "adm/index.php?i=users&icat=13&mode=overview&action=whois&user_ip=");
 
 	$mx_backend->load_forum_stats();
@@ -422,7 +424,7 @@ elseif ($mx_request_vars->get('pane', MX_TYPE_NO_TAGS) == 'right')
 					"FORUM_LOCATION" => $location,
 					"IP_ADDRESS" => $reg_ip,
 
-					"U_WHOIS_IP" => $whois_url . $reg_ip,
+					"U_WHOIS_IP" => $whois_url . $reg_ip . $whois_url_sufix,
 					"U_USER_PROFILE" => mx_append_sid(PHPBB_URL . "admin_users.$phpEx?mode=edit&amp;" . POST_USERS_URL . "=" . $onlinerow_reg[$i]['user_id']),
 					"U_FORUM_LOCATION" => mx_append_sid($location_url))
 				);
@@ -493,7 +495,7 @@ elseif ($mx_request_vars->get('pane', MX_TYPE_NO_TAGS) == 'right')
 				"FORUM_LOCATION" => $location,
 				"IP_ADDRESS" => $guest_ip,
 
-				"U_WHOIS_IP" => $whois_url . $guest_ip,
+				"U_WHOIS_IP" => $whois_url . $guest_ip . $whois_url_sufix,
 				"U_FORUM_LOCATION" => mx_append_sid($location_url))
 			);
 		}
