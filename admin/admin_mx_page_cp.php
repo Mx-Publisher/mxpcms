@@ -2,8 +2,8 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: admin_mx_page_cp.php,v 1.41 2014/05/09 07:51:42 orynider Exp $
-* @copyright (c) 2002-2008 MX-Publisher Project Team
+* @version $Id: admin_mx_page_cp.php,v 1.42 2023/11/09 07:21:42 orynider Exp $
+* @copyright (c) 2002-2023 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
 *
@@ -612,8 +612,8 @@ for($page_count = -1; $page_count < $total_pages; $page_count++)
 	$page_icon = post_icons('page_icons/', $page_icon);
 	
 	// Page templates dropdown
-	$template_list = !$new_page ? '' : mx_get_list('use_template', PAGE_TEMPLATES, 'page_template_id', 'template_name', 1, true);
-	$l_choose_page_template = !$new_page ? '' : empty($lang['Choose_page_template']) ? "Choose page template" : $lang['Choose_page_template'];
+	$template_list = !isset($new_page) ? '' : mx_get_list('use_template', PAGE_TEMPLATES, 'page_template_id', 'template_name', 1, true);
+	$l_choose_page_template = !isset($new_page) ? '' : (empty($lang['Choose_page_template']) ? "Choose page template" : $lang['Choose_page_template']);
 
 	$template->assign_block_vars('pages', array(
 		'L_TITLE' 					=> $lang['Page_admin'],
