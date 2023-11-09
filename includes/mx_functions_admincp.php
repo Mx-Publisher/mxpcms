@@ -2,21 +2,21 @@
 /**
 *
 * @package AdminCP
-* @version $Id: mx_functions_admincp.php,v 1.76 2014/07/07 20:36:52 orynider Exp $
-* @copyright (c) 2002-2006 MX-Publisher Project Team
+* @version $Id: mx_functions_admincp.php,v 1.76 2023/11/09 07:27:52 orynider Exp $
+* @copyright (c) 2002-2023 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
 *
 */
 
-if ( !defined( 'IN_PORTAL' ) )
+if ( !defined('IN_PORTAL') )
 {
-	die( "Hacking attempt" );
+	die("Hacking attempt in admin functions.");
 }
 
 /**#@+
  * AdminCP Class Flags
- *
+ *ş
  */
 define('MX_ADD'							, 20);
 define('MX_EDIT'						, 21);
@@ -130,7 +130,7 @@ class mx_admin
 	/**
 	* Constructor
 	*/
-	function mx_admin($stand_alone = true, $db = false)
+	function __construct($stand_alone = true, $db = false)
 	{
 		// Setup $this->db
 		if ($db == true)
@@ -4574,29 +4574,29 @@ function getCollationDropdownBox($name = null, $id = null, $default = null, $lab
 	 * @var array
 	 */
    $_charsets = array(
-		'big5'		 => 'big5',
-		'cp-866'	   => 'cp866',
-		'euc-jp'	   => 'ujis',
-		'euc-kr'	   => 'euckr',
-		'gb2312'	   => 'gb2312',
-		'gbk'		  => 'gbk',
-		'iso-8859-1'   => 'latin1',
-		'iso-8859-2'   => 'latin2',
-		'iso-8859-7'   => 'greek',
-		'iso-8859-8'   => 'hebrew',
-		'iso-8859-8-i' => 'hebrew',
-		'iso-8859-9'   => 'latin5',
-		'iso-8859-13'  => 'latin7',
-		'iso-8859-15'  => 'latin1',
-		'koi8-r'	   => 'koi8r',
-		'shift_jis'	=> 'sjis',
-		'tis-620'	  => 'tis620',
-		'utf-8'		=> 'utf8',
-		'windows-1250' => 'cp1250',
-		'windows-1251' => 'cp1251',
-		'windows-1252' => 'latin1',
-		'windows-1256' => 'cp1256',
-		'windows-1257' => 'cp1257',
+		'big5'		 					=> 'big5',
+		'cp-866'	   					=> 'cp866',
+		'euc-jp'	   					=> 'ujis',
+		'euc-kr'	   					=> 'euckr',
+		'gb2312'	   					=> 'gb2312',
+		'gbk'		  					=> 'gbk',
+		'iso-8859-1'   					=> 'latin1',
+		'iso-8859-2'   					=> 'latin2',
+		'iso-8859-7'   					=> 'greek',
+		'iso-8859-8'  	 				=> 'hebrew',
+		'iso-8859-8-i'	 				=> 'hebrew',
+		'iso-8859-9'					=> 'latin5',
+		'iso-8859-13'					=> 'latin7',
+		'iso-8859-15'					=> 'latin1',
+		'koi8-r'	  	 				=> 'koi8r',
+		'shift_jis'						=> 'sjis',
+		'tis-620'	  					=> 'tis620',
+		'utf-8'							=> 'utf8',
+		'windows-1250' 					=> 'cp1250',
+		'windows-1251' 					=> 'cp1251',
+		'windows-1252' 					=> 'latin1',
+		'windows-1256' 					=> 'cp1256',
+		'windows-1257' 					=> 'cp1257'
 	); 
 	
 	$sql = 'SELECT * FROM information_schema.COLLATIONS';
@@ -4606,18 +4606,18 @@ function getCollationDropdownBox($name = null, $id = null, $default = null, $lab
 		$char_set_name = $row['CHARACTER_SET_NAME'];
 		$name = $row['COLLATION_NAME'];
 		
-			self::$_collations[$char_set_name][] = $name;
+			$_collations[$char_set_name][] = $name;
 			
 			if ($row['IS_DEFAULT'] == 'Yes' || $row['IS_DEFAULT'] == '1') 
 			{
-				self::$_default_collations[$char_set_name] = $name;
+				$_default_collations[$char_set_name] = $name;
 			}
 	}
 	$db->sql_freeresult($res);
 	
-	foreach (self::$_collations as $key => $value) 
+	foreach ($_collations as $key => $value) 
 	{
-		sort(self::$_collations[$key], SORT_STRING);
+		sort($_collations[$key], SORT_STRING);
 	}
 		
 	if (empty($name)) 
@@ -4634,14 +4634,14 @@ function getCollationDropdownBox($name = null, $id = null, $default = null, $lab
 	
 	$return_str .= '<option value=""></option>' . "\n";
 	
-	foreach (self::$_charsets as $current_charset) 
+	foreach ($_charsets as $current_charset) 
 	{
-		$current_cs_descr	= empty(self::$_charsets_descriptions[$current_charset]) ? $current_charset : self::$_charsets_descriptions[$current_charset];
+		$current_cs_descr	= empty($_charsets_descriptions[$current_charset]) ? $current_charset : $_charsets_descriptions[$current_charset];
 
 		$return_str .= '<optgroup label="' . $current_charset  . '" title="' . $current_cs_descr . '">' . "\n";
-		foreach (self::$_collations[$current_charset] as $current_collation) 
+		foreach ($_collations[$current_charset] as $current_collation) 
 		{
-			$return_str .= '<option value="' . $current_collation . '" title="' . self::getCollationDescr($current_collation) . '"' . ($default == $current_collation ? ' selected="selected"' : '') . '>' . $current_collation . '</option>' . "\n";
+			$return_str .= '<option value="' . $current_collation . '" title="' . getCollationDescr($current_collation) . '"' . ($default == $current_collation ? ' selected="selected"' : '') . '>' . $current_collation . '</option>' . "\n";
 		}
 		$return_str .= '</optgroup>' . "\n";
 	}
