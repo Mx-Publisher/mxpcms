@@ -2,16 +2,16 @@
 /**
 *
 * @package Tools
-* @version $Id: mx_functions_tools.php,v 3.67 2020/02/25 11:01:24 orynider Exp $
+* @version $Id: mx_functions_tools.php,v 3.68 2023/11/09 08:42:24 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
 *
 */
 
-if ( !defined( 'IN_PORTAL' ) )
+if (!defined('IN_PORTAL'))
 {
-	die( "Hacking attempt" );
+	die("Hacking attempt in tools.");
 }
 
 /**
@@ -147,18 +147,18 @@ class mx_text
 	function display($text, $bbcode_uid = '')
 	{
 		global $mx_bbcode;
-
+		
 		//
 		// strip html if reqd
-		//
-		if ( !$this->html_on )
+		//ş
+		if (!$this->html_on)
 		{
-			if ( $text != '' )
+			if ($text != '')
 			{
 				$text = preg_replace('#(<)([\/]?.*?)(>)#is', "&lt;\\2&gt;", $text);
 			}
 		}
-
+		
 		//
 		// BBCode if reqd
 		//
@@ -173,7 +173,7 @@ class mx_text
 		{
 			$text = $mx_bbcode->make_clickable($text);
 		}
-
+		
 		//
 		// Parse smilies
 		//
@@ -191,7 +191,7 @@ class mx_text
 		if ($this->highlight_match)
 		{
 			// This has been back-ported from 3.0 CVS
-			$text = preg_replace('#(?!<.*)(?<!\w)(' . $this->highlight_match . ')(?!\w|[^<>]*>)#i', '<b style="color:#'.$this->highlight_match_color.'">\1</b>', $text);
+			/* $text = preg_replace('#(?!<.*)(?<!\w)(' . $this->highlight_match . ')(?!\w|[^<>]*>)#i', '<b style="color:#'.$this->highlight_match_color.'">\1</b>', $text);  */
 		}
 
 		//
@@ -201,7 +201,7 @@ class mx_text
 		{
 			if ($text != '')
 			{
-				$text = str_replace('\"', '"', substr(@preg_replace('#(\>(((?>([^><]+|(?R)))*)\<))#se', "@preg_replace(\$this->orig_word, \$this->replacement_word, '\\0')", '>' . $text . '<'), 1, -1));
+				/* $text = str_replace('\"', '"', substr(@preg_replace('#(\>(((?>([^><]+|(?R)))*)\<))#se', "@preg_replace(\$this->orig_word, \$this->replacement_word, '\\0')", '>' . $text . '<'), 1, -1)); */
 			}
 
 		}
@@ -210,14 +210,13 @@ class mx_text
 		// Replace newlines (we use this rather than nl2br because
 		// till recently it wasn't XHTML compliant)
 		//
-		if ( $text != '' )
+		if ($text != '')
 		{
 			if ( !($this->html_on && !$this->bbcode_on) ) // If this is not a html textblock
 			{
 				$text = str_replace("\n", "\n<br />\n", $text);
 			}
 		}
-
 		return $text;
 	}
 
