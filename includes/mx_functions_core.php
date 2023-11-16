@@ -2,7 +2,7 @@
 /**
 *
 * @package Core
-* @version $Id: mx_functions_core.php,v 1.140 2023/10/17 15:15:52 orynider Exp $
+* @version $Id: mx_functions_core.php,v 1.141 2023/11/16 6:15:52 orynider Exp $
 * @copyright (c) 2002-2023 MX-Publisher Development Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
@@ -18,17 +18,17 @@ if (!defined('IN_PORTAL'))
  * Class mx_cache specific definitions
  *
  */
-define('MX_CACHE_ALL'			, -1);		// Flag - all
-define('MX_CACHE_SINGLE'		, -2);		// Flag - single
-define('MX_CACHE_PAGE_TYPE'		, -3);		// Flag - blocks data
-define('MX_CACHE_BLOCK_TYPE'	, -4);		// Flag - pages data
+define('MX_CACHE_ALL', -1);			// Flag - all
+define('MX_CACHE_SINGLE', -2);		// Flag - single
+define('MX_CACHE_PAGE_TYPE', -3);	// Flag - blocks data
+define('MX_CACHE_BLOCK_TYPE', -4);	// Flag - pages data
 
-define('MX_QUERY_DB'		, true);	// Flag - to force db query // not used
-define('MX_CACHE_DEBUG'		, false);	// echo lots of debug info
+define('MX_QUERY_DB', true);		// Flag - to force db query // not used
+define('MX_CACHE_DEBUG', false);	// echo lots of debug info
 
-define('MX_GET_ALL_PARS'	, -10);		// Flag - get all parameters
-define('MX_GET_PAR_VALUE'	, -20);		// Flag - get parameter value
-define('MX_GET_PAR_OPTIONS'	, -30);		// Flag - get parameter option
+define('MX_GET_ALL_PARS', -10);		// Flag - get all parameters
+define('MX_GET_PAR_VALUE', -20);	// Flag - get parameter value
+define('MX_GET_PAR_OPTIONS', -30);	// Flag - get parameter option
 /**#@-*/
 
 /**
@@ -271,8 +271,67 @@ class mx_cache extends cache
 			if ( !($result = $db->sql_query($sql)) )
 			{
 				if (!function_exists('mx_message_die'))
-				{
-					die("mx_cache::obtain_mxbb_config(); Couldnt query portal configuration, Allso this hosting or server is using a cache optimizer not compatible with MX-Publisher or just lost connection to database wile query.");
+				{				
+					$row = $db->sql_fetchrow($db->sql_query("SELECT * FROM " . PORTAL_TABLE));
+					global $dbname, $mx_root_path, $mx_request_vars, $phpEx, $CONFIG_PATH;
+					
+					print("DataBase Wanished? mx_cache::obtain_mxbb_config(); 
+					Couldnt query portal configuration, 
+					Allso this hosting or server is using a cache optimizer not compatible with MX-Publisher or just lost connection to database wile query.
+					for '" . PORTAL_TABLE . "' table and $dbname database. Rows: " . print_r($row) . " in SELECT * FROM " . PORTAL_TABLE);
+								
+					/**
+					 * OPTIONAL SETTINGS: 'production' or 'development'
+					 */
+					if (!defined('ENVIRONMENT'))
+					{
+						@define('ENVIRONMENT', 'development');
+					}
+					
+					//filenames and paths for configuration related files
+					/*EDIT*/$CONFIG_PATH = isset($CONFIG_PATH) ? $CONFIG_PATH : $mx_root_path . 'pub/';
+
+					define('ENABLE_CACHE', false);
+					
+					/**
+					 * Format to display dates in.
+					 * @see date()
+					 */
+					define('DATE_FORMAT', 'Y-M-d');
+					
+					/**
+					 * Sets debug mode. Off (false) by default.
+					 */
+					define('DEBUG', false);
+					
+					/* END OPTIONAL SETTINGS */
+					
+					/** The time this script began to execute. */
+					define('START_TIME', microtime(true));
+										
+					/** The version of AutoIndex PHP Script (the whole release, not based on individual files). */
+					define('VERSION', '3.0.0');
+					
+					@define('PORTAL_BACKEND', 'internal');
+										
+					/**
+					 * This must be set to true for other included files to run. Setting it to
+					 * false could be used to temporarily disable the script.
+					 */
+					define('IN_AUTOINDEX', true);
+					print '	<!DOCTYPE html>
+							<html dir="ltr">
+							<head><meta charset="UTF-8" />
+							<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+							<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+							<meta name="apple-mobile-web-app-capable" content="yes" />
+							<meta name="apple-mobile-web-app-status-bar-style" content="blue" />' .
+							'<title>MXP CMS DB Error Page</title>' .
+							'</head>' .
+							'<body id="errorpage">' .
+							'<p><iframe src="'.$CONFIG_PATH . 'index.' . $phpEx .'" frameborder="0" allowtransparency="1" style="width: 90%; min-height: 500px; border: 0;"></iframe></p>' .
+							'</body>' .
+							'</html>';				
 				}
 				else
 				{
