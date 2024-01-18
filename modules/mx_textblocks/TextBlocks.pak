@@ -3,12 +3,12 @@ New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
 function=+:20=+:24=+:TextBlock (phpBB)=+:BBcodes, html and smilies - phpBB style=+:mx_textblock_bbcode.php=+:
 parameter=+:24=+:15=+:Text=+:phpBBTextBlock=+:Insert your text here=+:=+:0=+:0
 parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
-block=+:=+:Demo - TextBlock (phpBB)=+:Demo block=+:24=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+block=+:=+:TextBlock (phpBB)=+:Demo block=+:24=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
 New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
 function=+:20=+:23=+:TextBlock (HTML/WYSIWYG)=+:User friendly textblocks=+:mx_textblock_html.php=+:
 parameter=+:23=+:16=+:Html=+:WysiwygTextBlock=+:Entre your Html code here=+:=+:0=+:0
 parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
-block=+:=+:Demo - TextBlock (HTML/WYSIWYG)=+:Demo block=+:23=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+block=+:=+:TextBlock (HTML/WYSIWYG)=+:Demo block=+:23=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
 New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
 function=+:20=+:22=+:TextBlock (Customized)=+:Textblock, featuring block defined settings=+:mx_textblock_multi.php=+:
 parameter=+:22=+:50=+:Text=+:CustomizedTextBlock=+:Enter your block text here=+:=+:0=+:0
@@ -20,5 +20,24 @@ parameter=+:22=+:54=+:allow_html=+:Boolean=+:TRUE=+:=+:1=+:0
 parameter=+:22=+:56=+:allow_bbcode=+:Boolean=+:TRUE=+:=+:1=+:0
 parameter=+:22=+:55=+:html_tags=+:Text=+:b,i,u=+:=+:1=+:0
 parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
-block=+:=+:Demo - TextBlock (Customized)=+:Demo block=+:22=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+block=+:=+:TextBlock (Customized)=+:Demo block=+:22=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
+New_function=+:---------------------------=+:0=+:0=+:0=+:0=+:0
+function=+:20=+:33=+:Online Doc (Embed Block)=+:User friendly docs block=+:mx_docembed_code.php=+:
+parameter=+:33=+:56=+:title=+:Text=+:Read Document=+:b,i,u=+:1=+:0
+parameter=+:33=+:57=+:doc_hosting_site=+:Function=+:5=+:get_list_static("{parameter_id}[]",array("lib.store.yahoo.net", "scribd.com", "app.box.com", "docs.google.com", "drive.google.com", "sites.google.com", "adobe.com", "docs.sharefile.com", "app.gitbook.com"),"{parameter_value}")=+:0=+:0
+parameter=+:33=+:58=+:api_key=+:Text=+:key-dogbmich9x5iu09kiki=+:b,i,u=+:1=+:0
+parameter=+:33=+:59=+:access_key=+:Text=+:key-udvJPIjFRDyZvp27iWHJ=+:b,i,u=+:1=+:0
+parameter=+:33=+:60=+:session_key=+:Text=+:sess-1d9t8wze460fbhp7jw0p=+:b,i,u=+:1=+:0
+parameter=+:33=+:61=+:doc_ids=+:Text=+:695088299,628124596=+:b,i,u=+:1=+:0
+parameter=+:33=+:62=+:secret=+:Text=+:b109f3bbbc244eb8=+:b,i,u=+:1=+:0
+parameter=+:33=+:63=+:width=+:Number=+:100%=+:=+:1=+:60
+parameter=+:33=+:64=+:height=+:Number=+:400=+:=+:1=+:40
+parameter=+:33=+:65=+:user_id=+:Text=+:6784036=+:b,i,u=+:1=+:0
+parameter=+:33=+:66=+:username=+:Text=+:Florin-C-Bodin=+:b,i,u=+:1=+:0
+parameter=+:33=+:67=+:password=+:Text=+:LS3XT0b31976=+:b,i,u=+:1=+:0
+parameter=+:33=+:68=+:admin_user=+:Text=+:admin=+:b,i,u=+:1=+:0
+parameter=+:33=+:69=+:admin_pass=+:Text=+:b109f3bbbc244eb82441917ed06d618b9008dd09b3befd1b5e07394c706a8bb980b1d7785e5976ec049b46df5f1326af5a2ea6d103fd07c95385ffab0cacbc86=+:b,i,u=+:1=+:0
+parameter=+:33=+:70=+:Host=+:WysiwygTextBlock=+:scribd.com=+:b,i,u=+:1=+:0
+parameter=+:0=+:0=+:0=+:endoflist=+:0=+:0
+block=+:=+:Online Doc (Embed Block)=+:Demo block=+:33=+:0=+:5=+:0=+:0=+:0=+:0=+:1=+:1
 function=+:0=+:0=+:0=+:endoflist=+:0=+:0
