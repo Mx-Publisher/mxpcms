@@ -12,7 +12,6 @@
 class Template 
 {
 	var $classname = "Template";
-
 	// variable that holds all the data we'll be substituting into
 	// the compiled templates.
 	// ...
@@ -21,28 +20,31 @@ class Template
 	// if it's a root-level variable, it'll be like this:
 	// $this->_tpldata[.][0][varname] == value
 	var $_tpldata = array();
-
 	// Hash of filenames for each template handle.
 	var $files = array();
-
 	// Root template directory.
-	var $root = "";
-
+	var $root = ".";
 	// this will hash handle names to the compiled code for that handle.
 	var $compiled_code = array();
-
 	// This will hold the uncompiled code for that handle.
 	var $uncompiled_code = array();
-
+	
 	/**
 	 * Constructor. Simply sets the root dir.
 	 *
 	 */
 	function Template($root = ".")
 	{
-		$this->set_rootdir($root);
+		if (substr($root, 0, 1) != '/')
+		{
+       		$this->set_rootdir($root);
+		}	
+		
+		global $mx_root_path;
+		
+		$this->set_rootdir($mx_root_path . 'install/templates');
 	}
-
+	
 	/**
 	 * Destroys this template object. Should be called when you're done with it, in order
 	 * to clear out the template data so you can load/parse a new template set.
@@ -51,7 +53,7 @@ class Template
 	{
 		$this->_tpldata = array();
 	}
-
+	
 	/**
 	 * Sets the template root directory for this Template object.
 	 */
@@ -61,11 +63,11 @@ class Template
 		{
 			return false;
 		}
-
+		
 		$this->root = $dir;
 		return true;
 	}
-
+	
 	/**
 	 * Sets the template filenames for handles. $filename_array
 	 * should be a hash of handle => filename pairs.
@@ -76,17 +78,19 @@ class Template
 		{
 			return false;
 		}
-
 		reset($filename_array);
-		while(list($handle, $filename) = each($filename_array))
+		/* start Migrating from php5 to php7+ replace
+			foreach ($filename_array as $handle => $filename) {
+		with
+			while (list($handle, $filename) = each($filename_array)) {
+		ends Migrating */
+		foreach ($filename_array as $handle => $filename)
 		{
 			$this->files[$handle] = $this->make_filename($filename);
 		}
-
 		return true;
 	}
-
-
+	
 	/**
 	 * Load the file for the handle, compile the file,
 	 * and run the compiled code. This will print out
@@ -98,19 +102,18 @@ class Template
 		{
 			die("Template->pparse(): Couldn't load template file for handle $handle");
 		}
-
 		// actually compile the template now.
 		if (!isset($this->compiled_code[$handle]) || empty($this->compiled_code[$handle]))
 		{
 			// Actually compile the code now.
 			$this->compiled_code[$handle] = $this->compile($this->uncompiled_code[$handle]);
 		}
-
 		// Run the compiled code.
 		eval($this->compiled_code[$handle]);
+		
 		return true;
 	}
-
+	
 	/**
 	 * Inserts the uncompiled code for $handle as the
 	 * value of $varname in the root-level. This can be used
@@ -125,19 +128,17 @@ class Template
 		{
 			die("Template->assign_var_from_handle(): Couldn't load template file for handle $handle");
 		}
-
 		// Compile it, with the "no echo statements" option on.
 		$_str = "";
 		$code = $this->compile($this->uncompiled_code[$handle], true, '_str');
-
 		// evaluate the variable assignment.
 		eval($code);
 		// assign the value of the generated variable to the given varname.
 		$this->assign_var($varname, $_str);
-
+		
 		return true;
 	}
-
+	
 	/**
 	 * Block-level variable assignment. Adds a new block iteration with the given
 	 * variable assignments. Note that this should only be called once per block
@@ -151,6 +152,7 @@ class Template
 			$blocks = explode('.', $blockname);
 			$blockcount = sizeof($blocks) - 1;
 			$str = '$this->_tpldata';
+			
 			for ($i = 0; $i < $blockcount; $i++)
 			{
 				$str .= '[\'' . $blocks[$i] . '.\']';
@@ -161,7 +163,6 @@ class Template
 			// We're adding a new iteration to this block with the given
 			// variable assignments.
 			$str .= '[\'' . $blocks[$blockcount] . '.\'][] = $vararray;';
-
 			// Now we evaluate this assignment we've built up.
 			eval($str);
 		}
@@ -172,10 +173,9 @@ class Template
 			// we were given.
 			$this->_tpldata[$blockname . '.'][] = $vararray;
 		}
-
 		return true;
 	}
-
+	
 	/**
 	 * Root-level variable assignment. Adds to current assignments, overriding
 	 * any existing variable assignment with the same name.
@@ -183,14 +183,18 @@ class Template
 	function assign_vars($vararray)
 	{
 		reset ($vararray);
-		while (list($key, $val) = each($vararray))
+		/* start Migrating from php5 to php7+ replace
+			foreach ($vararray as $key => $val) {
+		with
+			while (list($key, $val) = each($vararray)) {
+		ends Migrating */	
+		foreach ($vararray as $key => $val)
 		{
 			$this->_tpldata['.'][0][$key] = $val;
 		}
-
 		return true;
-	}
-
+	}	
+	
 	/**
 	 * Root-level variable assignment. Adds to current assignments, overriding
 	 * any existing variable assignment with the same name.
@@ -201,8 +205,7 @@ class Template
 
 		return true;
 	}
-
-
+	
 	/**
 	 * Generates a full path+filename for the given filename, which can either
 	 * be an absolute name, or a name relative to the rootdir for this Template
@@ -214,17 +217,16 @@ class Template
 		if (substr($filename, 0, 1) != '/')
 		{
        		$filename = ($rp_filename = mx_realpath($this->root . '/' . $filename)) ? $rp_filename : $filename;
-		}
-
+		}	
+		
 		if (!file_exists($filename))
 		{
 			die("Template->make_filename(): Error - file $filename does not exist");
 		}
-
+		
 		return $filename;
 	}
-
-
+	
 	/**
 	 * If not already done, load the file for the given handle and populate
 	 * the uncompiled_code[] hash with its code. Do not compile.
@@ -236,26 +238,61 @@ class Template
 		{
 			return true;
 		}
-
+		
 		// If we don't have a file assigned to this handle, die.
 		if (!isset($this->files[$handle]))
 		{
 			die("Template->loadfile(): No file specified for handle $handle");
+		}		
+		
+		$file = $this->files[$handle];
+		
+		// If we don't have a file assigned to this handle, die.
+		if (null === $file)
+		{
+			print("Template->loadfile(): No file specified for handle $handle");
+		}	
+		
+		//$file = (null === $file) ? "empty.tpl" : $this->files[$handle];
+		// $file = (null === $file) ? "/" : $this->files[$handle];
+		
+		// Check if it's an absolute or relative path.
+		if (substr($file, 0, 1) != '/')
+		{
+       		$file = ($rp_file = mx_realpath($this->root . '/' . $file)) ? $rp_file: $file;
 		}
-
-		$filename = $this->files[$handle];
-
-		$str = implode("", @file($filename));
+		
+		global $mx_root_path;
+		
+		if (install_file_exists($file))			
+		{	
+			$filename = file($file);
+		}			
+		elseif (install_file_exists($mx_root_path . 'install/templates/' . $file))			
+		{	
+			$filename = file($mx_root_path . 'install/templates/' . $file);
+		}
+		else
+		{
+			$filename = $mx_root_path . 'install/templates/' . $file;
+			
+			print("Template->loadfile(): File $filename for handle $handle is empty. ");
+		}		
+		
+		$filename = is_array($filename) ? $filename :  array($filename, $file) ;
+		
+		$str = implode('', $filename);
+		
 		if (empty($str))
 		{
-			die("Template->loadfile(): File $filename for handle $handle is empty");
+			die("Template->loadfile(): File $filename for handle $handle is empty. ");
 		}
-
+		
 		$this->uncompiled_code[$handle] = $str;
-
+		
 		return true;
 	}
-
+	
 	/**
 	 * Compiles the given string of code, and returns
 	 * the result in a string.
@@ -268,34 +305,35 @@ class Template
 		// replace \ with \\ and then ' with \'.
 		$code = str_replace('\\', '\\\\', $code);
 		$code = str_replace('\'', '\\\'', $code);
-
 		// change template varrefs into PHP varrefs
-
+		
 		// This one will handle varrefs WITH namespaces
 		$varrefs = array();
 		preg_match_all('#\{(([a-z0-9\-_]+?\.)+?)([a-z0-9\-_]+?)\}#is', $code, $varrefs);
 		$varcount = sizeof($varrefs[1]);
+		
 		for ($i = 0; $i < $varcount; $i++)
 		{
 			$namespace = $varrefs[1][$i];
 			$varname = $varrefs[3][$i];
 			$new = $this->generate_block_varref($namespace, $varname);
-
+			
 			$code = str_replace($varrefs[0][$i], $new, $code);
-		}
-
+		}		
+		
 		// This will handle the remaining root-level varrefs
 		$code = preg_replace('#\{([a-z0-9\-_]*?)\}#is', '\' . ( ( isset($this->_tpldata[\'.\'][0][\'\1\']) ) ? $this->_tpldata[\'.\'][0][\'\1\'] : \'\' ) . \'', $code);
-
+		
 		// Break it up into lines.
 		$code_lines = explode("\n", $code);
-
+		
 		$block_nesting_level = 0;
 		$block_names = array();
 		$block_names[0] = ".";
-
+		
 		// Second: prepend echo ', append ' . "\n"; to each line.
 		$line_count = sizeof($code_lines);
+		
 		for ($i = 0; $i < $line_count; $i++)
 		{
 			$code_lines[$i] = chop($code_lines[$i]);
@@ -345,17 +383,17 @@ class Template
 					// We have the start of a block.
 					$block_nesting_level++;
 					$block_names[$block_nesting_level] = $m[1];
+					
 					if ($block_nesting_level < 2)
 					{
 						// Block is not nested.
-						$code_lines[$i] = '$_' . $m[1] . '_count = ( isset($this->_tpldata[\'' . $m[1] . '.\']) ) ? sizeof($this->_tpldata[\'' . $m[1] . '.\']) : 0;';
+						$code_lines[$i] = '$_' . $m[1] . '_count = (isset($this->_tpldata[\'' . $m[1] . '.\']) ) ? sizeof($this->_tpldata[\'' . $m[1] . '.\']) : 0;';
 						$code_lines[$i] .= "\n" . 'for ($_' . $m[1] . '_i = 0; $_' . $m[1] . '_i < $_' . $m[1] . '_count; $_' . $m[1] . '_i++)';
 						$code_lines[$i] .= "\n" . '{';
 					}
 					else
 					{
 						// This block is nested.
-
 						// Generate a namespace string for this block.
 						$namespace = implode('.', $block_names);
 						// strip leading period from root level..
@@ -364,7 +402,7 @@ class Template
 						// current indices of all parent blocks.
 						$varref = $this->generate_block_data_ref($namespace, false);
 						// Create the for loop code to iterate over this block.
-						$code_lines[$i] = '$_' . $m[1] . '_count = ( isset(' . $varref . ') ) ? sizeof(' . $varref . ') : 0;';
+						$code_lines[$i] = '$_' . $m[1] . '_count = (isset(' . $varref . ')) ? sizeof(' . $varref . ') : 0;';
 						$code_lines[$i] .= "\n" . 'for ($_' . $m[1] . '_i = 0; $_' . $m[1] . '_i < $_' . $m[1] . '_count; $_' . $m[1] . '_i++)';
 						$code_lines[$i] .= "\n" . '{';
 					}
@@ -390,13 +428,11 @@ class Template
 				}
 			}
 		}
-
 		// Bring it back into a single string of lines of code.
 		$code = implode("\n", $code_lines);
-		return $code	;
-
+		return $code;
 	}
-
+	
 	/**
 	 * Generates a reference to the given variable inside the given (possibly nested)
 	 * block namespace. This is a string of the form:
@@ -408,18 +444,14 @@ class Template
 	{
 		// Strip the trailing period.
 		$namespace = substr($namespace, 0, strlen($namespace) - 1);
-
 		// Get a reference to the data block for this namespace.
 		$varref = $this->generate_block_data_ref($namespace, true);
 		// Prepend the necessary code to stick this in an echo line.
-
+		
 		// Append the variable reference.
 		$varref .= '[\'' . $varname . '\']';
-
 		$varref = '\' . ( ( isset(' . $varref . ') ) ? ' . $varref . ' : \'\' ) . \'';
-
 		return $varref;
-
 	}
 
 	/**
