@@ -147,6 +147,7 @@ class mx_cache extends cache
 		// Load backend
 		$mx_root_path = $this->path;
 		$phpbb_root_path = $this->backend_path; 
+		
 		require($this->path . 'includes/sessions/'.$portal_config['portal_backend'].'/core.'. $this->php_ext); 
 		
 		//Redirect to upgrade or redefine portal backend path
@@ -451,9 +452,11 @@ class mx_cache extends cache
 	 * @param unknown_type $cache
 	 * @return unknown
 	 */
-	public function _read_config($id = 1, $sub_id = 0, $type, $force_query = false)
+	public function _read_config(int $id, int $sub_id, int $type, bool $force_query = false)
 	{
 		global $portal_config, $mx_root_path;
+		
+		$id = !($id > 0) ? 1 : $id;
 		
 		switch ($type)
 		{
@@ -1027,7 +1030,8 @@ class mx_cache extends cache
 		{
 			$id = 1;
 			
-			print('invalid cache read call - no id. </br>');
+			print('invalid cache read call - no id. </br><iframe src="index.php"></iframe>');
+			
 		}
 	}
 
@@ -6120,10 +6124,10 @@ class deactivated_super_global implements \ArrayAccess, \Countable, \IteratorAgg
 	* @param	string					$name		Name of the super global this is a replacement for - e.g. '_GET'.
 	* @param	mx_request_vars::POST|GET|REQUEST|COOKIE	$super_global	The variable's super global constant.
 	*/
-	public function __construct(mx_request_vars $request, $name, $super_global)
+	public function __construct($request, string $name, int $super_global)
 	{
-		$this->request = $request;
-		$this->name = $name;
+		$this->request 			= $request;
+		$this->name 				= $name;
 		$this->super_global = $super_global;
 	}
 
@@ -6153,7 +6157,7 @@ class deactivated_super_global implements \ArrayAccess, \Countable, \IteratorAgg
 	*
 	* @return	bool	Whether the key on the super global exists.
 	*/
-	public function offsetExists($offset)
+	public function offsetExists($offset): bool
 	{
 		return $this->request->is_set($offset, $this->super_global);
 	}
@@ -6161,17 +6165,17 @@ class deactivated_super_global implements \ArrayAccess, \Countable, \IteratorAgg
 	/**#@+
 	* Part of the \ArrayAccess implementation, will always result in a FATAL error.
 	*/
-	public function offsetGet($offset)
+	public function offsetGet($offset): mixed
 	{
 		$this->error();
 	}
 
-	public function offsetSet($offset, $value)
+	public function offsetSet($offset, $value): void
 	{
 		$this->error();
 	}
 
-	public function offsetUnset($offset)
+	public function offsetUnset($offset): void
 	{
 		$this->error();
 	}
@@ -6180,7 +6184,8 @@ class deactivated_super_global implements \ArrayAccess, \Countable, \IteratorAgg
 	/**
 	* Part of the \Countable implementation, will always result in a FATAL error
 	*/
-	public function count()
+	#[\ReturnTypeWillChange] 
+	public function count(): void
 	{
 		$this->error();
 	}
@@ -6188,7 +6193,8 @@ class deactivated_super_global implements \ArrayAccess, \Countable, \IteratorAgg
 	/**
 	* Part of the Traversable/IteratorAggregate implementation, will always result in a FATAL error
 	*/
-	public function getIterator()
+	#[\ReturnTypeWillChange] 
+	public function getIterator(): void
 	{
 		$this->error();
 	}
