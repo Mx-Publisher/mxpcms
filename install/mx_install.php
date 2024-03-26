@@ -31,10 +31,10 @@ define('INSTALL_READONLY', true);
 /*
 * Set MX-Publisher version here !
 */
-$mx_portal_name 		= 'MX-Publisher Modular System';
+$mx_portal_name 	= 'MX-Publisher Modular System';
 $mx_portal_version 	= '3.0.0-RC';
 $mx_php_version		= '5.3.0';
-$mx_portal_copy 		= '<b>MX-Publisher Modular System!</b> <br /><br/> MX-Publisher is a fully modular system, portal and CMS, featuring dynamic pages, blocks, and themes, by means of a powerful yet flexible AdminCP. It is the classical phpBB portal add-on, improved and enhanced for every phpBB version released since 2001 (originally named MX-Publisher). <br /><br />Authors: The MX-Publisher Development Team. <br />Please visit <a href="http://www.mx-publisher.com/">www.mx-publisher.com</a> for further information.';
+$mx_portal_copy 	= '<b>MX-Publisher Modular System!</b> <br /><br/> MX-Publisher is a fully modular system, portal and CMS, featuring dynamic pages, blocks, and themes, by means of a powerful yet flexible AdminCP. It is the classical phpBB portal add-on, improved and enhanced for every phpBB version released since 2001 (originally named MX-Publisher). <br /><br />Authors: The MX-Publisher Development Team. <br />Please visit <a href="http://www.mx-publisher.com/">www.mx-publisher.com</a> for further information.';
 
 /*
 * Please, update the installer version when making changes to this code.
