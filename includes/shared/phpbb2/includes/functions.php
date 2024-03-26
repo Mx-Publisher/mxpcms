@@ -516,7 +516,7 @@ class phpBB2
 		// php version < 4.1.0
 		if ((int) $php_version[0] < 4 || ((int) $php_version[0] == 4 && (int) $php_version[1] < 1))
 		{
-			while ($str{strlen($str)-1} == $charlist)
+			while ($str[strlen($str)-1] == $charlist)
 			{
 				$str = substr($str, 0, strlen($str)-1);
 			}
