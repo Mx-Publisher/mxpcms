@@ -2,12 +2,12 @@
 /**
 *
 * @package MX-Publisher Installation
-* @version $Id: functions_install.php,v 1.26 2014/05/18 06:24:35 orynider Exp $
+* @version $Id: functions_install.php,v 1.29 2024/03/26 13:34:35 orynider Exp $
 * @copyright (c) 2006 phpBB Group
-* @copyright (c) 2002-2008 MX-Publisher Project Team
+* @copyright (c) 2002-2024 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net
-*
+* @link http://github.com/MX-Publisher
 */
 
 /*
@@ -46,31 +46,31 @@ function page_header_install($title, $instruction_text = '')
 	$template->set_filenames(array('header' => 'mx_install_header.'.$tplEx));
 
 	$template->assign_vars(array(
-		'L_PORTAL_NAME'			=> $mx_portal_name,
-		'L_PORTAL_VERSION'		=> $mx_portal_version,
-		'U_INSTALL_URL'			=> $mx_root_path . 'install/',
-		'L_INSTALLATION'		=> $title,
-		'U_INDEX'				=> $mx_root_path . 'install/mx_install.'.$phpEx,
-		'U_LOGO'				=> $mx_root_path . 'install/templates/logo.gif',
-		'L_INSTRUCTION_TEXT'	=> $instruction_text,
+		'L_PORTAL_NAME'				=> $mx_portal_name,
+		'L_PORTAL_VERSION'			=> $mx_portal_version,
+		'U_INSTALL_URL'					=> $mx_root_path . 'install/',
+		'L_INSTALLATION'					=> $title,
+		'U_INDEX'									=> $mx_root_path . 'install/mx_install.'.$phpEx,
+		'U_LOGO'									=> $mx_root_path . 'install/templates/logo.gif',
+		'L_INSTRUCTION_TEXT'		=> $instruction_text,
 		
-		'T_ASSETS_VERSION'		=> INSTALLER_VERSION,
-		'T_ASSETS_PATH'			=> "{$portal_url}assets",
-		'T_THEME_PATH'			=> "{$portal_url}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme',
-		'T_TEMPLATE_PATH'		=> "{$portal_url}templates/" . rawurlencode($theme['template_name']) . '',
+		'T_ASSETS_VERSION'			=> INSTALLER_VERSION,
+		'T_ASSETS_PATH'				=> "{$portal_url}assets",
+		'T_THEME_PATH'					=> "{$portal_url}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme',
+		'T_TEMPLATE_PATH'			=> "{$portal_url}templates/" . rawurlencode($theme['template_name']) . '',
 		'T_SUPER_TEMPLATE_PATH'	=> "{$portal_url}templates/" . rawurlencode($theme['template_name']) . '/template',
 			
-		'T_IMAGES_PATH'			=> "{$portal_url}images/",
-		'T_SMILIES_PATH'		=> "{$portal_url}{$board_config['smilies_path']}/",
+		'T_IMAGES_PATH'							=> "{$portal_url}images/",
+		'T_SMILIES_PATH'							=> "{$portal_url}{$board_config['smilies_path']}/",
 		'T_AVATAR_GALLERY_PATH'	=> "{$portal_url}{$board_config['avatar_gallery_path']}/",
 		
-		'T_STYLESHEET_LINK'		=> "{$portal_url}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme/stylesheet.css',
-		'T_STYLESHEET_LANG_LINK'=> "{$portal_url}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme/images/lang_' . $default_lang . '/stylesheet.css',
-		'T_FONT_AWESOME_LINK'	=> "{$portal_url}assets/css/font-awesome.min.css",
-		'T_FONT_IONIC_LINK'			=> "{$portal_url}assets/css/ionicons.min.css",
+		'T_STYLESHEET_LINK'				=> "{$portal_url}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme/stylesheet.css',
+		'T_STYLESHEET_LANG_LINK'	=> "{$portal_url}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme/images/lang_' . $default_lang . '/stylesheet.css',
+		'T_FONT_AWESOME_LINK'		=> "{$portal_url}assets/css/font-awesome.min.css",
+		'T_FONT_IONIC_LINK'					=> "{$portal_url}assets/css/ionicons.min.css",
 
-		'T_JQUERY_LINK'			=> "{$portal_url}assets/javascript/jquery.min.js?assets_version=" . INSTALLER_VERSION,
-		'S_ALLOW_CDN'				=> false,
+		'T_JQUERY_LINK'							=> "{$portal_url}assets/javascript/jquery.min.js?assets_version=" . INSTALLER_VERSION,
+		'S_ALLOW_CDN'							=> false,
 		
 		'S_CONTENT_ENCODING'	=> 'UTF-8',
 	));
@@ -105,16 +105,16 @@ function page_footer_install($show_phpinfo = true)
 
 	$template->set_filenames(array('footer' => 'mx_install_footer.'.$tplEx));
 	$template->assign_vars(array(
-		'L_INSTALLER_NAME'		=> INSTALLER_NAME,
+		'L_INSTALLER_NAME'			=> INSTALLER_NAME,
 		'L_INSTALLER_VERSION'	=> INSTALLER_VERSION,
-		'L_INSTALL_MOREINFO'	=> $install_moreinfo,
-		'L_INSTALL_PHPINFO'		=> ( $show_phpinfo ? '<a href="?phpinfo" target="_blank">phpInfo</a>' : '' ),
-		'U_INSTALL_THEME'		=> $install_theme,
-		'U_INSTALL_PHPINFO'	=> ( $show_phpinfo ? '<a href="?phpinfo" target="_blank">phpInfo</a>' : '' ),
+		'L_INSTALL_MOREINFO'		=> $install_moreinfo,
+		'L_INSTALL_PHPINFO'			=> ( $show_phpinfo ? '<a href="?phpinfo" target="_blank">phpInfo</a>' : '' ),
+		'U_INSTALL_THEME'			=> $install_theme,
+		'U_INSTALL_PHPINFO'		=> ( $show_phpinfo ? '<a href="?phpinfo" target="_blank">phpInfo</a>' : '' ),
 	));
 	$template->pparse('footer');
-
-	if( $db )
+	
+	if ($db)
 	{
 		$db->sql_close();
 		$db = false;
@@ -127,7 +127,33 @@ function page_footer_install($show_phpinfo = true)
 */
 function can_load_dll($dll)
 {
-	return ((@ini_get('enable_dl') || strtolower(@ini_get('enable_dl')) == 'on') && (!@ini_get('safe_mode') || strtolower(@ini_get('safe_mode')) == 'off') && @dl($dll . '.' . PHP_SHLIB_SUFFIX)) ? true : false;
+	if (!extension_loaded($dll)) 
+	{	
+		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') //Windows
+		{
+			$prefix = (PHP_SHLIB_SUFFIX === 'dll') ? 'php_' : '';
+			$sufix = (PHP_SHLIB_SUFFIX === 'dll') ? '.' . PHP_SHLIB_SUFFIX : '';
+		}
+		elseif (strtoupper(substr(PHP_OS, 0, 3)) === 'LIN')  //Linux
+		{
+			$prefix = (PHP_SHLIB_SUFFIX === 'so') ? '' : '';
+			$sufix = (PHP_SHLIB_SUFFIX === 'so') ? '.' . 'so' : '';
+		}
+		else		
+		{
+			$prefix = '';
+			$sufix = '';
+		}	
+		
+		if (function_exists('dl'))
+		{			
+			return ((@ini_get('enable_dl') || strtolower(@ini_get('enable_dl')) == 'on') && (!@ini_get('safe_mode') || strtolower(@ini_get('safe_mode')) == 'off') && @dl($prefix . $dll . $sufix)) ? true : false;
+		} 
+		else 
+		{
+			print('Cant load module: '.$prefix . $dll . $sufix .' on ' . PHP_OS . '. ');
+		}
+	}
 }
 
 /**
@@ -137,6 +163,7 @@ function can_load_dll($dll)
 function get_available_dbms($dbms = false, $return_unavailable = false, $only_20x_options = false)
 {
 	global $lang;
+	
 	$available_dbms = array(
 //		'firebird'	=> array(
 //			'LABEL'			=> 'FireBird',
@@ -296,7 +323,7 @@ function get_available_dbms($dbms = false, $return_unavailable = false, $only_20
 
 		$dll = $db_ary['MODULE'];
 
-		if (!@extension_loaded($dll))
+		if (!extension_loaded($dll))
 		{
 			if (!can_load_dll($dll))
 			{
@@ -643,7 +670,7 @@ function connect_check_db($error_connect, &$error, $dbms, $table_prefix, $dbhost
 					$result = $db->sql_query($sql);
 					$row = $db->sql_fetchrow($result);
 					$db->sql_freeresult($result);
-
+					
 					if ($row['server_encoding'] !== 'UNICODE' && $row['server_encoding'] !== 'UTF8')
 					{
 						$error[] = $lang['INST_ERR_DB_NO_POSTGRES'];
@@ -651,7 +678,6 @@ function connect_check_db($error_connect, &$error, $dbms, $table_prefix, $dbhost
 				}
 			break;
 		}
-
 	}
 
 	if ($error_connect && (!isset($error) || !sizeof($error)))
@@ -724,13 +750,14 @@ function install_die($message, $debuginfo = false)
 	}
 	$message .= '</td></tr></table>';
 
-	if( headers_sent() )
+	if (headers_sent())
 	{
 		echo $message;
 	}
 	else
 	{
 		include_once($mx_root_path . "install/includes/template.$phpEx");
+		
 		$template = new Template($mx_root_path . 'install/templates');
 		page_header_install($lang['Installation_error'], $message);
 	}
@@ -744,10 +771,11 @@ function install_die($message, $debuginfo = false)
 function install_language_select(&$lang_select, $default, $select_name = 'language', $dirname = 'language')
 {
 	global $mx_root_path;
-
+	
 	$dir = @opendir($mx_root_path . $dirname);
 	$lang = array();
-	while ( $file = @readdir($dir) )
+	
+	while ($file = @readdir($dir))
 	{
 		if ( preg_match("#^lang_#", '', $file) && !@is_file($dirname . '/' . $file) && !@is_link($dirname . '/' . $file) )
 		{
@@ -760,15 +788,21 @@ function install_language_select(&$lang_select, $default, $select_name = 'langua
 	@closedir($dir);
 	@asort($lang);
 	@reset($lang);
-
+	
 	$lang_select = '<select name="' . $select_name . '">';
-	while ( list($displayname, $filename) = @each($lang) )
+	/* start Migrating from php5 to php7+ replace
+		foreach ($lang as $displayname => $filename) {
+	with
+		while (list($displayname, $filename) = each($lang)) {
+	ends Migrating */
+	foreach ($lang as $displayname => $filename)
 	{
-		$selected = ( strtolower($default) == strtolower($filename) ) ? ' selected="selected"' : '';
+		$selected = (strtolower($default) == strtolower($filename) )  ? ' selected="selected"' : '';
+		
 		$lang_select .= '<option value="' . $filename . '"' . $selected . '>' . ucwords($displayname) . '</option>';
 	}
 	$lang_select .= '</select>';
-
+	
 	return count($lang);
 }
 
@@ -784,36 +818,36 @@ function guess_lang()
 	// me first - psoTFX
 	$match_lang = array(
 		'arabic'					=> 'ar([_-][a-z]+)?',
-		'bulgarian'			=> 'bg',
-		'catalan'				=> 'ca',
+		'bulgarian'				=> 'bg',
+		'catalan'					=> 'ca',
 		'czech'					=> 'cs',
-		'danish'				=> 'da',
-		'german'				=> 'de([_-][a-z]+)?',
-		'english'				=> 'en([_-][a-z]+)?',
+		'danish'					=> 'da',
+		'german'					=> 'de([_-][a-z]+)?',
+		'english'					=> 'en([_-][a-z]+)?',
 		'estonian'				=> 'et',
-		'finnish'				=> 'fi',
+		'finnish'					=> 'fi',
 		'french'					=> 'fr([_-][a-z]+)?',
 		'greek'					=> 'el',
 		'spanish_argentina'	=> 'es[_-]ar',
 		'spanish'				=> 'es([_-][a-z]+)?',
 		'gaelic'					=> 'gd',
-		'galego'				=> 'gl',
-		'gujarati'				=> 'gu',
-		'hebrew'				=> 'he',
-		'hindi'					=> 'hi',
+		'galego'					=> 'gl',
+		'gujarati'					=> 'gu',
+		'hebrew'					=> 'he',
+		'hindi'						=> 'hi',
 		'croatian'				=> 'hr',
 		'hungarian'			=> 'hu',
 		'icelandic'				=> 'is',
 		'indonesian'			=> 'id([_-][a-z]+)?',
 		'italian'					=> 'it([_-][a-z]+)?',
 		'japanese'				=> 'ja([_-][a-z]+)?',
-		'korean'				=> 'ko([_-][a-z]+)?',
-		'latvian'				=> 'lv',
-		'lithuanian'			=> 'lt',
+		'korean'					=> 'ko([_-][a-z]+)?',
+		'latvian'					=> 'lv',
+		'lithuanian'				=> 'lt',
 		'macedonian'		=> 'mk',
-		'dutch'					=> 'nl([_-][a-z]+)?',
+		'dutch'						=> 'nl([_-][a-z]+)?',
 		'norwegian'			=> 'no',
-		'punjabi'				=> 'pa',
+		'punjabi'					=> 'pa',
 		'polish'					=> 'pl',
 		'portuguese_brazil'	=> 'pt[_-]br',
 		'portuguese'				=> 'pt([_-][a-z]+)?',
@@ -839,7 +873,12 @@ function guess_lang()
 		for ($i = 0; $i < sizeof($accept_lang_ary); $i++)
 		{
 			@reset($match_lang);
-			while (list($lang, $match) = each($match_lang))
+			/* start Migrating from php5 to php7+ replace
+				foreach ($match_lang as $lang => $match) {
+			with
+				while (list($lang, $match) = each($match_lang)) {
+			ends Migrating */
+			foreach ($match_lang as $lang => $match)
 			{
 				if (preg_match('#' . $match . '#i', trim($accept_lang_ary[$i])))
 				{
@@ -1234,15 +1273,15 @@ function get_mybb_info($mybb_config)
 		install_die(GENERAL_ERROR, 'Configuration file ' . $mybb_config . ' couldn\'t be opened.');
 	}	
 	return array(
-		'dbms'				=> $config['database']['type'], // 'mysqli';
+		'dbms'					=> $config['database']['type'], // 'mysqli';
 		'dbname'			=> $config['database']['database'], // 'mybb';
 		'table_prefix'		=> $config['database']['table_prefix'], // 'mybb_';
 
-		'dbhost'			=> $config['database']['hostname'], // 'localhost';
+		'dbhost'				=> $config['database']['hostname'], // 'localhost';
 		'dbname'			=> $config['database']['username'], // 'Admin';
-		'dbpasswd'			=> $config['database']['password'],
+		'dbpasswd'		=> $config['database']['password'],
 		
-		'admin_dir'			=> $config['admin_dir'],
+		'admin_dir'				=> $config['admin_dir'],
 		'dbcharacter_set'	=> $config['database']['encoding'],			
 	);
 }
@@ -1256,8 +1295,8 @@ function get_mybb_settings($mybb_settings)
 	}	
 	return array(
 		'bbname'			=> $settings['bbname'], // "MyBB TestSite with MXP CMS";
-		'bburl'				=> $settings['bburl'], // "http://localhost/mybb";	
-		'status'			=> $settings['boardclosed'],	
+		'bburl'					=> $settings['bburl'], // "http://localhost/mybb";	
+		'status'				=> $settings['boardclosed'],	
 	);
 }
 
@@ -1268,14 +1307,14 @@ function get_mxbb_info($config)
 		install_die(GENERAL_ERROR, 'Configuration file ' . $config . ' couldn\'t be opened.');
 	}
 	return array(
-		'dbms'				=> $dbms,
-		'dbhost'			=> $dbhost,
-		'dbname'			=> $dbname,
-		'dbuser'			=> $dbuser,
+		'dbms'						=> $dbms,
+		'dbhost'					=> $dbhost,
+		'dbname'				=> $dbname,
+		'dbuser'					=> $dbuser,
 		'dbpasswd'			=> $dbpasswd,
 		'mx_table_prefix'	=> $mx_table_prefix,
 		'dbcharacter_set'	=> (defined('DB_CHARACTER_SET') ? DB_CHARACTER_SET : ''),		
-		'status'			=> (defined('MX_INSTALLED') && (MX_INSTALLED === true)) ? true : false,
+		'status'					=> (defined('MX_INSTALLED') && (MX_INSTALLED === true)) ? true : false,
 	);
 }
 
@@ -1288,9 +1327,8 @@ function get_phpbb_url($table_prefix, $portal_backend = 'internal')
 	
 	$were_sql = ($portal_backend === 'phpbb3') ? 'WHERE is_dynamic = 1' : '';
 	
-	$sql = 'SELECT config_name, config_value
-		FROM ' . $table_prefix . 'config'
-		. $were_sql;
+	$sql = 'SELECT config_name, config_value FROM ' . $table_prefix . 'config' . $were_sql;
+	
 	if (!($result = $db->sql_query($sql)))
 	{
 		if (!function_exists('mx_message_die'))
@@ -1298,7 +1336,7 @@ function get_phpbb_url($table_prefix, $portal_backend = 'internal')
 			global $db;
 			
 			$sql = "SELECT * FROM ".$table_prefix."config";
-			if(!($result = $db->sql_query($sql)))
+			if (!($result = $db->sql_query($sql)))
 			{
 				print("Couldnt query config information, Allso this hosting or server is using a cache optimizer not compatible with MX-Publisher or just lost connection to database wile query.");
 				return false;
@@ -1320,7 +1358,7 @@ function get_phpbb_url($table_prefix, $portal_backend = 'internal')
 	$server_port = ($board_config['server_port'] <> 80) ? ':' . trim($board_config['server_port']) : '';
 	$script_name = preg_replace('#^\/?(.*?)\/?$#', '\1', trim($board_config['script_path']));
 	$script_name = ($script_name == '') ? $script_name : '/' . $script_name;
-
+	
 	return $server_protocol . $server_name . $server_port . $script_name . '/';
 }
 
@@ -1330,6 +1368,7 @@ function get_phpbb_url($table_prefix, $portal_backend = 'internal')
 function get_smf_url($table_prefix, $portal_backend = 'smf2', $backend_root_path)
 {
 	global $mx_root_path, $phpEx, $db;
+	
 	/*
 	$were_sql = ($portal_backend === 'smf3') ? 'WHERE smf_name = 1' : '';
 		
@@ -1361,6 +1400,7 @@ function get_smf_url($table_prefix, $portal_backend = 'smf2', $backend_root_path
 	}
 	$db->sql_freeresult($result);	
 	*/
+	
 	$smf_info = get_smf_info($backend_root_path . "Settings.$phpEx");
 	
 	return $smf_info['boardurl'];
@@ -1408,15 +1448,15 @@ function open_phpbb_db(&$db, &$phpbb_info)
 		$dbms = str_replace('mysqli', 'mysql4', $dbms); 
 		//this version of php does not have mysqli extension and my crash the installer if finds a forum using this
 	}
-
+	
 	// If we are on PHP < 5.6.04 we get the error:
 	//The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead
-	if (!function_exists('mysql_connect')) 
+	if (!function_exists('mysql_connect'))
 	{
-		$dbms = str_replace(array('mysql', 'mysql4'), 'mysqli', $dbms); 
+		//$dbms = str_replace(array('mysql', 'mysql4'), 'mysqli', $dbms); 
 		//this version of php does not have mysqli extension and my crash the installer if finds a forum using this
 	}
-
+	
 	// Load dbal and initiate class
 	//Apache 2.0.x and php < 5.2.5 combination will crash here this is fixed by upgrading to php 5.2.6 or Apache 2.2.x
 	include_once($mx_root_path . 'includes/db/' . $dbms . '.' . $phpEx);
