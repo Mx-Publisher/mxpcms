@@ -88,7 +88,7 @@ function page_footer_install($show_phpinfo = true)
 		'<a href="' . U_ONLINE_SUPPORT . '" target="_blank">', '</a>',
 		'<a href="' . U_TERMS_OF_USE . '" target="_blank">', '</a>'
 	);
-
+	
 	//Base Style for Installation
 	$subSilver = ($tplEx !== $phpEx) ? '<a href="?style=subSilver">Classic Style</a>' : '';
 	$prosilver = ($tplEx !== $phpEx) ? '<a href="?style=prosilver">Normal Style</a>' : '';
@@ -102,7 +102,7 @@ function page_footer_install($show_phpinfo = true)
 	{
 		$install_theme = ($tplEx == 'tpl') ? $subSilver : $prosilver;
 	}
-
+	
 	$template->set_filenames(array('footer' => 'mx_install_footer.'.$tplEx));
 	$template->assign_vars(array(
 		'L_INSTALLER_NAME'			=> INSTALLER_NAME,
@@ -112,6 +112,7 @@ function page_footer_install($show_phpinfo = true)
 		'U_INSTALL_THEME'			=> $install_theme,
 		'U_INSTALL_PHPINFO'		=> ( $show_phpinfo ? '<a href="?phpinfo" target="_blank">phpInfo</a>' : '' ),
 	));
+	
 	$template->pparse('footer');
 	
 	if ($db)
