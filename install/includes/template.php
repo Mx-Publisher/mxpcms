@@ -3,7 +3,7 @@
 *
 * @package MX-Publisher Installation
 * @version $Id: template.php,v 1.5 2014/05/18 06:24:35 orynider Exp $
-* @copyright (c) 2002-2008 MX-Publisher Project Team
+* @copyright (c) 2002-2024 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net
 *
@@ -11,10 +11,9 @@
 
 class Template 
 {
-	var $classname = "Template";
 	// variable that holds all the data we'll be substituting into
 	// the compiled templates.
-	// ...
+	var $classname = "Template";
 	// This will end up being a multi-dimensional array like this:
 	// $this->_tpldata[block.][iteration#][child.][iteration#][child2.][iteration#][variablename] == value
 	// if it's a root-level variable, it'll be like this:
@@ -28,7 +27,12 @@ class Template
 	var $compiled_code = array();
 	// This will hold the uncompiled code for that handle.
 	var $uncompiled_code = array();
-	
+	/**
+	* Array of filenames assigned to set_filenames
+	*
+	* @var array
+	*/
+	protected $filenames = array();	
 	/**
 	 * Constructor. Simply sets the root dir.
 	 *
@@ -72,13 +76,15 @@ class Template
 	 * Sets the template filenames for handles. $filename_array
 	 * should be a hash of handle => filename pairs.
 	 */
-	function set_filenames($filename_array)
+	function set_filenames(array $filename_array)
 	{
 		if (!is_array($filename_array))
 		{
 			return false;
 		}
+		
 		reset($filename_array);
+		
 		/* start Migrating from php5 to php7+ replace
 			foreach ($filename_array as $handle => $filename) {
 		with
@@ -88,7 +94,7 @@ class Template
 		{
 			$this->files[$handle] = $this->make_filename($filename);
 		}
-		return true;
+		return true; //to do: return $this;
 	}
 	
 	/**
