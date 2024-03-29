@@ -2,8 +2,8 @@
 /**
 *
 * @package Functions
-* @version $Id: mx_functions.php,v 3.127 2023/11/16 06:15:52 orynider Exp $
-* @copyright (c) 2002-2023 MX-Publisher Project Team
+* @version $Id: mx_functions.php,v 3.127 2024/03/29 22:50:52 orynider Exp $
+* @copyright (c) 2002-2024 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
 *
@@ -3884,40 +3884,38 @@ if( !function_exists('memory_get_usage') )
 	}
 }
 
-if( !function_exists('get_backtrace') )
+/**
+* Get backtrace.
+*
+* Return a nicely formatted backtrace (parts from the php manual by diz at ysagoon dot com)
+*
+* @return string (html)
+*/
+function mx_get_backtrace()
 {
-	/**
-	 * Get backtrace.
-	 *
-	 * Return a nicely formatted backtrace (parts from the php manual by diz at ysagoon dot com)
-	 *
-	 * @return string (html)
-	 */
-	function get_backtrace()
+	global $mx_root_path;
+	
+	$output = '<div style="font-family: monospace;">';
+	$backtrace = debug_backtrace();
+	$path = realpath($mx_root_path);
+
+	foreach ($backtrace as $number => $trace)
 	{
-		global $mx_root_path;
-
-		$output = '<div style="font-family: monospace;">';
-		$backtrace = debug_backtrace();
-		$path = realpath($mx_root_path);
-
-		foreach ($backtrace as $number => $trace)
+		// We skip the first one, because it only shows this file/function
+		if ($number == 0)
 		{
-			// We skip the first one, because it only shows this file/function
-			if ($number == 0)
-			{
-				continue;
-			}
+			continue;
+		}
 
-			// Strip the current directory from path
-			$trace['file'] = str_replace(array($path, '\\'), array('', '/'), $trace['file']);
-			$trace['file'] = substr($trace['file'], 1);
+		// Strip the current directory from path
+		$trace['file'] = str_replace(array($path, '\\'), array('', '/'), $trace['file']);
+		$trace['file'] = substr($trace['file'], 1);
 
-			$args = array();
-			foreach ($trace['args'] as $argument)
+		$args = array();
+		foreach ($trace['args'] as $argument)
+		{
+			switch (gettype($argument))
 			{
-				switch (gettype($argument))
-				{
 					case 'integer':
 					case 'double':
 						$args[] = $argument;
@@ -3950,53 +3948,54 @@ if( !function_exists('get_backtrace') )
 
 					default:
 						$args[] = 'Unknown';
-				}
 			}
-
-			$trace['class'] = (!isset($trace['class'])) ? '' : $trace['class'];
-			$trace['type'] = (!isset($trace['type'])) ? '' : $trace['type'];
-
-			$output .= '<br />';
-			$output .= '<b>FILE:</b> ' . htmlspecialchars($trace['file']) . '<br />';
-			$output .= '<b>LINE:</b> ' . $trace['line'] . '<br />';
-			$output .= '<b>CALL:</b> ' . htmlspecialchars($trace['class'] . $trace['type'] . $trace['function']) . '(' . ((sizeof($args)) ? implode(', ', $args) : '') . ')<br />';
 		}
-		$output .= '</div>';
-		return $output;
-	}
-
-	/**
-	 * Set config value.
-	 *
-	 * Creates missing config entry if needed.
-	 *
-	 * @param unknown_type $board_config_name
-	 * @param unknown_type $board_config_value
-	 * @param unknown_type $is_dynamic
-	 */
-	function mx_set_config($board_config_name, $board_config_value)
-	{
-		global $db, $mx_cache, $portal_config;
 		
-		//Aternative to $sql = "UPDATE  " . PORTAL_TABLE . " SET " . $db->sql_build_array('UPDATE', utf8_normalize_nfc($portal_config));
-		$sql = "UPDATE " . PORTAL_TABLE . "
+		$trace['class'] = (!isset($trace['class'])) ? '' : $trace['class'];
+		$trace['type'] = (!isset($trace['type'])) ? '' : $trace['type'];
+
+		$output .= '<br />';
+		$output .= '<b>FILE:</b> ' . htmlspecialchars($trace['file']) . '<br />';
+		$output .= '<b>LINE:</b> ' . $trace['line'] . '<br />';
+		$output .= '<b>CALL:</b> ' . htmlspecialchars($trace['class'] . $trace['type'] . $trace['function']) . '(' . ((sizeof($args)) ? implode(', ', $args) : '') . ')<br />';
+	}
+	
+	$output .= '</div>';
+	return $output;
+}
+
+/**
+* Set config value.
+*
+* Creates missing config entry if needed.
+*
+* @param unknown_type $board_config_name
+* @param unknown_type $board_config_value
+* @param unknown_type $is_dynamic
+*/
+function mx_set_config($board_config_name, $board_config_value)
+{
+	global $db, $mx_cache, $portal_config;
+		
+	//Aternative to $sql = "UPDATE  " . PORTAL_TABLE . " SET " . $db->sql_build_array('UPDATE', utf8_normalize_nfc($portal_config));
+	$sql = "UPDATE " . PORTAL_TABLE . "
 			SET " . $db->sql_escape($board_config_name) . " = " . $db->sql_escape($board_config_value) . "
 			WHERE portal_id = 1";
-		$db->sql_query($sql);
+	$db->sql_query($sql);
 
-		if (!$db->sql_affectedrows() && !isset($portal_config[$board_config_name]))
-		{
-			$portal_config[$board_config_name] = $board_config_value;
+	if (!$db->sql_affectedrows() && !isset($portal_config[$board_config_name]))
+	{
+		$portal_config[$board_config_name] = $board_config_value;
 			
-			$sql = "INSERT INTO ".PORTAL_TABLE." (".
+		$sql = "INSERT INTO ". PORTAL_TABLE ." (".
 					implode(', ', array_keys($portal_config)).
 					") VALUES (".
 					implode(', ', array_values($portal_config)).
 					")";
-			$db->sql_query($sql);
-		}
-		$mx_cache->put('mxbb_config', $portal_config);
+		$db->sql_query($sql);
 	}
+	
+	$mx_cache->put('mxbb_config', $portal_config);
 }
 
 /**
@@ -4275,87 +4274,87 @@ function mx_guess_lang($encode = false)
 	// matches. Don't go moving these around without checking with
 	// me first - psoTFX
 	$match_lang = array(
-		'Afar'					=> 'aa', //Ethiopia
+		'Afar'							=> 'aa', //Ethiopia
 		'Abkhazia'					=> 'ab',
 		//'Angola'					=> 'ad'
 		'avestan'					=> 'ae', //Persia
 		'afrikaans'					=> 'af', // speakers: 6,855,082 - 13,4%
 		//'AFGHANISTAN'; // langs: pashto and dari
-		'english-creole'					=> 'ag', //Antigua & Barbuda
-		'anguilla'					=> 'ai',
+		'english-creole'				=> 'ag', //Antigua & Barbuda
+		'anguilla'						=> 'ai',
 		'aromanian'					=> 'aj', //Aromaya
-		'akan'					=> 'ak',
-		'albanian'					=> 'al', //ALBANIA
-		'amharic'					=> 'am', //the country flag with am is Armenia
+		'akan'								=> 'ak',
+		'albanian'						=> 'al', //ALBANIA
+		'amharic'						=> 'am', //the country flag with am is Armenia
 		'aragonese'					=> 'an', //Andorra, Netherland Antilles
-		'angolian'					=> 'ao', //Angola
-		'angika'					=> 'ap', //Anga //India
-		'arabic'					=> 'ar([_-][a-z]+)?', //country: Argentina
-		//'antarctica'			=> 'aq',
+		'angolian'						=> 'ao', //Angola
+		'angika'							=> 'ap', //Anga //India
+		'arabic'							=> 'ar([_-][a-z]+)?', //country: Argentina
+		//'antarctica'					=> 'aq',
 		'assamese'					=> 'as', //American Samoa
 		'german-austrian'			=> 'at',
-		'avaric'						=> 'av',
+		'avaric'							=> 'av',
 		'daghestanian'				=> 'av-da', //AVARIAN_KHANATE
-		'aymara'				=> 'ay',
-		'aruba'				=> 'aw', //Aruba
-		'en-au'				=> 'au', //Australia
-		'azerbaijani'				=> 'az', //Azerbaijan
-		'finnish'				=> 'ax', //The Aland Islands or Aland (Swedish: Aland, IPA: ['o?land]; Finnish: Ahvenanmaa) is an archipelago province at the entrance to the Gulf of Bothnia in the Baltic Sea belonging to Finland.
-		'bashkir'				=> 'ba', //Baskortostán (Rusia)
+		'aymara'							=> 'ay',
+		'aruba'							=> 'aw', //Aruba
+		'en-au'							=> 'au', //Australia
+		'azerbaijani'					=> 'az', //Azerbaijan
+		'finnish'							=> 'ax', //The Aland Islands or Aland (Swedish: Aland, IPA: ['o?land]; Finnish: Ahvenanmaa) is an archipelago province at the entrance to the Gulf of Bothnia in the Baltic Sea belonging to Finland.
+		'bashkir'							=> 'ba', //Baskortostán (Rusia)
 		//Bosnia & Herzegovina, Bosnian, Croatian, Serbian
-		'barbados'				=> 'bb',
-		'bangladesh'				=> 'bd',
-		'belarusian'				=> 'be', //Belgium
+		'barbados'						=> 'bb',
+		'bangladesh'					=> 'bd',
+		'belarusian'					=> 'be', //Belgium
 		//'burkina-faso'				=> 'bf',
-		'bulgarian'					=> 'bg', 
-		'bhojpuri'					=> 'bh', // Bihar (India) 
+		'bulgarian'						=> 'bg', 
+		'bhojpuri'						=> 'bh', // Bihar (India) 
 		//'Bahrain'; // Mamlakat al-Ba?rayn (arabic)
 		'belarusian'					=> 'by',
 		//'Belarus';
-		'catalan'					=> 'ca', 
-		'czech'						=> 'cs', 
-		'danish'					=> 'da', 
-		'german'					=> 'de([_-][a-z]+)?',
-		'english'					=> 'en([_-][a-z]+)?', 
-		'estonian'					=> 'et', 
-		'finnish'					=> 'fi', 
-		'french'					=> 'fr([_-][a-z]+)?', 
-		'greek'						=> 'el', 
-		'spanish_argentina'			=> 'es[_-]ar', 
-		'spanish'					=> 'es([_-][a-z]+)?', 
-		'gaelic'					=> 'gd', 
-		'galego'					=> 'gl', 
-		'gujarati'					=> 'gu', 
-		'hebrew'					=> 'he', 
-		'hindi'						=> 'hi', 
-		'croatian'					=> 'hr', 
+		'catalan'							=> 'ca', 
+		'czech'							=> 'cs', 
+		'danish'							=> 'da', 
+		'german'							=> 'de([_-][a-z]+)?',
+		'english'							=> 'en([_-][a-z]+)?', 
+		'estonian'						=> 'et', 
+		'finnish'							=> 'fi', 
+		'french'							=> 'fr([_-][a-z]+)?', 
+		'greek'							=> 'el', 
+		'spanish_argentina'		=> 'es[_-]ar', 
+		'spanish'						=> 'es([_-][a-z]+)?', 
+		'gaelic'							=> 'gd', 
+		'galego'							=> 'gl', 
+		'gujarati'							=> 'gu', 
+		'hebrew'							=> 'he', 
+		'hindi'								=> 'hi', 
+		'croatian'						=> 'hr', 
 		'hungarian'					=> 'hu', 
-		'icelandic'					=> 'is', 
-		'indonesian'				=> 'id([_-][a-z]+)?', 
-		'italian'					=> 'it([_-][a-z]+)?', 
-		'japanese'					=> 'ja([_-][a-z]+)?', 
-		'korean'					=> 'ko([_-][a-z]+)?', 
-		'latvian'					=> 'lv', 
-		'lithuanian'				=> 'lt', 
+		'icelandic'						=> 'is', 
+		'indonesian'					=> 'id([_-][a-z]+)?', 
+		'italian'							=> 'it([_-][a-z]+)?', 
+		'japanese'						=> 'ja([_-][a-z]+)?', 
+		'korean'							=> 'ko([_-][a-z]+)?', 
+		'latvian'							=> 'lv', 
+		'lithuanian'						=> 'lt', 
 		'macedonian'				=> 'mk', 
-		'dutch'						=> 'nl([_-][a-z]+)?', 
+		'dutch'								=> 'nl([_-][a-z]+)?', 
 		'norwegian'					=> 'no', 
-		'punjabi'					=> 'pa', 
-		'polish'					=> 'pl', 
-		'portuguese_brazil'			=> 'pt[_-]br', 
-		'portuguese'				=> 'pt([_-][a-z]+)?', 
-		'romanian'					=> 'ro([_-][a-z]+)?', 
-		'russian'					=> 'ru([_-][a-z]+)?', 
-		'slovenian'					=> 'sl([_-][a-z]+)?', 
-		'albanian'					=> 'sq', 
-		'serbian'					=> 'sr([_-][a-z]+)?', 
-		'slovak'					=> 'sv([_-][a-z]+)?', 
-		'swedish'					=> 'sv([_-][a-z]+)?', 
-		'thai'						=> 'th([_-][a-z]+)?', 
-		'turkish'					=> 'tr([_-][a-z]+)?', 
-		'ukranian'					=> 'uk([_-][a-z]+)?', 
-		'urdu'						=> 'ur', 
-		'viatnamese'				=> 'vi',
+		'punjabi'							=> 'pa', 
+		'polish'							=> 'pl', 
+		'portuguese_brazil'		=> 'pt[_-]br', 
+		'portuguese'					=> 'pt([_-][a-z]+)?', 
+		'romanian'						=> 'ro([_-][a-z]+)?', 
+		'russian'							=> 'ru([_-][a-z]+)?', 
+		'slovenian'						=> 'sl([_-][a-z]+)?', 
+		'albanian'						=> 'sq', 
+		'serbian'							=> 'sr([_-][a-z]+)?', 
+		'slovak'							=> 'sv([_-][a-z]+)?', 
+		'swedish'						=> 'sv([_-][a-z]+)?', 
+		'thai'								=> 'th([_-][a-z]+)?', 
+		'turkish'							=> 'tr([_-][a-z]+)?', 
+		'ukranian'						=> 'uk([_-][a-z]+)?', 
+		'urdu'								=> 'ur', 
+		'viatnamese'					=> 'vi',
 		'chinese_traditional_taiwan'=> 'zh[_-]tw',
 		'chinese_simplified'		=> 'zh', 
 	);
