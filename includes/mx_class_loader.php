@@ -19,21 +19,21 @@ if (!defined('IN_PORTAL'))
 * The class loader resolves class names to file system paths and loads them if
 * necessary.
 *
-* Classes have to be of the form MX_(dir_)*(classpart_)*, so directory names
-* must never contain underscores. Example: MX_dir_subdir_class_name is a
-* valid class name, while MX_dir_sub_dir_class_name is not.
+* Classes have to be of the form mx_(dir_)*(classpart_)*, so directory names
+* must never contain underscores. Example: mx_dir_subdir_class_name is a
+* valid class name, while mx_dir_sub_dir_class_name is not.
 *
 * If every part of the class name is a directory, the last directory name is
-* also used as the filename, e.g. MX_dir would resolve to dir/dir.php.
+* also used as the filename, e.g. mx_dir would resolve to dir/dir.php.
 *
 * @package MXP3
 */
 class mx_class_loader
 {
-	//private $prefix;
-	//private $path;
-	//private $php_ext;
-	//private $mx_cache;
+	private $prefix;
+	private $path;
+	private $php_ext;
+	private $mx_cache;
 
 	/**
 	* A map of looked up class names to paths relative to $this->path.
@@ -41,23 +41,23 @@ class mx_class_loader
 	*
 	* @var array
 	*/
-	//private $cached_paths = array();
+	private $cached_paths = array();
 
 	/**
-	* Creates a new MX_class_loader, which loads files with the given
+	* Creates a new mx_class_loader, which loads files with the given
 	* file extension from the given path.
 	*
 	* @param string $prefix  Required class name prefix for files to be loaded
 	* @param string $path    Directory to load files from
 	* @param string $php_ext The file extension for PHP files
-	* @param MX_cache_driver_interface $cache An implementation of the MX cache interface.
+	* @param mx_cache_driver_interface $cache An implementation of the MX cache interface.
 	*/
-	public function __construct($prefix, $path, $php_ext = 'php', $mx_cache = null)
+	public function __construct($prefix, $path, $php_ext = 'php', mx_cache_driver_interface $mx_cache = null)
 	{
-		$this->prefix = $prefix;
-		$this->path = $path;
-		$this->php_ext = $php_ext;
-
+		$this->prefix 		= $prefix;
+		$this->path 		= $path;
+		$this->php_ext	= $php_ext;
+		
 		$this->set_cache($mx_cache);
 	}
 
@@ -73,13 +73,13 @@ class mx_class_loader
 		if ($mx_cache)
 		{
 			$this->cached_paths = $mx_cache->get('class_loader_' . $this->prefix);
-
+			
 			if ($this->cached_paths === false)
 			{
 				$this->cached_paths = array();
 			}
 		}
-
+		
 		$this->mx_cache = $mx_cache;
 	}
 
@@ -157,6 +157,13 @@ class mx_class_loader
 	*/
 	public function load_class($class)
 	{
+		// In general $class is not supposed to contain a leading backslash,
+		// but sometimes it does. See tickets PHP-50731 and HHVM-1840.
+		if ($class[0] !== '\\')
+		{
+			$class = '\\' . $class;
+		}
+
 		if (substr($class, 0, strlen($this->prefix)) === $this->prefix)
 		{
 			$path = $this->resolve_path($class);
