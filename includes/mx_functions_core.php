@@ -2,11 +2,11 @@
 /**
 *
 * @package Core
-* @version $Id: mx_functions_core.php,v 1.141 2023/11/16 6:15:52 orynider Exp $
-* @copyright (c) 2002-2023 MX-Publisher Development Team
+* @version $Id: mx_functions_core.php,v 1.141 2024/03/29 22:42:52 orynider Exp $
+* @copyright (c) 2002-2024 MX-Publisher Development Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
-*
+* @link http://github.com/Mx-Publisher/mxpcms
 */
 
 if (!defined('IN_PORTAL'))
@@ -18,16 +18,16 @@ if (!defined('IN_PORTAL'))
  * Class mx_cache specific definitions
  *
  */
-define('MX_CACHE_ALL', -1);			// Flag - all
-define('MX_CACHE_SINGLE', -2);		// Flag - single
+define('MX_CACHE_ALL', -1);						// Flag - all
+define('MX_CACHE_SINGLE', -2);				// Flag - single
 define('MX_CACHE_PAGE_TYPE', -3);	// Flag - blocks data
 define('MX_CACHE_BLOCK_TYPE', -4);	// Flag - pages data
 
-define('MX_QUERY_DB', true);		// Flag - to force db query // not used
-define('MX_CACHE_DEBUG', false);	// echo lots of debug info
+define('MX_QUERY_DB', true);					// Flag - to force db query // not used
+define('MX_CACHE_DEBUG', false);			// echo lots of debug info
 
-define('MX_GET_ALL_PARS', -10);		// Flag - get all parameters
-define('MX_GET_PAR_VALUE', -20);	// Flag - get parameter value
+define('MX_GET_ALL_PARS', -10);			// Flag - get all parameters
+define('MX_GET_PAR_VALUE', -20);		// Flag - get parameter value
 define('MX_GET_PAR_OPTIONS', -30);	// Flag - get parameter option
 /**#@-*/
 
@@ -55,6 +55,8 @@ class mx_cache extends cache
 {
 	private $prefix;
 	private $path;
+	private $cache_dir;
+	private $backend;
 	private $backend_path;
 	private $php_ext;
 	private $mx_cache;
@@ -66,6 +68,7 @@ class mx_cache extends cache
 	protected $phpEx;
 	protected $db;
 	protected $portal_config;
+	protected $tpl_ext;
 	
 	/**
 	* Creates a cache service around a cache driver
@@ -79,15 +82,15 @@ class mx_cache extends cache
 		global $mx_table_prefix, $table_prefix, $phpEx, $tplEx;
 		global $mx_backend, $phpbb_auth, $mx_bbcode;
 		
-		$this->path = ($mx_root_path) ? $mx_root_path : './';
-		$this->php_ext = $phpEx;
-		$this->cache_dir = $mx_root_path . 'cache/';
-		$this->backend = $mx_backend;
-		$this->backend_path = $phpbb_root_path;
-		$this->db = $db;
-		$this->config = $portal_config;
-		$this->tpl_ext = $tplEx;
-		$this->prefix = $mx_table_prefix; 
+		$this->prefix 					= $mx_table_prefix; 		
+		$this->path 					= ($mx_root_path) ? $mx_root_path : './';
+		$this->php_ext 				= $phpEx;
+		$this->cache_dir 			= $mx_root_path . 'cache/';
+		$this->backend 			= $mx_backend;
+		$this->backend_path 	= $phpbb_root_path;
+		$this->db 						= $db;
+		$this->config 				= $portal_config;
+		$this->tpl_ext 				= $tplEx;	
 	}
 	
 	/**
@@ -104,8 +107,8 @@ class mx_cache extends cache
 
 		// Get MX-Publisher config settings
 		$this->portal_config = $portal_config = $this->obtain_mxbb_config();
-		//$portal_config['portal_backend'] = 'olympus';
-		//$portal_config['portal_backend_path'] = '../phpBBSeo/';
+		// $portal_config['portal_backend'] = 'olympus';
+		// $portal_config['portal_backend_path'] = '../phpBBSeo/';
 		// Check some vars
 		if (!$portal_config['portal_version'])
 		{
@@ -147,7 +150,7 @@ class mx_cache extends cache
 		// Load backend
 		$mx_root_path = $this->path;
 		$phpbb_root_path = $this->backend_path; 
-		
+
 		require($this->path . 'includes/sessions/'.$portal_config['portal_backend'].'/core.'. $this->php_ext); 
 		
 		//Redirect to upgrade or redefine portal backend path
@@ -339,11 +342,18 @@ class mx_cache extends cache
 					mx_message_die( GENERAL_ERROR, 'Couldnt query portal configuration', '', __LINE__, __FILE__, $sql );
 				}
 			}
+			
 			$row = $db->sql_fetchrow($result);
+			
+			$portal_config =  $row;
+			
+			/*
 			foreach ($row as $config_name => $config_value)
 			{
 				$portal_config[$config_name] = trim($config_value);
 			}
+			*/
+			
 			$db->sql_freeresult($result);
 			$this->put('mx_config', $portal_config);
 
@@ -457,7 +467,6 @@ class mx_cache extends cache
 		global $portal_config, $mx_root_path;
 		
 		$id = !($id > 0) ? 1 : $id;
-		
 		switch ($type)
 		{
 			case MX_CACHE_BLOCK_TYPE:
@@ -497,7 +506,7 @@ class mx_cache extends cache
 				}
 				else
 				{
-					$this->_get_page_config( $id );
+					$this->_get_page_config($id);
 				}
 			break;
 		}
@@ -561,25 +570,25 @@ class mx_cache extends cache
 			}
 			
 			$block_row = array(
-				"block_id" => $row['block_id'],
-				"block_title" => $row['block_title'],
-				"block_desc" => $row['block_desc'],
-				"block_size" => $row['block_size'],
-				"auth_view" => $row['auth_view'],
+				"block_id" 				=> $row['block_id'],
+				"block_title" 			=> $row['block_title'],
+				"block_desc" 		=> $row['block_desc'],
+				"block_size" 			=> $row['block_size'],
+				"auth_view" 			=> $row['auth_view'],
 				"auth_view_group" => $row['auth_view_group'],
-				"auth_edit" => $row['auth_edit'],
+				"auth_edit" 			=> $row['auth_edit'],
 				"auth_edit_group" => $row['auth_edit_group'],
 				"auth_moderator_group" => $row['auth_moderator_group'],
-				"show_block" => $row['show_block'],
-				"show_title" => $row['show_title'],
-				"show_stats" => $row['show_stats'],
-				"block_time" => $row['block_time'],
+				"show_block"	 	=> $row['show_block'],
+				"show_title" 			=> $row['show_title'],
+				"show_stats" 		=> $row['show_stats'],
+				"block_time" 			=> $row['block_time'],
 				"block_editor_id" => $row['block_editor_id'],
 				"module_root_path" => $row['module_path'],
-				"module_name" => $row['module_name'],
-				"block_file" => $row['function_file'],
-				"block_edit_file" => $row['function_admin'],
-				"function_id" => $row['function_id']
+				"module_name" 	=> $row['module_name'],
+				"block_file" 			=> $row['function_file'],
+				"block_edit_file" 	=> $row['function_admin'],
+				"function_id" 		=> $row['function_id']
 			);
 			
 			$this->block_config[$block_id]['block_info'] = $block_row;
@@ -623,39 +632,39 @@ class mx_cache extends cache
 			$block_id = $row['block_id'];
 			
 			$block_row = array(
-				"block_id" => $row['block_id'],
-				"block_title" => $row['block_title'],
+				"block_id" 		=> $row['block_id'],
+				"block_title" 	=> $row['block_title'],
 				"block_desc" => $row['block_desc'],
-				"block_size" => $row['block_size'],
-				"column_id" => $row['column_id'],
-				"auth_view" => $row['auth_view'],
+				"block_size" 	=> $row['block_size'],
+				"column_id" 	=> $row['column_id'],
+				"auth_view" 	=> $row['auth_view'],
 				"auth_view_group" => $row['auth_view_group'],
-				"auth_edit" => $row['auth_edit'],
+				"auth_edit" 	=> $row['auth_edit'],
 				"auth_edit_group" => $row['auth_edit_group'],
 				"auth_moderator_group" => $row['auth_moderator_group'],
 				"show_block" => $row['show_block'],
-				"show_title" => $row['show_title'],
+				"show_title" 	=> $row['show_title'],
 				"show_stats" => $row['show_stats'],
-				"block_time" => $row['block_time'],
+				"block_time" 	=> $row['block_time'],
 				"block_editor_id" => $row['block_editor_id'],
 				"module_root_path" => $row['module_path'],
 				"module_name" => $row['module_name'],
-				"block_file" => $row['function_file'],
+				"block_file" 		=> $row['function_file'],
 				"block_edit_file" => $row['function_admin'],
-				"function_id" => $row['function_id']
+				"function_id" 	=> $row['function_id']
 			);
 			
 			$param_row = array(
-				"parameter_id" => $row['parameter_id'],
-				"function_id" => $row['function_id'],
-				"parameter_name" => $row['parameter_name'],
-				"parameter_type" => $row['parameter_type'],
-				"parameter_auth" => $row['parameter_auth'],
-				"parameter_value" => $row['parameter_value'],
+				"parameter_id" 		=> $row['parameter_id'],
+				"function_id" 			=> $row['function_id'],
+				"parameter_name" 	=> $row['parameter_name'],
+				"parameter_type" 	=> $row['parameter_type'],
+				"parameter_auth" 	=> $row['parameter_auth'],
+				"parameter_value" 	=> $row['parameter_value'],
 				"parameter_default" => $row['parameter_default'],
 				"parameter_function" => $row['parameter_function'],
-				"parameter_opt" => $row['parameter_opt'],
-				"parameter_order" => $row['parameter_order']
+				"parameter_opt" 		=> $row['parameter_opt'],
+				"parameter_order" 	=> $row['parameter_order']
 			);
 			
 			if ( $next_block )
@@ -708,25 +717,25 @@ class mx_cache extends cache
 			$block_id = $row['block_id'];
 			
 			$block_row = array(
-				"block_id" => $row['block_id'],
-				"block_title" => $row['block_title'],
+				"block_id" 		=> $row['block_id'],
+				"block_title" 	=> $row['block_title'],
 				"block_desc" => $row['block_desc'],
 				"block_size" => $row['block_size'],
-				"auth_view" => $row['auth_view'],
+				"auth_view" 	=> $row['auth_view'],
 				"auth_view_group" => $row['auth_view_group'],
-				"auth_edit" => $row['auth_edit'],
+				"auth_edit" 	=> $row['auth_edit'],
 				"auth_edit_group" => $row['auth_edit_group'],
 				"auth_moderator_group" => $row['auth_moderator_group'],
 				"show_block" => $row['show_block'],
-				"show_title" => $row['show_title'],
+				"show_title" 	=> $row['show_title'],
 				"show_stats" => $row['show_stats'],
 				"block_time" => $row['block_time'],
 				"block_editor_id" => $row['block_editor_id'],
 				"module_root_path" => $row['module_path'],
 				"module_name" => $row['module_name'],
-				"block_file" => $row['function_file'],
+				"block_file" 	=> $row['function_file'],
 				"block_edit_file" => $row['function_admin'],
-				"function_id" => $row['function_id']
+				"function_id"	=> $row['function_id']
 			);
 			
 			$this->block_config[$block_id]['block_info'] = $block_row;
@@ -899,6 +908,7 @@ class mx_cache extends cache
 		{
 			mx_message_die(GENERAL_ERROR, "Could not query page information", "", __LINE__, __FILE__, $sql);
 		}
+		
 		$page_id = 0;
 		$column_id = 0;
 		
@@ -1030,8 +1040,7 @@ class mx_cache extends cache
 		{
 			$id = 1;
 			
-			print('invalid cache read call - no id. </br><iframe src="index.php"></iframe>');
-			
+			print('invalid cache read call - no id. </br>');
 		}
 	}
 
@@ -1336,12 +1345,17 @@ class mx_cache extends cache
 	public function _write($filename, $data = null, $expires = 0, $query = '')
 	{
 		global $phpEx;
-
-		$file = "{$this->cache_dir}$filename.$phpEx";
-
+		
+		$file = "{$this->cache_dir}$filename.$phpEx";	
+		
+		if (!class_exists('mx_lock_flock'))
+		{
+			include($this->path . 'includes/lock/flock.' . $phpEx);
+		}	
+		
 		$lock = new mx_lock_flock($file);
 		$lock->acquire();
-
+		
 		if ($handle = @fopen($file, 'wb'))
 		{
 			// File header
@@ -1417,7 +1431,25 @@ class mx_cache extends cache
 		if (!function_exists('phpbb_is_writable'))
 		{
 			global $phpbb_root_path, $phpEx;
-			include($phpbb_root_path . 'includes/functions.' . $phpEx);
+			
+			//
+			// Some includes
+			//
+			if ( PORTAL_BACKEND == 'phpbb2' )
+			{
+				$mx_cache->load_file( 'functions', true);
+				$mx_cache->load_file( 'functions_selects', true );
+				$mx_cache->load_file( 'functions_validate', true );
+			}
+
+			if ( PORTAL_BACKEND == 'phpbb3' )
+			{
+				include_once($mx_root_path . 'includes/sessions/phpbb3/auth.' . $phpEx );
+				$mx_cache->load_file( 'functions', 'phpbb3' );
+				$mx_cache->load_file( 'functions', 'phpbb2' );
+				$mx_cache->load_file( 'functions_module', 'phpbb3' );
+				$mx_cache->load_file( 'message_parser' , 'phpbb3' );
+			}
 		}
 
 		if ($check && !phpbb_is_writable($this->cache_dir))
@@ -1451,29 +1483,40 @@ class cache
 	// ------------------------------
 	// Vars
 	//
-
-	/**#@+
-	 * Class Flags
-	 * @access private
-	 */
-	var $vars = array();
-	var $var_expires = array();
-	var $is_modified = false;
-	var $sql_rowset = array('1' => '1'); // Cache fix. Now also FIRST query can be cached. Unsolved phpBB bug...i think ;)
-
-	/**
-	* Root path.
-	*
-	* @var string
-	*/
-	protected $mx_root_path;
-
+	private $prefix;
+	private $path;
+	private $cache_dir;
+	private $backend;
+	private $backend_path;
 	/**
 	* PHP extension.
 	*
 	* @var string
 	*/
-	protected $phpEx;	
+	private $php_ext;
+	private $mx_cache;
+	private $config;
+	
+	/**
+	* Root path.
+	*
+	* @var string
+	*/	
+	protected $mx_root_path;
+	protected $mx_backend;
+	protected $phbb_root_path;
+	protected $db;
+	protected $portal_config;
+	protected $tpl_ext;
+	
+	/**#@+
+	 * Class Flags
+	 * @access private
+	 */
+	var $vars 					= array();
+	var $var_expires 		= array();
+	var $is_modified 		= false;
+	var $sql_rowset 		= array('1' => '1'); // Cache fix. Now also FIRST query can be cached. Unsolved phpBB bug...i think ;)
 	
 	/**#@-*/
 
@@ -1489,10 +1532,22 @@ class cache
 	*/
 	public function __construct()
 	{
-		global $mx_root_path;
+		global $mx_root_path, $phpbb_root_path;
+		global $db, $portal_config;
+		global $mx_table_prefix, $table_prefix, $tplEx;
+		global $mx_backend, $phpbb_auth, $mx_bbcode;
+
+		$this->prefix 					= $mx_table_prefix; 		
+		$this->path 					= ($mx_root_path) ? $mx_root_path : './';
+		$this->php_ext 				= substr(strrchr(__FILE__, '.'));
+		$this->cache_dir 			= $mx_root_path . 'cache/';
+		$this->backend 			= $mx_backend;
+		$this->backend_path 	= $phpbb_root_path;
+		$this->db 						= $db;
+		$this->config 				= $portal_config;
+		$this->tpl_ext 				= $tplEx;		
 		
 		$this->path = ($mx_root_path) ? $mx_root_path : './';
-		$this->php_ext = substr(strrchr(__FILE__, '.'));
 		$this->cache_dir = $mx_root_path . 'cache/';
 	}	
 
@@ -1531,9 +1586,9 @@ class cache
 
 		if ($fp = @fopen($this->cache_dir . 'data_global.' . $phpEx, 'wb'))
 		{
-			@flock($fp, LOCK_EX);
+			flock($fp, LOCK_EX);
 			fwrite($fp, $file);
-			@flock($fp, LOCK_UN);
+			flock($fp, LOCK_UN);
 			fclose($fp);
 		}
 
@@ -1662,22 +1717,29 @@ class cache
 			// Bail out if the match fails.
 			return $query_result;
 		}
+		
 		$tables = array_map('trim', explode(',', $regs[1]));
 		
-		$fp = @fopen($this->cache_dir . 'sql_' . md5($query) . '.' . $phpEx, 'wb');
-		@flock($fp, LOCK_EX);
+		if ($fp = fopen($this->cache_dir . 'sql_' . md5($query) . '.' . $phpEx, 'wb'))
+		{
+			@flock($fp, LOCK_EX);
+			@fwrite($fp, $file);
+			@flock($fp, LOCK_UN);
+			@fclose($fp);
+		}		
+		
 		foreach ($tables as $table_name)
 		{
 			// Remove backticks
 			$table_name = ($table_name[0] == '`') ? substr($table_name, 1, -1) : $table_name;
-
+			
 			if (($pos = strpos($table_name, ' ')) !== false)
 			{
 				$table_name = substr($table_name, 0, $pos);
 			}
-
+			
 			$temp = $this->_read('sql_' . $table_name);
-
+			
 			if ($temp === false)
 			{
 				$temp = array();
@@ -1700,6 +1762,7 @@ class cache
 		
 		// store them in the right place
 		$lines = array();
+		
 		$query_id = sizeof($this->sql_rowset);
 		$query_id = !empty($query_id) ? $query_id : 1;
 		$this->sql_rowset[$query_id] = array();
@@ -1718,9 +1781,14 @@ class cache
 		}
 		else
 		{
-			@fwrite($fp, "<?php\n\n/*\n$query\n*/\n\n\$expired = (time() > " . (time() + $ttl) . ") ? true : false;\nif (\$expired) { return; }\n\n\$this->sql_rowset[\$query_id] = array(" . implode(',', $lines) . '); ?>');
-			@flock($fp, LOCK_UN);
-			@fclose($fp);		
+			$time_to_write = time() + $ttl;
+			$lines_to_write = implode(',', $lines);
+			$to_write = "<?php\n\n/*\n$query\n*/\n\n\$expired = (time() > " . $time_to_write . ") ? true : false;\nif (\$expired) { return; }\n\n\$this->sql_rowset[\$query_id] = array(" . $lines_to_write . '); ?>';
+
+			$fp = fopen($this->cache_dir . 'sql_' . md5($query) . '.' . $phpEx, 'wb');
+			fwrite($fp, $to_write);
+			flock($fp, LOCK_UN);
+			fclose($fp);		
 		}		
 		$query_result = $query_id;
 		
@@ -6126,8 +6194,8 @@ class deactivated_super_global implements \ArrayAccess, \Countable, \IteratorAgg
 	*/
 	public function __construct($request, string $name, int $super_global)
 	{
-		$this->request 			= $request;
-		$this->name 				= $name;
+		$this->request = $request;
+		$this->name = $name;
 		$this->super_global = $super_global;
 	}
 
@@ -6149,7 +6217,7 @@ class deactivated_super_global implements \ArrayAccess, \Countable, \IteratorAgg
 		}
 		trigger_error(sprintf($message, $file, $line), E_USER_ERROR);
 	}
-
+	
 	/**
 	* Redirects isset to the correct request class call.
 	*
@@ -6161,7 +6229,7 @@ class deactivated_super_global implements \ArrayAccess, \Countable, \IteratorAgg
 	{
 		return $this->request->is_set($offset, $this->super_global);
 	}
-
+	
 	/**#@+
 	* Part of the \ArrayAccess implementation, will always result in a FATAL error.
 	*/
