@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: index.php,v 1.90 2014/05/19 18:14:40 orynider Exp $
+* @version $Id: index.php,v 1.91 2024/04/02 06:19:17 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net
@@ -17,6 +17,8 @@ $mx_root_path = "./";
 */
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
 include($mx_root_path . 'common.' . $phpEx);
+
+
 
 /*
 * Page selector
