@@ -2,11 +2,11 @@
 /**
 *
 * @package Functions
-* @version $Id: mx_functions.php,v 3.127 2024/03/29 22:50:52 orynider Exp $
+* @version $Id: mx_functions.php,v 3.130 2024/04/02 06:19:17 orynider Exp $
 * @copyright (c) 2002-2024 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
-*
+* @link http://github.com/MX-Publisher
 */
 
 if (!defined('IN_PORTAL'))
@@ -42,30 +42,29 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 	
 	$default_lang = (isset($mx_user->lang['default_lang'])) ? $mx_user->lang['default_lang'] : $board_config['default_lang'];
 
-	if( !isset($msg_history) )
+	if (!isset($msg_history))
 	{
 		$msg_history = array();
 	}	
 	
 	$msg_history[] = array(
-		'msg_code'	=> $msg_code,
-		'msg_text'	=> $msg_text,
-		'msg_title'	=> $msg_title,
-		'err_line'	=> $err_line,
-		'err_file'	=> $err_file,
-		'sql'		=> $sql
+		'msg_code'		=> $msg_code,
+		'msg_text'			=> $msg_text,
+		'msg_title'			=> $msg_title,
+		'err_line'				=> $err_line,
+		'err_file'				=> $err_file,
+		'sql'						=> $sql
 	);
 	
 	//
 	//This will check whaever we are installing
 	//
-	if(defined('HAS_DIED'))
+	if (defined('HAS_DIED'))
 	{
-		//
 		// This message is printed at the end of the report.
 		// Of course, you can change it to suit your own needs. ;-)
-		//
 		$custom_error_message = 'Please, contact the %swebmaster%s. Thank you.';
+		
 		if ( !empty($board_config) && !empty($board_config['board_email']) )
 		{
 			$custom_error_message = sprintf($custom_error_message, '<a href="mailto:' . $board_config['board_email'] . '">', '</a>');
@@ -74,30 +73,39 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 		{
 			$custom_error_message = sprintf($custom_error_message, '', '');
 		}		
+		
 		echo "<html>\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n<body>\n<b>Critical Error!</b><br />\nmx_message_die() was called multiple times.<br />&nbsp;<hr />";
-		for( $i = 0; $i < count($msg_history); $i++ )
+		
+		for ( $i = 0; $i < count($msg_history); $i++ )
 		{
 			echo '<b>Error #' . ($i+1) . "</b>\n<br />\n";
-			if( !empty($msg_history[$i]['msg_title']) )
+			
+			if ( !empty($msg_history[$i]['msg_title']) )
 			{
 				echo '<b>' . $msg_history[$i]['msg_title'] . "</b>\n<br />\n";
 			}
+			
 			echo $msg_history[$i]['msg_text'] . "\n<br /><br />\n";
-			if( !empty($msg_history[$i]['err_line']) )
+			
+			if ( !empty($msg_history[$i]['err_line']) )
 			{
 				echo '<b>Line :</b> ' . $msg_history[$i]['err_line'] . '<br /><b>File :</b> ' . $msg_history[$i]['err_file'] . "</b>\n<br />\n";
 			}
-			if( !empty($msg_history[$i]['sql']) )
+			
+			if ( !empty($msg_history[$i]['sql']) )
 			{
 				echo '<b>SQL :</b> ' . $msg_history[$i]['sql'] . "\n<br />\n";
 			}
 			echo "&nbsp;<hr />\n";
 		}
+		
 		if (version_compare(PHP_VERSION, '5.4') < 0)
 		{
 			echo('You are running an unsupported PHP version: ' . PHP_VERSION . '. Please upgrade to PHP 5.4.6 or higher before trying to install phpBB3 or install / upgrate MX-Publisher 3<br />');
 		}		
+		
 		echo $custom_error_message . '<hr /><br clear="all" />';
+		
 		die("</body>\n</html>");
 	}
 	
@@ -131,22 +139,22 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 	}
 
 	//Security check
-	if( !is_object($mx_user) && !is_object($mx_page) && !is_object($mx_request_vars))
+	if ( !is_object($mx_user) && !is_object($mx_page) && !is_object($mx_request_vars))
 	{
 		die('Hacking attempt, or couldn\'t initalize the main classes required to call mx_message_die().');
 	}
 
-	if( !is_object($mx_user))
+	if ( !is_object($mx_user))
 	{
 		$mx_user = new mx_user();
 	}
 
-	if( !is_object($mx_page))
+	if ( !is_object($mx_page))
 	{
 		$mx_page = new mx_page();
 	}
 
-	if( !is_object($mx_request_vars))
+	if ( !is_object($mx_request_vars))
 	{
 		$mx_request_vars = new mx_request_vars();
 	}
@@ -177,6 +185,7 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 	if (empty($theme))
 	{
 		global $user_ip;
+		
 		$mx_user->page_id = 1;
 		$mx_user->user_ip = $user_ip;
 		$mx_user->_init_userprefs();
@@ -189,7 +198,7 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 
 	$default_lang = (isset($mx_user->lang['default_lang'])) ? $mx_user->encode_lang($mx_user->lang['default_lang']) : $board_config['default_lang'];
 
-	if ( empty($default_lang) )
+	if (empty($default_lang))
 	{
 		// - populate $default_lang
 		$default_lang = 'english';
@@ -318,7 +327,7 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 	//
 	if ( DEBUG && ( $msg_code == GENERAL_ERROR || $msg_code == CRITICAL_ERROR ) )
 	{
-		if ( $debug_text != '' )
+		if ($debug_text != '')
 		{
 			$msg_text = $msg_text . '<br /><br /><b><u>DEBUG MODE</u></b> ' . $debug_text;
 		}
@@ -364,14 +373,17 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 			$msg_text = str_replace('<a href="groupcp', '<a href="'.$phpbb_root_path.'groupcp', $msg_text);
 			$msg_text = str_replace('<a href="posting', '<a href="'.$phpbb_root_path.'posting', $msg_text);
 		}
+		
 		$template->assign_vars(array(
 			'MESSAGE_TITLE' => $msg_title,
 			'MESSAGE_TEXT' => $msg_text)
 		);
+		
 		ob_start();
 		$template->pparse('message_body');
 		$phpbb_output = ob_get_contents();
 		ob_end_clean();
+		
 		$phpbb_output = str_replace('"templates/'.$theme['template_name'], '"' . $phpbb_root_path . 'templates/'.$theme['template_name'], $phpbb_output);
 		echo($phpbb_output);
 		unset($phpbb_output);
@@ -391,6 +403,7 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 		{
 			define('TEMPLATE_ROOT_PATH', "{$mx_root_path}templates/" . (isset($theme['template_name']) ?  rawurlencode($theme['template_name']) : 'all') . '/');
 		}
+		
 		if (file_exists($mx_root_path . TEMPLATE_ROOT_PATH . 'msgdie_header.tpl'))
 		{		
 			$layouttemplate->set_filenames(array(
@@ -398,12 +411,12 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 			));
 			$layouttemplate->pparse('overall_header');			
 		}	
+		
 		echo "<html>\n<body>\n" . $msg_title . "\n<br /><br />\n" . $msg_text . "</body>\n</html>";		
+		
 		if (file_exists($mx_root_path . TEMPLATE_ROOT_PATH . 'msgdie_footer.tpl'))
 		{		
-			$layouttemplate->set_filenames(array(
-				'overall_footer' => 'msgdie_footer.tpl',
-			));
+			$layouttemplate->set_filenames(array('overall_footer' => 'msgdie_footer.tpl',));
 			$layouttemplate->pparse('overall_footer');			
 		}		
 	}
@@ -420,6 +433,9 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 function mx_msg_handler($msg_code, $msg_text = '', $msg_title = '', $err_line = '', $err_file = '', $sql = '')
 {		
 	global $db, $mx_user, $board_config, $phpbb_auth, $mx_root_path;
+	
+	$errno = $msg_code;
+	$err_file = $msg_title;
 	
 	// Do not display notices if we suppress them via @
 	if (error_reporting() == 0 && $errno != E_USER_ERROR && $errno != E_USER_WARNING && $errno != E_USER_NOTICE && $errno != E_USER_DEPRECATED)
@@ -496,13 +512,13 @@ function mx_msg_handler($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 				return;
 			}
 
-			if (strpos($errfile, 'cache') === false && strpos($errfile, 'template.') === false)
+			if (strpos($err_file, 'cache') === false && strpos($err_file, 'template.') === false)
 			{
-				$errfile = mx_filter_root_path($errfile);
+				$err_file = mx_filter_root_path($err_file);
 				$msg_text = mx_filter_root_path($msg_text);
 				$error_name = ($errno === E_WARNING) ? 'PHP Warning' : 'PHP Notice';
-				echo '<b>[phpBB Debug] ' . $error_name . '</b>: in file <b>' . $errfile . '</b> on line <b>' . $errline . '</b>: <b>' . $msg_text . '</b><br />' . "\n";
-				echo '<br /><br />BACKTRACE<br />' . get_backtrace() . '<br />' . "\n";
+				echo '<b>[phpBB Debug] ' . $error_name . '</b>: in file <b>' . $err_file . '</b> on line <b>' . $err_line . '</b>: <b>' . $msg_text . '</b><br />' . "\n";
+				echo '<br /><br />BACKTRACE<br />' . mx_get_backtrace() . '<br />' . "\n";
 			}
 
 			return;
@@ -709,6 +725,28 @@ function mx_msg_handler($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 	mx_message_die($msg_code, $msg_text, $msg_title, $err_line, $err_file, $sql);
 }
 
+/**
+* Removes absolute path to mxp root directory from error messages
+* and converts backslashes to forward slashes.
+*
+* @param string $err_file	Absolute file path
+*							(e.g. /var/www/mxpcms/includes/mx_functions.php)
+*							Please note that if $err_file is outside of the mx root,
+*							the root path will not be found and can not be filtered.
+* @return string			Relative file path
+*							(e.g. /includes/mx_functions.php)
+*/
+function mx_filter_root_path($err_file)
+{
+	global $mx_root_path;
+
+	if (empty($mx_root_path))
+	{
+		$mx_root_path = realpath(__DIR__ . '/../');
+	}
+
+	return str_replace(array($mx_root_path, '\\'), array('[ROOT]', '/'), $err_file);
+}
 
 /**
  * Simple mx_message_die.
@@ -1076,7 +1114,15 @@ function mx_create_date($format, $gmepoch, $tz)
 	if (empty($translate))
 	{
 		@reset($lang['datetime']);
-		while (list($match, $replace) = @each($lang['datetime']))
+		/*
+		* Import phpBB Graphics, prefix with PHPBB_URL, and apply LANG info
+		/* start Migrating from php5 to php7+ replace
+			foreach ($lang['datetime'] as $match => $replace)
+		with
+			while(list($match, $replace) = each($lang['datetime']))
+		ends Migrating
+		*/
+		foreach ($lang['datetime'] as $match => $replace)
 		{
 			$translate[$match] = $replace;
 		}
@@ -3430,7 +3476,7 @@ function get_page_id($search_item, $use_function_file = false, $get_page_data_ar
 			mx_message_die(GENERAL_ERROR, "Could not query column list", '', __LINE__, __FILE__, $sql);
 		}
 		$p_row = $db->sql_fetchrow($p_result);
-		$db->sql_freeresult($result);
+		$db->sql_freeresult($p_result);
 
 		if( empty($p_row['page_id']) )
 		{
@@ -3453,8 +3499,8 @@ function get_page_id($search_item, $use_function_file = false, $get_page_data_ar
 			{
 				mx_message_die(GENERAL_ERROR, "Could not query column list", '', __LINE__, __FILE__, $sql);
 			}
-			$db->sql_freeresult($result);
 			$p_row = $db->sql_fetchrow($p_result);
+			$db->sql_freeresult($p_result);
 		}
 		
 		if( empty($p_row['page_id']) )
@@ -3499,7 +3545,7 @@ function get_page_id($search_item, $use_function_file = false, $get_page_data_ar
 					continue;
 				}
 			}
-			$db->sql_freeresult($result);
+			$db->sql_freeresult($p_result);
 		}
 
 		if( empty($p_row['page_id']) )
@@ -3544,7 +3590,7 @@ function get_page_id($search_item, $use_function_file = false, $get_page_data_ar
 					continue;
 				}
 			}
-			$db->sql_freeresult($result);
+			$db->sql_freeresult($p_result);
 		}
 		
 		$page_id_array = array();
@@ -3891,7 +3937,7 @@ if( !function_exists('memory_get_usage') )
 *
 * @return string (html)
 */
-function mx_get_backtrace()
+function mx_get_backtrace(): string
 {
 	global $mx_root_path;
 	
