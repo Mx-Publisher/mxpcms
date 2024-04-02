@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: common.php,v 1.122 2023/10/20 03:11:42 orynider Exp $
+* @version $Id: common.php,v 1.123 2024/04/02 06:19:17 orynider Exp $$
 * @copyright (c) 2002-2023 MX-Publisher Development Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
@@ -85,7 +85,7 @@ function deregister_globals()
 	}
 
 	// Merge all into one extremely huge array; unset this later
-	$input = array_merge(
+	$input = array_merge (
 		array_keys($_GET),
 		array_keys($_POST),
 		array_keys($_COOKIE),
@@ -440,6 +440,18 @@ $phpBB3 = new phpBB3();
 //
 include_once($mx_root_path . INCLUDES . 'mx_functions.' . $phpEx); // CORE Functions
 
+/** /
+$portal_config['portal_backend'] = 'proteus'; //switch to last version
+		
+$sql = "UPDATE  " . PORTAL_TABLE . " SET " . $db->sql_build_array('UPDATE', utf8_normalize_nfc($portal_config));
+		
+if (!($db->sql_query($sql)))
+{
+	mx_message_die(GENERAL_ERROR, "Failed to update portal configuration ", "", __LINE__, __FILE__, $sql);
+}		
+print('updated portal configuration. uncomment code in common.php ... ');
+/**/
+
 /**
 * Minimum Requirement: PHP 5.3.0
 */
@@ -542,7 +554,7 @@ if (defined('DEBUG_EXTRA'))
 //
 // Show 'Board is disabled' message if needed.
 //
-if(!empty($portal_config['board_disable']) && !defined("IN_ADMIN") && !defined("IN_LOGIN"))
+if (!empty($portal_config['board_disable']) && !defined("IN_ADMIN") && !defined("IN_LOGIN"))
 {
 	mx_message_die(GENERAL_MESSAGE, 'Board_disable', 'Information');
 }
