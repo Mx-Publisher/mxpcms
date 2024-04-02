@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Module - mx_xs
-* @version $Id: template.php,v 1.42 2014/05/16 18:02:06 orynider Exp $
+* @version $Id: template.php,v 1.42 2024/04/02 06:13:17 orynider Exp $
 * @copyright (c) 2002-2008 [CyberAlien, OryNider] MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
@@ -92,6 +92,7 @@ define('ENDIF', 8);
 define('DEFINE', 9);
 define('UNDEFINE', 10);
 define('BEGINELSE', 11);
+
 //MX-Publisher Stuff
 class Template 
 {
@@ -257,18 +258,18 @@ class Template
 		$default = array(
 			'xs_auto_compile'			=> 1,
 			'xs_auto_recompile'			=> 1,
-			'xs_use_cache'				=> 1,
-			'xs_php'					=> $phpEx,
-			'xs_def_template'			=> 'subSilver',
-			'xs_check_switches'			=> 1,
+			'xs_use_cache'					=> 1,
+			'xs_php'								=> $phpEx,
+			'xs_def_template'				=> 'subSilver',
+			'xs_check_switches'		=> 1,
 			'xs_warn_includes'			=> 1,
 			'xs_add_comments'			=> 0,
-			'xs_ftp_host'				=> '',
-			'xs_ftp_login'				=> '',
-			'xs_ftp_path'				=> '',
+			'xs_ftp_host'						=> '',
+			'xs_ftp_login'						=> '',
+			'xs_ftp_path'						=> '',
 			'xs_downloads_count'		=> '0',
-			'xs_downloads_default'		=> '0',
-			'xs_shownav'				=> '1',
+			'xs_downloads_default'	=> '0',
+			'xs_shownav'					=> '1',
 			'xs_template_time'			=> '0',
 			);
 		// checking if all variables exist
@@ -319,7 +320,7 @@ class Template
 				$up[] = 'xs_template_time';
 			}
 			global $db;
-			if(!empty($db))
+			if (!empty($db))
 			{
 				// adding new config values
 				for($i=0; $i<count($add); $i++)
@@ -348,15 +349,16 @@ class Template
 				}
 			}
 		}
-		$this->php = isset($board_config['xs_php']) ? $board_config['xs_php'] : ( isset($portal_config['xs_php']) ? $portal_config['xs_php'] : '' );
-		$this->tpldef = isset($board_config['xs_def_template']) ? $board_config['xs_def_template'] : ( isset($portal_config['xs_def_template']) ? $portal_config['xs_def_template'] : '' );
-		$this->use_cache = isset($board_config['xs_use_cache']) ? $board_config['xs_use_cache'] : ( isset($portal_config['xs_use_cache']) ? $portal_config['xs_use_cache'] : '' );
-		$this->auto_compile = isset($board_config['xs_auto_compile']) ? $board_config['xs_auto_compile'] : ( isset($portal_config['xs_auto_compile']) ? $portal_config['xs_auto_compile'] : '' );
+		$this->php 					= isset($board_config['xs_php']) ? $board_config['xs_php'] : ( isset($portal_config['xs_php']) ? $portal_config['xs_php'] : '' );
+		$this->tpldef 					= isset($board_config['xs_def_template']) ? $board_config['xs_def_template'] : ( isset($portal_config['xs_def_template']) ? $portal_config['xs_def_template'] : '' );
+		$this->use_cache 		= isset($board_config['xs_use_cache']) ? $board_config['xs_use_cache'] : ( isset($portal_config['xs_use_cache']) ? $portal_config['xs_use_cache'] : '' );
+		$this->auto_compile 	= isset($board_config['xs_auto_compile']) ? $board_config['xs_auto_compile'] : ( isset($portal_config['xs_auto_compile']) ? $portal_config['xs_auto_compile'] : '' );
 		$this->xs_check_switches = isset($board_config['xs_check_switches']) ? $board_config['xs_check_switches'] : ( isset($portal_config['xs_check_switches']) ? $portal_config['xs_check_switches'] : '' );
-		$this->cache_search = array('.', '\\', '/', '_tpl');
-		$this->cache_replace = array('_', XS_SEPARATOR, XS_SEPARATOR, '.'.$this->php);
-		$old_root = $this->root;
+		$this->cache_search 	= array('.', '\\', '/', '_tpl');
+		$this->cache_replace 	= array('_', XS_SEPARATOR, XS_SEPARATOR, '.'.$this->php);
+		$old_root 						= $this->root;
 		$this->set_rootdir($root);
+		
 		// Mighty Gorgon - Common TPL - BEGIN
 		$cfg_path = $this->tpl;
 		if ((defined('IN_PHPBB') || defined('IN_ADMIN')))
@@ -1542,16 +1544,16 @@ class Template
 			$blockcount = count($blocks) - 1;
 			$str = &$this->_tpldata;
 			$block = &$this->tpldata;
+			
 			for ($i = 0; $i < $blockcount; $i++)
 			{
 				$pos = strpos($blocks[$i], '[');
 				$name = ($pos !== false) ? substr($blocks[$i], 0, $pos) : $blocks[$i];
-				$block = &$block[$name];
+				$block =is_array($name) ? $block[$name] : $block;
 				$index = (!$pos || strpos($blocks[$i], '[]') === $pos) ? (count($block) - 1) : (min((int) substr($blocks[$i], $pos + 1, -1), count($block) - 1));
 				$block = &$block[$index];
 				
-				$str = &$str[$blocks[$i].'.'];
-								
+				$str = &$str[$blocks[$i].'.'];			
 				$str = &$str[sizeof($str)-1]; 				
 			}
 
