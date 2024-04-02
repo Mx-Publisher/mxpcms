@@ -2,7 +2,7 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: page_header.php,v 3.78 2020/02/25 05:58:02 orynider Exp $
+* @version $Id: page_header.php,v 3.78 2024/04/02 06:15:17 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
@@ -839,7 +839,8 @@ switch (PORTAL_BACKEND)
 	case 'olympus':
 	case 'ascraeus':
 	case 'rhea':
-	
+	case 'proteus':
+	default:
 		if ( !defined('PHPBB_VERSION') )
 		{
 			define('PHPBB_VERSION', $board_config['version']);
@@ -858,7 +859,15 @@ if ( !isset( $nav_links ) )
 
 $nav_links_html = '';
 $nav_link_proto = '<link rel="%s" href="%s" title="%s" />' . "\n";
-while( list($nav_item, $nav_array) = @each($nav_links) )
+/*
+* Import phpBB Graphics, prefix with PHPBB_URL, and apply LANG info
+/* start Migrating from php5 to php7+ replace
+	foreach ($images as $default_key => $default_value) {
+with
+	while(list($nav_item, $nav_array) = each($nav_links))
+ends Migrating
+*/
+foreach ($nav_links as $nav_item => $nav_array) 
 {
 	if ( !empty($nav_array['url']) )
 	{
@@ -867,7 +876,8 @@ while( list($nav_item, $nav_array) = @each($nav_links) )
 	else
 	{
 		// We have a nested array, used for items like <link rel='chapter'> that can occur more than once.
-		while( list(,$nested_array) = each($nav_array) )
+		// while( list(,$nested_array) = each($nav_array) )
+		foreach ($nav_array as $nested_array) 
 		{
 			$nav_links_html .= sprintf($nav_link_proto, $nav_item, $nested_array['url'], $nested_array['title']);
 		}
@@ -957,10 +967,17 @@ if (strpos($user_lang, '-x-') !== false)
 $phpbb_version_parts = explode('.', PHPBB_VERSION, 3);
 $phpbb_major = $phpbb_version_parts[0] . '.' . $phpbb_version_parts[1];
 
-@define('USER_ACTIVATION_NONE', 0);
-@define('USER_ACTIVATION_SELF', 1);
-@define('USER_ACTIVATION_ADMIN', 2);
-@define('USER_ACTIVATION_DISABLE', 3);
+if ((!defined('USER_ACTIVATION_NONE') || !defined('USER_ACTIVATION_SELF')))
+{
+	@define('USER_ACTIVATION_NONE', 0);
+	@define('USER_ACTIVATION_SELF', 1);
+}
+
+if ((!defined('USER_ACTIVATION_ADMIN') || !defined('USER_ACTIVATION_DISABLE')))
+{
+	@define('USER_ACTIVATION_ADMIN', 2);
+	@define('USER_ACTIVATION_DISABLE', 3);
+}
 
 //
 // Show the overall footer.
