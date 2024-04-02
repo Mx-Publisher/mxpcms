@@ -2,11 +2,11 @@
 /**
 *
 * @package Style
-* @version $Id: mx_functions_style.php,v 3.144 2023/10/17 15:25:52 orynider Exp $
+* @version $Id: mx_functions_style.php,v 3.144 2024/04/02 06:94:17 orynider Exp $
 * @copyright (c) 2002-2019 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
-*
+* @link https://github.com/Mx-Publisher/mxpcms/
 */
 
 if ( !defined('IN_PORTAL'))
@@ -423,6 +423,7 @@ class mx_Template extends Template
 			case 'proteus':	
 			case 'phpbb3':
 			case 'ascraeus':
+			default:
 				$this->debug_paths .= '<br>phpbb3';
 				$fileSearch = array();
 				$fileSearch[] = $style_path . '/' . 'template'; // First check current template
@@ -682,46 +683,36 @@ class mx_Template extends Template
 	function set_template()
 	{
 		global $module_root_path, $mx_root_path, $phpbb_root_path, $theme, $mx_user, $mx_block;
-
+		
 		$style_path = $theme['template_name'] . '/';
-
-		//
-		// Look at mxBB-Module folder.........................................................................mxBB-module
-		//
+		
+		// Look at MX-Publisher-Module folder.........................................................................MX-Publisher-module
 		if (!empty($module_root_path))
 		{
 			$this->module_template_path = '';
 			$moduleDefault = !empty($mx_user->loaded_default_styles[$mx_block->module_root_path]) ? $mx_user->loaded_default_styles[$mx_block->module_root_path] : $mx_user->default_template_name;
 
-			if( file_exists($module_root_path . 'templates/' . $style_path . '/') )
+			if (file_exists($module_root_path . 'templates/' . $style_path . '/') )
 			{
-				//
 				// First check current template
-				//
 				$this->root = $module_root_path . 'templates/' . $style_path . '/';
 				$this->module_template_path = 'templates/' . $style_path . '/';
 			}
 			else if( file_exists($module_root_path . 'templates/' . $mx_user->cloned_template_name . '/') && !empty($mx_user->cloned_template_name))
 			{
-				//
 				// Then check Cloned template
-				//
 				$this->root = $module_root_path . 'templates/' . $mx_user->cloned_template_name . '/';
 				$this->module_template_path = 'templates/' . $mx_user->cloned_template_name . '/';
 			}
 			else if( file_exists($module_root_path . 'templates/' . $moduleDefault . '/') )
 			{
-				//
 				// Then check default template
-				//
 				$this->root = $module_root_path . 'templates/' . $moduleDefault . '/';
 				$this->module_template_path = 'templates/' . $moduleDefault . '/';
 			}
 			else if( file_exists($module_root_path . 'templates/') )
 			{
-				//
 				// Finally check the template root (for compatibility with some old modules)
-				//
 				$this->root = $module_root_path . 'templates/';
 				$this->module_template_path = 'templates/';
 			}
@@ -731,23 +722,17 @@ class mx_Template extends Template
 				return '';
 			}
 		}
-
-		//
-		// Look at mxBB-Root folder.........................................................................mxBB-Root
-		//
-		if( file_exists($mx_root_path . 'templates/' . $style_path . '/') )
+		
+		// Look at MX-Publisher-Root folder.........................................................................MX-Publisher-Root
+		if (file_exists($mx_root_path . 'templates/' . $style_path . '/'))
 		{
-			//
 			// First check current template
-			//
 			$this->root = $mx_root_path . 'templates/' . $style_path . '/';
 			$this->cachepath = $mx_root_path . 'cache/tpl_' . $style_path . '_';
 		}
 		else if( file_exists($mx_root_path . 'templates/' . $mx_user->cloned_template_name . '/') && !empty($mx_user->cloned_template_name))
 		{
-			//
 			// Then check Cloned template
-			//
 			$this->root = $mx_root_path . 'templates/' . $mx_user->cloned_template_name . '/';
 			$this->cachepath = $mx_root_path . 'cache/tpl_' . $mx_user->cloned_template_name . '_';
 		}
@@ -759,9 +744,7 @@ class mx_Template extends Template
 			$this->root = $mx_root_path . 'templates/' . $mx_user->default_template_name . '/';
 			$this->cachepath = $mx_root_path . 'cache/tpl_' . $mx_user->default_template_name . '_';
 		}
-		//
 		// Look at Custom Root folder..............this is used my mx_mod installers too.......this does not use standard templates folders wich are set when the template was re-initialized and defined as custom var
-		//
 		else if( file_exists( $this->root . '/') )
 		{
 			$this->root =  $this->root . '/';
@@ -769,32 +752,24 @@ class mx_Template extends Template
 		}
 		else if( file_exists($this->root . '/' . $style_path . '/') )
 		{
-			//
 			// First check current template
-			//
 			$this->root = $this->root . '/' . $style_path . '/';
 			$this->cachepath = $mx_root_path . 'cache/tpl_' . $style_path . '_';
 		}
 		else if( file_exists($this->root . '/' . $style_path . '/') )
 		{
-			//
 			// tpl - html
-			//
 			$this->root = $this->root. '/' . $style_path . '/';
 		}
 		else if( file_exists($this->root . '/' . $mx_user->default_template_name . '/') )
 		{
-			//
 			// Then check current template
-			//
 			$this->root = $mx_root_path . '/' . $mx_user->default_template_name . '/';
 			$this->cachepath = $mx_root_path . 'cache/tpl_' . $mx_user->default_template_name . '_';
 		}
 		else if( file_exists($this->root . '/' . $moduleDefault . '/') )
 		{
-			//
 			// Finally check the Custom Root folde(for compatibility with some old modules)
-			//
 			$this->root = $this->root . '/' . $moduleDefault . '/';
 			$this->cachepath = $mx_root_path . 'cache/tpl_' . $moduleDefault . '_';
 		}
@@ -805,33 +780,25 @@ class mx_Template extends Template
 			//
 			if( file_exists($phpbb_root_path . 'templates/' . $style_path . '/') )
 			{
-				//
 				// First check current template
-				//
 				$this->root = $phpbb_root_path . 'templates/' . $style_path . '/';
 				$this->cachepath = $phpbb_root_path . 'cache/tpl_' . $style_path. '_';
 			}
 			else if( file_exists($phpbb_root_path . 'templates/' . $mx_user->cloned_template_name . '/') && !empty($mx_user->cloned_template_name))
 			{
-				//
 				// Then check Cloned
-				//
 				$this->root = $phpbb_root_path . 'templates/' . $mx_user->cloned_template_name . '/';
 				$this->cachepath = $phpbb_root_path . 'cache/tpl_' . $mx_user->cloned_template_name . '_';
 			}
 			else if( file_exists($phpbb_root_path . 'templates/' . $mx_user->default_template_name . '/') && !empty($mx_user->default_template_name))
 			{
-				//
 				// Then check Default
-				//
 				$this->root = $phpbb_root_path . 'templates/' . $mx_user->default_template_name . '/';
 				$this->cachepath = $phpbb_root_path . 'cache/tpl_' . $mx_user->default_template_name . '_';
 			}
 			else if (file_exists($phpbb_root_path . 'styles/' . $mx_user->theme['template_path'] . '/template'))
 			{
-				//
 				// Then check phpBB3 style
-				//
 				$this->root = $phpbb_root_path . 'styles/' . $mx_user->theme['template_path'] . '/template';
 				$this->cachepath = $phpbb_root_path . 'cache/tpl_' . $mx_user->theme['template_path'] . '_';
 			}
@@ -842,9 +809,7 @@ class mx_Template extends Template
 			}
 			else if( file_exists($this->root . '/') )
 			{
-				//
 				// Check if it's an absolute or relative path.
-				//
 				$this->root = phpbb_realpath($this->root . '/');
 				$this->cachepath = $phpbb_root_path . 'cache/tpl_' . phpbb_realpath($this->root . '/') . '_';
 			}
@@ -855,10 +820,8 @@ class mx_Template extends Template
 		}
 
 		$this->_rootref = &$this->_tpldata['.'][0];
-
 		return true;
 	}
-
 }	// class mx_Template
 
 /**#@+
@@ -1169,7 +1132,8 @@ class mx_user extends mx_session
 				case 'olympus':
 				case 'ascraeus':
 				case 'rhea':
-				case 'proteus':	
+				case 'proteus':
+				default:				
 					$this->data =  $this->session_pagestart($this->user_ip, $this->page_id);	
 					//$this->session_begin();
 				break;
@@ -1299,7 +1263,7 @@ class mx_user extends mx_session
 			case 'ascraeus':
 			case 'rhea':
 			case 'proteus':
-					
+			default:
 					$sql_users = 'UPDATE ' . USERS_TABLE . "
 						SET user_lang = '" . $this->encode_lang($this->lang['default_lang']) . "'
 						WHERE user_lang = '" . $this->encode_lang($this->data['user_lang']) . "'";
@@ -1705,6 +1669,7 @@ class mx_user extends mx_session
 				case 'rhea':
 				case 'proteus':
 				case 'phpbb3':
+				default:
 					$sql = "SELECT  mxt.*, bbt.style_id, bbt.style_name
 						FROM " . MX_THEMES_TABLE . " AS mxt, " . STYLES_TABLE . " AS bbt
 						WHERE bbt.style_active = 1 AND bbt.style_name = '$init_style'
@@ -1749,6 +1714,7 @@ class mx_user extends mx_session
 					case 'rhea':
 					case 'proteus':
 					case 'phpbb3':
+					default:
 						$sql = "SELECT  themes_id, style_name
 							FROM " . MX_THEMES_TABLE . "
 							WHERE portal_backend = 'phpbb3'";
@@ -1801,6 +1767,7 @@ class mx_user extends mx_session
 				case 'rhea':
 				case 'proteus':	
 				case 'phpbb3':
+				default:
 					$sql = "SELECT  mxt.*, bbt.style_id, bbt.style_name
 						FROM " . MX_THEMES_TABLE . " AS mxt, " . STYLES_TABLE . " AS bbt
 						WHERE bbt.style_active = 1 
@@ -1847,6 +1814,7 @@ class mx_user extends mx_session
 					case 'proteus':
 					case 'phpbb3':
 					case 'ascraeus':
+					default:
 						$sql2 = "SELECT  mxt.themes_id, bbt.style_id, bbt.style_name, bbt.style_path
 							FROM " . MX_THEMES_TABLE . " AS mxt, " . STYLES_TABLE . " AS bbt
 							WHERE bbt.style_active = 1 
@@ -1885,6 +1853,7 @@ class mx_user extends mx_session
 						case 'proteus':
 						case 'phpbb3':
 						case 'ascraeus':
+						default:
 							$sql = "SELECT  mxt.themes_id, bbt.style_id, bbt.style_name, bbt.style_path
 								FROM " . MX_THEMES_TABLE . " AS mxt, " . STYLES_TABLE . " AS bbt
 								WHERE bbt.style_name = mxt.style_name";
@@ -2084,6 +2053,7 @@ class mx_user extends mx_session
 			case 'proteus':	
 			case 'phpbb3':
 			case 'ascraeus':
+			default:
 			#AND mxt.template_name = style_path
 				$sql = "SELECT  mxt.*, mxt.template_name AS template_path, s.* 
 					FROM " . MX_THEMES_TABLE . " AS mxt, " . STYLES_TABLE . " AS s
@@ -2222,6 +2192,7 @@ class mx_user extends mx_session
 				case 'ascraeus':
 				case 'rhea':
 				case 'proteus':
+				default:
 					$sql = "SELECT mxt.*, mxt.template_name AS template_path, stt.*
 						FROM " . MX_THEMES_TABLE . " mxt, " . STYLES_TABLE . " stt
 						WHERE mxt.themes_id = " . (int) $init_style . "
@@ -2263,6 +2234,7 @@ class mx_user extends mx_session
 					case 'ascraeus':
 					case 'rhea':
 					case 'proteus':
+					default:
 						$sql = "SELECT mxt.*, mxt.template_name AS template_path, sst.*
 							FROM " . MX_THEMES_TABLE . " AS mxt, " . STYLES_TABLE . " AS sst
 							WHERE sst.style_id = " . (int) $init_style . "
@@ -2302,6 +2274,7 @@ class mx_user extends mx_session
 					case 'ascraeus':
 					case 'rhea':
 					case 'proteus':
+					default:
 						$sql = "SELECT mxt.*, mxt.template_name AS template_path, stt.*
 							FROM " . MX_THEMES_TABLE . " AS mxt, " . STYLES_TABLE . " AS stt
 							WHERE mxt.template_name = stt.style_path";
@@ -2341,6 +2314,7 @@ class mx_user extends mx_session
 			case 'proteus':
 			case 'rhea':
 			case 'phpbb3':
+			default:
 				$this->template_name = $row['template_name'];
 				$row['template_path'] = $row['style_path'];
 				$this->style_name = $row['style_name'];
@@ -2397,7 +2371,8 @@ class mx_user extends mx_session
 			case 'ascraeus':
 			case 'phpbb3':
 			case 'rhea':
-			case 'proteus':	
+			case 'proteus':
+			default:	
 				$row['style_copy'] = $template_config_row['template_copy'];
 				$row['head_stylesheet'] = $row['style_path'] . '.css';
 			break;
@@ -2411,6 +2386,7 @@ class mx_user extends mx_session
 				$row[$key] = $theme[$key];
 			}
 		}
+		
 		/* 
 		* Load images for example for 
 		* ACP images/admin_icons/
@@ -2432,7 +2408,8 @@ class mx_user extends mx_session
 			case 'olympus':
 			case 'ascraeus':
 			case 'rhea':
-			case 'proteus':	
+			case 'proteus':
+			default:	
 				$this->_load_mxbb_images();
 				$this->_load_phpbb_images();
 			break;
@@ -2453,7 +2430,7 @@ class mx_user extends mx_session
 	function _load_template_config()
 	{
 		global $board_config, $images, $theme, $template, $phpbb_root_path, $mx_root_path;
-
+		
 		unset($GLOBALS['MX_TEMPLATE_CONFIG']);
 		$mx_template_config = false;
 		
@@ -2462,7 +2439,7 @@ class mx_user extends mx_session
 		$cloned_template_path = $cloned_template_path_d = $mx_root_path . $this->cloned_current_template_path;
 		$default_template_path = $default_template_path_d = $mx_root_path . $this->default_current_template_path;
 		$template_name = $template_name_d = $this->template_name;
-	
+		
 		/*
 		* Load phpBB3 images
 		**/
@@ -2482,42 +2459,42 @@ class mx_user extends mx_session
 			case 'olympus':
 			case 'ascraeus':
 			case 'rhea':
+			case 'proteus':
+			default:
 				//$phpbb_images = $this->_load_phpbb_images();				
 			break;
 		}
 		
 		//$images = (is_array($phpbb_images) && is_array($images)) ? array_merge($phpbb_images, @$images) : (is_array($images) ? $images: $phpbb_images);
 		
-		//
-		// Load mxBB Template configuration data
-		//
+		// Load MXP Template configuration data
 		$template_config_filename = $mx_root_path . $this->current_template_path . '/' . $this->template_name . '.cfg';	
 		
 		/*
-		*fix for mxp
+		*	fix for mxp
 		**/
-		if ((@include $template_config_filename) === false)
+		if ((is_file($template_config_filename) !== true))
 		{
-			print('The files for ' . $this->template_name . ' are missing. The template configuration filename ' . $template_config_filename . ' couldn\'t be opened.<br/><br/>');
-			//
-			// Since we have no Template Config file, use default (subSilver) instead
-			//
+			print('The files for path ' . $mx_root_path . ' and template ' . $this->template_name . ' are missing. The template configuration file ' . $template_config_filename . ' couldn\'t be opened.<br/><br/>');
+			
+			// Since we have no Template Config file, use default (subsilver) instead
 			@include($mx_root_path . $this->default_current_template_path . '/' . $this->default_template_name . '.cfg');
 
-			//
 			// Make default template -> current template
-			//
 			$this->template_name = $this->default_template_name;
 			$this->current_template_path = $this->default_current_template_path;	
 		}
+		else
+		{
+			include $template_config_filename;
+		}
+		
 		$this->theme = (is_array($this->theme) && is_array($theme)) ? array_merge($this->theme, @$theme) : (is_array($theme) ? $theme: $this->theme);
 		
 		/* Removed since in 3.0.x+ our default template is no style
 		if ( !$mx_template_config )
 		{
-			//
 			// Since we have no Template Config file, use default instead
-			//
 			@include($mx_root_path . $this->default_current_template_path . '/' . $this->default_template_name . '.cfg');
 
 			//
@@ -2525,7 +2502,6 @@ class mx_user extends mx_session
 			//
 			$this->template_name = $this->default_template_name;
 			$this->current_template_path = $this->default_current_template_path;
-
 		}
 		*/
 		
@@ -2537,9 +2513,9 @@ class mx_user extends mx_session
 		/*
 		* Is this a cloned temmplate - defined by main *.cfg?
 		*/
-		$template_config_row['cloned_template'] = trim(htmlspecialchars($mx_template_settings['cloned_template']));
-		$template_config_row['border_graphics'] = $mx_template_settings['border_graphics'];
-		$template_config_row['template_copy'] = $mx_template_settings['template_copy'];
+		$template_config_row['cloned_template'] 	= trim(htmlspecialchars($mx_template_settings['cloned_template']));
+		$template_config_row['border_graphics'] 	= $mx_template_settings['border_graphics'];
+		$template_config_row['template_copy'] 		= $mx_template_settings['template_copy'];
 		return $template_config_row;
 	}
 	
@@ -2564,37 +2540,35 @@ class mx_user extends mx_session
 			break;
 			
 			case 'phpbb2':
-					$current_template_path 			= $this->current_template_path;
+					$current_template_path 					= $this->current_template_path;
 					$default_current_template_path 	= $this->default_current_template_path;
-					$current_style_phpbb_path 		= $this->current_style_phpbb_path; //new
+					$current_style_phpbb_path 			= $this->current_style_phpbb_path; //new
 					$cloned_current_template_path 	= $this->cloned_current_template_path;
-					$template_path 	 					= $this->template_path; //new
+					$template_path 	 							= $this->template_path; //new
 					$default_style_phpbb_path 			= $this->default_style_phpbb_path; 
-					$style_path 							= $this->style_path; //new
+					$style_path 										= $this->style_path; //new
 			break;
 			
 			case 'phpbb3':
 			case 'olympus':
 			case 'proteus':
 			default:
-					$current_template_path 			= $this->current_template_path;
+					$current_template_path 					= $this->current_template_path;
 					$default_current_template_path 	= $this->default_current_template_path;
 					$cloned_current_template_path 	= $this->cloned_current_template_path;
-					$current_style_phpbb_path 		= $this->current_style_phpbb_path; //new
-					$template_path 	 					= $this->template_path; //new
+					$current_style_phpbb_path 			= $this->current_style_phpbb_path; //new
+					$template_path 	 							= $this->template_path; //new
 					$default_style_phpbb_path 			= $this->default_style_phpbb_path; 
-					$style_path 							= $this->style_path; // To main style init. Should be correct and valid.
+					$style_path 										= $this->style_path; // To main style init. Should be correct and valid.
 			break;
 		}	
 		/*
 		* Load phpBB3 Template configuration data
 		*/			
 		$style_found = ''; //default
-
-		//
+		
 		// Load phpBB Template configuration data
 		// - First try current template
-		//
 		if (is_dir($phpbb_root_path . $this->current_template_path . "/images/") || is_dir($phpbb_root_path . $this->current_template_path . "/theme/images/"))
 		{
 			$current_template_path = $this->current_template_path;
@@ -2603,9 +2577,7 @@ class mx_user extends mx_session
 			$style_found = '_'; //default
 		}
 		
-		//
 		// Since we have no current Template Config file, try the cloned template instead
-		//
 		if ((is_dir($phpbb_root_path . $this->cloned_current_template_path . "/images/") || is_dir($phpbb_root_path . $this->cloned_current_template_path . "/theme/images/")) && empty($style_found) )
 		{
 			$current_template_path = $this->cloned_current_template_path;
@@ -2613,10 +2585,8 @@ class mx_user extends mx_session
 			
 			$style_found = 'cloned_'; //default	
 		}
-
-		//
+		
 		// Last attempt, use default template intead
-		//
 		if ((is_dir($phpbb_root_path . $this->default_current_template_path . "/images/") || is_dir($phpbb_root_path . $this->default_current_template_path . "/theme/images/")) && empty($style_found) )		
 		{
 			$current_template_path = $this->default_current_template_path;
@@ -2644,23 +2614,17 @@ class mx_user extends mx_session
 		{
 			if (!defined('TEMPLATE_CONFIG'))
 			{
-				//
 				// Do not alter this line!
-				//
 				@define(TEMPLATE_CONFIG, TRUE);
 			}
 			
 		}
 		elseif(@filemtime($phpbb_root_path . $current_template_path . "/style.cfg") )
 		{
-			//
 			// Do not alter this line!
-			//
 			@define(TEMPLATE_CONFIG, TRUE);
-		
-			//
-			// - First try phpBB2 then phpBB3 template lang images then old Olympus image sets
-			//		
+			
+			// - First try phpBB2 then phpBB3 template lang images then old Olympus image sets	
 			if (is_dir($phpbb_root_path . $current_template_path . '/images/'))
 			{
 				$this->current_template_images = $current_template_path . '/images';
@@ -2749,11 +2713,9 @@ class mx_user extends mx_session
 			$images['voting_graphic'][4] = "$current_template_images/voting_bar.gif";
 			
 			@include($phpbb_root_path . $this->cloned_current_template_path . '/' . $this->cloned_template_name . '.cfg');
-
-			//
+			
 			// Vote graphic length defines the maximum length of a vote result
 			// graphic, ie. 100% = this length
-			//
 			$board_config['vote_graphic_length'] = 205;
 			$board_config['privmsg_graphic_length'] = 175;			
 		}
@@ -2764,9 +2726,7 @@ class mx_user extends mx_session
 			{
 				if (!defined('TEMPLATE_CONFIG'))
 				{
-					//
 					// Do not alter this line!
-					//
 					@define(TEMPLATE_CONFIG, TRUE);
 				}
 				
@@ -2779,15 +2739,11 @@ class mx_user extends mx_session
 		}
 		/**/
 		
-		//
 		// We have no template to use - die
-		//
 		if ( !defined('TEMPLATE_CONFIG') )
 		{
-			//
 			// Load phpBB Template configuration data
-			// - Last try current template
-			//		
+			// - Last try current template		
 			if ((@include $phpbb_root_path . $this->template_path . $this->template_name . '/' . $this->template_name . '.cfg') === false)
 			{
 				mx_message_die(CRITICAL_ERROR, "Could not open phpBB $this->template_name template config file", '', __LINE__, __FILE__);
@@ -2801,10 +2757,8 @@ class mx_user extends mx_session
 			$parsed_array = array();
 		}	
 		
-		//
-		// Try phpBB2 then phpBB3 style configuration file
-		//		
-		if(@file_exists(@phpbb_realpath($phpbb_root_path . $current_template_path . '/' . $template_name . '.cfg')) )
+		// Try phpBB2 then phpBB3 style configuration file	
+		if (@file_exists(@phpbb_realpath($phpbb_root_path . $current_template_path . '/' . $template_name . '.cfg')) )
 		{		
 			//parse phpBB2 style cfg file	
 			$cfg_file_name = $this->template_name . '.cfg';
@@ -2941,14 +2895,10 @@ class mx_user extends mx_session
 			$this->imageset_backend = 'phpbb2';	
 		}
 		
-		//		
-		// phpBB2 image sets main images
-		//				
+		// phpBB2 image sets main images				
 		$img_lang = ( is_dir($phpbb_root_path . $this->current_template_path . $this->img_lang_dir) ) ? $this->img_lang : $this->default_language_name;
 		
-		//
 		// Import phpBB Graphics, prefix with PHPBB_URL, and apply LANG info
-		//
 		while( list($key, $value) = @each($images) )
 		{
 			if (is_array($value))
@@ -2989,9 +2939,8 @@ class mx_user extends mx_session
 			}			
 		}
 		
-		//print_r($images);		
-		// Import phpBB Olympus image sets main images
-		//		
+		// print_r($images);		
+		// Import phpBB Olympus image sets main images	
 		if (@file_exists("{$phpbb_root_path}{$this->template_path}{$this->template_name}{$this->imageset_path}/imageset.cfg"))
 		{		
 			$cfg_data_imageset = mx_parse_cfg_file("{$phpbb_root_path}{$this->template_path}{$this->template_name}{$this->imageset_path}/imageset.cfg");
@@ -3024,27 +2973,28 @@ class mx_user extends mx_session
 						'image_filename'	=> (string) $image_filename,
 						'image_height'		=> (int) $image_height,
 						'image_width'		=> (int) $image_width,
-						'imageset_id'		=> (int) $style_id,
-						'image_lang'		=> '',
+						'imageset_id'			=> (int) $style_id,
+						'image_lang'			=> '',
 					);
 					
 					if (!empty($row['image_lang']))
 					{
 						$localised_images = true;
 					}					
-					$row['image_filename'] = !empty($row['image_filename']) ? rawurlencode($row['image_filename']) : '';
-					$row['image_name'] = !empty($row['image_name']) ? rawurlencode($row['image_name']) : '';
-					$this->img_array[$row['image_name']] = $row;									
+					
+					$row['image_filename'] 								= !empty($row['image_filename']) ? rawurlencode($row['image_filename']) : '';
+					$row['image_name'] 									= !empty($row['image_name']) ? rawurlencode($row['image_name']) : '';
+					
+					$this->img_array[$row['image_name']]		= $row;									
 				}
 			}		
 		}
-		
-		//		
-		// - Olympus image sets lolalised images	
-		//		
+			
+		// - Olympus image sets lolalised images		
 		if (@file_exists("{$phpbb_root_path}{$this->template_path}{$this->template_name}{$this->imageset_path}{$this->img_lang}/imageset.cfg"))
 		{
 			$cfg_data_imageset_data = mx_parse_cfg_file("{$phpbb_root_path}{$this->template_path}{$this->template_name}{$this->imageset_path}{$this->img_lang}/imageset.cfg");
+			
 			foreach ($cfg_data_imageset_data as $image_name => $value)
 			{
 				if (strpos($value, '*') !== false)
@@ -3285,8 +3235,8 @@ class mx_user extends mx_session
 							'image_filename'	=> (string) $image_filename,
 							'image_height'		=> (int) $image_height,
 							'image_width'		=> (int) $image_width,
-							'imageset_id'		=> (int) $this->theme['imageset_id'],
-							'image_lang'		=> (string) $this->img_lang,
+							'imageset_id'			=> (int) $this->theme['imageset_id'],
+							'image_lang'			=> (string) $this->img_lang,
 						);
 						*/
 						//Here we overwrite phpBB3 images names from the template configuration file with images file names from database						
@@ -3374,11 +3324,13 @@ class mx_user extends mx_session
 			case 'rhea':
 			case 'proteus':
 			case 'phpbb3':
+			default:
 				/*
 				* Load phpBB Template configuration data
 				* - First prepare the variables
 				*/
 				$this->setup_style();
+				
 				if (!$this->template_name)
 				{
 					trigger_error("Could not get style data: $this->template_name", E_USER_ERROR);
@@ -3390,21 +3342,21 @@ class mx_user extends mx_session
 					$this->lang_path = $phpbb_root_path . 'language/' . $this->lang_name . '/';
 
 					$this->date_format = $this->data['user_dateformat'];
-					$this->timezone = $this->data['user_timezone'] * 3600;
-					$this->dst = $this->data['user_dst'] * 3600;
+					$this->timezone = (int)$this->data['user_timezone'] * 3600;
+					$this->dst = (int)$this->data['user_dst'] * 3600;
 				}
 				else
 				{
 					$this->lang_name = (file_exists($phpbb_root_path . 'language/' . $this->encode_lang($this->lang['default_lang']) . "/common.$phpEx")) ? $this->encode_lang($this->lang['default_lang']) : 'en';
 					$this->lang_path = $phpbb_root_path . 'language/' . $this->lang_name . '/';
 					$this->date_format = $board_config['default_dateformat'];
-					$this->timezone = $board_config['board_timezone'] * 3600;
-					$this->dst = isset($this->data['user_dst']) ? $this->data['user_dst'] * 3600 : $board_config['user_timezone'] * 3600;
+					$this->timezone = (int)$board_config['board_timezone'] * 3600;
+					$this->dst = isset($this->data['user_dst']) ? (int)$this->data['user_dst'] * 3600 : (int)$board_config['user_timezone'] * 3600;
 				}
 				
-				$this->img_lang = (@file_exists($phpbb_root_path . 'styles/' . $this->theme['imageset_path'] . '/theme/' . $this->lang_name)) ? $this->lang_name : $this->encode_lang($board_config['default_lang']);				
-				//$this->template_name = $this->theme['imageset_path'];
-				//trigger_error("Could not get style data: $this->template_name", E_USER_ERROR);
+				$this->img_lang = (@file_exists('{$phpbb_root_path}styles/{$this->template_path}/theme/images/{$this->lang_name}')) ? $this->lang_name : $this->encode_lang($board_config['default_lang']);				
+				// $this->template_name = $this->template_path;
+				// trigger_error("Could not get style data: $this->template_name", E_USER_ERROR);
 				
 				//
 				// Load phpBB Template configuration data
@@ -3418,7 +3370,11 @@ class mx_user extends mx_session
 					$current_style_phpbb_path = $this->current_style_phpbb_path = $this->style_path . $this->template_name;	//new
 					$current_template_phpbb_path = $current_style_phpbb_path . "/template";
 					$current_template_phpbb_images = @file_exists($phpbb_root_path . $current_style_phpbb_path . "/theme/images") ? $current_style_phpbb_path. "/theme/images" : (@file_exists($phpbb_root_path . $this->default_style2_name . "/theme/images") ? $phpbb_root_path . $this->default_style2_name . "/theme/images" : $phpbb_root_path . $this->default_template_name . "/theme/images");
-					@define('TEMPLATE_CONFIG', true);
+					
+					if ( !defined('TEMPLATE_CONFIG') )
+					{ 
+						@define('TEMPLATE_CONFIG', TRUE); 
+					}
 				}	
 				//
 				// Since we have no cloned Template Config file, try the cloned template instead
@@ -3431,7 +3387,11 @@ class mx_user extends mx_session
 					$cloned_style_phpbb_path = $this->cloned_style_phpbb_path = $this->style_path . $this->cloned_template_name; //new					
 					$current_template_phpbb_path = $cloned_style_phpbb_path . "/template";
 					$current_template_phpbb_images = @file_exists($phpbb_root_path . $cloned_style_phpbb_path . "/theme/images") ? $this->style_path . $this->cloned_template_name . "/theme/images" : (@file_exists($phpbb_root_path . $this->default_style2_name . "/theme/images") ? $phpbb_root_path . $this->default_style2_name . "/theme/images" : $phpbb_root_path . $this->default_template_name . "/theme/images");					
-					@define('TEMPLATE_CONFIG', true);					
+					
+					if ( !defined('TEMPLATE_CONFIG') )
+					{ 
+						@define('TEMPLATE_CONFIG', TRUE); 
+					}					
 				}
 				/**/
 				// Last attempt, use default template intead
@@ -3444,10 +3404,13 @@ class mx_user extends mx_session
 					$default_style_phpbb_path = $this->default_style_phpbb_path = $this->style_path . $this->default_style_name; //new					
 					$current_template_phpbb_path = $default_style_phpbb_path . "/template";
 					$current_template_phpbb_images = @file_exists($phpbb_root_path . $default_style_phpbb_path . "/theme/images") ? $this->style_path . $this->default_style_name . "/imageset" : (@file_exists($phpbb_root_path . $this->default_style2_name . "/imageset") ? $phpbb_root_path . $this->default_style2_name . "/imageset" : $phpbb_root_path . $this->default_template_name . "/imageset");					
-					@define('TEMPLATE_CONFIG', true);					
+					
+					if ( !defined('TEMPLATE_CONFIG') ) 
+					{ 
+						@define('TEMPLATE_CONFIG', TRUE); 
+					}				
 				}
-				
-				
+								
 				/**/
 				//Here we overwrite phpBB images from the template configuration file with images from css
 				$images['icon_quote'] =  $this->images('img_icon_post_quote');
@@ -3490,10 +3453,13 @@ class mx_user extends mx_session
 				$images['reply_new'] = $this->images('img_button_topic_reply');
 				$images['reply_locked'] = $this->images('img_icon_post_target_unread');
 				
-				@define('TEMPLATE_CONFIG', TRUE);
+				if ( !defined('TEMPLATE_CONFIG') || (TEMPLATE_CONFIG !== TRUE)) 
+				{ 
+					@define('TEMPLATE_CONFIG', TRUE); 
+				}
 				// We include common temlate config file here to not load it every time a module template config file is included
-				//$this->theme = is_array($this->theme) ? array_merge($this->theme, $theme) : $theme;				
-				//$this->theme = &$theme;			
+				// $this->theme = is_array($this->theme) ? array_merge($this->theme, $theme) : $theme;				
+				// $this->theme = &$theme;			
 			break;			
 		}
 		
@@ -3509,8 +3475,13 @@ class mx_user extends mx_session
 		
 		/*
 		* Import phpBB Graphics, prefix with PHPBB_URL, and apply LANG info
+			/* start Migrating from php5 to php7+ replace
+				foreach ($images as $default_key => $default_value) {
+			with
+				while (list($default_key, $default_value) = each($images)) {
+			ends Migrating
 		*/
-		while( list($key, $value) = @each($images) )
+		foreach ($images as $key => $value) 
 		{
 			if (is_array($value))
 			{
@@ -3569,6 +3540,7 @@ class mx_user extends mx_session
 			case 'olympus':
 			case 'ascraeus':
 			case 'rhea':
+			default:
 				$template_name2 = 'subsilver2';	
 				/**/
 				// Here we overwrite phpBB images from the template configuration file with images from database
@@ -3737,8 +3709,12 @@ class mx_user extends mx_session
 		}
 		
 		$img_lang = ( file_exists($mx_root_path . $current_template_path . '/images/lang_' . $board_config['default_lang']) ) ? $board_config['default_lang'] : 'english';
-		
-		while( list($key, $value) = @each($mx_images) )
+		/* start Migrating from php5 to php7+ replace
+			foreach ($mx_images as $key => $value) {
+		with
+			while (list($key, $value) = each($mx_images)) {
+		ends Migrating */		
+		foreach ($mx_images as $key => $value) 
 		{
 			if (is_array($value))
 			{
@@ -3928,7 +3904,7 @@ class mx_user extends mx_session
 				case 'ascraeus':
 				case 'rhea':
 				case 'proteus':
-					
+				default:
 					//Load vanilla phpBB3 common language files for new modules if is possible				
 					$shared_lang_path = $this->mx_root_path . 'includes/shared/phpbb3/language/';					
 					
@@ -3971,7 +3947,7 @@ class mx_user extends mx_session
 		//$path = $root_path . "language";	
 		$path = $root_path . "language/lang_" . $language;		
 		
-		$subdir_select = '';
+		$file = $subdir_select = '';
 		
 		$lang_files = array();
 		$subdirs = glob($path . '/*' , GLOB_ONLYDIR);
@@ -3998,7 +3974,7 @@ class mx_user extends mx_session
 			$dir = opendir($path . '/');
 		}
 		
-		while($file = @readdir($dir))
+		while ($file = @readdir($dir))
 		{
 			if ( $file == '.' || $file == '..' || $file == 'CVS')
 			{
@@ -4021,21 +3997,33 @@ class mx_user extends mx_session
 		{
 			$subdir = ($subdir_select == 'email') ? opendir($mx_root_path . 'language/lang_english/' . $subdir_select . '/') : opendir($subdir_select);
 		}
-		$subdir_select_from = $dir_select; //$root_path . $path . 'language/' . $language;
-		while($file = @readdir($subdir))
+		else
 		{
-			if ($file == '.' || $file == '..' || $file == 'CVS')
-			{
-				continue;
-			}
-			if(is_file($subdir_select_from . '/' . $file))
-			{
-				$sub_files[str_replace(".$phpEx", '', $file)] = $subdir_select_from . (!empty($subdir_select_from) ? '/' : '') . $file;
-				$lang_files = array_merge($lang_files, $sub_files);
-			}
-		}
-		@closedir($subdir);
+			$subdir = $subdir_select;
+		}			
+		$subdir_select_from = $dir_select; //$root_path . $path . 'language/' . $language;
 		
+		if (is_dir($subdir))
+		{
+			while ($file = readdir($subdir))
+			{
+				if ($file == '.' || $file == '..' || $file == 'CVS')
+				{
+					continue;
+				}
+				
+				if (is_file($subdir_select_from . '/' . $file))
+				{
+					$sub_files[str_replace(".$phpEx", '', $file)] = $subdir_select_from . (!empty($subdir_select_from) ? '/' : '') . $file;
+					$lang_files = array_merge($lang_files, $sub_files);
+				}
+			}
+			closedir($subdir);
+		}
+		else
+		{
+			print('Not uploaded yet: '.$subdir.' ?');
+		}
 		return $lang_files;
 	}
 	
@@ -4231,8 +4219,6 @@ class mx_user extends mx_session
 		return $this->language_list;
 	}
 	
-
-
 	/**
 	 * Init user style.
 	 * Populate $template, $theme, $images
@@ -4258,7 +4244,7 @@ class mx_user extends mx_session
 			$this->_init_session($user_ip, $this->page_id);
 			$this->_init_userprefs();
 			
-			print('Bad initialization method of the User Class!</br>');
+			print('Style: Bad initialization method of the User Class!</br>');
 		}
 
 		/*
@@ -4281,7 +4267,8 @@ class mx_user extends mx_session
 			case 'olympus':
 			case 'ascraeus':
 			case 'rhea':
-			case 'proteus':	
+			case 'proteus':
+			default:	
 				$this->_load_phpbb_images();
 			break;
 		}
@@ -4874,8 +4861,9 @@ class mx_language_file_loader
  * 
  */
 interface IException
-{
-    /* Protected methods inherited from Exception class */
+{   
+	
+	/* Protected methods inherited from Exception class */
     public function getMessage();                 // Exception message
     public function getCode();                    // User-defined Exception code
     public function getFile();                    // Source filename
@@ -4885,8 +4873,9 @@ interface IException
    
     /* Overrideable methods inherited from Exception class */
     public function __toString();                 // formated string for display
-    public function __construct($message = null, $code = 0);
+	public function __construct($message = "Unknown exception", array $parameters = array(), \Exception $previous = null, $code = 0);
 }
+
 /**
  * Class runtime_exception
  *
@@ -4894,42 +4883,42 @@ interface IException
  */
 abstract class runtime_exception extends Exception implements IException
 {
-	/**
-	 * Parameters to use with the language var.
-	 *
-	 * @var array
-	 */
-	protected $message = 'Unknown exception';     // Exception message
-    private   $string;                            // Unknown
-    protected $code    = 0;                       // User-defined exception code
-    protected $file;                              // Source filename of exception
-    protected $line;                              // Source line of exception
-    private   $trace;                             // Unknown
 
+	/**
+	 * Propeties
+	 */
+	private array $parameters = [];		// Unknow
+	private string $string = "";
+	protected string $file = "";				// Source filename of exception
+	protected int $line;  						// User-defined exception code
+	private array $trace = [];
+	private ?Throwable $previous = null;
+	
 	/**
 	 * Constructor
 	 *
 	 * @param string		$message	The Exception message to throw (must be a language variable).
 	 * @param integer		$code		The Exception code.
 	 */
-	public function __construct($message = "", $code = 0)
+	public function __construct($message = "Unknown exception", array $parameters = array(), \Exception $previous = null, $code = 0)
 	{
-        if (!empty($message)) 
+	
+		$this->parameters = $parameters;
+		
+		if (!empty($message)) 
 		{
-            //throw new $this('Unknown '. get_class($this));
-			print_r($message);
-        }
-        //parent::__construct($message, $code);
+				//throw new $this('Unknown '. get_class($this));
+				print_r($message);
+		}
 	}
+	//__construct($prefix . $message, $parameters, $previous, $code);
 	/**
-	 * {@inheritdoc}
+	 * tostr
 	 */
 	public function __toString()
     {
-        return get_class($this) . " '{$this->message}' in {$this->file}({$this->line})\n" . "{$this->getTraceAsString()}";
-    }	
-	/**
-	 */	
+		return get_class($this) . " '{$this->message}' in {$this->filename}({$this->line})\n" . "{$this->getTraceAsString()}";
+    }
 }  
 /**
  *
@@ -5635,7 +5624,7 @@ class mx_language extends mx_language_file_loader
 		return $lang_name;
 	}
 	
-	function ucstrreplace($pattern = '%{$regex}%i', $matches = '', $string) 
+	function ucstrreplace($pattern = '%{$regex}%i', $matches = '', $string = 'en') 
 	{
 		/* return with no uppercase if patern not in string */
 		if (strpos($string, $pattern) === false)
@@ -6226,8 +6215,8 @@ class mx_language extends mx_language_file_loader
 	}
 	
 	/* replacement for eregi($pattern, $string); outputs 0 or 1*/
-	function trisstr($pattern = '%{$regex}%i', $string, $matches = '') 
-	{         
+	function trisstr($pattern = '%{$regex}%i', $string = '', $matches = '') 
+	{
 		return preg_match('/' . $pattern . '/i', $string, $matches);	
 	}
 	
@@ -6350,7 +6339,7 @@ class mx_language extends mx_language_file_loader
 				case 'ascraeus':
 				case 'rhea':
 				case 'proteus':
-					
+				default:					
 					//Load vanilla phpBB3 common language files for new modules if is possible				
 					$shared_lang_path = $this->mx_root_path . 'includes/shared/phpbb2/language/';					
 					
