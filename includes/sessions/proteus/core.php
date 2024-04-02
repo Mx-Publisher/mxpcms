@@ -2,7 +2,7 @@
 /**
 *
 * @package Auth
-* @version $Id: core.php,v 1.29 2014/07/07 20:36:53 orynider Exp $
+* @version $Id: core.php,v 1.29 2024/04/02 06:09:17 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
@@ -1269,9 +1269,9 @@ class mx_backend
 		// even bother complaining ... go scream and shout at the idiots out there who feel
 		// "clever" is doing harm rather than good ... karma is a great thing ... :)
 		//
-		$this->client_ip = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : ( ( !empty($_ENV['REMOTE_ADDR']) ) ? $_ENV['REMOTE_ADDR'] : getenv('REMOTE_ADDR') );
-		$ip_sep = explode('.', $this->client_ip);
-		$this->user_ip = sprintf('%02x%02x%02x%02x', $ip_sep[0], $ip_sep[1], $ip_sep[2], $ip_sep[3]);	
+		$this->client_ip 	= isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : ( ( !empty($_ENV['REMOTE_ADDR']) ) ? $_ENV['REMOTE_ADDR'] : getenv('REMOTE_ADDR') );
+		$ip_sep 					= explode('.', $this->client_ip);
+		$this->user_ip 		= sprintf('%02x%02x%02x%02x', $ip_sep[0], $ip_sep[1], $ip_sep[2], $ip_sep[3]);	
 	}	
 	/***/
 	 
@@ -1315,9 +1315,9 @@ class mx_backend
 			// phpBB x.x auto-generated config file
 			// Do not change anything in this file!
 			$mx_dbms 			= $dbms;
-			$mx_dbhost 		= $dbhost; 
+			$mx_dbhost 			= $dbhost; 
 			$mx_dbname 		= $dbname; 
-			$mx_dbuser 		= $dbuser; 
+			$mx_dbuser 			= $dbuser; 
 			$mx_dbpasswd 	= $dbpasswd; 
 			$mx_table_prefix	= $table_prefix;
 			
@@ -1327,7 +1327,7 @@ class mx_backend
 			$dbms = $this->get_keys_sufix($dbms);
 			$acm_type = $this->get_keys_sufix($acm_type);
 			
-			$dbname 		= $backend_info['dbname'];
+			$dbname 			= $backend_info['dbname'];
 			$dbuser 			= $backend_info['dbuser'];
 			$dbpasswd 		= $backend_info['dbpasswd'];
 			$table_prefix 	= $backend_info['table_prefix'];
@@ -1409,8 +1409,8 @@ class mx_backend
 		// - optional parameter to enable/disable cache for config data. If enabled, remember to refresh the MX-Publisher cache whenever updating phpBB config settings
 		// - true: enable cache, false: disable cache
 		$board_config = $this->obtain_phpbb_config(false);
-		$script_name_phpbb = preg_replace('/^\/?(.*?)\/?$/', "\\1", trim($board_config['script_path'])) . '/';
-
+		$script_name_phpbb = isset($board_config['script_path']) ? preg_replace('/^\/?(.*?)\/?$/', "\\1", trim($board_config['script_path'])) . '/' : trim($portal_config['portal_backend_path']);
+		
 		$server_url_phpbb = $server_protocol . $server_name . $server_port . $script_name_phpbb;
 		define('PHPBB_URL', $server_url_phpbb);
 		
@@ -1560,6 +1560,7 @@ class mx_backend
 		if ($force_shared)
 		{
 			$backend = in_array($force_shared, array('internal', 'phpbb2', 'smf2', 'mybb', 'phpbb3', 'olympus', 'rhea', 'ascraeus', 'proteus')) ? $force_shared : PORTAL_BACKEND;
+			
 			switch ($backend)
 			{
 				case 'internal':
@@ -1577,6 +1578,7 @@ class mx_backend
 					$path = $mx_root_path . 'includes/shared/phpbb3/includes/';
 				break;
 			}
+		
 		}
 		else
 		{
@@ -1649,18 +1651,18 @@ class mx_backend
 		}
 		
 		return array(
-			'dbms'					=> $dbms,
-			'dbhost'					=> $dbhost,
-			'dbname'				=> $dbname,
-			'dbuser'					=> $dbuser,
+			'dbms'							=> $dbms,
+			'dbhost'						=> $dbhost,
+			'dbname'					=> $dbname,
+			'dbuser'						=> $dbuser,
 			'dbpasswd'				=> $dbpasswd,
 			'mx_table_prefix'		=> $mx_table_prefix,	
 			//'table_prefix'	=> $table_prefix,
-			'backend'				=> $backend,
-			'version'					=> $phpbbversion,
-			'acm_type'				=> isset($acm_type) ? $acm_type : '',
-			//'phpbb_root_path'		=> $phpbb_root_path,
-			'status'					=> defined('MX_INSTALLED') ? true : false,
+			'backend'					=> $backend,
+			'version'						=> $phpbbversion,
+			'acm_type'					=> isset($acm_type) ? $acm_type : '',
+			//'phpbb_root_path'	=> $phpbb_root_path,
+			'status'						=> defined('MX_INSTALLED') ? true : false,
 		);
 	}	
 	
@@ -2063,14 +2065,14 @@ class mx_backend
 				}
 
 				$layouttemplate->assign_vars(array(
-					'U_LOGIN_LOGOUT' => mx_append_sid(PORTAL_URL . $u_login_logout),
-					'L_LOGIN_LOGOUT' => $l_login_logout,
-					'LAST_VISIT_DATE' => sprintf($lang['You_last_visit'], $s_last_visit),
-					'PRIVATE_MESSAGE_INFO' => $l_privmsgs_text,
+					'U_LOGIN_LOGOUT' 					=> mx_append_sid(PORTAL_URL . $u_login_logout),
+					'L_LOGIN_LOGOUT' 					=> $l_login_logout,
+					'LAST_VISIT_DATE' 					=> sprintf($lang['You_last_visit'], $s_last_visit),
+					'PRIVATE_MESSAGE_INFO' 	=> $l_privmsgs_text,
 					'PRIVATE_MESSAGE_INFO_UNREAD' => $l_privmsgs_text_unread,
 					'PRIVATE_MESSAGE_NEW_FLAG' => $s_privmsg_new,
-					'PRIVMSG_IMG' => $icon_pm,
-					'L_PRIVATEMSGS' => $mx_priv_msg,
+					'PRIVMSG_IMG' 							=> $icon_pm,
+					'L_PRIVATEMSGS' 					=> $mx_priv_msg,
 
 					// Backend
 					'PHPBB' => true,
@@ -2135,10 +2137,9 @@ class mx_backend
 
 				$template->assign_vars(array(
 					'PHPBB_BACKEND'				=> true,
-					'PHPBB_VERSION' 			=> ($userdata['user_level'] == ADMIN && $userdata['user_id'] != ANONYMOUS) ? $current_phpbb_version : '',
-					'U_PHPBB_ROOT_PATH' 		=> PHPBB_URL,
+					'PHPBB_VERSION' 				=> ($userdata['user_level'] == ADMIN && $userdata['user_id'] != ANONYMOUS) ? $current_phpbb_version : '',
+					'U_PHPBB_ROOT_PATH' 	=> PHPBB_URL,
 				));
-
 				break;
 		}
 	}
@@ -2186,7 +2187,6 @@ class mx_backend
 				{
 					$cached_config[$row['config_name']] = $row['config_value'];
 				}
-
 				$config[$row['config_name']] = $row['config_value'];
 			}
 			$db->sql_freeresult($result);
@@ -2202,7 +2202,9 @@ class mx_backend
 			{
 				mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
 			}
-
+			
+			$config = array();
+			
 			while ($row = $db->sql_fetchrow($result))
 			{
 				$config[$row['config_name']] = $row['config_value'];
@@ -2216,13 +2218,13 @@ class mx_backend
 	/**
 	* Get key_sufix() from MX Installer
 	* we have so far in beta 3
-	* $dbms = 'phpbb\\db\\driver\\mysqli';
-	* $acm_type = 'phpbb\\cache\\driver\\file';
+	* $dbms 			= 'phpbb\\db\\driver\\mysqli';
+	* $acm_type 		= 'phpbb\\cache\\driver\\file';
 	* We only need the sufix in this installer
 	*/
 	function get_keys_sufix($key)
 	{
-		$keys = explode("\\", $key);
+		$keys = explode("\\", $key ?? '');
 
 		$i = count($keys) - 1;
 		$rkey = $keys[$i];
@@ -2246,17 +2248,17 @@ class mx_backend
 			global $table_prefix, $mx_root_path;
 				
 			require $mx_root_path. "includes/sessions/phpbb2/constants.$phpEx";
-		}		
+		}	
 		
 		// Read out config values
 		$config = $this->obtain_phpbb_config();
 		$old_value = !isset($config[$key]) ? $config[$key] : false;		
 		$use_cache = (($key == 'comments_pagination') || ($key == 'pagination')) ? true : false;
-			
+		
 		$sql = 'UPDATE ' . CONFIG_TABLE . "
 			SET config_value = '" . $db->sql_escape($new_value) . "'
 			WHERE config_name = '" . $db->sql_escape($key) . "'";
-
+		
 		if ($old_value !== false)
 		{
 			$sql .= " AND config_value = '" . $db->sql_escape($old_value) . "'";
@@ -2274,18 +2276,20 @@ class mx_backend
 
 		if (!isset($config[$key]))
 		{
-			$sql = 'INSERT INTO ' . CONFIG_TABLE . ' ' . $db->sql_build_array('INSERT', array(
+			$sql_array = $db->sql_build_array('INSERT', array(
 				'config_name'	=> $key,
 				'config_value'	=> $new_value,
-				'is_dynamic'	=> ($use_cache) ? 0 : 1));
+				'is_dynamic'		=> ($use_cache) ? 0 : 1));
+			
+			$sql = 'INSERT INTO ' . CONFIG_TABLE . ' ' . $sql_array;
+			
 			if (!$result = $db->sql_query($sql))
 			{
 				mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
 			}
 		}
 		
-		$config[$key] = $new_value;
-
+		$config = array_merge($config, $sql_array);
 		
 		if ($use_cache)
 		{
@@ -2327,14 +2331,18 @@ class mx_backend
 					mx_message_die( GENERAL_ERROR, 'Couldnt query portal configuration', '', __LINE__, __FILE__, $sql );
 				}
 			}
-			$row = $db->sql_fetchrow($result);
-			foreach ($row as $config_name => $config_value)
-			{
-				$portal_config[$config_name] = trim($config_value);
-			}
+			
+			$portal_config = array();
+			
+			$portal_config = $db->sql_fetchrow($result);
+			
+			//foreach ($portal_config as $config_name => $config_value)
+			//{
+			//	$portal_config[$config_name] = $config_value;
+			//}
 			$db->sql_freeresult($result);
+			
 			$mx_cache->put('mx_config', $portal_config);
-
 			return ($portal_config);
 		}
 	}
@@ -2349,7 +2357,7 @@ class mx_backend
 	public function obtain_phpbb_config($use_cache = true)
 	{
 		global $db, $phpbb_root_path, $table_prefix, $mx_cache, $phpEx;
-
+		
 		if (($config = $mx_cache->get('phpbb_config')) && ($use_cache) )
 		{
 			return $config;
@@ -2363,10 +2371,10 @@ class mx_backend
 				require $mx_root_path. "includes/sessions/phpbb3/constants.$phpEx";
 			}
 
-			$sql = "SELECT *
+			$sql = "SELECT config_name, config_value
 				FROM " . CONFIG_TABLE;
 
-			if ( !( $result = $db->sql_query( $sql ) ) )
+			if (!($result = $db->sql_query($sql)))
 			{
 				if (!function_exists('mx_message_die'))
 				{
@@ -2377,23 +2385,24 @@ class mx_backend
 					mx_message_die( GENERAL_ERROR, 'Couldnt query config information', '', __LINE__, __FILE__, $sql );
 				}
 			}
-
+			
+			$config = array();
+			
 			while ( $row = $db->sql_fetchrow($result) )
 			{
 				$config[$row['config_name']] = $row['config_value'];
 			}
+			
 			$db->sql_freeresult($result);
-
+			
 			if ($use_cache)
 			{
 				$mx_cache->put('phpbb_config', $config);
 			}
-
 			return ( $config );
 		}
 	}
-
-
+	
 	/**
 	* Set config value. Creates missing config entry.
 	*
@@ -2406,26 +2415,28 @@ class mx_backend
 		$portal_config = $this->obtain_portal_config();		
 		
 		$new[$key] = $new_value;
-
-		$sql = "UPDATE  " . PORTAL_TABLE . " SET " . $db->sql_build_array('UPDATE', utf8_normalize_nfc($new));
 		
-		if( !($db->sql_query($sql)) )
+		$sql_array = $db->sql_build_array('UPDATE', utf8_normalize_nfc($new));
+		
+		$sql = "UPDATE  " . PORTAL_TABLE . " SET " . $sql_array;
+		
+		if (!($db->sql_query($sql)))
 		{
 			mx_message_die(GENERAL_ERROR, "Failed to update portal configuration ", "", __LINE__, __FILE__, $sql);
 		}
 		
 		if (!$db->sql_affectedrows() && !isset($portal_config[$key]))
 		{
-			$sql = 'INSERT INTO ' . PORTAL_TABLE . ' ' . $db->sql_build_array('INSERT', array(
-				$db->sql_escape($key) => $db->sql_escape($new_value)));
+			$sql_array = $db->sql_build_array('INSERT', array($db->sql_escape($key) => $db->sql_escape($new_value)));
+			$sql = 'INSERT INTO ' . PORTAL_TABLE . ' ' . $sql_array;
+			
 			if (!$result = $db->sql_query($sql))
 			{
 				mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
 			}
 		}
-
-		$portal_config[$key] = $new_value;
-
+		
+		$portal_config = array_merge($portal_config, $sql_array);
 		$mx_cache->destroy('mx_config');
 	}	
 	
@@ -2452,10 +2463,10 @@ class mx_backend
 			$mx_user = intval($mxuser);
 		}
 
-		$sql = "SELECT *
-			FROM " . USERS_TABLE . "
-			WHERE ";
+		$sql = "SELECT * FROM " . USERS_TABLE . "	WHERE ";
+		
 		$sql .= ((is_integer($mxuser)) ? "user_id = $mxuser" : "username = '" .  str_replace("\'", "''", $mxuser) . "'" ) . " AND user_id <> " . ANONYMOUS;
+		
 		if (!($result = $db->sql_query($sql, 120)))
 		{
 			if (!function_exists('mx_message_die'))
@@ -2467,7 +2478,9 @@ class mx_backend
 				mx_message_die(GENERAL_ERROR, 'Tried obtaining data for a non-existent user', '', __LINE__, __FILE__, $sql);
 			}
 		}
+		
 		$return = ($row = $db->sql_fetchrow($result)) ? $row : false;
+		
 		/*
 		foreach ($row as $user_key => $user_value)
 		{
@@ -3574,27 +3587,27 @@ class mx_backend
 				"NUMBER_OF_POSTS" 	=> $mx_total_posts,
 				"NUMBER_OF_TOPICS" 	=> $mx_total_topics,
 				"NUMBER_OF_USERS" 	=> $mx_total_users,
-				"START_DATE" 				=> $mx_start_date,
+				"START_DATE" 					=> $mx_start_date,
 				"POSTS_PER_DAY" 			=> $mx_posts_per_day,
 				"TOPICS_PER_DAY" 		=> $mx_topics_per_day,
-				"USERS_PER_DAY" 			=> $mx_users_per_day,
+				"USERS_PER_DAY" 		=> $mx_users_per_day,
 				"AVATAR_DIR_SIZE" 		=> $mx_avatar_dir_size,
-				"DB_SIZE" 						=> $mx_dbsize,
+				"DB_SIZE" 							=> $mx_dbsize,
 				"GZIP_COMPRESSION" 	=> ( $board_config['gzip_compress'] ) ? $lang['ON'] : $lang['OFF']
 				)
 			);
 		}
 		$template->assign_vars(array(
-			"NUMBER_OF_POSTS" => $total_posts,
-			"NUMBER_OF_TOPICS" => $total_topics,
-			"NUMBER_OF_USERS" => $total_users,
-			"START_DATE" => $start_date,
-			"POSTS_PER_DAY" => $posts_per_day,
-			"TOPICS_PER_DAY" => $topics_per_day,
-			"USERS_PER_DAY" => $users_per_day,
-			"AVATAR_DIR_SIZE" => $avatar_dir_size,
-			"DB_SIZE" => $dbsize,
-			"GZIP_COMPRESSION" => ( $board_config['gzip_compress'] ) ? $lang['ON'] : $lang['OFF'])
+			"NUMBER_OF_POSTS" 	=> $total_posts,
+			"NUMBER_OF_TOPICS" 	=> $total_topics,
+			"NUMBER_OF_USERS" 	=> $total_users,
+			"START_DATE" 					=> $start_date,
+			"POSTS_PER_DAY" 			=> $posts_per_day,
+			"TOPICS_PER_DAY" 		=> $topics_per_day,
+			"USERS_PER_DAY" 		=> $users_per_day,
+			"AVATAR_DIR_SIZE" 		=> $avatar_dir_size,
+			"DB_SIZE" 							=> $dbsize,
+			"GZIP_COMPRESSION" 	=> ( $board_config['gzip_compress'] ) ? $lang['ON'] : $lang['OFF'])
 		);
 	}
 
@@ -3631,7 +3644,8 @@ class mx_backend
 			{
 				$upgrades_available = array_pop($upgrades_available);
 			}
-			$version_up_to_date		= empty($updates_available);
+			
+			$version_up_to_date			= empty($updates_available);
 			$version_upgradeable		= !empty($upgrades_available);
 			$upgrade_instructions		= !empty($upgrades_available) ? $mx_user->lang('UPGRADE_INSTRUCTIONS', $upgrades_available['current'], $upgrades_available['announcement']) : false;
 		}
