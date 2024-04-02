@@ -2,11 +2,11 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: page_header.php,v 3.78 2024/04/02 06:15:17 orynider Exp $
-* @copyright (c) 2002-2008 MX-Publisher Project Team
+* @version $Id: page_header.php,v 3.78 2024/04/02 23:15:17 orynider Exp $
+* @copyright (c) 2002-2034 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
-* @internal
+* @link http://github.com/Mx-Publisher/mxpcms
 *
 */
 
@@ -151,7 +151,7 @@ switch (PORTAL_BACKEND)
 	case 'mybb':
 		//To do: Profile oe UCP Links for each backend.
 	case 'smf2':
-		
+		$admin = ($mx_user->data['user_level'] == ADMIN) ? true : false;			
 		$u_register = mx_append_sid('login.'.$phpEx.'?mode=register');
 		$u_profile = mx_append_sid('profile.'.$phpEx.'?mode=editprofile');
 		
@@ -164,7 +164,10 @@ switch (PORTAL_BACKEND)
 	break;
 
 	case 'phpbb2':
-	//To do: Check this in sessions/phpbb2 comparing to sessions/internal
+		
+		//To do: Check this in sessions/phpbb2 comparing to sessions/internal		
+		$admin = ($mx_user->data['user_level'] == ADMIN) ? true : false;	
+		
 		$u_login = mx_append_sid("login.".$phpEx);
 		if (  $mx_user->data['user_id'] != ANONYMOUS )
 		{
@@ -190,6 +193,7 @@ switch (PORTAL_BACKEND)
 	case 'olympus':
 	//To do: Check this in sessions/phpbb2 comparing to sessions/internal
 		$u_login = mx_append_sid("login.".$phpEx);
+		$admin = ($mx_user->data['user_level'] == ADMIN) ? true : false;	
 		if ($mx_user->data['user_id'] != ANONYMOUS)
 		{
 			$u_login_logout = mx_append_sid('login.'.$phpEx.'?logout=true&sid=' . $mx_user->data['session_id']);
@@ -218,7 +222,9 @@ switch (PORTAL_BACKEND)
 		$u_login = mx_append_sid("{$phpbb_root_path}ucp.$phpEx", 'mode=login');
 		$u_register = mx_append_sid("{$phpbb_root_path}ucp.php?mode=register&redirect=$redirect_url");
 		$u_profile = mx_append_sid("{$phpbb_root_path}ucp.php?mode=editprofile");
-			
+		
+		$admin = ($mx_user->data['user_type'] == USER_FOUNDER) ? true : false;		
+		
 		if ($mx_user->data['user_id'] != ANONYMOUS)
 		{
 			//$u_login_logout = mx_append_sid("{$phpbb_root_path}ucp.$phpEx", "mode=logout&redirect=$redirect_url", true, $mx_user->session_id);
@@ -1085,8 +1091,8 @@ $layouttemplate->assign_vars(array(
 	
 	'loops'											=> '', // To get loops
 	
-	// 'L_CHANGE_FONT_SIZE'				=> '', 
-	'FONT_SIZE_CHANGE'						=> '- -- -', 
+	'L_CHANGE_FONT_SIZE'				=> $lang['CHANGE_FONT_SIZE'], 
+	'FONT_SIZE_CHANGE'					=> '- -- -', 
 	
 	'S_PLUPLOAD'							=> false,
 	'S_IN_SEARCH'							=> false,
@@ -1203,12 +1209,12 @@ $layouttemplate->assign_vars(array(
 	'U_RESTORE_PERMISSIONS'	=> ($mx_user->data['user_perm_from'] && (PORTAL_BACKEND !== 'internal') && $phpbb_auth->acl_get('a_switchperm')) ? mx_append_sid("{$phpbb_root_path}profile.$phpEx?mode=restore_perm") : '',
 	'U_FEED'				=> '',	
 		
-	'S_CONTENT_DIRECTION'	=> $lang['DIRECTION'] ? $lang['DIRECTION'] : $mx_user->lang['DIRECTION'],
-	'S_CONTENT_FLOW_BEGIN'	=> ($lang['DIRECTION'] == 'ltr') ? 'left' : 'right',
-	'S_CONTENT_FLOW_END'	=> ($lang['DIRECTION'] == 'ltr') ? 'right' : 'left',
-	'S_CONTENT_ENCODING'	=> $lang['ENCODING'] ? $lang['ENCODING'] : 'UTF-8',	
-	'S_CONTENT_DIR_LEFT'	=> $lang['LEFT'],
-	'S_CONTENT_DIR_RIGHT'	=> $lang['RIGHT'],
+	'S_CONTENT_DIRECTION'			=> $lang['DIRECTION'] ? $lang['DIRECTION'] : $mx_user->lang['DIRECTION'],
+	'S_CONTENT_FLOW_BEGIN'		=> ($lang['DIRECTION'] == 'ltr') ? 'left' : 'right',
+	'S_CONTENT_FLOW_END'			=> ($lang['DIRECTION'] == 'ltr') ? 'right' : 'left',
+	'S_CONTENT_ENCODING'			=> $lang['ENCODING'] ? $lang['ENCODING'] : 'UTF-8',	
+	'S_CONTENT_DIR_LEFT'			=> $lang['LEFT'],
+	'S_CONTENT_DIR_RIGHT'			=> $lang['RIGHT'],
 
 	'S_LOGIN_ACTION'		=> ((!defined('ADMIN_START')) ? $u_login : mx_append_sid("{$phpbb_admin_path}index.$phpEx", false, true, $mx_user->session_id)),
 	'S_LOGIN_REDIRECT'		=> mx_build_hidden_fields(array('redirect' => PORTAL_URL)),
@@ -1401,10 +1407,10 @@ $layouttemplate->assign_vars(array(
 	// Additional css for gecko browsers
 	'GECKO' => strstr($useragent, 'Gecko'),
 	
-	'S_ENABLE_FEEDS'							=> false,
+	'S_ENABLE_FEEDS'									=> false,
 	'S_ENABLE_FEFILES_OVERALL'			=> false,
 	'S_ENABLE_FEFILES_FORUMS'			=> false,
-	'S_ENABLE_FEFILES_TOPICS'			=> false,
+	'S_ENABLE_FEFILES_TOPICS'				=> false,
 	'S_ENABLE_FEFILES_TOPICS_ACTIVE'	=> false,
 	'S_ENABLE_FEFILES_NEWS'				=> false,
 			
