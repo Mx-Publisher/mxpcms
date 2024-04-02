@@ -2,7 +2,7 @@
 /**
 *
 * @package Functions_phpBB
-* @version $Id: bbcode.php,v 3.1 2020/02/22 23:14:56 orynider Exp $
+* @version $Id: bbcode.php,v 3.2 2024/04/02 06:94:17 orynider Exp $
 * @copyright (c) 2002-2008 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
@@ -28,12 +28,12 @@ $bbcode_tpl = null;
 $bbcode_uid = null;
 
 // Need to initialize the random numbers only ONCE
-mt_srand( (double) microtime() * 1000000);
+mt_srand( (int)(double) microtime() * (int) 1000000);
 
 //
 // Now load some bbcodes, to be extended for this backend (see below)
 //
-//include_once($mx_root_path . 'includes/mx_functions_bbcode.' . $phpEx); // BBCode associated functions
+//include_once($mx_root_path . 'includes/mx_functions_bbcode.' . $phpEx); //BBCode associated functions
 //
 
 /**
