@@ -2,8 +2,8 @@
 /**
 *
 * @package Core
-* @version $Id: mx_functions_core.php,v 1.141 2024/03/29 22:42:52 orynider Exp $
-* @copyright (c) 2002-2024 MX-Publisher Development Team
+* @version $Id: mx_functions_core.php,v 1.142 2024/04/02 06:12:17 orynider Exp $
+* @copyright (c) 2002-2023 MX-Publisher Development Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
 * @link http://github.com/Mx-Publisher/mxpcms
@@ -1703,8 +1703,8 @@ class cache
 	 */
 	public function sql_save($query, &$query_result, $ttl)
 	{
-		global $db, $phpEx;
-		
+		global $db, $mx_root_path, $phpEx;
+		$this->cache_dir = $mx_root_path . 'cache/';
 		// Remove extra spaces and tabs
 		$query = preg_replace('/[\n\r\s\t]+/', ' ', $query);		
 		$hash = md5($query);
@@ -1719,8 +1719,8 @@ class cache
 		}
 		
 		$tables = array_map('trim', explode(',', $regs[1]));
-		
-		if ($fp = fopen($this->cache_dir . 'sql_' . md5($query) . '.' . $phpEx, 'wb'))
+		$file = $this->cache_dir . 'sql_' . md5($query) . '.' . $phpEx;
+		if ($fp = fopen($file, 'wb'))
 		{
 			@flock($fp, LOCK_EX);
 			@fwrite($fp, $file);
@@ -1754,9 +1754,14 @@ class cache
 			}
 			else
 			{
-				@fwrite($fp, "<?php\n\n/*\n$query\n*/\n\n\$temp[\$hash] = " . true . "; ?>");
-				@flock($fp, LOCK_UN);
-				@fclose($fp);
+				
+				if ($fp = fopen($this->cache_dir . 'sql_' . md5($query) . '.' . $phpEx, 'wb'))
+				{
+					@flock($fp, LOCK_EX);
+					@fwrite($fp, "<?php\n\n/*\n$query\n*/\n\n\$temp[\$hash] = " . true . "; ?>");
+					@flock($fp, LOCK_UN);
+					@fclose($fp);
+				}	
 			}
 		}
 		
@@ -2003,12 +2008,15 @@ class cache
 	{
 		if ($var_name[0] == '_')
 		{
+			global $mx_root_path;
+			
+			$this->cache_dir = $mx_root_path . 'cache/';
 			$phpEx = substr(strrchr(__FILE__, '.'), 1);
-			if ($fp = @fopen($this->cache_dir . 'data' . $var_name . ".$phpEx", 'wb'))
+			if ($fp = fopen($this->cache_dir . 'data' . $var_name . ".$phpEx", 'wb'))
 			{
-				@flock($fp, LOCK_EX);
+				flock($fp, LOCK_EX);
 				fwrite($fp, "<?php\n\$expired = (time() > " . (time() + $ttl) . ") ? true : false;\nif (\$expired) { return; }\n\n\$data = unserialize('" . str_replace("'", "\\'", str_replace('\\', '\\\\', serialize($var))) . "');\n?>");
-				@flock($fp, LOCK_UN);
+				flock($fp, LOCK_UN);
 				fclose($fp);
 			}
 		}
@@ -6146,8 +6154,14 @@ class mx_request_vars
 				$var = array();
 				return;
 			}
-
-			list($default_key, $default_value) = each($default);
+			
+			/* start Migrating from php5 to php7+ replace
+				foreach ($images as $key => $value) {
+			with
+				while (list($key, $value) = each($images)) {
+			ends Migrating */		
+			foreach ($default as $default_key => $default_value);
+			
 			$key_type = gettype($default_key);
 
 			$_var = $var;
