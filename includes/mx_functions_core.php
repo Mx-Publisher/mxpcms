@@ -3,7 +3,7 @@
 *
 * @package Core
 * @version $Id: mx_functions_core.php,v 1.142 2024/04/02 06:12:17 orynider Exp $
-* @copyright (c) 2002-2023 MX-Publisher Development Team
+* @copyright (c) 2002-2024 MX-Publisher Development Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
 * @link http://github.com/Mx-Publisher/mxpcms
@@ -2653,7 +2653,21 @@ class mx_block extends mx_block_parameter
 	{
 		global $mx_user, $userdata, $lang;
 		
-		$is_admin = ($mx_user->data['user_level'] == ADMIN && $mx_user->data['session_logged_in']) ? true : 0;
+		// Generate logged in/logged out status	
+		switch (PORTAL_BACKEND)
+		{
+			case 'internal':
+			case 'mybb':
+				//To do: Profile oe UCP Links for each backend.
+			case 'smf2':
+			case 'phpbb2':				
+			case 'olympus':
+				$is_admin = ($mx_user->data['user_level'] == ADMIN && $mx_user->data['session_logged_in'] ) ? true : false;
+			break;
+			default:
+				$is_admin = ($mx_user->data['user_type'] == USER_FOUNDER) ? true : false;
+			break;
+		}	
 		
 		// Weird rewrite for php5 - anyone explaining why wins a medal ;)
 		$temp_row = isset($this->block_config[$this->block_id]) ? $this->block_config[$this->block_id] : false;
@@ -3039,23 +3053,38 @@ class mx_block extends mx_block_parameter
 	{
 		global $layouttemplate, $board_config, $lang, $mx_user, $phpBB2, $userdata;
 
-		if ( $this->show_stats && !empty($this->block_time) && !empty($this->editor_id) )
-		{
-			$is_admin = ($mx_user->data['user_level'] == ADMIN && $mx_user->data['session_logged_in'] ) ? TRUE : 0;
-			$editor_name_tmp = mx_get_userdata($this->editor_id);
-			$editor_name = $editor_name_tmp['username'];
-			$edit_time = $phpBB2->create_date( $board_config['default_dateformat'], $this->block_time, $board_config['board_timezone'] );
+			if ( $this->show_stats && !empty($this->block_time) && !empty($this->editor_id) )
+			{
+				// Generate logged in/logged out status	
+				switch (PORTAL_BACKEND)
+				{
+					case 'internal':
+					case 'mybb':
+						//To do: Profile oe UCP Links for each backend.
+					case 'smf2':
+					case 'phpbb2':				
+					case 'olympus':
+						$is_admin = ($mx_user->data['user_level'] == ADMIN && $mx_user->data['session_logged_in'] ) ? true : false;
+					break;
+					default:
+						$is_admin = ($mx_user->data['user_type'] == USER_FOUNDER) ? true : false;
+					break;
+				}				
+			
+				$editor_name_tmp = mx_get_userdata($this->editor_id);
+				$editor_name = $editor_name_tmp['username'];
+				$edit_time = $phpBB2->create_date( $board_config['default_dateformat'], $this->block_time, $board_config['board_timezone'] );
 
-			$layouttemplate->assign_block_vars('layout_column.blocks.block_stats', array(
-				'L_BLOCK_UPDATED'		=> $lang['Block_updated_date'],
-				'EDITOR_NAME'				=> $is_admin ? $lang['Block_updated_by'] . ' ' . $editor_name : '',
-				'EDIT_TIME'					=> $edit_time
-			));
-		}
-		else
-		{
-			$layouttemplate->assign_block_vars('layout_column.blocks.no_stats', array());
-		}
+				$layouttemplate->assign_block_vars('layout_column.blocks.block_stats', array(
+					'L_BLOCK_UPDATED'		=> $lang['Block_updated_date'],
+					'EDITOR_NAME'					=> $is_admin ? $lang['Block_updated_by'] . ' ' . $editor_name : '',
+					'EDIT_TIME'							=> $edit_time
+				));
+			}
+			else
+			{
+				$layouttemplate->assign_block_vars('layout_column.blocks.no_stats', array());
+			}
 	}
 
 	/**
@@ -3159,15 +3188,15 @@ class mx_block extends mx_block_parameter
 		//
 		$temp_array = array(
 			'BLOCK_SIZE'						=> (!empty($block_size) ? $block_size : '100%'),
-			'MODULE_ROOT_PATH'		=> $module_root_path,
+			'MODULE_ROOT_PATH'	=> $module_root_path,
 			'EDIT_ACTION'					=> $edit_url,
 			'EDIT_IMG'							=> $edit_img,
-			'EDIT_BLOCK_ALT'				=> $block_edit_alt, 
-			'EDIT_BLOCK_TITLE'			=> $this->block_title, 
-			'EDIT_BLOCK_DESC'			=> $block_desc,
-			'EDIT_BLOCK_SIZE'				=> $block_sizes,
+			'EDIT_BLOCK_ALT'			=> $block_edit_alt, 
+			'EDIT_BLOCK_TITLE'		=> $this->block_title, 
+			'EDIT_BLOCK_DESC'		=> $block_desc,
+			'EDIT_BLOCK_SIZE'			=> $block_sizes,
 			'EDIT_IMG_SRC'					=> $block_edit_img,
-			'EDITCP_SHOW' 					=> $mx_page->editcp_show ? '' : 'none',
+			'EDITCP_SHOW' 				=> $mx_page->editcp_show ? '' : 'none',
 			'S_HIDDEN_FORM_FIELDS'	=> $s_hidden_fields
 		);
 
@@ -3221,6 +3250,7 @@ class mx_block extends mx_block_parameter
 		{
 			return $this->block_parameters[$key]['parameter_opt'];
 		}
+		
 		/** **/
 		if (!isset($this->block_parameters[$key]['parameter_value']))
 		{
@@ -3245,9 +3275,32 @@ class mx_block extends mx_block_parameter
 				}
 				$key = trim($pars_key);		
 			}
+			
+			$block_parameters = array ('Site menu' => array ( 'parameter_id' => 100,
+															'function_id' => count($this->block_parameters) + (int) 1,
+															'parameter_name' => $key, 
+															'parameter_type' => 'site_menu', 
+															'parameter_auth' => 0, 
+															'parameter_value' => '',
+															'parameter_default' => '',
+															'parameter_function' => '',
+															'parameter_opt' => '',
+															'parameter_order' => $level, 
+															));
+			$this->block_parameters = array_merge($block_parameters, $this->block_parameters);	
 		}				
-		/** **/
-		return !empty($this->virtual_id) ? $this->block_virtual_parameters[$key]['parameter_value'] : $this->block_parameters[$key]['parameter_value'];
+		
+		/** menu_display_style **/
+		if (!empty($this->virtual_id))
+		{			
+			return $this->block_virtual_parameters[$key]['parameter_value'];
+		}
+		
+		if (isset($this->block_parameters[$key]['parameter_value']))
+		{		
+			return $this->block_parameters[$key]['parameter_value'];
+		}
+
 	}
 
 	/**
@@ -3259,7 +3312,7 @@ class mx_block extends mx_block_parameter
 	 */
 	public function auth($type)
 	{
-		global $db, $lang, $userdata;
+		global $db, $lang, $mx_user, $userdata;
 
 		switch( $type )
 		{
@@ -3283,14 +3336,13 @@ class mx_block extends mx_block_parameter
 		}
 
 		$auth_user = array();
-		//
+		
 		// If block_id is messed up, give only admin auth
-		//
 		if( $this->block_id == 0 )
 		{
 			for( $i = 0; $i < count($auth_fields); $i++ )
 			{
-				if( $userdata['user_level'] == ADMIN && $userdata['session_logged_in'] )
+				if( $mx_user->data['user_level'] == ADMIN && $mx_user->data['session_logged_in'] )
 				{
 					$auth_user[$auth_fields[$i]] = 1;
 				}
@@ -3302,7 +3354,21 @@ class mx_block extends mx_block_parameter
 			return $auth_user;
 		}
 
-		$is_admin = ( $userdata['user_level'] == ADMIN && $userdata['session_logged_in'] ) ? TRUE : 0;
+		// Generate logged in/logged out status	
+		switch (PORTAL_BACKEND)
+		{
+			case 'internal':
+			case 'mybb':
+				//To do: Profile oe UCP Links for each backend.
+			case 'smf2':
+			case 'phpbb2':				
+			case 'olympus':
+				$is_admin = ($mx_user->data['user_level'] == ADMIN && $mx_user->data['session_logged_in'] ) ? true : false;
+			break;
+			default:
+				$is_admin = ($mx_user->data['user_type'] == USER_FOUNDER) ? true : false;
+			break;
+		}	
 
 		for( $i = 0; $i < count($auth_fields); $i++ )
 		{
@@ -3325,22 +3391,22 @@ class mx_block extends mx_block_parameter
 				break;
 
 				case AUTH_REG:
-					$auth_user[$auth_fields[$i]] = ( $userdata['session_logged_in'] ) ? TRUE : 0;
+					$auth_user[$auth_fields[$i]] = ( $mx_user->data['session_logged_in'] ) ? TRUE : 0;
 					$auth_user[$auth_fields[$i] . '_type'] = $lang['Auth_Registered_Users'];
 				break;
 
 				case AUTH_ANONYMOUS:
-					$auth_user[$auth_fields[$i]] = ( ! $userdata['session_logged_in'] ) ? TRUE : 0;
+					$auth_user[$auth_fields[$i]] = ( ! $mx_user->data['session_logged_in'] ) ? TRUE : 0;
 					$auth_user[$auth_fields[$i] . '_type'] = $lang['Auth_Anonymous_Users'];
 				break;
 
 				case AUTH_ACL: // PRIVATE
-					$auth_user[$auth_fields[$i]] = ( $userdata['session_logged_in'] ) ? mx_is_group_member($this->block_info[$auth_fields_groups[$i]]) || $is_admin : 0;
+					$auth_user[$auth_fields[$i]] = ( $mx_user->data['session_logged_in'] ) ? mx_is_group_member($this->block_info[$auth_fields_groups[$i]]) || $is_admin : 0;
 					$auth_user[$auth_fields[$i] . '_type'] = $lang['Auth_Users_granted_access'];
 				break;
 
 				case AUTH_MOD:
-					$auth_user[$auth_fields[$i]] = ( $userdata['session_logged_in'] ) ? mx_is_group_member($this->block_info['auth_moderator_group']) || $is_admin : 0;
+					$auth_user[$auth_fields[$i]] = ( $mx_user->data['session_logged_in'] ) ? mx_is_group_member($this->block_info['auth_moderator_group']) || $is_admin : 0;
 					$auth_user[$auth_fields[$i] . '_type'] = $lang['Auth_Moderators'];
 				break;
 
@@ -3358,7 +3424,7 @@ class mx_block extends mx_block_parameter
 		//
 		// Is user a moderator?
 		//
-		$auth_user['auth_mod'] = ( $userdata['session_logged_in'] ) ? mx_is_group_member($this->block_info['auth_moderator_group']) || $is_admin : 0;
+		$auth_user['auth_mod'] = ( $mx_user->data['session_logged_in'] ) ? mx_is_group_member($this->block_info['auth_moderator_group']) || $is_admin : 0;
 
 		return $auth_user;
 	}
@@ -3410,7 +3476,7 @@ class mx_block extends mx_block_parameter
 
 		if( $module_id == 0 )
 		{
-			if( $userdata['user_level'] == ADMIN && $userdata['session_logged_in'] )
+			if( $mx_user->data['user_level'] == ADMIN && $mx_user->data['session_logged_in'] )
 			{
 				$auth_user[$auth_fields[0]] = 1;
 				$auth_user[$auth_fields[0] . '_type'] = $lang['Auth_Moderators'];
@@ -3423,7 +3489,21 @@ class mx_block extends mx_block_parameter
 			return $auth_user;
 		}
 
-		$is_admin = ( $userdata['user_level'] == ADMIN && $userdata['session_logged_in'] ) ? TRUE : 0;
+		// Generate logged in/logged out status	
+		switch (PORTAL_BACKEND)
+		{
+			case 'internal':
+			case 'mybb':
+				//To do: Profile oe UCP Links for each backend.
+			case 'smf2':
+			case 'phpbb2':				
+			case 'olympus':
+				$is_admin = ($mx_user->data['user_level'] == ADMIN && $mx_user->data['session_logged_in'] ) ? true : false;
+			break;
+			default:
+				$is_admin = ($mx_user->data['user_type'] == USER_FOUNDER) ? true : false;
+			break;
+		}
 
 		$auth_user = array();
 		for( $i = 0; $i < count($auth_fields); $i++ )
@@ -3453,12 +3533,12 @@ class mx_block extends mx_block_parameter
 				break;
 
 				case AUTH_REG:
-					$auth_user[$key] = ( $userdata['session_logged_in'] ) ? TRUE : 0;
+					$auth_user[$key] = ( $mx_user->data['session_logged_in'] ) ? TRUE : 0;
 					$auth_user[$key . '_type'] = $lang['Auth_Registered_Users'];
 				break;
 
 				case AUTH_ANONYMOUS:
-					$auth_user[$key] = ( ! $userdata['session_logged_in'] ) ? TRUE : 0;
+					$auth_user[$key] = ( ! $mx_user->data['session_logged_in'] ) ? TRUE : 0;
 					$auth_user[$key . '_type'] = $lang['Auth_Anonymous_Users'];
 				break;
 
@@ -4504,8 +4584,22 @@ class mx_page
 
 		$this->info = &$this->page_config[$this->page_id]['page_info'];	
 		
-		$is_admin = ($mx_user->data['user_level'] == ADMIN && $mx_user->data['session_logged_in']) ? true : 0;
-	
+		// Generate logged in/logged out status	
+		switch (PORTAL_BACKEND)
+		{
+			case 'internal':
+			case 'mybb':
+				//To do: Profile oe UCP Links for each backend.
+			case 'smf2':
+			case 'phpbb2':				
+			case 'olympus':
+				$is_admin = ($mx_user->data['user_level'] == ADMIN && $mx_user->data['session_logged_in'] ) ? true : false;
+			break;
+			default:
+				$is_admin = ($mx_user->data['user_type'] == USER_FOUNDER) ? true : false;
+			break;
+		}		
+		
 		/*
 		* IP filter
 		*/
@@ -5053,9 +5147,24 @@ class mx_page
 		$auth_fields = array('auth_view');
 		$auth_fields_groups = array('auth_view_group');
 
-		$is_admin = ( $mx_user->data['user_level'] == ADMIN && $userdata['session_logged_in'] ) ? TRUE : 0;
-
+		// Generate logged in/logged out status	
+		switch (PORTAL_BACKEND)
+		{
+			case 'internal':
+			case 'mybb':
+				//To do: Profile oe UCP Links for each backend.
+			case 'smf2':
+			case 'phpbb2':				
+			case 'olympus':
+				$is_admin = ($mx_user->data['user_level'] == ADMIN && $mx_user->data['session_logged_in'] ) ? true : false;
+			break;
+			default:
+				$is_admin = ($mx_user->data['user_type'] == USER_FOUNDER) ? true : false;
+			break;
+		}
+		
 		$auth_user = array();
+		
 		for( $i = 0; $i < count($auth_fields); $i++ )
 		{
 			$key = $auth_fields[$i];
