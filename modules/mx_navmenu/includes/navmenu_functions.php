@@ -2,11 +2,11 @@
 /**
 *
 * @package MX-Publisher Module - mx_navmenu
-* @version $Id: navmenu_functions.php,v 3.17 2020/02/24 04:49:09 orynider Exp $
-* @copyright (c) 2002-2008 [Martin, Markus, Jon Ohlsson] MX-Publisher Project Team
+* @version $Id: navmenu_functions.php,v 3.18 2024/03/03 14:49:09 orynider Exp $
+* @copyright (c) 2002-2024 [Martin, Markus, Jon Ohlsson] MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net
-*
+* @link http://github.com/Mx-Publisher/mxpcms
 */
 
 /********************************************************************************\
@@ -228,10 +228,8 @@ function mx_get_site_menu($block_id)
 	$db->sql_freeresult($result);
 
 	$num_of_menus = count($mx_nav_data);
-
-	//
+	
 	// Generate Page to Menu Cat mapping
-	//
 	$cat_id = 0;
 	$num_of_cats = 0;
 	$navCategory = array();
@@ -250,18 +248,14 @@ function mx_get_site_menu($block_id)
 		}
 
 		$cat_id	= $mx_nav_data[$menu_count]['cat_id'];
-
-		//
+		
 		// Menu Maps
-		//
 		if ($mx_nav_data[$menu_count]['page_id'] != '0' && !isset($pageMapping[$mx_nav_data[$menu_count]['page_id']]))
 		{
 			$pageMapping[$mx_nav_data[$menu_count]['page_id']] = $mx_nav_data[$menu_count]['cat_id'];
 		}
-
-		//
+		
 		// Group categories
-		//
 		$navCategory[$mx_nav_data[$menu_count]['cat_id']][] = $mx_nav_data[$menu_count];
 	}
 
@@ -278,164 +272,207 @@ function mx_get_site_menu($block_id)
  */
 function generate_site_menu( $page_parent = 0, $depth = 0, $current_parent_page = false )
 {
-	global $mx_page, $mx_bbcode, $language, $lang, $template, $phpEx, $images, $block_id, $mx_root_path;
+	global $mx_cache, $board_config, $mx_page, $mx_bbcode, $language, $lang, $template, $phpEx, $images, $block_id, $mx_root_path;
+	
+	/*
+	* Get menu data
+	**/
+	if ( $mx_cache->_exists( '_menu_' . $block_id ) )
+	{
+		$mx_nav_data = $mx_cache->get( '_menu_' . $block_id );
+	}
+	else
+	{
+		$mx_nav_data = mx_get_nav_menu($block_id);
+		$mx_cache->put( '_menu_' . $block_id, $mx_nav_data );
+	}
 
+	$navCategory = $mx_nav_data['navcategory'];
+	$pageMapping = $mx_nav_data['pagemapping'];
+	
+	$num_of_cats = count($navCategory);
+	$catData = array();
+	
+	foreach($navCategory as $cat_id => $catData)
+	{
+		$hasCurrentMenu = false;
+		
+		// Check if this Category contains any authorized menus, or any at all
+		$menuIsCat = false;
+		$catData[] = $catData;
+	}		
+	
 	if ( isset( $mx_page->subpage_rowset[$page_parent] ) )
 	{
 		$first_menu = true;
+		
 		foreach( $mx_page->subpage_rowset[$page_parent] as $subpage_id => $page_data )
 		{
 			// Define the global bbcode bitfield, will be used to load bbcodes
-			$bbcode_uid = $page_data['bbcode_uid'];
+			$bbcode_uid = isset($page_data['bbcode_uid']) ? $page_data['bbcode_uid'] : '0';
+			$key = '*';
 			$bbcode_bitfield = 'cA==';
-			//$bbcode_bitfield = $bbcode_bitfield | base64_decode($catData[0]['bbcode_bitfield']);	
-			// Instantiate BBCode if need be
-			if ($bbcode_bitfield !== '')
+			foreach($catData as $key => $menuData)
 			{
-				switch (PORTAL_BACKEND)
-				{
-					case 'internal':
-					case 'phpbb2':
-					case 'smf2':
-					case 'mybb':
-						$mx_bbcode = new mx_bbcode();
-					break;
-					case 'phpbb3':
-					case 'olympus':
-					case 'ascraeus':
-					default:
-						$mx_bbcode = new mx_bbcode(base64_encode($bbcode_bitfield));
-					break;
-				}
-			}
+				$key = $key;
+				$bbcode_bitfield = $bbcode_bitfield | base64_decode($catData[$key]['bbcode_bitfield']);	
+
 			
-			// Auth check
-			$_auth_ary = $mx_page->auth($page_data['auth_view'], $page_data['auth_view_group'], $page_data['auth_moderator_group']);
-			if ($_auth_ary['auth_view'] && $page_data['menu_active'])
-			{
-				if ( $depth == 0 )
+				// Instantiate BBCode if need be
+				if ($bbcode_bitfield !== '')
 				{
-					$cat = $page_data['page_name'];
-					$cat = ((mb_strlen($lang[str_replace(' ', '_', $cat)]) !== 0) ? $lang[str_replace(' ', '_', $cat)] : $language->lang($cat));
-					
-					$desc = $page_data['page_desc'];
-					$desc = ((mb_strlen($lang[str_replace(' ', '_', $desc)]) !== 0) ? $lang[str_replace(' ', '_', $desc)] : $language->lang($desc));
-					$desc = $mx_bbcode->decode($desc, $bbcode_uid, false);
-					
-					//
-					// Is this category a custom link? If not, link to first menu page.
-					//
-					$cat_target = ( true ) ? '' : '_blank';
-					$cat_url_tmp = mx_append_sid(PORTAL_URL . 'index.php?page=' . $page_data['page_id'] . '&cat_link=' . $page_data['page_id']);
-					$catt = ( true ) ? '<a class="nav" href="' . $cat_url_tmp . '" target="' . $cat_target . '" /><span class="nav">' . $cat . '</span></a>' : '<span class="nav">' . $cat . '</span>';
-					$cat_url = ( true ) ? $cat_url_tmp : 'javascript:void(0)';
-
-					//
-					// Get menu icon
-					//
-					if (true)
+					switch (PORTAL_BACKEND)
 					{
-						$icon_tmp = ( file_exists($mx_root_path . $images['mx_graphics']['menu_icons'] . '/' . $page_data['menu_icon']) ? $page_data['menu_icon'] : 'icon_blank.gif' );
-						$icon_url_hot = str_replace('.gif', '_hot.gif', $icon_tmp);
-
-						if ( file_exists($mx_root_path . $images['mx_graphics']['menu_icons'] . '/' . $icon_url_hot) )
+						case 'internal':
+						case 'phpbb2':
+						case 'smf2':
+						case 'mybb':
+							$mx_bbcode = new mx_bbcode();
+						break;
+						case 'phpbb3':
+						case 'olympus':
+						case 'ascraeus':
+						default:
+							$mx_bbcode = new mx_bbcode(base64_encode($bbcode_bitfield));
+						break;
+					}
+				}
+				
+				// Auth check
+				$_auth_ary = $mx_page->auth($page_data['auth_view'], $page_data['auth_view_group'], $page_data['auth_moderator_group']);
+				if ($_auth_ary['auth_view'] && $page_data['menu_active'])
+				{
+					if ( $depth == 0 )
+					{
+						$cat = $page_data['page_name'];
+						
+						if ( isset($lang[str_replace(' ', '_', $cat)]) )
 						{
-							$icon_url = ( $page_data['is_current'] ) ? $icon_url_hot : $icon_tmp;
-							$icon_style = ( $page_data['is_current'] ) ? 'mx_icon_hot' : 'mx_icon';
+							$cat = ((mb_strlen($lang[str_replace(' ', '_', $cat)]) !== 0) ? $lang[str_replace(' ', '_', $cat)] : $language->lang($cat));			
+						}				
+						else
+						{
+							$cat = $language->lang($cat);			
+						}			
+					
+						$desc = $page_data['page_desc'];
+						
+						if ( isset($lang[str_replace(' ', '_', $desc)]) )
+						{
+							$desc = ((mb_strlen($lang[str_replace(' ', '_', $desc)]) !== 0) ? $lang[str_replace(' ', '_', $desc)] : $language->lang($desc));
+						}				
+						else
+						{
+							$desc = $language->lang($desc);	
+						}
+						
+						$desc = $mx_bbcode->decode($desc, $bbcode_uid, false);
+						
+						// Is this category a custom link? If not, link to first menu page.
+						$cat_target = ( true ) ? '' : '_blank';
+						$cat_url_tmp = mx_append_sid(PORTAL_URL . 'index.php?page=' . $page_data['page_id'] . '&cat_link=' . $page_data['page_id']);
+						$catt = ( true ) ? '<a class="nav" href="' . $cat_url_tmp . '" target="' . $cat_target . '" /><span class="nav">' . $cat . '</span></a>' : '<span class="nav">' . $cat . '</span>';
+						$cat_url = ( true ) ? $cat_url_tmp : 'javascript:void(0)';
+
+						//
+						// Get menu icon
+						//
+						if (true)
+						{
+							$icon_tmp = ( file_exists($mx_root_path . $images['mx_graphics']['menu_icons'] . '/' . $page_data['menu_icon']) ? $page_data['menu_icon'] : 'icon_blank.gif' );
+							$icon_url_hot = str_replace('.gif', '_hot.gif', $icon_tmp);
+
+							if ( file_exists($mx_root_path . $images['mx_graphics']['menu_icons'] . '/' . $icon_url_hot) )
+							{
+								$icon_url = isset($page_data['is_current']) ? $icon_url_hot : $icon_tmp;
+								$icon_style = isset($page_data['is_current']) ? 'mx_icon_hot' : 'mx_icon';
+							}
+							else
+							{
+								$icon_url = $icon_tmp;
+								$icon_style = '';
+							}
+
+							$menu_icon = ( !empty($page_data['menu_icon']) && $page_data['menu_icon'] != 'none' ) ? '<img class="'.$icon_style.'" border="0" align="absmiddle" src="' . PORTAL_URL . $images['mx_graphics']['menu_icons'] . '/' . $icon_url . '" alt="' . $desc . '" />&nbsp;' : '';
 						}
 						else
 						{
-							$icon_url = $icon_tmp;
-							$icon_style = '';
+							$icon_url = ( $is_current ) ? (!empty($page_data['menu_alt_icon_hot']) ? $page_data['menu_alt_icon_hot'] : $page_data['menu_alt_icon']) : $page_data['menu_alt_icon'];
+							$menu_icon = '<img border="0" align="absmiddle" src="' . $icon_url . '" alt="' . $desc . '" />&nbsp;';
 						}
 
-						$menu_icon = ( !empty($page_data['menu_icon']) && $page_data['menu_icon'] != 'none' ) ? '<img class="'.$icon_style.'" border="0" align="absmiddle" src="' . PORTAL_URL . $images['mx_graphics']['menu_icons'] . '/' . $icon_url . '" alt="' . $desc . '" />&nbsp;' : '';
+						//
+						// For overall_header navigation
+						// - is this current page category?
+						//$current_parent_page = ($mx_page->page_id == $page_data['page_id'] || has_active_subpage($subpage_id) || ( isset($_GET['cat_link']) ? intval($_GET['cat_link']) == $page_data['page_id'] : false) ) ? true : false;
+						$current_parent_page = ($mx_page->page_id == $page_data['page_id'] || has_active_subpage($subpage_id) ) ? true : false;
+						
+						// Update cookie - if this was a cat link
+						if ( (isset($_GET['cat_link']) ? intval($_GET['cat_link']) == $page_data['page_id'] : false) || $current_parent_page)
+						{
+							setcookie('mxNavCat_' . intval($block_id) . intval($page_data['page_id']), true, (time()+21600), $board_config['cookie_path'], $board_config['cookie_domain'], $board_config['cookie_secure']);
+							$_COOKIE['mxNavCat_' . $block_id . $page_data['page_id']] = 1;
+						}
+						
+						// Generate the fold/unfold categories switches
+						$cat_on = $current_parent_page ? true : ( isset($_COOKIE['mxNavCat_' . $block_id . $page_data['page_id']]) ? $_COOKIE['mxNavCat_' . $block_id . $page_data['page_id']] == 1 : $catData[$key]['cat_show'] == 1 );
+						$menu_sep = $first_menu ? '' : '|';
+						$style = $current_parent_page ? 'cattitle' : 'genmed';
+						$first_menu = false;
+						$link_target = (true) ? '' : '_blank';
+						
+						$template->assign_block_vars('catrow', array(
+							'CAT_ID'										=> intval($page_data['page_id']),
+							'BLOCK_ID'									=> intval($block_id),
+							'CATEGORY'								=> $catt,
+							'CATEGORY_NAME'					=> $cat,
+							'U_CATEGORY_URL'				=> $cat_url,
+							'U_CAT_NAV_CONTRACT' 	=> $images['mx_contract'],
+							'U_CAT_NAV_EXPAND' 			=> $images['mx_expand'],
+							'U_CAT_NAV_DYNAMIC' 		=> $cat_on ? $images['mx_contract'] : $images['mx_expand'],
+							'CAT_SHOW' 								=> $cat_on ? '' : 'none',
+							'U_MENU_ICON'							=> $menu_icon,
+							'CURRENT' 									=> $current_parent_page ? '-current' : '',
+							'MENU_SEP'								=> $menu_sep,
+							
+							// Overall Nav
+							'U_CATEGORY_URL'						=> $cat_url,
+							'U_CATEGORY_URL_TARGET'		=> $link_target,
+							'CATEGORY_NAME'							=> $cat,
+							'CATEGORY_DESC'							=> $desc,
+							'CATEGORY_STYLE'						=> $style,
+
+						));
+
+						if ($current_parent_page)
+						{
+							// Overall Nav
+							$is_current = $mx_page->page_id == $page_data['page_id'];
+							$style = $is_current ? 'cattitle' : 'genmed';
+							$link_target = ( true ) ? '' : '_blank';
+
+							$template->assign_block_vars('menurow_cat', array(
+
+								// Overall Nav
+								'U_CATEGORY_URL'					=> $cat_url,
+								'U_CATEGORY_URL_TARGET' => $link_target,
+								'CATEGORY_NAME'						=> $cat,
+								'CATEGORY_DESC'						=> $desc,
+								'CATEGORY_STYLE'					=> $style,
+								'CURRENT' 										=> $is_current ? '-current' : '',
+								'MENU_SEP'									=> $menu_sep,
+							));
+						}
+
+						// Recursive call
+						generate_site_menu( $subpage_id, $depth + 1, $current_parent_page );
 					}
 					else
 					{
-						$icon_url = ( $is_current ) ? (!empty($page_data['menu_alt_icon_hot']) ? $page_data['menu_alt_icon_hot'] : $page_data['menu_alt_icon']) : $page_data['menu_alt_icon'];
-						$menu_icon = '<img border="0" align="absmiddle" src="' . $icon_url . '" alt="' . $desc . '" />&nbsp;';
+						output_menu($page_data, $current_parent_page);
 					}
-
-					//
-					// For overall_header navigation
-					// - is this current page category?
-					//$current_parent_page = ($mx_page->page_id == $page_data['page_id'] || has_active_subpage($subpage_id) || ( isset($_GET['cat_link']) ? intval($_GET['cat_link']) == $page_data['page_id'] : false) ) ? true : false;
-					$current_parent_page = ($mx_page->page_id == $page_data['page_id'] || has_active_subpage($subpage_id) ) ? true : false;
-
-					//
-					// Update cookie - if this was a cat link
-					//
-					if ( (isset($_GET['cat_link']) ? intval($_GET['cat_link']) == $page_data['page_id'] : false) || $current_parent_page)
-					{
-						setcookie('mxNavCat_' . intval($block_id) . intval($page_data['page_id']), true, (time()+21600), $board_config['cookie_path'], $board_config['cookie_domain'], $board_config['cookie_secure']);
-						$_COOKIE['mxNavCat_' . $block_id . $page_data['page_id']] = 1;
-					}
-
-					//
-					// Generate the fold/unfold categories switches
-					//
-					$cat_on = $current_parent_page ? true : ( isset($_COOKIE['mxNavCat_' . $block_id . $page_data['page_id']]) ? $_COOKIE['mxNavCat_' . $block_id . $page_data['page_id']] == 1 : $catData[0]['cat_show'] == 1 );
-					$menu_sep = $first_menu ? '' : '|';
-					$style = $current_parent_page ? 'cattitle' : 'genmed';
-					$first_menu = false;
-
-					$template->assign_block_vars('catrow', array(
-						'CAT_ID'				=> intval($page_data['page_id']),
-						'BLOCK_ID'				=> intval($block_id),
-						'CATEGORY'				=> $catt,
-						'CATEGORY_NAME'			=> $cat,
-						'U_CATEGORY_URL'		=> $cat_url,
-						'U_CAT_NAV_CONTRACT' 	=> $images['mx_contract'],
-						'U_CAT_NAV_EXPAND' 		=> $images['mx_expand'],
-						'U_CAT_NAV_DYNAMIC' 	=> $cat_on ? $images['mx_contract'] : $images['mx_expand'],
-						'CAT_SHOW' 				=> $cat_on ? '' : 'none',
-						'U_MENU_ICON'			=> $menu_icon,
-						'CURRENT' 				=> $current_parent_page ? '-current' : '',
-						'MENU_SEP'				=> $menu_sep,
-
-						//
-						// Overall Nav
-						//
-						'U_CATEGORY_URL'			=> $cat_url,
-						'U_CATEGORY_URL_TARGET'		=> $link_target,
-						'CATEGORY_NAME'				=> $cat,
-						'CATEGORY_DESC'				=> $desc,
-						'CATEGORY_STYLE'			=> $style,
-
-					));
-
-					if ($current_parent_page)
-					{
-						//
-						// Overall Nav
-						//
-						$is_current = $mx_page->page_id == $page_data['page_id'];
-						$style = $is_current ? 'cattitle' : 'genmed';
-						$link_target = ( true ) ? '' : '_blank';
-
-						$template->assign_block_vars('menurow_cat', array(
-							//
-							// Overall Nav
-							//
-							'U_CATEGORY_URL'		=> $cat_url,
-							'U_CATEGORY_URL_TARGET' => $link_target,
-							'CATEGORY_NAME'			=> $cat,
-							'CATEGORY_DESC'			=> $desc,
-							'CATEGORY_STYLE'		=> $style,
-							'CURRENT' 				=> $is_current ? '-current' : '',
-							'MENU_SEP'				=> $menu_sep,
-						));
-					}
-
-					// Recursive call
-					generate_site_menu( $subpage_id, $depth + 1, $current_parent_page );
-				}
-				else
-				{
-					output_menu($page_data, $current_parent_page);
-				}
-			} // End Auth
+				} // End Auth
+			}	
 		}
 		return;
 	}
@@ -492,15 +529,15 @@ function output_menu($page_data, $current_parent_page)
 	$link_target = ( true ) ? '' : '_blank';
 
 	$menu_array = array(
-		'ROW_COLOR_OVER'	=> '#' . $row_color_over,
-		'MENU_NAME'			=> $action,
-		'MENU_STYLE'		=> $style,
-		'MENU_DESC'			=> $desc,
-		'MENU_SEP'			=> $menu_sep,
-		'U_MENU_URL'		=> $menu_link,
+		'ROW_COLOR_OVER'			=> '#' . $row_color_over,
+		'MENU_NAME'						=> $action,
+		'MENU_STYLE'						=> $style,
+		'MENU_DESC'							=> $desc,
+		'MENU_SEP'							=> $menu_sep,
+		'U_MENU_URL'						=> $menu_link,
 		'U_MENU_URL_TARGET'	=> $link_target,
-		'U_MENU_ICON'		=> $menu_icon,
-		'CURRENT' 			=> $is_current ? '-current' : '',
+		'U_MENU_ICON'						=> $menu_icon,
+		'CURRENT' 								=> $is_current ? '-current' : '',
 	);
 
 	$template->assign_block_vars('catrow.menurow', $menu_array);
