@@ -3,7 +3,7 @@
 *
 * @package Functions_phpBB
 * @version $Id: bbcode.php,v 3.2 2024/04/02 06:94:17 orynider Exp $
-* @copyright (c) 2002-2008 MX-Publisher Project Team
+* @copyright (c) 2002-2024 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
 *
@@ -79,7 +79,7 @@ class mx_bbcode
 			$this->bbcode_bitfield = $bitfield;
 			$this->bbcode_cache_init();
 		}
-
+		
 		$this->smiley_path_url = PHPBB_URL; //change this to PORTAL_URL when shared folder will be removed
 		$this->smiley_root_path =	$phpbb_root_path; //same here
 		$board_config['smilies_path'] = str_replace("smiles", "smilies", $board_config['smilies_path']);
@@ -526,28 +526,29 @@ class mx_bbcode
 		global $mx_user;
 
 		static $replacements = array(
-			'quote_username_open'	=> array('{USERNAME}'	=> '$1'),
-			'color'					=> array('{COLOR}'		=> '$1', '{TEXT}'			=> '$2'),
-			'size'					=> array('{SIZE}'		=> '$1', '{TEXT}'			=> '$2'),
-			'img'					=> array('{URL}'		=> '$1'),
-			'flash'					=> array('{WIDTH}'		=> '$1', '{HEIGHT}'			=> '$2', '{URL}'		=> '$3'),
-			'scribd'				=> array('{WIDTH}'		=> '$1', '{HEIGHT}'			=> '$2', '{SCRIBDURL}'	=> '$3'),
-			'youtube'				=> array('{YOUTUBEID}'	=> '$1', '{YOUTUBELINK}'		=> '$2', '{WIDTH}'		=> '$3', '{HEIGHT}'			=> '$4'),			
-			'ipaper'				=> array('{IPAPERID}'	=> '$1', '{IPAPERKEY}'		=> '$2', '{WIDTH}'		=> '$3', '{HEIGHT}'			=> '$4', '{IPAPERLINK}'	=> '$5'),			
-			'ipaper_open'			=> array('{IPAPERCODE}'	=> '$1'),			
-			'url'					=> array('{URL}'		=> '$1', '{DESCRIPTION}'	=> '$2'),
-			'web'					=> array('{URL}'		=> '$1', '{DESCRIPTION}'	=> '$2'),
-			'size'					=> array('{ID}'			=> '$1', '{TEXT}'			=> '$2'),			
-			'email'					=> array('{EMAIL}'		=> '$1', '{DESCRIPTION}'	=> '$2')
+			'quote_username_open'	=> array('{USERNAME}'								=> '$1'),
+			'color'					=> array('{COLOR}'		=> '$1', '{TEXT}'						=> '$2'),
+			'size'					=> array('{SIZE}'			=> '$1', '{TEXT}'						=> '$2'),
+			'img'					=> array('{URL}'			=> '$1'),
+			'flash'					=> array('{WIDTH}'		=> '$1', '{HEIGHT}'							=> '$2', '{URL}'					=> '$3'),
+			'scribd'				=> array('{WIDTH}'		=> '$1', '{HEIGHT}'							=> '$2', '{SCRIBDURL}'	=> '$3'),
+			'youtube'			=> array('{YOUTUBEID}'	=> '$1', '{YOUTUBELINK}'		=> '$2', '{WIDTH}'				=> '$3', '{HEIGHT}'			=> '$4'),			
+			'ipaper'				=> array('{IPAPERID}'		=> '$1', '{IPAPERKEY}'			=> '$2', '{WIDTH}'				=> '$3', '{HEIGHT}'			=> '$4', '{IPAPERLINK}'	=> '$5'),			
+			'ipaper_open'	=> array('{IPAPERCODE}'	=> '$1'),			
+			'url'						=> array('{URL}'			=> '$1', '{DESCRIPTION}'		=> '$2'),
+			'web'					=> array('{URL}'			=> '$1', '{DESCRIPTION}'		=> '$2'),
+			'size'					=> array('{ID}'				=> '$1', '{TEXT}'						=> '$2'),			
+			'email'					=> array('{EMAIL}'		=> '$1', '{DESCRIPTION}'		=> '$2')
 		);
+		
+		$tpl = preg_replace('/{L_([A-Z_]+)}/', "(!empty(\$mx_user->lang['\$1'])) ? \$mx_user->lang['\$1'] : ucwords(strtolower(str_replace('_', ' ', '\$1')))", $tpl);
 
-		$tpl = preg_replace('/{L_([A-Z_]+)}/e', "(!empty(\$mx_user->lang['\$1'])) ? \$mx_user->lang['\$1'] : ucwords(strtolower(str_replace('_', ' ', '\$1')))", $tpl);
-
+		
 		if (!empty($replacements[$tpl_name]))
 		{
 			$tpl = strtr($tpl, $replacements[$tpl_name]);
 		}
-
+		
 		return trim($tpl);
 	}
 
@@ -1827,7 +1828,7 @@ class mx_bbcode
 
 			if (count($smilies))
 			{
-				@usort($smilies, 'smiley_sort');
+				usort($smilies, [$this::class, "smiley_sort"]);
 			}
 
 			for ($i = 0; $i < count($smilies); $i++)
@@ -1845,7 +1846,21 @@ class mx_bbcode
 
 		return $message;
 	}	
+	
+	/**
+	 * phpBB Smilies sort.
+	 * @return int
+	 */	
+	function smiley_sort($a, $b)
+	{
+		if ( strlen($a['code']) == strlen($b['code']) )
+		{
+			return 0;
+		}
 
+		return ( strlen($a['code']) > strlen($b['code']) ) ? -1 : 1;
+	}
+	
 	/**
 	 * phpBB Smilies pass.
 	 *
