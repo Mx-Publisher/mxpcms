@@ -2,8 +2,8 @@
 /**
 *
 * @package Tools
-* @version $Id: mx_functions_tools.php,v 3.68 2023/11/09 08:42:24 orynider Exp $
-* @copyright (c) 2002-2008 MX-Publisher Project Team
+* @version $Id: mx_functions_tools.php,v 3.68 2014/05/09 07:53:11 orynider Exp $
+* @copyright (c) 2002-2024 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
 *
@@ -737,26 +737,33 @@ class mx_tools
 	 * @param unknown_type $addsize
 	 * @return unknown
 	 */
-	function make_image($file, $alt = FALSE, $align = FALSE, $extras = FALSE,
-	                   $dir = '/images', $border = 0, $addsize = TRUE)
+	function make_image($file, $alt = FALSE, $align = FALSE, $extras = FALSE, $dir = '/images', $border = 0, $addsize = TRUE)
 	{
 	   // If no / was provided at the start of $dir, add it
-	   $webdir = $_SERVER['STATIC_ROOT'] . ($dir{0} == '/' ? '' : '/') . $dir;
+	   $webdir = $_SERVER['STATIC_ROOT'] . ($dir[0] == '/' ? '' : '/') . $dir;
 
 	   // Get width and height values if possible
-	   if ($addsize && ($size = @getimagesize($_SERVER['DOCUMENT_ROOT'] . "$dir/$file"))) {
+	   if ($addsize && ($size = @getimagesize($_SERVER['DOCUMENT_ROOT'] . "$dir/$file"))) 
+	   {
 	       $sizeparams = ' ' . trim($size[3]);
-	   } else {
+	   }
+	   else 
+	   {
 	       $sizeparams = '';
 	   }
-
+	   
 	   // Convert right or left alignment to CSS float,
 	   // but leave other alignments intact (for now)
-	   if (in_array($align, array("right", "left"))) {
+	   if (in_array($align, array("right", "left"))) 
+	   {
 	       $align = ' style="float: ' . $align . ';"';
-	   } elseif ($align) {
+	   } 
+	   elseif ($align) 
+	   {
 	       $align = ' align="' . $align . '"';
-	   } else {
+	   } 
+	   else 
+	   {
 	       $align = '';
 	   }
 
@@ -1422,14 +1429,14 @@ class mx_text_formatting
 		$inTag = false;
 		$ampText = "";
 
-		for ( $num = 0;$num < strlen( $message );$num++ )
+		for ($num = 0; $num < strlen($message); $num++)
 		{
-			$curChar = $message{$num};
+			$curChar = $message[$num];
 
 			if ( $curChar == "<" )
 			{
 				for ( $snum = 0;$snum < strlen( $ampText );$snum++ )
-				$this->_addWrap( $ampText{$snum}, $ampText{$snum+1}, $finalText, $tempText, $curCount, $tempCount );
+				$this->_addWrap( $ampText[$snum], $ampText[$snum +1], $finalText, $tempText, $curCount, $tempCount );
 				$ampText = "";
 				$tempText .= "<";
 				$inTag = true;
@@ -1446,20 +1453,19 @@ class mx_text_formatting
 			elseif ( $curChar == "&" )
 			{
 				for ( $snum = 0;$snum < strlen( $ampText );$snum++ )
-				$this->_addWrap( $ampText{$snum}, $ampText{$snum+1}, $finalText, $tempText, $curCount, $tempCount );
+				$this->_addWrap( $ampText[$snum], $ampText[$snum+1], $finalText, $tempText, $curCount, $tempCount );
 				$ampText = "&";
 			}
-			elseif ( strlen( $ampText ) < $longestAmp && $curChar == ";" &&
-					( strlen( html_entity_decode( "$ampText;" ) ) == 1 || preg_match( '/^&#[0-9][0-9]*$/', $ampText ) ) )
+			elseif ( strlen( $ampText ) < $longestAmp && $curChar == ";" && ( strlen( html_entity_decode( "$ampText;" ) ) == 1 || preg_match( '/^&#[0-9][0-9]*$/', $ampText ) ) )
 			{
-				$this->_addWrap( "$ampText;", $message{$num+1}, $finalText, $tempText, $curCount, $tempCount );
+				$this->_addWrap( "$ampText;", $message[$num + 1], $finalText, $tempText, $curCount, $tempCount );
 				$ampText = "";
 			}
 			elseif ( strlen( $ampText ) >= $longestAmp || $curChar == ";" )
 			{
-				for ( $snum = 0;$snum < strlen( $ampText );$snum++ )
-				$this->_addWrap( $ampText{$snum}, $ampText{$snum+1}, $finalText, $tempText, $curCount, $tempCount );
-				$this->_addWrap( $curChar, $message{$num+1}, $finalText, $tempText, $curCount, $tempCount );
+				for ( $snum = 0; $snum < strlen( $ampText ); $snum++ )
+				$this->_addWrap( $ampText[$snum], $ampText[$snum + 1], $finalText, $tempText, $curCount, $tempCount );
+				$this->_addWrap( $curChar, $message[$num + 1], $finalText, $tempText, $curCount, $tempCount );
 				$ampText = "";
 			}
 			elseif ( strlen( $ampText ) != 0 && strlen( $ampText ) < $longestAmp )
@@ -1468,7 +1474,7 @@ class mx_text_formatting
 			}
 			else
 			{
-				$this->_addWrap( $curChar, $message{$num+1}, $finalText, $tempText, $curCount, $tempCount );
+				$this->_addWrap( $curChar, $message[$num + 1], $finalText, $tempText, $curCount, $tempCount );
 			}
 		}
 
@@ -2772,39 +2778,39 @@ class mx_notification
 	function pm_notification($mode, $author, $recipients, $subject, $message)
 	{
 		global $db, $lang, $mx_user, $board_config, $phpbb_root_path, $mx_root_path, $phpEx, $phpbb_auth, $page_id;
-
+		
 		$subject = mx_censor_text($subject);
-
+		
 		unset($recipients[ANONYMOUS], $recipients[$mx_user->data['user_id']]);
-
+		
 		if (!sizeof($recipients))
 		{
 			return;
 		}
-
+		
 		// Get banned User ID's
 		$sql = 'SELECT ban_userid
 			FROM ' . BANLIST_TABLE . '
 			WHERE ' . $db->sql_in_set('ban_userid', array_map('intval', array_keys($recipients))) . '
 				AND ban_exclude = 0';
 		$result = $db->sql_query($sql);
-
+		
 		while ($row = $db->sql_fetchrow($result))
 		{
 			unset($recipients[$row['ban_userid']]);
 		}
 		$db->sql_freeresult($result);
-
+		
 		if (!sizeof($recipients))
 		{
 			return;
 		}
-
+		
 		$sql = 'SELECT user_id, username, user_email, user_lang, user_notify_pm, user_notify_type, user_jabber
 			FROM ' . USERS_TABLE . '
 			WHERE ' . $db->sql_in_set('user_id', array_map('intval', array_keys($recipients)));
 		$result = $db->sql_query($sql);
-
+		
 		$msg_list_ary = array();
 		while ($row = $db->sql_fetchrow($result))
 		{
@@ -2820,16 +2826,14 @@ class mx_notification
 			}
 		}
 		$db->sql_freeresult($result);
-
+		
 		if (!sizeof($msg_list_ary))
 		{
 			return;
 		}
-
-	    //
+		
 	    // Include and initiate mailer
-	    //
-	    include_once($mx_root_path . 'includes/mx_functions_emailer.'.$phpEx);
+		include_once($mx_root_path . 'includes/mx_functions_emailer.'.$phpEx);
 
 		//
 		// Let's do some checking to make sure that mass mail functions
@@ -2963,9 +2967,9 @@ class module_cache
 		if ( $fp = @fopen( $this->cache_dir . 'data_global.' . $phpEx, 'wb' ) )
 		{
 			@flock( $fp, LOCK_EX );
-			fwrite( $fp, $file );
+			@fwrite( $fp, $file );
 			@flock( $fp, LOCK_UN );
-			fclose( $fp );
+			@fclose( $fp );
 		}
 	}
 
@@ -2981,7 +2985,7 @@ class module_cache
 		$dir = opendir( $this->cache_dir );
 		while ( $entry = readdir( $dir ) )
 		{
-			if ( $entry{0} == '.' || substr( $entry, 0, 4 ) != 'sql_' )
+			if ( $entry[0] == '.' || substr( $entry, 0, 4 ) != 'sql_' )
 			{
 				continue;
 			}
