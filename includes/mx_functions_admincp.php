@@ -2,8 +2,8 @@
 /**
 *
 * @package AdminCP
-* @version $Id: mx_functions_admincp.php,v 1.76 2023/11/09 07:27:52 orynider Exp $
-* @copyright (c) 2002-2023 MX-Publisher Project Team
+* @version $Id: mx_functions_admincp.php,v 1.77 2024/04/10 06:27:52 orynider Exp $
+* @copyright (c) 2002-2024 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
 *
