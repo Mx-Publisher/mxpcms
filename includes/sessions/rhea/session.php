@@ -2,11 +2,11 @@
 /**
 *
 * @package Style
-* @version $Id: session.php,v 3.1 2023/10/17 15:52:02 orynider Exp $
-* @copyright (c) 2002-2008 MX-Publisher Project Team & (C) 2005 The phpBB Group
+* @version $Id: session.php,v 3.2 2024/04/02 06:94:17 orynider Exp $
+* @copyright (c) 2002-2024 MX-Publisher Development Team & (C) 2005 The phpBB Group
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
-*
+* @link https://github.com/Mx-Publisher/mxpcms/
 */
 
 if ( !defined('IN_PORTAL') )
@@ -134,18 +134,18 @@ class session
 		global $mx_cache, $board_config, $db, $phpbb_root_path, $mx_root_path, $phpEx;
 		global $mx_request_vars, $template, $language;
 		
-		$this->cache				= $mx_cache;
-		$this->config				= $board_config;
-		$this->db                 	= $db;
-		$this->user               	= $this;
+		$this->cache						= $mx_cache;
+		$this->config						= $board_config;
+		$this->db							= $db;
+		$this->user         				= $this;
 		$this->service_providers = array('user_id' => 1, 'session_id' => 0, 'provider'	=> '', 'oauth_token' => '');
-		$this->phpbb_root_path = $phpbb_root_path;
-		$this->mx_root_path	= $mx_root_path;
-		$this->php_ext			= $phpEx;
-		$this->lang_path			= $mx_root_path . 'language/';
-		$this->request				= $mx_request_vars;
-		$this->template			= $template;
-		$this->language			= $language;
+		$this->phpbb_root_path 	= $phpbb_root_path;
+		$this->mx_root_path		= $mx_root_path;
+		$this->php_ext					= $phpEx;
+		$this->lang_path				= $mx_root_path . 'language/';
+		$this->request					= $mx_request_vars;
+		$this->template					= $template;
+		$this->language				= $language;
 
 		// Setup $this->db_tools
 		if (!class_exists('mx_db_tools') && !class_exists('tools'))
@@ -161,11 +161,11 @@ class session
 			$this->db_tools = new tools($this->db);
 		}
 		
-		$this->service_providers = array('user_id' => 1, 'session_id' => 0, 'provider' => '', 'oauth_token' => '');
-		$this->phpbb_root_path = $phpbb_root_path;
-		$this->php_ext = $phpEx;
+		$this->service_providers 	= array('user_id' => 1, 'session_id' => 0, 'provider' => '', 'oauth_token' => '');
+		$this->phpbb_root_path 		= $phpbb_root_path;
+		$this->php_ext 				= $phpEx;
 	
-		$this->lang_path = $mx_root_path . 'language/';
+		$this->lang_path 			= $mx_root_path . 'language/';
 		/*
         $this->crawlers = new Crawlers();
         $this->exclusions = new Exclusions();
@@ -313,15 +313,15 @@ class session
 		$forum_id = (isset($_REQUEST['f']) && $_REQUEST['f'] > 0 && $_REQUEST['f'] < 16777215) ? (int) $_REQUEST['f'] : 0;
 
 		$page_array += array(
-			'page_name'			=> $page_name,
+			'page_name'				=> $page_name,
 			'page_dir'				=> $page_dir,
 
 			'query_string'			=> $query_string,
-			'script_path'				=> str_replace(' ', '%20', htmlspecialchars($script_path)),
+			'script_path'			=> str_replace(' ', '%20', htmlspecialchars($script_path)),
 			'root_script_path'		=> str_replace(' ', '%20', htmlspecialchars($root_script_path)),
 
-			'page'				=> $page,
-			'forum'				=> $forum_id,
+			'page'					=> $page,
+			'forum'					=> $forum_id,
 		);
 
 		return $page_array;
@@ -399,14 +399,14 @@ class session
 		global $phpEx, $SID, $_SID, $phpbb_auth, $phpBB3, $_EXTRA_URL, $db, $board_config, $mx_root_path, $phpbb_root_path, $page_id;
 
 		// Give us some basic information
-		$this->time_now					= time();
-		$this->cookie_data				= array('u' => 0, 'k' => '');
-		$this->update_session_page	= $update_session_page;
-		$this->browser					= (!empty($_SERVER['HTTP_USER_AGENT'])) ? htmlspecialchars((string) $_SERVER['HTTP_USER_AGENT']) : '';
-		$this->referer						= (!empty($_SERVER['HTTP_REFERER'])) ? htmlspecialchars((string) $_SERVER['HTTP_REFERER']) : '';		
-		$this->forwarded_for				= (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) ? (string) $_SERVER['HTTP_X_FORWARDED_FOR'] : '';
-		$this->host							= (!empty($_SERVER['HTTP_HOST'])) ? (string) $_SERVER['HTTP_HOST'] : 'localhost';
-		$this->page						= $this->extract_current_page($phpbb_root_path);
+		$this->time_now							= time();
+		$this->cookie_data						= array('u' => 0, 'k' => '');
+		$this->update_session_page				= $update_session_page;
+		$this->browser							= (!empty($_SERVER['HTTP_USER_AGENT'])) ? htmlspecialchars((string) $_SERVER['HTTP_USER_AGENT']) : '';
+		$this->referer							= (!empty($_SERVER['HTTP_REFERER'])) ? htmlspecialchars((string) $_SERVER['HTTP_REFERER']) : '';		
+		$this->forwarded_for					= (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) ? (string) $_SERVER['HTTP_X_FORWARDED_FOR'] : '';
+		$this->host								= (!empty($_SERVER['HTTP_HOST'])) ? (string) $_SERVER['HTTP_HOST'] : 'localhost';
+		$this->page								= $this->extract_current_page($phpbb_root_path);
 
 		// if the forwarded for header shall be checked we have to validate its contents
 		if ($board_config['forwarded_for_check'])
@@ -573,9 +573,9 @@ class session
 					// Check whether the session is still valid if we have one
 					$method = basename(trim($board_config['auth_method']));
 
-					if ((@include_once $mx_root_path . "includes/sessions/rhea/provider/" . $method . ".$phpEx") === false)
+					if ((@include_once $mx_root_path . "includes/sessions/proteus/provider/" . $method . ".$phpEx") === false)
 					{
-						mx_message_die(CRITICAL_ERROR, 'File ' . $mx_root_path . "includes/sessions/rhea/provider/" . $method . ".$phpEx" . ' couldn\'t be opened.');
+						mx_message_die(CRITICAL_ERROR, 'File ' . $mx_root_path . "includes/sessions/proteus/provider/" . $method . ".$phpEx" . ' couldn\'t be opened.');
 					}
 
 					if (class_exists($method))
@@ -585,7 +585,7 @@ class session
 					}
 					else
 					{
-						mx_message_die(CRITICAL_ERROR, 'Class not found: ' . 'in file ' . $mx_root_path . "includes/sessions/rhea/provider/" . $method . ".$phpEx" . ' couldn\'t be opened.');
+						mx_message_die(CRITICAL_ERROR, 'Class not found: ' . 'in file ' . $mx_root_path . "includes/sessions/proteus/provider/" . $method . ".$phpEx" . ' couldn\'t be opened.');
 					}
 
 					//phpBB Olympus login
@@ -604,7 +604,7 @@ class session
 					}
 					/* */
 
-					//phpBB Rhea Login
+					//phpBB Proteus Login
 					$ret = $provider->validate_session($this->data);
 					
 					if ($ret !== null && !$ret)
@@ -870,10 +870,9 @@ class session
 
 			if (!$bot)
 			{
-				$sql = 'SELECT u.*, s.*
-					FROM ' . USERS_TABLE . ' u
-					LEFT JOIN ' . SESSIONS_TABLE . ' s ON (s.session_user_id = u.user_id)
-					WHERE u.user_id = ' . (int) $this->cookie_data['u'];
+				$sql = 'SELECT *
+					FROM ' . USERS_TABLE . '
+					WHERE user_id = ' . (int) $this->cookie_data['u'];
 			}
 			else
 			{
@@ -883,6 +882,7 @@ class session
 					LEFT JOIN ' . SESSIONS_TABLE . ' s ON (s.session_user_id = u.user_id)
 					WHERE u.user_id = ' . (int) $bot;
 			}
+			
 			if (!$result = $db->sql_query($sql))
 			{
 				mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
@@ -904,7 +904,7 @@ class session
 		// Force user id to be integer...
 		$this->data['user_id'] = (int) $this->data['user_id'];
 		$this->data['session_id'] = $this->session_id;
-		$this->data['user_session_page'] = $this->data['session_page'];
+
 		// Redefine some MXP stylish userdata
 		$this->data['session_logged_in'] = $this->data['user_id'] != ANONYMOUS ? 1 : 0;
 		$this->data['is_registered'] = ($this->data['user_id'] != ANONYMOUS && ($this->data['user_type'] == USER_NORMAL || $this->data['user_type'] == USER_FOUNDER)) ? true : false;
@@ -999,24 +999,83 @@ class session
 
 		$session_autologin = (($this->cookie_data['k'] || $persist_login) && $this->data['is_registered']) ? true : false;
 		$set_admin = ($set_admin && $this->data['is_registered']) ? true : false;
-
-		// Create or update the session
-		$sql_ary = array(
-			'session_user_id'		=> (int) $this->data['user_id'],
-			'session_start'			=> (int) $this->time_now,
-			'session_last_visit'	=> (int) $this->data['session_last_visit'],
-			'session_time'			=> (int) $this->time_now,
-			'session_browser'		=> (string) substr($this->browser, 0, 149),
-			'session_forwarded_for'	=> (string) $this->forwarded_for,
-			'session_ip'			=> (string) $this->ip,
-			'session_autologin'		=> ($session_autologin) ? 1 : 0,
-			'session_admin'			=> ($set_admin) ? 1 : 0,
-			'session_viewonline'	=> ($viewonline) ? 1 : 0,
+		
+		$data_ary = array('user_id'			=> (int) $this->data['user_id'],
+						'user_type' 				=> $this->data['user_type'],
+						'group_id' 					=> (int) $this->data['group_id'],
+						'user_permissions' 			=> $this->data['user_permissions'],  //'000pa800000o13ydmo000000 hwby9w000000 hwby9w000000'
+						'user_perm_from' 			=> (int) $this->data['user_perm_from'],
+						'user_ip'					=> (int) $this->data['user_ip'],
+						'user_regdate' 				=> (int) $this->data['user_regdate'],
+						'username' 					=> $this->data['username'],
+						'username_clean' 			=> $this->data['username_clean'],
+						'user_password'				=> $this->data['user_password'],
+						'user_passchg'				=> (int) $this->data['user_passchg'],
+						'user_email' 				=> $this->data['user_email'],
+						'user_birthday' 			=> $this->data['user_birthday'],
+						'user_lastvisit' 			=> (int) $this->data['user_lastvisit'],
+						'user_lastmark' 			=> (int) $this->data['user_lastmark'],
+						'user_lastpost_time'		=> (int) $this->data['user_lastpost_time'], 
+						'user_lastpage' 			=> $this->data['user_lastpage'], 
+						'user_last_confirm_key'		=> $this->data['user_last_confirm_key'],
+						'user_last_search' 			=> (int) $this->data['user_last_search'],
+						'user_warnings'				=> (int) $this->data['user_warnings'],
+						'user_last_warning' 		=> (int) $this->data['user_last_warning'], 
+						'user_login_attempts' 		=> (int) $this->data['user_login_attempts'],  
+						'user_inactive_reason' 		=> (int) $this->data['user_inactive_reason'],
+						'user_inactive_time' 		=> (int) $this->data['user_inactive_time'],
+						'user_posts' 				=> (int) $this->data['user_posts'],
+						'user_lang'				 	=> basename($this->data['user_lang']),
+						'user_timezone' 			 => $this->data['user_timezone'],
+						'user_dateformat' 			=> $this->data['user_dateformat'],
+						'user_style'				=> (int) $this->data['user_style'], 
+						'user_rank' 				=> (int) $this->data['user_rank'],  
+						'user_colour' 				=> $this->data['user_colour'],
+						'user_new_privmsg'			=> (int) $this->data['user_new_privmsg'], 
+						'user_unread_privmsg' 		=> (int) $this->data['user_unread_privmsg'],  
+						'user_last_privmsg' 		=> (int) $this->data['user_last_privmsg'],  
+						'user_message_rules' 		=> (int) $this->data['user_message_rules'], 
+						'user_full_folder'			=> $this->data['user_full_folder'], 
+						'user_emailtime'			=> (int) $this->data['user_emailtime'], 
+						'user_topic_show_days' 		=> (int) $this->data['user_topic_show_days'], 
+						'user_topic_sortby_type' 	=> $this->data['user_topic_sortby_type'], 
+						'user_topic_sortby_dir' 	=> $this->data['user_topic_sortby_dir'], 
+						'user_post_show_days' 		=> (int) $this->data['user_post_show_days'],
+						'user_post_sortby_type' 	=> $this->data['user_post_sortby_type'], 
+						'user_post_sortby_dir' 		=> $this->data['user_post_sortby_dir'],
+						'user_notify' 				=> (int) $this->data['user_notify'],
+						'user_notify_pm' 			=> (int) $this->data['user_notify_pm'], 
+						'user_notify_type' 			=> (int) $this->data['user_notify_type'], 
+						'user_allow_pm' 			=> (int) $this->data['user_allow_pm'], 
+						'user_allow_viewonline'		=> (int) $this->data['user_allow_viewonline'], 
+						'user_allow_viewemail'		=> (int) $this->data['user_allow_viewemail'], 
+						'user_allow_massemail' 		=> (int) $this->data['user_allow_massemail'], 
+						'user_options' 				=> (int) $this->data['user_options'],  
+						'user_avatar' 				=> $this->data['user_avatar'],
+						'user_avatar_type' 			=> $this->data['user_avatar_type'],
+						'user_avatar_width' 		=> (int) $this->data['user_avatar_width'], 
+						'user_avatar_height' 		=> (int) $this->data['user_avatar_height'], 
+						'user_sig' 					=> $this->data['user_sig'],
+						'user_sig_bbcode_uid' 		=> $this->data['user_sig_bbcode_uid'],
+						'user_sig_bbcode_bitfield' 	=> $this->data['user_sig_bbcode_bitfield'],
+						'user_jabber' 				=> $this->data['user_jabber'],
+						'user_actkey' 				=> $this->data['user_actkey'],
+						'reset_token' 				=> '===',
+						'reset_token_expiration'	=> (int) 0, 
+						'user_newpasswd' 			=> $this->data['user_newpasswd'],
+						'user_form_salt' 			=> $this->data['user_form_salt'],
+						'user_new' 					=> (int) $this->data['user_new'],  
+						'user_reminded' 			=> (int) $this->data['user_reminded'], 
+						'user_reminded_time'		=> (int) $this->data['user_reminded_time'], 
+						'session_last_visit' 		=> (int) $this->data['session_last_visit'], 
+						'session_logged_in' 		=> (int) ($this->data['user_id'] != ANONYMOUS) ? 1 : 0,
+						'is_registered' 			=> (int) ($this->data['user_id'] != ANONYMOUS && ($this->data['user_type'] == USER_NORMAL || $this->data['user_type'] == USER_FOUNDER)) ? true : false,
+						'is_bot' 					=> (int) (!$this->data['is_registered'] && $this->data['user_id'] != ANONYMOUS) ? true : false,
 		);
 
 		if ($this->update_session_page)
 		{
-			$sql_ary['session_page'] = (string) substr($this->page['page'], 0, 199);
+			$sql_ary_session_page = (string) substr($this->page['page'], 0, 199);
 		}
 
 		$db->sql_return_on_error(true);
@@ -1029,7 +1088,7 @@ class session
 		if (!defined('IN_ERROR_HANDLER') && (!$this->session_id || !$db->sql_query($sql) || !$db->sql_affectedrows()))
 		{
 			// Limit new sessions in 1 minute period (if required)
-			if (empty($this->data['session_time']) && $board_config['active_sessions'])
+			if (empty($data_ary['session_time']) && $board_config['active_sessions'])
 			{
 				$sql = 'SELECT COUNT(session_id) AS sessions
 					FROM ' . SESSIONS_TABLE . '
@@ -1049,11 +1108,30 @@ class session
 			}
 		}
 
-		$this->session_id = $this->data['session_id'] = md5($phpBB3->unique_id());
+		$this->session_id = md5($phpBB3->unique_id());
 
-		$sql_ary['session_id'] = (string) $this->session_id;
-		$sql_ary['session_page'] = (string) substr($this->page['page'], 0, 199);
-
+		$sql_ary_session_id 		= (string) $this->session_id;
+		$sql_ary_session_page 	= (string) substr($this->page['page'], 0, 199);
+		
+		// Create or update the session
+		$sql_ary = array(
+			'session_user_id'				=> (int) $data_ary['user_id'],
+			'session_start'					=> (int) $this->time_now,
+			'session_last_visit'			=> (int) $data_ary['session_last_visit'],
+			'session_time'					=> (int) $this->time_now,
+			
+			'session_browser'				=> (string) substr($this->browser, 0, 149),
+			'session_forwarded_for'		=> (string) $this->forwarded_for,
+			'session_ip'							=> (string) $this->ip,
+			
+			'session_autologin'				=> ($session_autologin) ? 1 : 0,
+			'session_admin'					=> ($set_admin) ? 1 : 0,
+			'session_viewonline'			=> ($viewonline) ? 1 : 0,
+			
+			'session_id' 						=> (string) $sql_ary_session_id,
+			'session_page'					=> (string) $sql_ary_session_page,
+		);
+		
 		$sql = 'INSERT INTO ' . SESSIONS_TABLE . ' ' . $db->sql_build_array('INSERT', $sql_ary);
 		if (!$db->sql_query($sql))
 		{
@@ -1071,7 +1149,7 @@ class session
 		// refresh data
 		$SID = '?sid=' . $this->session_id;
 		$_SID = $this->session_id;
-		$this->data = array_merge($this->data, $sql_ary);
+		$this->data = array_merge($data_ary, $sql_ary);
 
 		if (!$bot)
 		{
@@ -1085,13 +1163,10 @@ class session
 		}
 		else
 		{
-			$this->data['session_time'] = $this->data['session_last_visit'] = $this->time_now;
-
-			// Update the last visit time
+			// Update the last visit time		
 			$sql = 'UPDATE ' . USERS_TABLE . '
-				SET user_lastvisit = ' . (int) $this->data['session_time'] . '
-				WHERE user_id = ' . (int) $this->data['user_id'];
-				
+				SET user_lastvisit = ' . (int) $this->time_now . ", user_lastpage = '" . $db->sql_escape($sql_ary_session_page) . "', user_lastpage = '" . $db->sql_escape($sql_ary_session_page) . "'
+				WHERE user_id = " . (int) $this->data['user_id'];			
 				if (!$db->sql_query($sql))
 				{
 					mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
@@ -1295,7 +1370,8 @@ class session
 	}
 
 	/**
-	* Check for banned user
+	* Check for banned user 
+	* $ban = $mx_user->check_ban(false, false, $email, true);
 	*
 	* Checks whether the supplied user is banned by id, ip or email. If no parameters
 	* are passed to the method pre-existing session data is used. If $return is false
@@ -1350,6 +1426,7 @@ class session
 
 			$sql .= ')';
 		}
+		
 		if (!$result = $db->sql_query($sql))
 		{
 			mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
@@ -1455,12 +1532,12 @@ class session
 			}
 
 			// Determine which message to output
-			$till_date = ($ban_row['ban_end']) ? $this->format_date($ban_row['ban_end']) : '';
-			$message = ($ban_row['ban_end']) ? 'BOARD_BAN_TIME' : 'BOARD_BAN_PERM';
+			$till_date 		= ($ban_row['ban_end']) ? $this->format_date($ban_row['ban_end']) : '';
+			$message 	= ($ban_row['ban_end']) ? 'BOARD_BAN_TIME' : 'BOARD_BAN_PERM';
 
-			$message = sprintf($this->lang[$message], $till_date, '<a href="mailto:' . $board_config['board_contact'] . '">', '</a>');
-			$message .= ($ban_row['ban_give_reason']) ? '<br /><br />' . sprintf($this->lang['BOARD_BAN_REASON'], $ban_row['ban_give_reason']) : '';
-			$message .= '<br /><br /><em>' . $this->lang['BAN_TRIGGERED_BY_' . strtoupper($ban_triggered_by)] . '</em>';
+			$message 	= sprintf($this->lang[$message], $till_date, '<a href="mailto:' . $board_config['board_contact'] . '">', '</a>');
+			$message 	.= ($ban_row['ban_give_reason']) ? '<br /><br />' . sprintf($this->lang['BOARD_BAN_REASON'], $ban_row['ban_give_reason']) : '';
+			$message 	.= '<br /><br /><em>' . $this->lang['BAN_TRIGGERED_BY_' . strtoupper($ban_triggered_by)] . '</em>';
 
 			trigger_error($message);
 		}
@@ -1486,8 +1563,8 @@ class session
 		}
 
 		$dnsbl_check = array(
-			'list.dsbl.org'			=> 'http://dsbl.org/listing?',
-			'sbl-xbl.spamhaus.org'	=> 'http://www.spamhaus.org/query/bl?ip=',
+			'list.dsbl.org'						=> 'http://dsbl.org/listing?',
+			'sbl-xbl.spamhaus.org'		=> 'http://www.spamhaus.org/query/bl?ip=',
 		);
 
 		if ($mode == 'register')
@@ -1581,9 +1658,9 @@ class session
 		$key_id = $phpBB3->unique_id(hexdec(substr($this->session_id, 0, 8)));
 
 		$sql_ary = array(
-			'key_id'		=> (string) md5($key_id),
-			'last_ip'		=> (string) $this->ip,
-			'last_login'	=> (int) time()
+			'key_id'			=> (string) md5($key_id),
+			'last_ip'			=> (string) $this->ip,
+			'last_login'		=> (int) time()
 		);
 
 		if (!$key)
@@ -1824,9 +1901,7 @@ class session
 		}		
 		*/
 		
-		//
 		// Populate session_id
-		//
 		$this->session_id = $this->data['session_id'];
 
 		$this->lang_path = $shared_lang_path;
@@ -1852,41 +1927,36 @@ class session
 			$board_config = $mx_cache->obtain_config(false);
 		}
 		
-		$board_config['avatar_gallery_path'] = isset($board_config['avatar_gallery_path']) ? $board_config['avatar_gallery_path'] : 'images/avatars'; 
-		$board_config['user_timezone'] = !empty($board_config['user_timezone']) ? $board_config['user_timezone'] : $board_config['board_timezone'];
-		
-		$this->data['user_dst'] = !empty($this->data['user_dst']) ? $this->data['user_dst'] : $this->data['user_timezone'];
-		$this->date_format = $board_config['default_dateformat'];
-		
-		$board_config['require_activation'] = 0;
+		$board_config['avatar_gallery_path'] 	= isset($board_config['avatar_gallery_path']) ? $board_config['avatar_gallery_path'] : 'images/avatars'; 
+		$board_config['user_timezone'] 			= !empty($board_config['user_timezone']) ? $board_config['user_timezone'] : $board_config['board_timezone'];
+		$gmepoch 												= mktime(0, 0, 0, 1, 1, 1998);
+		$this->data['user_dst'] 							= !empty($this->data['user_dst']) ? $this->data['user_dst'] : $this->data['user_timezone'];
+		$board_config['require_activation'] 		= 0;		
+		$format = $this->date_format 				= $board_config['default_dateformat'];
+		$this->timezone 										= (int)$board_config['user_timezone'] * (int) 3600;
+		$this->dst 													= (int)$this->data['user_timezone'] * (int) 3600;		
+		$now 															= time();
+		$delta 														= $now - $gmepoch;		
 		
 		try
-		{
-			$DateTimeZone = new \DateTimeZone($board_config['user_timezone']);
+		{		
+			$this->timezone = $timezone = new DateTime($now, new DateTimeZone($this->data['user_timezone']));
 		}
 		catch (\Exception $e)
 		{
-			// If the timezone the user has selected is invalid, we fall back to UTC or server.
-			$DateTimeZone = new \DateTimeZone(date_default_timezone_get());
+			// If the timezone the user has selected is invalid, we fall back to UTC.
+			$this->timezone = $timezone = new DateTime('2000-01-01', new DateTimeZone('UTC'));
 		}
-		
-		foreach ($DateTimeZone as $timezone_type => $dst)
-		{
-			$dst = $DateTimeZone->timezone_type;
-			$timezone = $DateTimeZone->timezone;
-		}
-		
-		$this->dst = $timezone * 3600;
-		
-		$sign = ($board_config['user_timezone'] < 0) ? '-' : '+';
-		$time_offset = abs($board_config['user_timezone']);
+		$this->dst 			= (int) $this->data['user_timezone'] * (int) 3600;		
+		$sign 					= ($board_config['user_timezone'] < 0) ? '-' : '+';
+		$time_offset 		= abs($board_config['user_timezone']);
 
 		$offset_seconds	= $time_offset % 3600;
 		$offset_minutes	= $offset_seconds / 60;
-		$offset_hours	= ($time_offset - $offset_seconds) / 3600;
+		$offset_hours		= ($time_offset - $offset_seconds) / 3600;
 		
 		// Zone offset
-		$zone_offset = $this->timezone + $this->dst;
+		$zone_offset = (int) $this->data['user_timezone'] + (int) $this->dst;
 		
 		$offset_string = sprintf($board_config['default_dateformat'], $sign, $offset_hours, $offset_minutes);
 		
@@ -1894,7 +1964,7 @@ class session
 		
 		// Format Timezone. We are unable to use array_pop here, because of PHP3 compatibility
 		$l_timezone = explode('.', $board_config['user_timezone']);
-		$l_timezone = (count($timezone) > 1) ? $this->lang(sprintf('%.1f', $board_config['board_timezone'])) : $offset_string;
+		$l_timezone = ((int)$zone_offset > 1) ? $this->lang(sprintf('%.1f', $board_config['board_timezone'])) : $offset_string;
 
 		$server_name = !empty($board_config['server_name']) ? preg_replace('/^\/?(.*?)\/?$/', "\\1", trim($board_config['server_name'])) : 'localhost';
 		$server_protocol = ($board_config['cookie_secure'] ) ? 'http://' : 'http://';
@@ -1904,12 +1974,27 @@ class session
 		$corrected_url = $server_protocol . $server_name . $server_port . $script_name_phpbb;
 		$board_url = PORTAL_URL;
 		$web_path = (defined('PORTAL_URL')) ? $board_url : $corrected_url;
-	
-		@define('PHPBB_URL', $board_url);
 		
-		//
+		if (defined('PHPBB_URL') )
+		{
+			if (is_file($mx_root_path . "viewforum.".$phpEx) && (PHPBB_URL !== PORTAL_URL))
+			{								
+				@define('PHPBB_URL', $board_url);
+			}			
+			elseif (is_file($phpbb_root_path . "viewforum.".$phpEx) && (PHPBB_URL !== $corrected_url))
+			{								
+				//@define('PHPBB_URL', $corrected_url);
+			}		
+			elseif (is_file($script_name_phpbb . "viewforum.".$phpEx))
+			{								
+				@define('PHPBB_URL', $corrected_url);
+			}
+		}	
+		else
+		{
+			define('PHPBB_URL', $portal_config['portal_backend_path']);
+		}
 		// Send a proper content-language to the output
-		//
 		$img_lang = $default_lang = $this->lang['default_lang'] = ($this->data['user_lang']) ? $this->data['user_lang'] : $board_config['default_lang'];
 
 		if ($this->data['user_id'] != ANONYMOUS)
@@ -1941,7 +2026,7 @@ class session
 			$this->lang_path = $phpbb_root_path . 'language/' . $this->lang_name . '/';
 			$this->date_format = $board_config['default_dateformat'];
 			$this->timezone = $board_config['board_timezone'] * 3600;
-			$this->dst = isset($this->data['user_dst']) ? $this->data['user_dst'] * 3600 : $board_config['user_timezone'] * 3600;
+			$this->dst = isset($this->data['user_dst']) ? (int)$this->data['user_dst'] * 3600 : (int)$board_config['user_timezone'] * 3600;
 			
 			$default_lang = mx_ltrim(basename(mx_rtrim($board_config['default_lang'])), "'");
 	
@@ -1954,10 +2039,10 @@ class session
 			**/
 			if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']))
 			{
-				$lang_iso_xx_yy = array();
-				$lang_iso_xx = array();
-				$accept_lang_xx_yy = array();
-				$accept_lang_xx = array();
+				$lang_iso_xx_yy 			= array();
+				$lang_iso_xx 				= array();
+				$accept_lang_xx_yy 	= array();
+				$accept_lang_xx 			= array();
 
 				$sql = 'SELECT lang_iso FROM ' . LANG_TABLE;
 				$result = $db->sql_query($sql, 3600);
@@ -2184,7 +2269,7 @@ class session
 				$user_style = $this->data['user_style'] ? $this->data['user_style'] : $this->phpbb_style['style_id'];
 				//If user have other style in mxp then the one from phpBB not to have forum page and modules graphics will be messaed up
 				//Anonymouse users should see all block graphic corect
-				//Query phpBB3 Rhea style_id corepondent to mxp themes_id
+				//Query phpBB3 Proteus style_id corepondent to mxp themes_id
 				$sql = "SELECT s.style_id, s.style_name
 					FROM " . MX_THEMES_TABLE . " AS m, " . STYLES_TABLE . " AS s
 					WHERE m.themes_id = " . (int) $user_style . "
@@ -2204,7 +2289,7 @@ class session
 				$default_style = $portal_config['default_style'];
 				//If user have other style in mxp then the one from phpBB not to have forum page and modules graphics will be messaed up
 				//Anonymouse users should see all block graphic corect
-				//Query phpBB3 Rhea style_id corepondent to mxp themes_id
+				//Query phpBB3 Proteus style_id corepondent to mxp themes_id
 				$sql = "SELECT s.style_id, s.style_name
 					FROM " . MX_THEMES_TABLE . " AS m, " . STYLES_TABLE . " AS s
 					WHERE m.themes_id = " . (int) $default_style . "
@@ -2229,7 +2314,7 @@ class session
 			$style_value = $phpBB3->request_var('demostyle', '');
 			if (intval($style_value) == 0)
 			{
-				//Query phpBB3 Rhea style_id corepondent to mxp style_name
+				//Query phpBB3 Proteus style_id corepondent to mxp style_name
 				//Any Demo Style here should work also for portal and forums
 				//Any Demo Style Name should be supported using same guild lines for portal as for forums for e.g. with spaces etc.				
 				$sql = "SELECT s.style_id, s.style_name
@@ -2284,7 +2369,7 @@ class session
 		// END Styles_Demo MOD 
 		if (isset($style_value) && (intval($style_value) == 0))  
 		{
-			//Query phpBB3 Rhea style_name
+			//Query phpBB3 Proteus style_name
 			$sql = "SELECT s.*
 				FROM " . STYLES_TABLE . " AS s
 				WHERE s.style_active = 1 AND s.style_name = '$style_value'";
@@ -2300,7 +2385,7 @@ class session
 		}
 		elseif (intval($style) !== 0)
 		{
-			//Query phpBB3 Rhea style_id get from main style init. Should be correct and valid.
+			//Query phpBB3 Proteus style_id get from main style init. Should be correct and valid.
 			$sql = "SELECT s.*, m.*
 				FROM " . MX_THEMES_TABLE . " AS m, " . STYLES_TABLE . " AS s
 				WHERE s.style_id = " . (int) $style . "
@@ -2316,6 +2401,7 @@ class session
 				mx_message_die(CRITICAL_ERROR, "Could not query database for phpbb_styles info style_id [$style]", "", __LINE__, __FILE__, $sql);
 			}
 		}
+		
 		// Default phpBB3 style as parent
 		$row['style_parent_tree'] = empty($row['style_parent_tree']) ? $row['style_parent_tree'] : 'prosilver';
 		$this->theme = is_array($this->theme) ? array_merge($this->theme, $row) : $row;
@@ -2334,13 +2420,14 @@ class session
 				mx_message_die(CRITICAL_ERROR, "Could not update/query database", "", __LINE__, __FILE__, $sql);
 			}
 			
-			//Query phpBB3 Rhea style_id get from main style init. Should be correct and valid.
+			//Query phpBB3 Proteus style_id get from main style init. Should be correct and valid.
 			$sql = "SELECT s.*, t.*
 				FROM " . MX_THEMES_TABLE . " AS t, " . STYLES_TABLE . " AS s
 				WHERE s.style_id = $style
 					AND t.template_name = s.style_path";
 			$result = $db->sql_query($sql, 3600);
 			$row = $db->sql_fetchrow($result);
+			
 			// Default phpBB3 style as parent
 			$row['style_parent_tree'] =empty($row['style_parent_tree']) ? $row['style_parent_tree'] : 'prosilver';
 			$this->theme = is_array($this->theme) ? array_merge($this->theme, $row) : $row;
@@ -2362,8 +2449,8 @@ class session
 		$parsed_items = $parsed_items['theme'];
 		
 		$check_for = array(
-			'parse_css_file'	=> (int) 0,
-			'pagination_sep'	=> (string) ', '
+			'parse_css_file'		=> (int) 0,
+			'pagination_sep'		=> (string) ', '
 		);
 		
 		foreach ($check_for as $key => $default_value)
@@ -2436,8 +2523,10 @@ class session
 		
 		$template->set_template();
 		
+		//$this->img_lang = (file_exists($phpbb_root_path . 'styles/' . $this->theme['imageset_path'] . '/imageset/' . $this->lang_name)) ? $this->lang_name : $this->encode_lang($board_config['default_lang']);
+		
 		//
-		// Added here for phpbb3 backend not for rhea backend
+		// Added here for phpbb3 backend not for proteus backend
 		// - First try old Olympus image sets then phpBB2 and phpBB3 Proteus template lang images 
 		//
 		if (is_dir("{$phpbb_root_path}{$this->style_path}{$this->template_name}/imageset/"))
@@ -2511,7 +2600,7 @@ class session
 					AND image_lang = \'' . $db->sql_escape($this->img_lang) . '\'';
 			$result = $db->sql_query($sql);
 			*/
-			if (@file_exists("{$phpbb_root_path}styles/{$this->theme['imageset_path']}/imageset/{$this->img_lang}/imageset.cfg"))
+			if (@file_exists("{$phpbb_root_path}styles/{$this->template_path}/imageset/{$this->img_lang}/imageset.cfg"))
 			{
 				$cfg_data_imageset_data = mx_parse_cfg_file("{$phpbb_root_path}styles/{$this->theme['imageset_path']}/imageset/{$this->img_lang}/imageset.cfg");
 				foreach ($cfg_data_imageset_data as $image_name => $value)
@@ -2542,8 +2631,8 @@ class session
 							'image_filename'	=> (string) $image_filename,
 							'image_height'		=> (int) $image_height,
 							'image_width'		=> (int) $image_width,
-							'imageset_id'		=> (int) $this->theme['imageset_id'],
-							'image_lang'		=> (string) $this->img_lang,
+							'imageset_id'			=> (int) $this->theme['imageset_id'],
+							'image_lang'			=> (string) $this->img_lang,
 						);
 					}
 				}
@@ -2740,21 +2829,32 @@ class session
 			{
 				$language_filename = $this->lang_path . (($use_help) ? 'help_' : '') . $lang_file . '.' . $phpEx;
 			}
-
-			//fix for mxp phpbb2 backend
-			if ((@include $language_filename) === false)
+			
+			if (($lang_file === 'main') || ($lang_file === 'admin'))
 			{
-				global $module_root_path;				
+				$lang_file = 'lang_' . $lang_file;
+				$language_filename = $this->lang_path . 'lang_' . $lang_file . '.' . $phpEx;
+			}
+			
+			if (($lang_file === 'lang_main') || ($lang_file === 'lang_admin'))
+			{
+				$language_filename = str_replace('phpbb3', 'phpbb2', $this->lang_path) . $lang_file . '.' . $phpEx;
+			}	
+			else
+			{
+				$language_filename = str_replace('phpbb2', 'phpbb3', $this->lang_path) . $lang_file . '.' . $phpEx;
+			}
+			
+			//fix for mxp phpbb2 backend
+			if (!is_file($language_filename))
+			{
+				global $module_root_path;
 				
-				//
-				//this will fix the path for shared language files
-				//				
+				//this will fix the path for shared language files			
 				$language_phpbb2_filename = substr_count($language_filename, 'phpbb3') ? str_replace("phpbb3", "phpbb2", $language_filename) : str_replace("phpbb3", "phpbb2", $language_filename);
 				$language_phpbb3_filename = substr_count($language_filename, 'phpbb2') ? str_replace("phpbb2", "phpbb3", $language_filename) : str_replace("phpb2", "phpbb3", $language_filename);				
 											
-				//
-				//this will fix the path for anonymouse users
-				//				
+				//this will fix the path for anonymouse users		
 				$shared_phpbb2_path = substr_count($phpbb_root_path, 'phpbb3') ? str_replace("phpbb3", "phpbb2", $phpbb_root_path) : str_replace("phpbb3", "phpbb2", $phpbb_root_path);
 				$shared_phpbb3_path = substr_count($phpbb_root_path, 'phpbb2') ? str_replace("phpbb2", "phpbb3", $phpbb_root_path) : str_replace("phpb2", "phpbb3", $phpbb_root_path);				
 							
@@ -2792,13 +2892,17 @@ class session
 					}					
 				}				
 			}
+			else
+			{
+				include $language_filename;
+			}
 		}
 		else
 		{
 			// Get Database Language Strings
 			// Put them into $lang if nothing is prefixed, put them into $help if help: is prefixed
 			// For example: help:faq, posting
-			die("You should not use db with MX-Publisher!");
+			print("You should not use db with MX-Publisher!");
 		}
 
 		// We include common language file here to not load it every time a custom language file is included
@@ -2835,8 +2939,7 @@ class session
 	* This function/functionality is inspired by SHS` and Ashe.
 	*
 	* Example call: <samp>$user->lang('NUM_POSTS_IN_QUEUE', 1);</samp>
-	*/
-	/**
+	*
 	 * Advanced language substitution
 	 *
 	 * Function to mimic sprintf() with the possibility of using phpBB's language system to substitute nullar/singular/plural forms.
@@ -2916,15 +3019,13 @@ class session
 				break;
 			}
 		}
-
+		
 		// Ok, let's check if the key was found, else use the last entry (because it is mostly the plural form)
 		if ($key_found === false)
 		{
 			$numbers = array_keys($lang);
 			$key_found = end($numbers);
 		}
-		
-
 		
 		// Use the language string we determined and pass it to sprintf()
 		$args[0] = $lang[$key_found];
@@ -2954,9 +3055,10 @@ class session
 		{
 			// Is the user requesting a friendly date format (i.e. 'Today 12:42')?
 			$date_cache[$format] = array(
-				'is_short'		=> strpos($format, '|'),
+				'is_short'			=> strpos($format, '|'),
 				'format_short'	=> substr($format, 0, strpos($format, '|')) . '||' . substr(strrchr($format, '|'), 1),
-				'format_long'	=> str_replace('|', '', $format),
+				'format_long'		=> str_replace('|', '', $format),
+				
 				// Filter out values that are not strings (e.g. arrays) for strtr().
 				'lang'			=> array_filter($this->lang['datetime'], 'is_string'),
 			);
@@ -3003,11 +3105,11 @@ class session
 
 			if ($day !== false)
 			{
-				return str_replace('||', $this->lang['datetime'][$day], strtr(@gmdate($date_cache[$format]['format_short'], $gmepoch + $zone_offset), $date_cache[$format]['lang']));
+				return str_replace('||', $this->lang['datetime'][$day], strtr(gmdate($date_cache[$format]['format_short'], $gmepoch + $zone_offset), $date_cache[$format]['lang']));
 			}
 		}
 
-		return strtr(@gmdate($date_cache[$format]['format_long'], $gmepoch + $zone_offset), $date_cache[$format]['lang']);
+		return strtr(gmdate($date_cache[$format]['format_long'], $gmepoch + $zone_offset), $date_cache[$format]['lang']);
 	}
 	
 
@@ -4751,6 +4853,7 @@ class session
 
 			include($phpbb_root_path . 'includes/functions_user.' . $phpEx);
 		}
+		
 		if ($group = remove_newly_registered($this->data['user_id'], $this->data))
 		{
 			$this->data['group_id'] = $group;
@@ -5954,7 +6057,7 @@ class session
 	 * @param unknown_type $lang
 	 * @return unknown
 	 */
-	function ucstrreplace($pattern = '%{$regex}%i', $matches = '', $string) 
+	function ucstrreplace($pattern = '%{$regex}%i', $matches = '', $string = 'ro') 
 	{
 		/* return with no uppercase if patern not in string */
 		if (strpos($string, $pattern) === false)
@@ -6125,7 +6228,7 @@ class session
 					$lang_name = 'galician';
 				break;
 				case 'gn':
-					$lang_name = 'guaraní';
+					$lang_name = 'guaraní­';
 				break;
 				case 'gu':
 					$lang_name = 'gujarati';
