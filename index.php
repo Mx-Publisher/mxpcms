@@ -2,8 +2,8 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: index.php,v 1.91 2024/04/02 06:19:17 orynider Exp $
-* @copyright (c) 2002-2008 MX-Publisher Project Team
+* @version $Id: index.php,v 1.92 2024/04/10 06:19:17 orynider Exp $
+* @copyright (c) 2002-2024 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net
 *
