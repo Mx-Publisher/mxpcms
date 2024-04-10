@@ -2,7 +2,7 @@
 /**
 *
 * @package Style
-* @version $Id: session.php,v 3.2 2024/04/02 06:94:17 orynider Exp $
+* @version $Id: session.php,v 3.2 2024/04/10 06:04:17 orynider Exp $
 * @copyright (c) 2002-2024 MX-Publisher Development Team & (C) 2005 The phpBB Group
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
