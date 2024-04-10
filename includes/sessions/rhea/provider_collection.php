@@ -3,7 +3,7 @@
 *
 * @package Auth
 *
-* @copyright (c) 2002-2008 MX-Publisher Project Team
+* @copyright (c) 2002-2024 MX-Publisher Project Team
 * @license GNU General Public License, version 2 (GPL-2.0)
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
