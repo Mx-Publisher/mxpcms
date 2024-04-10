@@ -22,10 +22,13 @@ if (!defined('E_STRICT'))
 	define('E_STRICT', 2048);
 }
 
+//Overwrite config.sys settings
 if (!defined('MX_ENVIRONMENT'))
 {
-	@define('MX_ENVIRONMENT', 'production');
+	//@define('MX_ENVIRONMENT', 'production');
+	@define('MX_DISPLAY_LOAD_TIME', true);
 	@define('MX_ENVIRONMENT', 'development');
+	@define('DEBUG_CONTAINER', true);
 }
 
 /*
@@ -44,11 +47,12 @@ $mx_starttime = $mx_starttime[1] + $mx_starttime[0];
 define('DEBUG', true); // [Admin Option] Show Footer debug stats - Actually set in phpBB/includes/constants.php
 define('DEBUG_EXTRA', true); // [Admin Option] Show memory usage. Show link to full SQL debug report in footer. Beware, this makes the page slow to load. For debugging only.
 define('INCLUDES', 'includes/'); //Main Includes folder
-@ini_set('display_errors', '1');
-//@error_reporting(E_ERROR | E_WARNING | E_PARSE); // This will NOT report uninitialized variables
-//@error_reporting(E_ALL | E_NOTICE | E_STRICT);
-@error_reporting(E_ALL & ~E_NOTICE); //Default error reporting in PHP 5.2+
-@session_cache_expire (1440);
+ini_set('display_errors', '1');
+//error_reporting(E_ERROR | E_WARNING | E_PARSE); // This will NOT report uninitialized variables
+//error_reporting(E_ALL | E_NOTICE | E_STRICT);
+//error_reporting(E_ALL & ~E_NOTICE); //Default error reporting in PHP 5.2+
+error_reporting(E_ALL);
+session_cache_expire (1440);
 @set_time_limit (1500);
 
 // ================================================================================
