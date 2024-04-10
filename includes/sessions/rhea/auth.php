@@ -2,8 +2,8 @@
 /**
 *
 * @package Auth
-* @version $Id: auth.php,v 1.1 2014/09/15 21:14:56 orynider Exp $
-* @copyright (c) 2002-2008 MX-Publisher Project Team
+* @version $Id: auth.php,v 1.1 2024/02/10 06:14:56 orynider Exp $
+* @copyright (c) 2002-2024 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
 *
@@ -888,8 +888,8 @@ class phpbb_auth_base
 		// Check whether the session is still valid if we have one
 		$method = basename(trim($board_config['auth_method']));
 
-		//phpBB3 Rhea Provider
-		//if ((@include_once $mx_root_path . "includes/session/rhea/provider/" . $method . ".$phpEx") === false)
+		//phpBB3 Proteus Provider
+		//if ((@include_once $mx_root_path . "includes/session/proteus/provider/" . $method . ".$phpEx") === false)
 		//{
 		//Fall to phpBB3 Olympus Auth Provider 
 		if ((@include_once $mx_root_path . "includes/shared/phpbb3/includes/auth/auth_" . $method . ".$phpEx") === false)
@@ -1037,7 +1037,76 @@ class phpbb_auth_base
 				foreach ($auth_options as $option)
 				{
 					if (strpos($option, '%') !== false)
+								else
+			{
+				$sql_opts = "AND $key = '" . $db->sql_escape($auth_options) . "'";
+			}
+		}
+		else
+		{
+			$is_like_expression = false;
+
+			foreach ($auth_options as $option)
+			{
+				if (strpos($option, '%') !== false)
+				{
+					$is_like_expression = true;
+				}
+			}
+
+			if (!$is_like_expression)
+			{
+				$sql_opts = 'AND ' . $db->sql_in_set($key, $auth_options);
+			}
+			else
+			{
+				$sql = array();
+
+				foreach ($auth_options as $option)
+				{
+					if (strpos($option, '%') !== false)
 					{
+						$sql[] = $key . ' ' . $db->sql_like_expression(str_replace('%', $db->any_char, $option));
+					}
+					else
+					{
+						$sql[] = $key . " = '" . $db->sql_escape($option) . "'";
+					}
+				}
+
+				$sql_opts = 'AND (' . implode(' OR ', $sql) . ')';
+			}
+		}
+	}
+}
+?>?php
+/**
+*
+* @package Auth
+* @version $Id: auth.php,v 1.1 2014/09/15 21:14:56 orynider Exp $
+* @copyright (c) 2002-2008 MX-Publisher Project Team
+* @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
+* @link http://mxpcms.sourceforge.net/
+*
+namespace phpbb\phpbb_auth;
+*/
+if ( !defined( 'IN_PORTAL' ) )
+{
+	die( "Hacking attempt" );
+}
+
+/**
+* Permission/Auth class for phpBB3 forums
+* @package MX-Publisher
+*/
+class phpbb_auth_base
+{
+	var $acl = array();
+	var $cache = array();
+	var $acl_options = array();
+	var $acl_forum_ids = false;
+
+{
 						$sql[] = $key . ' ' . $db->sql_like_expression(str_replace('%', $db->any_char, $option));
 					}
 					else
