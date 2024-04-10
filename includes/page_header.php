@@ -2,8 +2,8 @@
 /**
 *
 * @package MX-Publisher Core
-* @version $Id: page_header.php,v 3.78 2024/04/02 23:15:17 orynider Exp $
-* @copyright (c) 2002-2034 MX-Publisher Project Team
+* @version $Id: page_header.php,v 3.78 2024/04/10 6:15:17 orynider Exp $
+* @copyright (c) 2002-2024 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
 * @link http://github.com/Mx-Publisher/mxpcms
@@ -193,6 +193,11 @@ switch (PORTAL_BACKEND)
 	case 'olympus':
 	//To do: Check this in sessions/phpbb2 comparing to sessions/internal
 		$u_login = mx_append_sid("login.".$phpEx);
+		// Get referer to redirect user to the appropriate page after delete action
+		$redirect_url = mx_append_sid(PORTAL_URL . "index.$phpEx" . (isset($page_id) ? "?page={$page_id}" : "") . (isset($cat_nav) ? "&cat_nav={$cat_nav}" : ""));
+		$u_login = mx_append_sid("{$phpbb_root_path}ucp.$phpEx", 'mode=login');
+		$u_register = mx_append_sid("{$phpbb_root_path}ucp.php?mode=register&redirect=$redirect_url");
+		$u_profile = mx_append_sid("{$phpbb_root_path}ucp.php?mode=editprofile");
 		$admin = ($mx_user->data['user_level'] == ADMIN) ? true : false;	
 		if ($mx_user->data['user_id'] != ANONYMOUS)
 		{
@@ -631,7 +636,7 @@ if ( ($mx_user->data['session_logged_in']) && (PORTAL_BACKEND !== 'internal') &&
 			//
 			// Major query obtains the message ...
 			//	
-			$sql = "SELECT u.username AS username_1, u.user_id AS user_id_1, u2.username AS username_2, u2.user_id AS user_id_2, u.user_sig_bbcode_uid, u.user_regdate AS user_regdate1,u.user_posts AS user_posts1, u.user_from AS user_from1, u.user_website, u.user_email, u.user_icq, u.user_aim, u.user_yim, u.user_msnm, u.user_viewemail, u.user_rank AS user_rank1, u.user_sig, u.user_avatar AS user_avatar1,u.user_avatar_type AS user_avatar_type1, pm.*, pmt.privmsgs_bbcode_uid, pmt.privmsgs_text
+			$sql = "SELECT u.username AS username_1, u.user_id AS user_id_1, u2.username AS username_2, u2.user_id AS user_id_2, u.user_sig_bbcode_uid, u.user_regdate AS user_regdate1,u.user_posts AS user_posts1, u.user_from AS user_from1, u.user_website, u.user_email, u.user_icq, u.user_aim, u.user_yim, u.user_msnm, u.user_viewemail, u.user_rank AS user_rank1, u.user_sig, u.user_avatar AS user_avatar1,u.user_avatar_type AS user_avatar_type1, pm.*, pmt.*
 				FROM " . PRIVMSGS_TABLE . " pm, " . PRIVMSGS_TEXT_TABLE . " pmt, " . USERS_TABLE . " u, " . USERS_TABLE . " u2 
 				WHERE pm.privmsgs_id = pmt.privmsgs_text_id 
 					$pm_sql_user 
@@ -672,7 +677,7 @@ if ( ($mx_user->data['session_logged_in']) && (PORTAL_BACKEND !== 'internal') &&
 			if ( $privmsg = $db->sql_fetchrow($result) )
 			{
 				$notifications[] = $privmsg;
-				$privmsg_id = $privmsg['privmsgs_id'];
+				$privmsg_id = isset($privmsg['privmsgs_id']) ? $privmsg['privmsgs_id'] : 0;
 			}
 			else
 			{
@@ -689,17 +694,17 @@ if ( ($mx_user->data['session_logged_in']) && (PORTAL_BACKEND !== 'internal') &&
 		// Merge default options
 		$notifications = array_merge(array(
 			'notification_id'		=> 0,
-			'notification_time'	=> time(),
+			'notification_time'		=> time(),
 			'user_id'				=> $mx_user->data['user_id'],
 			'order_by'				=> 'notification_time',
-			'older_unread'		=> 1,
-			'order_dir'			=> 'DESC',
+			'older_unread'			=> 1,
+			'order_dir'				=> 'DESC',
 			'all_unread'			=> 0,
-			'unread_count'		=> 0,
+			'unread_count'			=> 0,
 			'limit'					=> 5,
 			'start'					=> 0,
-			'REASON'			=> 'Could not query private message post information',
-			'count_unread'		=> 0,
+			'REASON'				=> 'Could not query private message post information',
+			'count_unread'			=> 0,
 			'count_total'			=> $total_msgs,
 		), $notifications);	
 	}
@@ -707,17 +712,17 @@ if ( ($mx_user->data['session_logged_in']) && (PORTAL_BACKEND !== 'internal') &&
 	// Merge default options
 	$notifications = array_merge(array(
 		'notification_id'		=> $privmsg_id,
-		'notification_time'	=> !empty($privmsg['privmsgs_date']) ? $privmsg['privmsgs_date'] : time(),
+		'notification_time'		=> !empty($privmsg['privmsgs_date']) ? $privmsg['privmsgs_date'] : time(),
 		'user_id'				=> $mx_user->data['user_id'],
 		'order_by'				=> 'notification_time',
-		'older_unread'		=> $s_privmsg_new,
-		'order_dir'			=> 'DESC',
+		'older_unread'			=> $s_privmsg_new,
+		'order_dir'				=> 'DESC',
 		'all_unread'			=> $s_privmsg_new,		
-		'unread_count'		=> $s_privmsg_new,	
+		'unread_count'			=> $s_privmsg_new,	
 		'limit'					=> 5,
 		'start'					=> 0,
-		'REASON'			=> $privmsg['privmsgs_text'],
-		'count_unread'		=> $s_privmsg_new,
+		'REASON'				=> isset($privmsg['privmsgs_text']) ? $privmsg['privmsgs_text'] : 0,
+		'count_unread'			=> $s_privmsg_new,
 		'count_total'			=> $total_msgs,
 	), $notifications);
 }
