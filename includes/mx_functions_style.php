@@ -2,8 +2,8 @@
 /**
 *
 * @package Style
-* @version $Id: mx_functions_style.php,v 3.144 2024/04/02 06:94:17 orynider Exp $
-* @copyright (c) 2002-2019 MX-Publisher Project Team
+* @version $Id: mx_functions_style.php,v 3.146 2024/04/10 06:94:17 orynider Exp $
+* @copyright (c) 2002-2024 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
 * @link https://github.com/Mx-Publisher/mxpcms/
@@ -2513,9 +2513,9 @@ class mx_user extends mx_session
 		/*
 		* Is this a cloned temmplate - defined by main *.cfg?
 		*/
-		$template_config_row['cloned_template'] 	= trim(htmlspecialchars($mx_template_settings['cloned_template']));
-		$template_config_row['border_graphics'] 	= $mx_template_settings['border_graphics'];
-		$template_config_row['template_copy'] 		= $mx_template_settings['template_copy'];
+		$template_config_row['cloned_template'] = trim(htmlspecialchars($mx_template_settings['cloned_template']));
+		$template_config_row['border_graphics'] = $mx_template_settings['border_graphics'];
+		$template_config_row['template_copy'] = $mx_template_settings['template_copy'];
 		return $template_config_row;
 	}
 	
@@ -2540,13 +2540,13 @@ class mx_user extends mx_session
 			break;
 			
 			case 'phpbb2':
-					$current_template_path 					= $this->current_template_path;
+					$current_template_path 				= $this->current_template_path;
 					$default_current_template_path 	= $this->default_current_template_path;
-					$current_style_phpbb_path 			= $this->current_style_phpbb_path; //new
+					$current_style_phpbb_path 		= $this->current_style_phpbb_path; //new
 					$cloned_current_template_path 	= $this->cloned_current_template_path;
-					$template_path 	 							= $this->template_path; //new
+					$template_path 	 						= $this->template_path; //new
 					$default_style_phpbb_path 			= $this->default_style_phpbb_path; 
-					$style_path 										= $this->style_path; //new
+					$style_path 									= $this->style_path; //new
 			break;
 			
 			case 'phpbb3':
@@ -2569,6 +2569,7 @@ class mx_user extends mx_session
 		
 		// Load phpBB Template configuration data
 		// - First try current template
+		//
 		if (is_dir($phpbb_root_path . $this->current_template_path . "/images/") || is_dir($phpbb_root_path . $this->current_template_path . "/theme/images/"))
 		{
 			$current_template_path = $this->current_template_path;
@@ -2577,7 +2578,9 @@ class mx_user extends mx_session
 			$style_found = '_'; //default
 		}
 		
+		//
 		// Since we have no current Template Config file, try the cloned template instead
+		//
 		if ((is_dir($phpbb_root_path . $this->cloned_current_template_path . "/images/") || is_dir($phpbb_root_path . $this->cloned_current_template_path . "/theme/images/")) && empty($style_found) )
 		{
 			$current_template_path = $this->cloned_current_template_path;
@@ -2898,8 +2901,15 @@ class mx_user extends mx_session
 		// phpBB2 image sets main images				
 		$img_lang = ( is_dir($phpbb_root_path . $this->current_template_path . $this->img_lang_dir) ) ? $this->img_lang : $this->default_language_name;
 		
+		//
 		// Import phpBB Graphics, prefix with PHPBB_URL, and apply LANG info
-		while( list($key, $value) = @each($images) )
+		//
+		/* start Migrating from php5 to php7+ replace
+			foreach ($mx_images as $key => $value) {
+		with
+			while (list($key, $value) = each($mx_images)) {
+		ends Migrating */		
+		foreach ($mx_images as $key => $value) 
 		{
 			if (is_array($value))
 			{
@@ -2939,8 +2949,9 @@ class mx_user extends mx_session
 			}			
 		}
 		
-		// print_r($images);		
-		// Import phpBB Olympus image sets main images	
+		//print_r($images);		
+		// Import phpBB Olympus image sets main images
+		//		
 		if (@file_exists("{$phpbb_root_path}{$this->template_path}{$this->template_name}{$this->imageset_path}/imageset.cfg"))
 		{		
 			$cfg_data_imageset = mx_parse_cfg_file("{$phpbb_root_path}{$this->template_path}{$this->template_name}{$this->imageset_path}/imageset.cfg");
@@ -2973,28 +2984,27 @@ class mx_user extends mx_session
 						'image_filename'	=> (string) $image_filename,
 						'image_height'		=> (int) $image_height,
 						'image_width'		=> (int) $image_width,
-						'imageset_id'			=> (int) $style_id,
-						'image_lang'			=> '',
+						'imageset_id'		=> (int) $style_id,
+						'image_lang'		=> '',
 					);
 					
 					if (!empty($row['image_lang']))
 					{
 						$localised_images = true;
 					}					
-					
-					$row['image_filename'] 								= !empty($row['image_filename']) ? rawurlencode($row['image_filename']) : '';
-					$row['image_name'] 									= !empty($row['image_name']) ? rawurlencode($row['image_name']) : '';
-					
-					$this->img_array[$row['image_name']]		= $row;									
+					$row['image_filename'] = !empty($row['image_filename']) ? rawurlencode($row['image_filename']) : '';
+					$row['image_name'] = !empty($row['image_name']) ? rawurlencode($row['image_name']) : '';
+					$this->img_array[$row['image_name']] = $row;									
 				}
 			}		
 		}
-			
-		// - Olympus image sets lolalised images		
+		
+		//		
+		// - Olympus image sets lolalised images	
+		//		
 		if (@file_exists("{$phpbb_root_path}{$this->template_path}{$this->template_name}{$this->imageset_path}{$this->img_lang}/imageset.cfg"))
 		{
 			$cfg_data_imageset_data = mx_parse_cfg_file("{$phpbb_root_path}{$this->template_path}{$this->template_name}{$this->imageset_path}{$this->img_lang}/imageset.cfg");
-			
 			foreach ($cfg_data_imageset_data as $image_name => $value)
 			{
 				if (strpos($value, '*') !== false)
@@ -3235,8 +3245,8 @@ class mx_user extends mx_session
 							'image_filename'	=> (string) $image_filename,
 							'image_height'		=> (int) $image_height,
 							'image_width'		=> (int) $image_width,
-							'imageset_id'			=> (int) $this->theme['imageset_id'],
-							'image_lang'			=> (string) $this->img_lang,
+							'imageset_id'		=> (int) $this->theme['imageset_id'],
+							'image_lang'		=> (string) $this->img_lang,
 						);
 						*/
 						//Here we overwrite phpBB3 images names from the template configuration file with images file names from database						
@@ -3458,8 +3468,8 @@ class mx_user extends mx_session
 					@define('TEMPLATE_CONFIG', TRUE); 
 				}
 				// We include common temlate config file here to not load it every time a module template config file is included
-				// $this->theme = is_array($this->theme) ? array_merge($this->theme, $theme) : $theme;				
-				// $this->theme = &$theme;			
+				//$this->theme = is_array($this->theme) ? array_merge($this->theme, $theme) : $theme;				
+				//$this->theme = &$theme;			
 			break;			
 		}
 		
@@ -3540,6 +3550,7 @@ class mx_user extends mx_session
 			case 'olympus':
 			case 'ascraeus':
 			case 'rhea':
+			case 'proteus':
 			default:
 				$template_name2 = 'subsilver2';	
 				/**/
@@ -3627,9 +3638,11 @@ class mx_user extends mx_session
 		/* include( 'www\templates\prosilver2\prosilver2.cfg' )
 		**/
 		unset($GLOBALS['MX_TEMPLATE_CONFIG']);		
+		
 		$mx_template_config = false;
+		
 		if (@file_exists($mx_root_path . $module_root_path . $this->current_template_path . '/' . $template_name . '.cfg'))
-		{			
+		{
 			include($mx_root_path . $module_root_path . $this->current_template_path . '/' . $template_name . '.cfg');
 		}
 		
@@ -4861,9 +4874,8 @@ class mx_language_file_loader
  * 
  */
 interface IException
-{   
-	
-	/* Protected methods inherited from Exception class */
+{
+    /* Protected methods inherited from Exception class */
     public function getMessage();                 // Exception message
     public function getCode();                    // User-defined Exception code
     public function getFile();                    // Source filename
@@ -4873,9 +4885,8 @@ interface IException
    
     /* Overrideable methods inherited from Exception class */
     public function __toString();                 // formated string for display
-	public function __construct($message = "Unknown exception", array $parameters = array(), \Exception $previous = null, $code = 0);
+    public function __construct($message = null, $code = 0);
 }
-
 /**
  * Class runtime_exception
  *
@@ -4883,43 +4894,43 @@ interface IException
  */
 abstract class runtime_exception extends Exception implements IException
 {
-
 	/**
-	 * Propeties
+	 * Parameters to use with the language var.
+	 *
+	 * @var array
 	 */
-	private array $parameters = [];		// Unknow
-	private string $string = "";
-	protected string $file = "";				// Source filename of exception
-	protected int $line;  						// User-defined exception code
-	private array $trace = [];
-	private ?Throwable $previous = null;
-	
+	protected $message = 'Unknown exception';     // Exception message
+    private   $string;                            // Unknown
+    protected $code    = 0;                       // User-defined exception code
+    protected $file;                              // Source filename of exception
+    protected $line;                              // Source line of exception
+    private   $trace;                             // Unknown
+
 	/**
 	 * Constructor
 	 *
 	 * @param string		$message	The Exception message to throw (must be a language variable).
 	 * @param integer		$code		The Exception code.
 	 */
-	public function __construct($message = "Unknown exception", array $parameters = array(), \Exception $previous = null, $code = 0)
+	public function __construct($message = "", $code = 0)
 	{
-	
-		$this->parameters = $parameters;
-		
-		if (!empty($message)) 
+        if (!empty($message)) 
 		{
-				//throw new $this('Unknown '. get_class($this));
-				print_r($message);
-		}
+            //throw new $this('Unknown '. get_class($this));
+			print_r($message);
+        }
+        //parent::__construct($message, $code);
 	}
-	//__construct($prefix . $message, $parameters, $previous, $code);
 	/**
-	 * tostr
+	 * {@inheritdoc}
 	 */
 	public function __toString()
     {
-		return get_class($this) . " '{$this->message}' in {$this->filename}({$this->line})\n" . "{$this->getTraceAsString()}";
-    }
-}  
+        return get_class($this) . " '{$this->message}' in {$this->file}({$this->line})\n" . "{$this->getTraceAsString()}";
+    }	
+	/**
+	 */	
+}   
 /**
  *
  */
@@ -5624,7 +5635,7 @@ class mx_language extends mx_language_file_loader
 		return $lang_name;
 	}
 	
-	function ucstrreplace($pattern = '%{$regex}%i', $matches = '', $string = 'en') 
+	function ucstrreplace($pattern = '%{$regex}%i', $matches = '', $string) 
 	{
 		/* return with no uppercase if patern not in string */
 		if (strpos($string, $pattern) === false)
