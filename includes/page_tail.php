@@ -2,8 +2,8 @@
 /**
 *
 * @package page_tail
-* @version $Id: page_tail.php,v 1.46 2013/06/28 15:32:38 orynider Exp $
-* @copyright (c) 2002-2008 MX-Publisher Project Team
+* @version $Id: page_tail.php,v 1.46 2013/04/10 6:32:38 orynider Exp $
+* @copyright (c) 2002-2024 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
 * @internal
@@ -60,8 +60,16 @@ switch (PORTAL_BACKEND)
 
 	case 'phpbb2':
 	case 'olympus':
-	//To do: Check this in sessions/phpbb2 comparing to sessions/internal
+		if(!isset($phpbb_auth) || !is_object($phpbb_auth))
+		{
+			$phpbb_auth = new phpbb_auth();
+		}
+		$phpbb_auth->acl($mx_user->data);
+		//To do: Check this in sessions/phpbb2 comparing to sessions/internal
 		$u_login = mx_append_sid("login.".$phpEx);
+		// Get referer to redirect user to the appropriate page after delete action
+		$redirect_url = mx_append_sid(PORTAL_URL . "index.$phpEx" . (isset($page_id) ? "?page={$page_id}" : "") . (isset($cat_nav) ? "&cat_nav={$cat_nav}" : ""));
+		$u_login = mx_append_sid("{$phpbb_root_path}ucp.$phpEx", 'mode=login');
 		if (  $mx_user->data['user_id'] != ANONYMOUS )
 		{
 			$u_login_logout = mx_append_sid('login.'.$phpEx.'?logout=true&sid=' . $mx_user->data['session_id']);
@@ -140,7 +148,7 @@ if ($mx_page->editcp_exists)
 	));
 }
 
-if (!is_object($phpBB2))
+if (!isset($phpBB2))
 {
 	$phpBB2 = new phpBB2();
 }
@@ -217,43 +225,86 @@ if( !is_object($mx_backend))
 	$mx_backend = new mx_backend();
 }
 
+$web_path = (empty($portal_config['portal_url'])) ? PORTAL_URL : $portal_config['portal_url'];
+$https_path = str_replace("http://", "https://", $web_path);
+$web_path = str_replace("https://", "http://", $web_path);
+
+switch (PORTAL_BACKEND)
+{
+	case 'internal':
+	case 'smf2':
+	case 'mybb':
+		
+		if ( !defined('PHPBB_VERSION') )
+		{
+			define('PHPBB_VERSION', $board_config['portal_version']);
+		}	
+	
+	break;
+	
+	case 'phpbb2':
+		
+		if ( !defined('PHPBB_VERSION') )
+		{
+			define('PHPBB_VERSION', '2'.$board_config['version']);
+		}	
+	
+	break;
+	
+	case 'phpbb3':
+	case 'olympus':
+	case 'ascraeus':
+	case 'rhea':
+	case 'proteus':
+	default:
+		if ( !defined('PHPBB_VERSION') )
+		{
+			define('PHPBB_VERSION', $board_config['version']);
+		}
+		
+	break;
+}
+
+$phpbb_version_parts = explode('.', PHPBB_VERSION, 3);
+$phpbb_major = $phpbb_version_parts[0] . '.' . $phpbb_version_parts[1];
+
 $mx_backend->page_tail('generate_backend_version');
 
 $template->assign_vars(array(
-	'L_AJAX_ERROR_TITLE' 								=> $mx_user->lang['AJAX_ERROR_TITLE'],
-	'L_AJAX_ERROR_TEXT_ABORT' 					=> $mx_user->lang['AJAX_ERROR_TEXT_ABORT'],
-	'L_AJAX_ERROR_TEXT_TIMEOUT' 				=> $mx_user->lang['AJAX_ERROR_TEXT_TIMEOUT'],
-	'L_AJAX_ERROR_TEXT_PARSERERROR' 		=> $mx_user->lang['AJAX_ERROR_TEXT_PARSERERROR'],
-	'L_TIMEOUT_PROCESSING_REQ' 					=> $mx_user->lang['TIMEOUT_PROCESSING_REQ'],
-	'L_PRIVACY'						=> $mx_user->lang['PRIVACY'],
-	'L_PRIVACY_LINK'				=> !empty($mx_user->lang['PRIVACY_LINK']) ? $mx_user->lang['PRIVACY_LINK'] : 'Privacy ',
+	'L_AJAX_ERROR_TITLE' 				=> $mx_user->lang['AJAX_ERROR_TITLE'],
+	'L_AJAX_ERROR_TEXT_ABORT' 			=> $mx_user->lang['AJAX_ERROR_TEXT_ABORT'],
+	'L_AJAX_ERROR_TEXT_TIMEOUT' 		=> $mx_user->lang['AJAX_ERROR_TEXT_TIMEOUT'],
+	'L_AJAX_ERROR_TEXT_PARSERERROR' 	=> $mx_user->lang['AJAX_ERROR_TEXT_PARSERERROR'],
+	'L_TIMEOUT_PROCESSING_REQ' 			=> $mx_user->lang['TIMEOUT_PROCESSING_REQ'],
+	'L_PRIVACY'					=> $mx_user->lang['PRIVACY'],
+	'L_PRIVACY_LINK'			=> !empty($mx_user->lang['PRIVACY_LINK']) ? $mx_user->lang['PRIVACY_LINK'] : 'Privacy ',
 	'L_TERMS_LINK'				=> isset($mx_user->lang['TERMS_OF_USE_CONTENT']) ? $mx_user->lang['TERMS_OF_USE_CONTENT'] : 'Terms of use ',
 	'L_TERMS_USE'				=> $mx_user->lang['TERMS_USE'],
-	'L_TEST_CONNECTION'	=> $mx_user->lang['TEST_CONNECTION'],
+	'L_TEST_CONNECTION'			=> $mx_user->lang['TEST_CONNECTION'],
 	'L_THE_TEAM'				=> $mx_user->lang['THE_TEAM'],
-	'ROOT_PATH'				=> $web_path,
+	'ROOT_PATH'					=> $web_path,
 	'FULL_SITE_PATH'			=> $web_path,	
 	
-	'U_PORTAL_ROOT_PATH' 	=> PORTAL_URL,
-	'U_PHPBB_ROOT_PATH' 	=> PHPBB_URL,
-	'TEMPLATE_ROOT_PATH' 	=> TEMPLATE_ROOT_PATH,
+	'U_PORTAL_ROOT_PATH' 		=> PORTAL_URL,
+	'U_PHPBB_ROOT_PATH' 		=> PHPBB_URL,
+	'TEMPLATE_ROOT_PATH' 		=> TEMPLATE_ROOT_PATH,
 	'CMS_PAGE_HOME'				=> PORTAL_URL,
-	'BOARD_URL'						=> PORTAL_URL,
+	'BOARD_URL'					=> PORTAL_URL,
 	'PHPBB_VERSION'				=> PHPBB_VERSION,
-	'PHPBB_MAJOR'					=> $phpbb_major,
+	'PHPBB_MAJOR'				=> $phpbb_major,
 	'S_COOKIE_NOTICE'			=> !empty($board_config['cookie_name']),
 	
-	'T_ASSETS_VERSION'				=> $phpbb_major,
-	'T_ASSETS_PATH'					=> "{$web_path}assets",	
-	'T_THEME_PATH'					=> "{$web_path}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme',
-	'T_TEMPLATE_PATH'				=> "{$web_path}templates/" . rawurlencode($theme['template_name']) . '',
-	'T_SUPER_TEMPLATE_PATH'	=> "{$web_path}templates/" . rawurlencode($theme['template_name']) . '/template',
+	'T_ASSETS_VERSION'			=> $phpbb_major,
+	'T_ASSETS_PATH'				=> "{$web_path}assets",	
+	'T_THEME_PATH'				=> "{$web_path}templates/" . rawurlencode($theme['template_name'] ? $theme['template_name'] : str_replace('.css', '', $theme['head_stylesheet'])) . '/theme',
+	'T_TEMPLATE_PATH'			=> "{$web_path}templates/" . rawurlencode($theme['template_name']) . '',
+	'T_SUPER_TEMPLATE_PATH'		=> "{$web_path}templates/" . rawurlencode($theme['template_name']) . '/template',
 		
-	'T_IMAGES_PATH'					=> "{$web_path}images/",
-	'T_SMILIES_PATH'					=> "{$web_path}{$board_config['smilies_path']}/",
-	'T_AVATAR_GALLERY_PATH'	=> "{$web_path}{$board_config['avatar_gallery_path']}/",
+	'T_IMAGES_PATH'				=> "{$web_path}images/",
+	'T_SMILIES_PATH'			=> "{$web_path}{$board_config['smilies_path']}/",
+	'T_AVATAR_GALLERY_PATH'		=> "{$web_path}{$board_config['avatar_gallery_path']}/",
 	
-	'T_ICONS_PATH'					=> !empty($board_config['icons_path']) ? "{$web_path}{$board_config['icons_path']}/" : $web_path.'/images/icons/',
+	'T_ICONS_PATH'				=> !empty($board_config['icons_path']) ? "{$web_path}{$board_config['icons_path']}/" : $web_path.'/images/icons/',
 	'T_RANKS_PATH'				=> !empty($board_config['ranks_path']) ? "{$web_path}{$board_config['ranks_path']}/" : $web_path.'/images/ranks/',
 	'T_UPLOAD_PATH'				=> !empty($board_config['upload_path']) ? "{$web_path}{$board_config['upload_path']}/" : $web_path.'/cache/',	
 	
