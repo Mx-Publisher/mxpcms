@@ -2,7 +2,7 @@
 /**
 *
 * @package Functions
-* @version $Id: mx_functions.php,v 3.130 2024/04/02 06:19:17 orynider Exp $
+* @version $Id: mx_functions.php,v 3.131 2024/04/10 06:19:17 orynider Exp $
 * @copyright (c) 2002-2024 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
@@ -48,12 +48,12 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 	}	
 	
 	$msg_history[] = array(
-		'msg_code'		=> $msg_code,
-		'msg_text'			=> $msg_text,
-		'msg_title'			=> $msg_title,
-		'err_line'				=> $err_line,
-		'err_file'				=> $err_file,
-		'sql'						=> $sql
+		'msg_code'	=> $msg_code,
+		'msg_text'	=> $msg_text,
+		'msg_title'	=> $msg_title,
+		'err_line'	=> $err_line,
+		'err_file'	=> $err_file,
+		'sql'		=> $sql
 	);
 	
 	//
@@ -61,10 +61,11 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 	//
 	if (defined('HAS_DIED'))
 	{
+		//
 		// This message is printed at the end of the report.
 		// Of course, you can change it to suit your own needs. ;-)
+		//
 		$custom_error_message = 'Please, contact the %swebmaster%s. Thank you.';
-		
 		if ( !empty($board_config) && !empty($board_config['board_email']) )
 		{
 			$custom_error_message = sprintf($custom_error_message, '<a href="mailto:' . $board_config['board_email'] . '">', '</a>');
@@ -73,39 +74,30 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 		{
 			$custom_error_message = sprintf($custom_error_message, '', '');
 		}		
-		
 		echo "<html>\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n<body>\n<b>Critical Error!</b><br />\nmx_message_die() was called multiple times.<br />&nbsp;<hr />";
-		
-		for ( $i = 0; $i < count($msg_history); $i++ )
+		for( $i = 0; $i < count($msg_history); $i++ )
 		{
 			echo '<b>Error #' . ($i+1) . "</b>\n<br />\n";
-			
-			if ( !empty($msg_history[$i]['msg_title']) )
+			if( !empty($msg_history[$i]['msg_title']) )
 			{
 				echo '<b>' . $msg_history[$i]['msg_title'] . "</b>\n<br />\n";
 			}
-			
 			echo $msg_history[$i]['msg_text'] . "\n<br /><br />\n";
-			
-			if ( !empty($msg_history[$i]['err_line']) )
+			if( !empty($msg_history[$i]['err_line']) )
 			{
 				echo '<b>Line :</b> ' . $msg_history[$i]['err_line'] . '<br /><b>File :</b> ' . $msg_history[$i]['err_file'] . "</b>\n<br />\n";
 			}
-			
-			if ( !empty($msg_history[$i]['sql']) )
+			if( !empty($msg_history[$i]['sql']) )
 			{
 				echo '<b>SQL :</b> ' . $msg_history[$i]['sql'] . "\n<br />\n";
 			}
 			echo "&nbsp;<hr />\n";
 		}
-		
 		if (version_compare(PHP_VERSION, '5.4') < 0)
 		{
-			echo('You are running an unsupported PHP version: ' . PHP_VERSION . '. Please upgrade to PHP 5.4.6 or higher before trying to install phpBB3 or install / upgrate MX-Publisher 3<br />');
+			echo('You are running an unsupported PHP version: ' . PHP_VERSION . '. Please upgrade to PHP 5.6.4 or higher before trying to install phpBB3 or install / upgrate MX-Publisher 3<br />');
 		}		
-		
 		echo $custom_error_message . '<hr /><br clear="all" />';
-		
 		die("</body>\n</html>");
 	}
 	
@@ -139,22 +131,22 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 	}
 
 	//Security check
-	if ( !is_object($mx_user) && !is_object($mx_page) && !is_object($mx_request_vars))
+	if( !is_object($mx_user) && !is_object($mx_page) && !is_object($mx_request_vars))
 	{
 		die('Hacking attempt, or couldn\'t initalize the main classes required to call mx_message_die().');
 	}
 
-	if ( !is_object($mx_user))
+	if( !is_object($mx_user))
 	{
 		$mx_user = new mx_user();
 	}
 
-	if ( !is_object($mx_page))
+	if( !is_object($mx_page))
 	{
 		$mx_page = new mx_page();
 	}
 
-	if ( !is_object($mx_request_vars))
+	if( !is_object($mx_request_vars))
 	{
 		$mx_request_vars = new mx_request_vars();
 	}
@@ -185,7 +177,6 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 	if (empty($theme))
 	{
 		global $user_ip;
-		
 		$mx_user->page_id = 1;
 		$mx_user->user_ip = $user_ip;
 		$mx_user->_init_userprefs();
@@ -198,7 +189,7 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 
 	$default_lang = (isset($mx_user->lang['default_lang'])) ? $mx_user->encode_lang($mx_user->lang['default_lang']) : $board_config['default_lang'];
 
-	if (empty($default_lang))
+	if ( empty($default_lang) )
 	{
 		// - populate $default_lang
 		$default_lang = 'english';
@@ -327,7 +318,7 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 	//
 	if ( DEBUG && ( $msg_code == GENERAL_ERROR || $msg_code == CRITICAL_ERROR ) )
 	{
-		if ($debug_text != '')
+		if ( $debug_text != '' )
 		{
 			$msg_text = $msg_text . '<br /><br /><b><u>DEBUG MODE</u></b> ' . $debug_text;
 		}
@@ -373,17 +364,14 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 			$msg_text = str_replace('<a href="groupcp', '<a href="'.$phpbb_root_path.'groupcp', $msg_text);
 			$msg_text = str_replace('<a href="posting', '<a href="'.$phpbb_root_path.'posting', $msg_text);
 		}
-		
 		$template->assign_vars(array(
 			'MESSAGE_TITLE' => $msg_title,
 			'MESSAGE_TEXT' => $msg_text)
 		);
-		
 		ob_start();
 		$template->pparse('message_body');
 		$phpbb_output = ob_get_contents();
 		ob_end_clean();
-		
 		$phpbb_output = str_replace('"templates/'.$theme['template_name'], '"' . $phpbb_root_path . 'templates/'.$theme['template_name'], $phpbb_output);
 		echo($phpbb_output);
 		unset($phpbb_output);
@@ -403,7 +391,6 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 		{
 			define('TEMPLATE_ROOT_PATH', "{$mx_root_path}templates/" . (isset($theme['template_name']) ?  rawurlencode($theme['template_name']) : 'all') . '/');
 		}
-		
 		if (file_exists($mx_root_path . TEMPLATE_ROOT_PATH . 'msgdie_header.tpl'))
 		{		
 			$layouttemplate->set_filenames(array(
@@ -411,9 +398,7 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 			));
 			$layouttemplate->pparse('overall_header');			
 		}	
-		
 		echo "<html>\n<body>\n" . $msg_title . "\n<br /><br />\n" . $msg_text . "</body>\n</html>";		
-		
 		if (file_exists($mx_root_path . TEMPLATE_ROOT_PATH . 'msgdie_footer.tpl'))
 		{		
 			$layouttemplate->set_filenames(array('overall_footer' => 'msgdie_footer.tpl',));
@@ -433,20 +418,18 @@ function mx_message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 function mx_msg_handler($msg_code, $msg_text = '', $msg_title = '', $err_line = '', $err_file = '', $sql = '')
 {		
 	global $db, $mx_user, $board_config, $phpbb_auth, $mx_root_path;
-	
-	$errno = $msg_code;
-	$err_file = $msg_title;
-	
+	$msgtext 	= $msg_text; 
+	$msgtitle 	= $msg_title; 
+	$errline 	= $err_line; 
+	$errfile 	= $err_file;
+	$errno 		= is_numeric($msg_code) ? $msg_code : error_reporting();	
 	// Do not display notices if we suppress them via @
 	if (error_reporting() == 0 && $errno != E_USER_ERROR && $errno != E_USER_WARNING && $errno != E_USER_NOTICE && $errno != E_USER_DEPRECATED)
 	{
 		return;
-	}	
-			
-	//
+	}
 	// Get SQL error if we are debugging. Do this as soon as possible to prevent
 	// subsequent queries from overwriting the status of sql_error()
-	//
 	if (DEBUG && ($msg_code == E_USER_NOTICE || $msg_code == E_USER_ERROR))
 	{	
 		if ( isset($sql) )
@@ -460,10 +443,8 @@ function mx_msg_handler($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 			$sql_error = $db->sql_error_returned;
 			$sql_error['message'] = $db->sql_error_returned['message']; 
 			$sql_error['code'] = $db->sql_error_returned['code'];
-		}
-				
-		$debug_text = '';
-				
+		}				
+		$debug_text = '';				
 		//Some code with harcoded language from function db::sql_error() and other from msg_handler() with some fixes here
 		// If error occurs in initiating the session we need to use a pre-defined language string
 		// This could happen if the connection could not be established for example (then we are not able to grab the default language)
@@ -487,46 +468,47 @@ function mx_msg_handler($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 					}
 				}
 				$debug_text .= '<br /><br />SQL '  . $mx_user->lang('ERROR') . ' ' . $mx_user->lang('COLON') . ' ' . $sql_error['code'] . ' ' . $sql_error['message'];
-		}
-				
+		}				
 		if ( isset($sql_store) )
 		{
 			$debug_text .= "<br /><br />$sql_store";
 		}
-
 		if ( isset($err_line) && isset($err_file) )
 		{
 			$debug_text .= '</br /><br />Line : ' . $err_line . '<br />File : ' . $err_file;
 		}
-	}
-			
+	}			
+	
 	switch($msg_code)
-	{
+	{		
+
 		case E_NOTICE:
 		case E_WARNING:
-
 			// Check the error reporting level and return if the error level does not match
 			// If DEBUG is defined the default level is E_ALL
 			if (($errno & ((defined('DEBUG')) ? E_ALL : error_reporting())) == 0)
 			{
 				return;
 			}
-
+			if (is_array($err_file))
+			{
+				$err_file = isset($err_file[0]) ? $err_file[0] : print_r($err_file, true);
+			}
 			if (strpos($err_file, 'cache') === false && strpos($err_file, 'template.') === false)
 			{
 				$err_file = mx_filter_root_path($err_file);
 				$msg_text = mx_filter_root_path($msg_text);
+				
 				$error_name = ($errno === E_WARNING) ? 'PHP Warning' : 'PHP Notice';
-				echo '<b>[phpBB Debug] ' . $error_name . '</b>: in file <b>' . $err_file . '</b> on line <b>' . $err_line . '</b>: <b>' . $msg_text . '</b><br />' . "\n";
-				echo '<br /><br />BACKTRACE<br />' . mx_get_backtrace() . '<br />' . "\n";
+				
+				echo '<b>[phpBB Debug] ' . $error_name . '</b>: in file <b>' . $err_file . '</b> on line <b>' . $errline . '</b>: <b>' . $msg_text . '</b><br />' . "\n";
+				echo '<br /><br />BACKTRACE<br />' . get_backtrace() . '<br />' . "\n";
 			}
-
-			return;
-
 		break;
-
+		
+		
 		case E_USER_ERROR:
-
+		
 			if (!empty($mx_user) && $mx_user->is_setup())
 			{
 				$msg_text = (!empty($mx_user->lang[$msg_text])) ? $mx_user->lang[$msg_text] : $msg_text;
@@ -596,14 +578,14 @@ function mx_msg_handler($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 			echo '<meta charset="utf-8">';
 			echo '<meta http-equiv="X-UA-Compatible" content="IE=edge">';
 			echo '<title>' . $msg_title . '</title>';
-			echo '<style type="text/css">' . "\n" . '/* <![CDATA[ */' . "\n";
+			echo '<style type="text/css">' . "\n" . '<![CDATA[ ' . "\n";
 			echo '* { margin: 0; padding: 0; } html { font-size: 100%; height: 100%; margin-bottom: 1px; background-color: #E4EDF0; } body { font-family: "Lucida Grande", Verdana, Helvetica, Arial, sans-serif; color: #536482; background: #E4EDF0; font-size: 62.5%; margin: 0; } ';
 			echo 'a:link, a:active, a:visited { color: #006699; text-decoration: none; } a:hover { color: #DD6900; text-decoration: underline; } ';
 			echo '#wrap { padding: 0 20px 15px 20px; min-width: 615px; } #page-header { text-align: right; height: 40px; } #page-footer { clear: both; font-size: 1em; text-align: center; } ';
 			echo '.panel { margin: 4px 0; background-color: #FFFFFF; border: solid 1px  #A9B8C2; } ';
 			echo '#errorpage #page-header a { font-weight: bold; line-height: 6em; } #errorpage #content { padding: 10px; } #errorpage #content h1 { line-height: 1.2em; margin-bottom: 0; color: #DF075C; } ';
 			echo '#errorpage #content div { margin-top: 20px; margin-bottom: 5px; border-bottom: 1px solid #CCCCCC; padding-bottom: 5px; color: #333333; font: bold 1.2em "Lucida Grande", Arial, Helvetica, sans-serif; text-decoration: none; line-height: 120%; text-align: left; } ';
-			echo "\n" . '/* ]]> */' . "\n";
+			echo "\n" . '/* ]]>' . "\n";
 			echo '</style>';
 			echo '</head>';
 			echo '<body id="errorpage">';
@@ -635,82 +617,95 @@ function mx_msg_handler($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 			// On a fatal error (and E_USER_ERROR *is* fatal) we never want other scripts to continue and force an exit here.
 			exit;
 		break;
-
+		
 		case E_USER_WARNING:
 		case E_USER_NOTICE:
-
+			// Obtain number of new private messages
+			// if user is logged in
+			if(!isset($mx_user) || !is_object($mx_user))
+			{
+				$mx_user = new mx_user();
+			}
+			// Obtain number of new private messages
+			// if cache is logged in
+			if(!isset($mx_cache) || !is_object($mx_cache))
+			{
+				$cache = new mx_cache();
+			}
+			if(!isset($phpbb_auth) || !is_object($phpbb_auth))
+			{
+				$phpbb_auth = new phpbb_auth();
+			}
+			$phpbb_auth->acl($mx_user->data);
+			// Load common language file from phpBB3
+			$mx_user->set_lang($mx_user->lang, $mx_user->help, 'common');
+			$lang = &$mx_user->lang;
 			define('IN_ERROR_HANDLER', true);
-
-			if (empty($mx_user->data))
+			if (isset($mx_user))
 			{
 				$mx_user->session_begin();
 			}
-
 			// We re-init the auth array to get correct results on login/logout
 			$phpbb_auth->acl($mx_user->data);
-
-			if (!$mx_user->is_setup())
-			{
-				$mx_user->setup();
-			}
+			$mx_user->setup();
 
 			if ($msg_text == 'ERROR_NO_ATTACHMENT' || $msg_text == 'NO_FORUM' || $msg_text == 'NO_TOPIC' || $msg_text == 'NO_USER')
 			{
-				//send_status_line(404, 'Not Found');
-			}
-
+				send_status_line(404, 'Not Found');
+			}			
+			
 			$msg_text = (!empty($mx_user->lang[$msg_text])) ? $mx_user->lang[$msg_text] : $msg_text;
 			$msg_title = (!isset($msg_title)) ? $mx_user->lang['INFORMATION'] : ((!empty($mx_user->lang[$msg_title])) ? $mx_user->lang[$msg_title] : $msg_title);
-
+			
 			if (!defined('HEADER_INC'))
 			{
+				// Generate logged in/logged out status
+				$mx_backend = new mx_backend();
+				
 				if (defined('IN_ADMIN') && isset($mx_user->data['session_admin']) && $mx_user->data['session_admin'])
 				{
-					mx_admin_page_header($msg_title);
+					$mx_backend->admin_page_header($msg_title);
 				}
 				else
 				{
-					mx_page_header($msg_title);
+					$mx_backend->page_header($msg_title);
 				}
 			}
-
+			
+			global $template;
 			$template->set_filenames(array(
 				'body' => 'message_body.html')
 			);
-
+			
 			$template->assign_vars(array(
 				'MESSAGE_TITLE'		=> $msg_title,
 				'MESSAGE_TEXT'		=> $msg_text,
 				'S_USER_WARNING'	=> ($errno == E_USER_WARNING) ? true : false,
 				'S_USER_NOTICE'		=> ($errno == E_USER_NOTICE) ? true : false)
 			);
-
+			
 			// We do not want the cron script to be called on error messages
 			define('IN_CRON', true);
-
 			if (defined('IN_ADMIN') && isset($mx_user->data['session_admin']) && $mx_user->data['session_admin'])
 			{
-				mx_admin_page_footer();
+				//include_once($phpbb_root_path . 'admin/page_footer_admin.'.$phpEx);
 			}
 			else
 			{
-				mx_page_footer();
+				//include_once($phpbb_root_path . 'includes/page_tail.'.$phpEx);
 			}
-
-			exit_handler();
+			//exit_handler();
 		break;
-
+	
 		// PHP4 compatibility
 		case E_DEPRECATED:
+			echo '<br /><br />BACKTRACE<br /> ' . $error_name . '</b>: in file <b>' . $errfile . '</b> on line <b>' . $errline . '</b>: <b>' . $msg_text . '</b><br />' . "\n";
 			return true;
 		break;
 	}
-			
-	//
 	// Add on DEBUG info if we've enabled debug mode and this is an error. This
 	// prevents debug info being output for general messages should DEBUG be
 	// set TRUE by accident (preventing confusion for the end user!)
-	//
 	if ( DEBUG && ( $msg_code == E_USER_NOTICE || $msg_code == E_USER_ERROR ) )
 	{
 		if ( $debug_text != '' )
@@ -718,11 +713,27 @@ function mx_msg_handler($msg_code, $msg_text = '', $msg_title = '', $err_line = 
 			$msg_text = $msg_text . '<br /><br /><b><u>DEBUG MODE</u></b> ' . $debug_text;
 		}
 	}
-			
+		
 	$msg_text = (!empty($mx_user->lang[$msg_text])) ? $mx_user->lang[$msg_text] : $msg_text;
-	$msg_title = (!empty($mx_user->lang[$msg_title])) ? $mx_user->lang[$msg_title] : $msg_title;
-			
-	mx_message_die($msg_code, $msg_text, $msg_title, $err_line, $err_file, $sql);
+	$msg_title = (!empty($mx_user->lang[$msg_title])) ? $mx_user->lang[$msg_title] : $msg_title;	
+
+	if (!defined('MX_ENVIRONMENT'))
+	{
+		// Generate logged in/logged out status
+		mx_message_die($msg_code, $msg_text, $msg_title, $err_line, $err_file, $sql);
+	}
+	
+	if (MX_ENVIRONMENT == 'development')
+	{
+		// Generate logged in/logged out status
+		mx_message_die($msg_code, $msg_text, $msg_title, $err_line, $err_file, $sql);
+	}
+	
+	if (MX_ENVIRONMENT == 'protuction')
+	{
+		// Generate logged in/logged out status
+		mx_message_die(1, 'Portal enviroment set to production, set it to development to see errorrs on page.', 737, 'mx_functions', 'no sql query');
+	}
 }
 
 /**
@@ -1993,7 +2004,7 @@ function mx_rtrim($str, $charlist = false)
 	*/
 	if ((int) $php_version[0] < 4 || ((int) $php_version[0] == 4 && (int) $php_version[1] < 1))
 	{
-		while ($str[strlen($str)-1] == $charlist)
+		while ($str{strlen($str)-1} == $charlist)
 		{
 			$str = substr($str, 0, strlen($str)-1);
 		}
@@ -2692,11 +2703,11 @@ function mx_generate_text_for_display($text, $uid, $bitfield, $flags)
 
 		if (empty($mx_bbcode))
 		{
-			$mx_bbcode = new __construct($bitfield);
+			$mx_bbcode = new mx_bbcode($bitfield);
 		}
 		else
 		{
-			$mx_bbcode->__construct($bitfield);
+			$mx_bbcode->mx_bbcode($bitfield);
 		}
 
 		$mx_bbcode->bbcode_second_pass($text, $uid);
@@ -3476,7 +3487,7 @@ function get_page_id($search_item, $use_function_file = false, $get_page_data_ar
 			mx_message_die(GENERAL_ERROR, "Could not query column list", '', __LINE__, __FILE__, $sql);
 		}
 		$p_row = $db->sql_fetchrow($p_result);
-		$db->sql_freeresult($p_result);
+		$db->sql_freeresult($result);
 
 		if( empty($p_row['page_id']) )
 		{
@@ -3499,8 +3510,8 @@ function get_page_id($search_item, $use_function_file = false, $get_page_data_ar
 			{
 				mx_message_die(GENERAL_ERROR, "Could not query column list", '', __LINE__, __FILE__, $sql);
 			}
+			$db->sql_freeresult($result);
 			$p_row = $db->sql_fetchrow($p_result);
-			$db->sql_freeresult($p_result);
 		}
 		
 		if( empty($p_row['page_id']) )
@@ -3545,7 +3556,7 @@ function get_page_id($search_item, $use_function_file = false, $get_page_data_ar
 					continue;
 				}
 			}
-			$db->sql_freeresult($p_result);
+			$db->sql_freeresult($result);
 		}
 
 		if( empty($p_row['page_id']) )
@@ -3590,7 +3601,7 @@ function get_page_id($search_item, $use_function_file = false, $get_page_data_ar
 					continue;
 				}
 			}
-			$db->sql_freeresult($p_result);
+			$db->sql_freeresult($result);
 		}
 		
 		$page_id_array = array();
@@ -3930,38 +3941,40 @@ if( !function_exists('memory_get_usage') )
 	}
 }
 
-/**
-* Get backtrace.
-*
-* Return a nicely formatted backtrace (parts from the php manual by diz at ysagoon dot com)
-*
-* @return string (html)
-*/
-function mx_get_backtrace(): string
+if( !function_exists('get_backtrace') )
 {
-	global $mx_root_path;
-	
-	$output = '<div style="font-family: monospace;">';
-	$backtrace = debug_backtrace();
-	$path = realpath($mx_root_path);
-
-	foreach ($backtrace as $number => $trace)
+	/**
+	 * Get backtrace.
+	 *
+	 * Return a nicely formatted backtrace (parts from the php manual by diz at ysagoon dot com)
+	 *
+	 * @return string (html)
+	 */
+	function get_backtrace()
 	{
-		// We skip the first one, because it only shows this file/function
-		if ($number == 0)
-		{
-			continue;
-		}
+		global $mx_root_path;
 
-		// Strip the current directory from path
-		$trace['file'] = str_replace(array($path, '\\'), array('', '/'), $trace['file']);
-		$trace['file'] = substr($trace['file'], 1);
+		$output = '<div style="font-family: monospace;">';
+		$backtrace = debug_backtrace();
+		$path = realpath($mx_root_path);
 
-		$args = array();
-		foreach ($trace['args'] as $argument)
+		foreach ($backtrace as $number => $trace)
 		{
-			switch (gettype($argument))
+			// We skip the first one, because it only shows this file/function
+			if ($number == 0)
 			{
+				continue;
+			}
+
+			// Strip the current directory from path
+			$trace['file'] = str_replace(array($path, '\\'), array('', '/'), $trace['file']);
+			$trace['file'] = substr($trace['file'], 1);
+
+			$args = array();
+			foreach ($trace['args'] as $argument)
+			{
+				switch (gettype($argument))
+				{
 					case 'integer':
 					case 'double':
 						$args[] = $argument;
@@ -3994,54 +4007,53 @@ function mx_get_backtrace(): string
 
 					default:
 						$args[] = 'Unknown';
+				}
 			}
+
+			$trace['class'] = (!isset($trace['class'])) ? '' : $trace['class'];
+			$trace['type'] = (!isset($trace['type'])) ? '' : $trace['type'];
+
+			$output .= '<br />';
+			$output .= '<b>FILE:</b> ' . htmlspecialchars($trace['file']) . '<br />';
+			$output .= '<b>LINE:</b> ' . $trace['line'] . '<br />';
+			$output .= '<b>CALL:</b> ' . htmlspecialchars($trace['class'] . $trace['type'] . $trace['function']) . '(' . ((sizeof($args)) ? implode(', ', $args) : '') . ')<br />';
 		}
-		
-		$trace['class'] = (!isset($trace['class'])) ? '' : $trace['class'];
-		$trace['type'] = (!isset($trace['type'])) ? '' : $trace['type'];
-
-		$output .= '<br />';
-		$output .= '<b>FILE:</b> ' . htmlspecialchars($trace['file']) . '<br />';
-		$output .= '<b>LINE:</b> ' . $trace['line'] . '<br />';
-		$output .= '<b>CALL:</b> ' . htmlspecialchars($trace['class'] . $trace['type'] . $trace['function']) . '(' . ((sizeof($args)) ? implode(', ', $args) : '') . ')<br />';
+		$output .= '</div>';
+		return $output;
 	}
-	
-	$output .= '</div>';
-	return $output;
-}
 
-/**
-* Set config value.
-*
-* Creates missing config entry if needed.
-*
-* @param unknown_type $board_config_name
-* @param unknown_type $board_config_value
-* @param unknown_type $is_dynamic
-*/
-function mx_set_config($board_config_name, $board_config_value)
-{
-	global $db, $mx_cache, $portal_config;
+	/**
+	 * Set config value.
+	 *
+	 * Creates missing config entry if needed.
+	 *
+	 * @param unknown_type $board_config_name
+	 * @param unknown_type $board_config_value
+	 * @param unknown_type $is_dynamic
+	 */
+	function mx_set_config($board_config_name, $board_config_value)
+	{
+		global $db, $mx_cache, $portal_config;
 		
-	//Aternative to $sql = "UPDATE  " . PORTAL_TABLE . " SET " . $db->sql_build_array('UPDATE', utf8_normalize_nfc($portal_config));
-	$sql = "UPDATE " . PORTAL_TABLE . "
+		//Aternative to $sql = "UPDATE  " . PORTAL_TABLE . " SET " . $db->sql_build_array('UPDATE', utf8_normalize_nfc($portal_config));
+		$sql = "UPDATE " . PORTAL_TABLE . "
 			SET " . $db->sql_escape($board_config_name) . " = " . $db->sql_escape($board_config_value) . "
 			WHERE portal_id = 1";
-	$db->sql_query($sql);
+		$db->sql_query($sql);
 
-	if (!$db->sql_affectedrows() && !isset($portal_config[$board_config_name]))
-	{
-		$portal_config[$board_config_name] = $board_config_value;
+		if (!$db->sql_affectedrows() && !isset($portal_config[$board_config_name]))
+		{
+			$portal_config[$board_config_name] = $board_config_value;
 			
-		$sql = "INSERT INTO ". PORTAL_TABLE ." (".
+			$sql = "INSERT INTO ".PORTAL_TABLE." (".
 					implode(', ', array_keys($portal_config)).
 					") VALUES (".
 					implode(', ', array_values($portal_config)).
 					")";
-		$db->sql_query($sql);
+			$db->sql_query($sql);
+		}
+		$mx_cache->put('mxbb_config', $portal_config);
 	}
-	
-	$mx_cache->put('mxbb_config', $portal_config);
 }
 
 /**
@@ -4320,87 +4332,87 @@ function mx_guess_lang($encode = false)
 	// matches. Don't go moving these around without checking with
 	// me first - psoTFX
 	$match_lang = array(
-		'Afar'							=> 'aa', //Ethiopia
+		'Afar'					=> 'aa', //Ethiopia
 		'Abkhazia'					=> 'ab',
 		//'Angola'					=> 'ad'
 		'avestan'					=> 'ae', //Persia
 		'afrikaans'					=> 'af', // speakers: 6,855,082 - 13,4%
 		//'AFGHANISTAN'; // langs: pashto and dari
-		'english-creole'				=> 'ag', //Antigua & Barbuda
-		'anguilla'						=> 'ai',
+		'english-creole'					=> 'ag', //Antigua & Barbuda
+		'anguilla'					=> 'ai',
 		'aromanian'					=> 'aj', //Aromaya
-		'akan'								=> 'ak',
-		'albanian'						=> 'al', //ALBANIA
-		'amharic'						=> 'am', //the country flag with am is Armenia
+		'akan'					=> 'ak',
+		'albanian'					=> 'al', //ALBANIA
+		'amharic'					=> 'am', //the country flag with am is Armenia
 		'aragonese'					=> 'an', //Andorra, Netherland Antilles
-		'angolian'						=> 'ao', //Angola
-		'angika'							=> 'ap', //Anga //India
-		'arabic'							=> 'ar([_-][a-z]+)?', //country: Argentina
-		//'antarctica'					=> 'aq',
+		'angolian'					=> 'ao', //Angola
+		'angika'					=> 'ap', //Anga //India
+		'arabic'					=> 'ar([_-][a-z]+)?', //country: Argentina
+		//'antarctica'			=> 'aq',
 		'assamese'					=> 'as', //American Samoa
 		'german-austrian'			=> 'at',
-		'avaric'							=> 'av',
+		'avaric'						=> 'av',
 		'daghestanian'				=> 'av-da', //AVARIAN_KHANATE
-		'aymara'							=> 'ay',
-		'aruba'							=> 'aw', //Aruba
-		'en-au'							=> 'au', //Australia
-		'azerbaijani'					=> 'az', //Azerbaijan
-		'finnish'							=> 'ax', //The Aland Islands or Aland (Swedish: Aland, IPA: ['o?land]; Finnish: Ahvenanmaa) is an archipelago province at the entrance to the Gulf of Bothnia in the Baltic Sea belonging to Finland.
-		'bashkir'							=> 'ba', //Baskortostán (Rusia)
+		'aymara'				=> 'ay',
+		'aruba'				=> 'aw', //Aruba
+		'en-au'				=> 'au', //Australia
+		'azerbaijani'				=> 'az', //Azerbaijan
+		'finnish'				=> 'ax', //The Aland Islands or Aland (Swedish: Aland, IPA: ['o?land]; Finnish: Ahvenanmaa) is an archipelago province at the entrance to the Gulf of Bothnia in the Baltic Sea belonging to Finland.
+		'bashkir'				=> 'ba', //Baskortostán (Rusia)
 		//Bosnia & Herzegovina, Bosnian, Croatian, Serbian
-		'barbados'						=> 'bb',
-		'bangladesh'					=> 'bd',
-		'belarusian'					=> 'be', //Belgium
+		'barbados'				=> 'bb',
+		'bangladesh'				=> 'bd',
+		'belarusian'				=> 'be', //Belgium
 		//'burkina-faso'				=> 'bf',
-		'bulgarian'						=> 'bg', 
-		'bhojpuri'						=> 'bh', // Bihar (India) 
+		'bulgarian'					=> 'bg', 
+		'bhojpuri'					=> 'bh', // Bihar (India) 
 		//'Bahrain'; // Mamlakat al-Ba?rayn (arabic)
 		'belarusian'					=> 'by',
 		//'Belarus';
-		'catalan'							=> 'ca', 
-		'czech'							=> 'cs', 
-		'danish'							=> 'da', 
-		'german'							=> 'de([_-][a-z]+)?',
-		'english'							=> 'en([_-][a-z]+)?', 
-		'estonian'						=> 'et', 
-		'finnish'							=> 'fi', 
-		'french'							=> 'fr([_-][a-z]+)?', 
-		'greek'							=> 'el', 
-		'spanish_argentina'		=> 'es[_-]ar', 
-		'spanish'						=> 'es([_-][a-z]+)?', 
-		'gaelic'							=> 'gd', 
-		'galego'							=> 'gl', 
-		'gujarati'							=> 'gu', 
-		'hebrew'							=> 'he', 
-		'hindi'								=> 'hi', 
-		'croatian'						=> 'hr', 
+		'catalan'					=> 'ca', 
+		'czech'						=> 'cs', 
+		'danish'					=> 'da', 
+		'german'					=> 'de([_-][a-z]+)?',
+		'english'					=> 'en([_-][a-z]+)?', 
+		'estonian'					=> 'et', 
+		'finnish'					=> 'fi', 
+		'french'					=> 'fr([_-][a-z]+)?', 
+		'greek'						=> 'el', 
+		'spanish_argentina'			=> 'es[_-]ar', 
+		'spanish'					=> 'es([_-][a-z]+)?', 
+		'gaelic'					=> 'gd', 
+		'galego'					=> 'gl', 
+		'gujarati'					=> 'gu', 
+		'hebrew'					=> 'he', 
+		'hindi'						=> 'hi', 
+		'croatian'					=> 'hr', 
 		'hungarian'					=> 'hu', 
-		'icelandic'						=> 'is', 
-		'indonesian'					=> 'id([_-][a-z]+)?', 
-		'italian'							=> 'it([_-][a-z]+)?', 
-		'japanese'						=> 'ja([_-][a-z]+)?', 
-		'korean'							=> 'ko([_-][a-z]+)?', 
-		'latvian'							=> 'lv', 
-		'lithuanian'						=> 'lt', 
+		'icelandic'					=> 'is', 
+		'indonesian'				=> 'id([_-][a-z]+)?', 
+		'italian'					=> 'it([_-][a-z]+)?', 
+		'japanese'					=> 'ja([_-][a-z]+)?', 
+		'korean'					=> 'ko([_-][a-z]+)?', 
+		'latvian'					=> 'lv', 
+		'lithuanian'				=> 'lt', 
 		'macedonian'				=> 'mk', 
-		'dutch'								=> 'nl([_-][a-z]+)?', 
+		'dutch'						=> 'nl([_-][a-z]+)?', 
 		'norwegian'					=> 'no', 
-		'punjabi'							=> 'pa', 
-		'polish'							=> 'pl', 
-		'portuguese_brazil'		=> 'pt[_-]br', 
-		'portuguese'					=> 'pt([_-][a-z]+)?', 
-		'romanian'						=> 'ro([_-][a-z]+)?', 
-		'russian'							=> 'ru([_-][a-z]+)?', 
-		'slovenian'						=> 'sl([_-][a-z]+)?', 
-		'albanian'						=> 'sq', 
-		'serbian'							=> 'sr([_-][a-z]+)?', 
-		'slovak'							=> 'sv([_-][a-z]+)?', 
-		'swedish'						=> 'sv([_-][a-z]+)?', 
-		'thai'								=> 'th([_-][a-z]+)?', 
-		'turkish'							=> 'tr([_-][a-z]+)?', 
-		'ukranian'						=> 'uk([_-][a-z]+)?', 
-		'urdu'								=> 'ur', 
-		'viatnamese'					=> 'vi',
+		'punjabi'					=> 'pa', 
+		'polish'					=> 'pl', 
+		'portuguese_brazil'			=> 'pt[_-]br', 
+		'portuguese'				=> 'pt([_-][a-z]+)?', 
+		'romanian'					=> 'ro([_-][a-z]+)?', 
+		'russian'					=> 'ru([_-][a-z]+)?', 
+		'slovenian'					=> 'sl([_-][a-z]+)?', 
+		'albanian'					=> 'sq', 
+		'serbian'					=> 'sr([_-][a-z]+)?', 
+		'slovak'					=> 'sv([_-][a-z]+)?', 
+		'swedish'					=> 'sv([_-][a-z]+)?', 
+		'thai'						=> 'th([_-][a-z]+)?', 
+		'turkish'					=> 'tr([_-][a-z]+)?', 
+		'ukranian'					=> 'uk([_-][a-z]+)?', 
+		'urdu'						=> 'ur', 
+		'viatnamese'				=> 'vi',
 		'chinese_traditional_taiwan'=> 'zh[_-]tw',
 		'chinese_simplified'		=> 'zh', 
 	);
