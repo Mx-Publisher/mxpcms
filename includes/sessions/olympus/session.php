@@ -2,8 +2,8 @@
 /**
 *
 * @package Style
-* @version $Id: session.php,v 1.1 2023/10/17 17:48:17 orynider Exp $
-* @copyright (c) 2002-2008 MX-Publisher Project Team & (C) 2005 The phpBB Group
+* @version $Id: session.php,v 1.1 2024/04/10 06:48:17 orynider Exp $
+* @copyright (c) 2002-2024 MX-Publisher Project Team & (C) 2005 The phpBB Group
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
 *
@@ -137,14 +137,14 @@ class session
 		$this->config				= $board_config;
 		$this->db                 	= $db;
 		$this->user               	= $this;
-		$this->service_providers = array('user_id' => 1, 'session_id' => 0, 'provider'	=> '', 'oauth_token' => '');
-		$this->phpbb_root_path = $phpbb_root_path;
-		$this->mx_root_path	= $mx_root_path;
-		$this->php_ext			= $phpEx;
+		$this->service_providers 	= array('user_id' => 1, 'session_id' => 0, 'provider'	=> '', 'oauth_token' => '');
+		$this->phpbb_root_path 		= $phpbb_root_path;
+		$this->mx_root_path			= $mx_root_path;
+		$this->php_ext				= $phpEx;
 		$this->lang_path			= $mx_root_path . 'language/';
 		$this->request				= $mx_request_vars;
-		$this->template			= $template;
-		$this->language			= $language;
+		$this->template				= $template;
+		$this->language				= $language;
 
 		// Setup $this->db_tools
 		if (!class_exists('mx_db_tools') && !class_exists('tools'))
@@ -858,7 +858,7 @@ class session
 		// Force user id to be integer...
 		$this->data['user_id'] = (int) $this->data['user_id'];
 		$this->data['session_id'] = $this->session_id;
-		$this->data['user_session_page'] = $this->data['session_page'];
+		
 		// Redefine some MXP stylish userdata
 		$this->data['session_logged_in'] = $this->data['user_id'] != ANONYMOUS ? 1 : 0;
 		$this->data['is_registered'] = ($this->data['user_id'] != ANONYMOUS && ($this->data['user_type'] == USER_NORMAL || $this->data['user_type'] == USER_FOUNDER)) ? true : false;
@@ -947,19 +947,80 @@ class session
 
 		$session_autologin = (($this->cookie_data['k'] || $persist_login) && $this->data['is_registered']) ? true : false;
 		$set_admin = ($set_admin && $this->data['is_registered']) ? true : false;
+/*
 
-		// Create or update the session
-		$sql_ary = array(
-			'session_user_id'		=> (int) $this->data['user_id'],
-			'session_start'			=> (int) $this->time_now,
-			'session_last_visit'	=> (int) $this->data['session_last_visit'],
-			'session_time'			=> (int) $this->time_now,
-			'session_browser'		=> (string) substr($this->browser, 0, 149),
-			'session_forwarded_for'	=> (string) $this->forwarded_for,
-			'session_ip'			=> (string) $this->ip,
-			'session_autologin'		=> ($session_autologin) ? 1 : 0,
-			'session_admin'			=> ($set_admin) ? 1 : 0,
-			'session_viewonline'	=> ($viewonline) ? 1 : 0,
+*/		
+		$data_ary = array('user_id'				=> (int) $this->data['user_id'],
+						'user_type' 			=> $this->data['user_type'],
+						'group_id' 				=> (int) $this->data['group_id'],
+						'user_permissions' 		=> $this->data['user_permissions'],  //'000pa800000o13ydmo000000 hwby9w000000 hwby9w000000'
+						'user_perm_from' 		=> (int) $this->data['user_perm_from'],
+						'user_ip'				=> (int) $this->data['user_ip'],
+						'user_regdate' 			=> (int) $this->data['user_regdate'],
+						'username' 				=> $this->data['username'],
+						'username_clean' 		=> $this->data['username_clean'],
+						'user_password'			=> $this->data['user_password'],
+						'user_passchg'			=> (int) $this->data['user_passchg'],
+						'user_email' 			=> $this->data['user_email'],
+						'user_birthday' 		=> $this->data['user_birthday'],
+						'user_lastvisit' 		=> (int) $this->data['user_lastvisit'],
+						'user_lastmark' 		=> (int) $this->data['user_lastmark'],
+						'user_lastpost_time'	=> (int) $this->data['user_lastpost_time'], 
+						'user_lastpage' 			=> $this->data['user_lastpage'], 
+						'user_last_confirm_key'		=> $this->data['user_last_confirm_key'],
+						'user_last_search' 			=> (int) $this->data['user_last_search'],
+						'user_warnings'				=> (int) $this->data['user_warnings'],
+						'user_last_warning' 		=> (int) $this->data['user_last_warning'], 
+						'user_login_attempts' 		=> (int) $this->data['user_login_attempts'],  
+						'user_inactive_reason' 		=> (int) $this->data['user_inactive_reason'],
+						'user_inactive_time' 		=> (int) $this->data['user_inactive_time'],
+						'user_posts' 				=> (int) $this->data['user_posts'],
+						'user_lang'				 	=> basename($this->data['user_lang']),
+						'user_timezone' 			 => $this->data['user_timezone'],
+						'user_dateformat' 			=> $this->data['user_dateformat'],
+						'user_style'				=> (int) $this->data['user_style'], 
+						'user_rank' 				=> (int) $this->data['user_rank'],  
+						'user_colour' 				=> $this->data['user_colour'],
+						'user_new_privmsg'			=> (int) $this->data['user_new_privmsg'], 
+						'user_unread_privmsg' 		=> (int) $this->data['user_unread_privmsg'],  
+						'user_last_privmsg' 		=> (int) $this->data['user_last_privmsg'],  
+						'user_message_rules' 		=> (int) $this->data['user_message_rules'], 
+						'user_full_folder'			=> $this->data['user_full_folder'], 
+						'user_emailtime'			=> (int) $this->data['user_emailtime'], 
+						'user_topic_show_days' 		=> (int) $this->data['user_topic_show_days'], 
+						'user_topic_sortby_type' 	=> $this->data['user_topic_sortby_type'], 
+						'user_topic_sortby_dir' 	=> $this->data['user_topic_sortby_dir'], 
+						'user_post_show_days' 		=> (int) $this->data['user_post_show_days'],
+						'user_post_sortby_type' 	=> $this->data['user_post_sortby_type'], 
+						'user_post_sortby_dir' 		=> $this->data['user_post_sortby_dir'],
+						'user_notify' 				=> (int) $this->data['user_notify'],
+						'user_notify_pm' 			=> (int) $this->data['user_notify_pm'], 
+						'user_notify_type' 			=> (int) $this->data['user_notify_type'], 
+						'user_allow_pm' 			=> (int) $this->data['user_allow_pm'], 
+						'user_allow_viewonline'		=> (int) $this->data['user_allow_viewonline'], 
+						'user_allow_viewemail'		=> (int) $this->data['user_allow_viewemail'], 
+						'user_allow_massemail' 		=> (int) $this->data['user_allow_massemail'], 
+						'user_options' 				=> (int) $this->data['user_options'],  
+						'user_avatar' 				=> $this->data['user_avatar'],
+						'user_avatar_type' 			=> $this->data['user_avatar_type'],
+						'user_avatar_width' 		=> (int) $this->data['user_avatar_width'], 
+						'user_avatar_height' 		=> (int) $this->data['user_avatar_height'], 
+						'user_sig' 					=> $this->data['user_sig'],
+						'user_sig_bbcode_uid' 		=> $this->data['user_sig_bbcode_uid'],
+						'user_sig_bbcode_bitfield' 	=> $this->data['user_sig_bbcode_bitfield'],
+						'user_jabber' 				=> $this->data['user_jabber'],
+						'user_actkey' 				=> $this->data['user_actkey'],
+						'reset_token' 				=> '',
+						'reset_token_expiration'	=> 0, 
+						'user_newpasswd' 			=> $this->data['user_newpasswd'],
+						'user_form_salt' 			=> $this->data['user_form_salt'],
+						'user_new' 					=> (int) $this->data['user_new'],  
+						'user_reminded' 			=> (int) $this->data['user_reminded'], 
+						'user_reminded_time'		=> (int) $this->data['user_reminded_time'], 
+						'session_last_visit' 		=> (int) $this->data['session_last_visit'], 
+						'session_logged_in' 		=> (int) ($this->data['user_id'] != ANONYMOUS) ? 1 : 0,
+						'is_registered' 			=> (int) ($this->data['user_id'] != ANONYMOUS && ($this->data['user_type'] == USER_NORMAL || $this->data['user_type'] == USER_FOUNDER)) ? true : false,
+						'is_bot' 					=> (int) (!$this->data['is_registered'] && $this->data['user_id'] != ANONYMOUS) ? true : false,
 		);
 
 		if ($this->update_session_page)
@@ -995,10 +1056,29 @@ class session
 		}
 
 		$this->session_id = $this->data['session_id'] = md5($phpBB3->unique_id());
-
-		$sql_ary['session_id'] = (string) $this->session_id;
-		$sql_ary['session_page'] = (string) substr($this->page['page'], 0, 199);
-
+		
+		$sql_ary_session_id 	= (string) $this->session_id;
+		$sql_ary_session_page 	= (string) substr($this->page['page'], 0, 199);
+		
+		// Create or update the session
+		// Create or update the session
+		$sql_ary = array(
+			'session_user_id'				=> (int) $data_ary['user_id'],
+			'session_start'					=> (int) $this->time_now,
+			'session_last_visit'			=> (int) $data_ary['session_last_visit'],
+			'session_time'					=> (int) $this->time_now,
+			
+			'session_browser'				=> (string) substr($this->browser, 0, 149),
+			'session_forwarded_for'			=> (string) $this->forwarded_for,
+			'session_ip'							=> (string) $this->ip,
+			
+			'session_autologin'				=> ($session_autologin) ? 1 : 0,
+			'session_admin'					=> ($set_admin) ? 1 : 0,
+			'session_viewonline'			=> ($viewonline) ? 1 : 0,
+			
+			'session_id' 					=> (string) $sql_ary_session_id,
+			'session_page'					=> (string) $sql_ary_session_page,
+		);
 		$sql = 'INSERT INTO ' . SESSIONS_TABLE . ' ' . $db->sql_build_array('INSERT', $sql_ary);
 		$db->sql_query($sql);
 
@@ -1013,7 +1093,7 @@ class session
 		// refresh data
 		$SID = '?sid=' . $this->session_id;
 		$_SID = $this->session_id;
-		$this->data = array_merge($this->data, $sql_ary);
+		$this->data = array_merge($data_ary, $sql_ary);
 
 		if (!$bot)
 		{
@@ -2204,6 +2284,9 @@ class session
 				mx_message_die(CRITICAL_ERROR, "Could not query database for phpbb_styles info style_id [$style]", "", __LINE__, __FILE__, $sql);
 			}			
 		}
+		
+		$row['imageset_path'] = !isset($row['imageset_path']) && isset($this->theme['imageset_path']) ? $this->theme['imageset_path'] : $this->theme['style_name'];
+		$this->theme['imageset_path'] = isset($row['imageset_path']) && !isset($this->theme['imageset_path']) ? $row['imageset_path'] : $this->theme['style_name'];
 		
 		$this->theme = is_array($this->theme) ? array_merge($this->theme, $row) : $row;
 		$db->sql_freeresult($result);
@@ -3879,6 +3962,9 @@ class session
 				$img_data = '';
 				return $img_data;
 			}
+
+			$img_data['imageset_path'] = !isset($img_data['imageset_path']) && isset($this->theme['imageset_path']) ? $this->theme['imageset_path'] : $this->theme['style_name'];
+			$this->theme['imageset_path'] = isset($img_data['imageset_path']) && !isset($this->theme['imageset_path']) ? $img_data['imageset_path'] : $this->theme['style_name'];
 
 			$img_data['src'] = PHPBB_URL . 'styles/' . $this->theme['imageset_path'] . '/imageset/' . ($this->img_array[$img]['image_lang'] ? $this->img_array[$img]['image_lang'] .'/' : '') . $this->img_array[$img]['image_filename'];
 			$img_data['width'] = isset($this->img_array[$img]['image_width']) ? $this->img_array[$img]['image_width'] : $width;
