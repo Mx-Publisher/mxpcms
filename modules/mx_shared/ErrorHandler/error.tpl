@@ -2,6 +2,7 @@
 $showSourceUri = 'http://localhost/modules/mx_shared/ErrorHandler/showSource.php';
 $showSourcePrev = 10;
 $showSourceNext = 10;
+$errNo = isset($errNo) ? $errNo : 0;
 ?>
 
 <script type="text/javascript">
