@@ -2,8 +2,8 @@
 /**
 *
 * @package Style
-* @version $Id: mx_functions_style.php,v 3.144 2024/04/02 06:94:17 orynider Exp $
-* @copyright (c) 2002-2019 MX-Publisher Project Team
+* @version $Id: mx_functions_style.php, v 3.145 2024/04/15 02:34:17 orynider Exp $
+* @copyright (c) 2002-2024 MX-Publisher Project Team
 * @license http://opensource.org/licenses/gpl-license.php GNU General Public License v2
 * @link http://mxpcms.sourceforge.net/
 * @link https://github.com/Mx-Publisher/mxpcms/
@@ -75,7 +75,7 @@ class mx_Template extends Template
 	var $css_include = array();
 	var $js_include = array();		
 
-	var	$cloned_template_name = 'subSilver';
+	var	$cloned_template_name = 'prosilver';
 	var	$default_template_name = 'subsilver2';
 	
 	var $template_path = 'templates/';
