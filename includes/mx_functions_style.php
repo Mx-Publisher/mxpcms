@@ -3540,6 +3540,7 @@ class mx_user extends mx_session
 			case 'olympus':
 			case 'ascraeus':
 			case 'rhea':
+			case 'proteus':
 			default:
 				$template_name2 = 'subsilver2';	
 				/**/
@@ -3627,9 +3628,11 @@ class mx_user extends mx_session
 		/* include( 'www\templates\prosilver2\prosilver2.cfg' )
 		**/
 		unset($GLOBALS['MX_TEMPLATE_CONFIG']);		
+		
 		$mx_template_config = false;
+		
 		if (@file_exists($mx_root_path . $module_root_path . $this->current_template_path . '/' . $template_name . '.cfg'))
-		{			
+		{
 			include($mx_root_path . $module_root_path . $this->current_template_path . '/' . $template_name . '.cfg');
 		}
 		
