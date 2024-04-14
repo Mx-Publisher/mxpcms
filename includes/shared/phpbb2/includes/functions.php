@@ -6,8 +6,8 @@
  *   copyright            : (C) 2001 The phpBB Group
  *   email                : support@phpbb.com
  *
- *   $Id: functions.php,v 1.7 2023/10/17 15:40:14 orynider Exp $
- *
+ *   $Id: functions.php,v 1.7 2024/04/14 05:40:14 orynider Exp $
+ *   link http://github.com/MX-Publisher
  *
  ***************************************************************************/
 
@@ -27,11 +27,11 @@
 class phpBB2
 {	
 	protected $template;
-	protected $mx_user;
+	protected $user;
 	protected $db;
-	protected $mx_request_vars;
-	protected $mx_cache;
-	protected $board_config;
+	protected $request;
+	protected $cache;
+	protected $config;
 	protected $php_ext;
 	protected $root_path;
 	protected $mx_root_path;
@@ -42,14 +42,14 @@ class phpBB2
 	{
 		global $template, $mx_user, $db, $mx_cache, $mx_request_vars, $board_config, $phpEx, $phpbb_root_path, $mx_root_path, $module_root_path;		
 			
-		$this->template 			= $template;
-		$this->user 				= $mx_user;
-		$this->db 					= $db;
-		$this->request 				= $mx_request_vars;
-		$this->cache 				= $mx_cache;
-		$this->config 				= $board_config;
-		$this->php_ext 				= $phpEx;
-		$this->root_path 			= $mx_root_path;
+		$this->template 				= $template;
+		$this->user 						= $mx_user;
+		$this->db 							= $db;
+		$this->request 					= $mx_request_vars;
+		$this->cache 					= $mx_cache;
+		$this->config 					= $board_config;
+		$this->php_ext 					= $phpEx;
+		$this->root_path 				= $mx_root_path;
 		$this->mx_root_path 		= $mx_root_path;
 		$this->module_root_path 	= $module_root_path;		
 		$this->phpbb_root_path 		= $phpbb_root_path;		
@@ -510,10 +510,10 @@ class phpBB2
 		{
 			return rtrim($str);
 		}
-		
+
 		$php_version = explode('.', PHP_VERSION);
 
-		// php version < 4.1.0
+		// If we are on PHP >= 4.1 we do not need some code
 		if ((int) $php_version[0] < 4 || ((int) $php_version[0] == 4 && (int) $php_version[1] < 1))
 		{
 			while ($str[strlen($str)-1] == $charlist)
@@ -854,6 +854,7 @@ class phpBB2
 			}
 		}
 	}
+	
 	/**
 	 * {@inheritdoc}
 	 */
@@ -2612,8 +2613,15 @@ class phpBB2
 			}
 
 			$img_lang = (file_exists(@phpbb_realpath($phpbb_root_path . $current_template_path . '/images/lang_' . $board_config['default_lang']))) ? $board_config['default_lang'] : 'english';
-
-			while(list($key, $value) = @each($images))
+			
+			/* start Migrating from php5 to php7+ value
+				while(list($key, $value) = @each($images))
+				{
+			with
+				foreach ($images as $key => $value) 
+				{
+			ends Migrating */
+			foreach ($images as $key => $value)		
 			{
 				if (!is_array($value))
 				{
@@ -2621,7 +2629,6 @@ class phpBB2
 				}
 			}
 		}
-
 		return $row;
 	}
 
@@ -2745,8 +2752,8 @@ class phpBB2
 		
 		if (empty($translate) && $board_config['default_lang'] != 'english')
 		{
-			@reset($lang['datetime']);
-			while (list($match, $replace) = @each($lang['datetime']))
+			reset($lang['datetime']);
+			foreach ($lang['datetime'] as $match => $replace)
 			{
 				$translate[$match] = $replace;
 			}
@@ -2754,8 +2761,15 @@ class phpBB2
 		
 		if (empty($translate))
 		{
-			@reset($lang['datetime']);
-			while (list($match, $replace) = @each($lang['datetime']))
+			reset($lang['datetime']);
+			/* start Migrating from php5 to php7+ replace
+				foreach ($lang['datetime'] as $match => $replace) 
+				{
+			with
+				while (list($match, $replace) = each($lang['datetime'])) 
+				{
+			ends Migrating */				
+			foreach ($lang['datetime'] as $match => $replace)
 			{
 				$translate[$match] = $replace;
 			}
