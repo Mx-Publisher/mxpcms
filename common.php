@@ -25,9 +25,9 @@ if (!defined('E_STRICT'))
 //Overwrite config.sys settings
 if (!defined('MX_ENVIRONMENT'))
 {
-	//@define('MX_ENVIRONMENT', 'production');
+	@define('MX_ENVIRONMENT', 'production');
 	@define('MX_DISPLAY_LOAD_TIME', true);
-	@define('MX_ENVIRONMENT', 'development');
+	//@define('MX_ENVIRONMENT', 'development');
 	@define('DEBUG_CONTAINER', true);
 }
 
@@ -371,6 +371,14 @@ if (version_compare(PHP_VERSION, '5.3') < 0)
 	die('You are running an unsupported PHP version. You can ask Support Team for an downgraded version of mx_functions_core.php file. The class deactivated_super_global() require PHP 5.3.0 or higher before trying to install or update to MXP 3.0-RC2+');
 	require($mx_root_path . INCLUDES . 'mx_functions_core_beta.' . $phpEx); // CORE class
 }
+elseif (version_compare(PHP_VERSION, '5.5') < 0)
+{
+	require($mx_root_path . INCLUDES . 'mx_functions_core_beta.' . $phpEx); // CORE class
+}
+elseif (version_compare(PHP_VERSION, '6.0') < 0)
+{
+	require($mx_root_path . INCLUDES . 'mx_functions_core_rc.' . $phpEx); // CORE class
+}
 else
 {
 	require($mx_root_path . INCLUDES . 'mx_functions_core.' . $phpEx); // CORE class
@@ -439,10 +447,19 @@ if( class_exists('phpBB2'))
 }
 $phpBB3 = new phpBB3();
 
-//
 // MX-Publisher Includes - doing the rest
-//
-include_once($mx_root_path . INCLUDES . 'mx_functions.' . $phpEx); // CORE Functions
+if (version_compare(PHP_VERSION, '5.5') < 0)
+{
+	include_once($mx_root_path . INCLUDES . 'mx_functions_beta.' . $phpEx); // CORE Functions for MXP-Beta
+}
+elseif (version_compare(PHP_VERSION, '7.0') < 0)
+{
+	include_once($mx_root_path . INCLUDES . 'mx_functions_rc.' . $phpEx); // CORE Functions for MXP-Beta
+}
+else
+{
+	include_once($mx_root_path . INCLUDES . 'mx_functions.' . $phpEx); // CORE Functions for MXP-Gold
+}
 
 /** /
 $portal_config['portal_backend'] = 'proteus'; //switch to last version
@@ -463,6 +480,14 @@ if (version_compare(PHP_VERSION, '5.3') < 0)
 {
 	die('You are running an unsupported PHP version. You can ask Support Team for an downgraded version of mx_functions_style_beta.php file. The class deactivated_super_global() require PHP 5.3.0 or higher before trying to install or update to MXP 3.0-RC2+');
 	include_once($mx_root_path . INCLUDES . 'mx_functions_style_beta.' . $phpEx); // Styling and sessions
+}
+elseif (version_compare(PHP_VERSION, '5.5') < 0)
+{
+	include_once($mx_root_path . INCLUDES . 'mx_functions_style_beta.' . $phpEx); // Style and Sessions
+}
+elseif (version_compare(PHP_VERSION, '7.0') < 0)
+{
+	include_once($mx_root_path . INCLUDES . 'mx_functions_style_rc.' . $phpEx); 
 }
 else
 {
