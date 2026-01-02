@@ -1222,7 +1222,7 @@ class phpBB3 extends phpBB3_top
 	* Keeped here for refence
 	* added 2013-11-5 by Ory	
 	*/
-	public static function session_lang_click($default = '', $query_string)
+	public static function session_lang_click($default = '', $query_string = '&')
 	{
 		global $db, $mx_user, $phpbb_root_path;
 
