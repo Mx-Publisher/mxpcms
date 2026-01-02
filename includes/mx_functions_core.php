@@ -151,7 +151,19 @@ class mx_cache extends cache
 		$mx_root_path = $this->path;
 		$phpbb_root_path = $this->backend_path; 
 
-		require($this->path . 'includes/sessions/'.$portal_config['portal_backend'].'/core.'. $this->php_ext); 
+		// MX-Publisher Includes - doing the rest
+		if (version_compare(PHP_VERSION, '5.5') < 0)
+		{
+			require($this->path . 'includes/sessions/'.$portal_config['portal_backend'].'/core_beta.'. $this->php_ext); 
+		}
+		elseif (version_compare(PHP_VERSION, '7.0') < 0)
+		{
+			require($this->path . 'includes/sessions/'.$portal_config['portal_backend'].'/core_rc.'. $this->php_ext); 
+		}
+		else
+		{
+			require($this->path . 'includes/sessions/'.$portal_config['portal_backend'].'/core.'. $this->php_ext); 
+		}		
 		
 		//Redirect to upgrade or redefine portal backend path
 		if (!$portal_config['portal_backend_path'])
@@ -449,7 +461,7 @@ class mx_cache extends cache
 			}
 		}
 	}
-
+	
 	/**
 	 * Read.
 	 *
@@ -462,7 +474,68 @@ class mx_cache extends cache
 	 * @param unknown_type $cache
 	 * @return unknown
 	 */
-	public function _read_config(int $id, int $sub_id, int $type, bool $force_query = false)
+	public function _read_config_org($id = 1, $sub_id = 0, $type = MX_CACHE_BLOCK_TYPE, $force_query = false)
+	{
+		global $portal_config, $mx_root_path;
+		
+		switch ($type)
+		{
+			case MX_CACHE_BLOCK_TYPE:
+
+				if ($portal_config['mx_use_cache'] == 1 && !$force_query)
+				{
+					if ( $this->_exists( '_block_' . $id . '_' . $sub_id ) )
+					{
+						$this->block_config = $this->get( '_block_' . $id . '_' . $sub_id );
+					}
+					else
+					{
+						$this->_get_block_config($id, $sub_id);
+						$this->put( '_block_' . $id . '_' . $sub_id,  $this->block_config);
+					}
+				}
+				else
+				{
+					$this->_get_block_config( $id, $sub_id );
+				}
+
+			break;
+
+			case MX_CACHE_PAGE_TYPE:
+				if ($portal_config['mx_use_cache'] == 1 && !$force_query)
+				{
+					if ( $this->_exists( '_page_' . $id ) )
+					{
+						$this->pages_config = $this->get( '_page_' . $id );
+					}
+					else
+					{
+						$this->_get_page_config( $id );
+						$this->put( '_page_' . $id, $this->pages_config );
+					}
+				}
+				else
+				{
+					$this->_get_page_config( $id );
+				}				
+			
+			break;
+		}
+	}
+
+	/**
+	 * Read Mx for php7+
+	 *
+	 * Read page and block data.
+	 *
+	 * @access private
+	 * @param unknown_type $id
+	 * @param unknown_type $sub_id
+	 * @param unknown_type $type
+	 * @param unknown_type $cache
+	 * @return unknown
+	 */
+	public function _read_config(int $id = 1, int $sub_id = 0, int $type = MX_CACHE_BLOCK_TYPE, bool $force_query = false)
 	{
 		global $portal_config, $mx_root_path;
 		
